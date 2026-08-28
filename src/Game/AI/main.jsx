@@ -6,10 +6,21 @@ import {
     providerSupportsModelDiscovery,
     setProviderField,
 } from "./providerConfig.js";
-import { JSON_URLS, readJson } from "../../runtime/assets.js";
-import { chatLanguageDirective, languageDirective } from "../../runtime/i18n.js";
+import { JSON_URLS, loadCountryNames, loadRegionCatalog, readJson } from "../../runtime/assets.js";
+import {
+    chatLanguageDirective,
+    languageDirective,
+    languageDisplayName,
+    resolveChatLanguage,
+} from "../../runtime/i18n.js";
 import { difficultyDirective } from "../../runtime/difficulty.js";
 import { normalizePromptPack } from "./gameplayPrompts.js";
+import {
+    buildFocusedDiplomaticMapContext,
+    classifyDiplomaticTurn,
+    mergeDiplomaticPlan,
+    normalizeDiplomaticCountries,
+} from "./diplomacyRouting.js";
 import {
     buildPromptContext,
     renderTemplate,
@@ -664,7 +675,7 @@ async function callOpenAIStyleChatCompletions({
     let attempt = 1;
     while (attempt <= retries) {
         const requestCustomParams = { ...customParams };
-        if (reasoningMode === "fast") {
+        if (reasoningMode === "fast" || reasoningMode === "balanced") {
             // Background service work (currently UI translation) must not
             // inherit a player's high-reasoning gameplay setting. Some
             // gateways use `reasoning`, others `reasoning_effort`.
@@ -697,7 +708,7 @@ async function callOpenAIStyleChatCompletions({
                 // fell back to non-tool modes, which DID carry it). Providers that
                 // reject the tools+reasoning combination surface the documented
                 // error below and the call retries without it.
-                ...(getReasoningEnabled() && !disableToolReasoning && reasoningMode !== "fast"
+                ...(getReasoningEnabled() && !disableToolReasoning && !["fast", "balanced"].includes(reasoningMode)
                     ? { reasoning_effort: "medium" }
                     : {}),
                 // Thinking-class local models (Qwen3, Seed-OSS) key on
@@ -706,7 +717,7 @@ async function callOpenAIStyleChatCompletions({
                 // fields. Local endpoints only: strict cloud APIs reject
                 // unknown parameters. Sent only when the toggle is ON so a
                 // server-side --enable-thinking default is never overridden.
-                ...(streamLocalEndpoint && getReasoningEnabled() && !disableToolReasoning && reasoningMode !== "fast"
+                ...(streamLocalEndpoint && getReasoningEnabled() && !disableToolReasoning && !["fast", "balanced"].includes(reasoningMode)
                     ? { enable_thinking: true }
                     : {}),
                 // No cap unless a caller asked for a specific budget: omit the field so
@@ -718,6 +729,7 @@ async function callOpenAIStyleChatCompletions({
                 // effort value; avoid sending it to unrelated compatible
                 // models whose schemas may reject the parameter.
                 ...(reasoningMode === "fast" && /grok/i.test(model) ? { reasoning_effort: "low" } : {}),
+                ...(reasoningMode === "balanced" && /grok/i.test(model) ? { reasoning_effort: "medium" } : {}),
                 ...(structuredMode === "tool" && disableToolReasoning ? { reasoning_effort: "none" } : {}),
                 ...(structuredMode === "tool" ? {
                     tools: [{ type: "function", function: {
@@ -1221,9 +1233,10 @@ async function buildAdvisorSystemPrompt() {
     );
 }
 
-export async function buildDiplomaticSystemPrompt(countries, playerCountry) {
+export async function buildDiplomaticSystemPrompt(countries, playerCountry, speakingAs = "", { route = {} } = {}) {
     await ensurePromptsLoaded();
-    const participantList = countries.map((country) => `- ${country}`).join("\n");
+    const normalizedCountries = normalizeDiplomaticCountries(countries);
+    const participantList = normalizedCountries.map((country) => `- ${country.name}`).join("\n");
     const [gameData, actionData, chatData, worldData, eventData, advisorData] = await Promise.all([
         readJson(JSON_URLS.game, { defaultValue: {} }),
         readJson(JSON_URLS.actions, { defaultValue: [] }),
@@ -1233,17 +1246,37 @@ export async function buildDiplomaticSystemPrompt(countries, playerCountry) {
         readJson(JSON_URLS.advisor, { defaultValue: [] }),
     ]);
 
-    const variables = {
-        ...(await buildPromptVariables({
+    const resolvedPlayerCountry = playerCountry || gameData?.country || "";
+    const resolvedSpeaker = speakingAs || normalizedCountries.find((country) => country.name !== resolvedPlayerCountry)?.name || "";
+    const baseVariables = await buildPromptVariables({
             actionData,
             advisorData,
             chatData,
             eventData,
             gameData,
-            speakingAs: countries.find((country) => country !== playerCountry) || "",
+            speakingAs: resolvedSpeaker,
             worldData,
-        })),
+        });
+    const focusedMap = buildFocusedDiplomaticMapContext({
+        game: gameData,
+        participants: normalizedCountries,
+        regions: await loadRegionCatalog().catch(() => []),
+        route,
+        speakingAs: resolvedSpeaker,
+        world: worldData,
+    });
+    const variables = {
+        ...baseVariables,
         chatParticipants: participantList || "",
+        // The exact current thread is already supplied as role-tagged chat
+        // messages. Repeating it twice in the system prompt wasted tokens and
+        // encouraged repetitive replies; retain only a compact cross-chat recap.
+        chatHistory: "The exact ongoing conversation follows this system prompt as chat messages.",
+        chatHistoryLong: baseVariables.chatSummary,
+        language: languageDisplayName(resolveChatLanguage()),
+        respondingPolityName: resolvedSpeaker,
+        worldSummary: focusedMap,
+        worldSummaryNoCity: focusedMap,
     };
     const helperValues = resolveHelperValues(promptPack.helpers, variables);
 
@@ -1253,6 +1286,41 @@ export async function buildDiplomaticSystemPrompt(countries, playerCountry) {
         variables,
     )}\n\n${difficultyDirective(gameData?.difficulty)}`;
 }
+
+const parseDiplomaticPlan = (raw) => {
+    const text = String(raw ?? "").replace(/```(?:json)?/gi, "");
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    if (start === -1 || end <= start) return null;
+    try {
+        const parsed = JSON.parse(text.slice(start, end + 1));
+        return parsed && typeof parsed === "object" ? parsed : null;
+    } catch {
+        return null;
+    }
+};
+
+const planDiplomaticContext = async (message, countries, recentText, signal) => {
+    const participantNames = normalizeDiplomaticCountries(countries).map((country) => country.name);
+    const prompt =
+        `Classify one diplomatic message for a strategy game. Return JSON only with ` +
+        `{"complexity":"low|medium|high","entities":["canonical English country name"]}. ` +
+        `Use high for territorial division, annexation, war planning, borders, or multi-party security settlements; ` +
+        `medium for substantive trade, sanctions, treaties, alliances, or bilateral security; otherwise low. ` +
+        `List only countries materially involved, including countries referred to by pronouns.\n` +
+        `Chat participants: ${participantNames.join(", ") || "none"}\n` +
+        `Recent context: ${String(recentText || "").slice(-1200)}\n` +
+        `Current message: ${message}`;
+    const raw = await callAI(prompt, [
+        { role: "user", parts: [{ text: "Return the routing JSON." }] },
+    ], {
+        languageMode: "none",
+        maxTokens: 256,
+        reasoningMode: "fast",
+        signal,
+    });
+    return parseDiplomaticPlan(raw);
+};
 
 let advisorHistory = [];
 const MAX_LIVE_CHAT_MESSAGES = 24;
@@ -1330,7 +1398,21 @@ function parseReaction(raw) {
 }
 
 export async function sendDiplomaticMessage(playerMessage, speakingAs, countries, opts) {
-    const freshPrompt = await buildDiplomaticSystemPrompt(countries, null, null);
+    const recentText = diplomaticHistory.slice(-6).map((entry) => entry.parts?.[0]?.text || "").join("\n");
+    let route = classifyDiplomaticTurn({ message: playerMessage, recentText, countries });
+    if (route.needsPlanner) {
+        try {
+            const [plan, catalog] = await Promise.all([
+                planDiplomaticContext(playerMessage, countries, recentText, opts?.signal),
+                loadCountryNames().catch(() => []),
+            ]);
+            route = mergeDiplomaticPlan(route, plan, catalog);
+        } catch {
+            // A router failure must never block diplomacy. The deterministic
+            // high-complexity route remains intact and simply uses core parties.
+        }
+    }
+    const freshPrompt = await buildDiplomaticSystemPrompt(countries, null, speakingAs, { route });
 
     diplomaticHistory.push({ role: "user", parts: [{ text: playerMessage }] });
     diplomaticHistory = compactConversationHistory(diplomaticHistory);
@@ -1343,7 +1425,12 @@ export async function sendDiplomaticMessage(playerMessage, speakingAs, countries
     ];
 
     try {
-        const raw = await callAI(freshPrompt, historyWithInstruction, { ...opts, languageMode: "chat" });
+        const raw = await callAI(freshPrompt, historyWithInstruction, {
+            ...opts,
+            languageMode: "chat",
+            maxTokens: route.maxTokens,
+            reasoningMode: route.reasoningMode,
+        });
         const { reply, reaction } = parseReaction(raw);
         diplomaticHistory.push({ role: "model", parts: [{ text: `[${speakingAs}]: ${reply}` }] });
         return { reply, reaction };

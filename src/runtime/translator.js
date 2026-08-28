@@ -21,6 +21,7 @@ import {
   languageDisplayName,
   syncLanguageFromServer,
 } from "./i18n.js";
+import { shouldTranslateUiText } from "./translationFilter.js";
 
 const CACHE_PREFIX = "i18n_cache_";
 const CACHE_LIMIT = 8000;
@@ -41,6 +42,7 @@ const SKIP_SELECTOR = "script, style, noscript, input, textarea, [contenteditabl
 
 let language = DEFAULT_LANGUAGE;
 let cache = new Map();
+let translatedValues = new Set();
 let pending = new Set();
 let inFlight = false;
 let stopped = false;
@@ -93,8 +95,10 @@ const loadCache = () => {
   try {
     const raw = localStorage.getItem(cacheKey());
     cache = new Map(Object.entries(raw ? JSON.parse(raw) : {}));
+    translatedValues = new Set(cache.values());
   } catch {
     cache = new Map();
+    translatedValues = new Set();
   }
 };
 
@@ -140,8 +144,7 @@ const updateProgress = () => {
 // fragments and emoji stay as-is. The authored language is English, so
 // requiring two Latin letters is a safe "has words" test.
 const isTranslatable = (text) => {
-  const trimmed = text.trim();
-  return trimmed.length > 1 && trimmed.length < 3000 && /[A-Za-z]{2}/.test(trimmed);
+  return shouldTranslateUiText(text, language, translatedValues);
 };
 
 const applyToTextNode = (node, translated) => {
@@ -370,6 +373,7 @@ const processQueue = async () => {
             ? result.translations[index].trim()
             : "";
           cache.set(source, translated || source);
+          translatedValues.add(translated || source);
           unsyncedEntries[source] = translated || source;
           pending.delete(source);
         });
@@ -567,6 +571,7 @@ const loadServerPack = async () => {
     for (const [source, translated] of Object.entries(pack ?? {})) {
       if (typeof source === "string" && typeof translated === "string" && !cache.has(source)) {
         cache.set(source, translated);
+        translatedValues.add(translated);
       }
     }
     persistCache();

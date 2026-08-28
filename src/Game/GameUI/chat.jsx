@@ -435,11 +435,13 @@ const ConversationView = ({ chat, playerCountry, gameDate, onDelete, onBack, onM
     const [pendingCountry, setPendingCountry]   = useState(null);
     const [remainingQueue, setRemainingQueue]   = useState([]);
     const [speakingCountry, setSpeakingCountry] = useState(null);
+    const [streamingMessage, setStreamingMessage] = useState(null);
 
     const nextSpeakerIdx    = useRef(0);
     const lastPlayerMessage = useRef("");
     const messagesEndRef    = useRef(null);
     const messagesRef       = useRef(chat.messages ?? []);
+    const requestControllerRef = useRef(null);
 
     useEffect(() => {
         countries.forEach(({ name, code }) => getCountryFlag({ code, name }));
@@ -452,9 +454,11 @@ const ConversationView = ({ chat, playerCountry, gameDate, onDelete, onBack, onM
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chat.id]);
 
+    useEffect(() => () => requestControllerRef.current?.abort(), []);
+
         useEffect(() => {
             messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, [messages, isLoading, phase]);
+        }, [messages, isLoading, phase, streamingMessage]);
 
         const pushMessages = (updated) => {
             messagesRef.current = updated;
@@ -473,8 +477,27 @@ const ConversationView = ({ chat, playerCountry, gameDate, onDelete, onBack, onM
             }
             setIsLoading(true);
             setSpeakingCountry(country);
+            setStreamingMessage(null);
+            const controller = new AbortController();
+            requestControllerRef.current = controller;
+            let wasCancelled = false;
             try {
-                const { reply, reaction } = await sendDiplomaticMessage(playerMessage, country.name, countries);
+                const { reply, reaction } = await sendDiplomaticMessage(playerMessage, country.name, countries, {
+                    signal: controller.signal,
+                    onChunk: (_delta, fullText) => {
+                        const visibleText = String(fullText || "").replace(/\n?REACTION:[^\n]*$/i, "").trim();
+                        if (visibleText) {
+                            setStreamingMessage({
+                                role: "leader",
+                                speaker: country.name,
+                                code: country.code,
+                                text: visibleText,
+                                time: gameDate,
+                            });
+                        }
+                    },
+                });
+                setStreamingMessage(null);
 
                 if (reaction) {
                     const msgs = [...messagesRef.current];
@@ -492,10 +515,21 @@ const ConversationView = ({ chat, playerCountry, gameDate, onDelete, onBack, onM
                     pushMessages([...messagesRef.current, { role: "leader", speaker: country.name, code: country.code, text: reply, time: gameDate }]);
                 }
             } catch (err) {
-                pushMessages([...messagesRef.current, { role: "error", speaker: country.name, code: country.code, text: err.message, time: gameDate }]);
+                wasCancelled = controller.signal.aborted || err?.name === "AbortError";
+                if (!wasCancelled) {
+                    pushMessages([...messagesRef.current, { role: "error", speaker: country.name, code: country.code, text: err.message, time: gameDate }]);
+                }
             } finally {
+                if (requestControllerRef.current === controller) requestControllerRef.current = null;
                 setIsLoading(false);
                 setSpeakingCountry(null);
+                setStreamingMessage(null);
+            }
+            if (wasCancelled) {
+                setPendingCountry(null);
+                setRemainingQueue([]);
+                setPhase("player");
+                return;
             }
             if (queueAfter.length > 0) {
                 offerNextCountry(queueAfter);
@@ -622,11 +656,19 @@ const ConversationView = ({ chat, playerCountry, gameDate, onDelete, onBack, onM
                 </p>
             )}
             {messages.map((msg, i) => <MessageBubble key={i} msg={msg} chatCountries={countries} />)}
-            {isLoading && typingSpeaker && <TypingBubble speaker={typingSpeaker.name} code={typingSpeaker.code} />}
+            {streamingMessage && <MessageBubble msg={streamingMessage} chatCountries={countries} />}
+            {isLoading && !streamingMessage && typingSpeaker && <TypingBubble speaker={typingSpeaker.name} code={typingSpeaker.code} />}
             <div ref={messagesEndRef} />
             </div>
 
-            {phase === "pending" && !isLoading && pendingCountry ? (
+            {isLoading ? (
+                <div style={{ padding: "0.75rem 1rem 0.9rem", borderTop: "1px solid rgba(255,255,255,0.07)", backgroundColor: "rgba(0,0,0,0.15)", flexShrink: 0 }}>
+                <button
+                onClick={() => requestControllerRef.current?.abort(new DOMException("Diplomatic reply cancelled", "AbortError"))}
+                style={{ width: "100%", padding: "0.58rem 0.7rem", borderRadius: "10px", border: "1px solid rgba(239,68,68,0.35)", background: "rgba(239,68,68,0.12)", color: "#fca5a5", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer", fontFamily: "sans-serif" }}
+                >Cancel response</button>
+                </div>
+            ) : phase === "pending" && pendingCountry ? (
                 <div style={{ padding: "0.75rem 1rem 0.9rem", borderTop: "1px solid rgba(255,255,255,0.07)", backgroundColor: "rgba(0,0,0,0.15)", flexShrink: 0 }}>
                 <p style={{ margin: "0 0 0.55rem 0", fontSize: "0.78rem", color: "rgba(255,255,255,0.35)", textAlign: "center" }}>
                 <CountryTurnLabel country={pendingCountry} remaining={remainingQueue.length} />
