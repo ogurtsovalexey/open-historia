@@ -656,6 +656,7 @@ async function callOpenAIStyleChatCompletions({
     allowJsonSchemaFallback = false,
     maxTokens,
     tokenLimitField = "max_tokens",
+    reasoningMode,
 }) {
     let structuredMode = tool ? "tool" : "text";
     let disableToolReasoning = false;
@@ -663,6 +664,13 @@ async function callOpenAIStyleChatCompletions({
     let attempt = 1;
     while (attempt <= retries) {
         const requestCustomParams = { ...customParams };
+        if (reasoningMode === "fast") {
+            // Background service work (currently UI translation) must not
+            // inherit a player's high-reasoning gameplay setting. Some
+            // gateways use `reasoning`, others `reasoning_effort`.
+            delete requestCustomParams.reasoning;
+            delete requestCustomParams.reasoning_effort;
+        }
         if (disableToolReasoning) {
             delete requestCustomParams.reasoning;
         }
@@ -689,18 +697,27 @@ async function callOpenAIStyleChatCompletions({
                 // fell back to non-tool modes, which DID carry it). Providers that
                 // reject the tools+reasoning combination surface the documented
                 // error below and the call retries without it.
-                ...(getReasoningEnabled() && !disableToolReasoning ? { reasoning_effort: "medium" } : {}),
+                ...(getReasoningEnabled() && !disableToolReasoning && reasoningMode !== "fast"
+                    ? { reasoning_effort: "medium" }
+                    : {}),
                 // Thinking-class local models (Qwen3, Seed-OSS) key on
                 // enable_thinking, not reasoning_effort — textgen/oobabooga
                 // honors it per-request, llama.cpp/LM Studio ignore unknown
                 // fields. Local endpoints only: strict cloud APIs reject
                 // unknown parameters. Sent only when the toggle is ON so a
                 // server-side --enable-thinking default is never overridden.
-                ...(streamLocalEndpoint && getReasoningEnabled() && !disableToolReasoning ? { enable_thinking: true } : {}),
+                ...(streamLocalEndpoint && getReasoningEnabled() && !disableToolReasoning && reasoningMode !== "fast"
+                    ? { enable_thinking: true }
+                    : {}),
                 // No cap unless a caller asked for a specific budget: omit the field so
                 // the provider uses the model's own maximum (long turns aren't truncated).
                 ...(Number(maxTokens) > 0 ? { [tokenLimitField]: Number(maxTokens) } : {}),
                 ...requestCustomParams,
+                // Grok defaults can still spend substantial time reasoning
+                // when the field is omitted. It supports the explicit low
+                // effort value; avoid sending it to unrelated compatible
+                // models whose schemas may reject the parameter.
+                ...(reasoningMode === "fast" && /grok/i.test(model) ? { reasoning_effort: "low" } : {}),
                 ...(structuredMode === "tool" && disableToolReasoning ? { reasoning_effort: "none" } : {}),
                 ...(structuredMode === "tool" ? {
                     tools: [{ type: "function", function: {

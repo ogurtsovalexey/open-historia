@@ -5,7 +5,7 @@
 //
 // 1. A one-time PRE-TRANSLATION pass per language: on boot (and after
 //    switching languages) every string the game can show — the rendered DOM,
-//    scenario/game catalogs, country and polity names, region names, events,
+//    scenario/game catalogs, country and polity names, events,
 //    difficulty labels, Community-hub posts — is translated up front, with a
 //    progress pill, and cached in localStorage. After the pass, menus and
 //    tabs open already-translated: cached strings are applied synchronously
@@ -25,7 +25,10 @@ import {
 const CACHE_PREFIX = "i18n_cache_";
 const CACHE_LIMIT = 8000;
 const BATCH_SIZE = 60;
-const MAX_CONCURRENT_BATCHES = 3;
+// Translation is background housekeeping, not part of the game turn. Keep it
+// strictly serial so it cannot occupy all of a cloud provider's request slots
+// while the player is waiting for the advisor or simulation.
+const MAX_CONCURRENT_BATCHES = 1;
 const SCAN_DEBOUNCE_MS = 350;
 const MAX_CONSECUTIVE_FAILURES = 3;
 const TRANSLATED_ATTRIBUTES = ["placeholder", "title", "aria-label"];
@@ -320,7 +323,11 @@ const translateBatch = async (strings) => {
 
   const raw = await callAI(systemPrompt, [
     { role: "user", parts: [{ text: JSON.stringify(strings) }] },
-  ], { languageMode: "none" });
+  ], {
+    languageMode: "none",
+    reasoningMode: "fast",
+    maxTokens: 4096,
+  });
   const translations = extractJsonArray(raw);
 
   if (!translations) {
@@ -466,12 +473,10 @@ const collectCatalogStrings = async () => {
     }
   } catch { /* hub unreachable — translate live when opened */ }
 
-  // Region names — the big set (tags, owned-region pills, event impacts).
-  // Queued last so the visible UI translates first.
-  try {
-    const { loadRegionCatalog } = await import("./assets.js");
-    (await loadRegionCatalog().catch(() => [])).forEach((region) => add(region?.name));
-  } catch { /* optional */ }
+  // Do not pre-translate the full region catalog. It contains thousands of
+  // proper names and used to launch several expensive AI calls at game start,
+  // delaying actual gameplay. Visible names still use the shipped/server pack
+  // and genuinely missing UI text is translated lazily by the DOM observer.
 };
 
 // ---- public lookups (map labels, proactive callers) ----
