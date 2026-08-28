@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import { JSON_URLS, getNationTags, loadRegionCatalog, readJson } from "../../runtime/assets.js";
 import { resolveAllCountryTags, resolveCountryTags } from "../../runtime/countryTags.js";
 import { toCountryName } from "../../runtime/ownerNames.js";
+import { buildCampaignMemoryText } from "../../runtime/campaignMemory.js";
 import {
   buildActionDisplayText,
   isPolityLandless,
@@ -47,7 +48,7 @@ export const getUnconsolidatedEvents = (events, world) => {
   return boundaryIndex >= 0 ? normalizedEvents.slice(boundaryIndex + 1) : normalizedEvents;
 };
 
-export const buildEventHistoryText = (events, { limit = 10, world = null } = {}) => {
+export const buildEventHistoryText = (events, { includeIds = false, limit = 10, world = null } = {}) => {
   const normalizedEvents = world ? getUnconsolidatedEvents(events, world) : normalizeEvents(events);
   if (normalizedEvents.length === 0) {
     return "No unconsolidated events have been recorded yet.";
@@ -77,7 +78,7 @@ export const buildEventHistoryText = (events, { limit = 10, world = null } = {})
       }
 
       return [
-        `- ${date}: ${event.title}`,
+        `- ${includeIds ? `[event ${event.id}] ` : ""}${date}: ${event.title}`,
         description ? `  ${description}` : "",
         impactNotes.length > 0 ? `  ${impactNotes.join(" | ")}` : "",
       ].filter(Boolean).join("\n");
@@ -94,7 +95,7 @@ export const buildConsolidatedHistoryText = (world) => {
     .join("\n\n");
 };
 
-export const buildCampaignHistoryText = (events, world, { limit = 24 } = {}) => [
+export const buildCampaignHistoryText = (events, world, { limit = 60 } = {}) => [
   "STORY SO FAR:",
   buildConsolidatedHistoryText(world),
   "",
@@ -113,12 +114,12 @@ export const buildChatSummaryText = (chats, { limit = 4 } = {}) => {
   }).join("\n");
 };
 
-export const buildDetailedChatHistoryText = (chats, { limit = 8, messageLimit = 10 } = {}) => {
+export const buildDetailedChatHistoryText = (chats, { includeIds = false, limit = 8, messageLimit = 10 } = {}) => {
   const normalizedChats = normalizeChats(chats);
   if (normalizedChats.length === 0) return "No chats occurred in these rounds.";
 
   return normalizedChats.slice(0, limit).map((chat, index) => {
-    const header = `Chat ${index + 1}: ${chat.countries.map((country) => country.name).join(", ")}`;
+    const header = `Chat ${index + 1}${includeIds ? ` [chat ${chat.id}]` : ""}: ${chat.countries.map((country) => country.name).join(", ")}`;
     const body = chat.messages.length > 0
       ? chat.messages.slice(-messageLimit).map((message) => `${message.speaker || message.role}: ${message.text}`).join("\n")
       : "No messages yet.";
@@ -145,14 +146,19 @@ export const buildAdvisorHistoryText = (messages, { limit = 18 } = {}) => {
 // actions — and because this history is interpolated into the prompt more than
 // once, it was pasted in repeatedly. Events were always capped (eventLimit /
 // longEventLimit); actions simply never were. Matching longEventLimit here.
-export const ACTION_HISTORY_LIMIT = 24;
+export const ACTION_HISTORY_LIMIT = 48;
 
-export const buildActionHistoryText = (actions, { includeResolved = false, limit = ACTION_HISTORY_LIMIT } = {}) => {
+export const buildActionHistoryText = (actions, {
+  includeIds = false,
+  includeResolved = false,
+  limit = ACTION_HISTORY_LIMIT,
+} = {}) => {
   const normalizedActions = normalizeActions(actions);
   const renderAction = (action) => {
     const kindLabel = action.kind === "chat" ? "chat" : "action";
     const statusLabel = action.status !== "planned" ? ` [${action.status}]` : "";
-    return `- (${kindLabel}) ${action.title}${statusLabel}: ${buildActionDisplayText(action)}`;
+    const idLabel = includeIds && action.id ? ` [action ${action.id}]` : "";
+    return `- (${kindLabel})${idLabel} ${action.title}${statusLabel}: ${buildActionDisplayText(action)}`;
   };
 
   if (!includeResolved) {
@@ -456,7 +462,7 @@ export const buildPromptContext = async (bundle, {
   eventLimit = 10,
   eventsToConsolidate = "",
   gameMasterRequest = "",
-  longEventLimit = 24,
+  longEventLimit = 60,
   respondingPolityName = "",
   targetDate = "",
 } = {}) => {
@@ -490,6 +496,7 @@ export const buildPromptContext = async (bundle, {
       ? `${Math.min(100, normalizeArray(bundle.world.activeCatalyst.history).length * 50)}%`
       : "0%",
     catalystPremise,
+    campaignMemory: buildCampaignMemoryText(bundle.world?.campaignMemory),
     citiesSummary,
     chat: JSON.stringify(unconsolidatedChats),
     chatHistory: currentChat?.messages?.map((message) => `${message.speaker || message.role}: ${message.text}`).join("\n") || "No chat history.",

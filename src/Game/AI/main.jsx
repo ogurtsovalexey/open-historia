@@ -1166,10 +1166,16 @@ async function buildPromptVariables({
         world: worldData,
     }, {
         eventLimit: 16,
-        longEventLimit: 24,
+        longEventLimit: 60,
         respondingPolityName: speakingAs,
     });
 }
+
+const appendDurableCampaignMemory = (prompt, variables) => {
+    const memory = String(variables?.campaignMemory ?? "").trim();
+    if (!memory || memory.startsWith("No durable ")) return prompt;
+    return `${prompt}\n\n[Durable Campaign Memory — Binding Canon]\n${memory}\nTreat every ACTIVE fact as true and causally binding. Do not silently undo or forget it. Broken/resolved/superseded facts remain historical context but are no longer in force.`;
+};
 
 async function buildAdvisorSystemPrompt() {
     await ensurePromptsLoaded();
@@ -1192,7 +1198,10 @@ async function buildAdvisorSystemPrompt() {
     });
     const helperValues = resolveHelperValues(promptPack.helpers, variables);
 
-    return renderTemplate(promptPack.advisor, { ...variables, ...helperValues });
+    return appendDurableCampaignMemory(
+        renderTemplate(promptPack.advisor, { ...variables, ...helperValues }),
+        variables,
+    );
 }
 
 export async function buildDiplomaticSystemPrompt(countries, playerCountry) {
@@ -1222,7 +1231,10 @@ export async function buildDiplomaticSystemPrompt(countries, playerCountry) {
     const helperValues = resolveHelperValues(promptPack.helpers, variables);
 
     // Leaders negotiate as softly or ruthlessly as the chosen difficulty.
-    return `${renderTemplate(promptPack.leader, { ...variables, ...helperValues })}\n\n${difficultyDirective(gameData?.difficulty)}`;
+    return `${appendDurableCampaignMemory(
+        renderTemplate(promptPack.leader, { ...variables, ...helperValues }),
+        variables,
+    )}\n\n${difficultyDirective(gameData?.difficulty)}`;
 }
 
 let advisorHistory = [];

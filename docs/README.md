@@ -23,6 +23,7 @@ New to the codebase? Read **[Architecture Overview](architecture.md)** first —
 - [AI System Overview](ai-overview.md) — Transport/provider dispatch, key/relay security, streaming vs buffered, token caps, and the `runJsonTask` strict/salvage task pipeline.
 - [Prompt-Making Guide](ai-prompts.md) — The reference for authoring and editing AI prompts: every variable, all tasks, end-to-end assembly, and the override/frozen-prompt model.
 - [AI Return Schemas & Validation](ai-schemas.md) — AI JSON return schemas, the two-layer validator, and the `runJsonTask` strict/salvage retry discipline.
+- [Durable Campaign Memory](campaign-memory.md) — Evidence-backed long-term facts, consolidation operations, prompt injection, retention limits, compatibility, and the in-game audit view.
 
 ### Editor
 - [Map Editor](map-editor.md) — The OpenLayers map editor: tools, region/owner/flag/tag editing, tier-1/tier-2 game-seed export, and how edits reach the game.

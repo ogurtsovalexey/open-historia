@@ -14,6 +14,41 @@ const stringArraySchema = (description) => ({
   items: { type: "string" },
 });
 
+const campaignMemoryOperationSchema = {
+  type: "object",
+  description: "One evidence-backed update to the durable campaign canon.",
+  properties: {
+    op: {
+      type: "string",
+      enum: ["upsert", "resolve"],
+      description: "upsert creates or refreshes a fact; resolve closes an existing fact by id.",
+    },
+    id: textSchema("Stable fact id. Reuse the exact existing id when updating or resolving a fact; blank lets the engine derive one for a new upsert."),
+    category: {
+      type: "string",
+      enum: [
+        "alliance", "ceasefire", "crisis", "debt", "divergence", "grievance",
+        "leader", "occupation", "policy", "promise", "regime", "relationship",
+        "territorial", "trade", "treaty", "war", "other",
+      ],
+    },
+    statement: textSchema("Self-contained statement of the durable fact and its consequences."),
+    parties: stringArraySchema("Exact polity/person names materially involved in the fact."),
+    status: {
+      type: "string",
+      enum: ["active", "broken", "resolved", "superseded"],
+    },
+    sinceDate: textSchema("Date the fact began, or an empty string when unknown."),
+    endedDate: textSchema("Date the fact ended, or an empty string while active."),
+    evidenceIds: stringArraySchema("One or more exact event/chat/action ids from the supplied consolidation batch."),
+  },
+  required: [
+    "op", "id", "category", "statement", "parties", "status",
+    "sinceDate", "endedDate", "evidenceIds",
+  ],
+  additionalProperties: false,
+};
+
 const actionSchema = {
   type: "object",
   description: "One concrete action the player can take.",
@@ -609,8 +644,13 @@ export const EVENT_CONSOLIDATOR_SCHEMA = {
   description: "A continuity-safe summary of the supplied events and diplomatic chats.",
   properties: {
     summary: textSchema("Concise campaign history preserving major events, map changes, and diplomatic commitments."),
+    memoryOps: {
+      type: "array",
+      description: "Evidence-backed durable facts created, refreshed, or resolved by this batch. Empty when the batch changes no lasting fact.",
+      items: campaignMemoryOperationSchema,
+    },
   },
-  required: ["summary"],
+  required: ["summary", "memoryOps"],
   additionalProperties: false,
 };
 

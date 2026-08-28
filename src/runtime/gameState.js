@@ -4,6 +4,7 @@ import { enqueueContentStrings } from "./translator.js";
 import { normalizeTagList } from "./countryTags.js";
 import { dedupeEventLog } from "./eventDedup.js";
 import { toCountryName } from "./ownerNames.js";
+import { normalizeCampaignMemory } from "./campaignMemory.js";
 
 export const GAME_DEFAULTS = {
   country: "",
@@ -17,6 +18,10 @@ export const GAME_DEFAULTS = {
 export const WORLD_DEFAULTS = {
   actionSuggestions: [],
   activeCatalyst: null,
+  // Evidence-backed durable facts extracted when old events and chats are
+  // consolidated. Unlike narrative summaries, facts are updated by operations,
+  // so one weak consolidation cannot silently erase the campaign's canon.
+  campaignMemory: { version: 1, facts: [] },
   consolidatedHistory: [],
   // Per-polity international reputation (0-100), evolved by the AI each turn via
   // polityChanges and fed back into prompts. Authoritative, unlike the on-demand
@@ -993,6 +998,7 @@ export const normalizeWorldState = (world) => {
     countryStats,
     actionSuggestions: normalizeActionSuggestions(nextWorld.actionSuggestions),
     activeCatalyst: normalizeCatalyst(nextWorld.activeCatalyst),
+    campaignMemory: normalizeCampaignMemory(nextWorld.campaignMemory),
     consolidatedHistory: normalizeConsolidatedHistory(nextWorld.consolidatedHistory),
     internationalReputation,
     labelFont: normalizeOptionalString(nextWorld.labelFont),

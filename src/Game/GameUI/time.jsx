@@ -1117,6 +1117,7 @@ const TimelineSkipPanel = ({
 
 const TimelineHistoryPanel = ({
     isOpen,
+    memoryFacts = [],
     onRevealNextEvent,
     onRevealAll,
     lookups,
@@ -1218,6 +1219,53 @@ const TimelineHistoryPanel = ({
                 </>
             )}
             </div>
+        )}
+        {memoryFacts.length > 0 && (
+            <details
+            style={{
+                background: "rgba(30,41,59,0.42)",
+                border: "1px solid rgba(147,197,253,0.2)",
+                borderRadius: "12px",
+                marginTop: "0.85rem",
+                padding: "0.65rem 0.75rem",
+            }}
+            >
+            <summary
+            style={{
+                color: "#bfdbfe",
+                cursor: "pointer",
+                fontSize: "0.76rem",
+                fontWeight: 700,
+                letterSpacing: "0.04em",
+            }}
+            >
+            Campaign memory ({memoryFacts.length})
+            </summary>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginTop: "0.65rem" }}>
+            {memoryFacts.map((fact) => (
+                <div
+                key={fact.id}
+                style={{
+                    borderLeft: fact.status === "active" ? "2px solid #60a5fa" : "2px solid rgba(148,163,184,0.55)",
+                    color: fact.status === "active" ? "rgba(255,255,255,0.88)" : "rgba(203,213,225,0.7)",
+                    fontSize: "0.73rem",
+                    lineHeight: 1.45,
+                    paddingLeft: "0.6rem",
+                }}
+                >
+                <div style={{ color: "rgba(147,197,253,0.8)", fontSize: "0.64rem", textTransform: "uppercase" }}>
+                {fact.category} · {fact.status}{fact.sinceDate ? ` · ${fact.sinceDate}` : ""}
+                </div>
+                <div>{fact.statement}</div>
+                {fact.parties?.length > 0 && (
+                    <div style={{ color: "rgba(203,213,225,0.55)", fontSize: "0.66rem", marginTop: "0.15rem" }}>
+                    {fact.parties.join(" · ")}
+                    </div>
+                )}
+                </div>
+            ))}
+            </div>
+            </details>
         )}
         </PanelChrome>
     );
@@ -1650,6 +1698,7 @@ const DateWidget = ({
         />
         <TimelineHistoryPanel
         isOpen={openPanel === "history"}
+        memoryFacts={worldState?.campaignMemory?.facts ?? []}
         onRevealNextEvent={revealNextEvent}
         onRevealAll={revealAllEvents}
         lookups={lookups}

@@ -44,6 +44,7 @@ import {
 import { dedupeGeneratedEvents } from "../../runtime/eventDedup.js";
 import { difficultyDirective } from "../../runtime/difficulty.js";
 import { MAP_SETTING_KEYS, getMapSetting } from "../../runtime/mapSettings.js";
+import { applyCampaignMemoryOps } from "../../runtime/campaignMemory.js";
 
 const CHAT_HINT_PATTERNS = [
   /\bchat\b/i,
@@ -402,6 +403,20 @@ const runJsonTask = async (taskKey, {
     ...helperValues,
   });
 
+  // Durable campaign canon is independent of the editable/frozen prompt pack.
+  // Inject it at call time so old saves and community scenarios benefit without
+  // rewriting their prompts.json. It complements the narrative history: these
+  // are standing facts the model must treat as binding until explicitly closed.
+  const memoryAwareTasks = new Set([
+    "actions", "autoJumpForward", "catalystCreation", "catalystExecutor",
+    "catalystSummary", "countryStatSheet", "eventConsolidator", "gameMaster",
+    "idleDiplomacy", "jumpForward",
+  ]);
+  const durableMemory = normalizeString(variables?.campaignMemory);
+  if (memoryAwareTasks.has(taskKey) && durableMemory && !durableMemory.startsWith("No durable ")) {
+    systemPrompt = `${systemPrompt}\n\n[Durable Campaign Memory — Binding Canon]\n${durableMemory}\nTreat every ACTIVE fact above as true and causally binding. Do not silently undo, contradict, or forget it. A broken/resolved/superseded fact remains historical context but is no longer in force.`;
+  }
+
   // The chosen difficulty steers every simulation task (see runtime/difficulty.js).
   try {
     const game = await readGameData();
@@ -443,7 +458,7 @@ const runJsonTask = async (taskKey, {
   // is gone from the campaign for good. Existing games carry frozen prompts, so
   // both the instruction and the order list have to arrive at call time.
   if (taskKey === "eventConsolidator") {
-    systemPrompt = `${systemPrompt}\n\n[Durable Canon]\nThis summary REPLACES the material it covers: once consolidated, those events, conversations and player orders are never sent to the simulation again, so whatever you omit is lost permanently. Carry forward explicitly, as standing facts rather than narration:\n1. How this world has DIVERGED from real history — states that never formed, wars that never happened, rulers who never fell, borders that never moved. Name them. A later model that sees only a gap fills it from real history and invents powers this campaign does not contain.\n2. The lasting CONSEQUENCES of the player's own orders, not the orders themselves.\n3. Commitments still in force: treaties, alliances, occupations, debts, standing grievances.\nBrevity matters, but never at the cost of a divergence or a commitment that is still true.`;
+    systemPrompt = `${systemPrompt}\n\n[Durable Canon]\nThis summary REPLACES the material it covers: once consolidated, those events, conversations and player orders are never sent to the simulation again, so whatever you omit is lost permanently. Aim for roughly 800–1200 words when the material warrants it; brevity must never erase a divergence or commitment. Carry forward explicitly:\n1. How this world DIVERGED from real history — states that never formed, wars that never happened, rulers who never fell, borders that never moved.\n2. The lasting CONSEQUENCES of the player's own orders, not merely the order text.\n3. Commitments and pressures still in force: treaties, alliances, wars, occupations, promises, debts, trade arrangements, grievances and unresolved crises.\n\nAlso return memoryOps. Use upsert for each new or materially changed durable fact and resolve only when this batch ends/breaks/supersedes an existing fact. Every operation MUST cite one or more exact [event ...], [chat ...], or [action ...] ids from the supplied batch in evidenceIds. Never invent an evidence id. Reuse an existing fact's exact id when updating or resolving it; leave id blank only for a genuinely new upsert. Do not copy transient color into memory.`;
     const resolvedOrders = normalizeString(variables?.actionsToConsolidate);
     if (resolvedOrders && !resolvedOrders.startsWith("No ")) {
       systemPrompt = `${systemPrompt}\n\n[Player Orders Being Consolidated]\nThese are the player's own resolved orders for the period covered by this summary. Record what they CHANGED about the world; the order text itself is being discarded.\n${resolvedOrders}`;
@@ -612,9 +627,9 @@ const runJsonTask = async (taskKey, {
 };
 
 const CONSOLIDATION_INTERVAL_ROUNDS = 5;
-const CONSOLIDATION_RETAIN_EVENTS = 24;
-const CONSOLIDATION_SIZE_THRESHOLD = 48;
-const CONSOLIDATION_BATCH_SIZE = 60;
+const CONSOLIDATION_RETAIN_EVENTS = 60;
+const CONSOLIDATION_SIZE_THRESHOLD = 96;
+const CONSOLIDATION_BATCH_SIZE = 80;
 
 const consolidateHistoryBatch = async (bundle, events, chats, actions = []) => {
   const variables = await buildTemplateVariables(bundle, {
@@ -625,14 +640,23 @@ const consolidateHistoryBatch = async (bundle, events, chats, actions = []) => {
     // player hit exactly that — a 1920s Europe with no WW1 and a surviving Tsar
     // started growing a Soviet Union that never existed.
     actionsToConsolidate: buildActionHistoryText(actions, {
+      includeIds: true,
       includeResolved: true,
       limit: actions.length || 1,
     }),
-    chatsToConsolidate: buildDetailedChatHistoryText(chats, { limit: chats.length || 1, messageLimit: 100 }),
-    eventsToConsolidate: buildEventHistoryText(events, { limit: events.length || 1 }),
+    chatsToConsolidate: buildDetailedChatHistoryText(chats, {
+      includeIds: true,
+      limit: chats.length || 1,
+      messageLimit: 100,
+    }),
+    eventsToConsolidate: buildEventHistoryText(events, {
+      includeIds: true,
+      limit: events.length || 1,
+    }),
   });
   const { generation, payload } = await runJsonTask("eventConsolidator", {
     fallback: () => ({
+      memoryOps: [],
       summary: [
         events.map((event) => `${event.date || "undated"} ${event.title}: ${event.description}`).join("; "),
         buildChatSummaryText(chats, { limit: chats.length || 1 }),
@@ -643,7 +667,11 @@ const consolidateHistoryBatch = async (bundle, events, chats, actions = []) => {
     userMessage: "Consolidate the supplied campaign history with the required tool.",
     variables,
   });
-  return { generation, summary: normalizeString(payload?.summary) };
+  return {
+    generation,
+    memoryOps: normalizeArray(payload?.memoryOps),
+    summary: normalizeString(payload?.summary),
+  };
 };
 
 const compactHistoryIfNeeded = async (bundle) => {
@@ -670,7 +698,7 @@ const compactHistoryIfNeeded = async (bundle) => {
     .filter((action) => action.status !== "planned" && action.id && !priorActionIds.has(action.id))
     .slice(0, CONSOLIDATION_BATCH_SIZE);
 
-  const { generation, summary } = await consolidateHistoryBatch(
+  const { generation, memoryOps, summary } = await consolidateHistoryBatch(
     bundle,
     eventsToConsolidate,
     closedChats,
@@ -678,9 +706,20 @@ const compactHistoryIfNeeded = async (bundle) => {
   );
   if (!summary) return world;
   const throughEvent = eventsToConsolidate.at(-1);
+  const evidenceIds = [
+    ...eventsToConsolidate.map((event) => event.id),
+    ...closedChats.map((chat) => chat.id),
+    ...actionsToConsolidate.map((action) => action.id),
+  ].filter(Boolean);
+  const campaignMemory = applyCampaignMemoryOps(world.campaignMemory, memoryOps, {
+    allowedEvidenceIds: evidenceIds,
+    currentDate: throughEvent?.date || bundle.game.gameDate,
+    currentRound: bundle.game.round,
+  });
 
   return normalizeWorldState({
     ...world,
+    campaignMemory,
     consolidatedHistory: [
       ...world.consolidatedHistory,
       {
