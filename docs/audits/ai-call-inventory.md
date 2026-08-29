@@ -194,9 +194,10 @@ planner (`main.jsx:1318`) and translation batches (`translator.js:331`,
 `main.jsx:678-684`) request `"fast"` (which also strips gateway reasoning
 params for translation). `maxTokens` per call: advisor 8192 (`main.jsx:1352`),
 diplomacy 1024/4096/12000 by regex route (`diplomacyRouting.js:41-71`),
-planner 256, `nextSpeaker` 256, translation 4096; every structured task
-uncapped (see §2.1). The `anthropicModelMax` map (`main.jsx:914`) is the only
-model-behavior learning cache.
+planner 256, `nextSpeaker` 256 (`gameplay.js:1935`), translation 4096; every
+structured task **except `nextSpeaker`** is uncapped (see §2.1). The
+`anthropicModelMax` map (`main.jsx:914`) is the only model-behavior learning
+cache.
 
 ---
 
@@ -276,7 +277,12 @@ abort is never hit):
 | Gemini | 1 | 3 | 6 |
 | OpenAI (native) | up to 2 (tool → tool without reasoning) | 3 | 8 |
 | OpenAI-compatible | up to 5 (tool, no-reasoning, json_schema, json_object, text_json) | 3 | 14 |
-| Anthropic / compatible | 1 + up to 1 ceiling-learn repeat per attempt | 3 | 10 |
+| Anthropic / compatible | 1 | 3 | 6 |
+
+The Anthropic ceiling-learn path is not an extra request inside an attempt:
+the 400 `max_tokens` response `continue`s the `for` loop and consumes that
+attempt, so each `callAI` invocation makes at most 3 Anthropic requests
+(`main.jsx:956-1001`, `:1063-1105`).
 
 Latency risk is also cost risk here; there is no streaming/partial-progress
 for structured tasks (buffered only).
