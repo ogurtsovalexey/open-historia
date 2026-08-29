@@ -61,6 +61,14 @@ Rules:
   cross-module or high-correctness cases.
 - A worker never promotes itself. GPT records the evidence and promotion in the
   Issue before relaunching.
+- After every rejected handoff, GPT checks model fit separately from task fit.
+  A clear capability mismatch (for example fabricated research evidence or an
+  inability to follow repository/commit mechanics) may be rerouted immediately
+  to another non-escalation tier; do not spend a correction repeating the same
+  failure mode on the same model merely because that tier is cheaper.
+- Repetition of a previously documented blocker, or a false-complete handoff
+  without the required commit/private branch, counts as a failed correction
+  round for promotion accounting.
 - GPT planning, decisions, review and integration use the Codex subscription,
   not an OpenRouter worker model.
 - One initial worker pass plus at most two bounded correction rounds. If the

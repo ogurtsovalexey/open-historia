@@ -45,6 +45,18 @@ and correction. They are acceptance gates, not suggestions.
 5. If dependencies or an environment prevent validation, report that exact
    limitation. Never translate “not run” into “passes.”
 
+## Research and evidence quality
+
+1. Verify current APIs, module formats, version support and interoperability
+   against primary official sources. Do not turn model memory into a sourced
+   fact or invent methods, packages, compatibility claims or links.
+2. Bundle-size and performance numbers require a named package version and a
+   reproducible current source. Otherwise describe the comparison
+   qualitatively and mark the missing measurement.
+3. Separate sourced facts, repository evidence and worker inference. A research
+   task with inaccessible required sources is incomplete, not “best effort
+   complete.”
+
 ## Mandatory pre-handoff checks
 
 Before claiming completion:
@@ -58,9 +70,13 @@ Before claiming completion:
    placeholders, trailing whitespace and accidental generated files.
 6. Push only with the explicit private destination specified by the task, for
    example `git push private HEAD:refs/heads/<task-branch>`.
+7. Verify that the final commit exists and that `git ls-remote private` reports
+   the same SHA for the task branch. Never use a sample SHA, `(if committed)`,
+   or a completed todo as proof of handoff.
 
 The final `HANDOFF` must list exact commits, changed files, commands actually
 run with results, unverified checks, residual risks and decisions. Do not write
 “all requirements satisfied,” “all tests pass” or `status:review` when any
 required check failed, was skipped, was not discovered or was replaced by a
-proxy assertion.
+proxy assertion. Do not emit `HANDOFF` at all while changes are uncommitted or
+the required private branch is missing.
