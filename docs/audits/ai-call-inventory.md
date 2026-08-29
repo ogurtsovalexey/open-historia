@@ -34,12 +34,20 @@ Every network path that can reach an LLM, traced to a concrete `fetch`:
 | 9 | Same-origin relay `POST /api/ai/relay` | client `main.jsx:308`, server `server/server.js:605` | transport | Forwards any http(s) URL; used only by `providerFetch` callers (rows 4, 5, 7, 8). |
 | 10 | Lang-pack generator `POST {OH_LLM_BASE_URL}/chat/completions` | `scripts/generate-lang-packs.mjs:57` | yes | Offline/build tooling; env `OH_LLM_BASE_URL/KEY/MODEL/BATCH`. |
 
-Checked and excluded (non-LLM network): `scripts/fetch-fmg.mjs:39`,
-`scripts/fetch-map-assets.mjs:74`, `scripts/node-updater.mjs:56`,
-`src/runtime/web/sync.js` (community node), `electron/main.cjs` (spawns
-`fetch-map-assets.mjs`), `tools/import-counter/worker.js` (Cloudflare worker).
+Completeness claim: the accounting above is exhaustive for **LLM-shaped
+endpoints** (provider APIs, model discovery, the relay, and the offline
+generator). Non-LLM network activity is listed only as representative
+samples of the categories excluded — it is not an exhaustive inventory:
+map-asset downloads (`scripts/fetch-fmg.mjs:39`,
+`scripts/fetch-map-assets.mjs:74`), update checks
+(`scripts/node-updater.mjs:56`), community node sync
+(`src/runtime/web/sync.js`), the Electron fetcher spawn
+(`electron/main.cjs:47`), a Cloudflare worker
+(`tools/import-counter/worker.js:74`), prompt-context city seed data
+(`src/Game/AI/promptContext.js:292`), and server language packs
+(`src/runtime/translator.js:568`).
 
-All seven `callAI` call sites in the tree:
+All six `callAI` call sites in the tree:
 
 | Call site | File:line |
 |-----------|-----------|
@@ -80,7 +88,7 @@ while every directive is re-appended there. Chat prompts are
 | `actions` | `submit_actions` `:780` | `ACTIONS_SCHEMA` `:504` | `tasks.actions` | none beyond schema | — |
 | `descriptionToAction` | `submit_description_to_action` `:798` | `DESCRIPTION_TO_ACTION_SCHEMA` `:618` | `tasks.descriptionToAction` (`defaultPrompts.json:55`) | none beyond schema | — |
 | `nextSpeaker` | `submit_next_speaker` `:804` | `NEXT_SPEAKER_SCHEMA` `:632` | `tasks.nextSpeaker` (`defaultPrompts.json:59`) | name matched to chat participants `gameplay.js:1949` | — |
-| `eventConsolidator` | `submit_event_consolidation` `:810` | `EVENT_CONSOLIDATOR_SCHEMA` `:642` | `tasks.eventConsolidator` (`defaultPrompts.json:56`) | memoryOps evidence-id checks (prompt-enforced, `gameplay.js:462`) | — |
+| `eventConsolidator` | `submit_event_consolidation` `:810` | `EVENT_CONSOLIDATOR_SCHEMA` `:642` | `tasks.eventConsolidator` (`defaultPrompts.json:56`) | memoryOps evidence-ids enforced deterministically: `applyCampaignMemoryOps` filters ids against `allowedEvidenceIds`, resolves require a prior fact, and new facts require evidence (`src/runtime/campaignMemory.js:135-189`; caller `gameplay.js:716-720`); the prompt instruction (`gameplay.js:462`) is additional | — |
 | `catalystCreation` | `submit_catalyst_creation` `:816` | `CATALYST_CREATION_SCHEMA` `:657` | `tasks.catalystCreation` | none beyond schema | — |
 | `catalystExecutor` | `submit_catalyst_execution` `:822` | `CATALYST_EXECUTOR_SCHEMA` `:659` | `tasks.catalystExecutor` | none beyond schema | — |
 | `catalystSummary` | `submit_catalyst_summary` `:828` | `CATALYST_SUMMARY_SCHEMA` `:679` | `tasks.catalystSummary` | none beyond schema | — |
@@ -162,7 +170,7 @@ and its failure is converted into a "go to settings" error (`main.jsx:532`).
 | Relay fallback | Only when `PAGE_IS_LOCAL` and a CORS `TypeError`; origin remembered | `main.jsx:263-277,327-356` |
 | Streaming | Cloud buffered; streaming only for advisor `onChunk` or local endpoints; content-type branched | `main.jsx:691-700,809-821` |
 | Token caps | Sent only when caller passes maxTokens; floored at 8192 in `callGemini` default param but Gemini buffered path sends no cap; OpenAI uses `max_completion_tokens` / compatible `max_tokens`; Anthropic required | `main.jsx:536-543,723-725,951-954` |
-| Reasoning default | Global toggle **on by default**; Gemini `thinkingBudget: 8192`, OpenAI `reasoning_effort:"medium"`, Anthropic `budget_tokens: 4096` | `providerConfig.js:174-176`, `main.jsx:574,712,961` |
+| Reasoning default | Global toggle **on by default**; Gemini `thinkingBudget: 8192` on every call (tool or not), OpenAI `reasoning_effort:"medium"` every mode incl. tool calls, Anthropic `budget_tokens: 4096` only when `!tool`; `reasoningMode:"fast"` honored only by the OpenAI-style caller | `providerConfig.js:174-176`, `main.jsx:574,598,712,961,678-684` |
 | Telemetry | **None.** No token/usage/cost/latency record anywhere in `src/**`, `server/**`, `scripts/**` (grep for `usage|prompt_tokens|total_tokens|cost|telemetry|performance.measure` → no matches outside unrelated Editor UI props) | — |
 | Caching of responses | **None** for chat/tasks. Only caches: translator string cache (2.3), `relayOnlyOrigins`, `anthropicModelMax`, discovered model persisted to settings | `main.jsx:277,914,527` |
 
@@ -224,49 +232,84 @@ budget, latency, usage/cost record). Evidence: `src/Game/AI/main.jsx`
 buffered paths discard the response envelope after extraction (`:637-650`,
 `:819-836`, `:1010-1022`); no usage fields anywhere (grep, §3).
 
-### F2 — Reasoning defaults ON for every call, including background work
+### F2 — Reasoning defaults ON, with provider-specific cost exposure
 
 `getReasoningEnabled()` is true unless the user explicitly set `"0"`
-(`providerConfig.js:174`), and `runJsonTask` callers do not override it —
-so every jump, action-suggestion, stat-sheet and idle-diplomacy call pays
-thinking tokens (Gemini `thinkingBudget: 8192` `main.jsx:574/598`, OpenAI
-`reasoning_effort:"medium"` `main.jsx:712`, Anthropic `budget_tokens: 4096`
-`main.jsx:961`). Only translation (`reasoningMode:"fast"`, `main.jsx:678-684`)
-and the small routing calls (`nextSpeaker`, planner, both `reasoningMode:
-"fast"`) are protected. The expensive bulk calls are not.
+(`providerConfig.js:174`). How much each call actually pays differs by
+provider and by whether the call is a tool call:
 
-### F3 — Timeline jump sends the largest context with no output cap and retries the whole payload
+- **Gemini** — `thinkingBudget: 8192` is sent on **every** call, tool or not
+  (`main.jsx:574`, `:598`). `callGemini` does not read `reasoningMode`
+  (signature `main.jsx:536-544`), so background translation batches and the
+  small routing calls pay full thinking on Gemini.
+- **Anthropic (native + compatible)** — extended thinking is added only when
+  `reasoning && !tool` (`main.jsx:961`, `:1072`), so structured gameplay
+  calls (jump, stat sheet, GM, …) are exempt. Chat and translation (no tool)
+  pay `budget_tokens: 4096`; `callAnthropic`/`callAnthropicCompatible` do not
+  read `reasoningMode` either (`main.jsx:916-924`, `:1026-1034`).
+- **OpenAI / OpenAI-compatible** — `reasoning_effort: "medium"` is sent in
+  every mode including tool calls (`main.jsx:711-713`), except when a 400/422
+  conflict forces `disableToolReasoning` (`main.jsx:766-768`) or the call is
+  explicitly fast — only translation/planner/`nextSpeaker` are
+  (`main.jsx:678-684`; `gameplay.js:1935`; `main.jsx:1318`).
+
+Net: the bulk structured tasks pay thinking tokens on Gemini and OpenAI-style
+providers; background translation pays thinking on Gemini and Anthropic as
+well, because the `"fast"` reasoning mode is only honored by the OpenAI-style
+caller.
+
+### F3 — Timeline jump sends the largest context with no output cap, and failure paths repeat the full body
 
 Jump prompts include the full bundle plus five large call-time directives
 (`gameplay.js:435-504`); `simulateTimelineJump` passes no `callOptions`, so
 providers use the model's own maximum output (`gameplay.js:522-532`,
-`main.jsx:723-725,951-954`) — plus the retry loop re-sends the identical
-body. Worst case per task: 2 output attempts × 3 transport retries = 6
-full-body calls (`gameplay.js:521`, `main.jsx:589/676/956`). Latency risk is
-also cost risk here; there is no streaming/partial-progress for structured
-tasks (buffered only).
+`main.jsx:723-725,951-954`). On failure the whole body is re-sent, and the
+retry budget differs per provider because the OpenAI-style 400/422 ladder
+transitions (reasoning strip, `json_schema` → `json_object` → `text_json`)
+repeat requests **without** consuming a transport attempt
+(`main.jsx:761-787`), while 429/503 responses consume the attempt counter.
+Per-task worst-case requests (upper bound, assuming failures persist and
+abort is never hit):
+
+| Provider | Request variants per transport attempt | Transport attempts (429/503) | Worst-case requests per task (2 output attempts) |
+|---|---|---|---|
+| Gemini | 1 | 3 | 6 |
+| OpenAI (native) | up to 2 (tool → tool without reasoning) | 3 | 8 |
+| OpenAI-compatible | up to 5 (tool, no-reasoning, json_schema, json_object, text_json) | 3 | 14 |
+| Anthropic / compatible | 1 + up to 1 ceiling-learn repeat per attempt | 3 | 10 |
+
+Latency risk is also cost risk here; there is no streaming/partial-progress
+for structured tasks (buffered only).
 
 ### F4 — First-run translation cost spike for non-English players
 
 On first boot in a non-English language (and after each language switch), the
 pre-pass enqueues scenario/game catalogs, country names, events, difficulty
-labels and hub posts (`translator.js:419-484`), each AI batch is capped at 60
-strings and batches run strictly serial (`:28-32`). Every uncached string
-costs at least one model call. The server pack (`/api/lang/<code>`) amortizes
-across devices but not across fresh installs. High-impact mitigations (static
-packs, catalog-only pre-translation) belong to issue #2's audit; this entry
-records the cost exposure.
+labels and hub posts (`translator.js:419-484`). One model call covers a batch
+of up to 60 strings, so a cold catalog of N uncached strings costs roughly
+N/60 calls, strictly serial (`:28-32`). The boundary of "cold" is precise:
+the server pack `/api/lang/<code>` is loaded **before** any scan
+(`loadServerPack` `:566`, awaited in `startTranslator` `:597-649`), so a
+fresh client attached to a server that already accumulated translations pays
+nothing for pack-covered strings; the full cold cost is paid only by the
+first device+server combination in a language, plus strings neither pack nor
+local cache covers. High-impact mitigations (static packs, catalog-only
+pre-translation) belong to issue #2's audit; this entry records the cost
+exposure.
 
 ### F5 — Fixed 15 s retry delay without jitter; no deadline on most tasks
 
 `retryDelay = 15000` constant across all providers (`main.jsx:540-541,661-662,
 920-921,1031-1032`), and `runJsonTask` defaults to `timeoutMs = 0` — no
-deadline unless "Limit AI generation" is on (`gameplay.js:395`). A 429/503
-storm from a provider gate (or an overloaded local server) therefore yields
-three synchronous 15 s stalls per attempt, blocking the turn; a slow local
-model can stall a jump indefinitely by design (documented trade-off,
-`gameplay.js:2176-2182`). Exponential backoff + jitter and per-task budgets
-would bound both cost and wall-clock.
+deadline unless "Limit AI generation" is on (`gameplay.js:395`). The loops
+sleep only after transport attempts 1 and 2 and throw on attempt 3, so a
+plain 429/503 exhaustion costs **two** 15 s sleeps (~30 s) plus the request
+round-trips per transport loop (`main.jsx:616-630`, `:789-799`, `:978-987`,
+`:1083-1092`) — up to two such loops per task via the two output attempts.
+The OpenAI-style 400/422 ladder transitions in §F3 are immediate (no sleep)
+but repeat the full body. A slow local model can stall a jump indefinitely by
+design (documented trade-off, `gameplay.js:2176-2182`). Exponential backoff +
+jitter and per-task budgets would bound both cost and wall-clock.
 
 Secondary findings (recorded, not ranked): idle-diplomacy drip rolls every
 minute with a 1/8 chance and carries a full bundle for a one-line note
