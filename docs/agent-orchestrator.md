@@ -25,7 +25,9 @@ For every `ORCHESTRATOR_TICK`:
    owned paths.
 6. The orchestrator creates the branch/worktree and updates the Issue before
    launching a worker. Workers run headlessly through `opencode run --format
-   json`; no terminal window is required.
+   json` inside a detached `screen` session managed by
+   `scripts/agent-worker.sh`; no terminal window is required. A plain background
+   child of a Codex tool call is not durable and must not be used.
 7. Select the cheapest model tier that safely fits the task (§ Model routing).
    Record the chosen model in the claim comment.
 8. DeepSeek remains a bounded worker. GPT owns review, architecture, security,
@@ -83,6 +85,7 @@ npm run agents:install
 npm run agents:start
 npm run agents:status
 npm run agents:check
+npm run agents:workers
 npm run agents:stop
 npm run agents:run-now
 ```

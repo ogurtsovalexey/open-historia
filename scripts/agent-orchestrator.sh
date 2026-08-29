@@ -273,8 +273,12 @@ print_status() {
     | "#\(.number)\t\($status | sub("status:"; ""))\t\($agent | sub("agent:"; ""))\t\(.title)"
   '
 
-  printf '\nOpenCode processes:\n'
-  pgrep -fl 'opencode.*deepseek' || printf 'none\n'
+  printf '\nWorkers:\n'
+  if [[ -x "$REPO_ROOT/scripts/agent-worker.sh" ]]; then
+    bash "$REPO_ROOT/scripts/agent-worker.sh" status
+  else
+    pgrep -fl 'opencode.*deepseek' || printf 'none\n'
+  fi
   if [[ -s "$LAST_MESSAGE_PATH" ]]; then
     printf '\nLast orchestrator result:\n'
     tail -8 "$LAST_MESSAGE_PATH"
