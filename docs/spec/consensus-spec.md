@@ -43,6 +43,11 @@ incrementally rather than as a flag-day rewrite.
 
 ## 4. Minimum Scenario Contract
 
+The implementable Phase 1 shapes, ID grammar, provenance rules, protected paths,
+Draft lifecycle and deterministic build inputs are defined by the accepted
+[Minimal Scenario V2 Integrity Contract](scenario-v2-integrity.md). The compact
+interfaces below remain the consensus overview.
+
 ```ts
 interface ScenarioV2Adapter {
   schemaVersion: 2;

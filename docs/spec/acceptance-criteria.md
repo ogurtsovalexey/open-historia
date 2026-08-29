@@ -34,15 +34,24 @@ authored scenario facts.
 A pinned scenario builds and loads without network access or LLM credentials.
 Three builds from identical input produce identical canonical checksums.
 
+The exact input boundary, canonicalization and offline asset rules are defined
+by the accepted [Minimal Scenario V2 Integrity Contract](scenario-v2-integrity.md).
+
 ### AC-5 — Provenance and Missing Data
 
 Historical numbers carry units, date, source and confidence. Missing values are
 required errors, explicit unknowns or declared assumptions—never hidden defaults.
 
+Stable references, fact values, assumptions and fidelity gaps follow the
+[Scenario V2 integrity contract](scenario-v2-integrity.md).
+
 ### AC-6 — Pregame Facts
 
 Generated pregame text references `factsUsed[]`. Unknown references and claims
 contradicting protected scenario fields fail deterministic validation.
+
+Deterministic contradiction checks operate on the Draft's structured assertions;
+free-prose semantic review remains advisory and cannot promote Draft content.
 
 ### AC-7 — World 1916 Wave-One Slice
 
@@ -59,6 +68,9 @@ modern-era assumption without requiring separate engine code.
 
 Existing presets and saves remain untouched. Any v2 migration produces a
 side-by-side Draft plus validation report.
+
+Draft patch promotion, base checksums and idempotent legacy migration follow the
+[Scenario V2 integrity contract](scenario-v2-integrity.md).
 
 ## Success Metrics
 
