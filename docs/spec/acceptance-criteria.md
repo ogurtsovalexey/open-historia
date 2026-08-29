@@ -18,6 +18,11 @@ Every accepted turn commits under one world revision. Injected write failures
 leave the previous complete revision readable; no date/map/action mismatch is
 observable after restart.
 
+The transaction boundary, manifest and compare-and-swap semantics, coherent
+reads, compatibility migration, rollback behavior and fault-injection matrix
+are defined by the accepted
+[Atomic World Revision Contract](atomic-world-revision.md).
+
 ### AC-3 — Typed Authority
 
 The vertical slice uses stable IDs, validated commands/events and protected
