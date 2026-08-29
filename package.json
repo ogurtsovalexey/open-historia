@@ -7,6 +7,12 @@
     "node": "^20.19.0 || >=22.12.0"
   },
   "scripts": {
+    "agents:install": "bash scripts/agent-orchestrator.sh install",
+    "agents:start": "bash scripts/agent-orchestrator.sh start",
+    "agents:status": "bash scripts/agent-orchestrator.sh status",
+    "agents:stop": "bash scripts/agent-orchestrator.sh stop",
+    "agents:check": "bash scripts/agent-orchestrator.sh check",
+    "agents:run-now": "bash scripts/agent-orchestrator.sh run-now",
     "dev": "vite",
     "dev:web": "node scripts/seed-web-defaults.mjs && vite --mode web",
     "build": "vite build",

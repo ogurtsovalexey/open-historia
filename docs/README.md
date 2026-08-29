@@ -28,6 +28,7 @@ New to the codebase? Read **[Architecture Overview](architecture.md)** first —
 
 ### AI & Prompts
 - [AI System Overview](ai-overview.md) — Transport/provider dispatch, key/relay security, streaming vs buffered, token caps, and the `runJsonTask` strict/salvage task pipeline.
+- [Local Agent Orchestrator](agent-orchestrator.md) — Headless OpenCode workers, Codex review/integration cycles, watchdog commands, and owner-escalation rules.
 - [Prompt-Making Guide](ai-prompts.md) — The reference for authoring and editing AI prompts: every variable, all tasks, end-to-end assembly, and the override/frozen-prompt model.
 - [AI Return Schemas & Validation](ai-schemas.md) — AI JSON return schemas, the two-layer validator, and the `runJsonTask` strict/salvage retry discipline.
 - [Durable Campaign Memory](campaign-memory.md) — Evidence-backed long-term facts, consolidation operations, prompt injection, retention limits, compatibility, and the in-game audit view.
