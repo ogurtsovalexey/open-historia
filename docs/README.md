@@ -20,6 +20,7 @@ New to the codebase? Read **[Architecture Overview](architecture.md)** first —
 ### Getting Started
 - [Architecture Overview](architecture.md) — Tech stack, the three build variants and the `VITE_OH_WEB` flag, boot sequence, directory map, and the frontend↔`/api`↔storage data flow.
 - [Contributing & Conventions](conventions.md) — Repo/remote layout, release-channel workflow, PR-only process, commit/attribution and comment style, local dev, `node --test`, and frozen identifiers.
+- [Continuous Integration](ci.md) — CI workflow, aggregate validation command, baseline tracking, and missing validators.
 
 ### Game
 - [Game Map & Rendering](game-map.md) — In-game MapLibre rendering: region/country layers, owner colouring, disputed stripes, labels, cities/markers/units, the decorative globe, and `world.json` data flow.

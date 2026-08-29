@@ -25,6 +25,7 @@
     "preview:web": "vite preview --outDir dist-web",
     "test": "node --test \"server/**/*.test.js\" \"src/**/*.test.js\"",
     "test:server": "node --test \"server/**/*.test.js\"",
+    "ci": "npm run lint && npm run test && npm run build && npm run agents:test",
     "electron": "electron .",
     "dist:win": "npm run build && electron-builder --win",
     "dist:mac": "npm run build && electron-builder --mac",
