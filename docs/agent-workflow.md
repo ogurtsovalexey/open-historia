@@ -54,9 +54,9 @@ and chooses another ready issue.
 ## Layout
 
 ```text
-open-historia-memory/          integration worktree
-open-historia-codex/           Codex worktree and branch
-open-historia-opencode/        OpenCode worktree and branch
+open-historia-next/            integration worktree
+open-historia-next-codex/      Codex worktree and branch
+open-historia-next-opencode/   OpenCode worktree and branch
 ```
 
 Each task records its objective, acceptance criteria, owned files, read-only
@@ -67,7 +67,7 @@ Branch names use `agent/<agent>/<issue>-<slug>`. A typical worker starts with:
 
 ```bash
 git fetch private main
-git worktree add ../open-historia-opencode \
+git worktree add ../open-historia-next-opencode \
   -b agent/deepseek/<issue>-<slug> private/main
 ```
 
