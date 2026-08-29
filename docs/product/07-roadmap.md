@@ -545,12 +545,15 @@ Acceptance:
 
 ## Milestone 7 — localization and translation
 
-Goal: eliminate hidden repetitive translation cost while keeping all generated content readable in Russian or another chosen language.
+Goal: eliminate hidden repetitive translation cost while keeping all generated
+content readable in the two supported languages: English and Russian. Additional
+UI locales are explicitly outside the current playable-slice scope.
 
 ### M7.1 Static localization — P0 / M
 
 - replace DOM text crawling with locale keys/catalogs;
 - `ru` and `en` core catalogs;
+- expose only `en` and `ru` in the current language selector;
 - CI extraction/missing-key report and fallback;
 - `Intl.DisplayNames`/CLDR plus curated historical entity names;
 - scenario-local localized names keyed by stable ID/version.
@@ -558,6 +561,8 @@ Goal: eliminate hidden repetitive translation cost while keeping all generated c
 Acceptance:
 
 - menu/settings/country rendering makes zero network calls;
+- selecting either supported locale never starts an AI translation batch for
+  static UI;
 - missing locale key is visible in development and safely falls back;
 - entity IDs and structured values never translate.
 

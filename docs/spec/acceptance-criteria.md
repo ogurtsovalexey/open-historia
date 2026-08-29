@@ -8,6 +8,11 @@ Every production model call has a registered task, selected profile, context
 manifest, token budget, latency, usage/cost record and accepted state effect.
 Two-party speaker selection and static localization make no model call.
 
+Phase 1 supports exactly the English and Russian UI locales. All static UI for
+both locales resolves from checked-in catalogs (with English as the safe
+fallback); only dynamic or imported prose may use the optional translation
+path.
+
 The required fields, accounting levels, redaction boundary, migration path and
 automated checks are defined by the accepted
 [AI Call Registry Contract](ai-call-registry.md).

@@ -351,7 +351,11 @@ Player can view, search, correct, pin, resolve or restore facts. Manual edits ar
 
 ## Rule 1: static UI is never translated by an LLM at runtime
 
-Menus, buttons, settings, errors and help use versioned locale catalogs (`en`, `ru`, etc.). Missing keys fall back to English and are reported in development/CI. A build-time extraction command finds untranslated keys.
+Menus, buttons, settings, errors and help use versioned locale catalogs. The
+current supported set is deliberately limited to English (`en`) and Russian
+(`ru`); additional UI locales are deferred until the playable slice is proven.
+Missing Russian keys fall back to English and are reported in development/CI.
+A build-time extraction command finds untranslated keys.
 
 Do not crawl the rendered DOM and submit unknown labels to the active gameplay model.
 

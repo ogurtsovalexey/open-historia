@@ -40,6 +40,7 @@ incrementally rather than as a flag-day rewrite.
 | Storage | Modular projections share one atomic world revision. |
 | Validation | Deterministic checks block; optional AI semantic review is advisory. |
 | Stack | Incremental TypeScript in the existing cross-platform codebase. |
+| Phase 1 localization | English (`en`) and Russian (`ru`) are the only supported UI locales. Static UI uses checked-in catalogs and makes zero model calls; missing Russian keys fall back to English and fail development/CI coverage checks. |
 
 ## 4. Minimum Scenario Contract
 
