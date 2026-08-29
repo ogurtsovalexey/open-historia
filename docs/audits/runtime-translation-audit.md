@@ -5,7 +5,8 @@ Scope: how the live (runtime) UI translator consumes AI calls, which of those
 strings are static enough to stop consuming them, and how removal
 opportunities rank by impact and risk.
 
-Base SHA: `365bbe59376ce6ccf61548c636822fdc909a2c33` (`private/main`).
+Base SHA: `9d684f5a0f61b365d4aa1aef8c1ee34416fe6d27` (`private/main` — the CLAIM
+comment base; runtime files in this worktree are unchanged from it).
 Writable: this file only. Read-only paths followed: `src/runtime/**`,
 `src/Game/**`, `server/**`, `scripts/i18n/**`,
 `scripts/generate-lang-packs.mjs`.
@@ -62,7 +63,7 @@ game could show" and queues any string not already in the pack/cache:
 | Game cards via `GET /api/games` | `translator.js:434-442` | player saves — dynamic |
 | Country names via `loadCountryNames()` (countries.pmtiles z0 layer) | `translator.js:447`, `src/runtime/assets.js:966-985` | static (map data) |
 | World `polityOverrides` names + aliases | `translator.js:448-452` | scenario-authored — static per scenario |
-| Event titles/descriptions from `JSON_URLS.events` | `translator.js:453-456`, `assets.js:267` | current game's events — AI-generated, dynamic |
+| Event titles/descriptions from `JSON_URLS.events` | `translator.js:453-456`, `assets.js:267` | current game's events — AI-generated (already in UI language, see §2.2), dynamic |
 | Difficulty labels + blurbs | `translator.js:463-469` | static |
 | Community-hub post titles/descriptions | `translator.js:472-478` | user-authored — dynamic |
 | Region catalog | **explicitly excluded** `translator.js:480-484` | static, thousands of names |
@@ -104,10 +105,16 @@ content (`translator.js:531-560`, called from `gameState.js:1140,1164`,
   array out, preserve numbers/dates/emoji/placeholders, keep names in their
   standard target-language forms (`translator.js:317-325`).
 - `maxTokens: 4096`, `languageMode: "none"`, `reasoningMode: "fast"`
-  (`translator.js:330-332`). Note: `"fast"` is only honored by the
-  OpenAI-style caller — Gemini and Anthropic ignore `reasoningMode` (see
-  issue #1 audit, §F2: `main.jsx:536-544`, `:916-924`), so translation
-  batches pay full thinking budget on those providers.
+  (`translator.js:330-332`). `"none"` is the exception: `callAI` defaults to
+  `languageMode: "ui"` and appends `languageDirective()`, so every other AI
+  call site (structured tasks, chats use `"chat"`) already asks for
+  target-language output (`main.jsx:1130-1140`, `:1352`, `:1430`); the only
+  other `"none"` call is the diplomacy planner (`main.jsx:1317`). The
+  consequences for what the translator still has to handle are analyzed in
+  §2.2. Note: `"fast"` is only honored by the OpenAI-style caller — Gemini
+  and Anthropic ignore `reasoningMode` (see issue #1 audit, §F2:
+  `main.jsx:536-544`, `:916-924`), so translation batches pay full thinking
+  budget on those providers.
 - Response parsing: `extractJsonArray` (`translator.js:295-309`); batches of
   up to 60 strings (`BATCH_SIZE`, `:28`), **strictly serial**
   (`MAX_CONCURRENT_BATCHES = 1`, `:32`) so background translation cannot
@@ -184,20 +191,53 @@ languages ship **no pack at all**.
 ### 2.2 Genuinely dynamic content — must keep consuming runtime AI
 
 1. **AI-generated game text**: event titles/descriptions, polity names,
-   action suggestions, GM output — all arrive in English from the simulation
-   and are queued via the observer and `enqueueContentStrings`
-   (`gameState.js:1140,1164`, `translator.js:531-560`).
+   action suggestions, GM output. These do **not** arrive in English:
+   `callAI` defaults to `languageMode: "ui"` and appends
+   `languageDirective()` (`main.jsx:1130-1140`, `i18n.js:171-184`), so
+   natural-language fields are requested in the UI language. They remain
+   *dynamic* (they cannot be packed), but the residual runtime cost is not
+   "translate English output" — it is **re-queueing of already-localized
+   text**, and it splits by script:
+   - **Non-Latin-script languages** (24 codes have a `SCRIPT_PATTERNS`
+     entry, `translationFilter.js:1-26`): `looksLikeTargetLanguage`
+     requires ≥55% target-script letters (`translationFilter.js:28-35`), so
+     already-localized output is usually filtered and never queued. The
+     residual risk is mixed text — e.g. a title heavy with English proper
+     nouns — falling under the 0.55 threshold and costing a slot.
+   - **Latin-script languages** (es, fr, de, pt, it, id, tr, vi, sw, and
+     15 more — 24 of the 25 pattern-less codes are Latin-script; Amharic
+     (`am`, Ethiopic script) is stopped only by the Latin-letter test,
+     `translationFilter.js:42`): no `SCRIPT_PATTERNS` entry, so
+     `looksLikeTargetLanguage` returns false (`translationFilter.js:30`)
+     and the ≥2-Latin-letters test passes — already-localized AI text is
+     queued for translation again. Cost per string: one batch slot, prompt
+     and output tokens for a no-op translation (the prompt asks for
+     already-target strings to be returned unchanged,
+     `translator.js:324`, but nothing validates that), plus identity
+     entries polluting `i18n_cache_<lang>` and the saved pack. Affects
+     simulation output and also AI chat replies whenever chat language
+     equals UI language (the default) — the observer skip only applies
+     when they differ (`advisor.jsx:220-223`) and `data-no-translate`
+     covers only player/`asWritten` messages (`advisor.jsx:425`,
+     `chat.jsx:209`).
+   For non-Latin languages the waste is rare; for Latin-script languages
+   every AI-generated sentence is a candidate slot. This is the
+   highest-frequency residual consumer and it is invisible in the pack
+   pipeline — no pack change can remove it.
 2. **User-authored content**: community-hub posts
    (`communityHub.jsx:511`), imported scenario/game cards, edited
    descriptions (`library.js:205,215,355,365`).
 3. **Map labels for renamed/new polities** (`translateLabel`,
    `countryLabels.js:499`, `Nations.jsx:553`).
-4. **Chat replies** — *mostly* excluded already: replies arrive natively in
-   the chat language via `languageDirective`/`chatLanguageDirective`
-   (`i18n.js:171-201`), player messages and `asWritten` replies are marked
-   `data-no-translate` (`chat.jsx:209`, `advisor.jsx:425`), and the skip
-   logic is deliberate (`advisor.jsx:220-223`). Residual lazy translation of
-   chat text is rare by design (`translator.js:14-15`).
+4. **Chat replies** — arrive natively in the chat language via
+   `languageDirective`/`chatLanguageDirective` (`i18n.js:171-201`, applied
+   through `callAI`'s `"chat"` mode, `main.jsx:1352`, `:1430`). Player
+   messages and `asWritten` replies are marked `data-no-translate`
+   (`chat.jsx:209`, `advisor.jsx:425`), and the observer skip is deliberate
+   (`advisor.jsx:220-223`) — but it only applies when chat language
+   **differs** from UI language. In the default case (chat follows UI), AI
+   replies flow into the DOM unmarked and hit the same Latin-script
+   re-queue blind spot described in item 1.
 
 ### 2.3 Static content that currently leaks into runtime AI
 
@@ -217,11 +257,13 @@ checks found rendered, static strings absent from `catalog-en.json`
   (`:725`), "No events yet." (`:965`).
 - Time control: "Fallback" (`time.jsx:673`).
 
-Every one of these costs a runtime AI call for the first device per server
-(desktop) or per browser (web) in every language, forever, unless a device
-translates it into the saved pack. "Stored only in this browser." is in the
-catalog; a dozen of its neighbours in the same dialog are not — evidence the
-list simply went stale.
+Each missing string consumes one **batch slot**; up to 60 slots share a
+single AI call (`translator.js:28`, serial `:32`). The ~20 verified L1
+strings therefore add roughly one extra batch call (and more slots as the
+list grows) for the first device per server (desktop) or per browser (web)
+in every language — paid once, then cached in the saved pack. "Stored only
+in this browser." is in the catalog; a dozen of its neighbours in the same
+dialog are not — evidence the list simply went stale.
 
 **L2 — 27 languages with no shipped pack.** Every catalog string (583) plus
 all L1 gaps pay full runtime cost in those languages. Worst case for a cold
@@ -243,6 +285,13 @@ per server/browser per scenario.
 asserts that every static string a component renders is in
 `UI_STRINGS`, nor that shipped packs are complete against the catalog.
 String drift (L1) therefore recurs silently; there is no regression signal.
+Drift is not hypothetical: "Siam" — a static preset polity name
+(`scripts/presets/wwii-1939.spec.mjs:56`) that the current
+`collectSpecStrings` regex **does** collect — is absent from the committed
+`catalog-en.json` and therefore from all 22 shipped packs (verified by
+re-running the collection logic in-memory). The committed catalog is a
+stale build artifact: every `catalog-en.json` regeneration must be followed
+by pack regeneration for all languages, and nothing enforces that chain.
 
 Note the non-leaks, for completeness: country names on the map resolve to
 the same pmtiles source the catalog uses, so pack keys match unless a
@@ -259,36 +308,66 @@ deliberately excluded from the pre-pass and rely on packs/lazy translation
 Ranked by expected reduction in runtime AI calls per unit of work. None
 changes translation behavior or architecture (decision boundary, §5).
 
-### R1 — Ship packs for the remaining 27 languages (highest impact, lowest risk)
+### R1 — Ship packs for the remaining 27 languages (highest impact, lowest runtime risk)
 
 Offline-only: extend the `LANGUAGES` table in `generate-lang-packs.mjs:41-47`
-to the full 49-code list from `i18n.js:18-69` and run it. Eliminates the
-entire first-boot runtime cost for those languages (L2): hundreds of calls
-per language, per server/browser. Risk: none at runtime (packs are static
-files; missing packs already fall back gracefully,
-`settingsStore.js:34-36`, `server.js:196-200`). Cost: one offline generation
-pass per language — the same model calls, paid once at build time instead of
-once per server/browser forever.
+to the full 49-code list from `i18n.js:18-69` and run it. Impact framing
+must be precise: this removes the **catalog-covered cold-start batches** —
+583 catalog strings ≈ `ceil(583/60) = 10` serial batch calls per language,
+per server/browser — not all runtime translation. L1 gaps (until R2), all
+dynamic content (§2.2) and L3 strings keep paying at runtime, and the
+pre-pass pulls the full country list (~460 names ≈ 8 batches) for an
+unpacked language. Still the highest-impact item: it is the largest static
+block, it is fully understood, and it recurs once per server (desktop) or
+per browser (web) per language.
+
+Runtime risk: low — packs are static files and missing packs already fall
+back gracefully (`settingsStore.js:34-36`, `server.js:196-200`). The real
+risks are content-side, not compatibility: translation **quality** for 27
+more languages needs review (auto-generation is not automatic quality — the
+first German pack came back 56% English, `generate-lang-packs.mjs:90-99`);
+**pack size and review** (27 new committed files of ~583 entries each);
+**maintenance** (every catalog refresh now regenerates 49 packs; see L4's
+stale-chain finding). These are product/content risks, so the target
+language set is a PO decision, not an engineering one (see §5.1).
 
 ### R2 — Refresh `UI_STRINGS` to actual rendered strings (high impact, low risk)
 
 Bring `build-catalog.mjs:15-75` back in sync with the components (the L1
 list above is the concrete delta), regenerate the shipped packs. Kills the
-per-server/per-browser runtime calls for every static settings/chat/cheats
-string in all 22 packed languages today. Risk: low (catalog-only change;
-packs regenerate incrementally, `generate-lang-packs.mjs:129-130`). The
-hand-maintained list remains fragile without R4.
+per-server/per-browser runtime batch slots for every static
+settings/chat/cheats string in all 22 packed languages today — about one
+batch call per server/browser for the verified delta, and it stops new
+static strings from leaking until they are added to the list. Risk: low
+(catalog-only change; packs regenerate incrementally,
+`generate-lang-packs.mjs:129-130`). The hand-maintained list remains fragile
+without R4.
 
-### R3 — Fold shipped-preset world strings into the catalog (medium impact, low–medium risk)
+### R3 — Fold shipped-preset world strings into the catalog (medium impact, low–medium risk; feasibility needs a spike)
 
-Collect scenario `polityOverrides` names/aliases, country-name overrides and
-preset event titles/descriptions into `catalog-en.json` the way card fields
-are collected today (`build-catalog.mjs:77-89`), keyed by exact string.
-Safe because matching is exact-string, so community/AI content simply never
-matches. Impact is per-scenario: one-time cost per server/browser per
-shipped preset instead of every one. Risk: preset world files are JSON
-adjacent to the spec files, so collection is straightforward; the main risk
-is catalog bloat (cosmetic).
+Concrete static sources exist and are named here: preset spec files carry
+`polities` blocks with `name` + `aliases` (`wwii-1939.spec.mjs:50-62`) and
+`simulationRules` (`:308`), and scenarios declare `countryNameOverrides`
+(`server/data/scenarios/default/scenario.json:4`, empty in the default but
+the channel exists). Today's collector regex only picks
+`name|description|subtitle|eyebrow|heroTitle|heroSubtitle` followed
+immediately by a string literal (`build-catalog.mjs:84`), so it catches
+`polities[].name` incidentally (verified) but misses array-form `aliases`
+and concatenated `simulationRules`. The pre-pass already queues
+`polityOverrides` names + aliases and event titles at runtime
+(`translator.js:448-456`), so these strings demonstrably reach the UI.
+
+What is **not** established here: the exact distribution path from spec
+files into the runtime world JSON (`spec → scenario bundle → game-state
+polityOverrides`), i.e. which preset fields survive verbatim into
+`/api/runtime/json/world` and events. Feasibility is therefore marked as
+**needs a spike**: verify the path for `polities[].aliases`,
+`simulationRules` and `countryNameOverrides`, then extend
+`build-catalog.mjs` collection the way card fields are collected
+(`:77-89`), keyed by exact string. Safe because matching is exact-string,
+so community/AI content simply never matches. Impact: one-time cost per
+server/browser per shipped preset for those strings instead of every one.
+Risk: catalog bloat (cosmetic) plus the unverified path above.
 
 ### R4 — Catalog completeness check at test time (medium impact over time, low risk)
 
@@ -339,9 +418,9 @@ architecture for the static/dynamic split — out of scope (§5).
 
 | Failure | Behavior | Evidence |
 |---|---|---|
-| Batch reply not a JSON array | Batch errors; strings stay pending; 3 consecutive batch failures → 60 s cooldown, English remains | `translator.js:336-338`, `:382-397` |
+| AI provider unavailable / reply not a JSON array | Pending batches fail; strings stay pending; 3 consecutive batch failures → 60 s cooldown; untranslated text stays English | `translator.js:336-338`, `:382-397` |
 | Misaligned batch length | Silent index-fill; blank slot falls back to **source English** string | `translator.js:371-379` |
-| Provider unavailable at boot | Server pack fetch fails → localStorage cache only | `translator.js:566-581` |
+| Server or language pack unreachable at boot | Pack fetch fails → localStorage cache only for this device | `translator.js:566-581` |
 | Server unreachable on save | Translations stay device-local | `translator.js:80-82` |
 | localStorage full/blocked | Translations work for the session only | `translator.js:111-113` |
 | String ≥ 3000 chars | Never queued — long descriptions stay English forever | `translationFilter.js:39` |
@@ -362,7 +441,8 @@ Not decided here (escalate as `DECISION NEEDED` if acted upon):
 
 1. **Whether packs for all 49 languages should be shipped** — R1 is a
    build-cost/product trade-off (offline generation expense vs every-player
-   runtime expense), not an architecture change.
+   runtime expense), now including content review of 27 more language packs;
+   not an architecture change.
 2. **Whether the static/dynamic split should move into the runtime**
    (e.g. shipping `catalog-en.json` to the client and gating translation on
    it) — that is a replacement architecture for the pack mechanism, out of
@@ -373,6 +453,11 @@ Not decided here (escalate as `DECISION NEEDED` if acted upon):
 4. **Prompt alignment between the runtime translator and the offline
    generator** — both are live and both are in this audit's read-only
    scope; unifying them is a prompt-owner decision.
+5. **The Latin-script re-queue blind spot found in §2.2** — any fix (script
+   patterns for Latin languages, output-language validation, chat-reply
+   skip when chat == UI language) is a runtime/filter change and therefore
+   out of this audit's writable scope; it is escalated as a finding, not a
+   recommendation.
 
 ---
 
@@ -385,5 +470,15 @@ Not decided here (escalate as `DECISION NEEDED` if acted upon):
   absent, "Stored only in this browser." is present.
 - Language counts verified from source: 50 in `i18n.js:18-69`, 22 targets
   in `generate-lang-packs.mjs:41-47`, 22 pack files in `public/lang/`, all
-  22 packs complete at 583 entries.
-- Traces re-verified against the cited files at the base SHA.
+  22 packs complete at 583 entries; 24 codes have a `SCRIPT_PATTERNS`
+  entry (`translationFilter.js:1-26`), leaving the Latin-script languages
+  uncovered (§2.2).
+- `languageMode` verified: `callAI` defaults to `"ui"` and appends
+  `languageDirective()` (`main.jsx:1130-1140`); only `translator.js:330`
+  and the diplomacy planner (`main.jsx:1317`) pass `"none"`; chats pass
+  `"chat"` (`main.jsx:1352`, `:1430`).
+- Catalog drift verified by re-running the `build-catalog.mjs` collection
+  logic in-memory: "Siam" (`wwii-1939.spec.mjs:56`) is collected by the
+  current regex but absent from the committed `catalog-en.json` (L4).
+- Runtime files in the worktree are unchanged from base SHA `9d684f5`, so
+  all file:line citations hold against it.
