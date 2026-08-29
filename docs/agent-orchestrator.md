@@ -55,7 +55,7 @@ orchestrator does not assume they remain fixed.
 | Tier | Model | Snapshot price | Use |
 |---|---|---:|---|
 | Research | `qwen/qwen3-30b-a3b-instruct-2507` | `$0.048 / $0.193` | Internet/source search, inventories, documentation comparisons, bounded QA review with no code changes. |
-| Standard code | `qwen/qwen3-coder-30b-a3b-instruct` | `$0.07 / $0.28` | Accepted single-module implementation, focused tests, mechanical migrations and review corrections. |
+| Standard code | `deepseek/deepseek-v3.2` | `$0.269 / $0.40` | Accepted single-module implementation, focused tests, mechanical migrations and review corrections. |
 | Complex | `deepseek/deepseek-v3.2` | `$0.269 / $0.40` | Cross-module state, provider adapters, security-sensitive code, difficult debugging or broad refactoring. |
 | Escalation only | `deepseek/deepseek-v4-pro-0813` | `$0.66 / $1.98` | Only after two concrete failed review/correction rounds on a lower tier, or an explicit GPT finding that the task cannot be safely decomposed. |
 
@@ -65,7 +65,9 @@ Rules:
   merely to browse or copy facts into a matrix.
 - `type:audit`, research and documentation default to Research.
 - Implementation defaults to Standard code. Use Complex only for the named
-  cross-module or high-correctness cases.
+  cross-module or high-correctness cases. Standard and Complex currently route
+  to the same DeepSeek V3.2 model; the tiers remain separate so routing can be
+  adjusted later without changing task classification.
 - A worker never promotes itself. GPT records the evidence and promotion in the
   Issue before relaunching.
 - After every rejected handoff, GPT checks model fit separately from task fit.

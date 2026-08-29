@@ -46,7 +46,7 @@ load_config() {
   : "${TICK_SECONDS:=120}"
   : "${CLAIMED_CHECK_SECONDS:=900}"
   : "${RESEARCH_MODEL:=openrouter/qwen/qwen3-30b-a3b-instruct-2507}"
-  : "${CODE_MODEL:=openrouter/qwen/qwen3-coder-30b-a3b-instruct}"
+  : "${CODE_MODEL:=openrouter/deepseek/deepseek-v3.2}"
   : "${COMPLEX_MODEL:=openrouter/deepseek/deepseek-v3.2}"
   : "${ESCALATION_MODEL:=openrouter/deepseek/deepseek-v4-pro-0813}"
   : "${PENDING_START_TIMEOUT:=3600}"
@@ -60,7 +60,7 @@ write_config() {
   local tick_seconds="${TICK_SECONDS:-120}"
   local claimed_check_seconds="${CLAIMED_CHECK_SECONDS:-900}"
   local research_model="${RESEARCH_MODEL:-openrouter/qwen/qwen3-30b-a3b-instruct-2507}"
-  local code_model="${CODE_MODEL:-openrouter/qwen/qwen3-coder-30b-a3b-instruct}"
+  local code_model="${CODE_MODEL:-openrouter/deepseek/deepseek-v3.2}"
   local complex_model="${COMPLEX_MODEL:-openrouter/deepseek/deepseek-v3.2}"
   local escalation_model="${ESCALATION_MODEL:-openrouter/deepseek/deepseek-v4-pro-0813}"
   local pending_start_timeout="${PENDING_START_TIMEOUT:-3600}"
@@ -535,7 +535,7 @@ load_start_settings() {
     TICK_SECONDS=120
     CLAIMED_CHECK_SECONDS=900
     RESEARCH_MODEL="openrouter/qwen/qwen3-30b-a3b-instruct-2507"
-    CODE_MODEL="openrouter/qwen/qwen3-coder-30b-a3b-instruct"
+    CODE_MODEL="openrouter/deepseek/deepseek-v3.2"
     COMPLEX_MODEL="openrouter/deepseek/deepseek-v3.2"
     ESCALATION_MODEL="openrouter/deepseek/deepseek-v4-pro-0813"
     PENDING_START_TIMEOUT=3600
