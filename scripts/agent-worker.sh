@@ -82,6 +82,7 @@ print_status() {
   local found=0 issue state session model_line exit_code
   for prompt in "$STATE_DIR"/*.prompt; do
     [[ -f "$prompt" ]] || continue
+    [[ "$prompt" == *.composed.prompt ]] && continue
     found=1
     issue="$(basename "$prompt" .prompt)"
     if is_running "$issue"; then
