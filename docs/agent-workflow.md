@@ -43,7 +43,33 @@ them.
 Required labels are `status:ready`, `status:claimed`, `status:blocked`,
 `status:review`, `status:done`, `agent:gpt`, `agent:deepseek`,
 `role:po`, `role:analyst`, `role:developer`, `role:ai-engineer`, `role:qa`,
-`parallel:safe` and `decision:gpt-required`.
+`parallel:safe`, `decision:gpt-required`, and exactly one of
+`priority:critical`, `priority:high`, `priority:medium`, `priority:low`.
+
+Priority means pickup urgency, not complexity:
+
+- `CRITICAL`: current release/playtest blocker, correctness/data-loss/cost/
+  security risk, or direct prerequisite unlocking several current critical
+  tasks;
+- `HIGH`: committed current-milestone work with clear player or foundation
+  value;
+- `MEDIUM`: useful current-roadmap work outside the active critical path;
+- `LOW`: future idea, experiment, polish or optional optimization safe to leave
+  indefinitely.
+
+The lifecycle order is always review/integration, claimed-worker
+reconciliation, then new ready claims. For each agent class independently,
+filter out blocked, claimed, dependency-blocked, path-conflicting and
+capacity-ineligible work, then select only from the highest non-empty ready band
+in `CRITICAL` → `HIGH` → `MEDIUM` → `LOW` order. A blocked or claimed higher
+priority does not suppress lower ready work, and one agent class never suppresses
+the other. LOW is claimable only when no eligible higher band remains for that
+class. Within a band, issue number ascending is the deterministic tie-breaker;
+dependency-unblocking value is not currently machine-readable.
+
+An Issue with no canonical priority or more than one is malformed and must not
+be claimed. Diagnose and correct it first. Legacy `priority:p0` and
+`priority:p1` labels do not participate in scheduling.
 
 The issue is the live status record. Specifications and accepted decisions still
 belong in the repository; chat transcripts and issue comments are not canonical.
@@ -52,7 +78,8 @@ belong in the repository; chat transcripts and issue comments are not canonical.
 
 Before reading broadly or editing:
 
-1. Run `gh issue list --label status:ready --label agent:<agent>`.
+1. Read the code-generated agent-class queue (or run `npm run agents:status`)
+   and consider only its highest eligible priority band.
 2. Open the chosen issue and verify that every dependency is complete.
 3. Skip any issue already marked `status:claimed` or with overlapping owned paths.
 4. Replace `status:ready` with `status:claimed` and comment the agent/session,

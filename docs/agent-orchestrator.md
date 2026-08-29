@@ -36,8 +36,10 @@ For every `ORCHESTRATOR_TICK`:
 5. Fill free capacity only from existing `status:ready` Issues, up to the
    configured active-stream limit (currently seven total: the GPT integration
    stream plus at most six DeepSeek workers).
-   Prefer P0 dependencies of the current epic, then P1. Never claim overlapping
-   owned paths.
+   For each agent class independently, use the code-generated priority queue in
+   this exact order: `CRITICAL` → `HIGH` → `MEDIUM` → `LOW`. Apply dependency,
+   owned-path and concurrency checks, then claim only from the highest band
+   that still has an eligible candidate. Never claim overlapping owned paths.
 6. The orchestrator creates the branch/worktree and updates the Issue before
    launching a worker. Workers run headlessly through `opencode run --format
    json` inside a detached `screen` session managed by
@@ -58,6 +60,36 @@ For every `ORCHESTRATOR_TICK`:
 12. After a completed Issue is integrated and closed, archive its stopped worker
     record so the live worker list contains only actionable runs. Archiving must
     preserve prompts, logs and handoff metadata.
+
+## Priority dispatch
+
+Every open task has exactly one canonical priority label:
+
+| Label | Meaning |
+|---|---|
+| `priority:critical` | Current release/playtest blocker, correctness/data-loss/cost/security risk, or a direct prerequisite unlocking several current critical tasks. |
+| `priority:high` | Committed current-milestone work with clear player or foundation value. |
+| `priority:medium` | Useful current-roadmap work outside the active critical path. |
+| `priority:low` | Future idea, experiment, polish or optional optimization that may wait indefinitely. |
+
+Priority is urgency and pickup order, not complexity or functional role. The
+watchdog computes separate, deterministically ordered queues for `agent:gpt`
+and `agent:deepseek`, embeds both in every tick, and exposes the highest current
+band. Within a band it orders by issue number ascending. Dependency-unblocking
+value is not yet machine-readable; the owner may express it by changing the
+canonical priority rather than silently reordering a band.
+
+Lifecycle always outranks priority: process `status:review`, reconcile
+`status:claimed`, then fill slots from `status:ready`. `status:blocked` is never
+eligible. A blocked or claimed CRITICAL does not prevent pickup of a ready HIGH
+when no eligible ready CRITICAL remains. A GPT CRITICAL does not block a
+DeepSeek HIGH, or vice versa. LOW can be claimed only when that agent class has
+no eligible ready CRITICAL, HIGH or MEDIUM issue.
+
+Zero or multiple canonical priority labels make an Issue malformed. It is
+reported by `agents:status` and cannot be claimed until corrected. Legacy
+`priority:p0` and `priority:p1` labels are invalid and never participate in
+dispatch.
 
 ## Model routing
 

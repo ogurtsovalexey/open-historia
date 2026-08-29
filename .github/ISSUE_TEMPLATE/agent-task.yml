@@ -26,6 +26,18 @@ body:
         - QA
     validations:
       required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Select one level; the maintainer applies the matching canonical priority label before pickup.
+      options:
+        - CRITICAL — release/playtest blocker, correctness risk, or direct critical-path unlock
+        - HIGH — committed current-milestone work with clear player or foundation value
+        - MEDIUM — useful current-roadmap work outside the active critical path
+        - LOW — future idea, experiment, polish, or optional optimization
+    validations:
+      required: true
   - type: textarea
     id: objective
     attributes:

@@ -99,6 +99,62 @@ grep -Fq "CLAIMED_CHECK_SECONDS=420" "$CONFIG_FILE"
 grep -Fq "MAX_ACTIVE_STREAMS=7" "$CONFIG_FILE"
 [[ "$(tick_prompt tick-capacity)" == *"at most 7 active task streams total"* ]]
 
+PRIORITY_BOARD='[
+  {"number":40,"title":"critical later","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:critical"}]},
+  {"number":41,"title":"critical later two","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:critical"}]},
+  {"number":20,"title":"high","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:high"}]},
+  {"number":30,"title":"medium","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:medium"}]},
+  {"number":10,"title":"low","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:low"}]},
+  {"number":50,"title":"blocked critical","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:blocked"},{"name":"agent:deepseek"},{"name":"priority:critical"}]},
+  {"number":51,"title":"claimed critical","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:claimed"},{"name":"agent:deepseek"},{"name":"priority:critical"}]},
+  {"number":60,"title":"gpt critical","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:gpt"},{"name":"priority:critical"}]},
+  {"number":61,"title":"gpt low","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:gpt"},{"name":"priority:low"}]},
+  {"number":70,"title":"missing priority","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:deepseek"}]},
+  {"number":71,"title":"multiple priorities","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:critical"},{"name":"priority:high"}]},
+  {"number":80,"title":"review first","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:review"},{"name":"agent:deepseek"},{"name":"priority:low"}]}
+]'
+PRIORITY_SNAPSHOT="$(printf '%s' "$PRIORITY_BOARD" | dispatch_snapshot)"
+
+# CRITICAL precedes HIGH, HIGH precedes MEDIUM/LOW, and same-band order is stable.
+[[ "$(printf '%s' "$PRIORITY_SNAPSHOT" | jq -c '.["queues"]["agent:deepseek"] | map(.number)')" == '[40,41,20,30,10]' ]]
+[[ "$(printf '%s' "$PRIORITY_SNAPSHOT" | jq -c '.["highestBands"]["agent:deepseek"] | map(.number)')" == '[40,41]' ]]
+
+# Blocked and claimed CRITICAL work is not ready and cannot suppress ready HIGH.
+NON_READY_CRITICAL='[
+  {"number":1,"title":"blocked","updatedAt":"x","labels":[{"name":"status:blocked"},{"name":"agent:deepseek"},{"name":"priority:critical"}]},
+  {"number":2,"title":"claimed","updatedAt":"x","labels":[{"name":"status:claimed"},{"name":"agent:deepseek"},{"name":"priority:critical"}]},
+  {"number":3,"title":"high","updatedAt":"x","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:high"}]}
+]'
+[[ "$(printf '%s' "$NON_READY_CRITICAL" | dispatch_snapshot | jq -c '.["highestBands"]["agent:deepseek"] | map(.number)')" == '[3]' ]]
+
+# Agent classes have independent bands: GPT CRITICAL does not suppress DeepSeek HIGH.
+AGENT_ISOLATION='[
+  {"number":1,"title":"gpt","updatedAt":"x","labels":[{"name":"status:ready"},{"name":"agent:gpt"},{"name":"priority:critical"}]},
+  {"number":2,"title":"deepseek","updatedAt":"x","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:high"}]}
+]'
+AGENT_SNAPSHOT="$(printf '%s' "$AGENT_ISOLATION" | dispatch_snapshot)"
+[[ "$(printf '%s' "$AGENT_SNAPSHOT" | jq -r '.["highestBands"]["agent:gpt"][0].number')" == '1' ]]
+[[ "$(printf '%s' "$AGENT_SNAPSHOT" | jq -r '.["highestBands"]["agent:deepseek"][0].number')" == '2' ]]
+
+# LOW remains selectable when it is the highest eligible ready band.
+LOW_ONLY='[{"number":9,"title":"low","updatedAt":"x","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:low"}]}]'
+[[ "$(printf '%s' "$LOW_ONLY" | dispatch_snapshot | jq -r '.["highestBands"]["agent:deepseek"][0].number')" == '9' ]]
+
+# Missing and multiple canonical priorities fail closed and are diagnosed.
+[[ "$(printf '%s' "$PRIORITY_SNAPSHOT" | jq -c '.malformed | map(.number)')" == '[70,71]' ]]
+[[ "$(printf '%s' "$PRIORITY_BOARD" | malformed_priority_numbers)" == '#70, #71' ]]
+
+# Review precedence and the computed snapshot are part of every tick contract.
+PRIORITY_PROMPT="$(tick_prompt tick-priority "$PRIORITY_SNAPSHOT")"
+[[ "$PRIORITY_PROMPT" == *"(1) process every status:review handoff before any new claim; (2) reconcile status:claimed"* ]]
+[[ "$PRIORITY_PROMPT" == *'"review":[80]'* ]]
+[[ "$PRIORITY_PROMPT" == *"Never claim an issue listed as malformed"* ]]
+
+# Reprioritization alone changes the actionable signature.
+SIGNATURE_HIGH='[{"number":1,"title":"same","updatedAt":"same","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:high"}]}]'
+SIGNATURE_LOW='[{"number":1,"title":"same","updatedAt":"same","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:low"}]}]'
+[[ "$(printf '%s' "$SIGNATURE_HIGH" | actionable_signature)" != "$(printf '%s' "$SIGNATURE_LOW" | actionable_signature)" ]]
+
 BEFORE_PATH="$TEST_ROOT/sessions-before"
 find "$(codex_sessions_dir)" -type f -name '*.jsonl' -print | sort >"$BEFORE_PATH"
 NEW_SESSION_ID="aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"

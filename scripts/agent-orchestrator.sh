@@ -120,7 +120,8 @@ new_tick_id() {
 
 tick_prompt() {
   local tick_id="${1:?tick id required}"
-  printf '%s' "ORCHESTRATOR_TICK_ID=${tick_id}. Work in ${REPO_ROOT}. Read docs/agent-orchestrator.md and execute exactly one orchestration cycle against ${GITHUB_REPOSITORY}. Act only as integration owner and dispatcher: review/integrate handoffs, reconcile workers, improve worker prompts, and assign existing status:ready Issues. Never create new tasks, Issues, Epics, roadmap items, or backlog scope; the owner does that in a separate general session. Prefer review/integration before assignment. Keep at most ${MAX_ACTIVE_STREAMS} active task streams total, including the GPT integration stream. Worker model routing: research=${RESEARCH_MODEL}; standard-code=${CODE_MODEL}; complex=${COMPLEX_MODEL}; escalation-only=${ESCALATION_MODEL}. Do not use the escalation model unless the documented promotion rule is met. Do not create additional agent identities or ask the owner routine questions. End the final message with exactly one marker on its own line: ORCHESTRATOR_OK, ORCHESTRATOR_IDLE, or OWNER_ACTION_REQUIRED: <one-line decision>."
+  local dispatch_snapshot="${2:-{\"review\":[],\"malformed\":[],\"queues\":{\"agent:gpt\":[],\"agent:deepseek\":[]},\"highestBands\":{\"agent:gpt\":[],\"agent:deepseek\":[]}}}"
+  printf '%s' "ORCHESTRATOR_TICK_ID=${tick_id}. Work in ${REPO_ROOT}. Read docs/agent-orchestrator.md and execute exactly one orchestration cycle against ${GITHUB_REPOSITORY}. Act only as integration owner and dispatcher: review/integrate handoffs, reconcile workers, improve worker prompts, and assign existing status:ready Issues. Never create new tasks, Issues, Epics, roadmap items, or backlog scope; the owner does that in a separate general session. Lifecycle order is mandatory: (1) process every status:review handoff before any new claim; (2) reconcile status:claimed workers and stale claims; (3) fill free capacity from eligible status:ready work. status:blocked is never eligible. For each agent class independently, the code-generated queue below is ordered CRITICAL -> HIGH -> MEDIUM -> LOW and then by issue number. Apply dependency, owned-path and concurrency eligibility checks without reordering eligible work: claim only from the highest priority band that still has an eligible candidate. LOW is allowed only when no eligible ready CRITICAL, HIGH or MEDIUM remains for that agent class. A blocked or claimed higher-priority issue does not suppress lower ready work, and GPT work does not suppress DeepSeek work. Never claim an issue listed as malformed; zero or multiple canonical priority labels must be diagnosed. Priority labels are priority:critical, priority:high, priority:medium and priority:low; priority:p0 and priority:p1 are invalid. Dispatch snapshot: ${dispatch_snapshot}. Keep at most ${MAX_ACTIVE_STREAMS} active task streams total, including the GPT integration stream. Worker model routing: research=${RESEARCH_MODEL}; standard-code=${CODE_MODEL}; complex=${COMPLEX_MODEL}; escalation-only=${ESCALATION_MODEL}. Do not use the escalation model unless the documented promotion rule is met. Do not create additional agent identities or ask the owner routine questions. End the final message with exactly one marker on its own line: ORCHESTRATOR_OK, ORCHESTRATOR_IDLE, or OWNER_ACTION_REQUIRED: <one-line decision>."
 }
 
 write_pending_tick() {
@@ -292,6 +293,68 @@ board_json() {
     --json number,title,updatedAt,labels
 }
 
+dispatch_snapshot() {
+  jq -c '
+    def names: [.labels[].name];
+    def priorities: [names[] | select(. == "priority:critical" or . == "priority:high" or . == "priority:medium" or . == "priority:low")];
+    def rank($priority):
+      if $priority == "priority:critical" then 0
+      elif $priority == "priority:high" then 1
+      elif $priority == "priority:medium" then 2
+      elif $priority == "priority:low" then 3
+      else 99
+      end;
+    def queue($agent):
+      [
+        .[]
+        | (names) as $labels
+        | (priorities) as $priority
+        | select($labels | index("status:ready"))
+        | select($labels | index($agent))
+        | select($priority | length == 1)
+        | {
+            number,
+            priority: $priority[0],
+            priorityRank: rank($priority[0]),
+            title
+          }
+      ]
+      | sort_by(.priorityRank, .number);
+    def highest_band($queue):
+      if $queue | length == 0 then []
+      else ($queue[0].priorityRank) as $rank
+        | [$queue[] | select(.priorityRank == $rank)]
+      end;
+    (queue("agent:gpt")) as $gpt
+    | (queue("agent:deepseek")) as $deepseek
+    | {
+      review: [
+        .[]
+        | select(names | index("status:review"))
+        | .number
+      ] | sort,
+      malformed: [
+        .[]
+        | (priorities) as $priority
+        | select($priority | length != 1)
+        | {number, priorities: $priority}
+      ] | sort_by(.number),
+      queues: {
+        "agent:gpt": $gpt,
+        "agent:deepseek": $deepseek
+      },
+      highestBands: {
+        "agent:gpt": highest_band($gpt),
+        "agent:deepseek": highest_band($deepseek)
+      }
+    }
+  '
+}
+
+malformed_priority_numbers() {
+  printf '%s' "$(dispatch_snapshot)" | jq -r '.malformed | map("#" + (.number | tostring)) | join(", ")'
+}
+
 count_status() {
   local status="$1"
   jq --arg status "$status" '[.[] | select(any(.labels[]; .name == $status))] | length'
@@ -328,7 +391,8 @@ actionable_signature() {
     [
       .[]
       | select(any(.labels[]; .name == "status:ready" or .name == "status:review"))
-      | "\(.number):\(.updatedAt)"
+      | ([.labels[].name | select(startswith("status:") or startswith("agent:") or startswith("priority:"))] | sort | join(",")) as $routing
+      | "\(.number):\(.updatedAt):\($routing)"
     ]
     | sort
     | join("|")
@@ -359,7 +423,7 @@ run_tick() (
   printf '%s\n' "$$" >"$LOCK_DIR/pid"
   trap 'rm -rf "$LOCK_DIR" 2>/dev/null || true' EXIT
 
-  local board force prompt exit_code signature acknowledged_signature tick_id
+  local board dispatch force prompt exit_code signature acknowledged_signature tick_id
   local retry_required retry_attempts
   retry_required=0
   retry_attempts=1
@@ -393,6 +457,7 @@ run_tick() (
   fi
 
   board="$(board_json)"
+  dispatch="$(printf '%s' "$board" | dispatch_snapshot)"
   force="${ORCHESTRATOR_FORCE:-0}"
   if (( retry_required == 1 )); then
     force=1
@@ -410,7 +475,7 @@ run_tick() (
   fi
 
   tick_id="$(new_tick_id)"
-  prompt="$(tick_prompt "$tick_id")"
+  prompt="$(tick_prompt "$tick_id" "$dispatch")"
   write_pending_tick "$tick_id" "$signature" "$retry_attempts"
 
   log "wake: delivering tick ${tick_id} to Codex session ${SESSION_ID}"
@@ -477,13 +542,33 @@ print_status() {
     printf 'delivery: no pending tick\n\n'
   fi
 
-  board_json | jq -r '
-    sort_by(.number)
+  local board malformed
+  board="$(board_json)"
+  printf '%s' "$board" | jq -r '
+    def names: [.labels[].name];
+    def priority_rank:
+      if names | index("priority:critical") then 0
+      elif names | index("priority:high") then 1
+      elif names | index("priority:medium") then 2
+      elif names | index("priority:low") then 3
+      else 99
+      end;
+    sort_by(
+      (if names | index("status:ready") then 0 else 1 end),
+      (if names | index("status:ready") then priority_rank else 99 end),
+      .number
+    )
     | .[]
     | ([.labels[].name] | map(select(startswith("status:"))) | first // "status:unknown") as $status
     | ([.labels[].name] | map(select(startswith("agent:"))) | first // "agent:unknown") as $agent
-    | "#\(.number)\t\($status | sub("status:"; ""))\t\($agent | sub("agent:"; ""))\t\(.title)"
+    | ([.labels[].name] | map(select(startswith("priority:"))) | join(",") // "priority:missing") as $priority
+    | "#\(.number)\t\($status | sub("status:"; ""))\t\($agent | sub("agent:"; ""))\t\($priority | sub("priority:"; ""))\t\(.title)"
   '
+
+  malformed="$(printf '%s' "$board" | malformed_priority_numbers)"
+  if [[ -n "$malformed" ]]; then
+    printf '\nMalformed priority labels (not claimable): %s\n' "$malformed"
+  fi
 
   printf '\nWorkers:\n'
   if [[ -x "$REPO_ROOT/scripts/agent-worker.sh" ]]; then
@@ -618,12 +703,13 @@ start_new_terminal_session() {
   require_command jq
   require_command plutil
 
-  local board signature tick_id prompt sessions_before session_id launched_at codex_path
+  local board dispatch signature tick_id prompt sessions_before session_id launched_at codex_path
   load_start_settings
   board="$(board_json)"
+  dispatch="$(printf '%s' "$board" | dispatch_snapshot)"
   signature="$(printf '%s' "$board" | actionable_signature)"
   tick_id="$(new_tick_id)"
-  prompt="$(tick_prompt "$tick_id")"
+  prompt="$(tick_prompt "$tick_id" "$dispatch")"
   codex_path="$(command -v codex)"
   sessions_before="$(mktemp "${STATE_DIR}/sessions-before.XXXXXX")"
   find "$(codex_sessions_dir)" -type f -name '*.jsonl' -print 2>/dev/null | sort >"$sessions_before"
