@@ -33,8 +33,9 @@ For every `ORCHESTRATOR_TICK`:
 4. Reconcile `status:claimed` issues with their process, branch and worktree.
    A dead process with no handoff is retried once; repeated failure becomes
    `status:blocked` with evidence.
-5. Fill free capacity only from existing `status:ready` Issues, up to four
-   active task streams total.
+5. Fill free capacity only from existing `status:ready` Issues, up to the
+   configured active-stream limit (currently seven total: the GPT integration
+   stream plus at most six DeepSeek workers).
    Prefer P0 dependencies of the current epic, then P1. Never claim overlapping
    owned paths.
 6. The orchestrator creates the branch/worktree and updates the Issue before
@@ -150,3 +151,9 @@ Configuration is stored outside the repository in
 `~/Library/Application Support/OpenHistoriaAgentOrchestrator/`. The installer
 also places the launchd runtime copy there because macOS does not allow a
 background LaunchAgent to execute scripts directly from `~/Documents`.
+
+`MAX_ACTIVE_STREAMS` controls the combined GPT-plus-worker budget and defaults
+to `7`. Each worker still requires its own branch, worktree and OpenCode session;
+the prepared pool is `slot-1` through `slot-6`. `CLAIMED_CHECK_SECONDS` defaults
+to `420`, so a completed worker whose GitHub labels have not changed is audited
+within seven minutes even when the board signature itself is unchanged.

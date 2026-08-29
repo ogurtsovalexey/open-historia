@@ -15,6 +15,9 @@ export OPEN_HISTORIA_ORCHESTRATOR_CODEX_HOME="$TEST_ROOT/codex"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/agent-orchestrator.sh"
 
+CLAIMED_CHECK_SECONDS=420
+MAX_ACTIVE_STREAMS=7
+
 SESSION_ID="11111111-2222-4333-8444-555555555555"
 PENDING_START_TIMEOUT=3600
 PENDING_RUN_TIMEOUT=3600
@@ -92,6 +95,9 @@ inspect_pending_tick
 [[ -f "$CONFIG_FILE" ]]
 [[ -f "$PLIST_PATH" ]]
 grep -Fq "SESSION_ID=${SESSION_ID}" "$CONFIG_FILE"
+grep -Fq "CLAIMED_CHECK_SECONDS=420" "$CONFIG_FILE"
+grep -Fq "MAX_ACTIVE_STREAMS=7" "$CONFIG_FILE"
+[[ "$(tick_prompt tick-capacity)" == *"at most 7 active task streams total"* ]]
 
 BEFORE_PATH="$TEST_ROOT/sessions-before"
 find "$(codex_sessions_dir)" -type f -name '*.jsonl' -print | sort >"$BEFORE_PATH"
