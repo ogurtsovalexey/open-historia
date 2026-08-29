@@ -56,6 +56,13 @@ and correction. They are acceptance gates, not suggestions.
 3. Separate sourced facts, repository evidence and worker inference. A research
    task with inaccessible required sources is incomplete, not “best effort
    complete.”
+4. A claim that code, data or behavior is absent requires repository-wide path
+   and content searches across the project's actual extensions and generated,
+   default, fixture and runtime locations. A missing filename pattern or one
+   empty seed file proves only that narrow fact, not feature absence.
+5. Audit/spec deliverables must not contain orchestration `HANDOFF` scaffolding,
+   placeholder SHAs, “to be committed” text or pending validation claims. The
+   worker emits its HANDOFF only as the final response after commit and push.
 
 ## Mandatory pre-handoff checks
 
