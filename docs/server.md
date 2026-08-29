@@ -299,6 +299,8 @@ Every store imports this one constant, so a single env var relocates **all** wri
 | `PORT` | `3000` | Listen port (`server/server.js:61`) |
 | `OH_DATA_DIR` | `server/data` | Writable data root for every store (`server/dataDir.js`) |
 | `OH_ALLOW_CROSS_ORIGIN` | unset | `=1` disables the cross-origin-write guard (`server/server.js:111`) |
+| `OH_LAN_MODE` | unset | `=1` enables LAN binding (binds to all interfaces instead of loopback-only) and disables AI relay by default (`server/server.js:906`) |
+| `OH_AI_RELAY_IN_LAN` | unset | `=1` enables AI relay when `OH_LAN_MODE=1` (acknowledges security risks) (`server/server.js:608-612`) |
 | `OH_IMPORT_COUNTER_URL` | `https://oh-import-counter.…workers.dev` | Import-telemetry counter Worker; empty string disables pings (`server/server.js:653`) |
 
 Related sibling pages: [World state](world-state.md) · [Map editor](map-editor.md) · [Scenario hub](scenario-hub.md).

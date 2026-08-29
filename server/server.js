@@ -602,7 +602,17 @@ const setHubFileGuards = (res) => {
 // plain server-to-server for the endpoint. The target is whatever the player
 // configured in Settings — them talking to their own AI through their own
 // game server.
+//
+// In LAN mode (OH_LAN_MODE=1) the relay is disabled by default for security.
+// Set OH_AI_RELAY_IN_LAN=1 to enable it in LAN mode, acknowledging the risks:
+// spoofed-Origin LAN clients can drive the relay to private-range targets,
+// and API keys transit plaintext over the local network.
 app.post("/api/ai/relay", largeJsonParser, async (req, res) => {
+  // Disable relay in LAN mode unless explicitly enabled
+  if (process.env.OH_LAN_MODE === "1" && process.env.OH_AI_RELAY_IN_LAN !== "1") {
+    return sendError(res, 403, new Error("AI relay disabled in LAN mode. Set OH_AI_RELAY_IN_LAN=1 to enable."));
+  }
+
   const controller = new AbortController();
   let completed = false;
   const abortUpstream = () => {
@@ -617,16 +627,41 @@ app.post("/api/ai/relay", largeJsonParser, async (req, res) => {
     if (target.protocol !== "http:" && target.protocol !== "https:") {
       return sendError(res, 400, new Error("Only http(s) AI endpoints can be relayed."));
     }
+
+    // Apply upstream timeout (60 seconds)
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+    
     const upstream = await fetch(target, {
       method: method === "GET" ? "GET" : "POST",
       headers: { "Content-Type": "application/json", ...headers },
       body: method === "GET" ? undefined : JSON.stringify(payload ?? {}),
       signal: controller.signal,
     });
+    
+    clearTimeout(timeoutId);
+    
+    // Check response size (10MB limit)
+    const contentLength = upstream.headers.get("content-length");
+    if (contentLength && Number(contentLength) > 10 * 1024 * 1024) {
+      controller.abort();
+      return sendError(res, 413, new Error("Response too large (max 10MB)."));
+    }
+    
     const text = await upstream.text();
+    
+    // Enforce response size limit
+    if (text.length > 10 * 1024 * 1024) {
+      return sendError(res, 413, new Error("Response too large (max 10MB)."));
+    }
+    
+    // Restrict content-type passthrough to AI-shaped types
+    const contentType = upstream.headers.get("content-type") || "application/json";
+    const safeTypes = ["application/json", "text/event-stream"];
+    const isSafeType = safeTypes.some(safe => contentType.startsWith(safe));
+    
     completed = true;
     res.status(upstream.status);
-    res.type(upstream.headers.get("content-type") || "application/json");
+    res.type(isSafeType ? contentType : "application/json");
     res.send(text);
   } catch (error) {
     if (!controller.signal.aborted && !res.headersSent) {
@@ -903,8 +938,9 @@ app.get("*splat", (_req, res) => {
   res.sendFile(path.join(distDir, "index.html"));
 });
 
-const httpServer = app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+const httpServer = app.listen(PORT, process.env.OH_LAN_MODE === "1" ? undefined : "127.0.0.1", () => {
+  const host = process.env.OH_LAN_MODE === "1" ? `http://localhost:${PORT}` : `http://127.0.0.1:${PORT}`;
+  console.log(`Server running at ${host}`);
 });
 
 // A taken port used to crash with a raw EADDRINUSE stack, which the launchers
