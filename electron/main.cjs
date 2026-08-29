@@ -158,10 +158,9 @@ const findFreePort = (start, attempts = 20) =>
     probe.unref();
     probe.once("error", () => resolve(findFreePort(start + 1, attempts - 1)));
     probe.once("listening", () => probe.close(() => resolve(start)));
-    // Bind the wildcard, not 127.0.0.1: server.js now binds loopback-only by default
-    // (OH_LAN_MODE=1 for all-interfaces), but a loopback-only probe would call a port
-    // free that a 0.0.0.0 publisher (Docker's default) already owns — exactly the
-    // case this exists for.
+    // Bind the wildcard, not 127.0.0.1: server.js listens on every interface, so
+    // a loopback-only probe would call a port free that a 0.0.0.0 publisher
+    // (Docker's default) already owns — exactly the case this exists for.
     probe.listen(start);
   });
 
