@@ -45,7 +45,31 @@ The relay is a *general outbound HTTP proxy*: `method` may be `GET`, in which
 case no body is sent (`server/server.js:621-623`), and the target is any
 `http:`/`https:` URL (`server/server.js:616-619`).
 
-## 2. Deployment exposure matrix
+## 2. Security scope — owner boundary (80/20 local-first)
+
+Project-owner decision (2026-08-29) that constrains every conclusion below:
+
+1. The product is **local-first**; hostile public multi-tenant hosting and
+   zero-trust platform design are **out of scope** this phase.
+2. Default non-web server binding should be **loopback-only**.
+3. LAN binding is an explicit **operator opt-in**, not the default.
+4. In LAN mode the generic AI relay is **disabled** unless separately and
+   explicitly enabled; the trust tradeoff must be shown/documented.
+5. Only **cheap reliability guards** are added to relay operation: upstream
+   timeout/abort, bounded response size, safe error/content handling.
+6. Out of scope this phase: accounts, persistent server-side provider
+   profiles, OAuth, elaborate per-process token delivery, DNS-rebinding
+   infrastructure, public-hosting hardening.
+7. A malicious process already running as the same local user is **outside
+   the Phase 1 threat boundary**.
+
+Consequences for this document: the threat model still records the current
+behavior factually (including the all-interfaces bind and the open relay),
+but severity is scoped to the boundary above, and the guard comparison in
+§7 identifies a minimal local-first option as the recommendation — it does
+not treat every theoretical deployment equally.
+
+## 3. Deployment exposure matrix
 
 The same `server/server.js` runs in four contexts (docs/server.md):
 
@@ -55,48 +79,58 @@ The same `server/server.js` runs in four contexts (docs/server.md):
 | Android | embedded `nodejs-mobile`, in-process on the phone | all interfaces | phone itself + LAN (phone firewalls rarely block inbound Wi-Fi) | `docs/server.md:3,294`; `server/server.js:906` |
 | Termux / manual local server | player's machine / LAN box | all interfaces | LAN by design (the Android connect screen probes it) | `server/server.js:61,906`; CORS block comment `server/server.js:68-72` |
 | Web (hosted site) | **no game server** — static `dist-web` on static hosting | — | relay route does not exist | `vite build --mode web` (`package.json`), `scripts/assemble-site.mjs`; `PAGE_IS_LOCAL` is false on a hosted origin so the client never calls it either (`main.jsx:263-277`) |
-| Self-hosted full stack | player may run `node server.js` on a VPS | all interfaces | **anyone on the internet** | `server/server.js:906` binds all interfaces with no host argument |
+| Self-hosted full stack | player may run `node server.js` on a VPS | all interfaces | **anyone on the internet** | `server/server.js:906` binds all interfaces with no host argument. **Outside Phase 1 scope** per owner boundary (§2) — recorded for completeness only |
 
 Net exposure: relay code ships in every non-web deployment and listens on all
-interfaces. The web deployment is not affected.
+interfaces today. Per the owner scope (§2), the intended shape is different:
+**loopback-only binding by default, LAN as explicit opt-in, and the relay
+disabled in LAN mode unless separately enabled** — the current all-interfaces
+bind (`server/server.js:906`) does not yet implement that scope. The web
+deployment is not affected.
 
-## 3. Attacker model
+## 4. Attacker model
 
-| Attacker | Deployment | Can reach relay? | Constraint |
-|---|---|---|---|
-| Drive-by web page (visited by the player) | any server context | No, by default | Foreign `Origin` → 403 by the cross-origin-write guard (`server/server.js:112-128`, `security.js:35-54`) |
-| Drive-by web page | server with `OH_ALLOW_CROSS_ORIGIN=1` | **Yes, unrestricted** | the 403 error message itself suggests setting this flag (`server/server.js:126`); CORS preflight already succeeds because of `Access-Control-Allow-Origin: *` + `Allow-Headers: Content-Type` (`server/server.js:73-89`) |
-| Any LAN device (curl, script) | desktop / Android / Termux server | Yes, with one spoofed header | The guard compares `Origin` host to `Host` as strings (`security.js:51`); a non-browser client simply sends `Origin: http://<host>:<port>` and passes. The guard is browser-CSRF protection, not access control |
-| Any LAN device, no header work | desktop / Android / Termux server | No | No-`Origin` writes from non-loopback are 403 (`security.js:39-42`) — but the same-origin spoof above defeats it |
-| Malware / local user on the player's machine | all server contexts | Yes | Loopback no-Origin writes are explicitly trusted (`security.js:40-41`) |
-| Anyone | self-hosted VPS | Yes, same Origin spoof | No additional auth exists anywhere on the API |
-| Passive LAN sniffing (no relay access) | LAN deployments | n/a | Plaintext HTTP carries the provider API key in the relay body (see F9) |
+Rows are kept factual; "in scope" marks whether the owner boundary (§2)
+includes the attacker this phase.
+
+| Attacker | Deployment | Can reach relay? | Constraint | In Phase 1 scope? |
+|---|---|---|---|---|
+| Drive-by web page (visited by the player) | any server context | No, by default | Foreign `Origin` → 403 by the cross-origin-write guard (`server/server.js:112-128`, `security.js:35-54`) | yes — must stay blocked |
+| Drive-by web page | server with `OH_ALLOW_CROSS_ORIGIN=1` | **Yes, unrestricted** | the 403 error message itself suggests setting this flag (`server/server.js:126`); CORS preflight already succeeds because of `Access-Control-Allow-Origin: *` + `Allow-Headers: Content-Type` (`server/server.js:73-89`) | yes |
+| Any LAN device (curl, script) | LAN-opted-in desktop / Android / Termux server | Yes, with one spoofed header | The guard compares `Origin` host to `Host` as strings (`security.js:51`); a non-browser client simply sends `Origin: http://<host>:<port>` and passes. The guard is browser-CSRF protection, not access control | yes — **if** the operator opts into LAN mode with the relay enabled; the opt-in must document this |
+| Any LAN device, no header work | LAN-opted-in server | No | No-`Origin` writes from non-loopback are 403 (`security.js:39-42`) — but the same-origin spoof above defeats it | — |
+| Malware / malicious process as the same local user | all server contexts | Yes | Loopback no-Origin writes are explicitly trusted (`security.js:40-41`) | **No — outside the Phase 1 boundary** (§2.7) |
+| Anyone | self-hosted VPS | Yes, same Origin spoof | No additional auth exists anywhere on the API | **No — public hosting out of scope** (§2.1) |
+| Passive LAN sniffing (no relay access) | LAN deployments | n/a | Plaintext HTTP carries the provider API key in the relay body (see F9) | yes — tradeoff to document when LAN mode is opted into |
 
 Assumption tested: "the cross-origin-write guard protects the relay" — true
 only for browsers, and only until `OH_ALLOW_CROSS_ORIGIN=1`.
 
-## 4. Protected assets reachable through the relay
+## 5. Protected assets reachable through the relay
 
 1. **Game saves and scenario data on the server's disk** — loopback SSRF reads
    them: `GET http://127.0.0.1:<port>/api/runtime/json/world` returns the full
    world state of the active game, and every `/api/runtime/*`, `/api/games`,
    `/api/scenarios` GET does the same for its asset (`server/server.js:520-570`,
-   `:421-435`). The relay happily proxies a GET to its own server (F7).
+   `:421-435`). The relay happily proxies a GET to its own server (F7). In the
+   scoped threat model (§2) the only capable driver is a same-origin or
+   same-user process, which is accepted for Phase 1 (Option M, §7).
 2. **Other LAN services** — router admin panels, IoT devices, printers,
    NAS, anything HTTP(S) on the local network, including POSTs with
-   attacker-chosen headers (F2, F4).
+   attacker-chosen headers (F2, F4). Reachable only when the operator opts
+   into LAN mode with the relay enabled (§2.3-2.4).
 3. **Cloud metadata** — `http://169.254.169.254/…` if the server is ever run
-   on a VPS (F2).
+   on a VPS (F2). Outside Phase 1 scope (§2.1); recorded for completeness.
 4. **The player's provider API keys** — via plaintext transit of relay
    bodies on cross-device LAN (F9). The XSS-adjacent content-type passthrough
    (F6) is a hardening gap, not a demonstrated key-exfiltration path.
 5. **The player's local inference hardware** — the relay can drive the
    player's own llama.cpp / LM Studio / Ollama on loopback, burning their GPU
-   (F2, F8).
+   (F2, F8). Same-user driver is outside the boundary (§2.7).
 6. **The player's IP** — the relay is an open GET/POST proxy for abusive or
-   anonymizing traffic (F8).
+   anonymizing traffic (F8). Reachable only under the LAN opt-in (§2.3-2.4).
 
-## 5. Findings
+## 6. Findings
 
 ### F1 — The only gate is a spoofable, opt-outable CSRF guard
 
@@ -205,78 +239,101 @@ direct-only, `main.jsx:590`, `:971`), but they cross the LAN the same way
 when a cross-device client sends them to the provider directly — a
 deployment-wide plaintext question, not relay-specific.
 
-## 6. Guard options (compared, not chosen — DECISION NEEDED)
+## 7. Guard options (compared, minimal option identified — DECISION NEEDED for acceptance)
 
-All three below are designs, not recommendations. Selection is a security
-decision owned by the GPT integration owner (AGENTS.md: Consensus or
-Escalate).
+Selection remains a security decision owned by the GPT integration owner
+(AGENTS.md: Consensus or Escalate). Per the owner scope (§2), the comparison
+below is weighted toward the minimal local-first option, which this audit
+**identifies as the recommendation**; it is not accepted architecture until
+the integration owner confirms it.
 
-### Option A — Harden the generic relay in place (MITIGATION-ONLY)
+### Option M — Minimal local-first hardening (identified per owner scope §2)
+
+- **Loopback-only default bind** for the non-web server (all interfaces only
+  when a LAN opt-in is set) — today the server always binds all interfaces
+  (`server/server.js:906`; wildcard confirmed in `electron/main.cjs:161-164`).
+- **LAN mode = explicit operator opt-in**, and in LAN mode the generic relay
+  is **disabled unless separately enabled**; the enabling docs/flags must
+  state the trust tradeoff (spoofed-Origin LAN clients can drive the relay
+  to private-range targets; keys transit plaintext, §4/F9).
+- **Cheap relay reliability guards only** (§2.5): upstream timeout with
+  abort propagation, bounded response size, and content-type passthrough
+  limited to `application/json` / `text/event-stream` with safe error
+  handling (F5, F6). No allowlists, no profiles, no auth.
+- **Preserve compatibility**: local/self-hosted model endpoints and model
+  discovery keep working unchanged (`providerFetch`, `main.jsx:327-356`;
+  `resolveModel`, `main.jsx:489-534`).
+
+Rationale: in loopback-only mode the only relay drivers are the player's own
+browser (same-origin) and processes on the machine, and a malicious
+same-user process is outside the Phase 1 boundary (§2.7); the CSRF guard
+already blocks drive-by pages (F1). LAN mode keeps its residual risks, but
+they are operator-acknowledged opt-ins, not silent defaults. F7 (loopback
+reads of the server's own data) remains available to a same-origin driver
+by design of the generic proxy — an accepted tradeoff of keeping the relay
+generic — and is documented here rather than engineered away.
+
+What M does **not** do (out of scope per §2.6): endpoint allowlists or
+private-range checks (DNS-rebinding infrastructure excluded), server-side
+provider profiles, per-process tokens, auth, public-hosting hardening.
+Consequence: M is *not* a fix for F2/F3/F8 against LAN attackers — it
+removes LAN attackers from the default threat surface instead, and keeps
+the findings on record for any future hosting decision.
+
+### Option A — Harden the generic relay in place (heavier than M; not needed for Phase 1)
 
 - Restrict targets to loopback/private ranges, resolved and checked at
   connect time and again on every redirect hop (`redirect: "manual"` loop,
   mirroring `server/server.js:682-695`).
 - Whitelist upstream headers (`Content-Type`, `Authorization`, `x-api-key`,
-  `anthropic-version` only).
-- Restrict passthrough content-types to `application/json` /
-  `text/event-stream`; cap response size; add an upstream timeout.
-- Drop GET proxying (POST only).
+  `anthropic-version` only); drop GET proxying.
 
-Pros: smallest diff; keeps "any local model server" compatibility.
+Pros: keeps "any local model server" compatibility while shrinking F2/F3/F8
+for LAN mode.
 Cons: **incomplete as a guard** — with no authorization boundary, the
 spoofed-Origin LAN attacker still drives the relay against every
-private-range host on the network (router admin, IoT, NAS, the game server
-itself via loopback). DNS-rebinding remains a residual risk for the
-IP-check; relay to remote self-hosted endpoints breaks. Status: A reduces
-blast radius (no internet targets, no arbitrary headers, no open GET) but
-does **not** close the private-network SSRF hole — it must be combined with
-B's endpoint binding or C's authorization boundary to be a real guard.
+private-range host on the network; DNS-rebinding remains a residual risk;
+relay to remote self-hosted endpoints breaks. It adds redirect-hop and
+IP-check machinery the owner explicitly deferred (§2.6). Status: useful
+later if LAN-mode hardening is ever wanted; not required this phase.
 
 ### Option B — Server-side endpoint profile instead of a free-form URL
 
-Persist the configured `openai-compatible` / `anthropic-compatible` endpoint
-on the server (e.g., a `POST /api/settings` the locally-served page already
-talks to), and make the relay accept only a profile id; the server validates
-`url` against the stored value before proxying.
+Persist the configured endpoint on the server and validate the relay target
+against it.
 
-Pros: the relay can no longer be pointed at arbitrary hosts by anyone —
-including a spoofed-Origin LAN attacker; a redirect-hop allowlist becomes
-enforceable per profile.
-Cons: requires server-side storage of provider settings (today they exist
-only in browser `localStorage`, `providerConfig.js:42-103`); every device
-must re-configure or sync settings; Android-WebView and desktop share one
-server so settings would become global; "any gateway" flexibility is lost
-unless profiles support multiple endpoints.
+Pros: removes arbitrary target choice.
+Cons: requires server-side provider-settings storage (excluded by §2.6:
+"persistent server-side provider profiles"), makes settings global across
+devices, and loses "any gateway" flexibility. Status: **excluded this phase**
+by owner scope.
 
 ### Option C — Remove the generic relay; CORS or a desktop-only token
 
-- Published guidance already tells local servers to send CORS headers
-  (`OLLAMA_ORIGINS=…`, `main.jsx:345-352`); make that the primary path and
-  delete the generic relay.
-- Keep a relay only inside the desktop app, gated on `OH_DESKTOP_BUILD`
-  (set by Electron, `electron/main.cjs:37`), and require a per-process
-  random token that the server injects into the locally served page and the
-  client echoes on relay calls.
+- Make CORS-configured local servers the primary path (`OLLAMA_ORIGINS=…`,
+  `main.jsx:345-352`) and delete the generic relay; optionally keep a
+  desktop-only relay behind `OH_DESKTOP_BUILD` (`electron/main.cjs:37`) with
+  a per-process token.
 
-Pros: strongest reduction — the only relay that exists runs in a context
-where the browser and server are the same player process.
-Cons: the blanket `Access-Control-Allow-Origin: *` (`server/server.js:74`)
-would expose any token endpoint to every origin, so Option C forces a CORS
-scope change (or a token delivered outside HTTP) — a broader change than the
-relay itself; Termux/Android LAN setups lose relay fallback for their local
-model servers unless they also configure CORS (possible for Ollama/LM
-Studio, not all backends).
+Pros: strongest reduction.
+Cons: requires scoping the blanket CORS (`server/server.js:74`) to protect
+any token endpoint and breaks relay fallback for LAN/Android setups —
+elaborate token delivery is explicitly deferred (§2.6). Status: **excluded
+this phase** by owner scope.
 
-Cross-cutting decision points for the owner: acceptable compatibility loss
-(remote gateways via relay, exotic local backends), whether server-side
-provider config is acceptable (B), whether the blanket CORS may be scoped
-(C), and whether `OH_ALLOW_CROSS_ORIGIN` should exist at all (F1).
+Residual decision points for the integration owner: the exact opt-in
+mechanism and flag names for M (bind, LAN mode, relay-in-LAN-mode), whether
+`OH_ALLOW_CROSS_ORIGIN` should continue to exist (F1), and whether M's
+reliability guards (timeout/size/content-type) are part of this phase's
+implementation scope.
 
-## 7. Assumptions tested and unknowns
+## 8. Assumptions tested and unknowns
 
 Tested against code/config:
 - Relay route exists in every non-web deployment and binds all interfaces
-  (`server/server.js:906`; `electron/main.cjs:161-179`).
+  (`server/server.js:906`; `electron/main.cjs:161-179`) — the loopback-only /
+  LAN-opt-in shape of §2 is a **directive to implement**, not current
+  behavior.
 - Write guard precedes the relay in middleware order
   (`server/server.js:112-128` vs route registration `:605`).
 - `Access-Control-Allow-Origin: *` + `Allow-Headers: Content-Type` permit
@@ -286,15 +343,15 @@ Tested against code/config:
 
 Unknowns (recorded, not inferred):
 1. Whether any player actually self-hosts the full stack on a public IP —
-   no telemetry exists; the VPS row in §2 is a configuration possibility,
-   not an observed deployment.
+   no telemetry exists; the VPS row in §3 is a configuration possibility,
+   not an observed deployment — and is outside the Phase 1 scope (§2).
 2. OS firewall behavior on Windows/macOS/Android is platform-dependent and
    unmeasured; LAN reachability assumptions are conservative.
 3. Node's `fetch` DNS resolution and connection pooling details (relevant to
    DNS-rebinding residuals in Option A) are runtime-level, not verified by
    test.
 
-## 8. Verification
+## 9. Verification
 
 - `git diff --check` clean.
 - Evidence re-checked: relay handler `server/server.js:605-636`; middleware
