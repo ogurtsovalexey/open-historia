@@ -27,10 +27,22 @@ Every unit of work has one GitHub Issue with:
 - acceptance criteria and required validation;
 - owned paths and read-only paths;
 - dependencies and starting integration SHA;
-- assigned agent class and decision boundary.
+- assigned agent class, functional role and decision boundary.
+
+Agent class and functional role are separate dimensions:
+
+- `agent:gpt` / `agent:deepseek` says which model class executes the task;
+- `role:po`, `role:analyst`, `role:developer`, `role:ai-engineer` or `role:qa`
+  says which project responsibility and review standard applies.
+
+An issue has one lead functional role. A second role may be added only when its
+review is an explicit deliverable. The role definitions and development cycle in
+`AGENTS.md` remain binding; the issue board operationalizes rather than replaces
+them.
 
 Required labels are `status:ready`, `status:claimed`, `status:blocked`,
 `status:review`, `status:done`, `agent:gpt`, `agent:deepseek`,
+`role:po`, `role:analyst`, `role:developer`, `role:ai-engineer`, `role:qa`,
 `parallel:safe` and `decision:gpt-required`.
 
 The issue is the live status record. Specifications and accepted decisions still

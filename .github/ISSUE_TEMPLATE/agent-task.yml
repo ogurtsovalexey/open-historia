@@ -14,6 +14,18 @@ body:
         - Either after GPT triage
     validations:
       required: true
+  - type: dropdown
+    id: role
+    attributes:
+      label: Lead functional role
+      options:
+        - PO
+        - Analyst
+        - Developer
+        - AI Engineer
+        - QA
+    validations:
+      required: true
   - type: textarea
     id: objective
     attributes:
