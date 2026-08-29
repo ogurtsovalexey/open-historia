@@ -21,6 +21,8 @@ sentence. The authoritative mapping is:
 | #17 | Implement six-projection atomic world revisions | open | AC-2 implementation |
 | #18 | Scaffold strict TypeScript domain package | open | AC-3 implementation |
 | #19 | Prove the World 1916/1797 vertical slice end to end | open | AC-7 / AC-8 implementation |
+| #22 | Define the minimal Scenario V2 integrity contract | closed | Accepted AC-4 / AC-5 / AC-6 / AC-9 contract |
+| #26 | Implement the minimal Scenario V2 adapter and validators | open | AC-4 / AC-5 / AC-6 / AC-9 implementation |
 | #37 | Build the pure AI registry and ledger core | open | AC-1 implementation (core) |
 | #38 | Instrument provider transports with enforced budgets | open | AC-1 implementation (transports) |
 | #39 | Integrate invocation outcomes with validation and committed effects | open | AC-1 implementation (outcomes) |
@@ -102,13 +104,15 @@ totals or overwrite authored scenario facts.
 
 ### AC-4 - Deterministic Offline Scenario
 
-Source contract: [`consensus-spec.md`](consensus-spec.md) section 7. No dedicated issue found; owned by the scenario build path in the section 10 implementation sequence.
+Source contract: [`scenario-v2-integrity.md`](scenario-v2-integrity.md)
+section 10 (#22 accepted); implementation #26, with the final dual-fixture proof
+in #19.
 
 | Test ID | Production Boundary | Fixture/Precondition | Observable Expected Failure/Result | Runner/Discovery Path | Status | Owner vs. QA |
 |---------|--------------------|----------------------|------------------------------------|-----------------------|--------|--------------|
-| AC-4-01 | EXISTING scenario build entry (`scripts/presets/build-preset.mjs`) | Pinned scenario, network disabled | PLANNED: builds and loads with zero LLM calls and no credentials | `node --test` offline build harness (not yet present) | PLANNED | scenario-build owner implements |
-| AC-4-02 | PLANNED canonical checksum | Three builds from identical input | PLANNED: identical canonical checksums | `node --test` reproducibility harness (not yet present) | PLANNED | scenario-build owner implements |
-| AC-4-03 | PLANNED zero-hidden-call instrumented build | Build run under the #37 instrumented `callAI` | PLANNED: zero invocations recorded | `node --test` against instrumented call | PLANNED | #37 + scenario-build owner |
+| AC-4-01 | EXISTING legacy build entry (`scripts/presets/build-preset.mjs`) plus PLANNED v2 builder | Pinned scenario, network disabled | PLANNED: builds and loads with zero LLM calls and no credentials | `node --test` offline build harness (not yet present) | PLANNED | #26 implements |
+| AC-4-02 | PLANNED canonical checksum | Three builds from identical input | PLANNED: identical canonical checksums | `node --test` reproducibility harness (not yet present) | PLANNED | #26 implements |
+| AC-4-03 | PLANNED zero-hidden-call instrumented build | Build run under the #37 instrumented `callAI` | PLANNED: zero invocations recorded | `node --test` against instrumented call | PLANNED | #37 + #26 |
 | AC-4-04 | EXISTING deterministic resolution in `src/Game/AI/gameplay.js` | Same command + same world state | PLANNED: same resulting effect/revision | `node --test` determinism unit | PLANNED | #18/#19 owner |
 
 Validation wording (unchanged): a pinned scenario builds and loads without network
@@ -117,13 +121,14 @@ canonical checksums.
 
 ### AC-5 - Provenance and Missing Data
 
-Source contract: [`consensus-spec.md`](consensus-spec.md) section 4. No dedicated issue found; owned by the scenario adapter step.
+Source contract: [`scenario-v2-integrity.md`](scenario-v2-integrity.md)
+sections 5-6 (#22 accepted); implementation #26.
 
 | Test ID | Production Boundary | Fixture/Precondition | Observable Expected Failure/Result | Runner/Discovery Path | Status | Owner vs. QA |
 |---------|--------------------|----------------------|------------------------------------|-----------------------|--------|--------------|
-| AC-5-01 | PLANNED scenario-adapter validation | Historical number lacking units/date/source/confidence | PLANNED: rejected or marked low-fidelity, never silent | `node --test` adapter-validation unit | PLANNED | scenario-adapter owner implements |
-| AC-5-02 | PLANNED required-field validation | Required gap in a scenario manifest | PLANNED: build-time error, not a hidden default | `node --test` adapter-validation unit | PLANNED | scenario-adapter owner implements |
-| AC-5-03 | PLANNED explicit unknown/assumption markers | Optional field absent with a declared assumption | PLANNED: surfaced as explicit unknown or assumption | `node --test` fidelity-manifest unit | PLANNED | scenario-adapter owner implements |
+| AC-5-01 | PLANNED scenario-adapter validation | Historical number lacking units/date/source/confidence | PLANNED: rejected or marked low-fidelity, never silent | `node --test` adapter-validation unit | PLANNED | #26 implements |
+| AC-5-02 | PLANNED required-field validation | Required gap in a scenario manifest | PLANNED: build-time error, not a hidden default | `node --test` adapter-validation unit | PLANNED | #26 implements |
+| AC-5-03 | PLANNED explicit unknown/assumption markers | Optional field absent with a declared assumption | PLANNED: surfaced as explicit unknown or assumption | `node --test` fidelity-manifest unit | PLANNED | #26 implements |
 
 Validation wording (unchanged): historical numbers carry units, date, source and
 confidence; missing values are required errors, explicit unknowns or declared
@@ -131,12 +136,13 @@ assumptions - never hidden defaults.
 
 ### AC-6 - Pregame Facts
 
-Source contract: [`consensus-spec.md`](consensus-spec.md) section 6. No dedicated issue found; owned by the pregame-narrative validation step.
+Source contract: [`scenario-v2-integrity.md`](scenario-v2-integrity.md)
+section 8 (#22 accepted); implementation #26.
 
 | Test ID | Production Boundary | Fixture/Precondition | Observable Expected Failure/Result | Runner/Discovery Path | Status | Owner vs. QA |
 |---------|--------------------|----------------------|------------------------------------|-----------------------|--------|--------------|
-| AC-6-01 | PLANNED `factsUsed[]` reference check | Generated pregame text whose `factsUsed[]` names an unknown `FactId` | PLANNED: deterministic validation fails | `node --test` pregame-validation unit | PLANNED | scenario-adapter owner implements |
-| AC-6-02 | PLANNED contradiction detection | Pregame claim contradicting a protected scenario field | PLANNED: deterministic validation rejects the narrative | `node --test` pregame-validation unit | PLANNED | scenario-adapter owner implements |
+| AC-6-01 | PLANNED `factsUsed[]` reference check | Generated pregame text whose `factsUsed[]` names an unknown `FactId` | PLANNED: deterministic validation fails | `node --test` pregame-validation unit | PLANNED | #26 implements |
+| AC-6-02 | PLANNED contradiction detection | Pregame assertion contradicting a protected scenario starting value | PLANNED: deterministic validation rejects the Draft | `node --test` pregame-validation unit | PLANNED | #26 implements |
 
 Validation wording (unchanged): generated pregame text references `factsUsed[]`;
 unknown references and claims contradicting protected scenario fields fail
@@ -170,12 +176,13 @@ and catches at least one modern-era assumption without requiring separate engine
 
 ### AC-9 - Migration Safety
 
-Source contract: [`consensus-spec.md`](consensus-spec.md) section 9. No dedicated issue found; owned by the migration bridge in the scenario adapter.
+Source contract: [`scenario-v2-integrity.md`](scenario-v2-integrity.md)
+section 9 (#22 accepted); implementation #26.
 
 | Test ID | Production Boundary | Fixture/Precondition | Observable Expected Failure/Result | Runner/Discovery Path | Status | Owner vs. QA |
 |---------|--------------------|----------------------|------------------------------------|-----------------------|--------|--------------|
-| AC-9-01 | EXISTING preset files under `scripts/presets/` | Migration run against the existing presets | PLANNED: source files remain untouched | `node --test` file-integrity harness (not yet present) | PLANNED | scenario-adapter owner implements |
-| AC-9-02 | PLANNED side-by-side Draft path | v2 migration of one preset | PLANNED: produces a Draft plus validation report; no in-place rewrite | `node --test` adapter-migration unit | PLANNED | scenario-adapter owner implements |
+| AC-9-01 | EXISTING preset files under `scripts/presets/` | Migration run against the existing presets | PLANNED: source files remain untouched | `node --test` file-integrity harness (not yet present) | PLANNED | #26 implements |
+| AC-9-02 | PLANNED side-by-side Draft path | v2 migration of one preset | PLANNED: produces a Draft plus validation report; no in-place rewrite | `node --test` adapter-migration unit | PLANNED | #26 implements |
 
 Validation wording (unchanged): existing presets and saves remain untouched; any v2
 migration produces a side-by-side Draft plus validation report.
