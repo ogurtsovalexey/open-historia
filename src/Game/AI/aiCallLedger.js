@@ -1,6 +1,6 @@
 /**
  * AI Call Ledger - Record management, redaction, and bounded storage for AI calls
- * 
+ *
  * Implements the Phase 1 AI call registry contract from docs/spec/ai-call-registry.md
  */
 
@@ -51,7 +51,7 @@ export function createTransportAttemptStub({
   requestedOutputTokens
 }) {
   const now = new Date().toISOString();
-  
+
   return {
     transportAttempt,
     startedAt: now,
@@ -139,17 +139,17 @@ export function createInvocationRecord({
   budget
 }) {
   const now = new Date().toISOString();
-  
+
   // Validate inputs
   validateTask(taskId, taskVariant);
   validateContextManifest(context);
   validateBudget(budget);
-  
+
   // Validate profile
   const allowedProviderKinds = ['gemini', 'openai', 'anthropic', 'openai-compatible', 'anthropic-compatible'];
   const allowedEndpointClasses = ['provider-default', 'loopback', 'lan', 'remote-custom'];
   const allowedReasoningModes = ['off', 'fast', 'standard'];
-  
+
   if (!allowedProviderKinds.includes(profile.providerKind)) {
     throw new Error(`Invalid providerKind: ${profile.providerKind}`);
   }
@@ -162,7 +162,7 @@ export function createInvocationRecord({
   if (typeof profile.model !== 'string' || !profile.model.trim()) {
     throw new Error('Model must be non-empty string');
   }
-  
+
   return {
     schemaVersion: SCHEMA_VERSION,
     invocationId: generateInvocationId(),
@@ -202,26 +202,26 @@ export function addGenerationAttempt(record, {
   if (generationAttempt !== expectedAttemptNumber) {
     throw new Error(`Expected generationAttempt ${expectedAttemptNumber}, got ${generationAttempt}`);
   }
-  
+
   // Check transport attempt numbering
   for (let i = 0; i < transportAttempts.length; i++) {
     if (transportAttempts[i].transportAttempt !== i + 1) {
       throw new Error(`Transport attempt ${i + 1} has wrong transportAttempt number: ${transportAttempts[i].transportAttempt}`);
     }
   }
-  
+
   // Check budget limits
   if (record.attempts.length >= record.budget.maxGenerationAttempts) {
     throw new Error(`Exceeded maxGenerationAttempts (${record.budget.maxGenerationAttempts})`);
   }
-  
+
   const newAttempt = {
     generationAttempt,
     purpose,
     transportAttempts,
     result
   };
-  
+
   return {
     ...record,
     attempts: [...record.attempts, newAttempt]
@@ -238,18 +238,18 @@ export function closeInvocation(record, outcome) {
   if (record.finishedAt !== null) {
     throw new Error('Invocation already closed');
   }
-  
+
   const finishedAt = new Date().toISOString();
   const startedAt = new Date(record.startedAt);
   const latencyMs = Math.max(0, new Date(finishedAt).getTime() - startedAt.getTime());
-  
+
   // Validate state-change outcomes have required revisions
   if (outcome.status === 'accepted' && outcome.effect.effectKind === 'state-change') {
     if (outcome.effect.fromWorldRevision === null || outcome.effect.toWorldRevision === null) {
       throw new Error('State-change effects must have both fromWorldRevision and toWorldRevision');
     }
   }
-  
+
   return {
     ...record,
     finishedAt,
@@ -267,18 +267,18 @@ function redactSensitiveData(obj) {
   if (obj === null || obj === undefined) {
     return obj;
   }
-  
+
   if (typeof obj !== 'object') {
     return obj;
   }
-  
+
   if (Array.isArray(obj)) {
     return obj.map(redactSensitiveData);
   }
-  
+
   // Create shallow copy
   const result = { ...obj };
-  
+
   // Redact known sensitive fields
   for (const [key, value] of Object.entries(result)) {
     // Redact URLs
@@ -302,7 +302,7 @@ function redactSensitiveData(obj) {
         result[key] = '[REDACTED_URL]';
       }
     }
-    
+
     // Redact API keys, tokens, secrets
     if (typeof value === 'string' && (
       key.toLowerCase().includes('key') ||
@@ -313,13 +313,13 @@ function redactSensitiveData(obj) {
     )) {
       result[key] = '[REDACTED]';
     }
-    
+
     // Recursively process nested objects
     else if (typeof value === 'object' && value !== null) {
       result[key] = redactSensitiveData(value);
     }
   }
-  
+
   return result;
 }
 
@@ -331,10 +331,10 @@ function redactSensitiveData(obj) {
 export function sanitizeForSerialization(record) {
   // Deep clone and redact
   const sanitized = redactSensitiveData(record);
-  
+
   // Ensure schema version
   sanitized.schemaVersion = SCHEMA_VERSION;
-  
+
   return sanitized;
 }
 
@@ -348,7 +348,7 @@ export class AiCallLedger {
     /** @type {Map<string, AiInvocationRecord>} */
     this.openRecords = new Map();
   }
-  
+
   /**
    * Start tracking a new invocation
    * @param {Parameters<typeof createInvocationRecord>[0]} params
@@ -359,7 +359,7 @@ export class AiCallLedger {
     this.openRecords.set(record.invocationId, record);
     return record;
   }
-  
+
   /**
    * Get open invocation by ID
    * @param {string} invocationId
@@ -368,7 +368,7 @@ export class AiCallLedger {
   getOpenInvocation(invocationId) {
     return this.openRecords.get(invocationId) ?? null;
   }
-  
+
   /**
    * Update an open invocation
    * @param {string} invocationId
@@ -378,15 +378,15 @@ export class AiCallLedger {
     if (!this.openRecords.has(invocationId)) {
       throw new Error(`No open invocation with ID: ${invocationId}`);
     }
-    
+
     // Ensure ID doesn't change
     if (updatedRecord.invocationId !== invocationId) {
       throw new Error('Cannot change invocationId');
     }
-    
+
     this.openRecords.set(invocationId, updatedRecord);
   }
-  
+
   /**
    * Close an invocation and move to closed storage
    * @param {string} invocationId
@@ -398,62 +398,62 @@ export class AiCallLedger {
     if (!openRecord) {
       throw new Error(`No open invocation with ID: ${invocationId}`);
     }
-    
+
     const closedRecord = closeInvocation(openRecord, outcome);
     this.openRecords.delete(invocationId);
-    
+
     // Add to records and enforce bounded retention
     this.records.unshift(closedRecord); // Newest first
-    
+
     // Keep only MAX_RETAINED_RECORDS closed records
     if (this.records.length > MAX_RETAINED_RECORDS) {
       this.records = this.records.slice(0, MAX_RETAINED_RECORDS);
     }
-    
+
     return closedRecord;
   }
-  
+
   /**
    * Recover interrupted open records as failed/transport
    * Call on startup to clean up interrupted calls
    */
   recoverInterrupted() {
     const now = new Date().toISOString();
-    
+
     for (const [invocationId, record] of this.openRecords.entries()) {
       // Mark as transport failure
       const failure = {
         code: 'transport',
         sanitizedSummary: 'Interrupted before completion'
       };
-      
+
       const outcome = {
         status: 'failed',
         failure
       };
-      
+
       const recoveredRecord = {
         ...record,
         finishedAt: now,
         latencyMs: Math.max(0, new Date(now).getTime() - new Date(record.startedAt).getTime()),
         outcome
       };
-      
+
       // Move to closed storage
       this.records.unshift(recoveredRecord);
-      
+
       // Enforce bounded retention
       if (this.records.length > MAX_RETAINED_RECORDS) {
         this.records = this.records.slice(0, MAX_RETAINED_RECORDS);
       }
     }
-    
+
     // Clear open records
     const count = this.openRecords.size;
     this.openRecords.clear();
     return count;
   }
-  
+
   /**
    * Get all records (closed only, newest first)
    * @returns {AiInvocationRecord[]}
@@ -461,7 +461,7 @@ export class AiCallLedger {
   getClosedRecords() {
     return [...this.records];
   }
-  
+
   /**
    * Get open records
    * @returns {AiInvocationRecord[]}
@@ -469,7 +469,7 @@ export class AiCallLedger {
   getOpenRecords() {
     return Array.from(this.openRecords.values());
   }
-  
+
   /**
    * Get all records including open (for diagnostics)
    * @returns {AiInvocationRecord[]}
@@ -477,7 +477,7 @@ export class AiCallLedger {
   getAllRecords() {
     return [...this.getOpenRecords(), ...this.records];
   }
-  
+
   /**
    * Get aggregated usage statistics
    * @returns {{
@@ -496,7 +496,7 @@ export class AiCallLedger {
     let knownCostUSD = 0;
     let hasUnknownUsage = false;
     let hasUnknownCost = false;
-    
+
     for (const record of this.records) {
       for (const attempt of record.attempts) {
         for (const transport of attempt.transportAttempts) {
@@ -506,13 +506,13 @@ export class AiCallLedger {
           } else {
             hasUnknownUsage = true;
           }
-          
+
           if (transport.usage.outputTokens !== null) {
             knownOutputTokens += transport.usage.outputTokens;
           } else {
             hasUnknownUsage = true;
           }
-          
+
           // Cost
           if (transport.cost.amount !== null && transport.cost.currency === 'USD') {
             knownCostUSD += transport.cost.amount;
@@ -522,7 +522,7 @@ export class AiCallLedger {
         }
       }
     }
-    
+
     return {
       totalInvocations: this.records.length,
       openInvocations: this.openRecords.size,
@@ -533,7 +533,7 @@ export class AiCallLedger {
       hasUnknownCost
     };
   }
-  
+
   /**
    * Export sanitized records for diagnostics
    * @param {number} limit - Maximum number of records to export
@@ -545,7 +545,7 @@ export class AiCallLedger {
       .slice(0, limit)
       .map(sanitizeForSerialization);
   }
-  
+
   /**
    * Clear all records (for testing)
    */

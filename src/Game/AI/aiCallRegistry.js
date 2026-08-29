@@ -1,6 +1,6 @@
 /**
  * AI Call Registry - Core definitions and validation for AI task registry
- * 
+ *
  * Implements the Phase 1 AI call registry contract from docs/spec/ai-call-registry.md
  */
 
@@ -369,8 +369,8 @@ const BUDGET_POLICIES = {
 
 /**
  * Validate a task ID and variant against registry
- * @param {string} taskId 
- * @param {string|null} variant 
+ * @param {string} taskId
+ * @param {string|null} variant
  * @returns {AiTaskDefinition}
  * @throws {Error} If task not found or variant not allowed
  */
@@ -379,17 +379,17 @@ export function validateTask(taskId, variant = null) {
   if (!definition) {
     throw new Error(`Unknown task ID: ${taskId}`);
   }
-  
+
   if (variant !== null && !definition.allowedVariants.includes(variant)) {
     throw new Error(`Variant "${variant}" not allowed for task "${taskId}". Allowed: ${definition.allowedVariants.join(', ') || 'none'}`);
   }
-  
+
   return definition;
 }
 
 /**
  * Get budget policy by ID
- * @param {string} policyId 
+ * @param {string} policyId
  * @returns {AiBudgetSnapshot}
  * @throws {Error} If policy not found
  */
@@ -403,7 +403,7 @@ export function getBudgetPolicy(policyId) {
 
 /**
  * Validate and normalize budget snapshot
- * @param {Partial<AiBudgetSnapshot>} budget 
+ * @param {Partial<AiBudgetSnapshot>} budget
  * @returns {AiBudgetSnapshot}
  * @throws {Error} If budget invalid
  */
@@ -411,10 +411,10 @@ export function validateBudget(budget) {
   if (!budget.policyId) {
     throw new Error('Budget missing policyId');
   }
-  
+
   const basePolicy = getBudgetPolicy(budget.policyId);
   const result = { ...basePolicy, ...budget };
-  
+
   // Validate numeric fields are finite positive integers
   const numericFields = ['deadlineMs', 'maxOutputTokens', 'maxGenerationAttempts', 'maxTransportAttemptsPerGeneration'];
   for (const field of numericFields) {
@@ -423,48 +423,48 @@ export function validateBudget(budget) {
       throw new Error(`Budget ${field} must be finite positive integer, got: ${value}`);
     }
   }
-  
+
   return result;
 }
 
 /**
  * Validate context manifest
- * @param {AiContextManifest} manifest 
+ * @param {AiContextManifest} manifest
  * @throws {Error} If manifest invalid
  */
 export function validateContextManifest(manifest) {
   if (manifest.manifestVersion !== 1) {
     throw new Error(`Invalid manifest version: ${manifest.manifestVersion}`);
   }
-  
+
   if (manifest.fullMapIncluded !== false) {
     throw new Error('fullMapIncluded must be false (Principle 3)');
   }
-  
+
   // Validate items
   const allowedKinds = ['system-instructions', 'scenario-rules', 'world-summary', 'map-semantics', 'events', 'actions', 'chat', 'campaign-memory', 'country-dossier', 'user-input', 'retry-feedback'];
-  
+
   let totalCalculated = 0;
   for (const item of manifest.items) {
     if (!allowedKinds.includes(item.kind)) {
       throw new Error(`Invalid context item kind: ${item.kind}`);
     }
-    
+
     if (typeof item.itemCount !== 'number' || !Number.isFinite(item.itemCount) || item.itemCount < 0) {
       throw new Error(`Invalid itemCount for ${item.kind}: ${item.itemCount}`);
     }
-    
+
     if (typeof item.characterCount !== 'number' || !Number.isFinite(item.characterCount) || item.characterCount < 0) {
       throw new Error(`Invalid characterCount for ${item.kind}: ${item.characterCount}`);
     }
-    
+
     if (typeof item.truncated !== 'boolean') {
       throw new Error(`Invalid truncated for ${item.kind}: ${item.truncated}`);
     }
-    
+
     totalCalculated += item.characterCount;
   }
-  
+
   if (manifest.totalCharacterCount !== totalCalculated) {
     throw new Error(`totalCharacterCount (${manifest.totalCharacterCount}) does not match sum of item characterCounts (${totalCalculated})`);
   }
@@ -485,7 +485,7 @@ export function validateContextManifest(manifest) {
  */
 export function createContextManifest(items, worldRevision = null, promptPackRevision = null) {
   const totalCharacterCount = items.reduce((sum, item) => sum + item.characterCount, 0);
-  
+
   const manifest = {
     manifestVersion: 1,
     worldRevision,
@@ -498,14 +498,14 @@ export function createContextManifest(items, worldRevision = null, promptPackRev
     totalCharacterCount,
     fullMapIncluded: false
   };
-  
+
   validateContextManifest(manifest);
   return manifest;
 }
 
 /**
  * Check if task ID is known (for production safety path)
- * @param {string} taskId 
+ * @param {string} taskId
  * @returns {boolean}
  */
 export function isTaskKnown(taskId) {
