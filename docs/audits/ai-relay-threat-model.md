@@ -22,14 +22,28 @@ a machine the player controls (`PAGE_IS_LOCAL`, `main.jsx:263-277`),
 (`main.jsx:327-356`). The relay body is
 `{ url, method, headers, payload }` (`main.jsx:308-314`); the server fetches
 `url` with those headers, forwarding status, content-type and body
-(`server.js:614-630`). It is used by exactly three provider modes:
-`openai-compatible`, `anthropic-compatible` and OpenAI-compatible model
-discovery (`main.jsx:327-331`); native Gemini/OpenAI/Anthropic never relay
-(`main.jsx:590`, `:971`, `:692` via `callOpenAI` fixed endpoint).
+(`server/server.js:614-630`).
+
+Relay coverage (verified callers of `providerFetch`, the only route into the
+relay):
+- **Native OpenAI** — `callOpenAI` → `callOpenAIStyleChatCompletions`
+  (`main.jsx:840-871`) which fetches through `providerFetch`
+  (`main.jsx:692`). On a local page it *can* fall back to the relay, even
+  though `api.openai.com` normally sends CORS headers.
+- **OpenAI-compatible** — same function, user endpoint
+  (`main.jsx:874-905`, `:692`).
+- **Anthropic-compatible** — `callAnthropicCompatible` → `providerFetch`
+  (`main.jsx:1081`).
+- **Model discovery** — `resolveModel`'s `GET /models` through
+  `providerFetch` (`main.jsx:512`), applies to the two OpenAI-style
+  providers only (`providerConfig.js:141-144`).
+
+Never relayed: **Gemini** and **native Anthropic** use plain `fetch` with no
+relay fallback (`main.jsx:566`, `:590`, `:971`).
 
 The relay is a *general outbound HTTP proxy*: `method` may be `GET`, in which
-case no body is sent (`server.js:621-623`), and the target is any
-`http:`/`https:` URL (`server.js:616-619`).
+case no body is sent (`server/server.js:621-623`), and the target is any
+`http:`/`https:` URL (`server/server.js:616-619`).
 
 ## 2. Deployment exposure matrix
 
@@ -73,9 +87,9 @@ only for browsers, and only until `OH_ALLOW_CROSS_ORIGIN=1`.
    attacker-chosen headers (F2, F4).
 3. **Cloud metadata** — `http://169.254.169.254/…` if the server is ever run
    on a VPS (F2).
-4. **The player's provider API keys** — two channels: (a) same-origin XSS via
-   content-type passthrough reads `localStorage` (F6); (b) keys transit the
-   LAN in plaintext relay bodies (F9).
+4. **The player's provider API keys** — via plaintext transit of relay
+   bodies on cross-device LAN (F9). The XSS-adjacent content-type passthrough
+   (F6) is a hardening gap, not a demonstrated key-exfiltration path.
 5. **The player's local inference hardware** — the relay can drive the
    player's own llama.cpp / LM Studio / Ollama on loopback, burning their GPU
    (F2, F8).
@@ -110,11 +124,23 @@ re-validation for exactly this reason (`server/server.js:682-695`).
 
 ### F4 — Arbitrary upstream header injection
 
-The client-supplied `headers` object is spread verbatim into the upstream
-request, with only `Content-Type` forced (`server/server.js:622`). An
-attacker controlling a relay request can send any `Host`, `Authorization`,
-`Cookie`, `X-Forwarded-*` etc. to any target — credential-shaped headers into
-internal admin APIs, virtual-host routing tricks on shared LAN web servers.
+The client-supplied `headers` object is spread into the upstream request
+with only `Content-Type` forced (`server/server.js:622`). What actually
+reaches the target was verified empirically against the runtime's `fetch`
+(Undici; Node engines `^20.19.0 || >=22.12.0`, `package.json`):
+
+- **Pass through verbatim** (tested): `Authorization`, `Cookie`,
+  `x-api-key`, `X-Forwarded-For`, and arbitrary custom headers. These are
+  the credential-shaped headers that matter for internal admin APIs and
+  proxies that trust `X-Forwarded-*`.
+- **Ignored / derived from the URL**: `Host` — Undici sets it from the
+  target URL and the supplied value is not forwarded (tested). The
+  virtual-host-routing variant of the attack is therefore not available;
+  host selection still is (F2).
+- **Validated**: a supplied `Content-Length` is honored and checked against
+  the actual body — a mismatch aborts the upstream request
+  (`RequestContentLengthMismatchError`, tested). A relay driver can break
+  requests this way, but only ones it already controls.
 
 ### F5 — No timeout, no response-size cap, full buffering
 
@@ -126,16 +152,22 @@ route's body parser is `largeJsonParser` (2048 MB, `server/server.js:65`) —
 memory-exhaustion pressure on the server process is attacker-controllable
 in proportion to response size.
 
-### F6 — Response passthrough enables same-origin script execution
+### F6 — Untrusted response content-type and body passthrough (hardening gap)
 
-The upstream content-type and body are passed through untouched
-(`server/server.js:628-630`). A target returning `text/html` (or a browser
-sniffed type) is rendered/executed at the game's own origin — same-origin
-XSS with `localStorage` (the AI keys live there,
-`src/Game/AI/providerConfig.js:42-82`) and every `/api/*` route in scope.
-The hub file proxy defends against exactly this attack with `nosniff` +
-attachment disposition + a sandbox CSP (`server/server.js:585-597`); the
-relay has none of those guards.
+The upstream status, content-type and body are passed through untouched
+(`server/server.js:628-630`). The relay is a `fetch()`-only, POST route with
+no navigation sink — a `text/html` body is consumed by `response.text()` /
+`response.json()` in the provider callers, so **no executable XSS path is
+demonstrated**. The risks are instead: (a) a target may return arbitrarily
+large or arbitrarily typed bodies (size cap and content-type allowlist are
+absent — see F5); (b) any future consumer that renders or embeds relay
+output inherits the risk; (c) consumers keyed on content-type can be
+confused by mismatched types. The hub-file route's `nosniff` + attachment +
+CSP guards (`server/server.js:585-597`) are not directly transferable: that
+route is *navigable* (a crafted link opens it top-level), the relay is not.
+Hardening recommendation: cap response size, time out upstream, and
+restrict passthrough content-types to the AI-shaped set
+(`application/json`, `text/event-stream`).
 
 ### F7 — Loopback SSRF reads the game server's own data
 
@@ -150,14 +182,28 @@ in the relay distinguishes "its own server" from a model endpoint.
 target restriction, anyone who can drive the relay can browse the web through
 the player's IP and POST attacker payloads to arbitrary hosts.
 
-### F9 — Provider keys transit the LAN in plaintext
+### F9 — Provider keys transit unencrypted HTTP whenever relayed
 
-For `openai-compatible` and `anthropic-compatible`, the client's
-`Authorization: Bearer …` / `x-api-key` header is passed to `providerFetch`
-and embedded in the relay request body (`main.jsx:308-314`, `:882-885`,
-`:1053-1057`). On LAN deployments this HTTP request is unencrypted and
-visible to any passive listener on the same network (the server has no TLS
-at all, `server/server.js:906`).
+Every relayed mode carries its key inside the relay request body: native
+**OpenAI** and **OpenAI-compatible** put `Authorization: Bearer …` into the
+headers passed to `providerFetch` (`main.jsx:848-851`, `:882-885`,
+`:308-314`), **Anthropic-compatible** sends `x-api-key` (`main.jsx:1053-1057`).
+Two transport contexts:
+
+- **Same device** (browser and server on one machine — the desktop app, or a
+  phone talking to its own embedded server): the request is plaintext HTTP
+  but confined to loopback; a passive LAN listener cannot see it.
+- **Cross-device LAN** (a desktop browser or WebView connecting to a server
+  on another machine — the Android/home-server topology,
+  `docs/server.md:3`, `main.jsx:263-277` LAN ranges): the relay body,
+  key included, crosses the network unencrypted and is visible to any
+  passive listener on that network. The server has no TLS at all
+  (`server/server.js:906`).
+
+Gemini and native Anthropic keys never transit the relay (their calls are
+direct-only, `main.jsx:590`, `:971`), but they cross the LAN the same way
+when a cross-device client sends them to the provider directly — a
+deployment-wide plaintext question, not relay-specific.
 
 ## 6. Guard options (compared, not chosen — DECISION NEEDED)
 
@@ -165,25 +211,26 @@ All three below are designs, not recommendations. Selection is a security
 decision owned by the GPT integration owner (AGENTS.md: Consensus or
 Escalate).
 
-### Option A — Harden the generic relay in place
+### Option A — Harden the generic relay in place (MITIGATION-ONLY)
 
 - Restrict targets to loopback/private ranges, resolved and checked at
   connect time and again on every redirect hop (`redirect: "manual"` loop,
   mirroring `server/server.js:682-695`).
 - Whitelist upstream headers (`Content-Type`, `Authorization`, `x-api-key`,
   `anthropic-version` only).
-- Add the hub-file response guards (`nosniff`, attachment, CSP sandbox) and
-  reject `text/html` content types; cap response size; add an upstream
-  timeout.
+- Restrict passthrough content-types to `application/json` /
+  `text/event-stream`; cap response size; add an upstream timeout.
 - Drop GET proxying (POST only).
 
 Pros: smallest diff; keeps "any local model server" compatibility.
-Cons: breaks relay to remote self-hosted endpoints (VPS-hosted llama.cpp
-would need to be inside the private range); DNS-rebinding remains a residual
-risk for the IP-check; still no authentication — a spoofed-Origin LAN
-attacker retains SSRF against every private-range host on the network
-(except loopback services become reachable only through the app's own
-routes, which is precisely what must be prevented).
+Cons: **incomplete as a guard** — with no authorization boundary, the
+spoofed-Origin LAN attacker still drives the relay against every
+private-range host on the network (router admin, IoT, NAS, the game server
+itself via loopback). DNS-rebinding remains a residual risk for the
+IP-check; relay to remote self-hosted endpoints breaks. Status: A reduces
+blast radius (no internet targets, no arbitrary headers, no open GET) but
+does **not** close the private-network SSRF hole — it must be combined with
+B's endpoint binding or C's authorization boundary to be a real guard.
 
 ### Option B — Server-side endpoint profile instead of a free-form URL
 
@@ -252,6 +299,12 @@ Unknowns (recorded, not inferred):
 - `git diff --check` clean.
 - Evidence re-checked: relay handler `server/server.js:605-636`; middleware
   order `:73-89, :112-128`; hub-file guards `:585-597, :682-695`; client
-  relay path `main.jsx:263-356, :882-885, :1053-1057`; guard logic
+  relay path `main.jsx:263-356, :692, :840-905, :1053-1057`; guard logic
   `security.js:35-54`; bind `server/server.js:906`; Electron
   `electron/main.cjs:161-179, :37`.
+- F4 header behavior verified empirically against the project's runtime
+  (`node` v25.9.0, Undici `fetch`; engines `^20.19.0 || >=22.12.0`): a local
+  HTTP sink observed `Authorization`, `Cookie`, `x-api-key`,
+  `X-Forwarded-For` and custom headers arriving verbatim, `Host` replaced by
+  the URL-derived value, and a mismatched `Content-Length` aborting the
+  request.
