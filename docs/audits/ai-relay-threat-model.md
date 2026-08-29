@@ -1,7 +1,7 @@
 # AI Relay Threat Model & Guard Options
 
-Status: Draft — security audit; no code changes; nothing herein is accepted
-architecture. Security decisions are GPT-owned (`decision:gpt-required`).
+Status: Accepted audit. The integration decision is Option M (§7); no runtime
+code changes are part of this document.
 
 Scope: the generic browser-side AI relay `POST /api/ai/relay`
 (`server/server.js:605-636`) and its client counterpart `providerFetch` /
@@ -234,20 +234,18 @@ Two transport contexts:
   passive listener on that network. The server has no TLS at all
   (`server/server.js:906`).
 
-Gemini and native Anthropic keys never transit the relay (their calls are
-direct-only, `main.jsx:590`, `:971`), but they cross the LAN the same way
-when a cross-device client sends them to the provider directly — a
-deployment-wide plaintext question, not relay-specific.
+Gemini and native Anthropic keys never transit the relay. Their native callers
+connect directly from the browser to fixed HTTPS provider endpoints
+(`main.jsx:590`, `:971`), so there is no plaintext browser-to-game-server hop;
+normal LAN observers see encrypted TLS traffic, not the key.
 
-## 7. Guard options (compared, minimal option identified — DECISION NEEDED for acceptance)
+## 7. Guard options and integration decision
 
-Selection remains a security decision owned by the GPT integration owner
-(AGENTS.md: Consensus or Escalate). Per the owner scope (§2), the comparison
-below is weighted toward the minimal local-first option, which this audit
-**identifies as the recommendation**; it is not accepted architecture until
-the integration owner confirms it.
+The GPT integration owner accepts Option M under the owner scope (§2). The
+heavier alternatives remain documented for any future public-hosting or
+untrusted-LAN requirement.
 
-### Option M — Minimal local-first hardening (identified per owner scope §2)
+### Option M — Minimal local-first hardening (accepted for Phase 1)
 
 - **Loopback-only default bind** for the non-web server (all interfaces only
   when a LAN opt-in is set) — today the server always binds all interfaces
@@ -321,11 +319,10 @@ any token endpoint and breaks relay fallback for LAN/Android setups —
 elaborate token delivery is explicitly deferred (§2.6). Status: **excluded
 this phase** by owner scope.
 
-Residual decision points for the integration owner: the exact opt-in
-mechanism and flag names for M (bind, LAN mode, relay-in-LAN-mode), whether
-`OH_ALLOW_CROSS_ORIGIN` should continue to exist (F1), and whether M's
-reliability guards (timeout/size/content-type) are part of this phase's
-implementation scope.
+Integration decisions: exact flag names remain an implementation detail;
+`OH_ALLOW_CROSS_ORIGIN` stays as a legacy explicit escape hatch in Phase 1 and
+must not be enabled implicitly by LAN mode; timeout, bounded response size and
+safe content-type/error handling are required Phase 1 reliability guards.
 
 ## 8. Assumptions tested and unknowns
 
