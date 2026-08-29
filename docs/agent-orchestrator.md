@@ -1,8 +1,14 @@
 # Local Agent Orchestrator
 
-This Codex session is the integration owner and orchestration brain. A small
+This Codex session is the integration owner and worker dispatcher. A small
 `launchd` watchdog wakes the same session only when the GitHub board has work;
 it does not make product or architecture decisions itself.
+
+The owner creates tasks, Issues, Epics, roadmap items and backlog scope in a
+separate general Codex session. A watchdog tick never authors or expands that
+work. It operates only on Issues that already exist: review and integrate
+handoffs, reconcile workers, improve bounded worker prompts, update lifecycle
+labels/comments, and assign existing `status:ready` work.
 
 Every delivery carries a unique `ORCHESTRATOR_TICK_ID`. Queuing is not treated
 as success: the watchdog acknowledges the board signature only after the same
@@ -27,7 +33,8 @@ For every `ORCHESTRATOR_TICK`:
 4. Reconcile `status:claimed` issues with their process, branch and worktree.
    A dead process with no handoff is retried once; repeated failure becomes
    `status:blocked` with evidence.
-5. Fill free capacity from `status:ready`, up to four active task streams total.
+5. Fill free capacity only from existing `status:ready` Issues, up to four
+   active task streams total.
    Prefer P0 dependencies of the current epic, then P1. Never claim overlapping
    owned paths.
 6. The orchestrator creates the branch/worktree and updates the Issue before
@@ -45,6 +52,11 @@ For every `ORCHESTRATOR_TICK`:
    completing one issue frees its slot for the next.
 10. Do not push to public `origin`. Workers push task branches to `private`; only
    the integration owner updates `private/main`.
+11. Never create a task, Issue, Epic, roadmap item or new backlog scope during a
+    tick. Missing work waits for the owner’s general planning session.
+12. After a completed Issue is integrated and closed, archive its stopped worker
+    record so the live worker list contains only actionable runs. Archiving must
+    preserve prompts, logs and handoff metadata.
 
 ## Model routing
 
@@ -54,22 +66,24 @@ orchestrator does not assume they remain fixed.
 
 | Tier | Model | Snapshot price | Use |
 |---|---|---:|---|
-| Research | `qwen/qwen3-30b-a3b-instruct-2507` | `$0.048 / $0.193` | Internet/source search, inventories, documentation comparisons, bounded QA review with no code changes. |
+| Research | `deepseek/deepseek-v3.2` | `$0.269 / $0.40` | Internet/source search, inventories, documentation comparisons, bounded QA review with no code changes. |
 | Standard code | `deepseek/deepseek-v3.2` | `$0.269 / $0.40` | Accepted single-module implementation, focused tests, mechanical migrations and review corrections. |
 | Complex | `deepseek/deepseek-v3.2` | `$0.269 / $0.40` | Cross-module state, provider adapters, security-sensitive code, difficult debugging or broad refactoring. |
 | Escalation only | `deepseek/deepseek-v4-pro-0813` | `$0.66 / $1.98` | Only after two concrete failed review/correction rounds on a lower tier, or an explicit GPT finding that the task cannot be safely decomposed. |
 
 Rules:
 
-- Search tools fetch sources; the model synthesizes them. Do not pay a Pro model
-  merely to browse or copy facts into a matrix.
+- All worker tiers use DeepSeek. Qwen models are not used for research, code,
+  review corrections or any fallback.
+- Search tools fetch sources; the worker synthesizes them. Do not pay the
+  escalation model merely to browse or copy facts into a matrix.
 - `type:audit`, research and documentation default to Research.
 - Implementation defaults to Standard code. Use Complex only for the named
   cross-module or high-correctness cases. Standard and Complex currently route
   to the same DeepSeek V3.2 model; the tiers remain separate so routing can be
   adjusted later without changing task classification.
-- A worker never promotes itself. GPT records the evidence and promotion in the
-  Issue before relaunching.
+- A worker never promotes itself. GPT may route any initial worker to DeepSeek
+  V3.2 and records the evidence before any promotion to DeepSeek V4 Pro.
 - After every rejected handoff, GPT checks model fit separately from task fit.
   A clear capability mismatch (for example fabricated research evidence or an
   inability to follow repository/commit mechanics) may be rerouted immediately
@@ -110,6 +124,11 @@ npm run agents:stop
 npm run agents:run-now
 npm run agents:test
 ```
+
+`npm run agents:workers` shows only unarchived worker runs. After GPT has
+integrated and closed an Issue, `bash scripts/agent-worker.sh archive <issue>`
+moves its stopped prompt, log and metadata into the worker archive. It refuses
+to archive a running worker.
 
 `npm run agents:start <UUID>` binds the watchdog to an existing local Codex
 session, clears delivery state from the previous binding and immediately queues

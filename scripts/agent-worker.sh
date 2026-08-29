@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_PROMPT_FILE="${SCRIPT_DIR}/../docs/agent-worker-baseline.md"
-STATE_DIR="${HOME}/Library/Application Support/OpenHistoriaAgentOrchestrator/workers"
+STATE_DIR="${OPEN_HISTORIA_ORCHESTRATOR_WORKER_STATE_DIR:-${HOME}/Library/Application Support/OpenHistoriaAgentOrchestrator/workers}"
 mkdir -p "$STATE_DIR"
 
 screen_name() {
@@ -78,6 +78,40 @@ stop_worker() {
   fi
 }
 
+archive_worker() {
+  local issue="${1:?issue number required}"
+  local archive_dir path found=0
+
+  [[ "$issue" =~ ^[0-9]+$ ]] || { echo "Invalid issue number: $issue" >&2; exit 2; }
+  if is_running "$issue"; then
+    echo "Worker #$issue is still running; stop or finish it before archiving." >&2
+    exit 1
+  fi
+
+  archive_dir="$STATE_DIR/archive/${issue}-$(date '+%Y%m%dT%H%M%S')-$$"
+  for path in \
+    "$STATE_DIR/$issue.prompt" \
+    "$STATE_DIR/$issue.composed.prompt" \
+    "$STATE_DIR/$issue.jsonl" \
+    "$STATE_DIR/$issue.exit" \
+    "$STATE_DIR/$issue.meta" \
+    "$STATE_DIR/$issue.pid" \
+    "$STATE_DIR/$issue-run.sh"; do
+    [[ -e "$path" ]] || continue
+    if (( found == 0 )); then
+      mkdir -p "$archive_dir"
+    fi
+    mv "$path" "$archive_dir/"
+    found=1
+  done
+
+  if (( found == 0 )); then
+    echo "No worker record found for Issue #$issue." >&2
+    exit 1
+  fi
+  echo "Archived worker #$issue at $archive_dir."
+}
+
 print_status() {
   local found=0 issue state session model_line exit_code
   for prompt in "$STATE_DIR"/*.prompt; do
@@ -107,11 +141,14 @@ case "${1:-status}" in
   stop)
     stop_worker "${2:-}"
     ;;
+  archive)
+    archive_worker "${2:-}"
+    ;;
   status)
     print_status
     ;;
   *)
-    echo "Usage: $0 {start <issue> <model> <worktree> <prompt-file> [session-id]|stop <issue>|status}" >&2
+    echo "Usage: $0 {start <issue> <model> <worktree> <prompt-file> [session-id]|stop <issue>|archive <issue>|status}" >&2
     exit 2
     ;;
 esac

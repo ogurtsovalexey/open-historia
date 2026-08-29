@@ -45,7 +45,7 @@ load_config() {
   : "${GITHUB_REPOSITORY:?Missing GITHUB_REPOSITORY in $CONFIG_FILE}"
   : "${TICK_SECONDS:=120}"
   : "${CLAIMED_CHECK_SECONDS:=900}"
-  : "${RESEARCH_MODEL:=openrouter/qwen/qwen3-30b-a3b-instruct-2507}"
+  : "${RESEARCH_MODEL:=openrouter/deepseek/deepseek-v3.2}"
   : "${CODE_MODEL:=openrouter/deepseek/deepseek-v3.2}"
   : "${COMPLEX_MODEL:=openrouter/deepseek/deepseek-v3.2}"
   : "${ESCALATION_MODEL:=openrouter/deepseek/deepseek-v4-pro-0813}"
@@ -59,7 +59,7 @@ write_config() {
   local github_repository="${3:-ogurtsovalexey/open-historia-next}"
   local tick_seconds="${TICK_SECONDS:-120}"
   local claimed_check_seconds="${CLAIMED_CHECK_SECONDS:-900}"
-  local research_model="${RESEARCH_MODEL:-openrouter/qwen/qwen3-30b-a3b-instruct-2507}"
+  local research_model="${RESEARCH_MODEL:-openrouter/deepseek/deepseek-v3.2}"
   local code_model="${CODE_MODEL:-openrouter/deepseek/deepseek-v3.2}"
   local complex_model="${COMPLEX_MODEL:-openrouter/deepseek/deepseek-v3.2}"
   local escalation_model="${ESCALATION_MODEL:-openrouter/deepseek/deepseek-v4-pro-0813}"
@@ -117,7 +117,7 @@ new_tick_id() {
 
 tick_prompt() {
   local tick_id="${1:?tick id required}"
-  printf '%s' "ORCHESTRATOR_TICK_ID=${tick_id}. Work in ${REPO_ROOT}. Read docs/agent-orchestrator.md and execute exactly one orchestration cycle against ${GITHUB_REPOSITORY}. Prefer review/integration before claiming new work. Keep at most four active task streams total. Worker model routing: research=${RESEARCH_MODEL}; standard-code=${CODE_MODEL}; complex=${COMPLEX_MODEL}; escalation-only=${ESCALATION_MODEL}. Do not use the escalation model unless the documented promotion rule is met. Do not create additional agent identities or ask the owner routine questions. End the final message with exactly one marker on its own line: ORCHESTRATOR_OK, ORCHESTRATOR_IDLE, or OWNER_ACTION_REQUIRED: <one-line decision>."
+  printf '%s' "ORCHESTRATOR_TICK_ID=${tick_id}. Work in ${REPO_ROOT}. Read docs/agent-orchestrator.md and execute exactly one orchestration cycle against ${GITHUB_REPOSITORY}. Act only as integration owner and dispatcher: review/integrate handoffs, reconcile workers, improve worker prompts, and assign existing status:ready Issues. Never create new tasks, Issues, Epics, roadmap items, or backlog scope; the owner does that in a separate general session. Prefer review/integration before assignment. Keep at most four active task streams total. Worker model routing: research=${RESEARCH_MODEL}; standard-code=${CODE_MODEL}; complex=${COMPLEX_MODEL}; escalation-only=${ESCALATION_MODEL}. Do not use the escalation model unless the documented promotion rule is met. Do not create additional agent identities or ask the owner routine questions. End the final message with exactly one marker on its own line: ORCHESTRATOR_OK, ORCHESTRATOR_IDLE, or OWNER_ACTION_REQUIRED: <one-line decision>."
 }
 
 write_pending_tick() {
@@ -534,7 +534,7 @@ load_start_settings() {
     GITHUB_REPOSITORY="ogurtsovalexey/open-historia-next"
     TICK_SECONDS=120
     CLAIMED_CHECK_SECONDS=900
-    RESEARCH_MODEL="openrouter/qwen/qwen3-30b-a3b-instruct-2507"
+    RESEARCH_MODEL="openrouter/deepseek/deepseek-v3.2"
     CODE_MODEL="openrouter/deepseek/deepseek-v3.2"
     COMPLEX_MODEL="openrouter/deepseek/deepseek-v3.2"
     ESCALATION_MODEL="openrouter/deepseek/deepseek-v4-pro-0813"
