@@ -53,6 +53,12 @@ import {
   crossOriginWriteAllowed,
   isAllowedHubUrl,
   parseByteRange,
+  executeBoundedUpstreamFetch,
+  isRelayAllowed,
+  getBindHost,
+  getServerRunningMessage,
+  RelayError,
+  RELAY_ERROR_CODES,
 } from "./security.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -602,36 +608,71 @@ const setHubFileGuards = (res) => {
 // plain server-to-server for the endpoint. The target is whatever the player
 // configured in Settings — them talking to their own AI through their own
 // game server.
+//
+// LAN guard (Option M): the relay is a general outbound HTTP proxy, so it is
+// only exposed by default on a loopback-only server. When the operator opts
+// into LAN mode (OH_LAN_MODE=1) the relay stays DISABLED unless they also set
+// OH_AI_RELAY_IN_LAN=1 — accepting that spoofed-Origin LAN clients can drive
+// it to private-range targets and that provider keys transit the LAN in
+// plaintext (see docs/audits/ai-relay-threat-model.md).
 app.post("/api/ai/relay", largeJsonParser, async (req, res) => {
-  const controller = new AbortController();
-  let completed = false;
-  const abortUpstream = () => {
-    if (!completed) controller.abort();
-  };
-  req.once("aborted", abortUpstream);
-  res.once("close", abortUpstream);
+  const lanMode = process.env.OH_LAN_MODE === "1";
+  const relayInLan = process.env.OH_AI_RELAY_IN_LAN === "1";
+  if (!isRelayAllowed(lanMode, relayInLan)) {
+    return sendError(
+      res,
+      403,
+      new Error("AI relay is disabled in LAN mode. Set OH_AI_RELAY_IN_LAN=1 to enable it (see docs/server.md)."),
+    );
+  }
+
+  // The caller's cancellation is propagated into the upstream request so a
+  // client that hangs up aborts the relay fetch instead of leaving it running.
+  const callerController = new AbortController();
+  const onCallerAbort = () => callerController.abort();
+  req.once("aborted", onCallerAbort);
+  res.once("close", onCallerAbort);
 
   try {
     const { url: targetUrl, method = "POST", headers = {}, payload } = req.body ?? {};
-    const target = new URL(String(targetUrl ?? ""));
-    if (target.protocol !== "http:" && target.protocol !== "https:") {
-      return sendError(res, 400, new Error("Only http(s) AI endpoints can be relayed."));
-    }
-    const upstream = await fetch(target, {
-      method: method === "GET" ? "GET" : "POST",
-      headers: { "Content-Type": "application/json", ...headers },
-      body: method === "GET" ? undefined : JSON.stringify(payload ?? {}),
-      signal: controller.signal,
+    const result = await executeBoundedUpstreamFetch({
+      url: targetUrl,
+      method,
+      headers,
+      payload,
+      callerSignal: callerController.signal,
     });
-    const text = await upstream.text();
-    completed = true;
-    res.status(upstream.status);
-    res.type(upstream.headers.get("content-type") || "application/json");
-    res.send(text);
+
+    res.status(result.status);
+    res.type(result.contentType);
+    res.send(result.body);
   } catch (error) {
-    if (!controller.signal.aborted && !res.headersSent) {
+    if (error instanceof RelayError) {
+      switch (error.code) {
+        case RELAY_ERROR_CODES.INVALID_TARGET:
+          return sendError(res, 400, error);
+        case RELAY_ERROR_CODES.UNSAFE_CONTENT_TYPE:
+          return sendError(res, 502, error);
+        case RELAY_ERROR_CODES.RESPONSE_TOO_LARGE:
+          return sendError(res, 413, error);
+        case RELAY_ERROR_CODES.UPSTREAM_TIMEOUT:
+          // Exactly one 504, and only if the socket is still writable.
+          if (!res.headersSent && !res.writableEnded) return sendError(res, 504, error);
+          return;
+        case RELAY_ERROR_CODES.CLIENT_DISCONNECT:
+          // The caller is gone — there is nothing to respond to.
+          return;
+        default:
+          if (!res.headersSent && !res.writableEnded) return sendError(res, 502, error);
+          return;
+      }
+    }
+    if (!res.headersSent && !res.writableEnded) {
       sendError(res, 502, error);
     }
+  } finally {
+    req.removeListener("aborted", onCallerAbort);
+    res.removeListener("close", onCallerAbort);
   }
 });
 
@@ -903,8 +944,8 @@ app.get("*splat", (_req, res) => {
   res.sendFile(path.join(distDir, "index.html"));
 });
 
-const httpServer = app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+const httpServer = app.listen(PORT, getBindHost(process.env.OH_LAN_MODE === "1"), () => {
+  console.log(getServerRunningMessage(PORT, process.env.OH_LAN_MODE === "1"));
 });
 
 // A taken port used to crash with a raw EADDRINUSE stack, which the launchers

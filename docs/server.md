@@ -15,7 +15,7 @@ Open Historia ships with a small **Express** server (`server/server.js`) that is
 3. Installs the **CSRF / cross-origin-write guard** (`server/server.js:112-128`, logic in `server/security.js`). See [Security guard](#security--path-safety).
 4. Calls `ensureScenarioStore()`, `ensureGameStore()`, `ensureMapEditorStore()`, `ensureBasemapStore()` — first-run seeding of `server/data/` (`server/server.js:91-94`).
 5. Registers all `/api/*` routes, then the `/fmg` static mount (if vendored), then `express.static(distDir)`, then the SPA catch-all `GET *splat → dist/index.html` (`server/server.js:813-820`).
-6. `app.listen(PORT)`; an `EADDRINUSE` is caught and turned into a human message instead of a raw stack (`server/server.js:828-836`).
+6. `app.listen(PORT, getBindHost(...))` — loopback-only (`127.0.0.1`) by default, all interfaces only when `OH_LAN_MODE=1` (`server/security.js` `getBindHost`); an `EADDRINUSE` is caught and turned into a human message instead of a raw stack (`server/server.js:951-959`).
 
 Route ordering matters: `/fmg/*` and `express.static` are mounted **before** the `*splat` fallback so real files aren't swallowed by `index.html`.
 
@@ -90,7 +90,7 @@ All routes are JSON in / JSON out unless noted. Errors are `{ error: message }` 
 ### AI relay, hub proxy, telemetry, shutdown
 | Method | Path | Purpose | Handler |
 | --- | --- | --- | --- |
-| POST | `/api/ai/relay` | Server-to-server relay to a player-configured OpenAI-compatible endpoint (defeats the endpoint's missing CORS). Streams status/body back; aborts upstream if the client disconnects | `server/server.js:523` |
+| POST | `/api/ai/relay` | Server-to-server relay to a player-configured OpenAI-compatible endpoint (defeats the endpoint's missing CORS). Bounded by an upstream timeout (60 s), a 10 MiB response cap (checked from `Content-Length` and streamed chunks) and an `application/json`/`text/event-stream` content-type allowlist; aborts upstream if the client disconnects. Disabled in LAN mode unless `OH_AI_RELAY_IN_LAN=1` | `server/server.js:618` |
 | POST | `/api/server/shutdown` | Stop the process from the UI's ⏻ button (acks first, then `process.exit(0)`) | `server/server.js:559` |
 | GET | `/api/hub/file?url=` | Proxy-download a community bundle from GitHub only; manual redirect-following with per-hop allowlist re-check; on-disk cache keyed by URL SHA-256 | `server/server.js:575` |
 | POST | `/api/hub/import-log` | Best-effort import telemetry; one ping per scenario per install (atomic `wx` marker), forwarded to the counter Worker | `server/server.js:657` |
@@ -276,6 +276,8 @@ Bundles are the shareable unit strangers swap on the community hub. Schema strin
 | `isLoopbackAddress(addr)` | Unwraps IPv4-mapped IPv6 (`::ffff:127.0.0.1`); true for `::1`, `127.*`. |
 | `parseByteRange(header, size)` | Range parsing for `streamBinaryFile` (above). |
 | `isAllowedHubUrl(url, hosts)` | A hub download must be **https** and either on the fixed GitHub host set or any `*.githubusercontent.com`. Checked on the initial URL **and every redirect hop** in `/api/hub/file`, which follows redirects manually (`redirect: "manual"`) so a `github.com → attacker` redirect can't cause SSRF. |
+| `isRelayAllowed(lanMode, relayInLan)` / `getBindHost(lanMode)` / `getServerRunningMessage(port, lanMode)` | The Option M LAN policy: relay on off-LAN (always) or on-LAN with the explicit `OH_AI_RELAY_IN_LAN=1` opt-in; loopback-only bind by default, all interfaces in LAN mode. |
+| `executeBoundedUpstreamFetch(...)` / `readLimitedResponse(...)` / `isSafeContentType(...)` | The relay's bounded upstream lifecycle: timeout + abort, 10 MiB cap enforced from the `Content-Length` header **and** incrementally, and an `application/json`/`text/event-stream` content-type allowlist — each failure a distinct typed `RelayError` (`server/relay.test.js`). |
 
 Additional hardening in the stores: content hashes for basemaps/flags are **always computed server-side** — trusting a client hash would let a caller poison the dedup index so a later genuine upload is silently discarded (`server/basemapStore.js:104-110`, `server/flagStore.js:33-35`). Deletes are **soft** (`moveDirectoryToTrash`, `server/libraryStore.js:1804-1842`) with a Windows-specific retry-then-copy fallback for locked directories.
 
@@ -299,6 +301,8 @@ Every store imports this one constant, so a single env var relocates **all** wri
 | `PORT` | `3000` | Listen port (`server/server.js:61`) |
 | `OH_DATA_DIR` | `server/data` | Writable data root for every store (`server/dataDir.js`) |
 | `OH_ALLOW_CROSS_ORIGIN` | unset | `=1` disables the cross-origin-write guard (`server/server.js:111`) |
-| `OH_IMPORT_COUNTER_URL` | `https://oh-import-counter.…workers.dev` | Import-telemetry counter Worker; empty string disables pings (`server/server.js:653`) |
+| `OH_LAN_MODE` | unset | `=1` binds the server to all interfaces instead of loopback-only (`server/security.js` `getBindHost`). **Trust tradeoff:** any device on the LAN can then reach the whole API (and spoof an `Origin` to pass the CSRF guard). |
+| `OH_AI_RELAY_IN_LAN` | unset | `=1` enables the generic AI relay while `OH_LAN_MODE=1`. **Trust tradeoff:** spoofed-Origin LAN clients can drive the relay to private-range targets, and provider API keys transit the LAN in plaintext (`docs/audits/ai-relay-threat-model.md` §4/F9). Off the LAN the relay is always available. |
+| `OH_IMPORT_COUNTER_URL` | `https://oh-import-counter.…workers.dev` | Import-telemetry counter Worker; empty string disables pings (`server/server.js:778`) |
 
 Related sibling pages: [World state](world-state.md) · [Map editor](map-editor.md) · [Scenario hub](scenario-hub.md).

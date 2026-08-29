@@ -9,6 +9,13 @@ import {
   isLoopbackAddress,
   parseByteRange,
   resolveChildPath,
+  isRelayAllowed,
+  isSafeContentType,
+  getBindHost,
+  getServerRunningMessage,
+  MAX_RELAY_RESPONSE_SIZE,
+  RELAY_TIMEOUT_MS,
+  RELAY_ERROR_CODES,
 } from "./security.js";
 
 const BASE = path.resolve("/srv/data/scenarios");
@@ -99,4 +106,45 @@ test("isAllowedHubUrl: any *.githubusercontent.com CDN host is allowed on redire
   // Lookalike hosts must NOT slip through.
   assert.equal(isAllowedHubUrl(new URL("https://githubusercontent.com.evil.com/x"), hosts), false);
   assert.equal(isAllowedHubUrl(new URL("https://notgithubusercontent.com/x"), hosts), false);
+});
+
+test("isRelayAllowed: enabled off LAN, disabled in LAN unless opted in", () => {
+  // Loopback-only server: relay is always available.
+  assert.equal(isRelayAllowed(false, false), true);
+  assert.equal(isRelayAllowed(false, true), true);
+  // LAN mode: disabled by default, enabled only with the explicit opt-in.
+  assert.equal(isRelayAllowed(true, false), false);
+  assert.equal(isRelayAllowed(true, true), true);
+});
+
+test("getBindHost: loopback by default, all interfaces only in LAN mode", () => {
+  assert.equal(getBindHost(false), "127.0.0.1");
+  assert.equal(getBindHost(true), undefined); // undefined === Express "all interfaces"
+});
+
+test("getServerRunningMessage matches the bind decision", () => {
+  assert.equal(getServerRunningMessage(3000, false), "Server running at http://127.0.0.1:3000");
+  assert.equal(getServerRunningMessage(3000, true), "Server running at http://localhost:3000");
+});
+
+test("isSafeContentType: only JSON and SSE are forwarded", () => {
+  for (const ok of ["application/json", "application/json; charset=utf-8", "text/event-stream", "text/event-stream; charset=utf-8"]) {
+    assert.equal(isSafeContentType(ok), true, ok);
+  }
+  for (const no of ["text/html", "application/javascript", "image/png", "", null, undefined]) {
+    assert.equal(isSafeContentType(no), false, String(no));
+  }
+});
+
+test("relay bounds and typed error codes are exported", () => {
+  assert.equal(MAX_RELAY_RESPONSE_SIZE, 10 * 1024 * 1024);
+  assert.equal(RELAY_TIMEOUT_MS, 60000);
+  assert.deepEqual(RELAY_ERROR_CODES, {
+    INVALID_TARGET: "invalid_target",
+    UNSAFE_CONTENT_TYPE: "unsafe_content_type",
+    RESPONSE_TOO_LARGE: "response_too_large",
+    UPSTREAM_TIMEOUT: "upstream_timeout",
+    CLIENT_DISCONNECT: "client_disconnect",
+    UPSTREAM_ERROR: "upstream_error",
+  });
 });
