@@ -17,6 +17,7 @@ sentence. The authoritative mapping is:
 | #2 | Audit runtime translation AI usage | closed | Evidence source for static-localization gap |
 | #10 | Implement the accepted AI call registry and ledger | closed | Monolithic origin, later decomposed |
 | #11 | Verify AI registry budgets, redaction and provider parity | closed | Prior QA, superseded by #40 |
+| #12 | Remove runtime AI from static UI translation | open | AC-1 static-localization implementation |
 | #16 | Define atomic world-revision contract | closed | Accepted AC-2 contract |
 | #17 | Implement six-projection atomic world revisions | open | AC-2 implementation |
 | #18 | Scaffold strict TypeScript domain package | open | AC-3 implementation |
@@ -39,7 +40,8 @@ yet merged.
 
 ### AC-1 - Observable AI
 
-Source contract: [`ai-call-registry.md`](ai-call-registry.md); implementation #37, #38, #39; independent QA #40.
+Source contract: [`ai-call-registry.md`](ai-call-registry.md); implementation #12,
+#37, #38 and #39; independent QA #40.
 
 | Test ID | Production Boundary | Fixture/Precondition | Observable Expected Failure/Result | Runner/Discovery Path | Status | Owner vs. QA |
 |---------|--------------------|----------------------|------------------------------------|-----------------------|--------|--------------|
@@ -47,7 +49,7 @@ Source contract: [`ai-call-registry.md`](ai-call-registry.md); implementation #3
 | AC-1-02 | PLANNED task-registry lookup inside `callAI` | Unknown `taskId` passed to an instrumented call | PLANNED: rejected before network and recorded as `registry.unknown` | `node --test` colocated `src/Game/AI/` | PLANNED | #37 implements, #40 validates |
 | AC-1-03 | PLANNED context-manifest guard at final prompt assembly | Prompt assembled for `timeline.advance`; attempt to register a full-map item | PLANNED: `fullMapIncluded: false` is the only accepted value; a full-map item fails the guard before dispatch | `node --test` at the assembly seam | PLANNED | #37 implements, #40 validates |
 | AC-1-04 | PLANNED deterministic speaker selection | Exactly two eligible speakers | PLANNED: deterministic selection with zero model calls; no `legacy.two-party-speaker` record | `node --test` speaker-selection unit | PLANNED | #37/#39 implement, #40 validates |
-| AC-1-05 | PLANNED static localization path | Language-pack string lookup | PLANNED: zero model calls; no `legacy.runtime-translation` record | `node --test` with mocked `callAI` spy | PLANNED | #39 implements, #40 validates |
+| AC-1-05 | PLANNED static localization path | Language-pack string lookup | PLANNED: zero model calls; no `legacy.runtime-translation` record | `node --test` with mocked `callAI` spy | PLANNED | #12 implements; #39 integrates; #40 validates |
 | AC-1-06 | PLANNED three accounting levels | Structured task with parse failure then correction then success | PLANNED: 1 invocation, 2 generation attempts, >=2 transport attempts | `node --test` ledger unit | PLANNED | #37 implements, #40 validates |
 | AC-1-07 | PLANNED redaction boundary | Canary secrets in headers, URLs, prompts, responses, error bodies | PLANNED: none appear in serialized records | `node --test` canary tests | PLANNED | #37 implements, #40 validates |
 | AC-1-08 | PLANNED provider adapters for gemini, openai, anthropic, openai-compatible, anthropic-compatible | One modeled response per provider family | PLANNED: same domain record shape; missing usage/cost stays `null`, never zero | `node --test` adapter suite | PLANNED | #38 implements, #40 validates |
@@ -215,9 +217,10 @@ maps to a criterion.
 
 ## 3. Repository Evidence: EXISTS NOW vs PLANNED
 
-State as of the merge-base `4b6655b`. Searches ran with `rg` against `src/`,
-`server/`, `scripts/` and `package.json`. A symbol that appears only in the accepted
-spec documents or in this plan is recorded as PLANNED (not yet implemented).
+Repository evidence was reviewed against `private/main@c599ed3`. Searches ran with
+`rg` against `src/`, `server/`, `scripts/` and `package.json`. A symbol that
+appears only in the accepted spec documents or in this plan is recorded as PLANNED
+(not yet implemented).
 
 | Symbol / capability | EXISTS NOW (rg evidence) | PLANNED target / owning issue | Notes |
 |---------------------|--------------------------|-------------------------------|-------|
@@ -225,7 +228,7 @@ spec documents or in this plan is recorded as PLANNED (not yet implemented).
 | `applySimulationResult` | `src/Game/AI/gameplay.js:1656` (referenced in `docs/audits/runtime-write-path-inventory.md`) | typed-command/atomic-commit seam (#17, #18) | currently six independent writes |
 | `writeRuntimeJsonAsset` | `server/libraryStore.js:2315` | routed through revision transaction (#17) | currently last-writer-wins |
 | `PROVIDER_OPTIONS` | `src/Game/AI/providerConfig.js` values: gemini, openai, anthropic, openai-compatible, anthropic-compatible | - | five provider families confirmed |
-| `translationFilter` | `src/runtime/translationFilter.test.js` (filtering already-translated/static strings) | static localization path (#39) | NOT evidence of zero runtime calls |
+| `translationFilter` | `src/runtime/translationFilter.test.js` (filtering already-translated/static strings) | static localization path (#12), then lifecycle integration (#39) | NOT evidence of zero runtime calls |
 | `diplomacyRouting` | `src/Game/AI/diplomacyRouting.js` exports normalize/c classify/merge plan, focused map context | deterministic 2-party speaker selection | speaker selection not yet present |
 | `commitWorldRevision` | not found in `src/` `server/` `scripts/` | #17 | PLANNED |
 | `selectNextSpeaker` | not found | #37/#39 | PLANNED |
