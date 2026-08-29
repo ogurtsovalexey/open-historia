@@ -1,7 +1,8 @@
 # Phase 1 Atomic World Revision Contract
 
-Status: Accepted Phase 1 design contract. Runtime implementation is tracked in
-Issue #17.
+Status: Accepted Phase 1 design contract. Runtime implementation is split across
+Issues #41 (pure core), #42 (filesystem), #43 (IndexedDB) and #44 (desktop
+production integration). Superseded Issue #17 is evidence only.
 
 This contract refines [AC-2](acceptance-criteria.md#ac-2--atomic-state) and
 implements the second foundation in the
@@ -224,8 +225,8 @@ separate correctness-critical write.
 
 ## 8. Required Phase 1 tests
 
-Issue #17 is not accepted until all of these are automated for both adapters
-where applicable:
+The #41–#44 implementation set is not accepted until all of these are automated
+for both adapters where applicable:
 
 1. Inject failure before and after every staging/publication step; restart reads
    exactly the old or new bundle, never a mixture.

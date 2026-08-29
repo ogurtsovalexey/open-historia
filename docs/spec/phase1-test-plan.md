@@ -19,7 +19,7 @@ sentence. The authoritative mapping is:
 | #11 | Verify AI registry budgets, redaction and provider parity | closed | Prior QA, superseded by #40 |
 | #12 | Remove runtime AI from static UI translation | open | AC-1 static-localization implementation |
 | #16 | Define atomic world-revision contract | closed | Accepted AC-2 contract |
-| #17 | Implement six-projection atomic world revisions | open | AC-2 implementation |
+| #41–#44 | Pure revision core, filesystem/IndexedDB adapters and desktop production integration | open | AC-2 implementation; #17 superseded |
 | #18 | Scaffold strict TypeScript domain package | open | AC-3 implementation |
 | #19 | Prove the World 1916/1797 vertical slice end to end | open | AC-7 / AC-8 implementation |
 | #22 | Define the minimal Scenario V2 integrity contract | closed | Accepted AC-4 / AC-5 / AC-6 / AC-9 contract |
@@ -66,20 +66,20 @@ model call.
 
 ### AC-2 - Atomic State
 
-Source contract: [`atomic-world-revision.md`](atomic-world-revision.md) (#16 accepted); implementation #17.
+Source contract: [`atomic-world-revision.md`](atomic-world-revision.md) (#16 accepted); implementation #41–#44.
 
 | Test ID | Production Boundary | Fixture/Precondition | Observable Expected Failure/Result | Runner/Discovery Path | Status | Owner vs. QA |
 |---------|--------------------|----------------------|------------------------------------|-----------------------|--------|--------------|
-| AC-2-01 | PLANNED compare-and-swap commit | Two commits resolving the same `expectedRevision` | PLANNED: exactly one succeeds; the other reports `conflict` with the winning revision | `node --test` storage-adapter test | PLANNED | #17 implements |
-| AC-2-02 | PLANNED staged-write failure injection | Inject failure before and after each staging/publication step | PLANNED: previous complete revision stays readable; no mixed projection | `node --test` fault-injection | PLANNED | #17 implements |
-| AC-2-03 | PLANNED corrupt/missing projection | Remove or corrupt one of actions/chat/events/game/world/colors | PLANNED: manifest cannot become/read as current; recovery selects last complete parent | `node --test` filesystem adapter | PLANNED | #17 implements |
-| AC-2-04 | PLANNED coherent read under contention | Read repeatedly while a commit is paused at each step | PLANNED: every accepted read has one verified revision | `node --test` interleaving | PLANNED | #17 implements |
-| AC-2-05 | PLANNED active-game switch isolation | Switch active game during in-flight commit | PLANNED: only the explicit target game changes | `node --test` multi-game | PLANNED | #17 implements |
-| AC-2-06 | PLANNED legacy baseline import | Manifest-less save imported side-by-side | PLANNED: first revisioned write failing leaves the legacy baseline readable | `node --test` migration bridge | PLANNED | #17 implements |
-| AC-2-07 | EXISTING `writeRuntimeJsonAsset` in `server/libraryStore.js` | Legacy per-asset write that races a revisioned write | Today: last-writer-wins. PLANNED: routed through the transaction helper and conflicts when stale | `node --test` server storage | PLANNED | #17 implements |
-| AC-2-08 | PLANNED rollback crash safety | Crash before, during and after rollback publication | PLANNED: restart exposes pre-rollback or complete rollback with a valid restore path | `node --test` fault-injection | PLANNED | #17 implements |
-| AC-2-09 | PLANNED retention pruning guard | Prune attempt against current, recovery-parent, UI-visible revision | PLANNED: prune forbidden; those revisions retained | `node --test` retention unit | PLANNED | #17 implements |
-| AC-2-10 | PLANNED publication notification | `oh:turn-complete` and sync after durable commit | PLANNED: fires once after commit, never for conflicts or failed candidates | `node --test` notification spy | PLANNED | #17 implements |
+| AC-2-01 | PLANNED compare-and-swap commit | Two commits resolving the same `expectedRevision` | PLANNED: exactly one succeeds; the other reports `conflict` with the winning revision | `node --test` storage-adapter test | PLANNED | #41 core; #42/#43 adapters |
+| AC-2-02 | PLANNED staged-write failure injection | Inject failure before and after each staging/publication step | PLANNED: previous complete revision stays readable; no mixed projection | `node --test` fault-injection | PLANNED | #42/#43 implement |
+| AC-2-03 | PLANNED corrupt/missing projection | Remove or corrupt one of actions/chat/events/game/world/colors | PLANNED: manifest cannot become/read as current; recovery selects last complete parent | `node --test` storage adapters | PLANNED | #41–#43 implement |
+| AC-2-04 | PLANNED coherent read under contention | Read repeatedly while a commit is paused at each step | PLANNED: every accepted read has one verified revision | `node --test` interleaving | PLANNED | #42/#43 implement |
+| AC-2-05 | PLANNED active-game switch isolation | Switch active game during in-flight commit | PLANNED: only the explicit target game changes | `node --test` multi-game | PLANNED | #42/#43 implement |
+| AC-2-06 | PLANNED legacy baseline import | Manifest-less save imported side-by-side | PLANNED: first revisioned write failing leaves the legacy baseline readable | `node --test` migration bridge | PLANNED | #42/#43 implement |
+| AC-2-07 | EXISTING `writeRuntimeJsonAsset` in `server/libraryStore.js` | Legacy per-asset write that races a revisioned write | Today: last-writer-wins. PLANNED: routed through the transaction helper and conflicts when stale | `node --test` server storage | PLANNED | #44 implements desktop; #43 web |
+| AC-2-08 | PLANNED rollback crash safety | Crash before, during and after rollback publication | PLANNED: restart exposes pre-rollback or complete rollback with a valid restore path | `node --test` fault-injection | PLANNED | #42/#44 implement |
+| AC-2-09 | PLANNED retention pruning guard | Prune attempt against current, recovery-parent, UI-visible revision | PLANNED: prune forbidden; those revisions retained | `node --test` retention unit | PLANNED | #42/#43 implement |
+| AC-2-10 | PLANNED publication notification | `oh:turn-complete` and sync after durable commit | PLANNED: fires once after commit, never for conflicts or failed candidates | `node --test` notification spy | PLANNED | #44 implements |
 
 The six-projection boundary in this row is `actions`, `chat`, `events`, `game`,
 `world`, `colors` (`atomic-world-revision.md` section 1). It is not the deferred
@@ -156,7 +156,7 @@ Source contract: [`consensus-spec.md`](consensus-spec.md) section 10; implementa
 
 | Test ID | Production Boundary | Fixture/Precondition | Observable Expected Failure/Result | Runner/Discovery Path | Status | Owner vs. QA |
 |---------|--------------------|----------------------|------------------------------------|-----------------------|--------|--------------|
-| AC-7-01 | EXISTING load/command/resolve/save path via `src/Game/AI/gameplay.js` + PLANNED #17 commit | One sourced observation for Russia | PLANNED: observation travels load -> typed command -> deterministic resolve -> atomic save/replay -> causal narrative | `node --test` end-to-end slice (not yet present) | PLANNED | #19 implements |
+| AC-7-01 | EXISTING load/command/resolve/save path via `src/Game/AI/gameplay.js` + PLANNED #44 commit | One sourced observation for Russia | PLANNED: observation travels load -> typed command -> deterministic resolve -> atomic save/replay -> causal narrative | `node --test` end-to-end slice (not yet present) | PLANNED | #19 implements |
 | AC-7-02 | same boundary | One sourced observation for Germany | PLANNED: same pipeline | same harness | PLANNED | #19 implements |
 | AC-7-03 | same boundary | One sourced observation for Britain | PLANNED: same pipeline | same harness | PLANNED | #19 implements |
 
@@ -170,7 +170,7 @@ Source contract: [`consensus-spec.md`](consensus-spec.md) section 10; implementa
 
 | Test ID | Production Boundary | Fixture/Precondition | Observable Expected Failure/Result | Runner/Discovery Path | Status | Owner vs. QA |
 |---------|--------------------|----------------------|------------------------------------|-----------------------|--------|--------------|
-| AC-8-01 | EXISTING scenario load path + PLANNED #17 commit | Thin 1797 fixture | PLANNED: loads through the same contracts as 1916 | `node --test` slice harness (not yet present) | PLANNED | #19 implements |
+| AC-8-01 | EXISTING scenario load path + PLANNED #44 commit | Thin 1797 fixture | PLANNED: loads through the same contracts as 1916 | `node --test` slice harness (not yet present) | PLANNED | #19 implements |
 | AC-8-02 | PLANNED era-assumption guard | 1797 fixture exposing a modern-era assumption | PLANNED: caught by the same validation, no separate engine code | `node --test` era-sensitivity unit | PLANNED | #19 implements |
 
 Validation wording (unchanged): a thin 1797 fixture loads through the same contracts
@@ -225,12 +225,12 @@ appears only in the accepted spec documents or in this plan is recorded as PLANN
 | Symbol / capability | EXISTS NOW (rg evidence) | PLANNED target / owning issue | Notes |
 |---------------------|--------------------------|-------------------------------|-------|
 | `callAI` | `src/Game/AI/main.jsx` `export async function callAI` | registry instrumentation (#37, #38, #39) | currently un-instrumented |
-| `applySimulationResult` | `src/Game/AI/gameplay.js:1656` (referenced in `docs/audits/runtime-write-path-inventory.md`) | typed-command/atomic-commit seam (#17, #18) | currently six independent writes |
-| `writeRuntimeJsonAsset` | `server/libraryStore.js:2315` | routed through revision transaction (#17) | currently last-writer-wins |
+| `applySimulationResult` | `src/Game/AI/gameplay.js:1656` (referenced in `docs/audits/runtime-write-path-inventory.md`) | typed-command/atomic-commit seam (#44, #18) | currently six independent writes |
+| `writeRuntimeJsonAsset` | `server/libraryStore.js:2315` | routed through revision transaction (#44) | currently last-writer-wins |
 | `PROVIDER_OPTIONS` | `src/Game/AI/providerConfig.js` values: gemini, openai, anthropic, openai-compatible, anthropic-compatible | - | five provider families confirmed |
 | `translationFilter` | `src/runtime/translationFilter.test.js` (filtering already-translated/static strings) | static localization path (#12), then lifecycle integration (#39) | NOT evidence of zero runtime calls |
 | `diplomacyRouting` | `src/Game/AI/diplomacyRouting.js` exports normalize/c classify/merge plan, focused map context | deterministic 2-party speaker selection | speaker selection not yet present |
-| `commitWorldRevision` | not found in `src/` `server/` `scripts/` | #17 | PLANNED |
+| `commitWorldRevision` | not found in `src/` `server/` `scripts/` | #41–#44 | PLANNED |
 | `selectNextSpeaker` | not found | #37/#39 | PLANNED |
 | `factsUsed` / `inferredClaims` | not found in runtime; only accepted spec and recovered docs | scenario adapter (section 6) | PLANNED |
 | `fullMapIncluded` | not found in runtime; only accepted contract | #37 context guard | PLANNED |
