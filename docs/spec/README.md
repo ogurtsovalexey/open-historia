@@ -9,7 +9,7 @@
    cost-ledger contract for AC-1.
 5. `atomic-world-revision.md` — accepted atomic publish, recovery, rollback and
    compatibility contract for AC-2.
-6. `phase1-test-plan.md` — recovered QA design, to be narrowed before coding.
+6. `phase1-test-plan.md` — evidence-grounded executable QA matrix mapping AC-1 through AC-9.
 7. `recovered/` — verbatim agent evidence, not implementation authority.
 
 The global roadmap and research corpus is in `../product/`.
@@ -29,5 +29,5 @@ The global roadmap and research corpus is in `../product/`.
 - [Acceptance criteria](acceptance-criteria.md)
 - [AI call registry contract](ai-call-registry.md)
 - [Atomic world revision contract](atomic-world-revision.md)
-- [QA plan](phase1-test-plan.md)
+- [QA plan](phase1-test-plan.md) — evidence-grounded executable matrix mapping AC-1 through AC-9 bidirectionally
 - [Recovery provenance](provenance.md)
