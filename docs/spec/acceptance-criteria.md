@@ -8,6 +8,10 @@ Every production model call has a registered task, selected profile, context
 manifest, token budget, latency, usage/cost record and accepted state effect.
 Two-party speaker selection and static localization make no model call.
 
+The required fields, accounting levels, redaction boundary, migration path and
+automated checks are defined by the accepted
+[AI Call Registry Contract](ai-call-registry.md).
+
 ### AC-2 — Atomic State
 
 Every accepted turn commits under one world revision. Injected write failures
