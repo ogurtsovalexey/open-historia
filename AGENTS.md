@@ -5,10 +5,12 @@
 
 ## Before Any Work
 
-1. **Read `docs/principles.md`.** It is the source of truth for architecture,
-   data contracts, and design constraints.
-2. Check that your change does not violate any principle. If it does, escalate.
-3. Reference specific principle numbers in your specs and reviews.
+1. **Read `docs/principles.md`.** It is the source of truth for architecture
+   and design constraints.
+2. Read the accepted phase contract and acceptance criteria under `docs/spec/`.
+3. For parallel work, follow `docs/agent-workflow.md` in a separate worktree.
+4. Check that your change does not violate a principle; escalate if it does.
+5. Reference principle numbers and acceptance criteria in reviews.
 
 ## Agent Roles
 
@@ -33,18 +35,18 @@ Each phase follows this sequence:
 ## Key Rules (violating these = rejected spec)
 
 ### Scenario is Law
-- Spec `.spec.mjs` fields are immutable ground truth
-- AI-generated changes are validated against `simulationRules`
-- QA MUST test: "did AI overwrite a spec field?"
+- Authored scenario facts are immutable starting truth.
+- AI authoring output remains Draft until reviewed.
+- QA tests overwrites, provenance gaps and `factsUsed[]` references.
 
 ### Map Does NOT Go Into AI
 - Full map never travels into AI prompts
-- Use `mapSemantics` (~1-3 KB) → cheap model → region annotations
+- Use `mapSemantics` → deterministic resolution → optional utility fallback
 - QA MUST verify: AI context size < reasonable threshold
 
 ### Application = Engine, AI = Brain
 - Formulas, storage, recalculation → application code
-- What changes, by how much, why → AI
+- Strategy/explanations/bounded proposals → AI; final effects → engine
 - Developer + AI Engineer MUST agree on the engine/modifier contract
 
 ### Consensus or Escalate
@@ -54,7 +56,7 @@ Each phase follows this sequence:
 ## Tech Stack
 
 - **Language:** TypeScript (new code) / JavaScript (existing)
-- **Storage:** modular JSON files (world.json, economy.json, culture.json, etc.)
+- **Storage:** atomic versioned state with modular JSON projections during migration
 - **Platforms:** single codebase → desktop, web, Android
 - **Computations:** browser/WebView, Web Workers for heavy tasks (culture diffusion)
 
@@ -63,6 +65,10 @@ Each phase follows this sequence:
 | File | Purpose |
 |------|---------|
 | `docs/principles.md` | Canonical architectural principles |
+| `docs/product/README.md` | Global product specification and roadmap |
+| `docs/spec/consensus-spec.md` | Accepted Phase 1 contract |
+| `docs/spec/acceptance-criteria.md` | Phase 1 completion gates |
+| `docs/agent-workflow.md` | Parallel worktree and handoff protocol |
 | `docs/architecture.md` | System architecture overview |
 | `docs/ai-overview.md` | AI system (providers, tasks, schemas) |
 | `docs/ai-schemas.md` | JSON schemas for AI tasks |

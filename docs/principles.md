@@ -1,17 +1,17 @@
 # Open Historia — Principles & Architecture Decisions
 
-This document is the **canonical source of truth** for all architectural
-decisions, design principles, and constraints. Every agent (PO, Analyst,
-Developer, AI Engineer, QA) MUST reference this document before making any
-design or implementation decision. Changes to this document require discussion
-and consensus.
+This document is the **canonical source of truth** for architectural principles
+and constraints. Detailed product decisions live in `docs/product/`; accepted
+phase contracts live in `docs/spec/`. If documents disagree, precedence is:
+principles → accepted phase contract → product roadmap → recovered agent notes.
 
 ---
 
 ## 1. Scenario is Law (Сценарий — Закон)
 
-The `.spec.mjs` file is **immutable ground truth** for every game seeded from
-that scenario. It defines:
+The authored scenario package is **immutable ground truth** for every game
+seeded from that scenario. Existing `.spec.mjs` files are the current adapter;
+Scenario Package v2 is the target contract. It defines:
 
 - `polities` — polities of the era with colors and aliases
 - `countryAssignments` / `regionOverrides` — starting borders
@@ -20,11 +20,10 @@ that scenario. It defines:
 - `startingTimelineText` — narrative opening
 - `game.startDate` — starting date
 
-**AI fills gaps, never overrides.** AI-generated `polityChanges` and
-`regionTransfers` are validated against `simulationRules.alliances` and
-`activeWars`. If a spec declares "FRA-RUS alliance since 1892", AI cannot
-generate an event where France declares war on Russia without first breaking
-that alliance through explicit in-game events.
+**AI never silently fills canonical gaps and never overrides authored facts.**
+An authoring assistant may propose sourced Draft values, but human review must
+promote them into the scenario package. Runtime proposals are validated against
+scenario invariants and current canonical state.
 
 **Validation contract**: every AI-generated `impacts` block is checked against
 spec invariants. Spec fields that are explicitly set are never overwritten by AI.
@@ -39,11 +38,9 @@ spec invariants. Spec fields that are explicitly set are never overwritten by AI
 - Culture/religion: diffusion computed by the engine once per in-game month
 - Mobilization: manpower pool, mobilization rate, deployment delays
 
-**The AI** owns: what changes, by how much, and why.
-- Generates modifiers (e.g. `war_mobilization: +15% industrial output`)
-- Generates events that the engine applies
-- Generates `mapSemantics` for map-mode rendering
-- Does NOT compute formulas or modify totals directly
+**The AI** proposes intent, strategy, explanations, bounded events and severity
+bands. The engine validates those proposals and resolves actual numeric effects.
+AI does not own starting values, formulas, totals, transactions or final state.
 
 ---
 
@@ -59,8 +56,9 @@ The full world map (~8000+ regions, 200+ KB) never travels into AI prompts.
    - `contestedZones`: which areas are disputed
    - `cultureShifts` / `religionShifts`: demographic deltas
 
-2. **Cheap model** (or algorithmic fallback) resolves semantics to concrete `regionId`
-   annotations. If `mapSemantics` is empty (no changes), no AI is called at all.
+2. **Deterministic entity and geometry resolution** maps semantics to concrete
+   `regionId` annotations. A utility model is only an optional fallback for
+   unresolved names or ambiguous scope. If semantics are empty, no AI is called.
 
 3. **The application** interprets annotations and renders map layers.
 
@@ -106,7 +104,8 @@ Scenario authors choose the mode. Players cannot override.
 - `resources` map (oil, coal, iron, food, gold — per region)
 - Starting macro indicators per country
 
-**AI changes:** modifiers only (via `economy.modifiers[]`). Never raw numbers.
+**AI changes:** bounded modifier or shock proposals only. The engine resolves
+validated effects. AI never creates authoritative starting numbers or totals.
 
 **Region transfer → immediate recalculation.** Lose a coal region → country coal
 total drops instantly. No delay.
@@ -129,8 +128,8 @@ modifiers, never by directly editing totals.
 
 ## 8. Culture & Religion — Two Separate Layers
 
-Both are stored in `world.json` (separated into `culture.json` / `religion.json`
-in the modular storage). Each has:
+Both are separate domain modules and may be materialized as
+`culture.json` / `religion.json` projections. Each has:
 - Primary group per region
 - Minority percentages per region
 - Color-coded groups for map rendering
@@ -216,9 +215,11 @@ escalate to the project owner with 2-3 concrete options.
 
 ---
 
-## 15. Storage — Modular JSON
+## 15. Storage — Versioned, Atomic, Modular
 
-`world.json` is split into modular files, each with its own endpoint and polling:
+Domain data is modular, but a turn is committed under one world revision.
+Multiple files must never expose a mixed revision after a crash. Current JSON
+files are migration-compatible projections behind a transaction boundary:
 
 | File | Contents |
 |------|----------|
@@ -232,19 +233,21 @@ escalate to the project owner with 2-3 concrete options.
 
 ---
 
-## 16. Differential Polling (Дифференциальный Polling)
+## 16. Revision-Based Synchronization
 
-Instead of sending the full state every 5 seconds, only changed fields are sent
-(JSON Patch or field-level diff). Reduces traffic by 10-50× for large worlds.
-
-The 5-second interval stays; the payload shrinks.
+Consumers request changes since a known world revision. The preferred contract
+is a revision manifest plus changed assets or field-level patches. Existing
+5-second polling may remain as a compatibility fallback, while slow-changing
+projections may use longer intervals. Exact transport and intervals require
+measurement; correctness never depends on polling timing.
 
 ---
 
-## 17. Repository — Private GitHub
+## 17. Repository Privacy and Handoffs
 
-The canonical repository is private on GitHub. Forking and access are
-controlled by the project owner.
+The target canonical repository is private. The current GitHub fork is public,
+so consolidated planning remains local and MUST NOT be pushed until a private
+remote exists. Parallel agents use separate worktrees and commit-based handoffs.
 
 ---
 
@@ -252,4 +255,5 @@ controlled by the project owner.
 
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-08-29 | Resolve AI authority, atomic storage, synchronization and repository-status conflicts | Codex consolidation |
 | 2026-08-29 | Initial version — all principles from planning session | Planning session |

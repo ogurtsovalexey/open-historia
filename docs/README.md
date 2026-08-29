@@ -10,6 +10,13 @@ New to the codebase? Read **[Architecture Overview](architecture.md)** first —
 
 ## Contents
 
+### Product Direction & Specifications
+- [Canonical Principles](principles.md) — Binding authority, AI, state, storage, and repository constraints.
+- [Product Specification & Roadmap](product/README.md) — Consolidated research, domain model, scenarios, and implementation roadmap.
+- [Phase Specifications](spec/README.md) — Accepted contracts, acceptance criteria, QA plans, provenance, and recovered evidence.
+- [Parallel Agent Workflow](agent-workflow.md) — Safe Codex/OpenCode worktrees and Git handoffs.
+- [Open Questions](open-questions.md) — Product-owner decisions and implementation spikes still pending.
+
 ### Getting Started
 - [Architecture Overview](architecture.md) — Tech stack, the three build variants and the `VITE_OH_WEB` flag, boot sequence, directory map, and the frontend↔`/api`↔storage data flow.
 - [Contributing & Conventions](conventions.md) — Repo/remote layout, release-channel workflow, PR-only process, commit/attribution and comment style, local dev, `node --test`, and frozen identifiers.
