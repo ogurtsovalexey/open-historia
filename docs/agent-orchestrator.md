@@ -4,6 +4,13 @@ This Codex session is the integration owner and orchestration brain. A small
 `launchd` watchdog wakes the same session only when the GitHub board has work;
 it does not make product or architecture decisions itself.
 
+Every delivery carries a unique `ORCHESTRATOR_TICK_ID`. Queuing is not treated
+as success: the watchdog acknowledges the board signature only after the same
+Codex turn reaches `task_complete` with one of the required final markers. A
+missing marker, an interrupted turn or a timed-out turn remains unacknowledged
+and is retried. While a turn is still running, later watchdog checks wait rather
+than enqueue duplicate work.
+
 ## One orchestration cycle
 
 For every `ORCHESTRATOR_TICK`:
@@ -93,12 +100,29 @@ the board is stable.
 ```bash
 npm run agents:install
 npm run agents:start
+npm run agents:start <CODEX-session-UUID>
 npm run agents:status
 npm run agents:check
 npm run agents:workers
 npm run agents:stop
 npm run agents:run-now
+npm run agents:test
 ```
+
+`npm run agents:start <UUID>` binds the watchdog to an existing local Codex
+session, clears delivery state from the previous binding and immediately queues
+the first cycle. The session must already exist on this machine.
+
+`npm run agents:start` without a UUID intentionally creates a fresh integration
+owner: it opens a new Terminal window in the canonical repository, runs
+`codex --yolo` with the first orchestration prompt, detects the newly created
+session UUID, persists it and starts the watchdog. Existing detached workers are
+not stopped. If macOS denies Terminal automation or the UUID cannot be detected
+within 30 seconds, the watchdog remains stopped and the command explains how to
+bind the visible session manually.
+
+`agents:run-now` does not bypass an in-flight delivery. It forces a new cycle
+only when there is no pending tick, preventing duplicate integration work.
 
 Configuration is stored outside the repository in
 `~/.config/open-historia-orchestrator/config`. Logs and the last result are in

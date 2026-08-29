@@ -14,6 +14,7 @@
     "agents:check": "bash scripts/agent-orchestrator.sh check",
     "agents:run-now": "bash scripts/agent-orchestrator.sh run-now",
     "agents:workers": "bash scripts/agent-worker.sh status",
+    "agents:test": "bash scripts/agent-orchestrator.test.sh",
     "dev": "vite",
     "dev:web": "node scripts/seed-web-defaults.mjs && vite --mode web",
     "build": "vite build",
