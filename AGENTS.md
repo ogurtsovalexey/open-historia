@@ -8,9 +8,11 @@
 1. **Read `docs/principles.md`.** It is the source of truth for architecture
    and design constraints.
 2. Read the accepted phase contract and acceptance criteria under `docs/spec/`.
-3. For parallel work, follow `docs/agent-workflow.md` in a separate worktree.
-4. Check that your change does not violate a principle; escalate if it does.
-5. Reference principle numbers and acceptance criteria in reviews.
+3. For parallel work, claim a ready GitHub Issue and follow
+   `docs/agent-workflow.md` in a separate worktree.
+4. Do not edit files outside the issue's owned paths.
+5. Check that your change does not violate a principle; escalate if it does.
+6. Reference principle numbers and acceptance criteria in reviews.
 
 ## Agent Roles
 
@@ -52,6 +54,9 @@ Each phase follows this sequence:
 ### Consensus or Escalate
 - Developer and AI Engineer must reach consensus on every data contract
 - Deadlock → escalate to project owner with 2-3 concrete options
+- OpenCode/DeepSeek cannot finalize architecture, domain, persistence, security,
+  historical-assumption or accepted-scope decisions; mark them `DECISION NEEDED`
+  for GPT integration review.
 
 ## Tech Stack
 

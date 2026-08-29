@@ -1,0 +1,58 @@
+name: Agent task
+description: A bounded task for Codex/GPT or OpenCode/DeepSeek
+title: "[TASK] "
+labels:
+  - status:ready
+body:
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent class
+      options:
+        - GPT integration owner
+        - DeepSeek worker
+        - Either after GPT triage
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective and deliverable
+      description: One bounded outcome and its exact artifact.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Observable conditions that make the task reviewable.
+    validations:
+      required: true
+  - type: textarea
+    id: ownership
+    attributes:
+      label: Owned and read-only paths
+      description: List writable paths first, then source paths that must remain read-only.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and base SHA
+      description: Blocking issues, accepted contracts and the integration commit to start from.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Required validation
+      description: Tests, commands and manual checks required before handoff.
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Decision boundary
+      description: Decisions the worker must escalate as DECISION NEEDED.
+    validations:
+      required: true
