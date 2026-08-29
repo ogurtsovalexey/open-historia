@@ -12,6 +12,7 @@ PLIST_PATH="${HOME}/Library/LaunchAgents/${LABEL}.plist"
 LOG_PATH="${STATE_DIR}/watchdog.log"
 LAST_MESSAGE_PATH="${STATE_DIR}/last-message.txt"
 LAST_CLAIMED_CHECK_PATH="${STATE_DIR}/last-claimed-check"
+LAST_WAKE_SIGNATURE_PATH="${STATE_DIR}/last-wake-signature"
 LOCK_DIR="${STATE_DIR}/tick.lock"
 
 mkdir -p "$CONFIG_DIR" "$STATE_DIR"
@@ -149,6 +150,18 @@ needs_tick() {
   return 1
 }
 
+actionable_signature() {
+  jq -r '
+    [
+      .[]
+      | select(any(.labels[]; .name == "status:ready" or .name == "status:review"))
+      | "\(.number):\(.updatedAt)"
+    ]
+    | sort
+    | join("|")
+  '
+}
+
 notify_owner() {
   local message="$1"
   /usr/bin/osascript -e "display notification \"${message//\"/\\\"}\" with title \"Open Historia agents\"" >/dev/null 2>&1 || true
@@ -173,11 +186,18 @@ run_tick() {
   printf '%s\n' "$$" >"$LOCK_DIR/pid"
   trap 'rm -rf "$LOCK_DIR" 2>/dev/null || true' EXIT
 
-  local board force prompt exit_code
+  local board force prompt exit_code signature previous_signature
   board="$(board_json)"
   force="${ORCHESTRATOR_FORCE:-0}"
   if [[ "$force" != "1" ]] && ! needs_tick "$board"; then
     log "idle: no ready/review work and no claimed audit due"
+    return 0
+  fi
+
+  signature="$(printf '%s' "$board" | actionable_signature)"
+  previous_signature="$(cat "$LAST_WAKE_SIGNATURE_PATH" 2>/dev/null || true)"
+  if [[ "$force" != "1" && -n "$signature" && "$signature" == "$previous_signature" ]]; then
+    log "idle: actionable board state was already queued"
     return 0
   fi
 
@@ -186,6 +206,14 @@ run_tick() {
 
   log "wake: resuming Codex session ${SESSION_ID}"
   : >"$LAST_MESSAGE_PATH"
+
+  if codex queue --thread "$SESSION_ID" --message "$prompt" >>"$LOG_PATH" 2>&1; then
+    printf '%s\n' "$signature" >"$LAST_WAKE_SIGNATURE_PATH"
+    log "queued: orchestration tick delivered to the live Codex session"
+    return 0
+  fi
+
+  log "queue unavailable: falling back to headless session resume"
   set +e
   (
     cd "$REPO_ROOT"
@@ -198,6 +226,8 @@ run_tick() {
     log "error: Codex resume exited ${exit_code}; the next interval will retry"
     return "$exit_code"
   fi
+
+  printf '%s\n' "$signature" >"$LAST_WAKE_SIGNATURE_PATH"
 
   if grep -q '^OWNER_ACTION_REQUIRED:' "$LAST_MESSAGE_PATH"; then
     notify_owner "$(grep '^OWNER_ACTION_REQUIRED:' "$LAST_MESSAGE_PATH" | tail -1 | cut -c1-180)"
