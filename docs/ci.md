@@ -32,4 +32,3 @@ The CI job captures the size of the `dist` and `dist‑web` directories after ea
 ## Missing validators
 
 Currently there is no dedicated scenario‑ or schema‑validation command wired into CI. Scenario spec validation is performed by the `scripts/presets/build‑preset.mjs` tool during preset generation, but no standalone “validate all specs” script exists. Schema validation is embedded in runtime gameplay (`validateGameplayPayload`) and is exercised by the unit tests.
-

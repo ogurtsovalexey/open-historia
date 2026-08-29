@@ -32,8 +32,10 @@ jobs:
       - name: Aggregate validation
         run: |
           set -o pipefail
+          set +e
           npm run ci 2>&1 | tee ci-output.txt
           CI_EXIT=$?
+          set -e
           echo "### Build size baseline" >> $GITHUB_STEP_SUMMARY
           echo "Date: $(date -u)" >> $GITHUB_STEP_SUMMARY
           if [[ -d dist ]]; then
