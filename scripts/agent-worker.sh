@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_PROMPT_FILE="${SCRIPT_DIR}/../docs/agent-worker-baseline.md"
 STATE_DIR="${HOME}/Library/Application Support/OpenHistoriaAgentOrchestrator/workers"
 mkdir -p "$STATE_DIR"
 
@@ -21,15 +23,17 @@ start_worker() {
   local worktree="${3:?worktree required}"
   local prompt_file="${4:?prompt file required}"
   local resume_session="${5:-}"
-  local name runner log exit_file
+  local name runner log exit_file composed_prompt
 
   name="$(screen_name "$issue")"
   runner="$STATE_DIR/$issue-run.sh"
   log="$STATE_DIR/$issue.jsonl"
   exit_file="$STATE_DIR/$issue.exit"
+  composed_prompt="$STATE_DIR/$issue.composed.prompt"
 
   [[ -d "$worktree" ]] || { echo "Missing worktree: $worktree" >&2; exit 1; }
   [[ -f "$prompt_file" ]] || { echo "Missing prompt: $prompt_file" >&2; exit 1; }
+  [[ -f "$BASE_PROMPT_FILE" ]] || { echo "Missing worker baseline: $BASE_PROMPT_FILE" >&2; exit 1; }
   if is_running "$issue"; then
     echo "Worker #$issue is already running in screen session $name." >&2
     exit 1
@@ -37,6 +41,11 @@ start_worker() {
 
   printf 'MODEL=%s\nWORKTREE=%s\n' "$model" "$worktree" >"$STATE_DIR/$issue.meta"
   printf 'starting\n' >"$exit_file"
+  {
+    cat "$BASE_PROMPT_FILE"
+    printf '\n\n---\n\n# Task-Specific Instructions\n\n'
+    cat "$prompt_file"
+  } >"$composed_prompt"
 
   {
     printf '#!/usr/bin/env bash\nset +e\n'
@@ -45,7 +54,7 @@ start_worker() {
     if [[ -n "$resume_session" ]]; then
       printf ' --session %q' "$resume_session"
     fi
-    printf ' "$(cat %q)" >>%q 2>&1\n' "$prompt_file" "$log"
+    printf ' "$(cat %q)" >>%q 2>&1\n' "$composed_prompt" "$log"
     printf 'code=$?\nprintf "%%s\\n" "$code" >%q\nexit "$code"\n' "$exit_file"
   } >"$runner"
   chmod 700 "$runner"

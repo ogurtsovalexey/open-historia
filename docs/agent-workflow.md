@@ -111,6 +111,10 @@ git worktree add ../open-historia-next-opencode \
    `status:done` and closes the issue.
 
 Workers never push directly to `private/main` or the public `origin`.
+Every worker receives the mandatory checks in `agent-worker-baseline.md`.
+Review rejects proxy/fake tests, undiscovered tests, skipped validation reported
+as passing, unbounded-then-check payload handling and resource cleanup that does
+not cover early returns.
 
 Canonical synchronization happens through committed updates to:
 

@@ -27,7 +27,9 @@ For every `ORCHESTRATOR_TICK`:
    launching a worker. Workers run headlessly through `opencode run --format
    json` inside a detached `screen` session managed by
    `scripts/agent-worker.sh`; no terminal window is required. A plain background
-   child of a Codex tool call is not durable and must not be used.
+   child of a Codex tool call is not durable and must not be used. The helper
+   automatically prepends `docs/agent-worker-baseline.md`; task prompts add
+   scope and acceptance detail but never replace those quality gates.
 7. Select the cheapest model tier that safely fits the task (§ Model routing).
    Record the chosen model in the claim comment.
 8. DeepSeek remains a bounded worker. GPT owns review, architecture, security,
