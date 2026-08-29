@@ -1,991 +1,333 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import assert from 'node:assert/strict';
+import test from 'node:test';
 
-import * as registry from "./aiCallRegistry.js";
-import * as ledger from "./aiCallLedger.js";
+import * as registry from './aiCallRegistry.js';
+import * as ledger from './aiCallLedger.js';
 
-// Test canary secrets for redaction verification
-const CANARY_SECRETS = {
-  apiKey: "sk-proj-abc123def456ghi789jkl012mno345pqr678stu901",
-  authHeader: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-  endpointUrl: "https://api.openai.com/v1/chat/completions?api_key=secret&user=admin",
-  promptContent: "System: You are a helpful assistant. User: Tell me the secret code is 12345.",
-  modelResponse: '{"secret": "classified", "password": "admin123"}',
-  errorBody: '{"error": {"message": "Invalid API key sk-live-abcdef123456", "code": "auth_error"}}'
+const profile = Object.freeze({
+  providerKind: 'openai',
+  model: 'gpt-4o',
+  endpointClass: 'provider-default',
+  reasoningMode: 'off'
+});
+
+const context = () => registry.createContextManifest([
+  { kind: 'system-instructions', itemCount: 1, characterCount: 12 },
+  { kind: 'world-summary', itemCount: 1, characterCount: 24, sourceRevision: 'rev-1' }
+], 'rev-1', 'prompts-1');
+
+const invocation = (policyId = 'small-fast') => ledger.createInvocationRecord({
+  taskId: 'timeline.advance',
+  taskVersion: 1,
+  taskVariant: 'manual',
+  parentInvocationId: null,
+  profile,
+  context: context(),
+  budget: registry.getBudgetPolicy(policyId)
+});
+
+const successfulGeneration = (record, { transports = 1, result = 'accepted' } = {}) => {
+  let current = ledger.startGenerationAttempt(record, {
+    purpose: record.attempts.length === 0 ? 'initial' : 'validation-correction'
+  });
+  const generationAttempt = current.attempts.length;
+  for (let index = 0; index < transports; index += 1) {
+    const started = ledger.startTransportAttempt(current, generationAttempt, {
+      transport: 'direct',
+      structuredMode: 'json-schema',
+      reasoningMode: 'off',
+      requestedOutputTokens: current.budget.maxOutputTokens
+    });
+    current = ledger.finishTransportAttempt(started.record, generationAttempt, started.transportAttempt, {
+      latencyMs: 5,
+      terminalStatus: 'success',
+      httpStatus: 200,
+      effectiveOutputTokens: 10,
+      usage: {
+        inputTokens: 20,
+        outputTokens: 10,
+        reasoningTokens: 0,
+        cachedInputTokens: 0,
+        totalTokens: 30,
+        source: 'provider'
+      },
+      cost: { amount: 0.01, source: 'provider', priceSnapshotId: null }
+    });
+  }
+  return ledger.finishGenerationAttempt(current, generationAttempt, result);
 };
 
-test("Registry validates known tasks", () => {
-  const task = registry.validateTask('timeline.advance');
-  assert.equal(task.taskId, 'timeline.advance');
-  assert.equal(task.version, 1);
-  assert.deepEqual(task.allowedVariants, ['manual', 'automatic']);
+const acceptedEffect = () => ({
+  effectKind: 'state-change',
+  fromWorldRevision: 'rev-1',
+  toWorldRevision: 'rev-2',
+  validatedCommandIds: ['cmd-1'],
+  eventIds: ['event-1']
 });
 
-test("Registry validates task variants", () => {
-  const task = registry.validateTask('timeline.advance', 'manual');
-  assert.equal(task.taskId, 'timeline.advance');
-
-  assert.throws(() => {
-    registry.validateTask('timeline.advance', 'invalid-variant');
-  }, /Variant "invalid-variant" not allowed/);
-});
-
-test("Registry rejects unknown tasks", () => {
-  assert.throws(() => {
-    registry.validateTask('unknown.task');
-  }, /Unknown task ID/);
-});
-
-test("Registry provides all task definitions", () => {
+test('registry exposes every accepted Phase 1 task and immutable definitions', () => {
   const tasks = registry.getAllTaskDefinitions();
-  assert(Array.isArray(tasks));
-  assert(tasks.length > 0);
-  assert(tasks.every(t => typeof t.taskId === 'string'));
+  assert.equal(tasks.length, 15);
+  assert.deepEqual(registry.validateTask('timeline.advance', 'manual').allowedVariants, ['manual', 'automatic']);
+  assert.throws(() => { registry.validateTask('timeline.advance').taskId = 'mutated'; });
+  assert.throws(() => registry.validateTask('timeline.advance', 'other'), /not allowed/);
+  assert.throws(() => registry.validateTask('prompt-invented.task'), /Unknown task ID/);
+  assert.throws(() => { tasks[0].allowedVariants.push('unsafe'); });
 });
 
-test("Registry provides all budget policies", () => {
-  const policies = registry.getAllBudgetPolicies();
-  assert(typeof policies === 'object');
-  assert(policies['small-fast']);
-  assert(policies['large-generation']);
-});
-
-test("Registry validates budget policies", () => {
-  const policy = registry.getBudgetPolicy('small-fast');
-  assert.equal(policy.policyId, 'small-fast');
-  assert(policy.deadlineMs > 0);
-  assert(policy.maxOutputTokens > 0);
-});
-
-test("Registry rejects unknown budget policies", () => {
-  assert.throws(() => {
-    registry.getBudgetPolicy('unknown-policy');
-  }, /Unknown budget policy/);
-});
-
-test("Registry validates budget numeric fields", () => {
-  const validBudget = {
-    policyId: 'small-fast',
-    deadlineMs: 10000,
-    maxOutputTokens: 1000,
-    maxGenerationAttempts: 1,
-    maxTransportAttemptsPerGeneration: 2,
-    reasoningMode: 'off'
-  };
-
-  const result = registry.validateBudget(validBudget);
-  assert.deepEqual(result, validBudget);
-
-  // Test invalid budgets
-  assert.throws(() => {
-    registry.validateBudget({ ...validBudget, deadlineMs: 0 });
-  }, /deadlineMs must be finite positive integer/);
-
-  assert.throws(() => {
-    registry.validateBudget({ ...validBudget, maxOutputTokens: -1 });
-  }, /maxOutputTokens must be finite positive integer/);
-
-  assert.throws(() => {
-    registry.validateBudget({ ...validBudget, maxOutputTokens: Infinity });
-  }, /maxOutputTokens must be finite positive integer/);
-
-  assert.throws(() => {
-    registry.validateBudget({ ...validBudget, maxOutputTokens: 3.14 });
-  }, /maxOutputTokens must be finite positive integer/);
-});
-
-test("Registry validates context manifests", () => {
-  const validManifest = registry.createContextManifest([
-    {
-      kind: 'system-instructions',
-      itemCount: 1,
-      characterCount: 500,
-      truncated: false
-    },
-    {
-      kind: 'world-summary',
-      itemCount: 3,
-      characterCount: 1500,
-      truncated: true,
-      sourceRevision: 'rev-123'
-    }
-  ], 'world-rev-456', 'prompt-rev-789');
-
-  assert.equal(validManifest.manifestVersion, 1);
-  assert.equal(validManifest.worldRevision, 'world-rev-456');
-  assert.equal(validManifest.promptPackRevision, 'prompt-rev-789');
-  assert.equal(validManifest.totalCharacterCount, 2000);
-  assert.equal(validManifest.fullMapIncluded, false);
-
-  // Test validation
-  registry.validateContextManifest(validManifest);
-});
-
-test("Registry rejects context with full map", () => {
-  const invalidManifest = {
-    manifestVersion: 1,
-    worldRevision: null,
-    promptPackRevision: null,
-    items: [],
-    totalCharacterCount: 0,
-    fullMapIncluded: true  // Violates Principle 3
-  };
-
-  assert.throws(() => {
-    registry.validateContextManifest(invalidManifest);
-  }, /fullMapIncluded must be false/);
-});
-
-test("Registry rejects invalid context item kinds", () => {
-  const invalidManifest = {
-    manifestVersion: 1,
-    worldRevision: null,
-    promptPackRevision: null,
-    items: [{
-      kind: 'invalid-kind',
-      itemCount: 1,
-      characterCount: 100,
-      truncated: false,
-      sourceRevision: null
-    }],
-    totalCharacterCount: 100,
-    fullMapIncluded: false
-  };
-
-  assert.throws(() => {
-    registry.validateContextManifest(invalidManifest);
-  }, /Invalid context item kind/);
-});
-
-test("Registry rejects mismatched character counts", () => {
-  const invalidManifest = {
-    manifestVersion: 1,
-    worldRevision: null,
-    promptPackRevision: null,
-    items: [{
-      kind: 'system-instructions',
-      itemCount: 1,
-      characterCount: 100,
-      truncated: false,
-      sourceRevision: null
-    }],
-    totalCharacterCount: 200, // Doesn't match sum
-    fullMapIncluded: false
-  };
-
-  assert.throws(() => {
-    registry.validateContextManifest(invalidManifest);
-  }, /totalCharacterCount.*does not match sum/);
-});
-
-test("Ledger creates transport attempt stubs", () => {
-  const stub = ledger.createTransportAttemptStub({
-    transportAttempt: 1,
-    transport: 'direct',
-    structuredMode: 'json-schema',
-    reasoningMode: 'off',
-    requestedOutputTokens: 1000
-  });
-
-  assert.equal(stub.transportAttempt, 1);
-  assert.equal(stub.transport, 'direct');
-  assert.equal(stub.structuredMode, 'json-schema');
-  assert.equal(stub.requestedOutputTokens, 1000);
-  assert.equal(stub.terminalStatus, 'success'); // Initial value
-  assert.equal(stub.latencyMs, null); // Not completed yet
-});
-
-test("Ledger completes transport attempts", () => {
-  const stub = ledger.createTransportAttemptStub({
-    transportAttempt: 1,
-    transport: 'direct',
-    structuredMode: 'json-schema',
-    reasoningMode: 'off',
-    requestedOutputTokens: 1000
-  });
-
-  const completed = ledger.completeTransportAttempt(stub, {
-    latencyMs: 1500,
-    terminalStatus: 'success',
-    httpStatus: 200,
-    effectiveOutputTokens: 850,
-    usage: {
-      inputTokens: 1200,
-      outputTokens: 850,
-      source: 'provider'
-    },
-    cost: {
-      amount: 0.0025,
-      source: 'provider',
-      priceSnapshotId: 'prices-2025-01'
+test('production unknown-task path returns a stable non-dispatchable registry failure', () => {
+  assert.throws(() => registry.resolveTaskForDispatch('unknown.task'), /Unknown task ID/);
+  assert.deepEqual(registry.resolveTaskForDispatch('unknown.task', null, { production: true }), {
+    ok: false,
+    safetyRecord: {
+      taskId: 'registry.unknown',
+      outcome: {
+        status: 'failed',
+        failure: { code: 'registry', sanitizedSummary: 'Unknown or invalid AI task registration' }
+      }
     }
   });
-
-  assert.equal(completed.latencyMs, 1500);
-  assert.equal(completed.terminalStatus, 'success');
-  assert.equal(completed.httpStatus, 200);
-  assert.equal(completed.effectiveOutputTokens, 850);
-  assert.equal(completed.usage.inputTokens, 1200);
-  assert.equal(completed.usage.source, 'provider');
-  assert.equal(completed.cost.amount, 0.0025);
 });
 
-test("Ledger creates invocation records", () => {
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([
-    {
-      kind: 'system-instructions',
-      itemCount: 1,
-      characterCount: 500,
-      truncated: false
-    }
-  ]);
-
+test('budgets are finite, complete and cannot override registered policy', () => {
   const budget = registry.getBudgetPolicy('small-fast');
+  assert.deepEqual(registry.validateBudget(budget), budget);
+  for (const field of ['deadlineMs', 'maxOutputTokens', 'maxGenerationAttempts', 'maxTransportAttemptsPerGeneration']) {
+    const missing = { ...budget };
+    delete missing[field];
+    assert.throws(() => registry.validateBudget(missing), new RegExp(`missing ${field}`));
+    assert.throws(() => registry.validateBudget({ ...budget, [field]: 0 }), /finite positive integer/);
+  }
+  assert.throws(() => registry.validateBudget({ ...budget, deadlineMs: budget.deadlineMs + 1 }), /must match registered policy/);
+});
 
-  const record = ledger.createInvocationRecord({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
-  });
+test('context manifests store counts/revisions only and reject a full map', () => {
+  const manifest = registry.createContextManifest([
+    { kind: 'events', itemCount: 2, characterCount: 50, prompt: 'must disappear' }
+  ]);
+  assert.deepEqual(Object.keys(manifest.items[0]).sort(), [
+    'characterCount', 'itemCount', 'kind', 'sourceRevision', 'truncated'
+  ]);
+  assert.equal(manifest.fullMapIncluded, false);
+  assert.throws(() => registry.validateContextManifest({ ...manifest, fullMapIncluded: true }), /must be false/);
+  assert.throws(() => registry.validateContextManifest({ ...manifest, items: 'not-an-array' }), /must be an array/);
+  assert.throws(() => registry.validateContextManifest({
+    ...manifest,
+    items: [{ ...manifest.items[0], itemCount: 0.5 }]
+  }), /Invalid itemCount/);
+});
 
-  assert.equal(record.schemaVersion, 1);
-  assert.match(record.invocationId, /^inv_/);
-  assert.equal(record.taskId, 'timeline.advance');
-  assert.equal(record.taskVariant, 'manual');
-  assert.equal(record.finishedAt, null);
+test('invocation validates the registered task version and copies allowlisted inputs', () => {
+  const record = invocation();
+  assert.match(record.invocationId, /^inv_[0-9a-f]{32}$/);
   assert.equal(record.outcome, null);
   assert.deepEqual(record.attempts, []);
+  assert.throws(() => ledger.createInvocationRecord({
+    ...record,
+    taskVersion: 2,
+    budget: registry.getBudgetPolicy('small-fast')
+  }), /does not match registered version/);
 });
 
-test("Ledger rejects invalid profiles", () => {
-  const invalidProfile = {
-    providerKind: 'invalid-provider',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  assert.throws(() => {
-    ledger.createInvocationRecord({
-      taskId: 'timeline.advance',
-      taskVersion: 1,
-      taskVariant: 'manual',
-      parentInvocationId: null,
-      profile: invalidProfile,
-      context,
-      budget
-    });
-  }, /Invalid providerKind/);
-});
-
-test("Ledger adds generation attempts", () => {
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  let record = ledger.createInvocationRecord({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
-  });
-
-  const transportAttempt = ledger.createTransportAttemptStub({
+test('transport attempt is pending before dispatch and terminal exactly once', () => {
+  const stub = ledger.createTransportAttemptStub({
     transportAttempt: 1,
     transport: 'direct',
     structuredMode: 'json-schema',
     reasoningMode: 'off',
-    requestedOutputTokens: 1000
+    requestedOutputTokens: 100
   });
-
-  record = ledger.addGenerationAttempt(record, {
-    generationAttempt: 1,
-    purpose: 'initial',
-    transportAttempts: [transportAttempt],
-    result: 'accepted'
+  assert.equal(stub.terminalStatus, null);
+  assert.equal(stub.latencyMs, null);
+  const completed = ledger.completeTransportAttempt(stub, {
+    latencyMs: 9,
+    terminalStatus: 'timeout'
   });
-
-  assert.equal(record.attempts.length, 1);
-  assert.equal(record.attempts[0].generationAttempt, 1);
-  assert.equal(record.attempts[0].purpose, 'initial');
-  assert.equal(record.attempts[0].transportAttempts.length, 1);
+  assert.equal(completed.terminalStatus, 'timeout');
+  assert.throws(() => ledger.completeTransportAttempt(completed, {
+    latencyMs: 10,
+    terminalStatus: 'success'
+  }), /already completed/);
 });
 
-test("Ledger enforces generation attempt numbering", () => {
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  let record = ledger.createInvocationRecord({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
+test('staged lifecycle records the stub before completion and enforces both attempt budgets', () => {
+  let record = ledger.startGenerationAttempt(invocation(), { purpose: 'initial' });
+  const first = ledger.startTransportAttempt(record, 1, {
+    transport: 'direct', structuredMode: 'json-schema', reasoningMode: 'off', requestedOutputTokens: 1000
   });
-
-  const transportAttempt = ledger.createTransportAttemptStub({
-    transportAttempt: 1,
-    transport: 'direct',
-    structuredMode: 'json-schema',
-    reasoningMode: 'off',
-    requestedOutputTokens: 1000
+  record = first.record;
+  assert.equal(record.attempts[0].transportAttempts[0].terminalStatus, null);
+  assert.throws(() => ledger.startTransportAttempt(record, 1, {
+    transport: 'direct', structuredMode: 'json-schema', reasoningMode: 'off', requestedOutputTokens: 1000
+  }), /still open/);
+  record = ledger.finishTransportAttempt(record, 1, 1, { latencyMs: 1, terminalStatus: 'transport-error' });
+  const second = ledger.startTransportAttempt(record, 1, {
+    transport: 'relay', structuredMode: 'text-json', reasoningMode: 'off', requestedOutputTokens: 1000
   });
-
-  // Wrong attempt number
-  assert.throws(() => {
-    ledger.addGenerationAttempt(record, {
-      generationAttempt: 2, // Should be 1
-      purpose: 'initial',
-      transportAttempts: [transportAttempt],
-      result: 'accepted'
-    });
-  }, /Expected generationAttempt 1, got 2/);
+  record = ledger.finishTransportAttempt(second.record, 1, 2, { latencyMs: 1, terminalStatus: 'success' });
+  assert.throws(() => ledger.startTransportAttempt(record, 1, {
+    transport: 'direct', structuredMode: 'none', reasoningMode: 'off', requestedOutputTokens: 1
+  }), /Exceeded maxTransportAttemptsPerGeneration/);
+  record = ledger.finishGenerationAttempt(record, 1, 'accepted');
+  assert.throws(() => ledger.startGenerationAttempt(record, { purpose: 'validation-correction' }), /Exceeded maxGenerationAttempts/);
 });
 
-test("Ledger enforces transport attempt numbering", () => {
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  let record = ledger.createInvocationRecord({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
-  });
-
-  const transportAttempt = ledger.createTransportAttemptStub({
-    transportAttempt: 2, // Wrong - should be 1
-    transport: 'direct',
-    structuredMode: 'json-schema',
-    reasoningMode: 'off',
-    requestedOutputTokens: 1000
-  });
-
-  assert.throws(() => {
-    ledger.addGenerationAttempt(record, {
-      generationAttempt: 1,
-      purpose: 'initial',
-      transportAttempts: [transportAttempt],
-      result: 'accepted'
-    });
-  }, /Transport attempt 1 has wrong transportAttempt number/);
+test('two generations with three transports each remain one invocation and six billable attempts', () => {
+  let record = invocation('large-generation');
+  record = successfulGeneration(record, { transports: 3, result: 'schema-failed' });
+  record = successfulGeneration(record, { transports: 3, result: 'accepted' });
+  assert.equal(record.attempts.length, 2);
+  assert.equal(record.attempts.flatMap((attempt) => attempt.transportAttempts).length, 6);
 });
 
-test("Ledger enforces budget limits", () => {
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast'); // maxGenerationAttempts: 1
-
-  let record = ledger.createInvocationRecord({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
-  });
-
-  const transportAttempt = ledger.createTransportAttemptStub({
-    transportAttempt: 1,
-    transport: 'direct',
-    structuredMode: 'json-schema',
-    reasoningMode: 'off',
-    requestedOutputTokens: 1000
-  });
-
-  // First attempt succeeds
-  record = ledger.addGenerationAttempt(record, {
-    generationAttempt: 1,
-    purpose: 'initial',
-    transportAttempts: [transportAttempt],
-    result: 'accepted'
-  });
-
-  // Second attempt should fail due to budget limit
-  assert.throws(() => {
-    ledger.addGenerationAttempt(record, {
-      generationAttempt: 2,
-      purpose: 'validation-correction',
-      transportAttempts: [transportAttempt],
-      result: 'accepted'
-    });
-  }, /Exceeded maxGenerationAttempts/);
+test('generic close cannot claim acceptance and committed effects require a later explicit call', () => {
+  const generated = successfulGeneration(invocation());
+  assert.throws(() => ledger.closeInvocation(generated, {
+    status: 'accepted', effect: acceptedEffect()
+  }), /require acceptInvocationEffect/);
+  assert.throws(() => ledger.acceptInvocationEffect(generated, {
+    ...acceptedEffect(), toWorldRevision: null
+  }), /non-empty string/);
+  const closed = ledger.acceptInvocationEffect(generated, acceptedEffect());
+  assert.equal(closed.outcome.status, 'accepted');
+  assert.equal(closed.outcome.effect.toWorldRevision, 'rev-2');
+  assert.throws(() => ledger.acceptInvocationEffect(closed, acceptedEffect()), /already closed/);
 });
 
-test("Ledger closes invocations with outcomes", () => {
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  let record = ledger.createInvocationRecord({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
+test('validation failure cannot later become an accepted effect', () => {
+  const failed = successfulGeneration(invocation(), { result: 'schema-failed' });
+  assert.throws(() => ledger.acceptInvocationEffect(failed, acceptedEffect()), /requires an accepted generation result/);
+  const closed = ledger.closeInvocation(failed, {
+    status: 'failed',
+    failure: { code: 'schema', sanitizedSummary: 'raw provider response must not survive' }
   });
-
-  const transportAttempt = ledger.createTransportAttemptStub({
-    transportAttempt: 1,
-    transport: 'direct',
-    structuredMode: 'json-schema',
-    reasoningMode: 'off',
-    requestedOutputTokens: 1000
+  assert.deepEqual(closed.outcome, {
+    status: 'failed',
+    failure: { code: 'schema', sanitizedSummary: 'AI response failed schema validation' }
   });
-
-  record = ledger.addGenerationAttempt(record, {
-    generationAttempt: 1,
-    purpose: 'initial',
-    transportAttempts: [transportAttempt],
-    result: 'accepted'
-  });
-
-  const outcome = {
-    status: 'accepted',
-    effect: {
-      effectKind: 'state-change',
-      fromWorldRevision: 'rev-123',
-      toWorldRevision: 'rev-124',
-      validatedCommandIds: ['cmd-1'],
-      eventIds: ['event-1']
-    }
-  };
-
-  record = ledger.closeInvocation(record, outcome);
-
-  assert.equal(record.finishedAt, record.finishedAt); // Should be set
-  assert(typeof record.latencyMs === 'number' && record.latencyMs >= 0);
-  assert.deepEqual(record.outcome, outcome);
 });
 
-test("Ledger validates state-change outcomes", () => {
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
+test('allowlist serialization drops arbitrary prompt, response, endpoint and debug objects', () => {
+  const canaries = [
+    'sk-secret-key',
+    'https://user:pass@example.test/path?token=secret',
+    'SYSTEM PROMPT CANARY',
+    '{"providerResponse":"CANARY"}'
+  ];
+  const record = {
+    ...successfulGeneration(invocation()),
+    prompt: canaries[2],
+    response: canaries[3],
+    endpoint: canaries[1],
+    provider: { apiKey: canaries[0] },
+    _debug: canaries
   };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  let record = ledger.createInvocationRecord({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
-  });
-
-  // State-change without revisions should fail
-  const invalidOutcome = {
-    status: 'accepted',
-    effect: {
-      effectKind: 'state-change',
-      fromWorldRevision: null, // Missing
-      toWorldRevision: null, // Missing
-      validatedCommandIds: [],
-      eventIds: []
-    }
-  };
-
-  assert.throws(() => {
-    ledger.closeInvocation(record, invalidOutcome);
-  }, /State-change effects must have both fromWorldRevision and toWorldRevision/);
+  const serialized = JSON.stringify(ledger.sanitizeForSerialization(record));
+  for (const canary of canaries) assert.equal(serialized.includes(canary), false);
+  assert.deepEqual(Object.keys(JSON.parse(serialized)).sort(), [
+    'attempts', 'budget', 'context', 'finishedAt', 'invocationId', 'latencyMs', 'outcome',
+    'parentInvocationId', 'profile', 'schemaVersion', 'startedAt', 'taskId', 'taskVariant', 'taskVersion'
+  ]);
 });
 
-test("Ledger rejects double-closing", () => {
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  let record = ledger.createInvocationRecord({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
+test('aggregate usage and cost preserve partial/unknown distinctions', () => {
+  const store = new ledger.AiCallLedger();
+  const first = store.startInvocation({
+    taskId: 'timeline.advance', taskVersion: 1, taskVariant: 'manual', parentInvocationId: null,
+    profile, context: context(), budget: registry.getBudgetPolicy('small-fast')
   });
-
-  const outcome = {
-    status: 'no-effect',
-    reason: 'advisory'
-  };
-
-  record = ledger.closeInvocation(record, outcome);
-
-  assert.throws(() => {
-    ledger.closeInvocation(record, outcome);
-  }, /Invocation already closed/);
-});
-
-test("Ledger class manages open and closed records", () => {
-  const ledgerInstance = new ledger.AiCallLedger();
-
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  // Start invocation
-  const record = ledgerInstance.startInvocation({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
+  store.startGeneration(first.invocationId, { purpose: 'initial' });
+  const started = store.startTransport(first.invocationId, 1, {
+    transport: 'direct', structuredMode: 'json-schema', reasoningMode: 'off', requestedOutputTokens: 1000
   });
-
-  // Should be in open records
-  const openRecord = ledgerInstance.getOpenInvocation(record.invocationId);
-  assert.deepEqual(openRecord, record);
-
-  // Close it
-  const outcome = {
-    status: 'accepted',
-    effect: {
-      effectKind: 'display-only',
-      fromWorldRevision: null,
-      toWorldRevision: null,
-      validatedCommandIds: [],
-      eventIds: []
-    }
-  };
-
-  const closedRecord = ledgerInstance.closeInvocation(record.invocationId, outcome);
-  assert.equal(closedRecord.finishedAt, closedRecord.finishedAt);
-
-  // Should be removed from open records
-  assert.equal(ledgerInstance.getOpenInvocation(record.invocationId), null);
-
-  // Should be in closed records
-  const closedRecords = ledgerInstance.getClosedRecords();
-  assert.equal(closedRecords.length, 1);
-  assert.equal(closedRecords[0].invocationId, record.invocationId);
-});
-
-test("Ledger class recovers interrupted invocations", () => {
-  const ledgerInstance = new ledger.AiCallLedger();
-
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  // Start but don't close
-  const record = ledgerInstance.startInvocation({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
-  });
-
-  assert.equal(ledgerInstance.getOpenRecords().length, 1);
-
-  // Recover interrupted
-  const recoveredCount = ledgerInstance.recoverInterrupted();
-  assert.equal(recoveredCount, 1);
-
-  // Should be no open records
-  assert.equal(ledgerInstance.getOpenRecords().length, 0);
-
-  // Should be in closed records as failed
-  const closedRecords = ledgerInstance.getClosedRecords();
-  assert.equal(closedRecords.length, 1);
-  assert.equal(closedRecords[0].outcome?.status, 'failed');
-  assert.equal(closedRecords[0].outcome?.failure?.code, 'transport');
-});
-
-test("Ledger class enforces bounded retention", () => {
-  const ledgerInstance = new ledger.AiCallLedger();
-
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  const outcome = {
-    status: 'no-effect',
-    reason: 'advisory'
-  };
-
-  // Create more records than retention limit
-  for (let i = 0; i < 250; i++) {
-    const record = ledgerInstance.startInvocation({
-      taskId: 'timeline.advance',
-      taskVersion: 1,
-      taskVariant: 'manual',
-      parentInvocationId: null,
-      profile,
-      context,
-      budget
-    });
-
-    ledgerInstance.closeInvocation(record.invocationId, outcome);
-  }
-
-  // Should keep only MAX_RETAINED_RECORDS (200)
-  const closedRecords = ledgerInstance.getClosedRecords();
-  assert(closedRecords.length <= 200);
-  assert(closedRecords.length > 0);
-});
-
-test("Ledger provides usage statistics", () => {
-  const ledgerInstance = new ledger.AiCallLedger();
-
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  // Create a record with known usage
-  const record = ledgerInstance.startInvocation({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
-  });
-
-  // Manually add attempt with usage data
-  const transportAttempt = ledger.createTransportAttemptStub({
-    transportAttempt: 1,
-    transport: 'direct',
-    structuredMode: 'json-schema',
-    reasoningMode: 'off',
-    requestedOutputTokens: 1000
-  });
-
-  const completedAttempt = ledger.completeTransportAttempt(transportAttempt, {
-    latencyMs: 1500,
+  store.finishTransport(first.invocationId, 1, started.transportAttempt, {
+    latencyMs: 2,
     terminalStatus: 'success',
-    httpStatus: 200,
-    effectiveOutputTokens: 850,
-    usage: {
-      inputTokens: 1200,
-      outputTokens: 850,
-      source: 'provider'
-    },
-    cost: {
-      amount: 0.0025,
-      source: 'provider',
-      priceSnapshotId: 'prices-2025-01'
-    }
+    usage: { inputTokens: 20, outputTokens: null, source: 'provider' }
   });
-
-  const updatedRecord = ledger.addGenerationAttempt(record, {
-    generationAttempt: 1,
-    purpose: 'initial',
-    transportAttempts: [completedAttempt],
-    result: 'accepted'
-  });
-
-  ledgerInstance.updateInvocation(record.invocationId, updatedRecord);
-
-  // Close the invocation
-  const outcome = {
-    status: 'accepted',
-    effect: {
-      effectKind: 'display-only',
-      fromWorldRevision: null,
-      toWorldRevision: null,
-      validatedCommandIds: [],
-      eventIds: []
-    }
-  };
-
-  ledgerInstance.closeInvocation(record.invocationId, outcome);
-
-  // Check statistics
-  const stats = ledgerInstance.getUsageStatistics();
-  assert.equal(stats.totalInvocations, 1);
-  assert.equal(stats.openInvocations, 0);
-  assert.equal(stats.knownInputTokens, 1200);
-  assert.equal(stats.knownOutputTokens, 850);
-  assert.equal(stats.knownCostUSD, 0.0025);
-  assert.equal(stats.hasUnknownUsage, false);
-  assert.equal(stats.hasUnknownCost, false);
+  store.finishGeneration(first.invocationId, 1, 'accepted');
+  store.acceptEffect(first.invocationId, { ...acceptedEffect(), effectKind: 'display-only', fromWorldRevision: null, toWorldRevision: null });
+  const stats = store.getUsageStatistics();
+  assert.equal(stats.knownInputTokens, 20);
+  assert.equal(stats.knownOutputTokens, 0);
+  assert.equal(stats.hasUnknownUsage, true);
+  assert.equal(stats.knownCostUSD, 0);
+  assert.equal(stats.hasUnknownCost, true);
 });
 
-test("Ledger redacts sensitive data", () => {
-  const testObject = {
-    apiKey: CANARY_SECRETS.apiKey,
-    endpoint: CANARY_SECRETS.endpointUrl,
-    prompt: CANARY_SECRETS.promptContent,
-    response: CANARY_SECRETS.modelResponse,
-    error: CANARY_SECRETS.errorBody,
-    safeField: 'public-data',
-    nested: {
-      authHeader: CANARY_SECRETS.authHeader,
-      safeNested: 'also-public'
-    }
-  };
-
-  const redacted = ledger.sanitizeForSerialization(testObject);
-
-  // Check redaction
-  assert.equal(redacted.apiKey, '[REDACTED]');
-  assert.equal(redacted.endpoint, 'https://api.openai.com');
-  assert.equal(redacted.prompt, CANARY_SECRETS.promptContent); // Content not redacted at this level
-  assert.equal(redacted.response, CANARY_SECRETS.modelResponse); // Content not redacted at this level
-  assert.equal(redacted.error, CANARY_SECRETS.errorBody); // Content not redacted at this level
-  assert.equal(redacted.safeField, 'public-data');
-  assert.equal(redacted.nested.authHeader, '[REDACTED]');
-  assert.equal(redacted.nested.safeNested, 'also-public');
-});
-
-test("Ledger sanitizes records for serialization", () => {
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  const record = ledger.createInvocationRecord({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
-  });
-
-  // Add some sensitive data to test redaction
-  const recordWithSecrets = {
-    ...record,
-    _debug: {
-      rawEndpoint: CANARY_SECRETS.endpointUrl,
-      rawApiKey: CANARY_SECRETS.apiKey
-    }
-  };
-
-  const sanitized = ledger.sanitizeForSerialization(recordWithSecrets);
-
-  // Check schema version preserved
-  assert.equal(sanitized.schemaVersion, 1);
-
-  // Check sensitive data redacted
-  assert.equal(sanitized._debug.rawEndpoint, 'https://api.openai.com');
-  assert.equal(sanitized._debug.rawApiKey, '[REDACTED]');
-});
-
-test("Registry task known check works", () => {
-  assert(registry.isTaskKnown('timeline.advance'));
-  assert(registry.isTaskKnown('actions.suggest'));
-  assert(!registry.isTaskKnown('unknown.task'));
-});
-
-test("Canary secrets do not appear in serialized registry state", () => {
-  // Test that our test secrets would be redacted
-  const serializedTasks = JSON.stringify(registry.getAllTaskDefinitions());
-  const serializedPolicies = JSON.stringify(registry.getAllBudgetPolicies());
-
-  // Ensure no canary secrets are present (they shouldn't be in registry data anyway)
-  for (const [name, secret] of Object.entries(CANARY_SECRETS)) {
-    if (typeof secret === 'string') {
-      assert(!serializedTasks.includes(secret), `Canary secret ${name} found in task definitions`);
-      assert(!serializedPolicies.includes(secret), `Canary secret ${name} found in budget policies`);
-    }
-  }
-});
-
-test("Concurrent record handling with explicit IDs", () => {
-  const ledgerInstance = new ledger.AiCallLedger();
-
-  // Create multiple invocations
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  const records = [];
-  for (let i = 0; i < 5; i++) {
-    const record = ledgerInstance.startInvocation({
-      taskId: 'timeline.advance',
-      taskVersion: 1,
-      taskVariant: i % 2 === 0 ? 'manual' : 'automatic',
-      parentInvocationId: null,
-      profile,
-      context,
-      budget
+test('concurrent invocation IDs remain isolated without global current state', () => {
+  const store = new ledger.AiCallLedger();
+  const ids = Array.from({ length: 5 }, (_, index) => store.startInvocation({
+    taskId: 'timeline.advance', taskVersion: 1, taskVariant: index % 2 ? 'automatic' : 'manual',
+    parentInvocationId: null, profile, context: context(), budget: registry.getBudgetPolicy('small-fast')
+  }).invocationId);
+  assert.equal(new Set(ids).size, ids.length);
+  for (const id of ids.slice(0, 3)) {
+    store.startGeneration(id, { purpose: 'initial' });
+    const started = store.startTransport(id, 1, {
+      transport: 'direct', structuredMode: 'none', reasoningMode: 'off', requestedOutputTokens: 1
     });
-
-    records.push(record);
+    store.finishTransport(id, 1, started.transportAttempt, { latencyMs: 1, terminalStatus: 'cancelled' });
+    store.finishGeneration(id, 1, 'request-failed');
+    store.closeInvocation(id, { status: 'cancelled', by: 'superseded' });
   }
-
-  // All should have unique IDs
-  const ids = records.map(r => r.invocationId);
-  const uniqueIds = new Set(ids);
-  assert.equal(ids.length, uniqueIds.size);
-
-  // All should be open
-  assert.equal(ledgerInstance.getOpenRecords().length, 5);
-
-  // Close some
-  const outcome = {
-    status: 'no-effect',
-    reason: 'advisory'
-  };
-
-  for (let i = 0; i < 3; i++) {
-    ledgerInstance.closeInvocation(records[i].invocationId, outcome);
-  }
-
-  assert.equal(ledgerInstance.getOpenRecords().length, 2);
-  assert.equal(ledgerInstance.getClosedRecords().length, 3);
+  assert.equal(store.getOpenRecords().length, 2);
+  assert.equal(store.getClosedRecords().length, 3);
 });
 
-test("Export produces sanitized records", () => {
-  const ledgerInstance = new ledger.AiCallLedger();
-
-  const profile = {
-    providerKind: 'openai',
-    model: 'gpt-4o',
-    endpointClass: 'provider-default',
-    reasoningMode: 'off'
-  };
-
-  const context = registry.createContextManifest([]);
-  const budget = registry.getBudgetPolicy('small-fast');
-
-  // Add a record with sensitive debug data
-  const record = ledgerInstance.startInvocation({
-    taskId: 'timeline.advance',
-    taskVersion: 1,
-    taskVariant: 'manual',
-    parentInvocationId: null,
-    profile,
-    context,
-    budget
+test('interrupted records recover deterministically with terminal transport failure', () => {
+  const store = new ledger.AiCallLedger();
+  const record = store.startInvocation({
+    taskId: 'timeline.advance', taskVersion: 1, taskVariant: 'manual', parentInvocationId: null,
+    profile, context: context(), budget: registry.getBudgetPolicy('small-fast')
   });
+  store.startGeneration(record.invocationId, { purpose: 'initial' });
+  store.startTransport(record.invocationId, 1, {
+    transport: 'direct', structuredMode: 'json-schema', reasoningMode: 'off', requestedOutputTokens: 1000
+  });
+  assert.equal(store.recoverInterrupted(), 1);
+  const recovered = store.getClosedRecords()[0];
+  assert.equal(recovered.attempts[0].transportAttempts[0].terminalStatus, 'transport-error');
+  assert.equal(recovered.attempts[0].result, 'request-failed');
+  assert.equal(recovered.outcome.status, 'failed');
+  assert.equal(recovered.outcome.failure.code, 'transport');
+});
 
-  const recordWithSecrets = {
-    ...record,
-    _debug: {
-      rawEndpoint: CANARY_SECRETS.endpointUrl,
-      rawPrompt: CANARY_SECRETS.promptContent
-    }
-  };
+test('recovery also terminalizes a generation interrupted before dispatch', () => {
+  const store = new ledger.AiCallLedger();
+  const record = store.startInvocation({
+    taskId: 'timeline.advance', taskVersion: 1, taskVariant: 'manual', parentInvocationId: null,
+    profile, context: context(), budget: registry.getBudgetPolicy('small-fast')
+  });
+  store.startGeneration(record.invocationId, { purpose: 'initial' });
+  store.recoverInterrupted();
+  const recovered = store.getClosedRecords()[0];
+  assert.equal(recovered.attempts[0].transportAttempts.length, 1);
+  assert.equal(recovered.attempts[0].transportAttempts[0].terminalStatus, 'transport-error');
+});
 
-  ledgerInstance.updateInvocation(record.invocationId, recordWithSecrets);
-
-  const outcome = {
-    status: 'no-effect',
-    reason: 'advisory'
-  };
-
-  ledgerInstance.closeInvocation(record.invocationId, outcome);
-
-  // Export should sanitize
-  const exported = ledgerInstance.exportRecords(10);
-  assert.equal(exported.length, 1);
-
-  const exportedRecord = exported[0];
-  assert.equal(exportedRecord._debug.rawEndpoint, 'https://api.openai.com');
-  // Note: prompt content is not redacted by current redaction rules
-  // This is acceptable as per spec - content redaction is a separate concern
+test('retention keeps the latest 200 closed records and never evicts open records', () => {
+  const store = new ledger.AiCallLedger();
+  const open = store.startInvocation({
+    taskId: 'timeline.advance', taskVersion: 1, taskVariant: 'manual', parentInvocationId: null,
+    profile, context: context(), budget: registry.getBudgetPolicy('small-fast')
+  });
+  const closedIds = [];
+  for (let index = 0; index < 205; index += 1) {
+    const record = store.startInvocation({
+      taskId: 'timeline.advance', taskVersion: 1, taskVariant: 'manual', parentInvocationId: null,
+      profile, context: context(), budget: registry.getBudgetPolicy('small-fast')
+    });
+    closedIds.push(record.invocationId);
+    store.startGeneration(record.invocationId, { purpose: 'initial' });
+    const started = store.startTransport(record.invocationId, 1, {
+      transport: 'direct', structuredMode: 'none', reasoningMode: 'off', requestedOutputTokens: 1
+    });
+    store.finishTransport(record.invocationId, 1, started.transportAttempt, { latencyMs: 0, terminalStatus: 'cancelled' });
+    store.finishGeneration(record.invocationId, 1, 'request-failed');
+    store.closeInvocation(record.invocationId, { status: 'cancelled', by: 'user' });
+  }
+  assert.equal(store.getClosedRecords().length, 200);
+  assert.equal(store.getClosedRecords().at(-1).invocationId, closedIds[5]);
+  assert.equal(store.getOpenInvocation(open.invocationId).invocationId, open.invocationId);
 });

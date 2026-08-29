@@ -234,7 +234,9 @@ type AiTransportAttempt = {
   reasoningMode: "off" | "fast" | "standard";
   requestedOutputTokens: number;
   effectiveOutputTokens: number | null;
-  terminalStatus: "success" | "provider-error" | "transport-error" | "timeout" | "cancelled";
+  // null only while the pre-dispatch stub is open; a persisted/recovered
+  // terminal attempt always has one of the statuses below.
+  terminalStatus: "success" | "provider-error" | "transport-error" | "timeout" | "cancelled" | null;
   httpStatus: number | null;
   usage: AiUsage;
   cost: AiCost;
@@ -244,7 +246,8 @@ type AiGenerationAttempt = {
   generationAttempt: number;
   purpose: "initial" | "validation-correction";
   transportAttempts: AiTransportAttempt[];
-  result: "accepted" | "parse-failed" | "schema-failed" | "semantic-failed" | "request-failed";
+  // null only between startGenerationAttempt and its terminal completion.
+  result: "accepted" | "parse-failed" | "schema-failed" | "semantic-failed" | "request-failed" | null;
 };
 ```
 

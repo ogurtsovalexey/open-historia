@@ -80,7 +80,7 @@
  * @property {'off'|'fast'|'standard'} reasoningMode
  * @property {number} requestedOutputTokens
  * @property {number|null} effectiveOutputTokens - Null if unknown
- * @property {'success'|'provider-error'|'transport-error'|'timeout'|'cancelled'} terminalStatus
+ * @property {'success'|'provider-error'|'transport-error'|'timeout'|'cancelled'|null} terminalStatus
  * @property {number|null} httpStatus - HTTP status code or null
  * @property {AiUsage} usage
  * @property {AiCost} cost
@@ -91,7 +91,7 @@
  * @property {number} generationAttempt - 1-indexed attempt number
  * @property {'initial'|'validation-correction'} purpose
  * @property {AiTransportAttempt[]} transportAttempts
- * @property {'accepted'|'parse-failed'|'schema-failed'|'semantic-failed'|'request-failed'} result
+ * @property {'accepted'|'parse-failed'|'schema-failed'|'semantic-failed'|'request-failed'|null} result
  */
 
 /**
@@ -330,6 +330,12 @@ const TASK_DEFINITIONS = [
   }
 ];
 
+for (const task of TASK_DEFINITIONS) {
+  Object.freeze(task.allowedVariants);
+  Object.freeze(task);
+}
+Object.freeze(TASK_DEFINITIONS);
+
 // Budget policies - concrete numbers TBD per implementation
 /** @type {Record<string, AiBudgetSnapshot>} */
 const BUDGET_POLICIES = {
@@ -367,6 +373,9 @@ const BUDGET_POLICIES = {
   }
 };
 
+for (const policy of Object.values(BUDGET_POLICIES)) Object.freeze(policy);
+Object.freeze(BUDGET_POLICIES);
+
 /**
  * Validate a task ID and variant against registry
  * @param {string} taskId
@@ -385,6 +394,32 @@ export function validateTask(taskId, variant = null) {
   }
 
   return definition;
+}
+
+/**
+ * Resolve a task at the dispatch boundary. Development callers fail loudly;
+ * production callers receive a stable non-dispatchable safety record instead
+ * of inventing a task from prompt prose.
+ */
+export function resolveTaskForDispatch(taskId, variant = null, { production = false } = {}) {
+  try {
+    return { ok: true, definition: validateTask(taskId, variant) };
+  } catch (error) {
+    if (!production) throw error;
+    return Object.freeze({
+      ok: false,
+      safetyRecord: Object.freeze({
+        taskId: 'registry.unknown',
+        outcome: Object.freeze({
+          status: 'failed',
+          failure: Object.freeze({
+            code: 'registry',
+            sanitizedSummary: 'Unknown or invalid AI task registration'
+          })
+        })
+      })
+    });
+  }
 }
 
 /**
@@ -408,23 +443,44 @@ export function getBudgetPolicy(policyId) {
  * @throws {Error} If budget invalid
  */
 export function validateBudget(budget) {
-  if (!budget.policyId) {
+  if (!budget || typeof budget !== 'object' || Array.isArray(budget)) {
+    throw new Error('Budget must be an object');
+  }
+  if (!Object.hasOwn(budget, 'policyId') || !budget.policyId) {
     throw new Error('Budget missing policyId');
   }
 
   const basePolicy = getBudgetPolicy(budget.policyId);
-  const result = { ...basePolicy, ...budget };
+  const fields = [
+    'policyId',
+    'deadlineMs',
+    'maxOutputTokens',
+    'maxGenerationAttempts',
+    'maxTransportAttemptsPerGeneration',
+    'reasoningMode'
+  ];
+  for (const field of fields) {
+    if (!Object.hasOwn(budget, field)) {
+      throw new Error(`Budget missing ${field}`);
+    }
+  }
 
   // Validate numeric fields are finite positive integers
   const numericFields = ['deadlineMs', 'maxOutputTokens', 'maxGenerationAttempts', 'maxTransportAttemptsPerGeneration'];
   for (const field of numericFields) {
-    const value = result[field];
+    const value = budget[field];
     if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0 || !Number.isInteger(value)) {
       throw new Error(`Budget ${field} must be finite positive integer, got: ${value}`);
     }
   }
 
-  return result;
+  for (const field of fields) {
+    if (budget[field] !== basePolicy[field]) {
+      throw new Error(`Budget ${field} must match registered policy ${budget.policyId}`);
+    }
+  }
+
+  return { ...basePolicy };
 }
 
 /**
@@ -433,12 +489,25 @@ export function validateBudget(budget) {
  * @throws {Error} If manifest invalid
  */
 export function validateContextManifest(manifest) {
+  if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
+    throw new Error('Context manifest must be an object');
+  }
   if (manifest.manifestVersion !== 1) {
     throw new Error(`Invalid manifest version: ${manifest.manifestVersion}`);
   }
 
   if (manifest.fullMapIncluded !== false) {
     throw new Error('fullMapIncluded must be false (Principle 3)');
+  }
+
+  if (!Array.isArray(manifest.items)) {
+    throw new Error('Context manifest items must be an array');
+  }
+
+  for (const field of ['worldRevision', 'promptPackRevision']) {
+    if (manifest[field] !== null && typeof manifest[field] !== 'string') {
+      throw new Error(`${field} must be a string or null`);
+    }
   }
 
   // Validate items
@@ -450,16 +519,20 @@ export function validateContextManifest(manifest) {
       throw new Error(`Invalid context item kind: ${item.kind}`);
     }
 
-    if (typeof item.itemCount !== 'number' || !Number.isFinite(item.itemCount) || item.itemCount < 0) {
+    if (!Number.isInteger(item.itemCount) || item.itemCount < 0) {
       throw new Error(`Invalid itemCount for ${item.kind}: ${item.itemCount}`);
     }
 
-    if (typeof item.characterCount !== 'number' || !Number.isFinite(item.characterCount) || item.characterCount < 0) {
+    if (!Number.isInteger(item.characterCount) || item.characterCount < 0) {
       throw new Error(`Invalid characterCount for ${item.kind}: ${item.characterCount}`);
     }
 
     if (typeof item.truncated !== 'boolean') {
       throw new Error(`Invalid truncated for ${item.kind}: ${item.truncated}`);
+    }
+
+    if (item.sourceRevision !== null && typeof item.sourceRevision !== 'string') {
+      throw new Error(`Invalid sourceRevision for ${item.kind}`);
     }
 
     totalCalculated += item.characterCount;
@@ -491,7 +564,9 @@ export function createContextManifest(items, worldRevision = null, promptPackRev
     worldRevision,
     promptPackRevision,
     items: items.map(item => ({
-      ...item,
+      kind: item.kind,
+      itemCount: item.itemCount,
+      characterCount: item.characterCount,
       truncated: item.truncated ?? false,
       sourceRevision: item.sourceRevision ?? null
     })),
@@ -517,7 +592,10 @@ export function isTaskKnown(taskId) {
  * @returns {ReadonlyArray<AiTaskDefinition>}
  */
 export function getAllTaskDefinitions() {
-  return Object.freeze([...TASK_DEFINITIONS]);
+  return Object.freeze(TASK_DEFINITIONS.map((task) => Object.freeze({
+    ...task,
+    allowedVariants: Object.freeze([...task.allowedVariants])
+  })));
 }
 
 /**
@@ -525,11 +603,14 @@ export function getAllTaskDefinitions() {
  * @returns {Readonly<Record<string, AiBudgetSnapshot>>}
  */
 export function getAllBudgetPolicies() {
-  return Object.freeze({ ...BUDGET_POLICIES });
+  return Object.freeze(Object.fromEntries(
+    Object.entries(BUDGET_POLICIES).map(([key, policy]) => [key, Object.freeze({ ...policy })])
+  ));
 }
 
 export default {
   validateTask,
+  resolveTaskForDispatch,
   getBudgetPolicy,
   validateBudget,
   validateContextManifest,
