@@ -228,7 +228,12 @@ export const executeBoundedUpstreamFetch = async ({
   maxBytes = MAX_RELAY_RESPONSE_SIZE,
   callerSignal,
 }) => {
-  const target = new URL(String(url ?? ""));
+  let target;
+  try {
+    target = new URL(String(url ?? ""));
+  } catch {
+    throw new RelayError(RELAY_ERROR_CODES.INVALID_TARGET, "Invalid AI endpoint URL.");
+  }
   if (target.protocol !== "http:" && target.protocol !== "https:") {
     throw new RelayError(RELAY_ERROR_CODES.INVALID_TARGET, "Only http(s) AI endpoints can be relayed.");
   }

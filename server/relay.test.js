@@ -148,6 +148,13 @@ test("relay rejects a non-http(s) target", async () => {
   });
 });
 
+test("relay maps malformed and missing targets to the typed invalid-target error", async () => {
+  for (const url of [undefined, "", "not a URL"]) {
+    const code = await errorCode(executeBoundedUpstreamFetch({ url }));
+    assert.equal(code, RELAY_ERROR_CODES.INVALID_TARGET, String(url));
+  }
+});
+
 test("relay rejects an oversized Content-Length before reading", async () => {
   await withStubbedFetch(async () => jsonResponse("{}", { headers: { "content-length": "999999" } }), async () => {
     const code = await errorCode(executeBoundedUpstreamFetch({ url: "https://example.test/x", maxBytes: 1024 }));
