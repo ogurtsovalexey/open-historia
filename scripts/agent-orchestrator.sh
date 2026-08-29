@@ -8,6 +8,7 @@ DEFAULT_REPO_ROOT="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
 CONFIG_DIR="${HOME}/.config/open-historia-orchestrator"
 CONFIG_FILE="${CONFIG_DIR}/config"
 STATE_DIR="${HOME}/Library/Application Support/OpenHistoriaAgentOrchestrator"
+RUNTIME_SCRIPT_PATH="${STATE_DIR}/agent-orchestrator.sh"
 PLIST_PATH="${HOME}/Library/LaunchAgents/${LABEL}.plist"
 LOG_PATH="${STATE_DIR}/watchdog.log"
 LAST_MESSAGE_PATH="${STATE_DIR}/last-message.txt"
@@ -83,6 +84,10 @@ write_config() {
 write_plist() {
   load_config
   mkdir -p "$(dirname "$PLIST_PATH")"
+  if [[ "$SCRIPT_PATH" != "$RUNTIME_SCRIPT_PATH" ]]; then
+    cp "$SCRIPT_PATH" "$RUNTIME_SCRIPT_PATH"
+    chmod 700 "$RUNTIME_SCRIPT_PATH"
+  fi
   cat >"$PLIST_PATH" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -93,7 +98,7 @@ write_plist() {
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>${SCRIPT_PATH}</string>
+    <string>${RUNTIME_SCRIPT_PATH}</string>
     <string>tick</string>
   </array>
   <key>StartInterval</key>

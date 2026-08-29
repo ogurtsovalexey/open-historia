@@ -89,4 +89,6 @@ npm run agents:run-now
 
 Configuration is stored outside the repository in
 `~/.config/open-historia-orchestrator/config`. Logs and the last result are in
-`~/Library/Application Support/OpenHistoriaAgentOrchestrator/`.
+`~/Library/Application Support/OpenHistoriaAgentOrchestrator/`. The installer
+also places the launchd runtime copy there because macOS does not allow a
+background LaunchAgent to execute scripts directly from `~/Documents`.
