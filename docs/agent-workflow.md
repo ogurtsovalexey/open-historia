@@ -99,7 +99,10 @@ git worktree add ../open-historia-next-opencode \
 1. Start from the recorded integration SHA.
 2. Make small, focused commits without unrelated cleanup.
 3. Run task-specific validation.
-4. Push the task branch to `private`, replace `status:claimed` with
+4. Push the task branch with an explicit destination, for example
+   `git push private HEAD:refs/heads/agent/deepseek/<issue>-<slug>`; a worker
+   branch based on `private/main` may otherwise update `main` through its
+   configured upstream. Then replace `status:claimed` with
    `status:review`, and comment commits, changed files, tests, risks and open
    decisions.
 5. The GPT integration owner reviews against principles and acceptance criteria,
