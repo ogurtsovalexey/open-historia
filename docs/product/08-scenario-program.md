@@ -4,7 +4,7 @@
 
 The product will be designed and debugged against two curated historical scenarios from the beginning:
 
-1. **Primary development scenario:** the whole world starting in 1916. Russia is the first deeply curated player country, with the first complete authored and tested arc covering the revolution and civil-war transition. The campaign itself must not be forced to end on the historical date.
+1. **Primary development scenario:** the whole world starting in 1916. The first curated/debugging wave is Russia, Germany and Britain, covering internal revolution/state continuity, industrial continental war, and naval/colonial/trade power. The campaign itself must not be forced to end on the historical date.
 2. **Parallel compatibility scenario:** the whole world starting provisionally on 1797-01-01, with the European coalition/Napoleonic theatre calibrated in depth through 1815-12-31 and every other world region present and simulated.
 
 Georgia 2016 is not a product vertical slice. It remains only an inspected legacy-save/audit fixture where useful for migrations and regression tests.
@@ -29,7 +29,7 @@ Global coverage does not require false equal precision. Content has three declar
 | `Supported` | Reconciled regional allocation, strategic transport/resources/formations, key institutions and calibrated pressures; suitable for a serious campaign. |
 | `Curated` | Detailed source review, scenario-specific actors/actions, golden paths, AI evaluations and balance/playtesting. |
 
-Russia begins as `Curated` in World 1916. Major WWI actors begin at least `Supported`; every other polity must reach `Baseline` before the scenario is called playable. In World 1797, the principal coalition powers and affected European/Mediterranean actors lead curation, while the rest of the world still advances and influences trade, colonies, naval power and diplomacy.
+Russia, Germany and Britain form the first `Curated` wave in World 1916. Wave 2 promotes France, Austria-Hungary, the Ottoman Empire and the United States. Wave 3 promotes the Republic of China and necessary regional actors, Japan, Italy, Spain and Switzerland. Every other polity must reach `Baseline` before the scenario is called playable. In World 1797, the principal coalition powers and affected European/Mediterranean actors lead curation, while the rest of the world still advances and influences trade, colonies, naval power and diplomacy.
 
 Changing focus never permits the LLM to invent missing detail. Refinement uses versioned source data and must conserve the existing national totals; otherwise the polity remains honestly marked at its current fidelity.
 
@@ -72,15 +72,15 @@ If one common kernel supports both honestly, it is much less likely to contain h
 
 An era module may define institutions, resource vocabulary, available commands, formulas and UI projections. It cannot bypass common ledgers, event validation, provenance, replay or AI authority boundaries.
 
-## Scenario A: World 1916, first curated path Russia
+## Scenario A: World 1916, first curated wave
 
 ### Scope and dates
 
 - provisional start date: `1916-01-01`;
-- every valid polity is selectable; Russian Empire is the first `Curated` seat and reference campaign;
+- every valid polity is selectable; Russia, Germany and Britain are the first `Curated` seats and reference campaigns;
 - first complete validation window: from start through the end of the revolutionary and civil-war transition;
 - no historical event is guaranteed and no historical successor appears solely because a date was reached;
-- every polity receives a simulated baseline; the Eastern Front, Russian dependencies and major belligerents receive the first supported/curated regional detail.
+- every polity receives a simulated baseline; the first detailed theatres cover Russia and the Eastern Front, Germany's continental war economy, and Britain's naval, imperial and trade network.
 
 The exact start date may be revised after source and gameplay review, but it must precede the decisive 1917 institutional crisis by enough time for player policy to alter its causes.
 
@@ -206,7 +206,7 @@ Scenario work proceeds in thin, reviewable layers:
 9. **Playable slice:** dashboards, map modes, exception inbox and scenario-specific actions.
 10. **Content expansion:** more actors, regional detail, events and alternative starts.
 
-World 1916 with Russia leads each engine capability. World 1797 follows one thin layer behind and must expose modern-era assumptions early. It must not block every primary-scenario commit, but no shared API is declared stable until both global scenario skeletons validate against it.
+World 1916 wave 1 leads each engine capability through Russia, Germany and Britain. World 1797 follows one thin layer behind and must expose modern-era assumptions early. It must not block every primary-scenario commit, but no shared API is declared stable until both global scenario skeletons validate against it.
 
 ## Scenario repositories and versioning
 
@@ -253,9 +253,9 @@ It may not create starting numbers, transfer control, alter allegiance, kill or 
 - every canonical record has provenance or an explicit scenario assumption;
 - both packages load without any LLM call.
 
-### World 1916 / Russia simulation alpha
+### World 1916 wave-one simulation alpha
 
-- twelve months can run headlessly with reconciled population, budget, production, transport and military ledgers;
+- twelve months can run headlessly for Russia, Germany and Britain with reconciled population, budget, production, transport and military ledgers;
 - supply and political pressures respond causally to player policy;
 - at least three materially different authority-transition paths work without scripted dates;
 - save/replay is deterministic and AI cannot mutate protected state.
@@ -275,7 +275,7 @@ It may not create starting numbers, transfer control, alter allegiance, kill or 
 
 ## Explicit scope control
 
-- Do not call a scenario playable until every polity has the global `Baseline`; do not require equal subregional precision before the curated Russian theatre reconciles.
+- Do not call a scenario playable until every polity has the global `Baseline`; do not require equal subregional precision before the first curated wave reconciles.
 - Do not build tactical battle simulation; resolve operations from formations, plans, terrain, logistics, morale and uncertainty.
 - Do not model every commodity, social faction or road—only categories with causal gameplay value.
 - Do not use event trees to compensate for missing institutions or ledgers.

@@ -245,9 +245,10 @@ measurement; correctness never depends on polling timing.
 
 ## 17. Repository Privacy and Handoffs
 
-The target canonical repository is private. The current GitHub fork is public,
-so consolidated planning remains local and MUST NOT be pushed until a private
-remote exists. Parallel agents use separate worktrees and commit-based handoffs.
+The canonical development repository is the private GitHub remote `private`
+(`ogurtsovalexey/open-historia-next`). The `origin` remote remains the public
+fork and MUST NOT receive consolidated planning or private development work.
+Parallel agents use separate worktrees and commit-based handoffs.
 
 ---
 

@@ -8,7 +8,7 @@ This is an implementation order, not a wish list. The project should become play
 measurement and safe persistence
   → typed IDs/events/units
   → deterministic simulation kernel
-  → World 1916/Russia vertical slice + World 1797 compatibility skeleton
+  → World 1916 Russia/Germany/Britain slice + World 1797 compatibility skeleton
   → state-grounded AI and diplomacy
   → logistics/combat and world depth
   → scenario platform and content
@@ -16,7 +16,7 @@ measurement and safe persistence
 
 Rewriting the UI or changing language before the state model exists would only move the current ambiguity into new files. Keep TypeScript/Node/React/Electron per [ADR-001](decisions/ADR-001-language-and-runtime.md), with a pure simulation package and worker boundary.
 
-This roadmap is a north-star dependency map, not authorization to implement every milestone. Both scenario packages represent the entire world and simulate every polity at least at a declared baseline fidelity. The committed primary deep slice is Russia inside World 1916 through its revolutionary/civil-war transition. World 1797–1815 follows in parallel, with Europe first curated in depth, as a global and era-compatibility test. Every wider system must pass the scope guardrail and the [scenario program](08-scenario-program.md).
+This roadmap is a north-star dependency map, not authorization to implement every milestone. Both scenario packages represent the entire world and simulate every polity at least at a declared baseline fidelity. The first World 1916 curation wave is Russia, Germany and Britain; later waves are defined in the [scenario program](08-scenario-program.md). World 1797–1815 follows in parallel as a global and era-compatibility test. Every wider system must pass the scope guardrail.
 
 ## Milestone -1 — build-versus-buy decision
 
@@ -303,9 +303,9 @@ Acceptance:
 - material player divergence changes later economic and political outcomes;
 - every exogenous input has a source/vintage/uncertainty and can be overridden by scenario divergence.
 
-## Milestone 3 — dual global-scenario foundation and World 1916/Russia economic alpha
+## Milestone 3 — dual global-scenario foundation and World 1916 wave-one alpha
 
-Goal: prove the shared architecture with global baseline coverage, a deep Russian 1916 starting state and a thinner World 1797 skeleton that continuously detects modern-era and Eurocentric assumptions.
+Goal: prove the shared architecture with global baseline coverage, curated Russia/Germany/Britain starting states and a thinner World 1797 skeleton that continuously detects modern-era and Eurocentric assumptions.
 
 ### M3.1 Historical geography and scenario skeletons — P0 / L
 
@@ -692,7 +692,7 @@ Requires M0 + stable-ID/event skeleton from M1. Suitable for continuing current 
 
 ### Gate B — simulation alpha
 
-Requires M1, M2, global `Baseline` coverage in both scenario skeletons and the reconciled curated Russia 1916 starting state. No requirement for polished combat. The key proof is that twelve headless months advance every polity while the Russian population/economy/budget/production/transport model works without AI-authored statistics or forced revolution dates.
+Requires M1, M2, global `Baseline` coverage in both scenario skeletons and reconciled wave-one Russia/Germany/Britain starting states. No requirement for polished combat. The key proof is that twelve headless months advance every polity while the three reference powers exercise distinct mechanics without AI-authored statistics or forced historical outcomes.
 
 ### Gate C — grand-strategy beta
 
@@ -722,8 +722,8 @@ The first coding batch after this specification should be deliberately small and
 4. stop runtime LLM translation of static/already-localized UI;
 5. introduce world revision + atomic single-artifact write helper with crash tests;
 6. scaffold strict TypeScript `domain` package with stable IDs, units, commands/events and runtime schemas;
-7. define minimal manifests for `world-1916` and `world-1797`, including fidelity ratings, then carry one sourced Russian 1916 observation end to end;
+7. define minimal manifests for `world-1916` and `world-1797`, including fidelity ratings, then carry one sourced 1916 observation for Russia, Germany and Britain end to end;
 8. implement a headless deterministic monthly clock plus population/fiscal ledger toy fixture;
-9. only then replace one generated/custom statistic panel with a canonical Russia 1916 ledger projection.
+9. only then replace one generated/custom statistic panel with a canonical wave-one ledger projection.
 
 This batch produces visible cost improvements immediately while proving the architecture before the XL simulation work begins.

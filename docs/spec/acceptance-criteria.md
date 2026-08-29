@@ -35,11 +35,11 @@ required errors, explicit unknowns or declared assumptions—never hidden defaul
 Generated pregame text references `factsUsed[]`. Unknown references and claims
 contradicting protected scenario fields fail deterministic validation.
 
-### AC-7 — World 1916 Vertical Slice
+### AC-7 — World 1916 Wave-One Slice
 
-One sourced Russian 1916 observation travels through scenario load, a typed
-player command, deterministic resolution, atomic save/replay and a causal
-narrative explanation.
+One sourced observation for each wave-one polity—Russia, Germany and Britain—
+travels through scenario load, a typed player command, deterministic resolution,
+atomic save/replay and a causal narrative explanation.
 
 ### AC-8 — World 1797 Compatibility
 

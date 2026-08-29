@@ -12,7 +12,7 @@ smallest foundation that removes the largest current risks:
 1. every AI call has an explicit task, context manifest, budget and cost record;
 2. canonical state changes commit atomically under one world revision;
 3. stable IDs, typed commands/events and runtime validation replace prose-owned state;
-4. one World 1916/Russia slice proves the path end to end.
+4. one World 1916 slice proves the path across Russia, Germany and Britain.
 
 World 1797 remains a thin compatibility fixture. World 1853 and World 1690 stay
 in the roadmap until the shared kernel is proven.
@@ -163,8 +163,9 @@ mechanism; exact intervals are measured rather than frozen in the domain spec.
 2. World revision plus crash-safe atomic commit tests.
 3. TypeScript domain scaffold for stable IDs, commands, events and schemas.
 4. Minimal v2 scenario adapter with provenance and pregame `factsUsed` checks.
-5. World 1916/Russia fixture carrying one sourced observation through load,
-   command, deterministic state change, save/replay and narrative explanation.
+5. World 1916 wave-one fixtures for Russia, Germany and Britain, each carrying
+   one sourced observation through load, command, deterministic state change,
+   save/replay and narrative explanation.
 6. World 1797 thin fixture proving no hidden modern-era assumption.
 
 Only after these pass should the team add full modular simulation domains,
@@ -181,3 +182,14 @@ automatic macro-region tooling or optional AI authoring assistants.
 
 The recovered agent specifications in `recovered/` remain valuable design input
 for these later milestones, but they are not a Phase 1 implementation checklist.
+
+## 12. World 1916 Curation Waves
+
+| Wave | Polities | Purpose |
+|---|---|---|
+| 1 — foundation and debugging | Russian Empire, German Empire, British Empire | Revolution/state continuity; industrial land war; naval, colonial and trade systems. |
+| 2 — continental completion | France, Austria-Hungary, Ottoman Empire, United States | Republican politics, multinational collapse, straits/imperial reform, neutral-to-belligerent transition. |
+| 3 — global breadth | Republic of China and regional actors, Japan, Italy, Spain, Switzerland | Fragmented authority, Asian great-power expansion, secondary belligerents, neutrality and finance. |
+
+Every other polity reaches an honest `Baseline` before World 1916 is called
+globally playable. A wave means curation order, not separate engine code.
