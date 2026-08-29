@@ -39,13 +39,18 @@ Each domain lists candidate sources as rows:
 | Tier | `P` primary (contemporary record), `S` scholarly dataset/monograph, `C` compiled reference, `A` reconstruction/approximation. |
 | Coverage | Temporal range the source actually covers. |
 | Granularity | National / guberniia-state-region / district-city level. |
-| Access & license | Where it is, and what redistribution allows. Scans of pre-1929 publications are public domain as documents; archive hosts apply their own service terms. |
+| Access & license | Where it is and how it can be used. Copyright is jurisdiction- and work-specific and must be verified per source before any reuse (see §8). "Public-domain scan" below is shorthand for an archive.org digitized copy of a work in the US public domain under the current US rule; UK/European rules differ. |
 
-Verification note: every link was checked on 2026-08-29. Two access
-caveats are explicit: `maps.nls.uk` rejects automated clients (browser access
-only) and the GESIS HISTAT portal (`histat.gesis.org`) was unreachable from the
-verification host, so German statistical needs are anchored to
-`digizeitschriften.de` scans instead.
+Validation performed (2026-08-29): every URL in this matrix was checked for
+HTTP reachability only — reachability is not bibliographic or content-level
+verification. Direct digitized records are pinned to `archive.org` item pages;
+generic search and catalogue links (WorldCat, library catalogues) are labelled
+"discovery lead" and still need volume/page-level pinning. Access caveats:
+`maps.nls.uk` rejects automated clients (browser access only); the GESIS HISTAT
+portal (`histat.gesis.org`) was unreachable from the verification host; the
+`digizeitschriften.de` service was discontinued on 2025-12-31, so German
+yearbook statistics are pinned to direct `archive.org` volume records instead
+(see §4.1).
 
 ## 3. Data needs of the wave-one slice
 
@@ -72,8 +77,8 @@ authority paths for Russia.
 | Статистический ежегодник России (ЦСК annual), e.g. [1911 г.](https://archive.org/details/stat_ezhegodnik_rossii_1911), [1913 г.](https://archive.org/details/1913_20210303) | P | 1904–1916 | National + guberniia | Public-domain scans | Carries ЦСК annual population estimates for 1914–1916, bridging census years. |
 | Рашин А.Г., Население России за 100 лет (1811–1913), М., 1956 — [scan](https://archive.org/details/naseleniye_rossii_za_sto_let) | S | 1811–1913 | Guberniia | Scan; Soviet-era methodology noted | Long-run population reconstruction used to sanity-check census figures. |
 | Gatrell P., *Russia's First World War: A Social and Economic History*, Pearson, 2005 | S | 1914–1918 | National + regional | Print; library access | Population displacement, refugees and wartime demographic strain; calibrates pressure mechanics. |
-| Volkszählung vom 1. Dezember 1910 (Statistik des Deutschen Reichs) — via [digizeitschriften search](https://www.digizeitschriften.de/search?query=statistisches+jahrbuch) and print volumes | P | 1910 | State (Bundesstaat), Kreis | Public-domain | Last full pre-war German census; base for per-region population. |
-| Statistisches Jahrbuch für das Deutsche Reich — [digizeitschriften search](https://www.digizeitschriften.de/search?query=statistisches+jahrbuch) | P | 1880–1942 (incl. war years) | National + state | Public-domain scans | Annual official series; wartime volumes hold reduced but authoritative population tables. |
+| Volkszählung vom 1. Dezember 1910 (Statistik des Deutschen Reichs, Bd. 240) — census volumes via [WorldCat search](https://search.worldcat.org/search?q=Statistik+des+Deutschen+Reichs+Volksz%C3%A4hlung+1910) (discovery lead); summary tables in the 1913 yearbook below | P | 1910 | State (Bundesstaat), Kreis | Print/catalogue; rights per volume | Last full pre-war German census; base for per-region population. Volume-level pinning still needed. |
+| Statistisches Jahrbuch für das Deutsche Reich — direct volumes: [1913, Bd. 34](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1913_34), [1916, Bd. 37](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1916_37), [1917, Bd. 38](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1917_38) | P | 1880–1942 (incl. war years) | National + state | Direct archive.org volume records; per-volume reuse terms | Annual official series; wartime volumes hold reduced but authoritative population tables. The former digizeitschriften portal was discontinued 2025-12-31; the archive.org run is the active access path. |
 | Census of England and Wales, 1911 — [archive.org item](https://archive.org/details/censusofenglandw03lond); Scotland 1911 via same series | P | 1911 | Registration district | Public-domain scan | Base for per-region British population. |
 | [Vision of Britain census reports](https://www.visionofbritain.org.uk/census/) | C | 1801–1961 | District-level tables | Free web access | Navigable index into census reports and boundary units. |
 | Statistical Abstract for the United Kingdom, [1913–1928 volume](https://archive.org/details/annual-abstract-of-statistics-gb_1913-1928_73) | P | 1913–1928 | National | Public-domain scan | One volume covers the entire extended window: population, vital statistics, economy. |
@@ -93,7 +98,7 @@ authority paths for Russia.
 | «На новых путях. Итоги новой экономической политики 1921–1922 г.г.», М., 1923 — [scan](https://archive.org/details/nanovyhputjahitoginovojekonomicheskojpo90) | P | 1921–1922 | National | Public-domain scan | Early NEP accounting; start of the extended window. |
 | Статистический справочник СССР за 1928, М., 1929 — [scan](https://archive.org/details/statisticheskijspravochniksssrza1928m25) | P/C | 1928 | National | Public-domain scan | End-of-NEP snapshot for the 1928 horizon. |
 | Lotz W., Die deutsche Staatsfinanzwirtschaft im Kriege, Stuttgart, 1927 — [scan](https://archive.org/details/diedeutschestaat0000unse) | S | 1914–1918 | National | Public-domain scan | Carnegie German series; war finance, debt and money. |
-| Statistisches Jahrbuch für das Deutsche Reich — [digizeitschriften](https://www.digizeitschriften.de/search?query=statistisches+jahrbuch) | P | 1880–1942 | National | Public-domain scans | Reich budget, debt and monetary tables through the war and Weimar. |
+| Statistisches Jahrbuch für das Deutsche Reich — direct volumes [1913](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1913_34) / [1916](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1916_37) | P | 1880–1942 | National | Direct archive.org volume records; per-volume reuse terms | Reich budget, debt and monetary tables through the war and Weimar. |
 | Bresciani-Turroni C., *The Economics of Inflation*, London, 1937 — [scan](https://archive.org/details/TheEconomicsOfInflationAStudyOfCurrencyDepreciationInPostWarGermanay) | S | 1914–1923 | National, monthly | Public-domain scan | The standard study of German wartime/post-war inflation. |
 | Holtfrerich C.-L., *The German Inflation 1914–1923*, De Gruyter, 1986 | S | 1914–1923 | National | Print | Modern re-examination with extended series. |
 | Roesler K., Die Finanzpolitik des Deutschen Reiches im Ersten Weltkrieg, Berlin, 1967 | S | 1914–1918 | National | Print | War-time fiscal policy detail. |
@@ -116,7 +121,7 @@ authority paths for Russia.
 | Всероссийская сельскохозяйственная перепись 1916 и 1917 гг. | P | 1916–1917 | Guberniia, uezd | Print/archival; partially published | The only near-war agricultural census; see §8 gap note. |
 | Сидоров А.Л., Экономическое положение России в годы первой мировой войны, М., 1973 | S | 1914–1917 | Sectoral | Print | Coal, metal, fuel and factory production series. |
 | Skalweit A., Die deutsche Kriegsernährungswirtschaft, Stuttgart, 1927 — [scan](https://archive.org/details/diedeuschekriegs0000prof) | S | 1914–1918 | National | Public-domain scan | Carnegie German series; food supply and rationing. |
-| Statistisches Jahrbuch für das Deutsche Reich — [digizeitschriften](https://www.digizeitschriften.de/search?query=statistisches+jahrbuch) | P | 1880–1942 | National | Public-domain scans | Coal, iron, steel and industrial production tables. |
+| Statistisches Jahrbuch für das Deutsche Reich — direct volumes [1913](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1913_34) / [1916](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1916_37) | P | 1880–1942 | National | Direct archive.org volume records; per-volume reuse terms | Coal, iron, steel and industrial production tables. |
 | Hoffmann W.G. et al., *Das Wachstum der deutschen Wirtschaft seit der Mitte des 19. Jahrhunderts*, Springer, 1965 | S | mid-19th c.–1959 | National + sectoral | Print | Standard long-run German production series. |
 | *History of the Ministry of Munitions*, 12 vols, HMSO, 1922 — [archive.org item](https://archive.org/details/historyofministr0102grea) | P | 1915–1918 | National | Public-domain scans | British war production organization and output. |
 | Beveridge W., *British Food Control*, Yale/Carnegie, 1928 | S/P | 1914–1920 | National | Print (Carnegie series) | Food supply and control for the home front. |
@@ -130,8 +135,8 @@ authority paths for Russia.
 | Статистический сборник Министерства путей сообщения (annual) — [1920 issue scan](https://archive.org/details/rossijaministerstvoputejsoobschenijast95) | P | 1900s–1917 | Network, line groups | Public-domain scan | Line lengths, rolling stock, freight and passenger traffic. |
 | Головин Н.Н., Военные усилия России в мировой войне, Париж, 1939 — [т.1 scan](https://archive.org/details/golovinnnvoennyeusilijarossiivmirovojv28) | S | 1914–1917 | Fronts, army groups | Public-domain scan | Mobilization transport, replacements, supply of the army. |
 | Westwood J.N., *A History of Russian Railways*, London, 1964 — [scan](https://archive.org/details/historyofrussian0000jnwe) | S | 19th c.–1960s | Network | Scan; lending-library terms | System capacity and wartime bottlenecks. |
-| Statistisches Jahrbuch für das Deutsche Reich — [digizeitschriften](https://www.digizeitschriften.de/search?query=statistisches+jahrbuch) | P | 1880–1942 | National | Public-domain scans | Railways, inland navigation and port statistics. |
-| Reichsarchiv, *Der Weltkrieg 1914 bis 1918*, 14 vols, Berlin, 1925–1944 | P/S | 1914–1918 | Front/army level | Print; [WorldCat search](https://search.worldcat.org/search?q=Der+Weltkrieg+1914+bis+1918+Reichsarchiv) | Official history; rail mobilization and operational logistics. |
+| Statistisches Jahrbuch für das Deutsche Reich — direct volumes [1913](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1913_34) / [1916](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1916_37) | P | 1880–1942 | National | Direct archive.org volume records; per-volume reuse terms | Railways, inland navigation and port statistics. |
+| Reichsarchiv, *Der Weltkrieg 1914 bis 1918*, 14 vols, Berlin, 1925–1944 | P/S | 1914–1918 | Front/army level | Print; [WorldCat search](https://search.worldcat.org/search?q=Der+Weltkrieg+1914+bis+1918+Reichsarchiv) (discovery lead) | Official history; rail mobilization and operational logistics. |
 | Pratt E.A., *British Railways and the Great War*, London, 1921 — [scan](https://archive.org/details/britishrailwaysg0001edwi) | S/P | 1914–1918 | National | Public-domain scan | Railway control, effort and difficulties. |
 | Statistical Abstract for the United Kingdom, [1913–1928](https://archive.org/details/annual-abstract-of-statistics-gb_1913-1928_73) | P | 1913–1928 | National | Public-domain scan | Railway returns and shipping tables. |
 | Railway Returns, Board of Trade (annual) | P | pre-1914–1920s | Company-level | Print; not digitized in full | Detail beyond the Statistical Abstract; see §8 gap note. |
@@ -147,8 +152,8 @@ authority paths for Russia.
 | Урланис Б.Ц., Войны и народонаселение Европы, М., 1960 | S | 17th–20th c. | National | Print | Comparative demographic loss methodology. |
 | Knox A., *With the Russian Army 1914–1917*, London, 1921 — [scan](https://archive.org/details/withrussianarmy101knoxuoft) | P | 1914–1917 | Army/front | Public-domain scan | British liaison memoir; qualitative command/supply evidence. |
 | Военная энциклопедия, СПб., 1911–1915, 18 т. — [scan example](https://archive.org/details/voennajaentsiklopedijaspb19111915t41) | P/C | 1910s | Topic entries | Public-domain scans | Period reference for formations, weapons, organization. |
-| Reichsarchiv, *Der Weltkrieg 1914 bis 1918*, 14 vols, Berlin, 1925–1944 | P/S | 1914–1918 | Army/front | Print; [WorldCat search](https://search.worldcat.org/search?q=Der+Weltkrieg+1914+bis+1918+Reichsarchiv) | German official operations history; force levels and deployments. |
-| Sanitätsbericht über das Deutsche Heer, Berlin, 1934–1938 | P | 1914–1918 | Army level | Print; [WorldCat search](https://search.worldcat.org/search?q=Sanit%C3%A4tsbericht%20%C3%BCber%20das%20deutsche%20Heer) | Official German casualty statistics; the standard loss source. |
+| Reichsarchiv, *Der Weltkrieg 1914 bis 1918*, 14 vols, Berlin, 1925–1944 | P/S | 1914–1918 | Army/front | Print; [WorldCat search](https://search.worldcat.org/search?q=Der+Weltkrieg+1914+bis+1918+Reichsarchiv) (discovery lead) | German official operations history; force levels and deployments. |
+| Sanitätsbericht über das Deutsche Heer, Berlin, 1934–1938 | P | 1914–1918 | Army level | Print; [WorldCat search](https://search.worldcat.org/search?q=Sanit%C3%A4tsbericht%20%C3%BCber%20das%20deutsche%20Heer) (discovery lead) | Official German casualty statistics; the standard loss source. |
 | Ludendorff E., Meine Kriegserinnerungen, Berlin, 1919 — [scan](https://archive.org/details/erich-ludendorff-meine-kriegserinnerungen-1919-664-s.-scan-fraktur) | P | 1914–1918 | High command | Public-domain scan | Memoir; strong self-serving bias, use for plans/intent only. |
 | *Statistics of the Military Effort of the British Empire During the Great War*, War Office, 1922 — [scan](https://archive.org/details/statisticsofmili00grea) | P | 1914–1920 | National + theatre | Public-domain scan | Canonical British compilation: personnel, formations, casualties, production. |
 | *History of the Great War Based on Official Documents* (Military Operations and Statistics volumes), HMSO — [example](https://archive.org/details/mil-op-fb-1918-v5) | P | 1914–1919 | Theatre | Public-domain scans | British official history; operations and logistics detail. |
@@ -189,8 +194,8 @@ authority paths for Russia.
 | Обзор внешней торговли России по европейской и азиатской границам (annual) — [scan](https://archive.org/details/obzor_vneshnei_torgovli_rossii) | P | 1890s–1917 | Commodity level | Public-domain scan | Russian customs returns; import/export structure. |
 | Боевая летопись русского флота, М., 1948 — [scan](https://archive.org/details/boevajaletopisrusskogoflota72) | P/S | 1914–1918 | Ship/action level | Scan | Soviet-era chronicle of Russian fleet operations. |
 | Nolde B.E., *Russia in the Economic War*, Yale/Carnegie, 1928 | S/P | 1914–1917 | National | Print | Blockade, economic warfare and trade disruption. |
-| Statistisches Jahrbuch für das Deutsche Reich — [digizeitschriften](https://www.digizeitschriften.de/search?query=statistisches+jahrbuch) | P | 1880–1942 | National | Public-domain scans | German trade, shipping and naval budget tables. |
-| Marine-Archiv, *Der Krieg zur See 1914–1918*, Berlin, 1920–1937 | P/S | 1914–1918 | Naval theatre | Print; [WorldCat search](https://search.worldcat.org/search?q=Der+Krieg+zur+See+1914+1918) | German official naval history; Baltic/U-boat volumes matter most here. |
+| Statistisches Jahrbuch für das Deutsche Reich — direct volumes [1913](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1913_34) / [1916](https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1916_37) | P | 1880–1942 | National | Direct archive.org volume records; per-volume reuse terms | German trade, shipping and naval budget tables. |
+| Marine-Archiv, *Der Krieg zur See 1914–1918*, Berlin, 1920–1937 | P/S | 1914–1918 | Naval theatre | Print; [WorldCat search](https://search.worldcat.org/search?q=Der+Krieg+zur+See+1914+1918) (discovery lead) | German official naval history; Baltic/U-boat volumes matter most here. |
 | Statistical Abstract for the United Kingdom, [1913–1928](https://archive.org/details/annual-abstract-of-statistics-gb_1913-1928_73) | P | 1913–1928 | National | Public-domain scan | Trade and shipping tables across the horizon. |
 | Fayle C.E., *The War and the Shipping Industry*, Yale/Carnegie, 1927 — [scan](https://archive.org/details/warshippingindus0000unse) | S/P | 1914–1918 | National | Public-domain scan | Merchant shipping, losses and freight during the war. |
 | Salter A., *Allied Shipping Control*, Oxford, 1921 — [scan](https://archive.org/details/alliedshippingco0000salt) | S/P | 1916–1919 | National | Public-domain scan | Inter-allied tonnage allocation; import policy. |
@@ -228,7 +233,7 @@ sources about plans and programs, not scenario facts.
 |---|---|---|---|---|---|
 | Деникин А.И., Очерки русской смуты, 5 т., Париж/Берлин, 1921–1926 — [scan](https://archive.org/details/denikinaiocherkirusskojsmutyv5tit24); English: *The Russian Turmoil* — [scan](https://archive.org/details/russianturmoilme00deniuoft) | P | 1917–1920 | Army/policy level | Public-domain scans | White movement's own account; programs, dilemmas, decisions. |
 | Врангель П.Н., Записки — English: *The Memoirs of General Wrangel* — [scan](https://archive.org/details/the-memoirs-of-general-wrangel) | P | 1916–1920 | Army/policy level | Public-domain scan | Crimean stage of the White movement; state-building practice. |
-| Допрос Колчака, Л., 1925 | P | 1918–1920 | Person-level | Print; [WorldCat search](https://search.worldcat.org/search?q=%D0%94%D0%BE%D0%BF%D1%80%D0%BE%D1%81%20%D0%9A%D0%BE%D0%BB%D1%87%D0%B0%D0%BA%D0%B0) | Interrogation transcripts of the White Supreme Ruler. |
+| Допрос Колчака, Л., 1925 | P | 1918–1920 | Person-level | Print; [WorldCat search](https://search.worldcat.org/search?q=%D0%94%D0%BE%D0%BF%D1%80%D0%BE%D1%81%20%D0%9A%D0%BE%D0%BB%D1%87%D0%B0%D0%BA%D0%B0) (discovery lead) | Interrogation transcripts of the White Supreme Ruler. |
 | Гинс Г.К., Сибирь, союзники и Колчак, Пекин, 1921 — [т.2 scan](https://archive.org/details/sibirsojuznikiikolchakt2ch2i3verh82) | P | 1918–1920 | Government level | Public-domain scan | Inside account of the Omsk government machinery. |
 | Савинков Б.В., Борьба с большевиками, Варшава, 1920 — [scan](https://archive.org/details/savinkovbvborbasbolshevikamivarsha71) | P | 1918–1920 | Movement level | Public-domain scan | SR-military line; third-force plans. |
 | Лукомский А.С., Воспоминания, 1922 — [scan](https://archive.org/details/lukomskijasvospominanijageneralaaslu36) | P | 1914–1920 | High command | Public-domain scan | Volunteer Army staff perspective. |
@@ -271,9 +276,11 @@ only flags them.
 8. **Soviet-period reconstructions.** Russian pre-1917 series reconstructed in
    Soviet scholarship (Лященко, Сидоров, and later handbooks) carry
    methodology assumptions; pair them with contemporary sources.
-9. **GESIS HISTAT accessibility.** `histat.gesis.org` was unreachable at
-   verification time; German long series should be anchored to
-   digizeitschriften scans and print volumes until access is confirmed.
+9. **German statistics access.** GESIS HISTAT (`histat.gesis.org`) was
+   unreachable at verification time, and the `digizeitschriften.de` portal was
+   discontinued on 2025-12-31. German yearbook series are pinned to direct
+   `archive.org` volume records (§4); other German long series require print
+   volumes until an active digital alternative is confirmed.
 
 ## 7. Known gaps
 
@@ -302,9 +309,13 @@ only flags them.
 
 ## 8. License and redistribution rules
 
-- Pre-1929 publications are public domain as documents; archive.org scans are
-  usable for research, but bulk republication of scan files should follow the
-  host's terms.
+- Copyright is jurisdiction- and work-specific. In the US the current rule
+  covers works published before 1931 ([Copyright Office Circular 15a](https://www.copyright.gov/circs/circ15a.pdf)); UK literary
+  works generally use life+70 with special rules for Crown, archival and
+  unpublished material ([gov.uk guide](https://www.gov.uk/copyright/how-long-copyright-lasts)). Factual-data
+  reuse, scan/text reuse and edition-specific rights are separate questions:
+  verify each source before any redistribution, and note that archive hosts
+  impose their own service terms on bulk reuse of their scans.
 - Do not copy raw values from any source into canonical scenario data without
   provenance records (units, effective date, source, confidence) per AC-5.
 - Derived transport geometry from OpenStreetMap carries ODbL share-alike
@@ -366,7 +377,14 @@ below was settled by this document.
 
 ## 10. Validation performed
 
-- Every link in §4–§5 checked 2026-08-29; two access caveats recorded in §2
-  and §6.9.
+- All URLs in §4–§5 checked for HTTP reachability on 2026-08-29; access
+  caveats recorded in §2 and §6. Reachability is not content verification:
+  generic search/catalogue links are labelled "discovery lead" and still need
+  volume/page-level pinning.
+- High-priority sources still requiring volume/page-level pinning: Statistik
+  des Deutschen Reichs census volumes (1910), Отчет Государственного контроля
+  (Russian executed budgets), Всероссийская сельскохозяйственная перепись
+  1916/1917, Railway Returns (UK), Jane's Fighting Ships 1914–1919 editions,
+  GESIS HISTAT series.
 - No numeric historical values are included in this matrix.
 - `git diff --check` run at handoff.
