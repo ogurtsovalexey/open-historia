@@ -42,6 +42,10 @@ load_config() {
   : "${GITHUB_REPOSITORY:?Missing GITHUB_REPOSITORY in $CONFIG_FILE}"
   : "${TICK_SECONDS:=120}"
   : "${CLAIMED_CHECK_SECONDS:=900}"
+  : "${RESEARCH_MODEL:=openrouter/qwen/qwen3-30b-a3b-instruct-2507}"
+  : "${CODE_MODEL:=openrouter/qwen/qwen3-coder-30b-a3b-instruct}"
+  : "${COMPLEX_MODEL:=openrouter/deepseek/deepseek-v3.2}"
+  : "${ESCALATION_MODEL:=openrouter/deepseek/deepseek-v4-pro-0813}"
 }
 
 write_config() {
@@ -68,6 +72,10 @@ write_config() {
     printf 'GITHUB_REPOSITORY=%q\n' "$github_repository"
     printf 'TICK_SECONDS=%q\n' "120"
     printf 'CLAIMED_CHECK_SECONDS=%q\n' "900"
+    printf 'RESEARCH_MODEL=%q\n' "openrouter/qwen/qwen3-30b-a3b-instruct-2507"
+    printf 'CODE_MODEL=%q\n' "openrouter/qwen/qwen3-coder-30b-a3b-instruct"
+    printf 'COMPLEX_MODEL=%q\n' "openrouter/deepseek/deepseek-v3.2"
+    printf 'ESCALATION_MODEL=%q\n' "openrouter/deepseek/deepseek-v4-pro-0813"
   } >"$CONFIG_FILE"
   chmod 600 "$CONFIG_FILE"
 }
@@ -202,7 +210,7 @@ run_tick() {
   fi
 
   date +%s >"$LAST_CLAIMED_CHECK_PATH"
-  prompt="ORCHESTRATOR_TICK. Work in ${REPO_ROOT}. Read docs/agent-orchestrator.md and execute exactly one orchestration cycle against ${GITHUB_REPOSITORY}. Prefer review/integration before claiming new work. Keep at most four active task streams total. Do not create additional agent identities or ask the owner routine questions. End the final message with exactly one marker: ORCHESTRATOR_OK, ORCHESTRATOR_IDLE, or OWNER_ACTION_REQUIRED: <one-line decision>."
+  prompt="ORCHESTRATOR_TICK. Work in ${REPO_ROOT}. Read docs/agent-orchestrator.md and execute exactly one orchestration cycle against ${GITHUB_REPOSITORY}. Prefer review/integration before claiming new work. Keep at most four active task streams total. Worker model routing: research=${RESEARCH_MODEL}; standard-code=${CODE_MODEL}; complex=${COMPLEX_MODEL}; escalation-only=${ESCALATION_MODEL}. Do not use the escalation model unless the documented promotion rule is met. Do not create additional agent identities or ask the owner routine questions. End the final message with exactly one marker: ORCHESTRATOR_OK, ORCHESTRATOR_IDLE, or OWNER_ACTION_REQUIRED: <one-line decision>."
 
   log "wake: resuming Codex session ${SESSION_ID}"
   : >"$LAST_MESSAGE_PATH"
@@ -247,6 +255,10 @@ print_status() {
   fi
   printf 'session:  %s\n' "$SESSION_ID"
   printf 'repo:     %s\n\n' "$REPO_ROOT"
+  printf 'models:   research=%s\n' "$RESEARCH_MODEL"
+  printf '          code=%s\n' "$CODE_MODEL"
+  printf '          complex=%s\n' "$COMPLEX_MODEL"
+  printf '          escalation=%s\n\n' "$ESCALATION_MODEL"
 
   board_json | jq -r '
     sort_by(.number)

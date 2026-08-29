@@ -26,12 +26,41 @@ For every `ORCHESTRATOR_TICK`:
 6. The orchestrator creates the branch/worktree and updates the Issue before
    launching a worker. Workers run headlessly through `opencode run --format
    json`; no terminal window is required.
-7. DeepSeek remains a bounded worker. GPT owns review, architecture, security,
+7. Select the cheapest model tier that safely fits the task (§ Model routing).
+   Record the chosen model in the claim comment.
+8. DeepSeek remains a bounded worker. GPT owns review, architecture, security,
    persistence, domain contracts, historical assumptions and accepted scope.
-8. Do not create more agent identities. Reuse the fixed concurrency budget;
+9. Do not create more agent identities. Reuse the fixed concurrency budget;
    completing one issue frees its slot for the next.
-9. Do not push to public `origin`. Workers push task branches to `private`; only
+10. Do not push to public `origin`. Workers push task branches to `private`; only
    the integration owner updates `private/main`.
+
+## Model routing
+
+Price snapshot: OpenRouter Models API, 2026-08-29. Prices are USD per one
+million input/output tokens and are used only to choose relative tiers; the
+orchestrator does not assume they remain fixed.
+
+| Tier | Model | Snapshot price | Use |
+|---|---|---:|---|
+| Research | `qwen/qwen3-30b-a3b-instruct-2507` | `$0.048 / $0.193` | Internet/source search, inventories, documentation comparisons, bounded QA review with no code changes. |
+| Standard code | `qwen/qwen3-coder-30b-a3b-instruct` | `$0.07 / $0.28` | Accepted single-module implementation, focused tests, mechanical migrations and review corrections. |
+| Complex | `deepseek/deepseek-v3.2` | `$0.269 / $0.40` | Cross-module state, provider adapters, security-sensitive code, difficult debugging or broad refactoring. |
+| Escalation only | `deepseek/deepseek-v4-pro-0813` | `$0.66 / $1.98` | Only after two concrete failed review/correction rounds on a lower tier, or an explicit GPT finding that the task cannot be safely decomposed. |
+
+Rules:
+
+- Search tools fetch sources; the model synthesizes them. Do not pay a Pro model
+  merely to browse or copy facts into a matrix.
+- `type:audit`, research and documentation default to Research.
+- Implementation defaults to Standard code. Use Complex only for the named
+  cross-module or high-correctness cases.
+- A worker never promotes itself. GPT records the evidence and promotion in the
+  Issue before relaunching.
+- GPT planning, decisions, review and integration use the Codex subscription,
+  not an OpenRouter worker model.
+- One initial worker pass plus at most two bounded correction rounds. If the
+  contract itself is unclear, stop and resolve it instead of buying more tokens.
 
 ## Owner interruptions
 
