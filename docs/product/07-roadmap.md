@@ -21,9 +21,12 @@ This roadmap is a north-star dependency map, not authorization to implement ever
 Before that historical alpha, the owner-directed
 [ten-region economy MVP](../spec/first-economy-mvp.md) is the immediate manual
 playtest gate: two fictional countries, five regions each, transparent regional
-population/production, one investment decision and territorial
-re-aggregation. It proves the region-first kernel and UI without pretending to
-be a researched scenario or expanding the accepted Phase 1 scope.
+population/production, one input-limited `Coal + Iron -> Goods` chain, one
+investment decision and territorial re-aggregation. Its resource catalog,
+National Stockpile and supply rules are defined by the
+[regional resource extension](../spec/regional-resource-economy.md). It proves
+the region-first kernel and UI without pretending to be a researched scenario
+or expanding the accepted Phase 1 scope.
 
 ## Milestone -1 — build-versus-buy decision
 

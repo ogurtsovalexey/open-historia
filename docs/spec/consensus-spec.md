@@ -183,6 +183,9 @@ does not replace the World 1916/1797 proof, relax authored-fact provenance, or
 claim completion of the full economy deferred below. Its purpose is to prove
 regional aggregation, one deterministic policy and territorial re-aggregation
 in the running UI before historical content multiplies debugging variables.
+Its accepted [regional resource extension](regional-resource-economy.md) also
+proves one input-limited production chain and a reconciled National Stockpile;
+it does not authorize general markets, logistics or factory simulation.
 
 ## 11. Deferred Roadmap
 

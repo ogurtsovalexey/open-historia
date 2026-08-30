@@ -10,10 +10,12 @@ economic model.
 ## 1. Player outcome
 
 A player can load a tiny offline map, select either of two countries, inspect
-how five owned regions form the national economy, invest in one region, advance
-one month, see deterministic changes, transfer a region, and verify that both
-countries' totals change immediately. Twelve months can be played, saved,
-reloaded and replayed without an AI provider.
+how five owned regions form the national economy, see one raw-input production
+chain, invest in one region, advance one month, see deterministic changes,
+transfer a region, and verify that both countries' totals change immediately.
+Twelve months can be played, saved, reloaded and replayed without an AI
+provider. The accepted resource/activity extension is defined in
+[Regional Resource Economy](regional-resource-economy.md).
 
 ## 2. Fixture boundary
 
@@ -52,10 +54,12 @@ interface EconomyMvpRegion {
 }
 ```
 
-The fixture may display the commodity labels as food, coal, iron and
-manufactured goods. The engine-facing categories remain broad enough for other
-eras; a future scenario may represent `energy` with wood, coal, oil or another
-authored source.
+This four-group field is the baseline kernel implemented by #32. The extension
+layer replaces its player-facing abstraction with a catalog resource and one
+scenario-authored regional activity. `energy` is not a player-visible resource:
+the first fixture displays Food, Wood, Coal, Iron and Goods and resolves
+`1 Coal + 1 Iron -> 1 Goods`. This preserves #32 as an implementation step
+without making its temporary commodity grouping the long-term domain model.
 
 Population, productive capacity, specialization, infrastructure and damage
 stay with the region when control changes. They are not copied into country
@@ -65,8 +69,9 @@ state and are never regenerated from the new controller's national averages.
 
 Canonical polity-level stocks in this MVP are limited to:
 
-- treasury in fixed-point scenario currency;
-- commodity inventories by the four MVP commodity groups;
+- treasury in fixed-point Gold, the single comparable currency for all
+  polities;
+- a National Stockpile keyed by the resources active in the scenario;
 - the accepted regional-investment command for the effective month.
 
 The following are derived projections and cannot be independently edited:
@@ -97,14 +102,16 @@ constants.
    rates, carrying deterministic division remainder between months.
 4. Calculate available workforce from the new population and authored
    workforce rate.
-5. Calculate gross regional output as a bounded function of workforce,
+5. Calculate potential regional output as a bounded function of workforce,
    base capacity, infrastructure and damage.
-6. Aggregate production and taxable output by current controller.
-7. Consume authored food need from each polity inventory plus current food
+6. Resolve raw output, then the accepted Goods process and its material-input
+   limit in the order defined by the resource extension.
+7. Aggregate production and taxable output by current controller.
+8. Consume authored food need from each polity inventory plus current food
    production; record surplus or shortfall without creating negative stock.
-8. Add tax revenue, subtract accepted spending and update treasury.
-9. Produce typed regional deltas, national contribution ledgers and alerts.
-10. Commit all results as one world revision.
+9. Add tax revenue, subtract accepted spending and update treasury Gold.
+10. Produce typed regional deltas, stock movements, national contribution
+    ledgers and alerts, then commit all results as one world revision.
 
 The first implementation uses these inspectable formulas. Every division is
 integer floor division and carries the named remainder where one is shown:
@@ -187,9 +194,11 @@ The selected-country dashboard shows:
 
 - total population and monthly delta;
 - treasury, revenue, spending and balance;
-- production and inventory for all four commodity groups;
+- production, use, balance and inventory for all five active resources;
 - food surplus/shortfall;
-- five region rows with population, specialization, output, infrastructure and
+- the selected region's activity, capacity, potential/actual output, input
+  supply and limiting resource;
+- five region rows with population, activity, output, infrastructure and
   last-month delta.
 
 Selecting a total or region opens `Why changed`, built from the deterministic
@@ -200,12 +209,13 @@ Opening the dashboard, region details or explanation makes zero model calls.
 
 1. Load the development scenario offline and select polity A.
 2. Manually sum its five starting populations and compare with the dashboard.
-3. Manually sum output by commodity and compare with national production.
+3. Manually sum output by resource and compare with national production.
 4. Preview and cancel an investment; verify that nothing changes.
 5. Invest in a food region, advance one month and inspect its regional and
    national contribution deltas.
-6. Reload the starting revision, invest the same amount in an energy region and
-   verify a materially different commodity result.
+6. Reload the starting revision, invest the same amount in a Goods region and
+   verify that the preview identifies whether capacity or Coal/Iron supply is
+   limiting.
 7. Transfer one productive region from A to B and verify both national
    population/output totals immediately, including a fresh manual sum.
 8. Advance the transferred world one month and verify only B receives that
@@ -216,7 +226,9 @@ Opening the dashboard, region details or explanation makes zero model calls.
 ## 10. Automated gates
 
 - Region population sums equal polity totals after every operation and month.
-- Region production sums equal polity production for every commodity.
+- Region production sums equal polity production for every active resource.
+- Coal and Iron stock movements exactly reconcile with actual Goods output.
+- A Goods region without either required input has capacity but zero output.
 - Population, inventory and treasury identities reconcile exactly.
 - No negative population, inventory, treasury spend or output is accepted.
 - A region belongs to exactly one controller and contributes exactly once.
@@ -231,7 +243,7 @@ Opening the dashboard, region details or explanation makes zero model calls.
 ## 11. Explicitly deferred
 
 - historical World 1916 balancing and global coverage;
-- prices, inflation, debt, credit, trade and market clearing;
+- prices, inflation, debt, credit, trade, Gold settlement and market clearing;
 - multi-stage factory input chains and employment sectors;
 - migration, age cohorts, culture, religion and political groups;
 - combat, occupation fractions, casualties, refugees and war damage;
