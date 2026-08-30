@@ -16,6 +16,7 @@ import {
   verifyProjectionDescriptors,
   planWorldRevisionCommit,
   buildWorldBundle,
+  canonicalizeProjection,
 } from "../src/runtime/worldRevisionCore.js";
 
 export {
@@ -36,6 +37,7 @@ const MANIFEST_FILE = "manifest.json";
 // --- Path utilities ---
 
 function getGameRootPath(gameId) {
+  assertPathToken(gameId, "gameId");
   return path.join(DATA_DIR, "games", gameId);
 }
 
@@ -44,6 +46,7 @@ function getGameRevisionStorePath(gameId) {
 }
 
 function getRevisionDirectory(gameId, revision) {
+  assertPathToken(revision, "revision");
   return path.join(getGameRevisionStorePath(gameId), revision);
 }
 
@@ -52,6 +55,9 @@ function getManifestPath(gameId, revision) {
 }
 
 function getProjectionPath(gameId, revision, projectionKey) {
+  if (!WORLD_PROJECTION_KEYS.includes(projectionKey)) {
+    throw new WorldRevisionError("INVALID_PROJECTION_KEY", `Unknown projection ${projectionKey}`, "projectionKey");
+  }
   return path.join(getRevisionDirectory(gameId, revision), `${projectionKey}.json`);
 }
 
@@ -69,6 +75,21 @@ function getLegacyGameJsonPath(gameId, assetKey) {
 
 // --- File system utilities ---
 
+function assertPathToken(value, field) {
+  if (
+    typeof value !== "string" ||
+    value.length === 0 ||
+    value !== value.trim() ||
+    value === "." ||
+    value === ".." ||
+    value.includes("/") ||
+    value.includes("\\") ||
+    value.includes("\0")
+  ) {
+    throw new WorldRevisionError("INVALID_PATH_TOKEN", `${field} must be a safe opaque path token`, field);
+  }
+}
+
 function ensureDirectory(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
@@ -78,6 +99,11 @@ function ensureDirectory(dirPath) {
 function writeJsonFile(filePath, data) {
   ensureDirectory(path.dirname(filePath));
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+}
+
+function writeExactFile(filePath, bytes) {
+  ensureDirectory(path.dirname(filePath));
+  fs.writeFileSync(filePath, bytes, { flag: "wx" });
 }
 
 function readJsonFile(filePath, defaultValue = null) {
@@ -98,29 +124,56 @@ function atomicRename(source, target) {
   fs.renameSync(source, target);
 }
 
-// Best-effort durability: fsync a single file, then its parent directory.
-// fsync is a no-op on some platforms (e.g. certain WebView/embedding layers),
-// so failures are ignored — rename atomicity is the correctness guarantee.
+// Durability is part of the publication contract. File sync failures are never
+// ignored. A few platforms reject directory fsync even though file fsync is
+// supported; only those explicit unsupported-operation codes are tolerated.
 function fsyncFileWithParent(filePath) {
+  const fd = fs.openSync(filePath, "r");
   try {
-    const fd = fs.openSync(filePath, "r");
-    try {
-      fs.fsyncSync(fd);
-    } finally {
-      fs.closeSync(fd);
-    }
-  } catch {
-    /* fsync unavailable */
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
   }
+  fsyncDirectory(path.dirname(filePath));
+}
+
+function fsyncDirectory(directoryPath) {
   try {
-    const dirFd = fs.openSync(path.dirname(filePath), "r");
+    const dirFd = fs.openSync(directoryPath, "r");
     try {
       fs.fsyncSync(dirFd);
     } finally {
       fs.closeSync(dirFd);
     }
-  } catch {
-    /* fsync unavailable */
+  } catch (error) {
+    if (!["EINVAL", "EPERM", "ENOTSUP", "EISDIR"].includes(error?.code)) {
+      throw error;
+    }
+  }
+}
+
+let testHooks = Object.freeze({});
+
+/**
+ * Installs deterministic pause/failure hooks into the real production adapter.
+ * Intended for contract tests; an empty object restores normal production use.
+ */
+export function setWorldRevisionFilesystemTestHooks(hooks = {}) {
+  if (hooks === null || typeof hooks !== "object" || Array.isArray(hooks)) {
+    throw new TypeError("filesystem revision hooks must be an object");
+  }
+  const previous = testHooks;
+  testHooks = Object.freeze({ ...hooks });
+  return () => {
+    testHooks = previous;
+  };
+}
+
+async function runHook(name, context) {
+  const hook = testHooks[name];
+  if (hook !== undefined) {
+    if (typeof hook !== "function") throw new TypeError(`hook ${name} must be a function`);
+    await hook(Object.freeze({ ...context }));
   }
 }
 
@@ -139,10 +192,6 @@ function readCurrentRevision(gameId) {
   return null;
 }
 
-function writeCurrentRevision(gameId, revision) {
-  writeJsonFile(getCurrentPointerPath(gameId), { revision });
-}
-
 // --- Per-game commit serialization (compare-and-swap boundary) ---
 
 // A single-process mutex per game. Plan/validate and publish happen inside the
@@ -157,8 +206,14 @@ function acquireCommitGate(gameId) {
   const current = new Promise((resolve) => {
     release = resolve;
   });
-  gameCommitGates.set(gameId, previous.then(() => current));
-  return previous.then(() => ({ release }));
+  const tail = previous.then(() => current);
+  gameCommitGates.set(gameId, tail);
+  return previous.then(() => ({
+    release() {
+      release();
+      if (gameCommitGates.get(gameId) === tail) gameCommitGates.delete(gameId);
+    },
+  }));
 }
 
 // --- Legacy compatibility ---
@@ -212,7 +267,7 @@ function legacyCommittedAt(gameId) {
       // Missing file — keep current max.
     }
   }
-  return new Date(mtimeMs > 0 ? mtimeMs : Date.now()).toISOString();
+  return new Date(mtimeMs > 0 ? mtimeMs : 0).toISOString();
 }
 
 // A game with only legacy per-projection storage is exposed as a synthetic
@@ -249,6 +304,8 @@ function resolveCurrentRevisionForCas(gameId) {
 // --- Revision bundle storage ---
 
 async function loadRevisionBundle(gameId, revision) {
+  assertPathToken(gameId, "gameId");
+  assertPathToken(revision, "revision");
   const manifestPath = getManifestPath(gameId, revision);
   if (!fs.existsSync(manifestPath)) {
     throw new WorldRevisionError(
@@ -259,6 +316,12 @@ async function loadRevisionBundle(gameId, revision) {
   }
   const manifest = readJsonFile(manifestPath);
   const validatedManifest = validateManifest(manifest);
+  if (validatedManifest.gameId !== gameId) {
+    throw new WorldRevisionError("GAME_ID_MISMATCH", `Manifest belongs to ${validatedManifest.gameId}, not ${gameId}`, "gameId");
+  }
+  if (validatedManifest.revision !== revision) {
+    throw new WorldRevisionError("REVISION_PATH_MISMATCH", `Manifest revision ${validatedManifest.revision} does not match directory ${revision}`, "revision");
+  }
 
   const projections = {};
   for (const key of WORLD_PROJECTION_KEYS) {
@@ -290,21 +353,28 @@ async function stageAndVerifyRevision(gameId, bundle) {
   const tempDir = getRevisionDirectory(gameId, `${revision}.tmp`);
   const finalDir = getRevisionDirectory(gameId, revision);
 
-  if (fs.existsSync(tempDir)) {
-    fs.rmSync(tempDir, { recursive: true, force: true });
+  if (fs.existsSync(finalDir)) {
+    throw new WorldRevisionError("REVISION_COLLISION", `Revision ${revision} already exists`, "revision");
   }
+  if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
   ensureDirectory(tempDir);
 
+  await runHook("beforeStageWrites", { gameId, revision });
   writeJsonFile(path.join(tempDir, MANIFEST_FILE), bundle.manifest);
+  await runHook("afterManifestWrite", { gameId, revision });
   for (const key of WORLD_PROJECTION_KEYS) {
-    writeJsonFile(path.join(tempDir, `${key}.json`), bundle.projections[key]);
+    const { bytes } = await canonicalizeProjection(bundle.projections[key]);
+    writeExactFile(path.join(tempDir, `${key}.json`), bytes);
+    await runHook("afterProjectionWrite", { gameId, revision, projectionKey: key });
   }
 
   // Make staged bytes durable while still unreachable from the pointer.
   for (const key of WORLD_PROJECTION_KEYS) {
     fsyncFileWithParent(path.join(tempDir, `${key}.json`));
+    await runHook("afterProjectionSync", { gameId, revision, projectionKey: key });
   }
   fsyncFileWithParent(path.join(tempDir, MANIFEST_FILE));
+  await runHook("afterManifestSync", { gameId, revision });
 
   // Verify the bytes actually on disk round-trip to the published descriptors.
   const storedProjections = {};
@@ -312,17 +382,25 @@ async function stageAndVerifyRevision(gameId, bundle) {
     storedProjections[key] = readJsonFile(path.join(tempDir, `${key}.json`));
   }
   await verifyProjectionDescriptors(storedProjections, bundle.manifest.projections);
+  await runHook("afterStoredDescriptorVerification", { gameId, revision });
 
   atomicRename(tempDir, finalDir);
+  fsyncDirectory(getGameRevisionStorePath(gameId));
+  await runHook("afterRevisionDirectoryPublish", { gameId, revision });
 }
 
-function publishCurrentRevision(gameId, revision) {
+async function publishCurrentRevision(gameId, revision) {
   const pointerPath = getCurrentPointerPath(gameId);
   const tempPointerPath = `${pointerPath}.tmp`;
+  if (fs.existsSync(tempPointerPath)) fs.rmSync(tempPointerPath, { force: true });
+  await runHook("beforePointerWrite", { gameId, revision });
   writeJsonFile(tempPointerPath, { revision });
   fsyncFileWithParent(tempPointerPath);
+  await runHook("afterPointerSync", { gameId, revision });
   atomicRename(tempPointerPath, pointerPath);
+  await runHook("afterPointerPublish", { gameId, revision });
   fsyncFileWithParent(pointerPath);
+  await runHook("afterPointerDurable", { gameId, revision });
 }
 
 // --- Public API ---
@@ -333,6 +411,7 @@ function publishCurrentRevision(gameId, revision) {
  * @returns {Promise<{manifest: Object, projections: Object}>}
  */
 export async function readGameStateBundle(gameId) {
+  assertPathToken(gameId, "gameId");
   const currentRevision = readCurrentRevision(gameId);
 
   if (currentRevision) {
@@ -363,6 +442,9 @@ export async function readGameStateBundle(gameId) {
  * @returns {Promise<{status: "committed", bundle: Object}|{status: "conflict", currentRevision: string|null}>}
  */
 export async function commitWorldRevision(request) {
+  if (typeof request !== "object" || request === null) {
+    throw new WorldRevisionError("INVALID_REQUEST", "request must be an object", "request");
+  }
   const {
     gameId,
     expectedRevision,
@@ -370,6 +452,8 @@ export async function commitWorldRevision(request) {
     rollbackOf = null,
     projections,
   } = request;
+
+  assertPathToken(gameId, "gameId");
 
   const { release } = await acquireCommitGate(gameId);
   try {
@@ -397,18 +481,41 @@ export async function commitWorldRevision(request) {
     }
 
     const { bundle } = planResult;
+    await runHook("afterCompareAndSwap", { gameId, revision: bundle.manifest.revision, currentRevision });
 
     // Step 4/5: stage durably, verify descriptors, then publish the pointer.
     await stageAndVerifyRevision(gameId, bundle);
-    publishCurrentRevision(gameId, bundle.manifest.revision);
+    await publishCurrentRevision(gameId, bundle.manifest.revision);
+
+    // Return the exact canonical bytes that readers will observe, not the
+    // caller-owned object passed into the pure planner.
+    const storedBundle = await loadRevisionBundle(gameId, bundle.manifest.revision);
 
     return {
       status: "committed",
-      bundle,
+      bundle: storedBundle,
     };
   } finally {
     release();
   }
+}
+
+/**
+ * Compatibility seam for one legacy per-asset write. It always reads and
+ * commits the complete six-projection bundle through the same CAS transaction.
+ */
+export async function commitCompatibilityProjection({ gameId, expectedRevision, assetKey, value }) {
+  assertPathToken(gameId, "gameId");
+  if (!WORLD_PROJECTION_KEYS.includes(assetKey)) {
+    throw new WorldRevisionError("INVALID_PROJECTION_KEY", `Unknown projection ${assetKey}`, "assetKey");
+  }
+  const current = await readGameStateBundle(gameId);
+  return commitWorldRevision({
+    gameId,
+    expectedRevision,
+    reason: "compat-write",
+    projections: { ...current.projections, [assetKey]: value },
+  });
 }
 
 /**
@@ -417,6 +524,7 @@ export async function commitWorldRevision(request) {
  * @returns {Promise<Array<Object>>}
  */
 export async function listGameRevisions(gameId) {
+  assertPathToken(gameId, "gameId");
   const revisions = [];
   const storePath = getGameRevisionStorePath(gameId);
 
@@ -431,28 +539,23 @@ export async function listGameRevisions(gameId) {
       continue;
     }
 
-    const revision = entry.name;
-    const manifestPath = getManifestPath(gameId, revision);
-
     try {
-      const manifest = readJsonFile(manifestPath, null);
-      const validated = manifest ? validateManifest(manifest) : null;
-      if (validated) {
-        revisions.push({
-          revision: validated.revision,
-          parentRevision: validated.parentRevision,
-          committedAt: validated.committedAt,
-          reason: validated.reason,
-          rollbackOf: validated.rollbackOf,
-        });
-      }
+      assertPathToken(entry.name, "revision");
+      const bundle = await loadRevisionBundle(gameId, entry.name);
+      const validated = bundle.manifest;
+      revisions.push({
+        revision: validated.revision,
+        parentRevision: validated.parentRevision,
+        committedAt: validated.committedAt,
+        reason: validated.reason,
+        rollbackOf: validated.rollbackOf,
+      });
     } catch {
-      // Invalid or incomplete manifest — skip.
+      // Invalid, incomplete or corrupt revision — skip.
     }
   }
 
-  revisions.sort((a, b) => new Date(b.committedAt) - new Date(a.committedAt));
-  return revisions;
+  return rankCompleteRevisions(revisions);
 }
 
 /**
@@ -462,6 +565,10 @@ export async function listGameRevisions(gameId) {
  * @returns {Promise<number>} Number of revisions pruned
  */
 export async function pruneOldRevisions(gameId, keepCount = 12) {
+  assertPathToken(gameId, "gameId");
+  if (!Number.isInteger(keepCount) || keepCount < 1) {
+    throw new RangeError("keepCount must be a positive integer");
+  }
   const allRevisions = await listGameRevisions(gameId);
   const currentRevision = readCurrentRevision(gameId);
 
@@ -486,9 +593,7 @@ export async function pruneOldRevisions(gameId, keepCount = 12) {
     }
   }
 
-  const sortedOldestFirst = [...allRevisions].sort(
-    (a, b) => new Date(a.committedAt) - new Date(b.committedAt)
-  );
+  const sortedOldestFirst = [...allRevisions].reverse();
 
   const toPrune = [];
   for (let i = 0; i < sortedOldestFirst.length - keepCount; i++) {
@@ -520,15 +625,16 @@ export async function pruneOldRevisions(gameId, keepCount = 12) {
  * @returns {Promise<{revision: string|null, recovered: boolean}>}
  */
 export async function recoverCurrentRevision(gameId) {
+  assertPathToken(gameId, "gameId");
   const currentRevision = readCurrentRevision(gameId);
 
   if (!currentRevision) {
     // Pointer missing or cleared: fall back to the latest valid revision.
     const allRevisions = await listGameRevisions(gameId);
     if (allRevisions.length > 0) {
-      const latest = allRevisions[0].revision;
-      writeCurrentRevision(gameId, latest);
-      return { revision: latest, recovered: true };
+      const selected = selectDeepestCompleteRevision(allRevisions);
+      await publishCurrentRevision(gameId, selected);
+      return { revision: selected, recovered: true };
     }
     return { revision: null, recovered: false };
   }
@@ -551,7 +657,7 @@ export async function recoverCurrentRevision(gameId) {
     if (parentRevision) {
       try {
         await loadRevisionBundle(gameId, parentRevision);
-        writeCurrentRevision(gameId, parentRevision);
+        await publishCurrentRevision(gameId, parentRevision);
         return { revision: parentRevision, recovered: true };
       } catch {
         // Fall through to the latest valid revision search.
@@ -570,12 +676,43 @@ export async function recoverCurrentRevision(gameId) {
     }
 
     if (validRevisions.length > 0) {
-      const latestValid = validRevisions[0].revision;
-      writeCurrentRevision(gameId, latestValid);
-      return { revision: latestValid, recovered: true };
+      const selected = selectDeepestCompleteRevision(validRevisions);
+      await publishCurrentRevision(gameId, selected);
+      return { revision: selected, recovered: true };
     }
 
-    writeCurrentRevision(gameId, null);
+    clearCurrentRevision(gameId);
     return { revision: null, recovered: true };
   }
+}
+
+function selectDeepestCompleteRevision(revisions) {
+  return rankCompleteRevisions(revisions)[0].revision;
+}
+
+function rankCompleteRevisions(revisions) {
+  const byId = new Map(revisions.map((revision) => [revision.revision, revision]));
+  const memo = new Map();
+  const visiting = new Set();
+  function depth(revisionId) {
+    if (memo.has(revisionId)) return memo.get(revisionId);
+    if (visiting.has(revisionId)) return 0;
+    visiting.add(revisionId);
+    const revision = byId.get(revisionId);
+    const result = revision?.parentRevision && byId.has(revision.parentRevision)
+      ? depth(revision.parentRevision) + 1
+      : 1;
+    visiting.delete(revisionId);
+    memo.set(revisionId, result);
+    return result;
+  }
+  return [...revisions].sort((left, right) =>
+    depth(right.revision) - depth(left.revision) || left.revision.localeCompare(right.revision));
+}
+
+function clearCurrentRevision(gameId) {
+  const pointerPath = getCurrentPointerPath(gameId);
+  if (fs.existsSync(pointerPath)) fs.rmSync(pointerPath, { force: true });
+  ensureDirectory(path.dirname(pointerPath));
+  fsyncDirectory(path.dirname(pointerPath));
 }

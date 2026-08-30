@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import { test, describe, before, after, beforeEach, afterEach } from "node:test";
 import fs from "fs";
+import crypto from "crypto";
 import path from "path";
 import { fileURLToPath } from "url";
 import {
@@ -24,6 +25,9 @@ let commitWorldRevision;
 let listGameRevisions;
 let pruneOldRevisions;
 let recoverCurrentRevision;
+let commitCompatibilityProjection;
+let setWorldRevisionFilesystemTestHooks;
+let restoreHooks = () => {};
 
 // Helper to create valid projections
 function createValidProjections() {
@@ -55,6 +59,8 @@ describe("World Revision Filesystem Adapter", () => {
     listGameRevisions = adapter.listGameRevisions;
     pruneOldRevisions = adapter.pruneOldRevisions;
     recoverCurrentRevision = adapter.recoverCurrentRevision;
+    commitCompatibilityProjection = adapter.commitCompatibilityProjection;
+    setWorldRevisionFilesystemTestHooks = adapter.setWorldRevisionFilesystemTestHooks;
   });
 
   after(() => {
@@ -67,6 +73,8 @@ describe("World Revision Filesystem Adapter", () => {
   });
 
   afterEach(() => {
+    restoreHooks();
+    restoreHooks = () => {};
     cleanupTestDirectory();
   });
 
@@ -600,10 +608,9 @@ describe("World Revision Filesystem Adapter", () => {
       assert(recovery.recovered);
       assert.equal(recovery.revision, null);
 
-      // Pointer should be cleared
+      // No pointer is the canonical representation of no published revision.
       const pointerPath = path.join(TEST_DATA_DIR, "games", TEST_GAME_ID, "current-revision.json");
-      const pointer = JSON.parse(fs.readFileSync(pointerPath, "utf-8"));
-      assert.equal(pointer.revision, null);
+      assert.equal(fs.existsSync(pointerPath), false);
     });
   });
 
@@ -822,6 +829,169 @@ describe("World Revision Filesystem Adapter", () => {
       );
       const after = await readGameStateBundle(TEST_GAME_ID);
       assert.equal(after.manifest.revision, before.manifest.revision);
+    });
+
+    test("cases 1 and 4: production hooks expose only old/new coherent bundles at every stage", async () => {
+      const prePublicationHooks = [
+        "afterCompareAndSwap",
+        "beforeStageWrites",
+        "afterManifestWrite",
+        "afterProjectionWrite",
+        "afterProjectionSync",
+        "afterManifestSync",
+        "afterStoredDescriptorVerification",
+        "afterRevisionDirectoryPublish",
+        "beforePointerWrite",
+        "afterPointerSync",
+      ];
+      const postPublicationHooks = ["afterPointerPublish", "afterPointerDurable"];
+
+      for (const hookName of [...prePublicationHooks, ...postPublicationHooks]) {
+        cleanupTestDirectory();
+        const projections = createValidProjections();
+        const initial = await commitWorldRevision({
+          gameId: TEST_GAME_ID,
+          expectedRevision: null,
+          reason: "pregame",
+          projections,
+        });
+        const oldRevision = initial.bundle.manifest.revision;
+        let released;
+        let enteredResolve;
+        const entered = new Promise((resolve) => { enteredResolve = resolve; });
+        const pause = new Promise((resolve) => { released = resolve; });
+        let fired = false;
+        restoreHooks = setWorldRevisionFilesystemTestHooks({
+          [hookName]: async () => {
+            if (fired) return;
+            fired = true;
+            enteredResolve();
+            await pause;
+            throw new Error(`injected crash at ${hookName}`);
+          },
+        });
+
+        const pending = commitWorldRevision({
+          gameId: TEST_GAME_ID,
+          expectedRevision: oldRevision,
+          reason: "turn",
+          projections: { ...projections, game: { ...projections.game, turn: 2 } },
+        });
+        await entered;
+        const whilePaused = await readGameStateBundle(TEST_GAME_ID);
+        const isPostPublication = postPublicationHooks.includes(hookName);
+        assert.equal(whilePaused.manifest.revision === oldRevision, !isPostPublication, hookName);
+        assert.equal(whilePaused.projections.game.turn, isPostPublication ? 2 : 1, hookName);
+        released();
+        await assert.rejects(pending, new RegExp(hookName));
+        restoreHooks();
+        restoreHooks = () => {};
+
+        const afterRestart = await readGameStateBundle(TEST_GAME_ID);
+        assert.equal(afterRestart.manifest.revision === oldRevision, !isPostPublication, hookName);
+        assert.equal(afterRestart.projections.game.turn, isPostPublication ? 2 : 1, hookName);
+      }
+    });
+
+    test("case 2: corruption of every staged projection prevents publication", async () => {
+      for (const corruptKey of WORLD_PROJECTION_KEYS) {
+        cleanupTestDirectory();
+        const projections = createValidProjections();
+        const initial = await commitWorldRevision({ gameId: TEST_GAME_ID, expectedRevision: null, reason: "pregame", projections });
+        const oldRevision = initial.bundle.manifest.revision;
+        restoreHooks = setWorldRevisionFilesystemTestHooks({
+          afterProjectionWrite({ gameId, revision, projectionKey }) {
+            if (projectionKey !== corruptKey) return;
+            const file = path.join(TEST_DATA_DIR, "games", gameId, "revisions", `${revision}.tmp`, `${projectionKey}.json`);
+            fs.writeFileSync(file, '{"corrupt":true}', "utf8");
+          },
+        });
+        await assert.rejects(() => commitWorldRevision({
+          gameId: TEST_GAME_ID,
+          expectedRevision: oldRevision,
+          reason: "turn",
+          projections: { ...projections, game: { ...projections.game, turn: 2 } },
+        }), (error) => error instanceof WorldRevisionError);
+        restoreHooks();
+        restoreHooks = () => {};
+        assert.equal((await readGameStateBundle(TEST_GAME_ID)).manifest.revision, oldRevision, corruptKey);
+      }
+    });
+
+    test("stored projection bytes are the canonical bytes named by descriptors", async () => {
+      const projections = { ...createValidProjections(), game: { z: 1, a: 2 } };
+      const result = await commitWorldRevision({ gameId: TEST_GAME_ID, expectedRevision: null, reason: "pregame", projections });
+      const revision = result.bundle.manifest.revision;
+      const bytes = fs.readFileSync(path.join(TEST_DATA_DIR, "games", TEST_GAME_ID, "revisions", revision, "game.json"));
+      const descriptor = result.bundle.manifest.projections.game;
+      assert.equal(bytes.toString("utf8"), '{"a":2,"z":1}');
+      assert.equal(bytes.byteLength, descriptor.byteLength);
+      assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"), descriptor.checksum);
+    });
+
+    test("durability failures are blocking and cannot publish a candidate", async () => {
+      const projections = createValidProjections();
+      const initial = await commitWorldRevision({ gameId: TEST_GAME_ID, expectedRevision: null, reason: "pregame", projections });
+      const oldRevision = initial.bundle.manifest.revision;
+      const originalFsync = fs.fsyncSync;
+      fs.fsyncSync = () => {
+        const error = new Error("injected disk sync failure");
+        error.code = "EIO";
+        throw error;
+      };
+      try {
+        await assert.rejects(() => commitWorldRevision({
+          gameId: TEST_GAME_ID,
+          expectedRevision: oldRevision,
+          reason: "turn",
+          projections: { ...projections, game: { ...projections.game, turn: 2 } },
+        }), /injected disk sync failure/);
+      } finally {
+        fs.fsyncSync = originalFsync;
+      }
+      assert.equal((await readGameStateBundle(TEST_GAME_ID)).manifest.revision, oldRevision);
+    });
+
+    test("case 7: every compatibility asset write uses complete-bundle CAS", async () => {
+      const projections = createValidProjections();
+      let current = (await commitWorldRevision({ gameId: TEST_GAME_ID, expectedRevision: null, reason: "pregame", projections })).bundle;
+      for (const key of WORLD_PROJECTION_KEYS) {
+        const value = { compatKey: key };
+        const result = await commitCompatibilityProjection({
+          gameId: TEST_GAME_ID,
+          expectedRevision: current.manifest.revision,
+          assetKey: key,
+          value,
+        });
+        assert.equal(result.status, "committed");
+        current = result.bundle;
+        assert.deepEqual(current.projections[key], value);
+        assert.deepEqual(Object.keys(current.projections).sort(), [...WORLD_PROJECTION_KEYS].sort());
+      }
+      const beforeCount = (await listGameRevisions(TEST_GAME_ID)).length;
+      const conflict = await commitCompatibilityProjection({
+        gameId: TEST_GAME_ID,
+        expectedRevision: "stale-revision",
+        assetKey: "game",
+        value: { lost: true },
+      });
+      assert.equal(conflict.status, "conflict");
+      assert.equal(conflict.currentRevision, current.manifest.revision);
+      assert.equal((await listGameRevisions(TEST_GAME_ID)).length, beforeCount);
+    });
+
+    test("unsafe game and pointer tokens cannot escape the storage root", async () => {
+      await assert.rejects(
+        () => readGameStateBundle("../outside"),
+        (error) => error instanceof WorldRevisionError && error.code === "INVALID_PATH_TOKEN",
+      );
+      const gameRoot = path.join(TEST_DATA_DIR, "games", TEST_GAME_ID);
+      fs.mkdirSync(gameRoot, { recursive: true });
+      fs.writeFileSync(path.join(gameRoot, "current-revision.json"), JSON.stringify({ revision: "../../outside" }));
+      await assert.rejects(
+        () => readGameStateBundle(TEST_GAME_ID),
+        (error) => error instanceof WorldRevisionError && error.code === "INVALID_PATH_TOKEN",
+      );
     });
   });
 });
