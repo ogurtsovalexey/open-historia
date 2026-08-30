@@ -1,0 +1,26 @@
+{
+  "name": "@open-historia/sim-core",
+  "version": "0.1.0",
+  "description": "Open Historia simulation core - deterministic region-driven economy engine",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:tests": "tsc -p tsconfig.test.json",
+    "clean": "rm -rf dist",
+    "test": "npm run build:tests && node --test \"dist-test/test/**/*.test.js\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.9.3"
+  }
+}

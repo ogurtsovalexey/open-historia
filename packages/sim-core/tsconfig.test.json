@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist-test",
+    "rootDir": ".",
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "target": "ES2020",
+    "module": "ES2020"
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["dist", "dist-test", "node_modules"]
+}
