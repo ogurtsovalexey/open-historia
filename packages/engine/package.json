@@ -1,0 +1,26 @@
+{
+  "name": "@open-historia/engine",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:tests": "tsc -p tsconfig.test.json",
+    "test": "npm run build:tests && node --test \"dist-test/test/*.test.js\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "clean": "rm -rf dist dist-test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@open-historia/data-packs": "file:../data-packs",
+    "@open-historia/domain": "file:../domain",
+    "zod": "^4.0.0"
+  }
+}

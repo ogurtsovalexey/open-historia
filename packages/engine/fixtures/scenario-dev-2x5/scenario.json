@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "open-historia-engine-scenario/1",
+  "scenarioId": "scenario:dev-2x5",
+  "label": "development-test",
+  "displayName": {
+    "en": "Development 2x5 Economy Fixture",
+    "ru": "Тестовый сценарий экономики 2x5"
+  },
+  "startMonth": "1900-01-01",
+  "activeResources": ["food", "wood", "coal", "iron", "goods"],
+  "economy": {
+    "foodNeedPerPersonMilli": 50,
+    "infrastructureBpPerMoney": 1,
+    "resourceParams": [
+      { "resource": "food", "accountingValue": 1, "taxRateBp": 800 },
+      { "resource": "wood", "accountingValue": 2, "taxRateBp": 1000 },
+      { "resource": "coal", "accountingValue": 3, "taxRateBp": 1200 },
+      { "resource": "iron", "accountingValue": 4, "taxRateBp": 1200 },
+      { "resource": "goods", "accountingValue": 10, "taxRateBp": 1500 }
+    ]
+  },
+  "polities": [
+    {
+      "id": "polity:ostreya",
+      "displayName": { "en": "Ostreya", "ru": "Острея" },
+      "treasury": 5000,
+      "stockpile": [
+        { "resource": "food", "amount": 200 },
+        { "resource": "wood", "amount": 100 },
+        { "resource": "coal", "amount": 50 },
+        { "resource": "iron", "amount": 40 },
+        { "resource": "goods", "amount": 10 }
+      ]
+    },
+    {
+      "id": "polity:vindar",
+      "displayName": { "en": "Vindar", "ru": "Виндар" },
+      "treasury": 8000,
+      "stockpile": [
+        { "resource": "food", "amount": 100 },
+        { "resource": "wood", "amount": 40 },
+        { "resource": "coal", "amount": 80 },
+        { "resource": "iron", "amount": 60 },
+        { "resource": "goods", "amount": 30 }
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "regionId": "region:dev-2x5:A1",
+      "controllerId": "polity:ostreya",
+      "displayName": { "en": "Velle Plains", "ru": "Веллские равнины" },
+      "activity": { "kind": "extraction", "resource": "food" },
+      "population": 900000,
+      "annualBirthRateBp": 320,
+      "annualDeathRateBp": 210,
+      "workforceRateBp": 4500,
+      "infrastructureBp": 6000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 200000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:dev-2x5:A2",
+      "controllerId": "polity:ostreya",
+      "displayName": { "en": "South Marches", "ru": "Южные марки" },
+      "activity": { "kind": "extraction", "resource": "food" },
+      "population": 600000,
+      "annualBirthRateBp": 300,
+      "annualDeathRateBp": 220,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 100000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:dev-2x5:A3",
+      "controllerId": "polity:ostreya",
+      "displayName": { "en": "Ostwood", "ru": "Остенский лес" },
+      "activity": { "kind": "extraction", "resource": "wood" },
+      "population": 300000,
+      "annualBirthRateBp": 310,
+      "annualDeathRateBp": 230,
+      "workforceRateBp": 5000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 20000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:dev-2x5:A4",
+      "controllerId": "polity:ostreya",
+      "displayName": { "en": "Grey Hills", "ru": "Серые холмы" },
+      "activity": { "kind": "extraction", "resource": "coal" },
+      "population": 250000,
+      "annualBirthRateBp": 290,
+      "annualDeathRateBp": 240,
+      "workforceRateBp": 4800,
+      "infrastructureBp": 4000,
+      "damageBp": 2000,
+      "baseMonthlyCapacity": 15000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:dev-2x5:A5",
+      "controllerId": "polity:ostreya",
+      "displayName": { "en": "Ostreya City", "ru": "Город Острея" },
+      "activity": { "kind": "processing", "activity": "basic_goods" },
+      "population": 400000,
+      "annualBirthRateBp": 280,
+      "annualDeathRateBp": 200,
+      "workforceRateBp": 5000,
+      "infrastructureBp": 7000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 8000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:dev-2x5:B1",
+      "controllerId": "polity:vindar",
+      "displayName": { "en": "Vindar Lowlands", "ru": "Виндарские низины" },
+      "activity": { "kind": "extraction", "resource": "food" },
+      "population": 350000,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 210,
+      "workforceRateBp": 4600,
+      "infrastructureBp": 5500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 100000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:dev-2x5:B2",
+      "controllerId": "polity:vindar",
+      "displayName": { "en": "Black Ridge", "ru": "Чёрный кряж" },
+      "activity": { "kind": "extraction", "resource": "coal" },
+      "population": 280000,
+      "annualBirthRateBp": 270,
+      "annualDeathRateBp": 220,
+      "workforceRateBp": 5200,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 18000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:dev-2x5:B3",
+      "controllerId": "polity:vindar",
+      "displayName": { "en": "Iron Reach", "ru": "Железный предел" },
+      "activity": { "kind": "extraction", "resource": "iron" },
+      "population": 260000,
+      "annualBirthRateBp": 250,
+      "annualDeathRateBp": 215,
+      "workforceRateBp": 5000,
+      "infrastructureBp": 6000,
+      "damageBp": 1000,
+      "baseMonthlyCapacity": 16000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:dev-2x5:B4",
+      "controllerId": "polity:vindar",
+      "displayName": { "en": "North Mine", "ru": "Северный рудник" },
+      "activity": { "kind": "extraction", "resource": "iron" },
+      "population": 150000,
+      "annualBirthRateBp": 265,
+      "annualDeathRateBp": 225,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 10000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:dev-2x5:B5",
+      "controllerId": "polity:vindar",
+      "displayName": { "en": "Vindar Works", "ru": "Виндарские заводы" },
+      "activity": { "kind": "processing", "activity": "basic_goods" },
+      "population": 320000,
+      "annualBirthRateBp": 255,
+      "annualDeathRateBp": 205,
+      "workforceRateBp": 5500,
+      "infrastructureBp": 8000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 9000,
+      "outputPerWorker": 1
+    }
+  ]
+}

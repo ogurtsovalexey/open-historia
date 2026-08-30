@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+dist-test
 dist-web
 dist-ssr
 # electron-builder output (the packaged app + installer)
@@ -53,3 +54,6 @@ CLAUDE.md
 /trust/*.key.pem
 # generated per release build by the desktop workflow
 electron/build-id.json
+
+# engine playtest run output
+runs

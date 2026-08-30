@@ -1,0 +1,12 @@
+{
+  "commands": [
+    {
+      "kind": "economy.invest-region",
+      "commandId": "6a1f5c1e-0d2b-4d3a-9a51-000000000003",
+      "actorPolityId": "polity:vindar",
+      "targetRegionId": "region:dev-2x5:B5",
+      "effectiveMonth": "1900-06-01",
+      "spend": 2000
+    }
+  ]
+}
