@@ -201,6 +201,13 @@ All development follows this cycle:
 4. **IMPLEMENT** — Developer + AI Engineer (parallel, continuous sync)
 5. **VERIFY** — QA (test plan execution, fix → re-test)
 
+Every bounded DeepSeek task has a GPT plan gate before implementation. The
+worker receives one read-only planning run, GPT approves or amends that plan,
+and the same worker then receives one implementation run. Worker corrections
+and automatic retries are forbidden: a rejected implementation is preserved as
+evidence and returned to owner/GPT analysis. All DeepSeek phases use the
+approved V4 Pro model and enforced request-token budgets.
+
 **Deadlocks → human escalation.** When Developer and AI Engineer cannot agree,
 escalate to the project owner with 2-3 concrete options.
 

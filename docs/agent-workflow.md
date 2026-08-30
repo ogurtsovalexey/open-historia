@@ -40,8 +40,9 @@ review is an explicit deliverable. The role definitions and development cycle in
 `AGENTS.md` remain binding; the issue board operationalizes rather than replaces
 them.
 
-Required labels are `status:ready`, `status:claimed`, `status:blocked`,
-`status:review`, `status:done`, `agent:gpt`, `agent:deepseek`,
+Required labels are `status:ready`, `status:claimed`, `status:plan-review`,
+`status:blocked`, `status:review`, `status:done`, `stage:planning`,
+`stage:implementation`, `agent:gpt`, `agent:deepseek`,
 `role:po`, `role:analyst`, `role:developer`, `role:ai-engineer`, `role:qa`,
 `parallel:safe`, `decision:gpt-required`, and exactly one of
 `priority:critical`, `priority:high`, `priority:medium`, `priority:low`.
@@ -57,8 +58,9 @@ Priority means pickup urgency, not complexity:
 - `LOW`: future idea, experiment, polish or optional optimization safe to leave
   indefinitely.
 
-The lifecycle order is always review/integration, claimed-worker
-reconciliation, then new ready claims. For each agent class independently,
+The lifecycle order is always implementation review/integration, GPT plan
+review, claimed-worker reconciliation, then new ready claims. For each agent
+class independently,
 filter out blocked, claimed, dependency-blocked, path-conflicting and
 capacity-ineligible work, then select only from the highest non-empty ready band
 in `CRITICAL` → `HIGH` → `MEDIUM` → `LOW` order. A blocked or claimed higher
@@ -82,8 +84,9 @@ Before reading broadly or editing:
    and consider only its highest eligible priority band.
 2. Open the chosen issue and verify that every dependency is complete.
 3. Skip any issue already marked `status:claimed` or with overlapping owned paths.
-4. Replace `status:ready` with `status:claimed` and comment the agent/session,
-   branch, worktree, base SHA and start time.
+4. Replace `status:ready` with `status:claimed`, add `stage:planning`, and
+   comment the agent/session, branch, worktree, base SHA, token budget and start
+   time.
 5. Fetch `private/main`, create the issue branch and a dedicated worktree.
 
 Claiming is intentionally visible before implementation. If two agents race, the
@@ -121,7 +124,33 @@ git worktree add ../open-historia-next-opencode \
 | Historical datasets for different countries | Yes | Shared schema must already be accepted. |
 | Any work requiring a new architecture/domain decision | GPT gate | Worker raises `DECISION NEEDED`. |
 
-## Handoff
+## Plan Gate
+
+Every new DeepSeek task begins with one read-only planning phase. The worker
+traces production paths and posts `PLAN HANDOFF` containing:
+
+- acceptance criterion → owned file → executable validation mapping;
+- production seams and existing tests it will exercise;
+- the smallest coherent commit sequence;
+- risks, missing decisions and scope conflicts.
+- whether it is one cohesive production seam and can fit the 1,500,000-token
+  implementation budget.
+
+It makes no file changes and moves the Issue from `status:claimed` to
+`status:plan-review`. GPT then reviews the plan. GPT may approve it unchanged or
+write a corrected plan itself; the worker is never rerun merely to rewrite the
+plan. If safe implementation is possible, GPT posts `APPROVED IMPLEMENTATION
+PLAN`, returns the Issue to `status:claimed` with `stage:implementation`, and
+resumes the same worker session for its single implementation run. A genuine
+owner decision instead moves the Issue to `status:blocked`.
+
+GPT must not approve a plan that bundles independent production seams merely
+because all files share a feature name. Such an Issue is marked
+`NEEDS DECOMPOSITION` and `status:blocked`; the owner planning session creates
+the smaller child Issues. The budget is a task-size gate, not something raised
+until an oversized task fits.
+
+## Implementation Handoff
 
 1. Start from the recorded integration SHA.
 2. Make small, focused commits without unrelated cleanup.
@@ -132,12 +161,14 @@ git worktree add ../open-historia-next-opencode \
    configured upstream. Then replace `status:claimed` with
    `status:review`, and comment commits, changed files, tests, risks and open
    decisions.
-5. The GPT integration owner reviews against principles and acceptance criteria,
-   then validates and integrates the advertised range through
+5. The GPT integration owner reviews against the approved plan, principles and
+   acceptance criteria, then validates and integrates the advertised range through
    `scripts/agent-orchestrator.sh integrate-range`. A correction commit whose
    advertised start is an unintegrated/rejected ancestor is rejected before the
    canonical worktree is mutated.
-6. QA validates the integrated worktree; only the integration owner applies
+6. A rejected implementation is labelled `status:blocked` with exact evidence.
+   It is not resumed for a correction round and is not automatically rerun.
+7. QA validates the integrated worktree; only the integration owner applies
    `status:done` and closes the issue.
 
 Workers never push directly to `private/main` or the public `origin`.
@@ -149,6 +180,11 @@ Every worker receives the mandatory checks in `agent-worker-baseline.md`.
 Review rejects proxy/fake tests, undiscovered tests, skipped validation reported
 as passing, unbounded-then-check payload handling and resource cleanup that does
 not cover early returns.
+
+All worker phases use `openrouter/deepseek/deepseek-v4-pro-0813`. The runner
+rejects every other model. Planning and implementation each have exactly one
+attempt and separate hard request-token budgets; reaching a budget stops the
+worker and leads to `status:blocked`, never a retry.
 
 Canonical synchronization happens through committed updates to:
 

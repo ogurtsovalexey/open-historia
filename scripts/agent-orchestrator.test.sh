@@ -17,6 +17,9 @@ source "$SCRIPT_DIR/agent-orchestrator.sh"
 
 CLAIMED_CHECK_SECONDS=420
 MAX_ACTIVE_STREAMS=7
+WORKER_MODEL="openrouter/deepseek/deepseek-v4-pro-0813"
+PLANNING_TOKEN_BUDGET=400000
+IMPLEMENTATION_TOKEN_BUDGET=1500000
 
 SESSION_ID="11111111-2222-4333-8444-555555555555"
 PENDING_START_TIMEOUT=3600
@@ -108,7 +111,12 @@ inspect_pending_tick
 grep -Fq "SESSION_ID=${SESSION_ID}" "$CONFIG_FILE"
 grep -Fq "CLAIMED_CHECK_SECONDS=420" "$CONFIG_FILE"
 grep -Fq "MAX_ACTIVE_STREAMS=7" "$CONFIG_FILE"
+grep -Fq "WORKER_MODEL=openrouter/deepseek/deepseek-v4-pro-0813" "$CONFIG_FILE"
+grep -Fq "PLANNING_TOKEN_BUDGET=400000" "$CONFIG_FILE"
+grep -Fq "IMPLEMENTATION_TOKEN_BUDGET=1500000" "$CONFIG_FILE"
 [[ "$(tick_prompt tick-capacity)" == *"at most 7 active task streams total"* ]]
+[[ "$(tick_prompt tick-capacity)" == *"Every worker phase uses openrouter/deepseek/deepseek-v4-pro-0813"* ]]
+[[ "$(tick_prompt tick-capacity)" == *"resume it as a correction"* ]]
 
 # A review tick fails closed on owner Git state, reports the exact condition,
 # preserves the file, and cannot manufacture an ORCHESTRATOR_OK result.
@@ -141,7 +149,8 @@ PRIORITY_BOARD='[
   {"number":61,"title":"gpt low","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:gpt"},{"name":"priority:low"}]},
   {"number":70,"title":"missing priority","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:deepseek"}]},
   {"number":71,"title":"multiple priorities","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:critical"},{"name":"priority:high"}]},
-  {"number":80,"title":"review first","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:review"},{"name":"agent:deepseek"},{"name":"priority:low"}]}
+  {"number":80,"title":"review first","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:review"},{"name":"agent:deepseek"},{"name":"priority:low"}]},
+  {"number":81,"title":"plan review","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:plan-review"},{"name":"agent:deepseek"},{"name":"priority:critical"}]}
 ]'
 PRIORITY_SNAPSHOT="$(printf '%s' "$PRIORITY_BOARD" | dispatch_snapshot)"
 
@@ -176,8 +185,10 @@ LOW_ONLY='[{"number":9,"title":"low","updatedAt":"x","labels":[{"name":"status:r
 
 # Review precedence and the computed snapshot are part of every tick contract.
 PRIORITY_PROMPT="$(tick_prompt tick-priority "$PRIORITY_SNAPSHOT")"
-[[ "$PRIORITY_PROMPT" == *"(1) process every status:review handoff before any new claim; (2) reconcile status:claimed"* ]]
+[[ "$PRIORITY_PROMPT" == *"(1) process every status:review implementation handoff"* ]]
+[[ "$PRIORITY_PROMPT" == *"(2) process every status:plan-review plan"* ]]
 [[ "$PRIORITY_PROMPT" == *'"review":[80]'* ]]
+[[ "$PRIORITY_PROMPT" == *'"planReview":[81]'* ]]
 [[ "$PRIORITY_PROMPT" == *"Never claim an issue listed as malformed"* ]]
 
 # Reprioritization alone changes the actionable signature.

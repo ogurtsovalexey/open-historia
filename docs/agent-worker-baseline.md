@@ -1,7 +1,20 @@
 # Mandatory Worker Baseline
 
-These instructions are automatically prepended to every OpenCode worker task
-and correction. They are acceptance gates, not suggestions.
+These instructions are automatically prepended to every OpenCode worker phase.
+They are acceptance gates, not suggestions. The runner adds either a planning
+or implementation phase contract after this baseline.
+
+## One-plan, one-implementation lifecycle
+
+1. A planning phase is read-only. Inspect the real system, post `PLAN HANDOFF`,
+   move the Issue to `status:plan-review`, and stop.
+2. GPT approves or amends the plan. Do not implement before the Issue contains
+   `APPROVED IMPLEMENTATION PLAN`.
+3. The implementation phase follows that accepted plan and gets one attempt.
+4. There are no worker correction rounds or automatic phase retries. On a
+   failed gate, preserve evidence and set `status:blocked`.
+5. The runner enforces the phase request-token budget. Do not attempt to evade,
+   reset or replace its accounting.
 
 ## Authority and scope
 
@@ -64,7 +77,7 @@ and correction. They are acceptance gates, not suggestions.
    placeholder SHAs, “to be committed” text or pending validation claims. The
    worker emits its HANDOFF only as the final response after commit and push.
 
-## Mandatory pre-handoff checks
+## Mandatory implementation pre-handoff checks
 
 Before claiming completion:
 

@@ -26,41 +26,49 @@ For every `ORCHESTRATOR_TICK`:
 3. Process all `status:review` work before starting new work:
    - verify the issue contract, owned paths, commits and validation;
    - review against `AGENTS.md`, principles and accepted specifications;
-   - accept and integrate, or post concrete changes requested;
-   - automatically resume the same worker session for bounded corrections when
-     its session id is known;
+   - accept and integrate, or reject it to `status:blocked` with concrete
+     evidence; never resume a rejected implementation for correction;
    - close accepted issues as `status:done` and unblock direct dependants.
-4. Reconcile `status:claimed` issues with their process, branch and worktree.
-   A dead process with no handoff is retried once; repeated failure becomes
-   `status:blocked` with evidence. A worker exit code describes only the local
+4. Process all `status:plan-review` work. Review the worker's read-only plan
+   against the Issue, repository and production seams. Approve it or amend it
+   directly as GPT, post `APPROVED IMPLEMENTATION PLAN`, move the Issue to
+   `status:claimed` plus `stage:implementation`, and resume the same worker
+   session once. Approve only one cohesive production seam that can realistically
+   fit the implementation budget. Otherwise post `NEEDS DECOMPOSITION`, block
+   the Issue and leave child-Issue creation to the owner planning session. Do
+   not rerun the planning phase or raise the budget to fit an oversized task.
+5. Reconcile `status:claimed` issues with their process, branch and worktree.
+   A dead process with no appropriate lifecycle handoff becomes
+   `status:blocked` immediately. A worker exit code describes only the local
    process: even `exit(0)` remains unfinished until the Issue has a verified
    handoff and lifecycle transition. Exited claimed workers wake reconciliation
    immediately instead of waiting for the periodic claimed audit.
-5. Fill free capacity only from existing `status:ready` Issues, up to the
+6. Fill free capacity only from existing `status:ready` Issues, up to the
    configured active-stream limit (currently seven total: the GPT integration
    stream plus at most six DeepSeek workers).
    For each agent class independently, use the code-generated priority queue in
    this exact order: `CRITICAL` → `HIGH` → `MEDIUM` → `LOW`. Apply dependency,
    owned-path and concurrency checks, then claim only from the highest band
    that still has an eligible candidate. Never claim overlapping owned paths.
-6. The orchestrator creates the branch/worktree and updates the Issue before
-   launching a worker. Workers run headlessly through `opencode run --format
+7. The orchestrator creates the branch/worktree, moves the Issue to
+   `status:claimed` plus `stage:planning`, and launches the one read-only plan
+   phase. Workers run headlessly through `opencode run --format
    json` inside a detached `screen` session managed by
    `scripts/agent-worker.sh`; no terminal window is required. A plain background
    child of a Codex tool call is not durable and must not be used. The helper
    automatically prepends `docs/agent-worker-baseline.md`; task prompts add
    scope and acceptance detail but never replace those quality gates.
-7. Select the cheapest model tier that safely fits the task (§ Model routing).
-   Record the chosen model in the claim comment.
-8. DeepSeek remains a bounded worker. GPT owns review, architecture, security,
+8. Every phase uses DeepSeek V4 Pro and its configured hard token budget
+   (§ Worker model and budgets). Record model, phase and budget in the comment.
+9. DeepSeek remains a bounded worker. GPT owns review, architecture, security,
    persistence, domain contracts, historical assumptions and accepted scope.
-9. Do not create more agent identities. Reuse the fixed concurrency budget;
+10. Do not create more agent identities. Reuse the fixed concurrency budget;
    completing one issue frees its slot for the next.
-10. Do not push to public `origin`. Workers push task branches to `private`; only
+11. Do not push to public `origin`. Workers push task branches to `private`; only
    the integration owner updates `private/main`.
-11. Never create a task, Issue, Epic, roadmap item or new backlog scope during a
+12. Never create a task, Issue, Epic, roadmap item or new backlog scope during a
     tick. Missing work waits for the owner’s general planning session.
-12. After a completed Issue is integrated and closed, archive its stopped worker
+13. After a completed Issue is integrated and closed, archive its stopped worker
     record so the live worker list contains only actionable runs. Archiving must
     preserve prompts, logs and handoff metadata.
 
@@ -104,8 +112,9 @@ band. Within a band it orders by issue number ascending. Dependency-unblocking
 value is not yet machine-readable; the owner may express it by changing the
 canonical priority rather than silently reordering a band.
 
-Lifecycle always outranks priority: process `status:review`, reconcile
-`status:claimed`, then fill slots from `status:ready`. `status:blocked` is never
+Lifecycle always outranks priority: process `status:review`, process
+`status:plan-review`, reconcile `status:claimed`, then fill slots from
+`status:ready`. `status:blocked` is never
 eligible. A blocked or claimed CRITICAL does not prevent pickup of a ready HIGH
 when no eligible ready CRITICAL remains. A GPT CRITICAL does not block a
 DeepSeek HIGH, or vice versa. LOW can be claimed only when that agent class has
@@ -116,44 +125,26 @@ reported by `agents:status` and cannot be claimed until corrected. Legacy
 `priority:p0` and `priority:p1` labels are invalid and never participate in
 dispatch.
 
-## Model routing
+## Worker model and budgets
 
-Price snapshot: OpenRouter Models API, 2026-08-29. Prices are USD per one
-million input/output tokens and are used only to choose relative tiers; the
-orchestrator does not assume they remain fixed.
+Every OpenCode worker phase uses only
+`openrouter/deepseek/deepseek-v4-pro-0813`. DeepSeek V3.2, tier routing,
+promotion and fallback models are disabled. GPT planning decisions, plan review,
+implementation review and integration use the Codex subscription.
 
-| Tier | Model | Snapshot price | Use |
-|---|---|---:|---|
-| Research | `deepseek/deepseek-v3.2` | `$0.269 / $0.40` | Internet/source search, inventories, documentation comparisons, bounded QA review with no code changes. |
-| Standard code | `deepseek/deepseek-v3.2` | `$0.269 / $0.40` | Accepted single-module implementation, focused tests, mechanical migrations and review corrections. |
-| Complex | `deepseek/deepseek-v3.2` | `$0.269 / $0.40` | Cross-module state, provider adapters, security-sensitive code, difficult debugging or broad refactoring. |
-| Escalation only | `deepseek/deepseek-v4-pro-0813` | `$0.66 / $1.98` | Only after two concrete failed review/correction rounds on a lower tier, or an explicit GPT finding that the task cannot be safely decomposed. |
+Default hard budgets count cumulative request tokens reported in OpenCode
+`step_finish` events:
 
-Rules:
+| Phase | Budget | Result at limit |
+|---|---:|---|
+| Planning | 400,000 | Stop process, preserve log, block Issue |
+| Implementation | 1,500,000 | Stop process, preserve branch/log, block Issue |
 
-- All worker tiers use DeepSeek. Qwen models are not used for research, code,
-  review corrections or any fallback.
-- Search tools fetch sources; the worker synthesizes them. Do not pay the
-  escalation model merely to browse or copy facts into a matrix.
-- `type:audit`, research and documentation default to Research.
-- Implementation defaults to Standard code. Use Complex only for the named
-  cross-module or high-correctness cases. Standard and Complex currently route
-  to the same DeepSeek V3.2 model; the tiers remain separate so routing can be
-  adjusted later without changing task classification.
-- A worker never promotes itself. GPT may route any initial worker to DeepSeek
-  V3.2 and records the evidence before any promotion to DeepSeek V4 Pro.
-- After every rejected handoff, GPT checks model fit separately from task fit.
-  A clear capability mismatch (for example fabricated research evidence or an
-  inability to follow repository/commit mechanics) may be rerouted immediately
-  to another non-escalation tier; do not spend a correction repeating the same
-  failure mode on the same model merely because that tier is cheaper.
-- Repetition of a previously documented blocker, or a false-complete handoff
-  without the required commit/private branch, counts as a failed correction
-  round for promotion accounting.
-- GPT planning, decisions, review and integration use the Codex subscription,
-  not an OpenRouter worker model.
-- One initial worker pass plus at most two bounded correction rounds. If the
-  contract itself is unclear, stop and resolve it instead of buying more tokens.
+The monitor checks between emitted events, so one already in-flight request may
+finish and cause a bounded overshoot. Each phase can be launched once. A plan
+review is not another worker attempt: GPT approves or edits the plan itself.
+Likewise, a rejected implementation is investigated from its preserved branch
+and log rather than resumed.
 
 ## Owner interruptions
 
@@ -215,3 +206,8 @@ the prepared pool is `slot-1` through `slot-6`. `CLAIMED_CHECK_SECONDS` defaults
 to `420` as a fallback audit for live or ambiguous claims. A worker with a
 recorded exit result and unchanged `status:claimed` wakes the next watchdog
 interval immediately; it does not wait seven minutes.
+
+`PLANNING_TOKEN_BUDGET` and `IMPLEMENTATION_TOKEN_BUDGET` configure the two
+phase limits. `npm run agents:workers` shows the active phase and usage/budget;
+`bash scripts/agent-worker.sh usage <issue>` prints its exact accounting and
+whether the hard limit fired.

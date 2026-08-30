@@ -47,10 +47,9 @@ load_config() {
   : "${TICK_SECONDS:=120}"
   : "${CLAIMED_CHECK_SECONDS:=420}"
   : "${MAX_ACTIVE_STREAMS:=7}"
-  : "${RESEARCH_MODEL:=openrouter/deepseek/deepseek-v3.2}"
-  : "${CODE_MODEL:=openrouter/deepseek/deepseek-v3.2}"
-  : "${COMPLEX_MODEL:=openrouter/deepseek/deepseek-v3.2}"
-  : "${ESCALATION_MODEL:=openrouter/deepseek/deepseek-v4-pro-0813}"
+  WORKER_MODEL="openrouter/deepseek/deepseek-v4-pro-0813"
+  : "${PLANNING_TOKEN_BUDGET:=400000}"
+  : "${IMPLEMENTATION_TOKEN_BUDGET:=1500000}"
   : "${PENDING_START_TIMEOUT:=3600}"
   : "${PENDING_RUN_TIMEOUT:=3600}"
 }
@@ -62,10 +61,9 @@ write_config() {
   local tick_seconds="${TICK_SECONDS:-120}"
   local claimed_check_seconds="${CLAIMED_CHECK_SECONDS:-420}"
   local max_active_streams="${MAX_ACTIVE_STREAMS:-7}"
-  local research_model="${RESEARCH_MODEL:-openrouter/deepseek/deepseek-v3.2}"
-  local code_model="${CODE_MODEL:-openrouter/deepseek/deepseek-v3.2}"
-  local complex_model="${COMPLEX_MODEL:-openrouter/deepseek/deepseek-v3.2}"
-  local escalation_model="${ESCALATION_MODEL:-openrouter/deepseek/deepseek-v4-pro-0813}"
+  local worker_model="openrouter/deepseek/deepseek-v4-pro-0813"
+  local planning_token_budget="${PLANNING_TOKEN_BUDGET:-400000}"
+  local implementation_token_budget="${IMPLEMENTATION_TOKEN_BUDGET:-1500000}"
   local pending_start_timeout="${PENDING_START_TIMEOUT:-3600}"
   local pending_run_timeout="${PENDING_RUN_TIMEOUT:-3600}"
 
@@ -89,10 +87,9 @@ write_config() {
     printf 'TICK_SECONDS=%q\n' "$tick_seconds"
     printf 'CLAIMED_CHECK_SECONDS=%q\n' "$claimed_check_seconds"
     printf 'MAX_ACTIVE_STREAMS=%q\n' "$max_active_streams"
-    printf 'RESEARCH_MODEL=%q\n' "$research_model"
-    printf 'CODE_MODEL=%q\n' "$code_model"
-    printf 'COMPLEX_MODEL=%q\n' "$complex_model"
-    printf 'ESCALATION_MODEL=%q\n' "$escalation_model"
+    printf 'WORKER_MODEL=%q\n' "$worker_model"
+    printf 'PLANNING_TOKEN_BUDGET=%q\n' "$planning_token_budget"
+    printf 'IMPLEMENTATION_TOKEN_BUDGET=%q\n' "$implementation_token_budget"
     printf 'PENDING_START_TIMEOUT=%q\n' "$pending_start_timeout"
     printf 'PENDING_RUN_TIMEOUT=%q\n' "$pending_run_timeout"
   } >"$CONFIG_FILE"
@@ -310,9 +307,9 @@ new_tick_id() {
 
 tick_prompt() {
   local tick_id="${1:?tick id required}"
-  local dispatch_snapshot="${2:-{\"review\":[],\"malformed\":[],\"queues\":{\"agent:gpt\":[],\"agent:deepseek\":[]},\"highestBands\":{\"agent:gpt\":[],\"agent:deepseek\":[]}}}"
+  local dispatch_snapshot="${2:-{\"review\":[],\"planReview\":[],\"malformed\":[],\"queues\":{\"agent:gpt\":[],\"agent:deepseek\":[]},\"highestBands\":{\"agent:gpt\":[],\"agent:deepseek\":[]}}}"
   local worker_snapshot="${3:-[]}"
-  printf '%s' "ORCHESTRATOR_TICK_ID=${tick_id}. Work in ${REPO_ROOT}. Read docs/agent-orchestrator.md and execute exactly one orchestration cycle against ${GITHUB_REPOSITORY}. Act only as integration owner and dispatcher: review/integrate handoffs, reconcile workers, improve worker prompts, and assign existing status:ready Issues. Never create new tasks, Issues, Epics, roadmap items, or backlog scope; the owner does that in a separate general session. Lifecycle order is mandatory: (1) process every status:review handoff before any new claim; (2) reconcile status:claimed workers and stale claims; (3) fill free capacity from eligible status:ready work. status:blocked is never eligible. A worker exit code records process termination only; it is never handoff acceptance. Every completed worker still labelled status:claimed in the worker reconciliation snapshot must be resolved in this cycle by review/correction, status:blocked with evidence, or a verified status:review handoff. Do not end ORCHESTRATOR_OK or ORCHESTRATOR_IDLE while such a completion remains unreconciled. Before any integration, run scripts/agent-orchestrator.sh preflight ${REPO_ROOT} and integrate the advertised range with scripts/agent-orchestrator.sh integrate-range; never manually cherry-pick an unvalidated worker range. For each agent class independently, the code-generated queue below is ordered CRITICAL -> HIGH -> MEDIUM -> LOW and then by issue number. Apply dependency, owned-path and concurrency eligibility checks without reordering eligible work: claim only from the highest priority band that still has an eligible candidate. LOW is allowed only when no eligible ready CRITICAL, HIGH or MEDIUM remains for that agent class. A blocked or claimed higher-priority issue does not suppress lower ready work, and GPT work does not suppress DeepSeek work. Never claim an issue listed as malformed; zero or multiple canonical priority labels must be diagnosed. Priority labels are priority:critical, priority:high, priority:medium and priority:low; priority:p0 and priority:p1 are invalid. Dispatch snapshot: ${dispatch_snapshot}. Worker reconciliation snapshot: ${worker_snapshot}. Keep at most ${MAX_ACTIVE_STREAMS} active task streams total, including the GPT integration stream. Worker model routing: research=${RESEARCH_MODEL}; standard-code=${CODE_MODEL}; complex=${COMPLEX_MODEL}; escalation-only=${ESCALATION_MODEL}. Do not use the escalation model unless the documented promotion rule is met. Do not create additional agent identities or ask the owner routine questions. End the final message with exactly one marker on its own line: ORCHESTRATOR_OK, ORCHESTRATOR_IDLE, or OWNER_ACTION_REQUIRED: <one-line decision>."
+  printf '%s' "ORCHESTRATOR_TICK_ID=${tick_id}. Work in ${REPO_ROOT}. Read docs/agent-orchestrator.md and execute exactly one orchestration cycle against ${GITHUB_REPOSITORY}. Act only as GPT plan gate, integration owner and dispatcher: review/integrate implementation handoffs, review worker plans, reconcile workers, improve initial prompts, and assign existing status:ready Issues. Never create new tasks, Issues, Epics, roadmap items, or backlog scope; the owner does that in a separate general session. Lifecycle order is mandatory: (1) process every status:review implementation handoff; rejected implementation is blocked with evidence and is never resumed for correction; (2) process every status:plan-review plan before any new claim—approve it or amend it yourself only when it covers one cohesive production seam and can fit the implementation token budget, then post APPROVED IMPLEMENTATION PLAN, move the Issue to status:claimed plus stage:implementation, and resume the same worker session exactly once; otherwise post NEEDS DECOMPOSITION and block it for the owner planning session without raising the budget; (3) reconcile status:claimed workers and stale claims without retrying an exited phase; (4) fill free capacity from eligible status:ready work by moving it to status:claimed plus stage:planning and launching exactly one planning phase. status:blocked is never eligible. A worker exit code records process termination only; it is never handoff acceptance. Every completed worker still labelled status:claimed in the worker reconciliation snapshot must be set status:blocked with evidence unless it already made the verified lifecycle handoff appropriate to its phase. Do not resume it as a correction. Do not end ORCHESTRATOR_OK or ORCHESTRATOR_IDLE while such a completion remains unreconciled. Before any integration, run scripts/agent-orchestrator.sh preflight ${REPO_ROOT} and integrate the advertised range with scripts/agent-orchestrator.sh integrate-range; never manually cherry-pick an unvalidated worker range. For each agent class independently, the code-generated queue below is ordered CRITICAL -> HIGH -> MEDIUM -> LOW and then by issue number. Apply dependency, owned-path and concurrency eligibility checks without reordering eligible work: claim only from the highest priority band that still has an eligible candidate. LOW is allowed only when no eligible ready CRITICAL, HIGH or MEDIUM remains for that agent class. A blocked or claimed higher-priority issue does not suppress lower ready work, and GPT work does not suppress DeepSeek work. Never claim an issue listed as malformed; zero or multiple canonical priority labels must be diagnosed. Priority labels are priority:critical, priority:high, priority:medium and priority:low; priority:p0 and priority:p1 are invalid. Dispatch snapshot: ${dispatch_snapshot}. Worker reconciliation snapshot: ${worker_snapshot}. Keep at most ${MAX_ACTIVE_STREAMS} active task streams total, including the GPT integration stream. Every worker phase uses ${WORKER_MODEL}; V3.2 and automatic model promotion are forbidden. Invoke planning with a ${PLANNING_TOKEN_BUDGET}-token hard budget and implementation with a ${IMPLEMENTATION_TOKEN_BUDGET}-token hard budget through scripts/agent-worker.sh. The budget is cumulative request-token usage reported by OpenCode and may overshoot by at most the in-flight request. Do not create additional agent identities or ask the owner routine questions. End the final message with exactly one marker on its own line: ORCHESTRATOR_OK, ORCHESTRATOR_IDLE, or OWNER_ACTION_REQUIRED: <one-line decision>."
 }
 
 write_pending_tick() {
@@ -524,6 +521,11 @@ dispatch_snapshot() {
         | select(names | index("status:review"))
         | .number
       ] | sort,
+      planReview: [
+        .[]
+        | select(names | index("status:plan-review"))
+        | .number
+      ] | sort,
       malformed: [
         .[]
         | (priorities) as $priority
@@ -595,12 +597,13 @@ claimed_check_due() {
 
 needs_tick() {
   local board="$1"
-  local ready review claimed_deepseek
+  local ready review plan_review claimed_deepseek
   ready="$(printf '%s' "$board" | count_status 'status:ready')"
   review="$(printf '%s' "$board" | count_status 'status:review')"
+  plan_review="$(printf '%s' "$board" | count_status 'status:plan-review')"
   claimed_deepseek="$(printf '%s' "$board" | jq '[.[] | select(any(.labels[]; .name == "status:claimed")) | select(any(.labels[]; .name == "agent:deepseek"))] | length')"
 
-  if (( ready > 0 || review > 0 )); then
+  if (( ready > 0 || review > 0 || plan_review > 0 )); then
     return 0
   fi
   if [[ "$(worker_reconciliation_snapshot "$board" | jq 'length')" -gt 0 ]]; then
@@ -616,7 +619,7 @@ actionable_signature() {
   jq -r '
     [
       .[]
-      | select(any(.labels[]; .name == "status:ready" or .name == "status:review"))
+      | select(any(.labels[]; .name == "status:ready" or .name == "status:plan-review" or .name == "status:review"))
       | ([.labels[].name | select(startswith("status:") or startswith("agent:") or startswith("priority:"))] | sort | join(",")) as $routing
       | "\(.number):\(.updatedAt):\($routing)"
     ]
@@ -770,10 +773,8 @@ print_status() {
   printf 'repo:     %s\n\n' "$REPO_ROOT"
   printf 'capacity: %s active streams (GPT + up to %s workers)\n' "$MAX_ACTIVE_STREAMS" "$((MAX_ACTIVE_STREAMS - 1))"
   printf 'claimed:  audit every %ss\n\n' "$CLAIMED_CHECK_SECONDS"
-  printf 'models:   research=%s\n' "$RESEARCH_MODEL"
-  printf '          code=%s\n' "$CODE_MODEL"
-  printf '          complex=%s\n' "$COMPLEX_MODEL"
-  printf '          escalation=%s\n\n' "$ESCALATION_MODEL"
+  printf 'worker:   model=%s\n' "$WORKER_MODEL"
+  printf 'budgets:  planning=%s implementation=%s request tokens\n\n' "$PLANNING_TOKEN_BUDGET" "$IMPLEMENTATION_TOKEN_BUDGET"
 
   if read_pending_tick; then
     inspect_pending_tick
@@ -827,13 +828,14 @@ check_board() {
   require_command gh
   require_command jq
 
-  local board ready review claimed_deepseek
+  local board ready review plan_review claimed_deepseek
   board="$(board_json)"
   ready="$(printf '%s' "$board" | count_status 'status:ready')"
   review="$(printf '%s' "$board" | count_status 'status:review')"
+  plan_review="$(printf '%s' "$board" | count_status 'status:plan-review')"
   claimed_deepseek="$(printf '%s' "$board" | jq '[.[] | select(any(.labels[]; .name == "status:claimed")) | select(any(.labels[]; .name == "agent:deepseek"))] | length')"
 
-  printf 'ready=%s review=%s claimed_deepseek=%s\n' "$ready" "$review" "$claimed_deepseek"
+  printf 'ready=%s plan_review=%s review=%s claimed_deepseek=%s\n' "$ready" "$plan_review" "$review" "$claimed_deepseek"
   if needs_tick "$board"; then
     printf 'decision=wake\n'
   else
@@ -865,10 +867,9 @@ load_start_settings() {
     TICK_SECONDS=120
     CLAIMED_CHECK_SECONDS=420
     MAX_ACTIVE_STREAMS=7
-    RESEARCH_MODEL="openrouter/deepseek/deepseek-v3.2"
-    CODE_MODEL="openrouter/deepseek/deepseek-v3.2"
-    COMPLEX_MODEL="openrouter/deepseek/deepseek-v3.2"
-    ESCALATION_MODEL="openrouter/deepseek/deepseek-v4-pro-0813"
+    WORKER_MODEL="openrouter/deepseek/deepseek-v4-pro-0813"
+    PLANNING_TOKEN_BUDGET=400000
+    IMPLEMENTATION_TOKEN_BUDGET=1500000
     PENDING_START_TIMEOUT=3600
     PENDING_RUN_TIMEOUT=3600
   fi
