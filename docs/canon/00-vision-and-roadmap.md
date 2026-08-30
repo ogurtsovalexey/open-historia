@@ -92,9 +92,9 @@ opponent → deterministic consequences) comes second.
 
 | Phase | Delivers | Status |
 |---|---|---|
-| **P0 — Deterministic economy core** | Headless slice: 2 countries × 5 regions, monthly tick, ledger, report with causes, atomic run dirs, byte-identical replay, golden tests | **Done** (canon 04) |
+| **P0 — Deterministic economy core** | Headless slice (originally 2 countries × 5 regions; superseded as a playtest target by the four-polity Central Europe scenario, kept as a regression fixture), monthly tick, ledger, report with causes, atomic run dirs, byte-identical replay, golden tests | **Done** (canon 04) |
 | **P1 — Headless bench** | UI-free playtest surface for fast checks: region table, national totals, "why changed" from the ledger, resource flows, investment order, advance one/twelve months, reset, turn report. Zero model calls (`npm run play:engine`). A test bench, not the product. | **Done** |
-| **P2 — The engine inside the game** | Our scenario visible on the map; clicking a region selects it; the `Economy` drawer tab shows region + controller numbers and "why changed" from the ledger; advancing a month runs the engine, not a model. The game looks as before, with our panel added. Zero model calls. | **Next** |
+| **P2 — The engine inside the game** | The Central Europe scenario (4 polities, 47 real regions) visible on the map; clicking a region selects it; the `Economy` drawer tab shows region + controller numbers and "why changed" from the ledger; advancing a month runs the engine, not a model. The game looks as before, with our panel added. Zero model calls. | **Next** |
 | **P3 — The loop (fun gate)** | Free-text orders → typed commands (interpreter, canon 07); LLM opponent playing rival countries from a bounded engine-built brief; difficulty levels; relations/agreements state so opponents have something to do with each other | Core bet |
 | **P4 — Internal politics** | Factions/estates fed by existing economy outputs (tax pressure, food shortfall, investment neglect), legitimacy, unrest, rulers | |
 | **P5 — War and army** | Forces and mobilization from population, supply on a bounded map, aggregate combat, occupation → region transfer (transfer semantics already specified) | |

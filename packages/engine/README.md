@@ -4,6 +4,15 @@ Deterministic economy engine for Open Historia. Headless: no UI, no LLM calls,
 no randomness, no wall clock in state. Contracts: [`docs/canon/03-simulation-core.md`](../../docs/canon/03-simulation-core.md)
 and [`docs/canon/04-economy-slice.md`](../../docs/canon/04-economy-slice.md).
 
+## Scenarios
+
+- `fixtures/scenario-dev-map-4c` — **Central Europe, the playtest scenario.**
+  Four polities on 47 real map regions, all optional mechanics enabled. This is
+  where mechanics are tried and where the game is played.
+- `fixtures/scenario-dev-2x5` — **regression fixture only.** Enables no modules;
+  its golden campaign exists to prove the base economy stays byte-identical as
+  the economy grows. Do not author new mechanics into it.
+
 ## Play it in a browser (phase P1)
 
 ```bash

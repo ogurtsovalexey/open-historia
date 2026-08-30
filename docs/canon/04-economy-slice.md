@@ -1,8 +1,21 @@
-# 04 — Economy slice 2×5 (feature spec, implemented)
+# 04 — Economy slice (feature spec, implemented)
 
 Sources: `docs/spec/first-economy-mvp.md`, `docs/spec/regional-resource-economy.md`.
 Implementation: `packages/engine/` (2026-08-30). Status: **shipped headlessly,
 all gates green.**
+
+## The playtest scenario (owner decision 2026-08-31)
+
+**`scenario-dev-map-4c` — "Central Europe" — replaces the originally planned
+2×5 fixture as the playtest target.** Four polities (Austria 9 regions, Czechia
+14, Germany 16, Slovakia 8) on their real map regions, each region with its own
+authored numbers, each polity with exactly one processing region plus its own
+coal and iron. All optional mechanics are enabled there.
+
+`scenario-dev-2x5` is **kept, but only as a regression fixture**: it enables no
+modules, so its golden campaign proves the base economy stayed byte-identical
+while the economy grew around it. It is no longer where mechanics are tried, and
+no new mechanic is authored into it.
 
 ## Preconditions
 
