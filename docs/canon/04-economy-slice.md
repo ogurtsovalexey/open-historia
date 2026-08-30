@@ -58,6 +58,13 @@ ledger + §10 invariants → content-addressed revision → report → persist.
   canon 06.
 - Everything in spec §11 (prices, trade, migration, combat, NPC AI…).
 
+## Relationship to packages/sim-core
+
+`packages/sim-core` implements the same accepted contract at its earlier #32
+stage and additionally has region transfer. It is kept, not deleted; the
+comparison and the convergence order are in canon 02. Region transfer (task T9
+below) ports from there.
+
 ## Open questions
 
 - Merge dev-fixture scenario format into ScenarioV2 — canon 05.

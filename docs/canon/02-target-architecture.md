@@ -19,17 +19,54 @@ The repo currently contains three parallel world models. Their statuses:
 | Model | Location | Status |
 |---|---|---|
 | **Engine state** (`EconWorldState`) | `packages/engine/src/state.ts` | **Future SSOT.** All new mechanics land here. |
+| Sim-core kernel state | `packages/sim-core/src/types.ts` | Earlier stage of the same contract, kept — see "Two economy kernels" below. |
 | Live app state (`world.json`) | `src/runtime/gameState.js` | Legacy, still runs the shipping game. Migrates to the engine incrementally. Do not add new numeric mechanics here. |
 | Domain demo reducer | `packages/domain/src/reducer.ts` | Demonstration scaffold only. Its ID schemas (`ids.ts`), result shapes and `exportJsonSchema` are reused by the engine; its `worldStateSchema` is NOT extended. |
 
 **Workers: do not "helpfully" unify these models.** Unification is an
 explicit, owner-approved migration, one subsystem at a time.
 
+## Two economy kernels (current, deliberate)
+
+Two implementations of the accepted economy contract exist side by side. Both
+are pure packages that the running game does not call yet. Nothing is deleted.
+
+| | `packages/sim-core` | `packages/engine` |
+|---|---|---|
+| Resource model | the four commodity groups (`food/energy/materials/manufactures`) of the #32 baseline kernel | the accepted resource catalog and the `1 Coal + 1 Iron -> 1 Goods` chain of the resource extension |
+| Remainders | `bigint`, per the literal spec | safe integers with an assertion, so state canonicalizes to JSON (canon 03) |
+| Revisions | validates `expectedRevision` | content-addressed: sha256 of the canonical state |
+| Replay / golden fixtures | — | byte-identical 12-turn replay, golden state/report/checksum chain |
+| Ledger and report | contribution notions | ledger plus a markdown "why changed" report |
+| Persistence | — | atomic per-turn run directories |
+| CLI / dashboard | — | both (`npm run play:engine`) |
+| Region transfer | implemented (`transfer.ts`) | not yet |
+
+`first-economy-mvp.md` §3 is explicit that the #32 commodity grouping is an
+implementation step and must not become the long-term domain model. The engine
+implements the extension that replaces it, so **the engine is the direction of
+travel** and stays the declared SSOT above.
+
+Convergence, in this order, none of it silent:
+
+1. Port the region-transfer semantics into the engine (its state already
+   carries `controllerId`; the re-aggregation identities are specified in
+   `first-economy-mvp.md` §7 and `sim-core/src/transfer.ts` is the working
+   reference).
+2. Harvest anything else sim-core proves better — its preview/resolver parity
+   test is a good idea worth keeping.
+3. Only then, and only on an explicit decision, retire sim-core. Until that
+   decision it stays wired into `npm test` and must keep passing.
+
+Workers: do not port engine features into sim-core, and do not unify the two on
+your own initiative. Add new mechanics to the engine.
+
 ## Package layout
 
 ```
 packages/domain      — shared ID brands, base command/result shapes (stable)
 packages/data-packs  — ScenarioV2 validation/build + canonicalStringify (stable)
+packages/sim-core    — #32 baseline economy kernel (kept, superseded in scope)
 packages/engine      — deterministic economy engine (active development)
 src/, server/        — live game (additive integration only; keep it running)
 ```
