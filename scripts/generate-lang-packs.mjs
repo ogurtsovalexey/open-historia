@@ -39,11 +39,7 @@ const RETRIES = 3;
 // code -> endonym (the language's own name). The endonym matters: models translate
 // noticeably better when asked for "Deutsch" than for "German".
 const LANGUAGES = {
-  ar: "العربية", bn: "বাংলা", de: "Deutsch", es: "Español", fa: "فارسی",
-  fr: "Français", hi: "हिन्दी", id: "Bahasa Indonesia", it: "Italiano",
-  ja: "日本語", ko: "한국어", nl: "Nederlands", pl: "Polski", pt: "Português",
-  ru: "Русский", sv: "Svenska", th: "ไทย", tr: "Türkçe", uk: "Українська",
-  ur: "اردو", vi: "Tiếng Việt", zh: "中文",
+  ru: "Русский",
 };
 
 const readJson = (p, fallback) => {
