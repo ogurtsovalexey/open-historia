@@ -1,0 +1,1112 @@
+{
+  "schemaVersion": "open-historia-engine-scenario/1",
+  "scenarioId": "scenario:dev-map-4c",
+  "label": "development-test",
+  "displayName": {
+    "en": "Central Europe (4 polities)",
+    "ru": "Центральная Европа (4 страны)"
+  },
+  "startMonth": "1900-01-01",
+  "activeResources": [
+    "food",
+    "wood",
+    "coal",
+    "iron",
+    "goods"
+  ],
+  "economy": {
+    "foodNeedPerPersonMilli": 50,
+    "infrastructureBpPerMoney": 1,
+    "resourceParams": [
+      {
+        "resource": "food",
+        "accountingValue": 1,
+        "taxRateBp": 800
+      },
+      {
+        "resource": "wood",
+        "accountingValue": 2,
+        "taxRateBp": 1000
+      },
+      {
+        "resource": "coal",
+        "accountingValue": 3,
+        "taxRateBp": 1200
+      },
+      {
+        "resource": "iron",
+        "accountingValue": 4,
+        "taxRateBp": 1200
+      },
+      {
+        "resource": "goods",
+        "accountingValue": 10,
+        "taxRateBp": 1500
+      }
+    ]
+  },
+  "polities": [
+    {
+      "id": "polity:austria",
+      "displayName": {
+        "en": "Austria",
+        "ru": "Австрия"
+      },
+      "treasury": 5000,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 150
+        },
+        {
+          "resource": "wood",
+          "amount": 80
+        },
+        {
+          "resource": "coal",
+          "amount": 60
+        },
+        {
+          "resource": "iron",
+          "amount": 45
+        },
+        {
+          "resource": "goods",
+          "amount": 10
+        }
+      ]
+    },
+    {
+      "id": "polity:czechia",
+      "displayName": {
+        "en": "Czechia",
+        "ru": "Чехия"
+      },
+      "treasury": 8000,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 220
+        },
+        {
+          "resource": "wood",
+          "amount": 120
+        },
+        {
+          "resource": "coal",
+          "amount": 115
+        },
+        {
+          "resource": "iron",
+          "amount": 80
+        },
+        {
+          "resource": "goods",
+          "amount": 25
+        }
+      ]
+    },
+    {
+      "id": "polity:germany",
+      "displayName": {
+        "en": "Germany",
+        "ru": "Германия"
+      },
+      "treasury": 14000,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 290
+        },
+        {
+          "resource": "wood",
+          "amount": 160
+        },
+        {
+          "resource": "coal",
+          "amount": 170
+        },
+        {
+          "resource": "iron",
+          "amount": 115
+        },
+        {
+          "resource": "goods",
+          "amount": 40
+        }
+      ]
+    },
+    {
+      "id": "polity:slovakia",
+      "displayName": {
+        "en": "Slovakia",
+        "ru": "Словакия"
+      },
+      "treasury": 3500,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 360
+        },
+        {
+          "resource": "wood",
+          "amount": 200
+        },
+        {
+          "resource": "coal",
+          "amount": 225
+        },
+        {
+          "resource": "iron",
+          "amount": 150
+        },
+        {
+          "resource": "goods",
+          "amount": 55
+        }
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "regionId": "region:gadm:AUT.9_1",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Wien",
+        "ru": "Вена"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 380000,
+      "annualBirthRateBp": 240,
+      "annualDeathRateBp": 190,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 7000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:AUT.3_1",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Niederösterreich",
+        "ru": "Нижняя Австрия"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 483000,
+      "annualBirthRateBp": 247,
+      "annualDeathRateBp": 195,
+      "workforceRateBp": 4130,
+      "infrastructureBp": 3970,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 107000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:AUT.4_1",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Oberösterreich",
+        "ru": "Верхняя Австрия"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 546000,
+      "annualBirthRateBp": 254,
+      "annualDeathRateBp": 200,
+      "workforceRateBp": 4260,
+      "infrastructureBp": 4440,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 124000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:AUT.1_1",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Burgenland",
+        "ru": "Бургенланд"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 609000,
+      "annualBirthRateBp": 261,
+      "annualDeathRateBp": 205,
+      "workforceRateBp": 4390,
+      "infrastructureBp": 4910,
+      "damageBp": 1500,
+      "baseMonthlyCapacity": 141000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:AUT.2_1",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Kärnten",
+        "ru": "Каринтия"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 424000,
+      "annualBirthRateBp": 268,
+      "annualDeathRateBp": 210,
+      "workforceRateBp": 4520,
+      "infrastructureBp": 5380,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 30400,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:AUT.5_1",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Salzburg",
+        "ru": "Зальцбург"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 465000,
+      "annualBirthRateBp": 275,
+      "annualDeathRateBp": 215,
+      "workforceRateBp": 4650,
+      "infrastructureBp": 5850,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 33500,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:AUT.7_1",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Tirol",
+        "ru": "Тироль"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 452000,
+      "annualBirthRateBp": 282,
+      "annualDeathRateBp": 220,
+      "workforceRateBp": 4780,
+      "infrastructureBp": 6320,
+      "damageBp": 2500,
+      "baseMonthlyCapacity": 27800,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:AUT.8_1",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Vorarlberg",
+        "ru": "Форарльберг"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 489000,
+      "annualBirthRateBp": 289,
+      "annualDeathRateBp": 225,
+      "workforceRateBp": 4910,
+      "infrastructureBp": 6790,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 30100,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:AUT.6_1",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Steiermark",
+        "ru": "Штирия"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 442000,
+      "annualBirthRateBp": 296,
+      "annualDeathRateBp": 230,
+      "workforceRateBp": 5040,
+      "infrastructureBp": 7260,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 27200,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:CZE.11_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Prague",
+        "ru": "Прага"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 380000,
+      "annualBirthRateBp": 240,
+      "annualDeathRateBp": 190,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 7000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:CZE.12_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Středočeský",
+        "ru": "Среднечешский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 483000,
+      "annualBirthRateBp": 247,
+      "annualDeathRateBp": 195,
+      "workforceRateBp": 4130,
+      "infrastructureBp": 3970,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 107000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:CZE.1_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Jihočeský",
+        "ru": "Южночешский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 546000,
+      "annualBirthRateBp": 254,
+      "annualDeathRateBp": 200,
+      "workforceRateBp": 4260,
+      "infrastructureBp": 4440,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 124000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:CZE.2_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Jihomoravský",
+        "ru": "Южноморавский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 609000,
+      "annualBirthRateBp": 261,
+      "annualDeathRateBp": 205,
+      "workforceRateBp": 4390,
+      "infrastructureBp": 4910,
+      "damageBp": 1500,
+      "baseMonthlyCapacity": 141000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:CZE.9_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Pardubický",
+        "ru": "Пардубицкий край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 672000,
+      "annualBirthRateBp": 268,
+      "annualDeathRateBp": 210,
+      "workforceRateBp": 4520,
+      "infrastructureBp": 5380,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 158000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:CZE.4_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Kraj Vysočina",
+        "ru": "Край Высочина"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 465000,
+      "annualBirthRateBp": 275,
+      "annualDeathRateBp": 215,
+      "workforceRateBp": 4650,
+      "infrastructureBp": 5850,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 33500,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:CZE.5_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Královéhradecký",
+        "ru": "Краловеградецкий край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 506000,
+      "annualBirthRateBp": 282,
+      "annualDeathRateBp": 220,
+      "workforceRateBp": 4780,
+      "infrastructureBp": 6320,
+      "damageBp": 2500,
+      "baseMonthlyCapacity": 36600,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:CZE.6_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Liberecký",
+        "ru": "Либерецкий край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 547000,
+      "annualBirthRateBp": 289,
+      "annualDeathRateBp": 225,
+      "workforceRateBp": 4910,
+      "infrastructureBp": 6790,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 39700,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:CZE.7_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Moravskoslezský",
+        "ru": "Моравскосилезский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 526000,
+      "annualBirthRateBp": 296,
+      "annualDeathRateBp": 230,
+      "workforceRateBp": 5040,
+      "infrastructureBp": 7260,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 32400,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:CZE.13_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Ústecký",
+        "ru": "Устецкий край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 563000,
+      "annualBirthRateBp": 303,
+      "annualDeathRateBp": 235,
+      "workforceRateBp": 5170,
+      "infrastructureBp": 7730,
+      "damageBp": 800,
+      "baseMonthlyCapacity": 34700,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:CZE.3_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Karlovarský",
+        "ru": "Карловарский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 600000,
+      "annualBirthRateBp": 310,
+      "annualDeathRateBp": 240,
+      "workforceRateBp": 5300,
+      "infrastructureBp": 8200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 37000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:CZE.10_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Plzeňský",
+        "ru": "Пльзеньский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 529000,
+      "annualBirthRateBp": 317,
+      "annualDeathRateBp": 245,
+      "workforceRateBp": 5430,
+      "infrastructureBp": 8670,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 32900,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:CZE.8_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Olomoucký",
+        "ru": "Оломоуцкий край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 558000,
+      "annualBirthRateBp": 324,
+      "annualDeathRateBp": 190,
+      "workforceRateBp": 5560,
+      "infrastructureBp": 3640,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 34800,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:CZE.14_1",
+      "controllerId": "polity:czechia",
+      "displayName": {
+        "en": "Zlínský",
+        "ru": "Злинский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 587000,
+      "annualBirthRateBp": 241,
+      "annualDeathRateBp": 195,
+      "workforceRateBp": 5690,
+      "infrastructureBp": 4110,
+      "damageBp": 1500,
+      "baseMonthlyCapacity": 36700,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.3_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Berlin",
+        "ru": "Берлин"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 380000,
+      "annualBirthRateBp": 240,
+      "annualDeathRateBp": 190,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 7000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.9_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Niedersachsen",
+        "ru": "Нижняя Саксония"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 483000,
+      "annualBirthRateBp": 247,
+      "annualDeathRateBp": 195,
+      "workforceRateBp": 4130,
+      "infrastructureBp": 3970,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 107000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:DEU.2_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Bayern",
+        "ru": "Бавария"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 546000,
+      "annualBirthRateBp": 254,
+      "annualDeathRateBp": 200,
+      "workforceRateBp": 4260,
+      "infrastructureBp": 4440,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 124000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:DEU.1_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Baden-Württemberg",
+        "ru": "Баден-Вюртемберг"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 609000,
+      "annualBirthRateBp": 261,
+      "annualDeathRateBp": 205,
+      "workforceRateBp": 4390,
+      "infrastructureBp": 4910,
+      "damageBp": 1500,
+      "baseMonthlyCapacity": 141000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:DEU.4_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Brandenburg",
+        "ru": "Бранденбург"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 672000,
+      "annualBirthRateBp": 268,
+      "annualDeathRateBp": 210,
+      "workforceRateBp": 4520,
+      "infrastructureBp": 5380,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 158000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:DEU.15_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Schleswig-Holstein",
+        "ru": "Шлезвиг-Гольштейн"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 735000,
+      "annualBirthRateBp": 275,
+      "annualDeathRateBp": 215,
+      "workforceRateBp": 4650,
+      "infrastructureBp": 5850,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 175000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:DEU.11_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Rheinland-Pfalz",
+        "ru": "Рейнланд-Пфальц"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 506000,
+      "annualBirthRateBp": 282,
+      "annualDeathRateBp": 220,
+      "workforceRateBp": 4780,
+      "infrastructureBp": 6320,
+      "damageBp": 2500,
+      "baseMonthlyCapacity": 36600,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.8_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Mecklenburg-Vorpommern",
+        "ru": "Мекленбург-Передняя Померания"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 547000,
+      "annualBirthRateBp": 289,
+      "annualDeathRateBp": 225,
+      "workforceRateBp": 4910,
+      "infrastructureBp": 6790,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 39700,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.5_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Bremen",
+        "ru": "Бремен"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 588000,
+      "annualBirthRateBp": 296,
+      "annualDeathRateBp": 230,
+      "workforceRateBp": 5040,
+      "infrastructureBp": 7260,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 42800,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.10_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Nordrhein-Westfalen",
+        "ru": "Северный Рейн-Вестфалия"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 563000,
+      "annualBirthRateBp": 303,
+      "annualDeathRateBp": 235,
+      "workforceRateBp": 5170,
+      "infrastructureBp": 7730,
+      "damageBp": 800,
+      "baseMonthlyCapacity": 34700,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.13_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Sachsen-Anhalt",
+        "ru": "Саксония-Анхальт"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 600000,
+      "annualBirthRateBp": 310,
+      "annualDeathRateBp": 240,
+      "workforceRateBp": 5300,
+      "infrastructureBp": 8200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 37000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.14_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Sachsen",
+        "ru": "Саксония"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 637000,
+      "annualBirthRateBp": 317,
+      "annualDeathRateBp": 245,
+      "workforceRateBp": 5430,
+      "infrastructureBp": 8670,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 39300,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.12_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Saarland",
+        "ru": "Саар"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 674000,
+      "annualBirthRateBp": 324,
+      "annualDeathRateBp": 190,
+      "workforceRateBp": 5560,
+      "infrastructureBp": 3640,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 41600,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.16_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Thüringen",
+        "ru": "Тюрингия"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 587000,
+      "annualBirthRateBp": 241,
+      "annualDeathRateBp": 195,
+      "workforceRateBp": 5690,
+      "infrastructureBp": 4110,
+      "damageBp": 1500,
+      "baseMonthlyCapacity": 36700,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.7_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Hessen",
+        "ru": "Гессен"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 616000,
+      "annualBirthRateBp": 248,
+      "annualDeathRateBp": 200,
+      "workforceRateBp": 4020,
+      "infrastructureBp": 4580,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 38600,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:DEU.6_1",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Hamburg",
+        "ru": "Гамбург"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 645000,
+      "annualBirthRateBp": 255,
+      "annualDeathRateBp": 205,
+      "workforceRateBp": 4150,
+      "infrastructureBp": 5050,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 40500,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:SVK.2_1",
+      "controllerId": "polity:slovakia",
+      "displayName": {
+        "en": "Bratislavský",
+        "ru": "Братиславский край"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 380000,
+      "annualBirthRateBp": 240,
+      "annualDeathRateBp": 190,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 7000,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:SVK.4_1",
+      "controllerId": "polity:slovakia",
+      "displayName": {
+        "en": "Nitriansky",
+        "ru": "Нитранский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 483000,
+      "annualBirthRateBp": 247,
+      "annualDeathRateBp": 195,
+      "workforceRateBp": 4130,
+      "infrastructureBp": 3970,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 107000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:SVK.7_1",
+      "controllerId": "polity:slovakia",
+      "displayName": {
+        "en": "Trnavský",
+        "ru": "Трнавский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 546000,
+      "annualBirthRateBp": 254,
+      "annualDeathRateBp": 200,
+      "workforceRateBp": 4260,
+      "infrastructureBp": 4440,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 124000,
+      "outputPerWorker": 2
+    },
+    {
+      "regionId": "region:gadm:SVK.5_1",
+      "controllerId": "polity:slovakia",
+      "displayName": {
+        "en": "Prešovský",
+        "ru": "Прешовский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 383000,
+      "annualBirthRateBp": 261,
+      "annualDeathRateBp": 205,
+      "workforceRateBp": 4390,
+      "infrastructureBp": 4910,
+      "damageBp": 1500,
+      "baseMonthlyCapacity": 27300,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:SVK.6_1",
+      "controllerId": "polity:slovakia",
+      "displayName": {
+        "en": "Trenčiansky",
+        "ru": "Тренчинский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 378000,
+      "annualBirthRateBp": 268,
+      "annualDeathRateBp": 210,
+      "workforceRateBp": 4520,
+      "infrastructureBp": 5380,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 23200,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:SVK.8_1",
+      "controllerId": "polity:slovakia",
+      "displayName": {
+        "en": "Žilinský",
+        "ru": "Жилинский край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 415000,
+      "annualBirthRateBp": 275,
+      "annualDeathRateBp": 215,
+      "workforceRateBp": 4650,
+      "infrastructureBp": 5850,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 25500,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:SVK.1_1",
+      "controllerId": "polity:slovakia",
+      "displayName": {
+        "en": "Banskobystrický",
+        "ru": "Банскобистрицкий край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 384000,
+      "annualBirthRateBp": 282,
+      "annualDeathRateBp": 220,
+      "workforceRateBp": 4780,
+      "infrastructureBp": 6320,
+      "damageBp": 2500,
+      "baseMonthlyCapacity": 23400,
+      "outputPerWorker": 1
+    },
+    {
+      "regionId": "region:gadm:SVK.3_1",
+      "controllerId": "polity:slovakia",
+      "displayName": {
+        "en": "Košický",
+        "ru": "Кошицкий край"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 413000,
+      "annualBirthRateBp": 289,
+      "annualDeathRateBp": 225,
+      "workforceRateBp": 4910,
+      "infrastructureBp": 6790,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 25300,
+      "outputPerWorker": 1
+    }
+  ]
+}

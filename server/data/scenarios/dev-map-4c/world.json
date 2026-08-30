@@ -1,0 +1,104 @@
+{
+  "regionOwnershipOverrides": {
+    "AUT.9_1": "Austria",
+    "AUT.3_1": "Austria",
+    "AUT.4_1": "Austria",
+    "AUT.1_1": "Austria",
+    "AUT.2_1": "Austria",
+    "AUT.5_1": "Austria",
+    "AUT.7_1": "Austria",
+    "AUT.8_1": "Austria",
+    "AUT.6_1": "Austria",
+    "CZE.11_1": "Czechia",
+    "CZE.12_1": "Czechia",
+    "CZE.1_1": "Czechia",
+    "CZE.2_1": "Czechia",
+    "CZE.9_1": "Czechia",
+    "CZE.4_1": "Czechia",
+    "CZE.5_1": "Czechia",
+    "CZE.6_1": "Czechia",
+    "CZE.7_1": "Czechia",
+    "CZE.13_1": "Czechia",
+    "CZE.3_1": "Czechia",
+    "CZE.10_1": "Czechia",
+    "CZE.8_1": "Czechia",
+    "CZE.14_1": "Czechia",
+    "DEU.3_1": "Germany",
+    "DEU.9_1": "Germany",
+    "DEU.2_1": "Germany",
+    "DEU.1_1": "Germany",
+    "DEU.4_1": "Germany",
+    "DEU.15_1": "Germany",
+    "DEU.11_1": "Germany",
+    "DEU.8_1": "Germany",
+    "DEU.5_1": "Germany",
+    "DEU.10_1": "Germany",
+    "DEU.13_1": "Germany",
+    "DEU.14_1": "Germany",
+    "DEU.12_1": "Germany",
+    "DEU.16_1": "Germany",
+    "DEU.7_1": "Germany",
+    "DEU.6_1": "Germany",
+    "SVK.2_1": "Slovakia",
+    "SVK.4_1": "Slovakia",
+    "SVK.7_1": "Slovakia",
+    "SVK.5_1": "Slovakia",
+    "SVK.6_1": "Slovakia",
+    "SVK.8_1": "Slovakia",
+    "SVK.1_1": "Slovakia",
+    "SVK.3_1": "Slovakia"
+  },
+  "polityOverrides": {
+    "Austria": {
+      "color": [
+        110,
+        168,
+        254
+      ]
+    },
+    "Czechia": {
+      "color": [
+        242,
+        119,
+        122
+      ]
+    },
+    "Germany": {
+      "color": [
+        107,
+        207,
+        138
+      ]
+    },
+    "Slovakia": {
+      "color": [
+        232,
+        194,
+        106
+      ]
+    }
+  },
+  "customRegions": true,
+  "author": "",
+  "mapCredit": "",
+  "difficulty": "standard",
+  "language": "English",
+  "simulationRules": "Deterministic economy engine owns all numbers. No model may invent a quantity.",
+  "startingTimelineText": "Four neighbouring states, each with its own regions, resources and industry.",
+  "ownerCodes": [
+    "Austria",
+    "Czechia",
+    "Germany",
+    "Slovakia"
+  ],
+  "allowedUnitTypes": [
+    "infantry",
+    "armor",
+    "air",
+    "naval",
+    "artillery",
+    "garrison"
+  ],
+  "ownerSchema": 2,
+  "regionClaimants": {}
+}

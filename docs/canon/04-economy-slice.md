@@ -48,6 +48,31 @@ ledger + §10 invariants → content-addressed revision → report → persist.
 6. Tax is floored per region×resource row, then summed (locality of the
    ledger beats global rounding).
 
+## How the tick is driven (owner decision 2026-08-31)
+
+The engine tick is driven by **game time**, not by a button. The monthly
+resolution happens on the 1st of each in-game month. The player-facing control
+stays the one that already exists — the AI time jump: advancing six months runs
+six deterministic monthly ticks in order, and the model narrates on top of the
+numbers the engine produced. It never produces them.
+
+A separate "advance month" button exists only as a development affordance while
+the engine is being tested, and is removed once time-driven ticking is wired.
+
+## Map linkage (owner decision 2026-08-31)
+
+Engine regions are bound to real map regions, so our scenario renders on the
+existing map exactly like any other. The dataset segment of the branded region
+id carries the binding: `region:gadm:AUT.3_1` is the engine's identity for the
+map region `AUT.3_1`. A scenario fixture ships a `map-link.json` next to it
+declaring the dataset, the engine-region-to-map-region pairs, and the map owner
+name for each polity (the app's `regionOwnershipOverrides` maps a map region id
+to an owner *name*, so each engine polity needs one).
+
+The first map fixture is `packages/engine/fixtures/scenario-dev-map-2x5/`:
+Ostreya holds five Austrian lands, Vindar five Czech regions — adjacent, in
+central Europe, visually unambiguous.
+
 ## Not doing (deferred from the archived spec)
 
 - §8 in-game dashboard UI and §9 in-app playtest script (the headless CLI +

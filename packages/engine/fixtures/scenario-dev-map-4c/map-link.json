@@ -1,0 +1,248 @@
+{
+  "schemaVersion": "open-historia-engine-map-link/1",
+  "dataset": "gadm",
+  "note": "Four central-European polities on their real regions.",
+  "polityOwnerNames": {
+    "polity:austria": "Austria",
+    "polity:czechia": "Czechia",
+    "polity:germany": "Germany",
+    "polity:slovakia": "Slovakia"
+  },
+  "regions": [
+    {
+      "engineRegionId": "region:gadm:AUT.9_1",
+      "mapRegionId": "AUT.9_1",
+      "mapName": "Wien"
+    },
+    {
+      "engineRegionId": "region:gadm:AUT.3_1",
+      "mapRegionId": "AUT.3_1",
+      "mapName": "Niederösterreich"
+    },
+    {
+      "engineRegionId": "region:gadm:AUT.4_1",
+      "mapRegionId": "AUT.4_1",
+      "mapName": "Oberösterreich"
+    },
+    {
+      "engineRegionId": "region:gadm:AUT.1_1",
+      "mapRegionId": "AUT.1_1",
+      "mapName": "Burgenland"
+    },
+    {
+      "engineRegionId": "region:gadm:AUT.2_1",
+      "mapRegionId": "AUT.2_1",
+      "mapName": "Kärnten"
+    },
+    {
+      "engineRegionId": "region:gadm:AUT.5_1",
+      "mapRegionId": "AUT.5_1",
+      "mapName": "Salzburg"
+    },
+    {
+      "engineRegionId": "region:gadm:AUT.7_1",
+      "mapRegionId": "AUT.7_1",
+      "mapName": "Tirol"
+    },
+    {
+      "engineRegionId": "region:gadm:AUT.8_1",
+      "mapRegionId": "AUT.8_1",
+      "mapName": "Vorarlberg"
+    },
+    {
+      "engineRegionId": "region:gadm:AUT.6_1",
+      "mapRegionId": "AUT.6_1",
+      "mapName": "Steiermark"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.11_1",
+      "mapRegionId": "CZE.11_1",
+      "mapName": "Prague"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.12_1",
+      "mapRegionId": "CZE.12_1",
+      "mapName": "Středočeský"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.1_1",
+      "mapRegionId": "CZE.1_1",
+      "mapName": "Jihočeský"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.2_1",
+      "mapRegionId": "CZE.2_1",
+      "mapName": "Jihomoravský"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.9_1",
+      "mapRegionId": "CZE.9_1",
+      "mapName": "Pardubický"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.4_1",
+      "mapRegionId": "CZE.4_1",
+      "mapName": "Kraj Vysočina"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.5_1",
+      "mapRegionId": "CZE.5_1",
+      "mapName": "Královéhradecký"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.6_1",
+      "mapRegionId": "CZE.6_1",
+      "mapName": "Liberecký"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.7_1",
+      "mapRegionId": "CZE.7_1",
+      "mapName": "Moravskoslezský"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.13_1",
+      "mapRegionId": "CZE.13_1",
+      "mapName": "Ústecký"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.3_1",
+      "mapRegionId": "CZE.3_1",
+      "mapName": "Karlovarský"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.10_1",
+      "mapRegionId": "CZE.10_1",
+      "mapName": "Plzeňský"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.8_1",
+      "mapRegionId": "CZE.8_1",
+      "mapName": "Olomoucký"
+    },
+    {
+      "engineRegionId": "region:gadm:CZE.14_1",
+      "mapRegionId": "CZE.14_1",
+      "mapName": "Zlínský"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.3_1",
+      "mapRegionId": "DEU.3_1",
+      "mapName": "Berlin"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.9_1",
+      "mapRegionId": "DEU.9_1",
+      "mapName": "Niedersachsen"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.2_1",
+      "mapRegionId": "DEU.2_1",
+      "mapName": "Bayern"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.1_1",
+      "mapRegionId": "DEU.1_1",
+      "mapName": "Baden-Württemberg"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.4_1",
+      "mapRegionId": "DEU.4_1",
+      "mapName": "Brandenburg"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.15_1",
+      "mapRegionId": "DEU.15_1",
+      "mapName": "Schleswig-Holstein"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.11_1",
+      "mapRegionId": "DEU.11_1",
+      "mapName": "Rheinland-Pfalz"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.8_1",
+      "mapRegionId": "DEU.8_1",
+      "mapName": "Mecklenburg-Vorpommern"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.5_1",
+      "mapRegionId": "DEU.5_1",
+      "mapName": "Bremen"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.10_1",
+      "mapRegionId": "DEU.10_1",
+      "mapName": "Nordrhein-Westfalen"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.13_1",
+      "mapRegionId": "DEU.13_1",
+      "mapName": "Sachsen-Anhalt"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.14_1",
+      "mapRegionId": "DEU.14_1",
+      "mapName": "Sachsen"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.12_1",
+      "mapRegionId": "DEU.12_1",
+      "mapName": "Saarland"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.16_1",
+      "mapRegionId": "DEU.16_1",
+      "mapName": "Thüringen"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.7_1",
+      "mapRegionId": "DEU.7_1",
+      "mapName": "Hessen"
+    },
+    {
+      "engineRegionId": "region:gadm:DEU.6_1",
+      "mapRegionId": "DEU.6_1",
+      "mapName": "Hamburg"
+    },
+    {
+      "engineRegionId": "region:gadm:SVK.2_1",
+      "mapRegionId": "SVK.2_1",
+      "mapName": "Bratislavský"
+    },
+    {
+      "engineRegionId": "region:gadm:SVK.4_1",
+      "mapRegionId": "SVK.4_1",
+      "mapName": "Nitriansky"
+    },
+    {
+      "engineRegionId": "region:gadm:SVK.7_1",
+      "mapRegionId": "SVK.7_1",
+      "mapName": "Trnavský"
+    },
+    {
+      "engineRegionId": "region:gadm:SVK.5_1",
+      "mapRegionId": "SVK.5_1",
+      "mapName": "Prešovský"
+    },
+    {
+      "engineRegionId": "region:gadm:SVK.6_1",
+      "mapRegionId": "SVK.6_1",
+      "mapName": "Trenčiansky"
+    },
+    {
+      "engineRegionId": "region:gadm:SVK.8_1",
+      "mapRegionId": "SVK.8_1",
+      "mapName": "Žilinský"
+    },
+    {
+      "engineRegionId": "region:gadm:SVK.1_1",
+      "mapRegionId": "SVK.1_1",
+      "mapName": "Banskobystrický"
+    },
+    {
+      "engineRegionId": "region:gadm:SVK.3_1",
+      "mapRegionId": "SVK.3_1",
+      "mapName": "Košický"
+    }
+  ]
+}

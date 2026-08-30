@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import type { CommandId, PolityId, RegionId } from '@open-historia/domain';
 import { EMPTY_TURN_COMMANDS } from '../src/commands.js';
 import type { EconCommand } from '../src/commands.js';
-import { resolveMonth } from '../src/tick.js';
+import { potentialOutput, resolveMonth } from '../src/tick.js';
 import { canonicalState } from '../src/canonical.js';
 import { getStock } from '../src/state.js';
 import type { EconWorldState } from '../src/state.js';
@@ -235,5 +235,49 @@ describe('monthly tick — goods edge cases (rre §7)', () => {
     assert.strictEqual(ostreya.goods!.actual, 40);
     assert.strictEqual(iron.processingUse, 40);
     assert.strictEqual(iron.closing, 0);
+  });
+});
+
+describe('potentialOutput overflow safety (found by cross-checking sim-core)', () => {
+  it('caps at capacity without demanding the labour product be a safe integer', () => {
+    // Idle labour can dwarf capacity: 1e9 workers x 1e9 output each overflows
+    // 2^53, yet the answer is simply the capacity, which needs no big number.
+    const region = {
+      regionId: 'region:dev-2x5:BIG' as RegionId,
+      controllerId: OSTREYA,
+      displayName: { en: 'Big', ru: 'Большой' },
+      activity: { kind: 'extraction' as const, resource: 'coal' as const },
+      population: 1_000_000_000,
+      annualBirthRateBp: 0,
+      annualDeathRateBp: 0,
+      birthRemainder: 0,
+      deathRemainder: 0,
+      workforceRateBp: 10000,
+      infrastructureBp: 10000,
+      damageBp: 0,
+      baseMonthlyCapacity: 15000,
+      outputPerWorker: 1_000_000_000,
+    };
+    assert.strictEqual(potentialOutput(region, 1_000_000_000), 15000);
+  });
+
+  it('still asserts loudly when the labour product itself is the answer', () => {
+    const region = {
+      regionId: 'region:dev-2x5:BIG2' as RegionId,
+      controllerId: OSTREYA,
+      displayName: { en: 'Big', ru: 'Большой' },
+      activity: { kind: 'extraction' as const, resource: 'coal' as const },
+      population: 1,
+      annualBirthRateBp: 0,
+      annualDeathRateBp: 0,
+      birthRemainder: 0,
+      deathRemainder: 0,
+      workforceRateBp: 10000,
+      infrastructureBp: 10000,
+      damageBp: 0,
+      baseMonthlyCapacity: Number.MAX_SAFE_INTEGER,
+      outputPerWorker: 1_000_000_000,
+    };
+    assert.throws(() => potentialOutput(region, 1_000_000_000), RangeError);
   });
 });

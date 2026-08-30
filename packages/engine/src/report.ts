@@ -38,6 +38,17 @@ export function renderReport(
     lines.push('');
   }
 
+  if (ledger.transfers.length > 0) {
+    lines.push('## Territorial changes');
+    lines.push('');
+    for (const transfer of ledger.transfers) {
+      lines.push(
+        `- ${transfer.regionId}: ${transfer.fromPolityId} → ${transfer.toPolityId} (population ${transfer.population} moves to the new controller; infrastructure ${transfer.infrastructureBp} bp and damage ${transfer.damageBp} bp stay with the region; treasuries and stockpiles do not move)`
+      );
+    }
+    lines.push('');
+  }
+
   for (const polity of ledger.polities) {
     const statePolity = next.polities.find((p) => p.id === polity.polityId)!;
     lines.push(`## ${statePolity.displayName.en} (${polity.polityId})`);

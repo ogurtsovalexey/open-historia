@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import Map from "react-map-gl/maplibre";
 import Nations from "./Nations";
 import { useCustomBackground } from "./useCustomBackground.js";
+import { useLibraryState } from "../../runtime/library.js";
 import GlobeEffects from "./GlobeEffects.jsx";
 import RegionPopup from "../Selection/Regions";
 import CountryInfoPanel from "../Selection/CountryPanel.jsx";
@@ -164,10 +165,15 @@ function World({ mapRef, projection, terrainEnabled, onInitialIdle }) {
   const hasReportedInitialIdleRef = useRef(false);
   const [loading, setLoading] = useState(false);
   const loadTimerRef = useRef(null);
+  // A scenario may open the camera over its own territory; without it the world
+  // starts at (0,0), which for a small scenario is empty ocean. The map is keyed
+  // on the active game, so this is read once per session.
+  const { activeGame, runtimeScenario } = useLibraryState();
+  const startView = activeGame?.startView ?? runtimeScenario?.startView ?? null;
   const viewStateRef = useRef({
-    longitude: 0,
-    latitude: 0,
-    zoom: 3.5,
+    longitude: startView?.longitude ?? 0,
+    latitude: startView?.latitude ?? 0,
+    zoom: startView?.zoom ?? 3.5,
     bearing: 0,
     pitch: 0,
   });

@@ -88,9 +88,19 @@ step than starting fresh agents. Fan out implementation only after the
 contract (types + failing tests) exists and the pieces are provably
 independent.
 
-## UI smoke (Track A, planned)
+## UI smoke
 
-Playwright smoke suite, 3–5 scenarios, **AI mocked via `page.route`** (zero
-tokens): app boots → scenario loads → map canvas non-empty + console clean →
-full turn with mocked AI → result visible. Runs in CI on PRs; traces and
-screenshots on failure are the diagnostic artifact for agents.
+The app is the product surface, so it gets a Playwright smoke suite: boot →
+scenario loads → map renders regions → clicking a region selects it → advance a
+month → the Economy drawer shows the new numbers and their causes → console
+clean. Any model call is mocked via `page.route`, so smoke costs zero tokens.
+Runs in CI on PRs; traces and screenshots on failure are the diagnostic
+artifact.
+
+Until those screens exist, the headless bench covers the same logic more
+cheaply: `packages/engine/test/devServer.test.ts` pins the data contract the UI
+will read.
+
+Note for browser-driven checks: the Chrome automation screenshot is scaled
+relative to the real viewport, so coordinate clicks can miss silently. Prefer
+element lookups or direct handler/API assertions over pixel coordinates.

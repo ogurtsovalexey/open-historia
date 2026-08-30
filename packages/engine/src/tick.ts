@@ -11,6 +11,7 @@ import {
   BP_SCALE,
   addChecked,
   applyBp,
+  assertSafeInt,
   clampBp,
   divFloor,
   mulDivFloor,
@@ -23,6 +24,7 @@ import type {
   ResourceProduction,
   StockMovement,
   TaxRow,
+  TransferRecord,
   TurnLedger,
 } from './ledger.js';
 import { checkInvariants } from './ledger.js';
@@ -34,6 +36,7 @@ import { stateChecksum } from './canonical.js';
 
 export type EngineEvent =
   | { type: 'command-rejected'; commandId: string; reason: CommandRejection['reason']; detail: string }
+  | { type: 'region-transferred'; regionId: RegionId; fromPolityId: PolityId; toPolityId: PolityId; population: number }
   | { type: 'investment-applied'; polityId: PolityId; regionId: RegionId; spend: number; infrastructureGainBp: number; infrastructureBp: number }
   | { type: 'population-changed'; regionId: RegionId; births: number; deaths: number; population: number }
   | { type: 'region-produced'; regionId: RegionId; resource: ResourceId; potential: number; actual: number }
@@ -58,10 +61,19 @@ interface MutablePolity {
   stock: Map<ResourceId, number>;
 }
 
-/** Capacity-side output before material inputs (rre §5). */
+/**
+ * Capacity-side output before material inputs (rre §5).
+ *
+ * The labour product is only ever compared against capacity, so it must not be
+ * required to be a safe integer: a region can have far more idle labour than
+ * its capacity can use. Assert only on the value actually carried forward.
+ */
 export function potentialOutput(region: EconRegionState, workforce: number): number {
-  const labourOutput = addChecked(workforce * region.outputPerWorker, 0, 'labour output');
-  const usableCapacity = Math.min(region.baseMonthlyCapacity, labourOutput);
+  const labourOutput = workforce * region.outputPerWorker;
+  const usableCapacity =
+    labourOutput >= region.baseMonthlyCapacity
+      ? region.baseMonthlyCapacity
+      : assertSafeInt(labourOutput, `labour output ${region.regionId}`);
   const afterInfrastructure = applyBp(usableCapacity, region.infrastructureBp, 'infrastructure factor');
   return applyBp(afterInfrastructure, BP_SCALE - region.damageBp, 'damage factor');
 }
@@ -96,6 +108,16 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   // ---- 1. Validate commands: any failure rejects the command, changes nothing.
   const accepted: EconCommand[] = [];
   const investedPolities = new Set<PolityId>();
+  const transferredRegions = new Set<RegionId>();
+  /** Controllership as it will stand after the accepted transfers so far. */
+  const projectedController = new Map<RegionId, PolityId>(
+    regions.map((region) => [region.regionId, region.controllerId])
+  );
+  const processingRegionsOf = (polityId: PolityId): RegionId[] =>
+    regions
+      .filter((region) => region.activity.kind === 'processing' && projectedController.get(region.regionId) === polityId)
+      .map((region) => region.regionId);
+
   for (const command of commandsFile.commands) {
     const reject = (reason: CommandRejection['reason'], detail: string) => {
       rejections.push({ command, reason, detail });
@@ -123,6 +145,36 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
       reject('stale-revision', `expected ${command.expectedRevision}, world at ${state.revision}`);
       continue;
     }
+
+    if (command.kind === 'territory.transfer-region') {
+      const receiver = polityById.get(command.newControllerId);
+      if (!receiver) {
+        reject('unknown-new-controller', `no polity ${command.newControllerId}`);
+        continue;
+      }
+      if (command.newControllerId === command.actorPolityId) {
+        reject('same-controller', `${command.targetRegionId} already belongs to ${command.actorPolityId}`);
+        continue;
+      }
+      if (transferredRegions.has(command.targetRegionId)) {
+        reject('command-limit', `${command.targetRegionId} is already being transferred this month`);
+        continue;
+      }
+      // rre §5 assumes exactly one processing region per polity; allocation
+      // between competing factories needs an accepted contract first.
+      if (target.activity.kind === 'processing' && processingRegionsOf(command.newControllerId).length > 0) {
+        reject(
+          'processing-competition',
+          `${command.newControllerId} would control two processing regions (${processingRegionsOf(command.newControllerId).join(', ')} and ${command.targetRegionId})`
+        );
+        continue;
+      }
+      transferredRegions.add(command.targetRegionId);
+      projectedController.set(command.targetRegionId, command.newControllerId);
+      accepted.push(command);
+      continue;
+    }
+
     if (!Number.isSafeInteger(command.spend) || command.spend <= 0) {
       reject('invalid-amount', `spend ${command.spend}`);
       continue;
@@ -142,6 +194,7 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   // ---- 2. Pay accepted investments; clamp infrastructure at 10000 bp.
   const investments = new Map<PolityId, InvestmentRecord>();
   for (const command of accepted) {
+    if (command.kind !== 'economy.invest-region') continue;
     const actor = polityById.get(command.actorPolityId)!;
     const region = regionById.get(command.targetRegionId)!;
     actor.treasury -= command.spend;
@@ -162,6 +215,33 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
       spend: command.spend,
       infrastructureGainBp: record.infrastructureGainBp,
       infrastructureBp: region.infrastructureBp,
+    });
+  }
+
+  // ---- 2b. Apply accepted transfers. Investments are paid first, so a region
+  // ceded this month carries the improvement its previous controller bought.
+  // Population, capacity, infrastructure and damage stay with the region;
+  // treasury and national stockpiles do not move (§7).
+  const transfers: TransferRecord[] = [];
+  for (const command of accepted) {
+    if (command.kind !== 'territory.transfer-region') continue;
+    const region = regionById.get(command.targetRegionId)!;
+    const record: TransferRecord = {
+      regionId: region.regionId,
+      fromPolityId: region.controllerId,
+      toPolityId: command.newControllerId,
+      population: region.population,
+      infrastructureBp: region.infrastructureBp,
+      damageBp: region.damageBp,
+    };
+    region.controllerId = command.newControllerId;
+    transfers.push(record);
+    events.push({
+      type: 'region-transferred',
+      regionId: region.regionId,
+      fromPolityId: record.fromPolityId,
+      toPolityId: record.toPolityId,
+      population: record.population,
     });
   }
 
@@ -368,6 +448,7 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   const ledger: TurnLedger = {
     month: state.month,
     turn: nextState.turn,
+    transfers,
     polities: state.polities.map((prevPolity) => {
       const id = prevPolity.id;
       const regionRows = nextState.regions

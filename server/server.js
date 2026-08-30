@@ -33,6 +33,7 @@ import {
   uploadScenarioAsset,
   writeRuntimeJsonAsset,
 } from "./libraryStore.js";
+import { readEconomyState, resetEconomyState, runEconomyTurns } from "./economyStore.js";
 import {
   createMapEditorDocument,
   deleteMapEditorDocument,
@@ -547,6 +548,38 @@ app.put("/api/runtime/json/:assetKey", jsonParser, (req, res) => {
     res.setHeader("Cache-Control", "no-store");
     res.type("application/json");
     res.send(JSON.stringify(asset.data));
+  } catch (error) {
+    sendError(res, 400, error);
+  }
+});
+
+// Deterministic economy engine (docs/canon/04-economy-slice.md). Only reachable
+// for a game whose scenario is engine-driven; every other game keeps the legacy
+// model-driven jump untouched. No model is ever called from here.
+app.get("/api/economy/state", (req, res) => {
+  try {
+    res.setHeader("Cache-Control", "no-store");
+    res.json(readEconomyState());
+  } catch (error) {
+    sendError(res, 400, error);
+  }
+});
+
+app.post("/api/economy/turn", jsonParser, (req, res) => {
+  try {
+    const months = req.body?.months ?? 1;
+    const commands = Array.isArray(req.body?.commands) ? req.body.commands : [];
+    res.setHeader("Cache-Control", "no-store");
+    res.json(runEconomyTurns({ months, commands }));
+  } catch (error) {
+    sendError(res, 400, error);
+  }
+});
+
+app.post("/api/economy/reset", jsonParser, (req, res) => {
+  try {
+    res.setHeader("Cache-Control", "no-store");
+    res.json(resetEconomyState());
   } catch (error) {
     sendError(res, 400, error);
   }

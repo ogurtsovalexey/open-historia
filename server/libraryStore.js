@@ -590,6 +590,20 @@ const normalizePlayCount = (raw) => {
   return Number.isFinite(value) && value > 0 ? Math.trunc(value) : 0;
 };
 
+const normalizeStartView = (raw) => {
+  if (!raw || typeof raw !== "object") return null;
+  const longitude = Number(raw.longitude);
+  const latitude = Number(raw.latitude);
+  const zoom = Number(raw.zoom);
+  if (!Number.isFinite(longitude) || !Number.isFinite(latitude) || !Number.isFinite(zoom)) return null;
+  // Keep it inside the map's own limits so a bad value cannot break the camera.
+  return {
+    longitude: Math.max(-180, Math.min(180, longitude)),
+    latitude: Math.max(-85, Math.min(85, latitude)),
+    zoom: Math.max(0, Math.min(18, zoom)),
+  };
+};
+
 const readScenarioMeta = (scenarioId) => {
   const raw = readJsonFile(getScenarioMetaPath(scenarioId), {});
   const name = String(raw?.name ?? "").trim() || DEFAULT_SCENARIO_META.name;
@@ -614,6 +628,12 @@ const readScenarioMeta = (scenarioId) => {
     playCount: normalizePlayCount(raw?.playCount),
     subtitle,
     updatedAt: raw?.updatedAt ?? new Date().toISOString(),
+    // Routes the time jump through the deterministic economy engine instead of
+    // the model. Absent/false for every legacy scenario.
+    engineDriven: raw?.engineDriven === true,
+    engineScenario: String(raw?.engineScenario ?? "").trim() || null,
+    // Where the camera opens for this scenario; null keeps the app default.
+    startView: normalizeStartView(raw?.startView),
   };
 };
 
@@ -669,6 +689,10 @@ const readGameMeta = (gameId) => {
     scenarioId: String(raw?.scenarioId ?? "").trim() || DEFAULT_SCENARIO_ID,
     subtitle,
     updatedAt: raw?.updatedAt ?? new Date().toISOString(),
+    engineDriven: raw?.engineDriven === true,
+    engineScenario: String(raw?.engineScenario ?? "").trim() || null,
+    // Where the camera opens for this scenario; null keeps the app default.
+    startView: normalizeStartView(raw?.startView),
   };
 };
 
@@ -1587,6 +1611,11 @@ const createGame = ({
     DEFAULT_GAME_META.heroTitle,
     name: String(name ?? "").trim() || `${seedName} Session`,
                 scenarioId: scenarioSummary.id,
+                // A game keeps the scenario's engine routing, so the time jump
+                // stays deterministic for every session started from it.
+                engineDriven: sourceGame?.engineDriven === true || scenarioSummary.engineDriven === true,
+                engineScenario: sourceGame?.engineScenario ?? scenarioSummary.engineScenario ?? null,
+                startView: sourceGame?.startView ?? scenarioSummary.startView ?? null,
                 coverImageContentType: sourceGame?.coverImageContentType ?? null,
                 subtitle:
                 String(subtitle ?? "").trim() ||
@@ -2738,6 +2767,10 @@ const updateScenarioFromBundle = (scenarioId, bundle) => {
 };
 
 export {
+  getGameDirectory,
+  getGameJsonPath,
+  getScenarioJsonPath,
+  getScenarioSummary,
   createGame,
   createScenario,
   deleteGame,

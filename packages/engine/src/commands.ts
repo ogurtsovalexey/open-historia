@@ -34,8 +34,28 @@ export const investInRegionCommandSchema = z
   .strict();
 export type InvestInRegionCommand = z.infer<typeof investInRegionCommandSchema>;
 
+/**
+ * Region control transfer (first-economy-mvp.md §7). In the finished game this
+ * is the outcome of war or diplomacy; in the slice it is a directly issued
+ * command so the re-aggregation contract can be tested on its own.
+ */
+export const transferRegionCommandSchema = z
+  .object({
+    kind: z.literal('territory.transfer-region'),
+    commandId: commandIdSchema,
+    /** Must currently control the region. */
+    actorPolityId: polityIdSchema,
+    targetRegionId: regionIdSchema,
+    newControllerId: polityIdSchema,
+    expectedRevision: worldRevisionIdSchema.optional(),
+    effectiveMonth: gameDateSchema,
+  })
+  .strict();
+export type TransferRegionCommand = z.infer<typeof transferRegionCommandSchema>;
+
 export const econCommandSchema = z.discriminatedUnion('kind', [
   investInRegionCommandSchema,
+  transferRegionCommandSchema,
 ]);
 export type EconCommand = z.infer<typeof econCommandSchema>;
 
@@ -55,6 +75,9 @@ export const REJECTION_REASONS = [
   'invalid-amount',
   'insufficient-treasury',
   'command-limit',
+  'unknown-new-controller',
+  'same-controller',
+  'processing-competition',
 ] as const;
 export type RejectionReason = (typeof REJECTION_REASONS)[number];
 

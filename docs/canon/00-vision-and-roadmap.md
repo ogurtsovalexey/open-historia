@@ -93,35 +93,64 @@ opponent → deterministic consequences) comes second.
 | Phase | Delivers | Status |
 |---|---|---|
 | **P0 — Deterministic economy core** | Headless slice: 2 countries × 5 regions, monthly tick, ledger, report with causes, atomic run dirs, byte-identical replay, golden tests | **Done** (canon 04) |
-| **P1 — See it with your eyes** | Local playtest dashboard: region table, national totals, "why changed" from the ledger, resource flows, investment order with preview, advance one month / twelve, reset, full turn report. Zero model calls (`npm run play:engine`). | **Done** |
-| **P2 — The loop (fun gate)** | Free-text orders → typed commands (interpreter, canon 07); LLM opponent playing rival countries from a bounded engine-built brief; difficulty levels; relations/agreements state so opponents have something to do with each other | **Next** — core bet |
-| **P3 — Internal politics** | Factions/estates fed by existing economy outputs (tax pressure, food shortfall, investment neglect), legitimacy, unrest, rulers | |
-| **P4 — War and army** | Forces and mobilization from population, supply on a bounded map, aggregate combat, occupation → region transfer (transfer semantics already specified) | |
-| **P5 — Identity and people** | Culture/religion static (unrest, annexation resistance); rulers/dynasties with succession | |
-| **P6 — Technology and markets** | Research as capabilities/efficiencies; projects with cost schedules; trade, prices, shortages, blockade | |
-| **P7 — World and balance** | Grow the fictional world to full bounded size, tune coefficients to historically plausible magnitudes, playtest for actual fun; simple culture dynamics if wanted | |
-| **P8 — Optional** | One curated historical scenario; anything else | Optional |
+| **P1 — Headless bench** | UI-free playtest surface for fast checks: region table, national totals, "why changed" from the ledger, resource flows, investment order, advance one/twelve months, reset, turn report. Zero model calls (`npm run play:engine`). A test bench, not the product. | **Done** |
+| **P2 — The engine inside the game** | Our scenario visible on the map; clicking a region selects it; the `Economy` drawer tab shows region + controller numbers and "why changed" from the ledger; advancing a month runs the engine, not a model. The game looks as before, with our panel added. Zero model calls. | **Next** |
+| **P3 — The loop (fun gate)** | Free-text orders → typed commands (interpreter, canon 07); LLM opponent playing rival countries from a bounded engine-built brief; difficulty levels; relations/agreements state so opponents have something to do with each other | Core bet |
+| **P4 — Internal politics** | Factions/estates fed by existing economy outputs (tax pressure, food shortfall, investment neglect), legitimacy, unrest, rulers | |
+| **P5 — War and army** | Forces and mobilization from population, supply on a bounded map, aggregate combat, occupation → region transfer (transfer semantics already specified) | |
+| **P6 — Identity and people** | Culture/religion static (unrest, annexation resistance); rulers/dynasties with succession | |
+| **P7 — Technology and markets** | Research as capabilities/efficiencies; projects with cost schedules; trade, prices, shortages, blockade | |
+| **P8 — World and balance** | Grow the fictional world to full bounded size, tune coefficients to historically plausible magnitudes, playtest for actual fun; simple culture dynamics if wanted | |
+| **P9 — Optional** | One curated historical scenario; anything else | Optional |
 
 **Gates** (a phase is passable, not a calendar promise):
 
-- **Gate A — playable loop**: P0+P1+P2. A campaign of ≥12 months can be played
+- **Gate A — playable loop**: P0-P3. A campaign of ≥12 months can be played
   end to end with orders in prose, an opponent that visibly reacts to the
   numbers, and every change explainable from the ledger.
-- **Gate B — core four**: +P3+P4. All four systems interact; a war changes the
+- **Gate B — core four**: +P4+P5. All four systems interact; a war changes the
   economy, which changes politics, which constrains the war.
-- **Gate C — full game**: +P5+P6. All eight systems present; identity, people,
+- **Gate C — full game**: +P6+P7. All eight systems present; identity, people,
   technology and trade all feed the same numbers.
-- **Gate D — playable-for-real**: +P7. Balanced enough that the author chooses
+- **Gate D — playable-for-real**: +P8. Balanced enough that the author chooses
   to play it for its own sake. This is "finished".
 - Optional Gate E: a curated historical scenario on top, if wanted.
 
-## Cross-cutting, runs alongside (Track A)
+## The inherited application IS our game shell (owner clarification 2026-08-31)
 
-Independent of the phases, on the live game: static EN+RU locales only (drop
-the 23-language runtime translation), stop sending the map and unbounded
-context into prompts (`docs/principles.md` §3), wire the built
-`aiCallRegistry`/ledger so token spend is observable per task, and a Playwright
-smoke suite with mocked AI (canon 08) so nothing silently breaks.
+The game stays what it is visually: **a map-based grand strategy game**. The
+inherited React application, its MapLibre map, its panels and its drawer are
+the shell we keep and extend. Our work replaces the *numeric core* and adds
+panels; it does not replace the presentation.
+
+Concretely:
+
+- **The map is the primary interface.** Selecting a region means clicking it on
+  the map, not picking it from a list.
+- **Our economy view is a drawer tab inside the game**, not a separate page.
+  `regional-resource-economy.md` §6 already fixes this contract: the right
+  drawer's first tab is `Economy` (open by default), then `Advisor`, then
+  `Stats`; a map click selects a region; the region section sits above its
+  current controller's section.
+- **`packages/engine` is the authority for numbers**; the app renders what the
+  engine computed and explains it from the contribution ledger. The legacy
+  path where a model writes `impacts` into `world.json` is what goes away.
+- The standalone playtest server (`npm run play:engine`) is a **headless test
+  bench**, not the product surface. It stays useful for fast, UI-free checks.
+
+What is dropped is the legacy *content and semantics*, not the application:
+its scenarios are not our playtest target, and a model never again invents a
+numeric outcome. Because we do ship this application, its token hygiene is our
+problem: static EN+RU locales, no runtime model translation, bounded prompt
+context, every model call through the call registry/ledger (canon 07), and a
+Playwright smoke suite over our own screens (canon 08).
+
+Audit findings on the inherited code are recorded in `docs/audits/` and are
+directly actionable now that this app is the shell. The most important one:
+prompt bloat does **not** come from the map (the map rule is honoured) but from
+`consolidatedHistory` and `campaignMemory`, which are appended forever and
+rendered into the prompt in full — the same bug class already fixed once for
+action history and not fixed for its replacements.
 
 ## What is explicitly NOT the plan
 
@@ -130,7 +159,7 @@ Dropped or deferred from the archived roadmap, with reasons:
 - **Global coverage / every polity in the world** — replaced by the bounded
   world above.
 - **Two mandatory historical scenarios (World 1916 + World 1797–1815)** and the
-  curated multi-wave source program — moved to optional P8; a fictional world
+  curated multi-wave source program — moved to optional P9; a fictional world
   with historically plausible magnitudes is the driver instead. (The research
   already done, `docs/research/world-1916-*`, stays as reference.)
 - **Scenario platform, authoring tools, Pax import boundary** (archived M8) —

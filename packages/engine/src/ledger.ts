@@ -86,10 +86,25 @@ export interface PolityLedger {
   stockMovements: StockMovement[];
 }
 
+/**
+ * One accepted region transfer. Population is the value at transfer time, i.e.
+ * before this month's demography, which is the amount that moves between the
+ * national totals (first-economy-mvp.md §10).
+ */
+export interface TransferRecord {
+  regionId: RegionId;
+  fromPolityId: PolityId;
+  toPolityId: PolityId;
+  population: number;
+  infrastructureBp: number;
+  damageBp: number;
+}
+
 export interface TurnLedger {
   month: string;
   turn: number;
   polities: PolityLedger[];
+  transfers: TransferRecord[];
 }
 
 /**
@@ -184,6 +199,30 @@ export function checkInvariants(
     if (nextPolity.treasury < 0) fail('no-negative-treasury', `${id}: ${nextPolity.treasury}`);
     checked.push('treasury-identity');
   }
+
+  // Transfers move the region and its attached values, nothing else (§7).
+  for (const transfer of ledger.transfers) {
+    const before = prev.regions.find((r) => r.regionId === transfer.regionId);
+    const after = next.regions.find((r) => r.regionId === transfer.regionId);
+    if (!before || !after) return fail('transfer-region-exists', `${transfer.regionId} missing`);
+    if (before.controllerId !== transfer.fromPolityId) {
+      fail('transfer-source', `${transfer.regionId} was controlled by ${before.controllerId}, not ${transfer.fromPolityId}`);
+    }
+    if (after.controllerId !== transfer.toPolityId) {
+      fail('transfer-applied', `${transfer.regionId} ended under ${after.controllerId}, expected ${transfer.toPolityId}`);
+    }
+    if (before.population !== transfer.population) {
+      fail('transfer-population', `${transfer.regionId}: recorded ${transfer.population}, state had ${before.population}`);
+    }
+    // Infrastructure and damage stay attached to the region.
+    if (after.infrastructureBp !== transfer.infrastructureBp || after.damageBp !== transfer.damageBp) {
+      fail('transfer-attached-values', `${transfer.regionId}: infrastructure/damage changed during transfer`);
+    }
+    if (transfer.fromPolityId === transfer.toPolityId) {
+      fail('transfer-distinct-controllers', `${transfer.regionId}: from equals to`);
+    }
+  }
+  if (ledger.transfers.length > 0) checked.push('transfer-conservation');
 
   // A region belongs to exactly one controller and contributes exactly once.
   const seenRegions = new Set<string>();

@@ -6,6 +6,7 @@ import { sendMessage, startChat, loadHistory } from "../AI/main.jsx";
 import { JSON_URLS, readJson, writeJson } from "../../runtime/assets.js";
 import { chatLanguageDiffersFromUi, isRtlLanguage, resolveChatLanguage } from "../../runtime/i18n.js";
 import StatsPane from "./stats.jsx";
+import EconomyPane from "./economy.jsx";
 
 Chart.register(...registerables);
 
@@ -191,7 +192,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
     const messagesEndRef            = useRef(null);
     const [hasOpened, setHasOpened] = useState(isAdvisorOpen);
     const [hasBootstrapped, setHasBootstrapped] = useState(false);
-    const [activeTab, setActiveTab] = useState("advisor");
+    const [activeTab, setActiveTab] = useState("economy");
     const inputRef = useRef(null);
     const [isResizing, setIsResizing] = useState(false);
     const [handleHover, setHandleHover] = useState(false);
@@ -374,6 +375,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
         )}
         {/* Header: tabs to flip between the advisor chat and national stats. */}
         <div style={{ alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", display: "flex", padding: "0 0.75rem 0 0.35rem" }}>
+        <TabButton icon="🏭" label="Economy" active={activeTab === "economy"} onClick={() => setActiveTab("economy")} />
         <TabButton icon="🧭" label="Advisor" active={activeTab === "advisor"} onClick={() => setActiveTab("advisor")} />
         <TabButton icon="📊" label="Stats" active={activeTab === "stats"} onClick={() => setActiveTab("stats")} />
         <div style={{ flex: 1 }} />
@@ -393,6 +395,11 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
             style={{ background: "none", border: "none", color: "rgba(255,255,255,0.55)", cursor: "pointer", fontSize: "1.35rem", lineHeight: 1, padding: "0 0 0 0.5rem", display: "flex", alignItems: "center" }}
             >✕</button>
         )}
+        </div>
+
+        {/* Deterministic economy pane — engine numbers only, zero model calls. */}
+        <div style={{ display: activeTab === "economy" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
+        <EconomyPane active={isAdvisorOpen && activeTab === "economy"} />
         </div>
 
         {/* National stats pane — kept mounted so flipping tabs is instant. */}

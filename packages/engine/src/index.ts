@@ -1,6 +1,7 @@
 export * from './fixedPoint.js';
 export * from './canonical.js';
 export * from './scenario.js';
+export * from './mapLink.js';
 export * from './state.js';
 export * from './commands.js';
 export * from './ledger.js';

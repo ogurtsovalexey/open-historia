@@ -11,6 +11,7 @@ import {
     loadRegionCatalog,
 } from "../../runtime/assets.js";
 import { loadRollbackSnapshots, maybeGeneratePregameHistory, rollBackToSnapshot, simulateAutoJump, simulateTimelineJump } from "../AI/gameplay.js";
+import { isEngineDrivenGame, runEconomyMonths } from "../../runtime/economy.js";
 import { isMainMenuOpen } from "./libraryBar";
 import {
     applyEventImpactsToWorld,
@@ -1449,6 +1450,24 @@ const DateWidget = ({
         const controller = new AbortController();
         jumpAbortRef.current = controller;
         try {
+            // An engine-driven scenario advances by running deterministic monthly
+            // ticks — one per 1st of month crossed — instead of asking a model to
+            // invent the period. Every other scenario keeps the legacy path.
+            if (await isEngineDrivenGame()) {
+                const months = Math.max(1, Math.round(days / 30));
+                await runEconomyMonths({ months });
+                const [nextGame, nextWorld, nextEvents] = await Promise.all([
+                    readGameData({ force: true }),
+                    readWorldState({ force: true }),
+                    readEventsState({ force: true }),
+                ]);
+                setGameData(nextGame);
+                setWorldState(nextWorld);
+                setEvents(nextEvents);
+                setVisibleEventCount(1);
+                setPanel("history");
+                return;
+            }
             const result = mode === "auto"
             ? await simulateAutoJump({ days, signal: controller.signal })
             : await simulateTimelineJump({ days, signal: controller.signal });
