@@ -32,7 +32,10 @@ For every `ORCHESTRATOR_TICK`:
    - close accepted issues as `status:done` and unblock direct dependants.
 4. Reconcile `status:claimed` issues with their process, branch and worktree.
    A dead process with no handoff is retried once; repeated failure becomes
-   `status:blocked` with evidence.
+   `status:blocked` with evidence. A worker exit code describes only the local
+   process: even `exit(0)` remains unfinished until the Issue has a verified
+   handoff and lifecycle transition. Exited claimed workers wake reconciliation
+   immediately instead of waiting for the periodic claimed audit.
 5. Fill free capacity only from existing `status:ready` Issues, up to the
    configured active-stream limit (currently seven total: the GPT integration
    stream plus at most six DeepSeek workers).
@@ -60,6 +63,28 @@ For every `ORCHESTRATOR_TICK`:
 12. After a completed Issue is integrated and closed, archive its stopped worker
     record so the live worker list contains only actionable runs. Archiving must
     preserve prompts, logs and handoff metadata.
+
+Before processing any review handoff, the watchdog checks the canonical Git
+worktree with plumbing-level tests. Staged, unstaged, untracked or unmerged
+paths and active merge, cherry-pick, rebase, revert or sequencer state refuse
+integration without discarding owner changes. The visible result contains the
+exact state and cannot report `ORCHESTRATOR_OK`.
+
+GPT validates and integrates a worker range through the fail-closed helpers:
+
+```bash
+bash scripts/agent-orchestrator.sh preflight <integration-worktree>
+bash scripts/agent-orchestrator.sh validate-range <repo> <recorded-base> <base..tip> <integration-ref>
+bash scripts/agent-orchestrator.sh integrate-range <repo> <recorded-base> <base..tip> [integration-ref]
+```
+
+Validation proves the range is rooted at the recorded base and does not depend
+on an unintegrated correction ancestor. An explicitly advertised rebased range
+may instead become one self-contained binary patch, but only when that patch
+applies cleanly in a disposable worktree. `integrate-range` starts from a
+proven-clean canonical state. If its own cherry-pick or patch commit nevertheless
+fails, it aborts only that operation and verifies that the original
+head/index/worktree state was restored.
 
 ## Priority dispatch
 
@@ -187,5 +212,6 @@ background LaunchAgent to execute scripts directly from `~/Documents`.
 `MAX_ACTIVE_STREAMS` controls the combined GPT-plus-worker budget and defaults
 to `7`. Each worker still requires its own branch, worktree and OpenCode session;
 the prepared pool is `slot-1` through `slot-6`. `CLAIMED_CHECK_SECONDS` defaults
-to `420`, so a completed worker whose GitHub labels have not changed is audited
-within seven minutes even when the board signature itself is unchanged.
+to `420` as a fallback audit for live or ambiguous claims. A worker with a
+recorded exit result and unchanged `status:claimed` wakes the next watchdog
+interval immediately; it does not wait seven minutes.

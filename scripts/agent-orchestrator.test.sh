@@ -71,7 +71,7 @@ launchctl() {
 }
 
 gh() {
-  printf '[]\n'
+  printf '%s\n' "${MOCK_GH_BOARD:-[]}"
 }
 
 codex() {
@@ -86,6 +86,17 @@ plutil() {
   return 0
 }
 
+notify_owner() {
+  return 0
+}
+
+FAKE_REPO="$TEST_ROOT/canonical-repo"
+git init -qb main "$FAKE_REPO"
+git -C "$FAKE_REPO" config user.email test@example.com
+git -C "$FAKE_REPO" config user.name 'Test User'
+git -C "$FAKE_REPO" commit --allow-empty -qm base
+DEFAULT_REPO_ROOT="$FAKE_REPO"
+
 rm -f "$PENDING_TICK_PATH" "$CONFIG_FILE"
 start_bound_session "$SESSION_ID" >/dev/null
 read_pending_tick
@@ -98,6 +109,25 @@ grep -Fq "SESSION_ID=${SESSION_ID}" "$CONFIG_FILE"
 grep -Fq "CLAIMED_CHECK_SECONDS=420" "$CONFIG_FILE"
 grep -Fq "MAX_ACTIVE_STREAMS=7" "$CONFIG_FILE"
 [[ "$(tick_prompt tick-capacity)" == *"at most 7 active task streams total"* ]]
+
+# A review tick fails closed on owner Git state, reports the exact condition,
+# preserves the file, and cannot manufacture an ORCHESTRATOR_OK result.
+rm -f "$PENDING_TICK_PATH"
+printf 'owner work\n' >"$FAKE_REPO/owner-change.txt"
+MOCK_GH_BOARD='[{"number":99,"title":"review","updatedAt":"x","labels":[{"name":"status:review"},{"name":"agent:deepseek"},{"name":"priority:high"}]}]'
+if run_tick; then
+  printf 'Dirty review tick unexpectedly passed preflight.\n' >&2
+  exit 1
+fi
+[[ -f "$FAKE_REPO/owner-change.txt" ]]
+grep -Fq 'untracked-files' "$LAST_MESSAGE_PATH"
+grep -Fq 'OWNER_ACTION_REQUIRED:' "$LAST_MESSAGE_PATH"
+if grep -Fq 'ORCHESTRATOR_OK' "$LAST_MESSAGE_PATH"; then
+  printf 'Refused review tick reported ORCHESTRATOR_OK.\n' >&2
+  exit 1
+fi
+rm "$FAKE_REPO/owner-change.txt"
+MOCK_GH_BOARD='[]'
 
 PRIORITY_BOARD='[
   {"number":40,"title":"critical later","updatedAt":"2026-08-30T00:00:00Z","labels":[{"name":"status:ready"},{"name":"agent:deepseek"},{"name":"priority:critical"}]},
@@ -162,5 +192,131 @@ NEW_SESSION_FILE="$SESSION_DIR/rollout-new-${NEW_SESSION_ID}.jsonl"
 jq -cn --arg id "$NEW_SESSION_ID" '{type:"session_meta",payload:{id:$id,cwd:"/tmp/repo",source:"cli"}}' >"$NEW_SESSION_FILE"
 jq -cn '{ordinal:1,type:"response_item",payload:{type:"message",role:"user",content:[{type:"input_text",text:"ORCHESTRATOR_TICK_ID=tick-new"}],internal_chat_message_metadata_passthrough:{turn_id:"turn-new"}}}' >>"$NEW_SESSION_FILE"
 [[ "$(detect_new_orchestrator_session "$BEFORE_PATH" "tick-new")" == "$NEW_SESSION_ID" ]]
+
+# A worker process exit is not a handoff. It wakes reconciliation immediately,
+# even when the periodic claimed audit is not due, and exposes missing evidence.
+mkdir -p "$WORKER_STATE_DIR"
+printf '0\n' >"$WORKER_STATE_DIR/91.exit"
+printf 'MODEL=test-model\nWORKTREE=/tmp/worker-91\n' >"$WORKER_STATE_DIR/91.meta"
+printf '%s\n' '{"type":"text","sessionID":"session-91","part":{"text":"Finished locally without lifecycle mutation."}}' >"$WORKER_STATE_DIR/91.jsonl"
+CLAIMED_ONLY_BOARD='[{"number":91,"title":"claimed worker","updatedAt":"x","labels":[{"name":"status:claimed"},{"name":"agent:deepseek"},{"name":"priority:high"}]}]'
+date +%s >"$LAST_CLAIMED_CHECK_PATH"
+[[ "$(worker_reconciliation_snapshot "$CLAIMED_ONLY_BOARD" | jq -r '.[0].issue')" == '91' ]]
+[[ "$(worker_reconciliation_snapshot "$CLAIMED_ONLY_BOARD" | jq -r '.[0].exitCode')" == '0' ]]
+[[ "$(worker_reconciliation_snapshot "$CLAIMED_ONLY_BOARD" | jq -r '.[0].finalResponseHasHandoff')" == 'false' ]]
+needs_tick "$CLAIMED_ONLY_BOARD"
+RECONCILIATION_PROMPT="$(tick_prompt tick-worker '[]' "$(worker_reconciliation_snapshot "$CLAIMED_ONLY_BOARD")")"
+[[ "$RECONCILIATION_PROMPT" == *'exit code records process termination only'* ]]
+[[ "$RECONCILIATION_PROMPT" == *'"issue":91'* ]]
+WORKER_SIGNATURE="$(printf '%s' "$CLAIMED_ONLY_BOARD" | actionable_signature)|workers:$(worker_reconciliation_snapshot "$CLAIMED_ONLY_BOARD" | jq -c 'map({issue,exitCode,finalResponseHasHandoff})')"
+[[ "$WORKER_SIGNATURE" == *'"issue":91'* ]]
+
+# All Git safety checks operate on disposable repositories. The repository that
+# contains this test is never passed to a mutating helper.
+HANDOFF_REPO="$TEST_ROOT/handoff-repo"
+git init -qb main "$HANDOFF_REPO"
+git -C "$HANDOFF_REPO" config user.email test@example.com
+git -C "$HANDOFF_REPO" config user.name 'Test User'
+printf 'base\n' >"$HANDOFF_REPO/tracked.txt"
+git -C "$HANDOFF_REPO" add tracked.txt
+git -C "$HANDOFF_REPO" commit -qm base
+HANDOFF_BASE="$(git -C "$HANDOFF_REPO" rev-parse HEAD)"
+preflight_worktree "$HANDOFF_REPO"
+
+printf 'dirty\n' >>"$HANDOFF_REPO/tracked.txt"
+[[ "$(worktree_problems "$HANDOFF_REPO")" == *unstaged-changes* ]]
+if preflight_worktree "$HANDOFF_REPO" 2>/dev/null; then exit 1; fi
+git -C "$HANDOFF_REPO" restore tracked.txt
+printf 'staged\n' >>"$HANDOFF_REPO/tracked.txt"
+git -C "$HANDOFF_REPO" add tracked.txt
+[[ "$(worktree_problems "$HANDOFF_REPO")" == *staged-changes* ]]
+git -C "$HANDOFF_REPO" reset --hard -q HEAD
+printf 'untracked\n' >"$HANDOFF_REPO/untracked.txt"
+[[ "$(worktree_problems "$HANDOFF_REPO")" == *untracked-files* ]]
+rm "$HANDOFF_REPO/untracked.txt"
+HANDOFF_GIT_DIR="$(git_dir_of "$HANDOFF_REPO")"
+printf '%s\n' "$HANDOFF_BASE" >"$HANDOFF_GIT_DIR/MERGE_HEAD"
+[[ "$(worktree_problems "$HANDOFF_REPO")" == *merge-in-progress* ]]
+rm "$HANDOFF_GIT_DIR/MERGE_HEAD"
+printf '%s\n' "$HANDOFF_BASE" >"$HANDOFF_GIT_DIR/CHERRY_PICK_HEAD"
+[[ "$(worktree_problems "$HANDOFF_REPO")" == *cherry-pick-in-progress* ]]
+rm "$HANDOFF_GIT_DIR/CHERRY_PICK_HEAD"
+printf '%s\n' "$HANDOFF_BASE" >"$HANDOFF_GIT_DIR/REVERT_HEAD"
+[[ "$(worktree_problems "$HANDOFF_REPO")" == *revert-in-progress* ]]
+rm "$HANDOFF_GIT_DIR/REVERT_HEAD"
+for operation_dir in rebase-merge rebase-apply sequencer; do
+  mkdir "$HANDOFF_GIT_DIR/$operation_dir"
+  [[ -n "$(worktree_problems "$HANDOFF_REPO")" ]]
+  rm -r "$HANDOFF_GIT_DIR/$operation_dir"
+done
+BASE_BLOB="$(printf 'base conflict\n' | git -C "$HANDOFF_REPO" hash-object -w --stdin)"
+OURS_BLOB="$(printf 'ours conflict\n' | git -C "$HANDOFF_REPO" hash-object -w --stdin)"
+THEIRS_BLOB="$(printf 'theirs conflict\n' | git -C "$HANDOFF_REPO" hash-object -w --stdin)"
+printf '100644 %s 1\tconflict.txt\n100644 %s 2\tconflict.txt\n100644 %s 3\tconflict.txt\n' \
+  "$BASE_BLOB" "$OURS_BLOB" "$THEIRS_BLOB" | git -C "$HANDOFF_REPO" update-index --index-info
+[[ "$(worktree_problems "$HANDOFF_REPO")" == *unmerged-index* ]]
+git -C "$HANDOFF_REPO" reset --hard -q HEAD
+preflight_worktree "$HANDOFF_REPO"
+
+# A clean range rooted at the recorded base validates and integrates.
+git -C "$HANDOFF_REPO" switch -qc worker-valid
+printf 'worker\n' >"$HANDOFF_REPO/worker.txt"
+git -C "$HANDOFF_REPO" add worker.txt
+git -C "$HANDOFF_REPO" commit -qm worker
+VALID_TIP="$(git -C "$HANDOFF_REPO" rev-parse HEAD)"
+git -C "$HANDOFF_REPO" switch -q main
+validate_handoff_range "$HANDOFF_REPO" "$HANDOFF_BASE" "$HANDOFF_BASE..$VALID_TIP" HEAD
+integrate_handoff_range "$HANDOFF_REPO" "$HANDOFF_BASE" "$HANDOFF_BASE..$VALID_TIP" HEAD
+[[ -f "$HANDOFF_REPO/worker.txt" ]]
+preflight_worktree "$HANDOFF_REPO"
+
+# A branch rebased away from the recorded SHA is accepted only as one explicit
+# self-contained patch that applies to the current integration head.
+BASE_TREE="$(git -C "$HANDOFF_REPO" rev-parse "${HANDOFF_BASE}^{tree}")"
+UNRELATED_BASE="$(printf 'unrelated root\n' | git -C "$HANDOFF_REPO" commit-tree "$BASE_TREE")"
+git -C "$HANDOFF_REPO" switch -qc worker-rebased "$UNRELATED_BASE"
+printf 'rebased patch\n' >"$HANDOFF_REPO/rebased.txt"
+git -C "$HANDOFF_REPO" add rebased.txt
+git -C "$HANDOFF_REPO" commit -qm rebased-worker
+REBASED_TIP="$(git -C "$HANDOFF_REPO" rev-parse HEAD)"
+git -C "$HANDOFF_REPO" switch -q main
+validate_handoff_range "$HANDOFF_REPO" "$HANDOFF_BASE" "$UNRELATED_BASE..$REBASED_TIP" HEAD
+integrate_handoff_range "$HANDOFF_REPO" "$HANDOFF_BASE" "$UNRELATED_BASE..$REBASED_TIP" HEAD
+[[ -f "$HANDOFF_REPO/rebased.txt" ]]
+preflight_worktree "$HANDOFF_REPO"
+
+# Issue #7 regression: a correction advertised without its rejected add commit
+# depends on an ancestor absent from integration and is rejected before mutation.
+git -C "$HANDOFF_REPO" switch -qc worker-dependent "$HANDOFF_BASE"
+printf 'bad\n' >"$HANDOFF_REPO/dependent.txt"
+git -C "$HANDOFF_REPO" add dependent.txt
+git -C "$HANDOFF_REPO" commit -qm rejected-add
+REJECTED_ADD="$(git -C "$HANDOFF_REPO" rev-parse HEAD)"
+printf 'corrected\n' >"$HANDOFF_REPO/dependent.txt"
+git -C "$HANDOFF_REPO" commit -qam correction
+DEPENDENT_TIP="$(git -C "$HANDOFF_REPO" rev-parse HEAD)"
+git -C "$HANDOFF_REPO" switch -q main
+MAIN_BEFORE="$(git -C "$HANDOFF_REPO" rev-parse HEAD)"
+if validate_handoff_range "$HANDOFF_REPO" "$HANDOFF_BASE" "$REJECTED_ADD..$DEPENDENT_TIP" HEAD 2>/dev/null; then exit 1; fi
+[[ "$(git -C "$HANDOFF_REPO" rev-parse HEAD)" == "$MAIN_BEFORE" ]]
+preflight_worktree "$HANDOFF_REPO"
+
+# If the real cherry-pick fails after disposable validation, cleanup is allowed
+# because the helper proved the initial state clean and started the operation.
+git -C "$HANDOFF_REPO" switch -qc worker-hook-failure
+printf 'hook range\n' >"$HANDOFF_REPO/hook.txt"
+git -C "$HANDOFF_REPO" add hook.txt
+git -C "$HANDOFF_REPO" commit -qm hook-range
+HOOK_TIP="$(git -C "$HANDOFF_REPO" rev-parse HEAD)"
+HOOK_BASE="$(git -C "$HANDOFF_REPO" rev-parse HEAD^)"
+git -C "$HANDOFF_REPO" switch -q main
+git -C "$HANDOFF_REPO" config user.name ''
+git -C "$HANDOFF_REPO" config user.email ''
+HOOK_HEAD_BEFORE="$(git -C "$HANDOFF_REPO" rev-parse HEAD)"
+if integrate_handoff_range "$HANDOFF_REPO" "$HOOK_BASE" "$HOOK_BASE..$HOOK_TIP" HEAD 2>/dev/null; then exit 1; fi
+[[ "$(git -C "$HANDOFF_REPO" rev-parse HEAD)" == "$HOOK_HEAD_BEFORE" ]]
+preflight_worktree "$HANDOFF_REPO"
+git -C "$HANDOFF_REPO" config user.name 'Test User'
+git -C "$HANDOFF_REPO" config user.email test@example.com
 
 printf 'agent-orchestrator state tests passed\n'

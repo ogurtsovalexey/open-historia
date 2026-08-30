@@ -133,11 +133,18 @@ git worktree add ../open-historia-next-opencode \
    `status:review`, and comment commits, changed files, tests, risks and open
    decisions.
 5. The GPT integration owner reviews against principles and acceptance criteria,
-   then cherry-picks or merges.
+   then validates and integrates the advertised range through
+   `scripts/agent-orchestrator.sh integrate-range`. A correction commit whose
+   advertised start is an unintegrated/rejected ancestor is rejected before the
+   canonical worktree is mutated.
 6. QA validates the integrated worktree; only the integration owner applies
    `status:done` and closes the issue.
 
 Workers never push directly to `private/main` or the public `origin`.
+`exit(0)` from the worker runner is not a handoff and never changes lifecycle
+state by itself. Until the GitHub comment and `status:review` transition are
+verified, the orchestrator treats the stopped worker as `status:claimed` work
+requiring immediate reconciliation.
 Every worker receives the mandatory checks in `agent-worker-baseline.md`.
 Review rejects proxy/fake tests, undiscovered tests, skipped validation reported
 as passing, unbounded-then-check payload handling and resource cleanup that does

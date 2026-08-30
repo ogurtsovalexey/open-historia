@@ -17,6 +17,7 @@ LAST_ACK_SIGNATURE_PATH="${STATE_DIR}/last-ack-signature"
 PENDING_TICK_PATH="${STATE_DIR}/pending-tick"
 SESSION_LAUNCHER_PATH="${STATE_DIR}/open-orchestrator-session.sh"
 LOCK_DIR="${STATE_DIR}/tick.lock"
+WORKER_STATE_DIR="${OPEN_HISTORIA_ORCHESTRATOR_WORKER_STATE_DIR:-${STATE_DIR}/workers}"
 
 mkdir -p "$CONFIG_DIR" "$STATE_DIR"
 
@@ -102,6 +103,195 @@ valid_session_id() {
   [[ "${1:-}" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]
 }
 
+git_dir_of() {
+  local dir="${1:?directory required}"
+  git -C "$dir" rev-parse --absolute-git-dir 2>/dev/null
+}
+
+worktree_problems() {
+  local dir="${1:?directory required}"
+  local git_dir
+  git_dir="$(git_dir_of "$dir")" || {
+    printf 'not-a-git-worktree\n'
+    return 0
+  }
+
+  git -C "$dir" diff --cached --quiet --ignore-submodules -- 2>/dev/null || printf 'staged-changes\n'
+  git -C "$dir" diff --quiet --ignore-submodules -- 2>/dev/null || printf 'unstaged-changes\n'
+  [[ -z "$(git -C "$dir" ls-files --others --exclude-standard 2>/dev/null)" ]] || printf 'untracked-files\n'
+  [[ -z "$(git -C "$dir" ls-files --unmerged 2>/dev/null)" ]] || printf 'unmerged-index\n'
+  [[ ! -f "$git_dir/MERGE_HEAD" ]] || printf 'merge-in-progress\n'
+  [[ ! -f "$git_dir/CHERRY_PICK_HEAD" ]] || printf 'cherry-pick-in-progress\n'
+  [[ ! -f "$git_dir/REVERT_HEAD" ]] || printf 'revert-in-progress\n'
+  [[ ! -d "$git_dir/rebase-merge" ]] || printf 'rebase-merge-in-progress\n'
+  [[ ! -d "$git_dir/rebase-apply" ]] || printf 'rebase-apply-in-progress\n'
+  [[ ! -d "$git_dir/sequencer" ]] || printf 'sequencer-in-progress\n'
+}
+
+preflight_worktree() {
+  local dir="${1:?directory required}"
+  local problems
+  problems="$(worktree_problems "$dir")"
+  if [[ -z "$problems" ]]; then
+    return 0
+  fi
+  printf 'Integration preflight failed for %s:\n%s\n' "$dir" "$problems" >&2
+  return 1
+}
+
+remove_validation_worktree() {
+  local repo="${1:?repository required}"
+  local worktree="${2:?worktree required}"
+  git -C "$repo" worktree remove --force "$worktree" >/dev/null 2>&1 || true
+  [[ ! -d "$worktree" ]] || rm -rf "$worktree"
+}
+
+validate_handoff_range() {
+  local repo="${1:?repository required}"
+  local recorded_base="${2:?recorded base required}"
+  local advertised="${3:?advertised range required}"
+  local integration_ref="${4:?integration ref required}"
+  local base_sha from_ref to_ref from_sha to_sha integration_sha validation_worktree patch_file mode rc
+
+  base_sha="$(git -C "$repo" rev-parse --verify "${recorded_base}^{commit}" 2>/dev/null)" || {
+    printf 'Handoff rejected: recorded base %s is not a commit.\n' "$recorded_base" >&2
+    return 1
+  }
+  integration_sha="$(git -C "$repo" rev-parse --verify "${integration_ref}^{commit}" 2>/dev/null)" || {
+    printf 'Handoff rejected: integration ref %s is not a commit.\n' "$integration_ref" >&2
+    return 1
+  }
+  case "$advertised" in
+    *..*) from_ref="${advertised%%..*}"; to_ref="${advertised##*..}" ;;
+    *) from_ref="$recorded_base"; to_ref="$advertised" ;;
+  esac
+  from_sha="$(git -C "$repo" rev-parse --verify "${from_ref}^{commit}" 2>/dev/null)" || {
+    printf 'Handoff rejected: range start %s is not a commit.\n' "$from_ref" >&2
+    return 1
+  }
+  to_sha="$(git -C "$repo" rev-parse --verify "${to_ref}^{commit}" 2>/dev/null)" || {
+    printf 'Handoff rejected: range end %s is not a commit.\n' "$to_ref" >&2
+    return 1
+  }
+  [[ "$from_sha" != "$to_sha" ]] || {
+    printf 'Handoff rejected: advertised range is empty.\n' >&2
+    return 1
+  }
+  git -C "$repo" merge-base --is-ancestor "$from_sha" "$to_sha" 2>/dev/null || {
+    printf 'Handoff rejected: advertised range is not a forward commit chain.\n' >&2
+    return 1
+  }
+  mode=patch
+  if git -C "$repo" merge-base --is-ancestor "$base_sha" "$to_sha" 2>/dev/null; then
+    mode=commits
+    git -C "$repo" merge-base --is-ancestor "$from_sha" "$integration_sha" 2>/dev/null || {
+      printf 'Handoff rejected: correction depends on unintegrated ancestor %s.\n' "${from_sha:0:12}" >&2
+      return 1
+    }
+  elif [[ "$advertised" != *..* ]]; then
+    printf 'Handoff rejected: rebased work must advertise an explicit self-contained range.\n' >&2
+    return 1
+  fi
+
+  validation_worktree="$(mktemp -d "${TMPDIR:-/tmp}/historia-handoff.XXXXXX")"
+  if ! git -C "$repo" worktree add --detach --quiet "$validation_worktree" "$integration_sha"; then
+    rm -rf "$validation_worktree"
+    printf 'Handoff rejected: could not create disposable validation worktree.\n' >&2
+    return 1
+  fi
+  set +e
+  if [[ "$mode" == "commits" ]]; then
+    git -C "$validation_worktree" -c user.name='Open Historia Handoff Validator' \
+      -c user.email='handoff-validator@localhost' cherry-pick "$from_sha..$to_sha" >/dev/null 2>&1
+    rc=$?
+  else
+    patch_file="$(mktemp "${TMPDIR:-/tmp}/historia-handoff-patch.XXXXXX")"
+    git -C "$repo" diff --binary "$from_sha..$to_sha" >"$patch_file"
+    if [[ ! -s "$patch_file" ]]; then
+      rc=1
+    else
+      git -C "$validation_worktree" apply --index "$patch_file" >/dev/null 2>&1
+      rc=$?
+    fi
+    rm -f "$patch_file"
+  fi
+  set -e
+  remove_validation_worktree "$repo" "$validation_worktree"
+  if (( rc != 0 )); then
+    printf 'Handoff rejected: range does not apply cleanly to %s.\n' "${integration_sha:0:12}" >&2
+    return 1
+  fi
+}
+
+integrate_handoff_range() {
+  local repo="${1:?repository required}"
+  local recorded_base="${2:?recorded base required}"
+  local advertised="${3:?advertised range required}"
+  local integration_ref="${4:-HEAD}"
+  local integration_sha head_before base_sha from_ref to_ref from_sha to_sha mode patch_file rc
+
+  preflight_worktree "$repo" || return 1
+  integration_sha="$(git -C "$repo" rev-parse --verify "${integration_ref}^{commit}")"
+  head_before="$(git -C "$repo" rev-parse HEAD)"
+  [[ "$integration_sha" == "$head_before" ]] || {
+    printf 'Integration refused: integration ref must resolve to current HEAD.\n' >&2
+    return 1
+  }
+  validate_handoff_range "$repo" "$recorded_base" "$advertised" "$integration_sha" || return 1
+  case "$advertised" in
+    *..*) from_ref="${advertised%%..*}"; to_ref="${advertised##*..}" ;;
+    *) from_ref="$recorded_base"; to_ref="$advertised" ;;
+  esac
+  base_sha="$(git -C "$repo" rev-parse --verify "${recorded_base}^{commit}")"
+  from_sha="$(git -C "$repo" rev-parse --verify "${from_ref}^{commit}")"
+  to_sha="$(git -C "$repo" rev-parse --verify "${to_ref}^{commit}")"
+  mode=patch
+  if git -C "$repo" merge-base --is-ancestor "$base_sha" "$to_sha" 2>/dev/null; then
+    mode=commits
+  fi
+
+  set +e
+  if [[ "$mode" == "commits" ]]; then
+    git -C "$repo" cherry-pick "$from_sha..$to_sha"
+    rc=$?
+  else
+    patch_file="$(mktemp "${TMPDIR:-/tmp}/historia-integration-patch.XXXXXX")"
+    git -C "$repo" diff --binary "$from_sha..$to_sha" >"$patch_file"
+    git -C "$repo" apply --index "$patch_file"
+    rc=$?
+    rm -f "$patch_file"
+    if (( rc == 0 )); then
+      git -C "$repo" commit -m "Integrate handoff ${to_sha:0:12}"
+      rc=$?
+    fi
+  fi
+  set -e
+  if (( rc == 0 )); then
+    return 0
+  fi
+
+  if [[ "$(git -C "$repo" rev-parse HEAD 2>/dev/null)" != "$head_before" ]] || \
+     [[ -f "$(git_dir_of "$repo")/CHERRY_PICK_HEAD" ]] || \
+     [[ -d "$(git_dir_of "$repo")/sequencer" ]]; then
+    git -C "$repo" cherry-pick --abort >/dev/null 2>&1 || {
+      printf 'Integration failed and automatic abort failed; owner intervention is required.\n' >&2
+      return 2
+    }
+  fi
+  if ! preflight_worktree "$repo" >/dev/null 2>&1; then
+    git -C "$repo" reset --hard "$head_before" >/dev/null 2>&1 || {
+      printf 'Integration failed and automatic restoration failed; owner intervention is required.\n' >&2
+      return 2
+    }
+  fi
+  if [[ "$(git -C "$repo" rev-parse HEAD)" != "$head_before" ]] || ! preflight_worktree "$repo"; then
+    printf 'Integration failed and the original clean Git state was not restored.\n' >&2
+    return 2
+  fi
+  printf 'Integration failed; the orchestrator restored the original clean Git state.\n' >&2
+  return 1
+}
+
 codex_sessions_dir() {
   printf '%s/sessions\n' "${OPEN_HISTORIA_ORCHESTRATOR_CODEX_HOME:-${CODEX_HOME:-${HOME}/.codex}}"
 }
@@ -121,7 +311,8 @@ new_tick_id() {
 tick_prompt() {
   local tick_id="${1:?tick id required}"
   local dispatch_snapshot="${2:-{\"review\":[],\"malformed\":[],\"queues\":{\"agent:gpt\":[],\"agent:deepseek\":[]},\"highestBands\":{\"agent:gpt\":[],\"agent:deepseek\":[]}}}"
-  printf '%s' "ORCHESTRATOR_TICK_ID=${tick_id}. Work in ${REPO_ROOT}. Read docs/agent-orchestrator.md and execute exactly one orchestration cycle against ${GITHUB_REPOSITORY}. Act only as integration owner and dispatcher: review/integrate handoffs, reconcile workers, improve worker prompts, and assign existing status:ready Issues. Never create new tasks, Issues, Epics, roadmap items, or backlog scope; the owner does that in a separate general session. Lifecycle order is mandatory: (1) process every status:review handoff before any new claim; (2) reconcile status:claimed workers and stale claims; (3) fill free capacity from eligible status:ready work. status:blocked is never eligible. For each agent class independently, the code-generated queue below is ordered CRITICAL -> HIGH -> MEDIUM -> LOW and then by issue number. Apply dependency, owned-path and concurrency eligibility checks without reordering eligible work: claim only from the highest priority band that still has an eligible candidate. LOW is allowed only when no eligible ready CRITICAL, HIGH or MEDIUM remains for that agent class. A blocked or claimed higher-priority issue does not suppress lower ready work, and GPT work does not suppress DeepSeek work. Never claim an issue listed as malformed; zero or multiple canonical priority labels must be diagnosed. Priority labels are priority:critical, priority:high, priority:medium and priority:low; priority:p0 and priority:p1 are invalid. Dispatch snapshot: ${dispatch_snapshot}. Keep at most ${MAX_ACTIVE_STREAMS} active task streams total, including the GPT integration stream. Worker model routing: research=${RESEARCH_MODEL}; standard-code=${CODE_MODEL}; complex=${COMPLEX_MODEL}; escalation-only=${ESCALATION_MODEL}. Do not use the escalation model unless the documented promotion rule is met. Do not create additional agent identities or ask the owner routine questions. End the final message with exactly one marker on its own line: ORCHESTRATOR_OK, ORCHESTRATOR_IDLE, or OWNER_ACTION_REQUIRED: <one-line decision>."
+  local worker_snapshot="${3:-[]}"
+  printf '%s' "ORCHESTRATOR_TICK_ID=${tick_id}. Work in ${REPO_ROOT}. Read docs/agent-orchestrator.md and execute exactly one orchestration cycle against ${GITHUB_REPOSITORY}. Act only as integration owner and dispatcher: review/integrate handoffs, reconcile workers, improve worker prompts, and assign existing status:ready Issues. Never create new tasks, Issues, Epics, roadmap items, or backlog scope; the owner does that in a separate general session. Lifecycle order is mandatory: (1) process every status:review handoff before any new claim; (2) reconcile status:claimed workers and stale claims; (3) fill free capacity from eligible status:ready work. status:blocked is never eligible. A worker exit code records process termination only; it is never handoff acceptance. Every completed worker still labelled status:claimed in the worker reconciliation snapshot must be resolved in this cycle by review/correction, status:blocked with evidence, or a verified status:review handoff. Do not end ORCHESTRATOR_OK or ORCHESTRATOR_IDLE while such a completion remains unreconciled. Before any integration, run scripts/agent-orchestrator.sh preflight ${REPO_ROOT} and integrate the advertised range with scripts/agent-orchestrator.sh integrate-range; never manually cherry-pick an unvalidated worker range. For each agent class independently, the code-generated queue below is ordered CRITICAL -> HIGH -> MEDIUM -> LOW and then by issue number. Apply dependency, owned-path and concurrency eligibility checks without reordering eligible work: claim only from the highest priority band that still has an eligible candidate. LOW is allowed only when no eligible ready CRITICAL, HIGH or MEDIUM remains for that agent class. A blocked or claimed higher-priority issue does not suppress lower ready work, and GPT work does not suppress DeepSeek work. Never claim an issue listed as malformed; zero or multiple canonical priority labels must be diagnosed. Priority labels are priority:critical, priority:high, priority:medium and priority:low; priority:p0 and priority:p1 are invalid. Dispatch snapshot: ${dispatch_snapshot}. Worker reconciliation snapshot: ${worker_snapshot}. Keep at most ${MAX_ACTIVE_STREAMS} active task streams total, including the GPT integration stream. Worker model routing: research=${RESEARCH_MODEL}; standard-code=${CODE_MODEL}; complex=${COMPLEX_MODEL}; escalation-only=${ESCALATION_MODEL}. Do not use the escalation model unless the documented promotion rule is met. Do not create additional agent identities or ask the owner routine questions. End the final message with exactly one marker on its own line: ORCHESTRATOR_OK, ORCHESTRATOR_IDLE, or OWNER_ACTION_REQUIRED: <one-line decision>."
 }
 
 write_pending_tick() {
@@ -360,6 +551,38 @@ count_status() {
   jq --arg status "$status" '[.[] | select(any(.labels[]; .name == $status))] | length'
 }
 
+worker_reconciliation_snapshot() {
+  local board="${1:?board JSON required}"
+  local issue exit_file exit_code meta_file log_file model worktree session final_text has_handoff
+  local result='[]'
+
+  while IFS= read -r issue; do
+    exit_file="$WORKER_STATE_DIR/$issue.exit"
+    [[ -f "$exit_file" ]] || continue
+    exit_code="$(tr -d '\r\n' <"$exit_file")"
+    [[ "$exit_code" != "starting" ]] || continue
+    meta_file="$WORKER_STATE_DIR/$issue.meta"
+    log_file="$WORKER_STATE_DIR/$issue.jsonl"
+    model="$(sed -n 's/^MODEL=//p' "$meta_file" 2>/dev/null | head -1)"
+    worktree="$(sed -n 's/^WORKTREE=//p' "$meta_file" 2>/dev/null | head -1)"
+    session="$(grep -o '"sessionID":"[^"]*' "$log_file" 2>/dev/null | head -1 | cut -d'"' -f4 || true)"
+    final_text="$(jq -rs '[.[] | select(.type == "text") | .part.text] | last // ""' "$log_file" 2>/dev/null || true)"
+    has_handoff=false
+    [[ "$final_text" != *HANDOFF* ]] || has_handoff=true
+    result="$(jq -cn \
+      --argjson current "$result" \
+      --argjson issue "$issue" \
+      --arg exitCode "$exit_code" \
+      --arg model "$model" \
+      --arg worktree "$worktree" \
+      --arg session "$session" \
+      --argjson hasHandoff "$has_handoff" \
+      '$current + [{issue:$issue,process:"exited",exitCode:$exitCode,model:$model,worktree:$worktree,session:$session,finalResponseHasHandoff:$hasHandoff,githubStatus:"claimed"}]')"
+  done < <(printf '%s' "$board" | jq -r '.[] | select(any(.labels[]; .name == "status:claimed")) | select(any(.labels[]; .name == "agent:deepseek")) | .number')
+
+  printf '%s\n' "$result"
+}
+
 claimed_check_due() {
   local now last
   now="$(date +%s)"
@@ -378,6 +601,9 @@ needs_tick() {
   claimed_deepseek="$(printf '%s' "$board" | jq '[.[] | select(any(.labels[]; .name == "status:claimed")) | select(any(.labels[]; .name == "agent:deepseek"))] | length')"
 
   if (( ready > 0 || review > 0 )); then
+    return 0
+  fi
+  if [[ "$(worker_reconciliation_snapshot "$board" | jq 'length')" -gt 0 ]]; then
     return 0
   fi
   if (( claimed_deepseek > 0 )) && claimed_check_due; then
@@ -423,7 +649,7 @@ run_tick() (
   printf '%s\n' "$$" >"$LOCK_DIR/pid"
   trap 'rm -rf "$LOCK_DIR" 2>/dev/null || true' EXIT
 
-  local board dispatch force prompt exit_code signature acknowledged_signature tick_id
+  local board dispatch workers force prompt exit_code signature acknowledged_signature tick_id review_count
   local retry_required retry_attempts
   retry_required=0
   retry_attempts=1
@@ -458,6 +684,7 @@ run_tick() (
 
   board="$(board_json)"
   dispatch="$(printf '%s' "$board" | dispatch_snapshot)"
+  workers="$(worker_reconciliation_snapshot "$board")"
   force="${ORCHESTRATOR_FORCE:-0}"
   if (( retry_required == 1 )); then
     force=1
@@ -467,7 +694,20 @@ run_tick() (
     return 0
   fi
 
-  signature="$(printf '%s' "$board" | actionable_signature)"
+  review_count="$(printf '%s' "$board" | count_status 'status:review')"
+  if (( review_count > 0 )) && ! preflight_worktree "$REPO_ROOT" 2>"$STATE_DIR/preflight-error"; then
+    {
+      printf 'Integration refused: canonical worktree is unsafe.\n'
+      cat "$STATE_DIR/preflight-error"
+      printf 'OWNER_ACTION_REQUIRED: restore or explicitly resolve the reported canonical Git state before review integration.\n'
+    } >"$LAST_MESSAGE_PATH"
+    log "refused: review handoff exists but canonical worktree preflight failed"
+    notify_owner "Integration refused: canonical Git state is unsafe"
+    return 2
+  fi
+  rm -f "$STATE_DIR/preflight-error"
+
+  signature="$(printf '%s' "$board" | actionable_signature)|workers:$(printf '%s' "$workers" | jq -c 'map({issue,exitCode,finalResponseHasHandoff})')"
   acknowledged_signature="$(cat "$LAST_ACK_SIGNATURE_PATH" 2>/dev/null || true)"
   if [[ "$force" != "1" && -n "$signature" && "$signature" == "$acknowledged_signature" ]] && ! claimed_check_due; then
     log "idle: actionable board state was already acknowledged"
@@ -475,7 +715,7 @@ run_tick() (
   fi
 
   tick_id="$(new_tick_id)"
-  prompt="$(tick_prompt "$tick_id" "$dispatch")"
+  prompt="$(tick_prompt "$tick_id" "$dispatch" "$workers")"
   write_pending_tick "$tick_id" "$signature" "$retry_attempts"
 
   log "wake: delivering tick ${tick_id} to Codex session ${SESSION_ID}"
@@ -703,13 +943,14 @@ start_new_terminal_session() {
   require_command jq
   require_command plutil
 
-  local board dispatch signature tick_id prompt sessions_before session_id launched_at codex_path
+  local board dispatch workers signature tick_id prompt sessions_before session_id launched_at codex_path
   load_start_settings
   board="$(board_json)"
   dispatch="$(printf '%s' "$board" | dispatch_snapshot)"
-  signature="$(printf '%s' "$board" | actionable_signature)"
+  workers="$(worker_reconciliation_snapshot "$board")"
+  signature="$(printf '%s' "$board" | actionable_signature)|workers:$(printf '%s' "$workers" | jq -c 'map({issue,exitCode,finalResponseHasHandoff})')"
   tick_id="$(new_tick_id)"
-  prompt="$(tick_prompt "$tick_id" "$dispatch")"
+  prompt="$(tick_prompt "$tick_id" "$dispatch" "$workers")"
   codex_path="$(command -v codex)"
   sessions_before="$(mktemp "${STATE_DIR}/sessions-before.XXXXXX")"
   find "$(codex_sessions_dir)" -type f -name '*.jsonl' -print 2>/dev/null | sort >"$sessions_before"
@@ -809,11 +1050,23 @@ case "${1:-status}" in
   status)
     print_status
     ;;
+  preflight)
+    require_command git
+    preflight_worktree "${2:-$DEFAULT_REPO_ROOT}"
+    ;;
+  validate-range)
+    require_command git
+    validate_handoff_range "${2:?repository required}" "${3:?recorded base required}" "${4:?advertised range required}" "${5:?integration ref required}"
+    ;;
+  integrate-range)
+    require_command git
+    integrate_handoff_range "${2:?repository required}" "${3:?recorded base required}" "${4:?advertised range required}" "${5:-HEAD}"
+    ;;
   uninstall)
     uninstall_watchdog
     ;;
   *)
-    printf 'Usage: %s {install [session-id]|start [session-id]|stop|restart|check|run-now|status|uninstall}\n' "$SCRIPT_PATH" >&2
+    printf 'Usage: %s {install [session-id]|start [session-id]|stop|restart|check|run-now|status|preflight [repo]|validate-range <repo> <base> <range> <integration>|integrate-range <repo> <base> <range> [integration]|uninstall}\n' "$SCRIPT_PATH" >&2
     exit 2
     ;;
 esac
