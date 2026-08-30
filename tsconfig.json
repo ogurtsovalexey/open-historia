@@ -4,6 +4,7 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" },
     { "path": "./packages/domain/tsconfig.json" },
-    { "path": "./packages/data-packs/tsconfig.json" }
+    { "path": "./packages/data-packs/tsconfig.json" },
+    { "path": "./packages/sim-core/tsconfig.json" }
   ]
 }
