@@ -7,7 +7,9 @@
 
 1. **Read `docs/principles.md`.** It is the source of truth for architecture
    and design constraints.
-2. Read the accepted phase contract and acceptance criteria under `docs/spec/`.
+2. **Read the relevant doc in [`docs/canon/`](docs/canon/README.md)** — the
+   compressed, binding spec set (the old `docs/spec/` + `docs/product/` corpus
+   is archived reference). Never guess schemas, formulas or contracts.
 3. For parallel work, claim a ready GitHub Issue and follow
    `docs/agent-workflow.md` in a separate worktree.
 4. Do not edit files outside the issue's owned paths.
@@ -58,6 +60,20 @@ Each phase follows this sequence:
   historical-assumption or accepted-scope decisions; mark them `DECISION NEEDED`
   for GPT integration review.
 
+## Definition of Done (gate — see `docs/canon/08-testing-gates.md`)
+
+Work is done ONLY when all of these hold, and the closing message lists each
+item's actual value (a bare "Done!" is a violation):
+
+1. Root `npm test` green; 2. `npm run typecheck` green; 3. `npm run lint`
+zero new violations; 4. golden tests green (goldens never regenerated in CI);
+5. determinism guard green; 6. `git status` clean; 7. no file outside the
+task's declared whitelist touched.
+
+Bounded workers take only tasks whose DoD is verifiable by `npm test` without
+a human; the integration owner writes types and failing tests FIRST, the
+worker makes them green and escalates after 5 red runs.
+
 ## Tech Stack
 
 - **Language:** TypeScript (new code) / JavaScript (existing)
@@ -70,6 +86,9 @@ Each phase follows this sequence:
 | File | Purpose |
 |------|---------|
 | `docs/principles.md` | Canonical architectural principles |
+| `docs/canon/00-vision-and-roadmap.md` | **Start here:** what the finished game is, phase order, what is explicitly not the plan |
+| `docs/canon/` | Numbered binding spec set (architecture, simulation core, economy slice, AI boundary, testing gates) |
+| `packages/engine/` | Deterministic economy engine (headless slice, CLI, golden tests) |
 | `docs/product/README.md` | Global product specification and roadmap |
 | `docs/spec/consensus-spec.md` | Accepted Phase 1 contract |
 | `docs/spec/acceptance-criteria.md` | Phase 1 completion gates |

@@ -1,5 +1,9 @@
 # My Open Historia — specification and roadmap
 
+> **SUPERSEDED (2026-08-30):** this corpus is archived reference material.
+> The binding, compressed source of truth is [`docs/canon/`](../canon/README.md).
+> If this document and canon disagree, canon wins.
+
 Status: research baseline v1
 Prepared: 2026-08-29
 Target: personal, single-player fork of Open Historia, while preserving a practical path for upstream updates.

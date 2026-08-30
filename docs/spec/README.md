@@ -1,5 +1,9 @@
 # Specification Index
 
+> **SUPERSEDED (2026-08-30):** this corpus is archived reference material.
+> The binding, compressed source of truth is [`docs/canon/`](../canon/README.md).
+> If this document and canon disagree, canon wins.
+
 ## Authority
 
 1. `../principles.md` — binding constraints.
