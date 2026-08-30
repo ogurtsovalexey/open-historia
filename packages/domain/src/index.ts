@@ -4,6 +4,18 @@ export * from './ids.js';
 // Fact/provenance schemas
 export * from './facts.js';
 
+// Scenario V2 schemas
+export * from './scenario.js';
+
+// Scenario V2 validator
+export * from './validator.js';
+
+// Scenario V2 builder
+export * from './builder.js';
+
+// Legacy migration adapter
+export * from './migration.js';
+
 // Command and event schemas
 export * from './commands.js';
 
