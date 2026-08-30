@@ -6,6 +6,8 @@
 // "en" (the authored language) means no translation work happens at all.
 const STORAGE_KEY = "ui_language";
 export const DEFAULT_LANGUAGE = "en";
+export const SUPPORTED_LOCALES = Object.freeze(["en", "ru"]);
+const SUPPORTED_LOCALE_SET = new Set(SUPPORTED_LOCALES);
 
 // What the advisor and diplomatic chats reply in, so the interface can be read
 // in one language and the chats held in another. Defaults to the UI language —
@@ -70,7 +72,13 @@ export const LANGUAGES = [
 
 const RTL_LANGUAGES = new Set(["ar", "he", "fa", "ur"]);
 
-export const getLanguageOptions = () => LANGUAGES;
+export const normalizeLocale = (value) => {
+  const normalized = typeof value === "string" ? value.trim() : "";
+  return SUPPORTED_LOCALE_SET.has(normalized) ? normalized : DEFAULT_LANGUAGE;
+};
+
+export const getLanguageOptions = () =>
+  LANGUAGES.filter((entry) => SUPPORTED_LOCALE_SET.has(entry.code));
 
 export const languageDisplayName = (code) =>
   LANGUAGES.find((entry) => entry.code === code)?.name || code;
@@ -78,7 +86,11 @@ export const languageDisplayName = (code) =>
 export const getStoredLanguage = () => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored && stored.trim() ? stored.trim() : DEFAULT_LANGUAGE;
+    const normalized = normalizeLocale(stored);
+    if (stored !== null && (stored !== normalized || normalized === DEFAULT_LANGUAGE)) {
+      writeLocalLanguage(normalized);
+    }
+    return normalized;
   } catch {
     return DEFAULT_LANGUAGE;
   }
@@ -86,10 +98,11 @@ export const getStoredLanguage = () => {
 
 const writeLocalLanguage = (code) => {
   try {
-    if (!code || code === DEFAULT_LANGUAGE) {
+    const normalized = normalizeLocale(code);
+    if (normalized === DEFAULT_LANGUAGE) {
       localStorage.removeItem(STORAGE_KEY);
     } else {
-      localStorage.setItem(STORAGE_KEY, code);
+      localStorage.setItem(STORAGE_KEY, normalized);
     }
   } catch {
     // Private-mode storage failures just leave the game in English.
@@ -99,12 +112,13 @@ const writeLocalLanguage = (code) => {
 // Persist locally AND on the server, so the choice follows the player to
 // every device connected to this server (the Android app included).
 export const setStoredLanguage = async (code) => {
-  writeLocalLanguage(code);
+  const normalized = normalizeLocale(code);
+  writeLocalLanguage(normalized);
   try {
     await fetch("/api/ui-settings", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ language: code || DEFAULT_LANGUAGE }),
+      body: JSON.stringify({ language: normalized }),
     });
   } catch {
     // Offline/hub-hosted: the local copy still applies on this device.
@@ -121,9 +135,7 @@ export const syncLanguageFromServer = async () => {
     }
 
     const settings = await response.json();
-    const serverLanguage = typeof settings?.language === "string" && settings.language.trim()
-      ? settings.language.trim()
-      : DEFAULT_LANGUAGE;
+    const serverLanguage = normalizeLocale(settings?.language);
 
     if (serverLanguage !== getStoredLanguage()) {
       writeLocalLanguage(serverLanguage);
@@ -140,7 +152,18 @@ export const getStoredChatLanguage = () => {
   try {
     const stored = localStorage.getItem(CHAT_STORAGE_KEY);
     // No explicit choice ⇒ follow the UI language.
-    return stored && stored.trim() ? stored.trim() : getStoredLanguage();
+    if (stored === null) {
+      return getStoredLanguage();
+    }
+    const normalized = typeof stored === "string" ? stored.trim() : "";
+    if (SUPPORTED_LOCALE_SET.has(normalized)) {
+      if (stored !== normalized) {
+        localStorage.setItem(CHAT_STORAGE_KEY, normalized);
+      }
+      return normalized;
+    }
+    localStorage.removeItem(CHAT_STORAGE_KEY);
+    return getStoredLanguage();
   } catch {
     return getStoredLanguage();
   }
@@ -148,11 +171,12 @@ export const getStoredChatLanguage = () => {
 
 export const setStoredChatLanguage = (code) => {
   try {
-    if (!code) {
-      localStorage.removeItem(CHAT_STORAGE_KEY);
-    } else {
-      localStorage.setItem(CHAT_STORAGE_KEY, code);
+    const normalized = typeof code === "string" ? code.trim() : "";
+    if (SUPPORTED_LOCALE_SET.has(normalized)) {
+      localStorage.setItem(CHAT_STORAGE_KEY, normalized);
+      return;
     }
+    localStorage.removeItem(CHAT_STORAGE_KEY);
   } catch {
     // Private-mode storage failures just leave the chats on the UI language.
   }
