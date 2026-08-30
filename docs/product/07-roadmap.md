@@ -18,6 +18,13 @@ Rewriting the UI or changing language before the state model exists would only m
 
 This roadmap is a north-star dependency map, not authorization to implement every milestone. Both scenario packages represent the entire world and simulate every polity at least at a declared baseline fidelity. The first World 1916 curation wave is Russia, Germany and Britain; later waves are defined in the [scenario program](08-scenario-program.md). World 1797–1815 follows in parallel as a global and era-compatibility test. Every wider system must pass the scope guardrail.
 
+Before that historical alpha, the owner-directed
+[ten-region economy MVP](../spec/first-economy-mvp.md) is the immediate manual
+playtest gate: two fictional countries, five regions each, transparent regional
+population/production, one investment decision and territorial
+re-aggregation. It proves the region-first kernel and UI without pretending to
+be a researched scenario or expanding the accepted Phase 1 scope.
+
 ## Milestone -1 — build-versus-buy decision
 
 Goal: determine whether an existing game already satisfies the desired experience and identify only the gaps worth building. The decision is now to build the focused Open Historia fork; commercial games remain references, not blockers.

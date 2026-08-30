@@ -177,6 +177,13 @@ mechanism; exact intervals are measured rather than frozen in the domain spec.
 Only after these pass should the team add full modular simulation domains,
 automatic macro-region tooling or optional AI authoring assistants.
 
+An owner-directed pre-historical playtest may validate the shared engine sooner
+through the bounded [ten-region economy MVP](first-economy-mvp.md). That fixture
+does not replace the World 1916/1797 proof, relax authored-fact provenance, or
+claim completion of the full economy deferred below. Its purpose is to prove
+regional aggregation, one deterministic policy and territorial re-aggregation
+in the running UI before historical content multiplies debugging variables.
+
 ## 11. Deferred Roadmap
 
 - Full economy, population, logistics, armed forces and politics.
