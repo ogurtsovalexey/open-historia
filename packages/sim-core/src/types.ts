@@ -1,14 +1,21 @@
 import { z } from 'zod';
+import {
+  regionIdSchema,
+  polityIdSchema,
+  worldRevisionIdSchema,
+  gameDateSchema,
+  commandIdSchema,
+  RegionId,
+  PolityId,
+  WorldRevisionId,
+  CommandId,
+  GameDate
+} from '@open-historia/domain';
 
-// Simple ID types for MVP - using branded types would be ideal but causes compilation issues
-// In production, these would come from the domain package
-export type RegionId = string;
-export type PolityId = string;
-export type WorldRevisionId = string;
-export type CommandId = string;
-export type GameDate = string;
+// Re-export domain types
+export { RegionId, PolityId, WorldRevisionId, CommandId, GameDate };
 
-// Type aliases for clarity (not branded to avoid compilation issues)
+// Type aliases for clarity (not branded to avoid compilation issues in tests)
 export type BasisPoints = number; // 0-10000 where 10000 = 100%
 export type PersonCount = number;
 export type QuantityMicros = number;
@@ -18,7 +25,7 @@ export type QuantityMicros = number;
  */
 export const commoditySchema = z.enum([
   'food',
-  'energy', 
+  'energy',
   'materials',
   'manufactures'
 ]);
@@ -28,8 +35,8 @@ export type Commodity = z.infer<typeof commoditySchema>;
  * Economy MVP region state as defined in spec
  */
 export const economyMvpRegionSchema = z.object({
-  regionId: z.string().min(1),
-  controllerId: z.string().min(1),
+  regionId: regionIdSchema,
+  controllerId: polityIdSchema,
   population: z.number().int().min(0),
   annualBirthRateBp: z.number().int().min(0).max(10000),
   annualDeathRateBp: z.number().int().min(0).max(10000),
@@ -48,14 +55,14 @@ export type EconomyMvpRegion = z.infer<typeof economyMvpRegionSchema>;
  * Polity-level canonical stocks
  */
 export const polityStocksSchema = z.object({
-  polityId: z.string().min(1),
+  polityId: polityIdSchema,
   treasuryMicros: z.number().int().min(0),
   inventory: z.record(commoditySchema, z.number().int().min(0)),
   // Accepted regional investment for effective month
   acceptedInvestment: z.object({
-    targetRegionId: z.string().min(1),
+    targetRegionId: regionIdSchema,
     spendMicros: z.number().int().min(0),
-    effectiveMonth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+    effectiveMonth: gameDateSchema
   }).strict().nullable()
 }).strict();
 export type PolityStocks = z.infer<typeof polityStocksSchema>;
@@ -82,11 +89,11 @@ export type EconomyScenarioConstants = z.infer<typeof economyScenarioConstantsSc
  */
 export const investInRegionCommandSchema = z.object({
   kind: z.literal('economy.invest-region'),
-  commandId: z.string().uuid(),
-  actorPolityId: z.string().min(1),
-  targetRegionId: z.string().min(1),
-  expectedRevision: z.string().min(1),
-  effectiveMonth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  commandId: commandIdSchema,
+  actorPolityId: polityIdSchema,
+  targetRegionId: regionIdSchema,
+  expectedRevision: worldRevisionIdSchema,
+  effectiveMonth: gameDateSchema,
   spend: z.number().int().min(0)
 }).strict();
 export type InvestInRegionCommand = z.infer<typeof investInRegionCommandSchema>;
@@ -95,7 +102,7 @@ export type InvestInRegionCommand = z.infer<typeof investInRegionCommandSchema>;
  * Regional delta for reporting changes
  */
 export const regionalDeltaSchema = z.object({
-  regionId: z.string().min(1),
+  regionId: regionIdSchema,
   populationChange: z.number().int(),
   births: z.number().int().min(0),
   deaths: z.number().int().min(0),
@@ -110,7 +117,7 @@ export type RegionalDelta = z.infer<typeof regionalDeltaSchema>;
  * National contribution ledger
  */
 export const nationalContributionLedgerSchema = z.object({
-  polityId: z.string().min(1),
+  polityId: polityIdSchema,
   populationContribution: z.number().int().min(0),
   workforceContribution: z.number().int().min(0),
   productionContribution: z.record(commoditySchema, z.number().int().min(0)),
@@ -128,9 +135,9 @@ export const monthlyResolutionResultSchema = z.object({
   nextPolityStocks: polityStocksSchema.array(),
   regionalDeltas: regionalDeltaSchema.array(),
   nationalLedgers: nationalContributionLedgerSchema.array(),
-  foodSurplusOrShortfall: z.record(z.string().min(1), z.number().int()),
+  foodSurplusOrShortfall: z.record(polityIdSchema, z.number().int()),
   alerts: z.array(z.object({
-    polityId: z.string().min(1),
+    polityId: polityIdSchema,
     message: z.string(),
     severity: z.enum(['info', 'warning', 'error'])
   }).strict())

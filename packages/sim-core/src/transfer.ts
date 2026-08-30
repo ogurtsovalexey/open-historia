@@ -5,7 +5,8 @@ import {
   NationalContributionLedger,
   QuantityMicros,
   PersonCount,
-  Commodity
+  Commodity,
+  PolityId
 } from './types.js';
 import { calculateRegionGrossOutput } from './investment.js';
 
@@ -27,8 +28,22 @@ export function processRegionTransfer(
   }
 
   // Create working copies
-  const updatedRegions: EconomyMvpRegion[] = JSON.parse(JSON.stringify(regions));
-  const updatedPolityStocks: PolityStocks[] = JSON.parse(JSON.stringify(polityStocks));
+  // Deep copy to avoid mutation - handle BigInt by manual copying
+  const updatedRegions: EconomyMvpRegion[] = regions.map(region => ({
+    ...region,
+    birthRemainder: region.birthRemainder,
+    deathRemainder: region.deathRemainder
+  }));
+  const updatedPolityStocks: PolityStocks[] = polityStocks.map(stocks => ({
+    polityId: stocks.polityId,
+    treasuryMicros: stocks.treasuryMicros,
+    inventory: { ...stocks.inventory },
+    acceptedInvestment: stocks.acceptedInvestment ? {
+      targetRegionId: stocks.acceptedInvestment.targetRegionId,
+      spendMicros: stocks.acceptedInvestment.spendMicros,
+      effectiveMonth: stocks.acceptedInvestment.effectiveMonth
+    } : null
+  }));
 
   // Find the region to transfer
   const regionIndex = updatedRegions.findIndex(r => r.regionId === regionId);
@@ -41,10 +56,10 @@ export function processRegionTransfer(
   if (!regionToUpdate) {
     throw new Error(`Region ${regionId} not found after validation`);
   }
-  
+
   const updatedRegion: EconomyMvpRegion = {
     regionId: regionToUpdate.regionId,
-    controllerId: toPolityId,
+    controllerId: toPolityId as PolityId,
     population: regionToUpdate.population,
     annualBirthRateBp: regionToUpdate.annualBirthRateBp,
     annualDeathRateBp: regionToUpdate.annualDeathRateBp,
@@ -129,7 +144,7 @@ function calculateRegionContributions(
   polityId: string
 ): NationalContributionLedger {
   const grossOutput = calculateRegionGrossOutput(region);
-  
+
   const productionContribution: Record<Commodity, QuantityMicros> = {
     food: 0 as QuantityMicros,
     energy: 0 as QuantityMicros,
@@ -142,7 +157,7 @@ function calculateRegionContributions(
   const workforce = Math.floor((region.population * region.workforceRateBp) / 10000);
 
   return {
-    polityId,
+    polityId: polityId as PolityId,
     populationContribution: region.population,
     workforceContribution: workforce as PersonCount,
     productionContribution,
@@ -176,12 +191,12 @@ export function verifyTransferAccounting(
   const expectedToGains = transferResult.toPolityGains;
 
   // Check population
-  if (originalFromTotal.populationContribution - newFromTotal.populationContribution !== 
+  if (originalFromTotal.populationContribution - newFromTotal.populationContribution !==
       expectedFromLosses.populationContribution) {
     errors.push(`Population loss mismatch for ${fromPolityId}`);
   }
 
-  if (newToTotal.populationContribution - originalToTotal.populationContribution !== 
+  if (newToTotal.populationContribution - originalToTotal.populationContribution !==
       expectedToGains.populationContribution) {
     errors.push(`Population gain mismatch for ${toPolityId}`);
   }
@@ -189,9 +204,9 @@ export function verifyTransferAccounting(
   // Check each commodity production
   const commodities: Commodity[] = ['food', 'energy', 'materials', 'manufactures'];
   for (const commodity of commodities) {
-    const fromLoss = originalFromTotal.productionContribution[commodity] - 
+    const fromLoss = originalFromTotal.productionContribution[commodity] -
                      newFromTotal.productionContribution[commodity];
-    const toGain = newToTotal.productionContribution[commodity] - 
+    const toGain = newToTotal.productionContribution[commodity] -
                    originalToTotal.productionContribution[commodity];
 
     if (fromLoss !== expectedFromLosses.productionContribution[commodity]) {
@@ -229,7 +244,7 @@ function calculatePolityContributions(
     if (region.controllerId === polityId) {
       populationContribution += region.population;
       workforceContribution += Math.floor((region.population * region.workforceRateBp) / 10000);
-      
+
       const output = calculateRegionGrossOutput(region);
       productionContribution[region.primaryCommodity] += output as QuantityMicros;
     }
@@ -239,25 +254,5 @@ function calculatePolityContributions(
     populationContribution: populationContribution as PersonCount,
     workforceContribution: workforceContribution as PersonCount,
     productionContribution
-  };
-}
-
-/**
- * Check if a region transfer would create negative values
- */
-export function validateTransferWouldNotCreateNegatives(
-  regions: EconomyMvpRegion[],
-  polityStocks: PolityStocks[],
-  regionId: string,
-  fromPolityId: string
-): { valid: boolean; warnings: string[] } {
-  const warnings: string[] = [];
-  
-  // This is a placeholder for future validation
-  // In MVP, transfers always valid as long as region exists and is controlled by fromPolity
-  
-  return {
-    valid: true,
-    warnings
   };
 }

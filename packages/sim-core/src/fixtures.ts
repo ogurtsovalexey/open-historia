@@ -1,16 +1,23 @@
 import {
   EconomyMvpRegion,
   PolityStocks,
-  EconomyScenarioConstants
+  EconomyScenarioConstants,
+  RegionId,
+  PolityId
 } from './types.js';
+
+/**
+ * Create ten-region fixture with unequal values as specified in MVP
+ * Two polities (A and B) with five regions each
+ */
 export function createTenRegionFixture(): {
   regions: EconomyMvpRegion[];
   polityStocks: PolityStocks[];
   constants: EconomyScenarioConstants;
 } {
   // Two fictional polities
-  const polityA = 'polity:test-a';
-  const polityB = 'polity:test-b';
+  const polityA = 'polity:test-a' as PolityId;
+  const polityB = 'polity:test-b' as PolityId;
 
   // Scenario constants
   const constants: EconomyScenarioConstants = {
@@ -18,7 +25,7 @@ export function createTenRegionFixture(): {
     foodNeedPerPerson: 1000000, // 1 unit per person per month
     accountingValue: {
       food: 5000000,      // 5 units per food
-      energy: 8000000,    // 8 units per energy  
+      energy: 8000000,    // 8 units per energy
       materials: 12000000, // 12 units per materials
       manufactures: 20000000 // 20 units per manufactures
     },
@@ -30,7 +37,7 @@ export function createTenRegionFixture(): {
   const regions: EconomyMvpRegion[] = [
     // Polity A regions - deliberately unequal
     {
-      regionId: 'region:test:r1',
+      regionId: 'region:test:r1' as RegionId,
       controllerId: polityA,
       population: 1000000,
       annualBirthRateBp: 120, // 1.2%
@@ -45,7 +52,7 @@ export function createTenRegionFixture(): {
       damageBp: 0
     },
     {
-      regionId: 'region:test:r2',
+      regionId: 'region:test:r2' as RegionId,
       controllerId: polityA,
       population: 750000,
       annualBirthRateBp: 100, // 1.0%
@@ -60,7 +67,7 @@ export function createTenRegionFixture(): {
       damageBp: 500 // 5% damage
     },
     {
-      regionId: 'region:test:r3',
+      regionId: 'region:test:r3' as RegionId,
       controllerId: polityA,
       population: 1500000,
       annualBirthRateBp: 140, // 1.4%
@@ -75,7 +82,7 @@ export function createTenRegionFixture(): {
       damageBp: 0
     },
     {
-      regionId: 'region:test:r4',
+      regionId: 'region:test:r4' as RegionId,
       controllerId: polityA,
       population: 500000,
       annualBirthRateBp: 90,  // 0.9%
@@ -90,7 +97,7 @@ export function createTenRegionFixture(): {
       damageBp: 1000 // 10% damage
     },
     {
-      regionId: 'region:test:r5',
+      regionId: 'region:test:r5' as RegionId,
       controllerId: polityA,
       population: 1250000,
       annualBirthRateBp: 110, // 1.1%
@@ -106,7 +113,7 @@ export function createTenRegionFixture(): {
     },
     // Polity B regions - also unequal but different patterns
     {
-      regionId: 'region:test:r6',
+      regionId: 'region:test:r6' as RegionId,
       controllerId: polityB,
       population: 800000,
       annualBirthRateBp: 130, // 1.3%
@@ -121,7 +128,7 @@ export function createTenRegionFixture(): {
       damageBp: 300 // 3% damage
     },
     {
-      regionId: 'region:test:r7',
+      regionId: 'region:test:r7' as RegionId,
       controllerId: polityB,
       population: 950000,
       annualBirthRateBp: 95,  // 0.95%
@@ -136,7 +143,7 @@ export function createTenRegionFixture(): {
       damageBp: 800 // 8% damage
     },
     {
-      regionId: 'region:test:r8',
+      regionId: 'region:test:r8' as RegionId,
       controllerId: polityB,
       population: 1100000,
       annualBirthRateBp: 150, // 1.5%
@@ -151,7 +158,7 @@ export function createTenRegionFixture(): {
       damageBp: 0
     },
     {
-      regionId: 'region:test:r9',
+      regionId: 'region:test:r9' as RegionId,
       controllerId: polityB,
       population: 650000,
       annualBirthRateBp: 85,  // 0.85%
@@ -166,7 +173,7 @@ export function createTenRegionFixture(): {
       damageBp: 1200 // 12% damage
     },
     {
-      regionId: 'region:test:r10',
+      regionId: 'region:test:r10' as RegionId,
       controllerId: polityB,
       population: 1400000,
       annualBirthRateBp: 125, // 1.25%
@@ -233,7 +240,7 @@ export function calculateManualSums(
   for (const region of regions) {
     if (region.controllerId === polityId) {
       totalPopulation += region.population;
-      
+
       // Calculate gross output
       const workforce = Math.floor((region.population * region.workforceRateBp) / 10000);
       const labourOutput = workforce * region.outputPerWorker;

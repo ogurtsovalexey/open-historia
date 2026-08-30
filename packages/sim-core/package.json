@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@open-historia/domain": "file:../domain",
     "zod": "^4.0.0"
   },
   "devDependencies": {

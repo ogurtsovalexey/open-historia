@@ -8,6 +8,23 @@ import {
 } from './types.js';
 
 /**
+ * Infrastructure gain for an accepted regional investment.
+ *
+ * Spec formula (docs/spec/first-economy-mvp.md):
+ *   infrastructure gain = accepted spend × infrastructureBpPerMoney
+ *
+ * `spendMicros` is fixed-point money (1 unit = 1,000,000 micros) and
+ * `infrastructureBpPerMoney` is authored basis points per whole money unit,
+ * so the micros must be converted before multiplying.
+ */
+export function calculateInfrastructureGain(
+  spendMicros: QuantityMicros,
+  constants: EconomyScenarioConstants
+): BasisPoints {
+  return Math.floor((spendMicros * constants.infrastructureBpPerMoney) / 1_000_000);
+}
+
+/**
  * Pure investment calculation as defined in spec
  * Both preview and resolution call this same function
  */
@@ -34,11 +51,9 @@ export function calculateInvestmentPreview(
     };
   }
 
-  // Calculate infrastructure gain
-  const infrastructureGain = Math.floor(
-    (spendMicros * constants.infrastructureBpPerMoney) / 1000000
-  );
-  
+  // Calculate infrastructure gain via the shared pure formula.
+  const infrastructureGain = calculateInfrastructureGain(spendMicros, constants);
+
   // Apply infrastructure improvement, clamped at max
   const newInfrastructureBp = Math.min(
     region.infrastructureBp + infrastructureGain,
@@ -49,8 +64,7 @@ export function calculateInvestmentPreview(
   // Calculate estimated next month output delta
   const estimatedOutputDelta = calculateRegionOutputDelta(
     region,
-    newInfrastructureBp,
-    constants
+    newInfrastructureBp
   );
 
   // Calculate affected national commodity total
@@ -71,19 +85,18 @@ export function calculateInvestmentPreview(
  */
 function calculateRegionOutputDelta(
   region: EconomyMvpRegion,
-  newInfrastructureBp: BasisPoints,
-  constants: EconomyScenarioConstants
+  newInfrastructureBp: BasisPoints
 ): QuantityMicros {
   // Calculate current output
   const currentOutput = calculateRegionGrossOutput(region);
-  
+
   // Calculate output with new infrastructure
   const regionWithNewInfrastructure = {
     ...region,
     infrastructureBp: newInfrastructureBp
   };
   const newOutput = calculateRegionGrossOutput(regionWithNewInfrastructure);
-  
+
   return (newOutput - currentOutput) as QuantityMicros;
 }
 
@@ -93,19 +106,19 @@ function calculateRegionOutputDelta(
 export function calculateRegionGrossOutput(region: EconomyMvpRegion): QuantityMicros {
   // workforce = population × workforceRateBp / 10000
   const workforce = Math.floor((region.population * region.workforceRateBp) / 10000);
-  
+
   // labour output = workforce × outputPerWorker
   const labourOutput = workforce * region.outputPerWorker;
-  
+
   // usable capacity = min(baseMonthlyCapacity, labour output)
   const usableCapacity = Math.min(region.baseMonthlyCapacity, labourOutput);
-  
+
   // gross output = usable capacity × infrastructureBp / 10000
   let grossOutput = Math.floor((usableCapacity * region.infrastructureBp) / 10000);
-  
+
   // Apply damage: gross output = gross output × (10000 - damageBp) / 10000
   grossOutput = Math.floor((grossOutput * (10000 - region.damageBp)) / 10000);
-  
+
   return Math.max(0, grossOutput) as QuantityMicros;
 }
 
