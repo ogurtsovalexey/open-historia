@@ -1,4 +1,5 @@
 export * from './types.js';
+export * from './arithmetic.js';
 export * from './investment.js';
 export * from './resolution.js';
 export * from './transfer.js';

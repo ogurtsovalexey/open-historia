@@ -15,7 +15,9 @@ import {
 // Re-export domain types
 export { RegionId, PolityId, WorldRevisionId, CommandId, GameDate };
 
-// Type aliases for clarity (not branded to avoid compilation issues in tests)
+// Fixed-point values remain JSON-safe numbers at the package boundary. Every
+// production calculation checks Number.isSafeInteger and uses BigInt
+// intermediates before converting back exactly.
 export type BasisPoints = number; // 0-10000 where 10000 = 100%
 export type PersonCount = number;
 export type QuantityMicros = number;
@@ -40,8 +42,8 @@ export const economyMvpRegionSchema = z.object({
   population: z.number().int().min(0),
   annualBirthRateBp: z.number().int().min(0).max(10000),
   annualDeathRateBp: z.number().int().min(0).max(10000),
-  birthRemainder: z.bigint().min(BigInt(0)),
-  deathRemainder: z.bigint().min(BigInt(0)),
+  birthRemainder: z.bigint().min(0n).max(119_999n),
+  deathRemainder: z.bigint().min(0n).max(119_999n),
   workforceRateBp: z.number().int().min(0).max(10000),
   infrastructureBp: z.number().int().min(0).max(10000),
   primaryCommodity: commoditySchema,
@@ -61,7 +63,7 @@ export const polityStocksSchema = z.object({
   // Accepted regional investment for effective month
   acceptedInvestment: z.object({
     targetRegionId: regionIdSchema,
-    spendMicros: z.number().int().min(0),
+    spendMicros: z.number().int().positive(),
     effectiveMonth: gameDateSchema
   }).strict().nullable()
 }).strict();
@@ -80,7 +82,7 @@ export const economyScenarioConstantsSchema = z.object({
   // Tax rate in basis points
   taxRateBp: z.number().int().min(0).max(10000),
   // Maximum infrastructure (10000 basis points = 100%)
-  maxInfrastructureBp: z.number().int().min(0).max(10000)
+  maxInfrastructureBp: z.literal(10000)
 }).strict();
 export type EconomyScenarioConstants = z.infer<typeof economyScenarioConstantsSchema>;
 
@@ -94,7 +96,7 @@ export const investInRegionCommandSchema = z.object({
   targetRegionId: regionIdSchema,
   expectedRevision: worldRevisionIdSchema,
   effectiveMonth: gameDateSchema,
-  spend: z.number().int().min(0)
+  spend: z.number().int().positive()
 }).strict();
 export type InvestInRegionCommand = z.infer<typeof investInRegionCommandSchema>;
 
@@ -127,6 +129,14 @@ export const nationalContributionLedgerSchema = z.object({
 }).strict();
 export type NationalContributionLedger = z.infer<typeof nationalContributionLedgerSchema>;
 
+export const regionalEconomicContributionSchema = z.object({
+  polityId: polityIdSchema,
+  populationContribution: z.number().int().min(0),
+  workforceContribution: z.number().int().min(0),
+  productionContribution: z.record(commoditySchema, z.number().int().min(0))
+}).strict();
+export type RegionalEconomicContribution = z.infer<typeof regionalEconomicContributionSchema>;
+
 /**
  * Monthly resolution result
  */
@@ -153,7 +163,8 @@ export const investmentPreviewResultSchema = z.object({
   estimatedNextMonthOutputDelta: z.number().int().min(0),
   affectedNationalCommodityTotal: z.number().int().min(0),
   canAfford: z.boolean(),
-  isValidTarget: z.boolean()
+  isValidTarget: z.boolean(),
+  isValidAmount: z.boolean()
 }).strict();
 export type InvestmentPreviewResult = z.infer<typeof investmentPreviewResultSchema>;
 
@@ -163,7 +174,7 @@ export type InvestmentPreviewResult = z.infer<typeof investmentPreviewResultSche
 export const regionTransferResultSchema = z.object({
   updatedRegions: economyMvpRegionSchema.array(),
   updatedPolityStocks: polityStocksSchema.array(),
-  fromPolityLosses: nationalContributionLedgerSchema,
-  toPolityGains: nationalContributionLedgerSchema
+  fromPolityLosses: regionalEconomicContributionSchema,
+  toPolityGains: regionalEconomicContributionSchema
 }).strict();
 export type RegionTransferResult = z.infer<typeof regionTransferResultSchema>;

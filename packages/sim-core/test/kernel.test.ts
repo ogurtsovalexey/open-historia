@@ -3,7 +3,8 @@ import * as assert from 'node:assert';
 import {
   calculateInvestmentPreview,
   validateInvestmentCommand,
-  calculateRegionGrossOutput
+  calculateRegionGrossOutput,
+  acceptInvestmentCommand
 } from '../src/investment.js';
 import { resolveMonth, calculatePolityPopulation, calculatePolityProduction } from '../src/resolution.js';
 import { processRegionTransfer, verifyTransferAccounting } from '../src/transfer.js';
@@ -11,7 +12,10 @@ import { createTenRegionFixture, calculateManualSums } from '../src/fixtures.js'
 import type {
   EconomyMvpRegion,
   PolityStocks,
-  EconomyScenarioConstants
+  EconomyScenarioConstants,
+  InvestInRegionCommand,
+  WorldRevisionId,
+  GameDate
 } from '../src/types.js';
 
 describe('Economy MVP Kernel', () => {
@@ -38,15 +42,31 @@ describe('Economy MVP Kernel', () => {
         constants,
         100000000, // 100 units
         region.regionId,
-        polityA.polityId
+        polityA.polityId,
+        regions.filter(candidate => candidate.controllerId === polityA.polityId)
       );
 
       assert.strictEqual(preview.isValidTarget, true);
+      assert.strictEqual(preview.isValidAmount, true);
       assert.strictEqual(preview.canAfford, true);
       assert.strictEqual(preview.costMicros, 100000000);
-      assert.strictEqual(typeof preview.infrastructureChange, 'number');
-      assert.strictEqual(typeof preview.estimatedNextMonthOutputDelta, 'number');
-      assert.strictEqual(typeof preview.affectedNationalCommodityTotal, 'number');
+      const postInvestmentRegion = {
+        ...region,
+        infrastructureBp: region.infrastructureBp + preview.infrastructureChange
+      };
+      const expectedNationalCommodityTotal = regions
+        .filter(candidate =>
+          candidate.controllerId === polityA.polityId &&
+          candidate.primaryCommodity === region.primaryCommodity
+        )
+        .reduce((total, candidate) => total + calculateRegionGrossOutput(
+          candidate.regionId === region.regionId ? postInvestmentRegion : candidate
+        ), 0);
+      assert.strictEqual(preview.affectedNationalCommodityTotal, expectedNationalCommodityTotal);
+      assert.strictEqual(
+        preview.estimatedNextMonthOutputDelta,
+        calculateRegionGrossOutput(postInvestmentRegion) - calculateRegionGrossOutput(region)
+      );
     });
 
     it('should reject investment in foreign region', () => {
@@ -59,7 +79,8 @@ describe('Economy MVP Kernel', () => {
         constants,
         100000000,
         region.regionId,
-        polityB.polityId
+        polityB.polityId,
+        regions.filter(candidate => candidate.controllerId === polityB.polityId)
       );
 
       assert.strictEqual(preview.isValidTarget, false);
@@ -77,7 +98,8 @@ describe('Economy MVP Kernel', () => {
         constants,
         100000000,
         region.regionId,
-        polityA.polityId
+        polityA.polityId,
+        regions.filter(candidate => candidate.controllerId === polityA.polityId)
       );
 
       assert.strictEqual(preview.isValidTarget, true);
@@ -116,6 +138,78 @@ describe('Economy MVP Kernel', () => {
       assert.strictEqual(validation.valid, false);
       assert.strictEqual(validation.errors.length, 1);
       assert.strict.ok(validation.errors[0]!.includes('not controlled'));
+    });
+
+    it('accepts one current typed command without mutating canonical stocks', () => {
+      const region = regions[0]!;
+      const polityA = polityStocks[0]!;
+      const revision = 'revision:test-1' as WorldRevisionId;
+      const month = '1900-01-01' as GameDate;
+      const command = {
+        kind: 'economy.invest-region',
+        commandId: '00000000-0000-4000-8000-000000000001',
+        actorPolityId: polityA.polityId,
+        targetRegionId: region.regionId,
+        expectedRevision: revision,
+        effectiveMonth: month,
+        spend: 100000000
+      } as InvestInRegionCommand;
+      const before = structuredClone(polityStocks);
+
+      const accepted = acceptInvestmentCommand(regions, polityStocks, command, revision, month);
+
+      assert.deepStrictEqual(polityStocks, before);
+      assert.notStrictEqual(accepted, polityStocks);
+      assert.deepStrictEqual(accepted[0]!.acceptedInvestment, {
+        targetRegionId: region.regionId,
+        spendMicros: command.spend,
+        effectiveMonth: month
+      });
+    });
+
+    it('rejects stale, foreign, invalid and unaffordable commands with no state change', () => {
+      const revision = 'revision:test-1' as WorldRevisionId;
+      const month = '1900-01-01' as GameDate;
+      const baseCommand = {
+        kind: 'economy.invest-region',
+        commandId: '00000000-0000-4000-8000-000000000002',
+        actorPolityId: polityStocks[0]!.polityId,
+        targetRegionId: regions[0]!.regionId,
+        expectedRevision: revision,
+        effectiveMonth: month,
+        spend: 100000000
+      } as InvestInRegionCommand;
+
+      const cases: Array<{
+        command: InvestInRegionCommand;
+        stocks: PolityStocks[];
+        currentRevision?: WorldRevisionId;
+      }> = [
+        { command: baseCommand, stocks: structuredClone(polityStocks), currentRevision: 'revision:test-2' as WorldRevisionId },
+        {
+          command: { ...baseCommand, actorPolityId: polityStocks[1]!.polityId },
+          stocks: structuredClone(polityStocks)
+        },
+        { command: { ...baseCommand, spend: 0 }, stocks: structuredClone(polityStocks) },
+        {
+          command: baseCommand,
+          stocks: polityStocks.map(stocks => stocks.polityId === baseCommand.actorPolityId
+            ? { ...stocks, treasuryMicros: 0 }
+            : structuredClone(stocks))
+        }
+      ];
+
+      for (const testCase of cases) {
+        const before = structuredClone(testCase.stocks);
+        assert.throws(() => acceptInvestmentCommand(
+          regions,
+          testCase.stocks,
+          testCase.command,
+          testCase.currentRevision ?? revision,
+          month
+        ));
+        assert.deepStrictEqual(testCase.stocks, before);
+      }
     });
   });
 
@@ -175,6 +269,30 @@ describe('Economy MVP Kernel', () => {
       }
     });
 
+    it('carries exact birth and death division remainders into the next month', () => {
+      const region: EconomyMvpRegion = {
+        ...regions[0]!,
+        population: 1000001,
+        annualBirthRateBp: 121,
+        annualDeathRateBp: 83,
+        birthRemainder: 17n,
+        deathRemainder: 29n
+      };
+      const stocks = [{ ...polityStocks[0]!, inventory: { ...polityStocks[0]!.inventory } }];
+      const birthNumerator = BigInt(region.population) * 121n + 17n;
+      const deathNumerator = BigInt(region.population) * 83n + 29n;
+
+      const result = resolveMonth([region], stocks, constants);
+      const next = result.nextRegions[0]!;
+      const delta = result.regionalDeltas[0]!;
+
+      assert.strictEqual(delta.births, Number(birthNumerator / 120000n));
+      assert.strictEqual(delta.deaths, Number(deathNumerator / 120000n));
+      assert.strictEqual(next.birthRemainder, birthNumerator % 120000n);
+      assert.strictEqual(next.deathRemainder, deathNumerator % 120000n);
+      assert.strictEqual(next.population, region.population + delta.births - delta.deaths);
+    });
+
     it('should maintain inventory and treasury identities', () => {
       const result = resolveMonth(regions, polityStocks, constants);
 
@@ -182,13 +300,21 @@ describe('Economy MVP Kernel', () => {
         const opening = polityStocks.find(p => p.polityId === stocks.polityId)!;
         const ledger = result.nationalLedgers.find(l => l.polityId === stocks.polityId)!;
 
-        // inventory' = inventory + production - consumption, never negative
+        // inventory' = inventory + production - consumption, never negative.
         const foodNeed = ledger.foodNeedContribution;
         const foodProduction = ledger.foodProductionContribution;
         const available = opening.inventory.food + foodProduction;
         const expectedFood = Math.max(0, available - foodNeed);
         assert.strictEqual(stocks.inventory.food, expectedFood);
+        assert.strictEqual(result.foodSurplusOrShortfall[stocks.polityId], available - foodNeed);
         assert.ok(stocks.inventory.food >= 0);
+
+        for (const commodity of ['energy', 'materials', 'manufactures'] as const) {
+          assert.strictEqual(
+            stocks.inventory[commodity],
+            opening.inventory[commodity] + ledger.productionContribution[commodity]
+          );
+        }
 
         // treasury' = opening - accepted spending + tax revenue
         const expectedTreasury = opening.treasuryMicros + ledger.taxRevenueContribution;
@@ -208,7 +334,8 @@ describe('Economy MVP Kernel', () => {
         constants,
         spendMicros,
         region.regionId,
-        polityA.polityId
+        polityA.polityId,
+        regions.filter(candidate => candidate.controllerId === polityA.polityId)
       );
 
       const modifiedStocks = structuredClone(polityStocks);

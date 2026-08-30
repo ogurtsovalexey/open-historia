@@ -8,12 +8,23 @@ import {
   QuantityMicros,
   PersonCount,
   Commodity,
-  PolityId
+  PolityId,
+  economyMvpRegionSchema,
+  polityStocksSchema,
+  economyScenarioConstantsSchema,
+  monthlyResolutionResultSchema
 } from './types.js';
 import {
   calculateRegionGrossOutput,
   calculateInfrastructureGain
 } from './investment.js';
+import {
+  addExact,
+  fromBigIntExact,
+  multiplyDivideFloor,
+  multiplyExact,
+  subtractExact
+} from './arithmetic.js';
 
 // Fixed-point conversion constants used by the spec formulas.
 const MICROS_PER_UNIT = 1_000_000;
@@ -30,6 +41,9 @@ export function resolveMonth(
   polityStocksArray: PolityStocks[],
   constants: EconomyScenarioConstants
 ): MonthlyResolutionResult {
+  economyMvpRegionSchema.array().parse(regions);
+  polityStocksSchema.array().parse(polityStocksArray);
+  economyScenarioConstantsSchema.parse(constants);
   // Step 1: Validate controller references and the accepted policy command.
   const validated = validateControllersAndCommands(regions, polityStocksArray);
   if (!validated.valid) {
@@ -66,13 +80,13 @@ export function resolveMonth(
     if (!region) continue;
 
     const infrastructureChange = infrastructureChanges[region.regionId] ?? 0;
-    const delta = calculateRegionMonth(region, constants, infrastructureChange);
+    const delta = calculateRegionMonth(region, infrastructureChange);
 
     // Update region with the new population and carried remainders.
     const updatedRegion: EconomyMvpRegion = {
       regionId: region.regionId,
       controllerId: region.controllerId,
-      population: region.population + delta.populationChange,
+      population: addExact(region.population, delta.populationChange, `population.${region.regionId}`),
       annualBirthRateBp: region.annualBirthRateBp,
       annualDeathRateBp: region.annualDeathRateBp,
       birthRemainder: delta.birthRemainder,
@@ -112,26 +126,33 @@ export function resolveMonth(
     if (!stocks) continue;
 
     // Step 8: Add tax revenue. Spending was already deducted in step 2.
-    stocks.treasuryMicros += ledger.taxRevenueContribution;
+    stocks.treasuryMicros = addExact(stocks.treasuryMicros, ledger.taxRevenueContribution, `treasury.${polityId}`);
+
+    // Every commodity production enters its national inventory. Food is then
+    // consumed below; other commodities remain accumulated stocks.
+    for (const commodity of ['food', 'energy', 'materials', 'manufactures'] as Commodity[]) {
+      stocks.inventory[commodity] = addExact(
+        stocks.inventory[commodity],
+        ledger.productionContribution[commodity],
+        `inventory.${polityId}.${commodity}`
+      );
+    }
 
     // Step 7: Consume authored food need from inventory plus current production.
     const foodNeed = ledger.foodNeedContribution;
-    const foodProduction = ledger.foodProductionContribution;
-    const currentFoodInventory = stocks.inventory.food ?? 0;
-
-    const totalFoodAvailable = currentFoodInventory + foodProduction;
+    const totalFoodAvailable = stocks.inventory.food;
     const foodConsumed = Math.min(foodNeed, totalFoodAvailable);
-    const foodRemaining = totalFoodAvailable - foodConsumed;
+    const foodRemaining = subtractExact(totalFoodAvailable, foodConsumed, `foodRemaining.${polityId}`);
 
     stocks.inventory.food = Math.max(0, foodRemaining) as QuantityMicros;
-    foodSurplusOrShortfall[polityId] = (foodProduction - foodNeed) as QuantityMicros;
+    foodSurplusOrShortfall[polityId] = subtractExact(totalFoodAvailable, foodNeed, `foodBalance.${polityId}`) as QuantityMicros;
 
     // Reset accepted investment for next month.
     stocks.acceptedInvestment = null;
 
     // Generate alerts for food shortage.
     if (foodConsumed < foodNeed) {
-      const shortage = foodNeed - foodConsumed;
+      const shortage = subtractExact(foodNeed, foodConsumed, `foodShortage.${polityId}`);
       alerts.push({
         polityId,
         message: `Food shortage: ${shortage} micros needed`,
@@ -140,14 +161,14 @@ export function resolveMonth(
     }
   }
 
-  return {
+  return monthlyResolutionResultSchema.parse({
     nextRegions,
     nextPolityStocks,
     regionalDeltas,
     nationalLedgers,
     foodSurplusOrShortfall,
     alerts
-  };
+  });
 }
 
 /**
@@ -158,26 +179,26 @@ export function resolveMonth(
  */
 function calculateRegionMonth(
   region: EconomyMvpRegion,
-  constants: EconomyScenarioConstants,
   infrastructureChange: number
 ): RegionalDelta & { birthRemainder: bigint; deathRemainder: bigint } {
   // birth numerator = population × annualBirthRateBp + birthRemainder
   const birthNumerator = BigInt(region.population) * BigInt(region.annualBirthRateBp) + region.birthRemainder;
-  const births = Number(birthNumerator / BigInt(120000));
+  const births = fromBigIntExact(birthNumerator / 120000n, `births.${region.regionId}`);
   const birthRemainder = birthNumerator % BigInt(120000);
 
   // death numerator = population × annualDeathRateBp + deathRemainder
   const deathNumerator = BigInt(region.population) * BigInt(region.annualDeathRateBp) + region.deathRemainder;
-  const deaths = Number(deathNumerator / BigInt(120000));
+  const deaths = fromBigIntExact(deathNumerator / 120000n, `deaths.${region.regionId}`);
   const deathRemainder = deathNumerator % BigInt(120000);
 
-  const populationChange = births - deaths;
-  const newPopulation = region.population + populationChange;
+  const populationChange = subtractExact(births, deaths, `populationChange.${region.regionId}`);
+  const newPopulation = addExact(region.population, populationChange, `population.${region.regionId}`);
+  if (newPopulation < 0) throw new RangeError(`population.${region.regionId} cannot become negative`);
 
   // Workforce from the new population.
-  const oldWorkforce = Math.floor((region.population * region.workforceRateBp) / BP_PER_WHOLE);
-  const newWorkforce = Math.floor((newPopulation * region.workforceRateBp) / BP_PER_WHOLE);
-  const workforceChange = newWorkforce - oldWorkforce;
+  const oldWorkforce = multiplyDivideFloor([region.population, region.workforceRateBp], BP_PER_WHOLE, `oldWorkforce.${region.regionId}`);
+  const newWorkforce = multiplyDivideFloor([newPopulation, region.workforceRateBp], BP_PER_WHOLE, `newWorkforce.${region.regionId}`);
+  const workforceChange = subtractExact(newWorkforce, oldWorkforce, `workforceChange.${region.regionId}`);
 
   // Gross output from the new population and the (possibly updated) infrastructure.
   const outputRegion: EconomyMvpRegion = { ...region, population: newPopulation };
@@ -213,24 +234,29 @@ function processInvestments(
 
     const { targetRegionId, spendMicros } = stocks.acceptedInvestment;
 
-    // Foreign target or unknown region changes no state.
+    // Validation has already proved that the target exists and is controlled
+    // by this polity. Keep the defensive throws so future refactors cannot
+    // silently discard an accepted command.
     const regionIndex = regions.findIndex(r =>
       r.regionId === targetRegionId && r.controllerId === stocks.polityId
     );
-    if (regionIndex === -1) continue;
+    if (regionIndex === -1) {
+      throw new Error(`Accepted investment target ${targetRegionId} failed validated lookup`);
+    }
 
-    // Insufficient treasury changes no state.
-    if (stocks.treasuryMicros < spendMicros) continue;
+    if (stocks.treasuryMicros < spendMicros) {
+      throw new Error(`Accepted investment for ${stocks.polityId} exceeds treasury`);
+    }
 
-    stocks.treasuryMicros -= spendMicros;
+    stocks.treasuryMicros = subtractExact(stocks.treasuryMicros, spendMicros, `investmentTreasury.${stocks.polityId}`);
 
     const region = regions[regionIndex];
-    if (!region) continue;
+    if (!region) throw new Error(`Accepted investment target ${targetRegionId} disappeared`);
 
     const gain = calculateInfrastructureGain(spendMicros, constants);
     const previous = region.infrastructureBp;
-    region.infrastructureBp = Math.min(previous + gain, constants.maxInfrastructureBp);
-    infrastructureChanges[region.regionId] = region.infrastructureBp - previous;
+    region.infrastructureBp = Math.min(addExact(previous, gain, `infrastructure.${region.regionId}`), constants.maxInfrastructureBp);
+    infrastructureChanges[region.regionId] = subtractExact(region.infrastructureBp, previous, `infrastructureChange.${region.regionId}`);
   }
 
   return infrastructureChanges;
@@ -267,29 +293,39 @@ function aggregatePolityContributions(
     const delta = polityDeltas.find(d => d.regionId === region.regionId);
 
     // Population and workforce (post-tick values).
-    populationContribution += region.population;
-    workforceContribution += Math.floor((region.population * region.workforceRateBp) / BP_PER_WHOLE);
+    populationContribution = addExact(populationContribution, region.population, `populationContribution.${polityId}`);
+    workforceContribution = addExact(
+      workforceContribution,
+      multiplyDivideFloor([region.population, region.workforceRateBp], BP_PER_WHOLE, `workforce.${region.regionId}`),
+      `workforceContribution.${polityId}`
+    );
 
     // Production by commodity.
     const output = delta ? delta.grossOutput : calculateRegionGrossOutput(region);
-    productionContribution[region.primaryCommodity] += output;
+    productionContribution[region.primaryCommodity] = addExact(
+      productionContribution[region.primaryCommodity],
+      output,
+      `production.${polityId}.${region.primaryCommodity}`
+    );
 
     // Tax revenue = gross output (micros) × accounting value (micros per unit)
     //               × taxRateBp / (micros-per-unit × basis-points-per-whole)
     const accountingValue = constants.accountingValue[region.primaryCommodity];
-    const commodityTax = Math.floor(
-      (output * accountingValue * constants.taxRateBp) / (MICROS_PER_UNIT * BP_PER_WHOLE)
+    const commodityTax = multiplyDivideFloor(
+      [output, accountingValue, constants.taxRateBp],
+      MICROS_PER_UNIT * BP_PER_WHOLE,
+      `tax.${region.regionId}`
     );
-    taxRevenueContribution += commodityTax;
+    taxRevenueContribution = addExact(taxRevenueContribution, commodityTax, `tax.${polityId}`);
 
     // Food-specific calculations.
     if (region.primaryCommodity === 'food') {
-      foodProductionContribution += output;
+      foodProductionContribution = addExact(foodProductionContribution, output, `foodProduction.${polityId}`);
     }
   }
 
   // Food need = polity population × foodNeedPerPerson (both micros).
-  foodNeedContribution = populationContribution * constants.foodNeedPerPerson;
+  foodNeedContribution = multiplyExact(populationContribution, constants.foodNeedPerPerson, `foodNeed.${polityId}`);
 
   return {
     polityId,
@@ -311,6 +347,9 @@ function validateControllersAndCommands(
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
   const polityIds = new Set(polityStocks.map(p => p.polityId));
+  if (polityIds.size !== polityStocks.length) errors.push('Duplicate polity stock IDs are not allowed');
+  const regionIds = new Set(regions.map(region => region.regionId));
+  if (regionIds.size !== regions.length) errors.push('Duplicate region IDs are not allowed');
 
   // Each region must have a known controller.
   for (const region of regions) {
@@ -322,7 +361,7 @@ function validateControllersAndCommands(
   // Accepted investments must reference a region controlled by that polity.
   for (const stocks of polityStocks) {
     if (stocks.acceptedInvestment) {
-      const { targetRegionId } = stocks.acceptedInvestment;
+      const { targetRegionId, spendMicros } = stocks.acceptedInvestment;
       const region = regions.find(r => r.regionId === targetRegionId);
 
       if (!region) {
@@ -330,6 +369,8 @@ function validateControllersAndCommands(
       } else if (region.controllerId !== stocks.polityId) {
         errors.push(`Accepted investment targets region not controlled by polity ${stocks.polityId}`);
       }
+      if (spendMicros <= 0) errors.push(`Accepted investment for ${stocks.polityId} must be positive`);
+      if (spendMicros > stocks.treasuryMicros) errors.push(`Accepted investment for ${stocks.polityId} exceeds treasury`);
     }
   }
 
@@ -346,9 +387,12 @@ export function calculatePolityPopulation(
   regions: EconomyMvpRegion[],
   polityId: string
 ): PersonCount {
-  return regions
-    .filter(r => r.controllerId === polityId)
-    .reduce((sum, r) => sum + r.population, 0) as PersonCount;
+  economyMvpRegionSchema.array().parse(regions);
+  let total = 0;
+  for (const region of regions) {
+    if (region.controllerId === polityId) total = addExact(total, region.population, `population.${polityId}`);
+  }
+  return total as PersonCount;
 }
 
 /**
@@ -358,6 +402,7 @@ export function calculatePolityProduction(
   regions: EconomyMvpRegion[],
   polityId: string
 ): Record<Commodity, QuantityMicros> {
+  economyMvpRegionSchema.array().parse(regions);
   const result: Record<Commodity, QuantityMicros> = {
     food: 0 as QuantityMicros,
     energy: 0 as QuantityMicros,
@@ -368,7 +413,7 @@ export function calculatePolityProduction(
   for (const region of regions) {
     if (region.controllerId === polityId) {
       const output = calculateRegionGrossOutput(region);
-      result[region.primaryCommodity] += output;
+      result[region.primaryCommodity] = addExact(result[region.primaryCommodity], output, `production.${polityId}`);
     }
   }
 

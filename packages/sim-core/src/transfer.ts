@@ -2,13 +2,17 @@ import {
   EconomyMvpRegion,
   PolityStocks,
   RegionTransferResult,
-  NationalContributionLedger,
+  RegionalEconomicContribution,
   QuantityMicros,
   PersonCount,
   Commodity,
-  PolityId
+  PolityId,
+  economyMvpRegionSchema,
+  polityStocksSchema,
+  regionTransferResultSchema
 } from './types.js';
 import { calculateRegionGrossOutput } from './investment.js';
+import { addExact, multiplyDivideFloor, subtractExact } from './arithmetic.js';
 
 /**
  * Re-aggregate region transfer as defined in spec
@@ -21,6 +25,8 @@ export function processRegionTransfer(
   fromPolityId: string,
   toPolityId: string
 ): RegionTransferResult {
+  economyMvpRegionSchema.array().parse(regions);
+  polityStocksSchema.array().parse(polityStocks);
   // Validate inputs
   const validation = validateTransfer(regions, polityStocks, regionId, fromPolityId, toPolityId);
   if (!validation.valid) {
@@ -81,12 +87,12 @@ export function processRegionTransfer(
   // Note: Treasury and inventories remain with their original polities
   // Only regional contributions are transferred
 
-  return {
+  return regionTransferResultSchema.parse({
     updatedRegions,
     updatedPolityStocks,
     fromPolityLosses,
     toPolityGains
-  };
+  });
 }
 
 /**
@@ -100,6 +106,12 @@ function validateTransfer(
   toPolityId: string
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
+  if (new Set(regions.map(region => region.regionId)).size !== regions.length) {
+    errors.push('Duplicate region IDs are not allowed');
+  }
+  if (new Set(polityStocks.map(stocks => stocks.polityId)).size !== polityStocks.length) {
+    errors.push('Duplicate polity stock IDs are not allowed');
+  }
 
   // Check region exists
   const region = regions.find(r => r.regionId === regionId);
@@ -142,7 +154,7 @@ function validateTransfer(
 function calculateRegionContributions(
   region: EconomyMvpRegion,
   polityId: string
-): NationalContributionLedger {
+): RegionalEconomicContribution {
   const grossOutput = calculateRegionGrossOutput(region);
 
   const productionContribution: Record<Commodity, QuantityMicros> = {
@@ -154,16 +166,13 @@ function calculateRegionContributions(
   productionContribution[region.primaryCommodity] = grossOutput;
 
   // Calculate workforce
-  const workforce = Math.floor((region.population * region.workforceRateBp) / 10000);
+  const workforce = multiplyDivideFloor([region.population, region.workforceRateBp], 10000, `workforce.${region.regionId}`);
 
   return {
     polityId: polityId as PolityId,
     populationContribution: region.population,
     workforceContribution: workforce as PersonCount,
-    productionContribution,
-    taxRevenueContribution: 0 as QuantityMicros, // Tax revenue depends on accounting values and rates
-    foodNeedContribution: 0 as QuantityMicros,   // Food need depends on population and constants
-    foodProductionContribution: region.primaryCommodity === 'food' ? grossOutput : 0 as QuantityMicros
+    productionContribution
   };
 }
 
@@ -191,23 +200,39 @@ export function verifyTransferAccounting(
   const expectedToGains = transferResult.toPolityGains;
 
   // Check population
-  if (originalFromTotal.populationContribution - newFromTotal.populationContribution !==
+  if (subtractExact(originalFromTotal.populationContribution, newFromTotal.populationContribution, 'transfer.fromPopulation') !==
       expectedFromLosses.populationContribution) {
     errors.push(`Population loss mismatch for ${fromPolityId}`);
   }
 
-  if (newToTotal.populationContribution - originalToTotal.populationContribution !==
+  if (subtractExact(newToTotal.populationContribution, originalToTotal.populationContribution, 'transfer.toPopulation') !==
       expectedToGains.populationContribution) {
     errors.push(`Population gain mismatch for ${toPolityId}`);
+  }
+
+  if (subtractExact(originalFromTotal.workforceContribution, newFromTotal.workforceContribution, 'transfer.fromWorkforce') !==
+      expectedFromLosses.workforceContribution) {
+    errors.push(`Workforce loss mismatch for ${fromPolityId}`);
+  }
+
+  if (subtractExact(newToTotal.workforceContribution, originalToTotal.workforceContribution, 'transfer.toWorkforce') !==
+      expectedToGains.workforceContribution) {
+    errors.push(`Workforce gain mismatch for ${toPolityId}`);
   }
 
   // Check each commodity production
   const commodities: Commodity[] = ['food', 'energy', 'materials', 'manufactures'];
   for (const commodity of commodities) {
-    const fromLoss = originalFromTotal.productionContribution[commodity] -
-                     newFromTotal.productionContribution[commodity];
-    const toGain = newToTotal.productionContribution[commodity] -
-                   originalToTotal.productionContribution[commodity];
+    const fromLoss = subtractExact(
+      originalFromTotal.productionContribution[commodity],
+      newFromTotal.productionContribution[commodity],
+      `transfer.from.${commodity}`
+    );
+    const toGain = subtractExact(
+      newToTotal.productionContribution[commodity],
+      originalToTotal.productionContribution[commodity],
+      `transfer.to.${commodity}`
+    );
 
     if (fromLoss !== expectedFromLosses.productionContribution[commodity]) {
       errors.push(`${commodity} production loss mismatch for ${fromPolityId}`);
@@ -230,7 +255,7 @@ export function verifyTransferAccounting(
 function calculatePolityContributions(
   regions: EconomyMvpRegion[],
   polityId: string
-): Omit<NationalContributionLedger, 'polityId' | 'taxRevenueContribution' | 'foodNeedContribution' | 'foodProductionContribution'> {
+): Omit<RegionalEconomicContribution, 'polityId'> {
   let populationContribution = 0;
   let workforceContribution = 0;
   const productionContribution: Record<Commodity, QuantityMicros> = {
@@ -242,11 +267,19 @@ function calculatePolityContributions(
 
   for (const region of regions) {
     if (region.controllerId === polityId) {
-      populationContribution += region.population;
-      workforceContribution += Math.floor((region.population * region.workforceRateBp) / 10000);
+      populationContribution = addExact(populationContribution, region.population, `population.${polityId}`);
+      workforceContribution = addExact(
+        workforceContribution,
+        multiplyDivideFloor([region.population, region.workforceRateBp], 10000, `workforce.${region.regionId}`),
+        `workforce.${polityId}`
+      );
 
       const output = calculateRegionGrossOutput(region);
-      productionContribution[region.primaryCommodity] += output as QuantityMicros;
+      productionContribution[region.primaryCommodity] = addExact(
+        productionContribution[region.primaryCommodity],
+        output,
+        `production.${polityId}.${region.primaryCommodity}`
+      ) as QuantityMicros;
     }
   }
 

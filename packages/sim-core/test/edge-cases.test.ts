@@ -2,7 +2,8 @@ import { describe, it } from 'node:test';
 import * as assert from 'node:assert';
 import {
   calculateInvestmentPreview,
-  validateInvestmentCommand
+  validateInvestmentCommand,
+  calculateRegionGrossOutput
 } from '../src/investment.js';
 import { resolveMonth } from '../src/resolution.js';
 import { processRegionTransfer } from '../src/transfer.js';
@@ -27,12 +28,14 @@ describe('Edge Cases and Mutation Resistance', () => {
         constants,
         0,
         region.regionId,
-        polityA.polityId
+        polityA.polityId,
+        regions.filter(candidate => candidate.controllerId === polityA.polityId)
       );
 
       assert.strictEqual(preview.costMicros, 0);
       assert.strictEqual(preview.infrastructureChange, 0);
-      assert.strictEqual(preview.canAfford, true);
+      assert.strictEqual(preview.canAfford, false);
+      assert.strictEqual(preview.isValidAmount, false);
     });
 
     it('should handle maximum infrastructure investment', () => {
@@ -52,24 +55,29 @@ describe('Edge Cases and Mutation Resistance', () => {
         constants,
         largeSpend,
         region.regionId,
-        polityA.polityId
+        polityA.polityId,
+        [nearlyMaxRegion, ...regions.filter(candidate =>
+          candidate.controllerId === polityA.polityId && candidate.regionId !== nearlyMaxRegion.regionId
+        )]
       );
 
       // Infrastructure change should be clamped at max
       assert.strict.ok(preview.infrastructureChange <= 100); // Can't exceed 10000 bp total
     });
 
-    it('should handle negative population edge case', () => {
-      // This test ensures we don't have negative population
-      const regionWithLowPopulation: EconomyMvpRegion = {
+    it('rejects negative population before resolution and changes no state', () => {
+      const regionWithNegativePopulation: EconomyMvpRegion = {
         ...regions[0]!,
-        population: 10,
-        annualDeathRateBp: 10000 // 100% death rate
+        population: -1
       };
+      const inputRegions = [regionWithNegativePopulation];
+      const inputStocks = [structuredClone(polityStocks[0]!)];
+      const beforeRegions = structuredClone(inputRegions);
+      const beforeStocks = structuredClone(inputStocks);
 
-      // The calculation should prevent negative population
-      const workforce = Math.floor((regionWithLowPopulation.population * regionWithLowPopulation.workforceRateBp) / 10000);
-      assert.strict.ok(workforce >= 0);
+      assert.throws(() => resolveMonth(inputRegions, inputStocks, constants));
+      assert.deepStrictEqual(inputRegions, beforeRegions);
+      assert.deepStrictEqual(inputStocks, beforeStocks);
     });
   });
 
@@ -118,7 +126,7 @@ describe('Edge Cases and Mutation Resistance', () => {
       assert.strictEqual(delta.grossOutput, 0);
     });
 
-    it('should handle polity with negative treasury (should not happen but defensive)', () => {
+    it('should reject negative treasury without changing input', () => {
       const polityWithDebt: PolityStocks = {
         ...polityStocks[0]!,
         treasuryMicros: -1000000
@@ -126,12 +134,12 @@ describe('Edge Cases and Mutation Resistance', () => {
 
       const modifiedPolityStocks = [polityWithDebt];
 
-      // Should still resolve without crashing
-      const result = resolveMonth([regions[0]!], modifiedPolityStocks, constants);
-      assert.strict.ok(result.nextPolityStocks.length === 1);
+      const before = structuredClone(modifiedPolityStocks);
+      assert.throws(() => resolveMonth([regions[0]!], modifiedPolityStocks, constants));
+      assert.deepStrictEqual(modifiedPolityStocks, before);
     });
 
-    it('should handle accepted investment with insufficient treasury', () => {
+    it('rejects accepted investment with insufficient treasury', () => {
       const spendMicros = 100000000;
       const modifiedPolityStocks = structuredClone(polityStocks);
       modifiedPolityStocks[0]!.treasuryMicros = 0;
@@ -143,16 +151,12 @@ describe('Edge Cases and Mutation Resistance', () => {
 
       const originalInfrastructure = regions[0]!.infrastructureBp;
 
-      // Insufficient treasury: spend is not applied, so the published identity
-      // becomes treasury' = opening - 0 + exact tax.
-      const result = resolveMonth(regions, modifiedPolityStocks, constants);
-
-      const ledgerA = result.nationalLedgers.find(l => l.polityId === polityStocks[0]!.polityId)!;
-      assert.strictEqual(result.nextPolityStocks[0]!.treasuryMicros, ledgerA.taxRevenueContribution);
-
-      // No infrastructure change when the spend cannot be paid.
-      const updatedRegion = result.nextRegions.find(r => r.regionId === regions[0]!.regionId)!;
-      assert.strictEqual(updatedRegion.infrastructureBp, originalInfrastructure);
+      const beforeRegions = structuredClone(regions);
+      const beforeStocks = structuredClone(modifiedPolityStocks);
+      assert.throws(() => resolveMonth(regions, modifiedPolityStocks, constants), /exceeds treasury/);
+      assert.deepStrictEqual(regions, beforeRegions);
+      assert.deepStrictEqual(modifiedPolityStocks, beforeStocks);
+      assert.strictEqual(regions[0]!.infrastructureBp, originalInfrastructure);
     });
   });
 
@@ -271,21 +275,73 @@ describe('Edge Cases and Mutation Resistance', () => {
       assert.strictEqual(json1, json2);
     });
 
-    it('should handle large numbers without overflow', () => {
+    it('uses exact capped multiplication for large labour output', () => {
       const largeRegion: EconomyMvpRegion = {
         ...regions[0]!,
         population: 1000000000, // 1 billion
         outputPerWorker: 1000000000 // Large output
       };
 
-      // Should calculate without overflow
-      const workforce = Math.floor((largeRegion.population * largeRegion.workforceRateBp) / 10000);
-      const labourOutput = workforce * largeRegion.outputPerWorker;
+      const output = calculateRegionGrossOutput(largeRegion);
+      const expected = Math.floor(
+        Math.floor((largeRegion.baseMonthlyCapacity * largeRegion.infrastructureBp) / 10000) *
+        (10000 - largeRegion.damageBp) / 10000
+      );
+      assert.strictEqual(output, expected);
+    });
 
-      assert.strict.ok(workforce > 0);
-      assert.strict.ok(labourOutput > 0);
-      assert.strict.ok(!isNaN(labourOutput));
-      assert.strict.ok(isFinite(labourOutput));
+    it('rejects aggregate overflow without changing inputs', () => {
+      const hugeRegion: EconomyMvpRegion = {
+        ...regions[0]!,
+        regionId: 'region:test:overflow-a' as EconomyMvpRegion['regionId'],
+        population: 1,
+        annualBirthRateBp: 0,
+        annualDeathRateBp: 0,
+        workforceRateBp: 10000,
+        infrastructureBp: 10000,
+        primaryCommodity: 'materials',
+        baseMonthlyCapacity: Number.MAX_SAFE_INTEGER,
+        outputPerWorker: Number.MAX_SAFE_INTEGER,
+        damageBp: 0
+      };
+      const inputRegions = [
+        hugeRegion,
+        { ...hugeRegion, regionId: 'region:test:overflow-b' as EconomyMvpRegion['regionId'] }
+      ];
+      const inputStocks = [structuredClone(polityStocks[0]!)];
+      const zeroValueConstants = {
+        ...constants,
+        foodNeedPerPerson: 0,
+        accountingValue: {
+          food: 0,
+          energy: 0,
+          materials: 0,
+          manufactures: 0
+        }
+      };
+      const beforeRegions = structuredClone(inputRegions);
+      const beforeStocks = structuredClone(inputStocks);
+
+      assert.throws(
+        () => resolveMonth(inputRegions, inputStocks, zeroValueConstants),
+        /safe integer range/
+      );
+      assert.deepStrictEqual(inputRegions, beforeRegions);
+      assert.deepStrictEqual(inputStocks, beforeStocks);
+    });
+
+    it('rejects duplicate canonical identities', () => {
+      const duplicateRegions = [regions[0]!, structuredClone(regions[0]!)];
+      assert.throws(
+        () => resolveMonth(duplicateRegions, [polityStocks[0]!], constants),
+        /Duplicate region IDs/
+      );
+
+      const duplicateStocks = [polityStocks[0]!, structuredClone(polityStocks[0]!)];
+      assert.throws(
+        () => resolveMonth([regions[0]!], duplicateStocks, constants),
+        /Duplicate polity stock IDs/
+      );
     });
   });
 

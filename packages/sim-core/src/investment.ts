@@ -4,8 +4,23 @@ import {
   EconomyScenarioConstants,
   InvestmentPreviewResult,
   QuantityMicros,
-  BasisPoints
+  BasisPoints,
+  InvestInRegionCommand,
+  WorldRevisionId,
+  GameDate,
+  investInRegionCommandSchema,
+  economyMvpRegionSchema,
+  polityStocksSchema,
+  economyScenarioConstantsSchema,
+  investmentPreviewResultSchema
 } from './types.js';
+import {
+  addExact,
+  assertSafeInteger,
+  multiplyDivideFloor,
+  multiplyCapped,
+  subtractExact
+} from './arithmetic.js';
 
 /**
  * Infrastructure gain for an accepted regional investment.
@@ -21,7 +36,11 @@ export function calculateInfrastructureGain(
   spendMicros: QuantityMicros,
   constants: EconomyScenarioConstants
 ): BasisPoints {
-  return Math.floor((spendMicros * constants.infrastructureBpPerMoney) / 1_000_000);
+  return multiplyDivideFloor(
+    [spendMicros, constants.infrastructureBpPerMoney],
+    1_000_000,
+    'infrastructureGain'
+  ) as BasisPoints;
 }
 
 /**
@@ -34,21 +53,36 @@ export function calculateInvestmentPreview(
   constants: EconomyScenarioConstants,
   spendMicros: QuantityMicros,
   targetRegionId: string,
-  actorPolityId: string
+  actorPolityId: string,
+  controlledRegions: EconomyMvpRegion[]
 ): InvestmentPreviewResult {
-  // Validate target region belongs to actor
-  const isValidTarget = region.controllerId === actorPolityId && region.regionId === targetRegionId;
-  const canAfford = polityStocks.treasuryMicros >= spendMicros;
+  economyMvpRegionSchema.parse(region);
+  polityStocksSchema.parse(polityStocks);
+  economyScenarioConstantsSchema.parse(constants);
+  economyMvpRegionSchema.array().parse(controlledRegions);
+  if (new Set(controlledRegions.map((candidate) => candidate.regionId)).size !== controlledRegions.length) {
+    throw new Error('Duplicate region IDs are not allowed in an investment preview');
+  }
 
-  if (!isValidTarget || !canAfford) {
-    return {
-      costMicros: spendMicros,
+  // Validate target region belongs to actor
+  const isValidTarget =
+    polityStocks.polityId === actorPolityId &&
+    region.controllerId === actorPolityId &&
+    region.regionId === targetRegionId &&
+    controlledRegions.some((candidate) => candidate.regionId === targetRegionId);
+  const isValidAmount = Number.isSafeInteger(spendMicros) && spendMicros > 0;
+  const canAfford = isValidAmount && polityStocks.treasuryMicros >= spendMicros;
+
+  if (!isValidTarget || !canAfford || !isValidAmount) {
+    return investmentPreviewResultSchema.parse({
+      costMicros: Number.isSafeInteger(spendMicros) && spendMicros >= 0 ? spendMicros : 0,
       infrastructureChange: 0,
       estimatedNextMonthOutputDelta: 0 as QuantityMicros,
       affectedNationalCommodityTotal: 0 as QuantityMicros,
       canAfford,
-      isValidTarget
-    };
+      isValidTarget,
+      isValidAmount
+    });
   }
 
   // Calculate infrastructure gain via the shared pure formula.
@@ -56,7 +90,7 @@ export function calculateInvestmentPreview(
 
   // Apply infrastructure improvement, clamped at max
   const newInfrastructureBp = Math.min(
-    region.infrastructureBp + infrastructureGain,
+    addExact(region.infrastructureBp, infrastructureGain, 'newInfrastructureBp'),
     constants.maxInfrastructureBp
   );
   const infrastructureChange = newInfrastructureBp - region.infrastructureBp;
@@ -68,16 +102,28 @@ export function calculateInvestmentPreview(
   );
 
   // Calculate affected national commodity total
-  const affectedNationalCommodityTotal = region.baseMonthlyCapacity;
+  let affectedNationalCommodityTotal = 0;
+  for (const candidate of controlledRegions) {
+    if (candidate.controllerId !== actorPolityId || candidate.primaryCommodity !== region.primaryCommodity) continue;
+    const output = candidate.regionId === region.regionId
+      ? calculateRegionGrossOutput({ ...region, infrastructureBp: newInfrastructureBp })
+      : calculateRegionGrossOutput(candidate);
+    affectedNationalCommodityTotal = addExact(
+      affectedNationalCommodityTotal,
+      output,
+      'affectedNationalCommodityTotal'
+    );
+  }
 
-  return {
+  return investmentPreviewResultSchema.parse({
     costMicros: spendMicros,
     infrastructureChange,
     estimatedNextMonthOutputDelta: estimatedOutputDelta,
     affectedNationalCommodityTotal,
     canAfford: true,
-    isValidTarget: true
-  };
+    isValidTarget: true,
+    isValidAmount: true
+  });
 }
 
 /**
@@ -97,27 +143,45 @@ function calculateRegionOutputDelta(
   };
   const newOutput = calculateRegionGrossOutput(regionWithNewInfrastructure);
 
-  return (newOutput - currentOutput) as QuantityMicros;
+  return subtractExact(newOutput, currentOutput, 'investmentOutputDelta') as QuantityMicros;
 }
 
 /**
  * Calculate region gross output as defined in spec formulas
  */
 export function calculateRegionGrossOutput(region: EconomyMvpRegion): QuantityMicros {
+  assertSafeInteger(region.population, 'population', 0);
+  assertSafeInteger(region.workforceRateBp, 'workforceRateBp', 0);
+  assertSafeInteger(region.outputPerWorker, 'outputPerWorker', 0);
+  assertSafeInteger(region.baseMonthlyCapacity, 'baseMonthlyCapacity', 0);
+  assertSafeInteger(region.infrastructureBp, 'infrastructureBp', 0);
+  assertSafeInteger(region.damageBp, 'damageBp', 0);
+  for (const [name, value] of [
+    ['workforceRateBp', region.workforceRateBp],
+    ['infrastructureBp', region.infrastructureBp],
+    ['damageBp', region.damageBp],
+  ] as const) {
+    if (value > 10_000) throw new RangeError(`${name} cannot exceed 10000`);
+  }
   // workforce = population × workforceRateBp / 10000
-  const workforce = Math.floor((region.population * region.workforceRateBp) / 10000);
+  const workforce = multiplyDivideFloor([region.population, region.workforceRateBp], 10000, 'workforce');
 
   // labour output = workforce × outputPerWorker
-  const labourOutput = workforce * region.outputPerWorker;
-
-  // usable capacity = min(baseMonthlyCapacity, labour output)
-  const usableCapacity = Math.min(region.baseMonthlyCapacity, labourOutput);
+  // usable capacity = min(baseMonthlyCapacity, workforce × outputPerWorker).
+  // The capped multiplication remains exact even when the unused labour
+  // product itself would exceed Number.MAX_SAFE_INTEGER.
+  const usableCapacity = multiplyCapped(
+    workforce,
+    region.outputPerWorker,
+    region.baseMonthlyCapacity,
+    'usableCapacity'
+  );
 
   // gross output = usable capacity × infrastructureBp / 10000
-  let grossOutput = Math.floor((usableCapacity * region.infrastructureBp) / 10000);
+  let grossOutput = multiplyDivideFloor([usableCapacity, region.infrastructureBp], 10000, 'infrastructureOutput');
 
   // Apply damage: gross output = gross output × (10000 - damageBp) / 10000
-  grossOutput = Math.floor((grossOutput * (10000 - region.damageBp)) / 10000);
+  grossOutput = multiplyDivideFloor([grossOutput, 10000 - region.damageBp], 10000, 'damageAdjustedOutput');
 
   return Math.max(0, grossOutput) as QuantityMicros;
 }
@@ -133,6 +197,10 @@ export function validateInvestmentCommand(
   actorPolityId: string
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
+
+  if (!Number.isSafeInteger(spendMicros)) {
+    errors.push(`Spend amount must be a safe integer: ${spendMicros}`);
+  }
 
   if (region.controllerId !== actorPolityId) {
     errors.push(`Region ${targetRegionId} is not controlled by polity ${actorPolityId}`);
@@ -154,4 +222,62 @@ export function validateInvestmentCommand(
     valid: errors.length === 0,
     errors
   };
+}
+
+/**
+ * Accepts one typed policy command without mutating the caller's stocks. Stale,
+ * foreign, invalid and unaffordable commands throw before any state change.
+ */
+export function acceptInvestmentCommand(
+  regions: EconomyMvpRegion[],
+  polityStocks: PolityStocks[],
+  commandInput: InvestInRegionCommand,
+  currentRevision: WorldRevisionId,
+  currentMonth: GameDate
+): PolityStocks[] {
+  const command = investInRegionCommandSchema.parse(commandInput);
+  economyMvpRegionSchema.array().parse(regions);
+  polityStocksSchema.array().parse(polityStocks);
+
+  if (new Set(regions.map((region) => region.regionId)).size !== regions.length) {
+    throw new Error('Duplicate region IDs are not allowed');
+  }
+  if (new Set(polityStocks.map((stocks) => stocks.polityId)).size !== polityStocks.length) {
+    throw new Error('Duplicate polity stock IDs are not allowed');
+  }
+
+  if (command.expectedRevision !== currentRevision) {
+    throw new Error(`Stale economy command: expected ${command.expectedRevision}, current ${currentRevision}`);
+  }
+  if (command.effectiveMonth !== currentMonth) {
+    throw new Error(`Investment effective month ${command.effectiveMonth} does not match ${currentMonth}`);
+  }
+  const region = regions.find((candidate) => candidate.regionId === command.targetRegionId);
+  const stocks = polityStocks.find((candidate) => candidate.polityId === command.actorPolityId);
+  if (!region || !stocks) throw new Error('Investment references an unknown region or polity');
+  const validation = validateInvestmentCommand(
+    region,
+    stocks,
+    command.spend,
+    command.targetRegionId,
+    command.actorPolityId
+  );
+  if (!validation.valid) throw new Error(`Invalid investment: ${validation.errors.join(', ')}`);
+  if (stocks.acceptedInvestment) throw new Error(`Polity ${stocks.polityId} already has an accepted investment`);
+
+  return polityStocks.map((candidate) => candidate.polityId === stocks.polityId
+    ? {
+        ...candidate,
+        inventory: { ...candidate.inventory },
+        acceptedInvestment: {
+          targetRegionId: command.targetRegionId,
+          spendMicros: command.spend,
+          effectiveMonth: command.effectiveMonth
+        }
+      }
+    : {
+        ...candidate,
+        inventory: { ...candidate.inventory },
+        acceptedInvestment: candidate.acceptedInvestment ? { ...candidate.acceptedInvestment } : null
+      });
 }
