@@ -34,6 +34,13 @@ import {
   writeRuntimeJsonAsset,
 } from "./libraryStore.js";
 import {
+  readGameStateBundle,
+  commitWorldRevision,
+  listGameRevisions,
+  pruneOldRevisions,
+  recoverCurrentRevision,
+} from "./worldRevisionFilesystem.js";
+import {
   createMapEditorDocument,
   deleteMapEditorDocument,
   ensureMapEditorStore,
@@ -547,6 +554,71 @@ app.put("/api/runtime/json/:assetKey", jsonParser, (req, res) => {
     res.setHeader("Cache-Control", "no-store");
     res.type("application/json");
     res.send(JSON.stringify(asset.data));
+  } catch (error) {
+    sendError(res, 400, error);
+  }
+});
+
+// Atomic world revision endpoints
+app.get("/api/atomic-revision/:gameId", async (req, res) => {
+  try {
+    const bundle = await readGameStateBundle(req.params.gameId);
+    res.setHeader("Cache-Control", "no-store");
+    res.type("application/json");
+    res.send(JSON.stringify(bundle));
+  } catch (error) {
+    sendError(res, 404, error);
+  }
+});
+
+app.post("/api/atomic-revision/:gameId/commit", jsonParser, async (req, res) => {
+  try {
+    if (!Number(req.headers["content-length"])) {
+      return sendError(res, 400, new Error("Commit request must have a body"));
+    }
+    
+    const result = await commitWorldRevision({
+      gameId: req.params.gameId,
+      ...req.body,
+    });
+    
+    res.setHeader("Cache-Control", "no-store");
+    res.type("application/json");
+    res.send(JSON.stringify(result));
+  } catch (error) {
+    sendError(res, 400, error);
+  }
+});
+
+app.get("/api/atomic-revision/:gameId/revisions", async (req, res) => {
+  try {
+    const revisions = await listGameRevisions(req.params.gameId);
+    res.setHeader("Cache-Control", "no-store");
+    res.type("application/json");
+    res.send(JSON.stringify(revisions));
+  } catch (error) {
+    sendError(res, 400, error);
+  }
+});
+
+app.post("/api/atomic-revision/:gameId/recover", async (req, res) => {
+  try {
+    const result = await recoverCurrentRevision(req.params.gameId);
+    res.setHeader("Cache-Control", "no-store");
+    res.type("application/json");
+    res.send(JSON.stringify(result));
+  } catch (error) {
+    sendError(res, 400, error);
+  }
+});
+
+app.delete("/api/atomic-revision/:gameId/prune", async (req, res) => {
+  try {
+    const keepCount = Number(req.query.keep) || 12;
+    const pruned = await pruneOldRevisions(req.params.gameId, keepCount);
+    res.setHeader("Cache-Control", "no-store");
+    res.type("application/json");
+    res.send(JSON.stringify({ pruned }));
   } catch (error) {
     sendError(res, 400, error);
   }
