@@ -1,190 +1,305 @@
-// Simple Scenario V2 schemas that actually compile
-export interface ScenarioManifest {
-  schemaVersion: 2;
-  id: string; // scenario:world-1916
-  contentVersion: string; // 0.1.0
-  engineRange: string;
-  defaultLocale: string;
-  scenarioPath: 'scenario.json';
-  sourcesPath: 'sources.json';
-  assets: AssetRef[];
-}
+import { z } from 'zod';
+import {
+  scenarioIdSchema,
+  polityIdSchema,
+  regionIdSchema,
+  sourceIdSchema,
+  factIdSchema,
+  assumptionIdSchema,
+  macroRegionIdSchema,
+  assetIdSchema,
+  draftPatchIdSchema,
+  gameDateSchema,
+  dateRangeSchema,
+  entityIdSchema,
+  historicalFactSchema,
+  assumptionSchema,
+} from '@open-historia/domain';
 
-export interface AssetRef {
-  id: string; // asset:world-1916:regions
-  kind: 'regions' | 'cities' | 'background' | 'other';
-  path?: string;
-  contentAddress?: string; // sha256:...
-  mediaType: string;
-  required: boolean;
-}
+// ── SemVer (no leading "v") ───────────────────────────────────────────────────
+export const contentVersionSchema = z
+  .string()
+  .regex(/^\d+\.\d+\.\d+$/, 'Content version must be SemVer without a leading v');
+export type ContentVersion = z.infer<typeof contentVersionSchema>;
 
-export interface ScenarioV2 {
-  schemaVersion: 2;
-  id: string; // scenario:world-1916
-  meta: ScenarioMeta;
-  game: GameStart;
-  polities: Record<string, PolityDef>;
-  regions: RegionRef[];
-  regionAssignments?: Record<string, string>; // regionId -> polityId
-  cities?: CityDef[];
-  simulationRules: SimulationRules;
-  historicalFacts: HistoricalFact[];
-  assumptions: Assumption[];
-  macroRegions: MacroRegionDef[];
-  fidelity: FidelityManifest;
-}
+// ── Package manifest ──────────────────────────────────────────────────────────
+export const assetRefSchema = z
+  .object({
+    id: assetIdSchema,
+    kind: z.enum(['regions', 'cities', 'background', 'other']),
+    path: z.string().optional(),
+    contentAddress: z
+      .string()
+      .regex(/^sha256:[a-f0-9]{64}$/, 'contentAddress must be `sha256:<hex>`')
+      .optional(),
+    mediaType: z.string(),
+    required: z.boolean(),
+  })
+  .strict();
+export type ScenarioAssetRef = z.infer<typeof assetRefSchema>;
 
-export interface ScenarioMeta {
-  title: string;
-  description?: string;
-  locales?: Record<string, { title: string; description?: string }>;
-}
+export const scenarioManifestSchema = z
+  .object({
+    schemaVersion: z.literal(2),
+    id: scenarioIdSchema,
+    contentVersion: contentVersionSchema,
+    engineRange: z.string().min(1),
+    defaultLocale: z.string().min(1),
+    scenarioPath: z.literal('scenario.json'),
+    sourcesPath: z.literal('sources.json'),
+    assets: z.array(assetRefSchema),
+  })
+  .strict();
+export type ScenarioV2Manifest = z.infer<typeof scenarioManifestSchema>;
 
-export interface GameStart {
-  startDate: string; // YYYY-MM-DD
-  defaultPlayer: string; // polity:id
-}
+// ── Scenario metadata ────────────────────────────────────────────────────────
+export const scenarioMetaSchema = z
+  .object({
+    title: z.string(),
+    description: z.string().optional(),
+    locales: z
+      .record(
+        z.string(),
+        z
+          .object({
+            title: z.string(),
+            description: z.string().optional(),
+          })
+          .strict(),
+      )
+      .optional(),
+  })
+  .strict();
+export type ScenarioMeta = z.infer<typeof scenarioMetaSchema>;
 
-export interface PolityDef {
-  id: string; // polity:russian-empire
-  name: string;
-  aliases?: string[];
-  color: string; // #RRGGBB
-}
+// ── Polities, regions, cities ─────────────────────────────────────────────────
+export const polityDefSchema = z
+  .object({
+    id: polityIdSchema,
+    name: z.string(),
+    aliases: z.array(z.string()).optional(),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Color must be `#RRGGBB`'),
+  })
+  .strict();
+export type PolityDef = z.infer<typeof polityDefSchema>;
 
-export interface RegionRef {
-  id: string; // region:gadm-4-1:RUS.33_1
-  dataset: string;
-  datasetVersion: string;
-  nativeId: string;
-}
+export const regionRefSchema = z
+  .object({
+    id: regionIdSchema,
+    dataset: z.string(),
+    datasetVersion: z.string(),
+    nativeId: z.string(),
+  })
+  .strict();
+export type RegionRef = z.infer<typeof regionRefSchema>;
 
-export interface CityDef {
-  id: string;
-  name: string;
-  regionId: string;
-  population?: number;
-  note?: string;
-}
+export const cityDefSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    regionId: regionIdSchema,
+    population: z.number().int().nonnegative().optional(),
+    note: z.string().optional(),
+  })
+  .strict();
+export type CityDef = z.infer<typeof cityDefSchema>;
 
-export interface SimulationRules {
-  era: string;
-  aiHistoryMode: 'conditional' | 'free' | 'guided';
-  eraNarrative?: string;
-  constraints: {
-    noAirPower?: boolean;
-    noGunpowder?: boolean;
-    noNaval?: boolean;
-    maxUnitTier?: number;
-    narrativeRules?: string[];
-  };
-  factions?: FactionDef[];
-  activeConflicts?: ConflictDef[];
-  technologyLevel: {
-    era: string;
-    notable?: string[];
-  };
-}
+// ── Structured simulation rules ──────────────────────────────────────────────
+export const factionDefSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    leader: z.string().optional(),
+    ideology: z.string().optional(),
+    strength: z.string().optional(),
+  })
+  .strict();
+export type FactionDef = z.infer<typeof factionDefSchema>;
 
-export interface FactionDef {
-  id: string;
-  name: string;
-  leader?: string;
-  ideology?: string;
-  strength?: string;
-}
+export const conflictDefSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    participants: z.array(polityIdSchema),
+    startDate: gameDateSchema.optional(),
+    status: z.enum(['active', 'dormant', 'resolved']).optional(),
+    type: z.enum(['war', 'civil-war', 'rebellion', 'colonial']).optional(),
+  })
+  .strict();
+export type ConflictDef = z.infer<typeof conflictDefSchema>;
 
-export interface ConflictDef {
-  id: string;
-  name: string;
-  participants: string[]; // polity IDs
-  startDate?: string;
-  status?: 'active' | 'dormant' | 'resolved';
-  type?: 'war' | 'civil-war' | 'rebellion' | 'colonial';
-}
+export const simulationRulesSchema = z
+  .object({
+    era: z.string(),
+    aiHistoryMode: z.enum(['conditional', 'free', 'guided']),
+    eraNarrative: z.string().optional(),
+    constraints: z
+      .object({
+        noAirPower: z.boolean().optional(),
+        noGunpowder: z.boolean().optional(),
+        noNaval: z.boolean().optional(),
+        maxUnitTier: z.number().int().positive().optional(),
+        narrativeRules: z.array(z.string()).optional(),
+      })
+      .strict(),
+    factions: z.array(factionDefSchema).optional(),
+    activeConflicts: z.array(conflictDefSchema).optional(),
+    technologyLevel: z
+      .object({
+        era: z.string(),
+        notable: z.array(z.string()).optional(),
+      })
+      .strict(),
+  })
+  .strict();
+export type SimulationRules = z.infer<typeof simulationRulesSchema>;
 
-export interface HistoricalFact {
-  id: string; // fact:world-1916:population-001
-  role: 'observation' | 'starting-value';
-  subjectRefs: string[]; // entity IDs
-  predicate: string;
-  effectiveRange: DateRange;
-  value: FactValue;
-  sourceRefs: string[]; // source IDs
-  assumptionRefs: string[]; // assumption IDs
-  confidence: 'high' | 'medium' | 'low' | 'assumption';
-  transformation: TransformationStep[];
-  note?: string;
-}
+// ── Macro regions and fidelity ───────────────────────────────────────────────
+export const macroRegionDefSchema = z
+  .object({
+    id: macroRegionIdSchema,
+    name: z.string(),
+    members: z.array(regionIdSchema),
+    purpose: z.enum(['aggregation', 'fixture', 'historical-area']),
+    geometryAssetRef: assetIdSchema.optional(),
+  })
+  .strict();
+export type MacroRegionDef = z.infer<typeof macroRegionDefSchema>;
 
-export interface DateRange {
-  from: string; // YYYY-MM-DD
-  until?: string; // YYYY-MM-DD
-}
+export const fidelityGapSchema = z
+  .object({
+    path: z.string().startsWith('/'),
+    disposition: z.enum(['unknown', 'assumption', 'not-applicable']),
+    reason: z.string(),
+    assumptionRef: assumptionIdSchema.optional(),
+  })
+  .strict();
+export type FidelityGap = z.infer<typeof fidelityGapSchema>;
 
-export type FactValue =
-  | { kind: 'quantity'; amount: string; unit: string; scope?: string }
-  | { kind: 'text'; value: string }
-  | { kind: 'boolean'; value: boolean }
-  | { kind: 'entity-ref'; value: string }
-  | { kind: 'unknown'; expectedKind: 'quantity' | 'text' | 'boolean' | 'entity-ref'; reason: string };
+export const fidelityManifestSchema = z
+  .object({
+    intendedUse: z.enum(['test-fixture', 'development-scenario', 'playable-scenario']),
+    polityLevels: z.record(polityIdSchema, z.enum(['Baseline', 'Supported', 'Curated'])),
+    gaps: z.array(fidelityGapSchema),
+  })
+  .strict();
+export type FidelityManifest = z.infer<typeof fidelityManifestSchema>;
 
-export interface TransformationStep {
-  operation: 'identity' | 'unit-conversion' | 'calendar-conversion' | 'currency-conversion' | 'territorial-allocation' | 'aggregation' | 'scenario-choice';
-  description: string;
-  inputSourceRefs: string[]; // source IDs
-  formula?: string;
-}
+// ── Scenario V2 document ──────────────────────────────────────────────────────
+export const scenarioV2Schema = z
+  .object({
+    schemaVersion: z.literal(2),
+    id: scenarioIdSchema,
+    meta: scenarioMetaSchema,
+    game: z
+      .object({
+        startDate: gameDateSchema,
+        defaultPlayer: polityIdSchema,
+      })
+      .strict(),
+    polities: z.record(polityIdSchema, polityDefSchema),
+    regions: z.array(regionRefSchema),
+    regionAssignments: z.record(regionIdSchema, polityIdSchema).optional(),
+    cities: z.array(cityDefSchema).optional(),
+    simulationRules: simulationRulesSchema,
+    historicalFacts: z.array(historicalFactSchema),
+    assumptions: z.array(assumptionSchema),
+    macroRegions: z.array(macroRegionDefSchema),
+    fidelity: fidelityManifestSchema,
+  })
+  .strict();
+export type ScenarioV2 = z.infer<typeof scenarioV2Schema>;
 
-export interface SourceRef {
-  id: string; // source:world-1916:russia-yearbook-1916
-  title: string;
-  publisher?: string;
-  publicationDate?: string;
-  locator: string;
-  retrievedAt?: string;
-  contentHash?: string; // sha256:...
-  license: {
-    status: 'redistributable' | 'metadata-only' | 'unknown';
-    name?: string;
-    url?: string;
-  };
-  note?: string;
-}
+// ── Pregame narrative draft ──────────────────────────────────────────────────
+export const assertionOperatorSchema = z.enum([
+  'equals',
+  'not-equals',
+  'less-than',
+  'less-or-equal',
+  'greater-than',
+  'greater-or-equal',
+  'contains',
+]);
+export type AssertionOperator = z.infer<typeof assertionOperatorSchema>;
 
-export interface Assumption {
-  id: string; // assumption:world-1916:territorial-basis
-  statement: string;
-  rationale: string;
-  affectedPaths: string[]; // JSON pointers
-  sourceRefs: string[]; // source IDs
-  status: 'authored';
-}
+// A claim assertion cannot carry an `unknown` value (contract §8).
+export const assertionValueSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('quantity'), amount: z.string(), unit: z.string(), scope: z.string().optional() }).strict(),
+  z.object({ kind: z.literal('text'), value: z.string() }).strict(),
+  z.object({ kind: z.literal('boolean'), value: z.boolean() }).strict(),
+  z.object({ kind: z.literal('entity-ref'), value: entityIdSchema }).strict(),
+]);
+export type AssertionValue = z.infer<typeof assertionValueSchema>;
 
-export interface MacroRegionDef {
-  id: string; // macro-region:world-1916:eastern-front
-  name: string;
-  members: string[]; // region IDs
-  purpose: 'aggregation' | 'fixture' | 'historical-area';
-  geometryAssetRef?: string; // asset ID
-}
+export const inferredClaimSchema = z
+  .object({
+    id: z.string(),
+    claim: z.string(),
+    evidenceRefs: z.array(factIdSchema),
+    confidence: z.enum(['high', 'medium', 'low']),
+    assertion: z
+      .object({
+        subjectRef: entityIdSchema,
+        predicate: z.string(),
+        operator: assertionOperatorSchema,
+        value: assertionValueSchema,
+      })
+      .strict(),
+  })
+  .strict();
+export type InferredClaim = z.infer<typeof inferredClaimSchema>;
 
-export interface FidelityManifest {
-  intendedUse: 'test-fixture' | 'development-scenario' | 'playable-scenario';
-  polityLevels: Record<string, 'Baseline' | 'Supported' | 'Curated'>;
-  gaps: FidelityGap[];
-}
+export const pregameNarrativeSegmentSchema = z
+  .object({
+    text: z.string(),
+    kind: z.enum(['fact', 'inference', 'narrative-color']),
+    factRefs: z.array(factIdSchema),
+    claimRefs: z.array(z.string()),
+  })
+  .strict();
+export type PregameNarrativeSegment = z.infer<typeof pregameNarrativeSegmentSchema>;
 
-export interface FidelityGap {
-  path: string; // JSON pointer
-  disposition: 'unknown' | 'assumption' | 'not-applicable';
-  reason: string;
-  assumptionRef?: string; // assumption ID
-}
+export const pregameNarrativeDraftSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    scenarioId: scenarioIdSchema,
+    baseInputChecksum: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+    segments: z.array(pregameNarrativeSegmentSchema),
+    factsUsed: z.array(factIdSchema),
+    inferredClaims: z.array(inferredClaimSchema),
+  })
+  .strict();
+export type PregameNarrativeDraft = z.infer<typeof pregameNarrativeDraftSchema>;
 
-export interface ScenarioBundle {
-  manifest: ScenarioManifest;
-  scenario: ScenarioV2;
-  sources: SourceRef[];
-}
+// ── Draft scenario patch ──────────────────────────────────────────────────────
+export const draftPatchOperationSchema = z
+  .object({
+    op: z.enum(['add', 'replace', 'remove']),
+    path: z.string().startsWith('/'),
+    value: z.unknown().optional(),
+    sourceRefs: z.array(sourceIdSchema),
+    assumptionRefs: z.array(assumptionIdSchema),
+    rationale: z.string(),
+  })
+  .strict();
+export type DraftPatchOperation = z.infer<typeof draftPatchOperationSchema>;
+
+export const draftScenarioPatchSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    id: draftPatchIdSchema,
+    status: z.literal('draft'),
+    base: z
+      .object({
+        scenarioId: scenarioIdSchema,
+        contentVersion: contentVersionSchema,
+        inputChecksum: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+      })
+      .strict(),
+    operations: z.array(draftPatchOperationSchema),
+  })
+  .strict();
+export type DraftScenarioPatch = z.infer<typeof draftScenarioPatchSchema>;
+
+// ── Effective date range helper type (re-exported for adapter consumers) ────
+export type DateRange = z.infer<typeof dateRangeSchema>;

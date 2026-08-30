@@ -1,117 +1,106 @@
-import { createHash } from 'crypto';
+import { createHash } from 'node:crypto';
 import { ScenarioV2Validator } from './validator.js';
-import type { ScenarioBundle } from './schemas.js';
+import type { ScenarioBundle, Diagnostic } from './validator.js';
 
-export class ScenarioV2Builder {
-  private validator = new ScenarioV2Validator();
-
-  build(bundle: any): BuildResult {
-    // Validate the bundle
-    const validation = this.validator.validateBundle(bundle);
-    if (!validation.valid) {
-      return {
-        success: false,
-        errors: validation.errors,
-        inputChecksum: null
-      };
-    }
-
-    // Calculate canonical input checksum
-    const inputChecksum = this.calculateCanonicalChecksum(bundle);
-
-    return {
-      success: true,
-      bundle: bundle as ScenarioBundle,
-      inputChecksum,
-      errors: []
-    };
-  }
-
-  verifyDeterministicBuild(bundle: any): DeterministicBuildVerification {
-    const checksums: string[] = [];
-
-    for (let i = 0; i < 3; i++) {
-      const result = this.build(bundle);
-      if (!result.success) {
-        return {
-          deterministic: false,
-          checksums: [],
-          error: `Build ${i + 1} failed: ${result.errors[0]?.message || 'Unknown error'}`,
-          mismatchIndex: i
-        };
-      }
-      checksums.push(result.inputChecksum!);
-    }
-
-    // Verify all checksums are equal
-    const firstChecksum = checksums[0];
-    const allEqual = checksums.every(cs => cs === firstChecksum);
-
-    if (!allEqual) {
-      return {
-        deterministic: false,
-        checksums,
-        error: 'Checksums do not match across three builds',
-        mismatchIndex: 1
-      };
-    }
-
-    return {
-      deterministic: true,
-      checksums,
-      error: null,
-      mismatchIndex: null
-    };
-  }
-
-  private calculateCanonicalChecksum(bundle: any): string {
-    // Simple canonicalization: sort object keys
-    const canonicalData = {
-      manifest: this.canonicalize(bundle.manifest),
-      scenario: this.canonicalize(bundle.scenario),
-      sources: this.canonicalize(bundle.sources),
-      builderVersion: '1.0.0'
-    };
-
-    const canonicalJson = JSON.stringify(canonicalData, this.canonicalReplacer);
-    const hash = createHash('sha256');
-    hash.update(canonicalJson);
-    return `sha256:${hash.digest('hex')}`;
-  }
-
-  private canonicalize(data: any): any {
-    return JSON.parse(JSON.stringify(data, this.canonicalReplacer));
-  }
-
-  private canonicalReplacer(_key: string, value: any): any {
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      // Sort object keys for deterministic output
-      return Object.keys(value).sort().reduce((acc: any, k) => {
-        acc[k] = value[k];
-        return acc;
-      }, {});
-    }
-    return value;
-  }
-}
+export const BUILDER_CONTRACT_VERSION = '1';
 
 export interface BuildResult {
   success: boolean;
   bundle?: ScenarioBundle;
   inputChecksum: string | null;
-  errors: ValidationError[];
+  errors: Diagnostic[];
 }
 
-export interface ValidationError {
-  code: string;
-  path: string;
-  message: string;
-  refs?: string[];
+export interface WorldProjection {
+  scenarioId: string;
+  startDate: string;
+  polities: Array<{ id: string; name: string; color: string }>;
+  regions: Array<{ id: string; owner: string | null }>;
+  simulationRules: unknown;
 }
 
-export interface DeterministicBuildVerification {
-  deterministic: boolean;
-  checksums: string[];
-  error: string | null;
-  mismatchIndex: number | null;
+/**
+ * Deterministic offline Scenario V2 builder. Parses, validates, canonicalizes
+ * and checksums a pinned package. Performs no network I/O and no model calls.
+ */
+export class ScenarioV2Builder {
+  private readonly validator = new ScenarioV2Validator();
+
+  build(input: unknown): BuildResult {
+    const result = this.validator.validateBundle(input);
+    if (!result.valid || !result.bundle) {
+      return { success: false, inputChecksum: null, errors: result.errors };
+    }
+    const inputChecksum = calculateInputChecksum(result.bundle);
+    return { success: true, bundle: result.bundle, inputChecksum, errors: [] };
+  }
+
+  projections(bundle: ScenarioBundle): WorldProjection {
+    return {
+      scenarioId: bundle.scenario.id,
+      startDate: bundle.scenario.game.startDate,
+      polities: Object.values(bundle.scenario.polities).map((p) => ({ id: p.id, name: p.name, color: p.color })),
+      regions: bundle.scenario.regions.map((r) => ({
+        id: r.id,
+        owner: bundle.scenario.regionAssignments?.[r.id] ?? null,
+      })),
+      simulationRules: bundle.scenario.simulationRules,
+    };
+  }
+}
+
+/**
+ * Compute the canonical input checksum for a validated bundle.
+ * Includes schema-valid manifest/scenario/source data, the sorted byte hashes
+ * of required assets, and the builder contract version. Excludes drafts, local
+ * machine data, timestamps, network/LLM output and publication revision IDs.
+ */
+export function calculateInputChecksum(bundle: ScenarioBundle): string {
+  const requiredAssetHashes = bundle.manifest.assets
+    .filter((asset) => asset.required && asset.contentAddress)
+    .map((asset) => asset.contentAddress as string)
+    .sort();
+
+  const canonicalInput = {
+    schemaVersion: 2,
+    manifest: bundle.manifest,
+    scenario: bundle.scenario,
+    sources: bundle.sources,
+    requiredAssetHashes,
+    builderContractVersion: BUILDER_CONTRACT_VERSION,
+  };
+
+  const json = canonicalStringify(canonicalInput);
+  return `sha256:${createHash('sha256').update(json, 'utf8').digest('hex')}`;
+}
+
+/**
+ * RFC 8785/JCS-style canonical serialization: object keys are sorted, arrays
+ * preserve order, strings use JSON escaping and numbers use shortest
+ * round-trip (integers in practice). Deterministic across runs and machines.
+ */
+export function canonicalStringify(value: unknown): string {
+  if (value === null) return 'null';
+  if (value === true) return 'true';
+  if (value === false) return 'false';
+  if (typeof value === 'number') return canonicalNumber(value);
+  if (typeof value === 'string') return JSON.stringify(value);
+  if (Array.isArray(value)) {
+    return `[${value.map(canonicalStringify).join(',')}]`;
+  }
+  if (typeof value === 'object') {
+    const keys = Object.keys(value as Record<string, unknown>).sort();
+    return `{${keys
+      .map((key) => `${JSON.stringify(key)}:${canonicalStringify((value as Record<string, unknown>)[key])}`)
+      .join(',')}}`;
+  }
+  // Undefined, functions, symbols cannot appear in a validated bundle.
+  throw new Error(`cannot canonicalize value of type ${typeof value}`);
+}
+
+function canonicalNumber(value: number): string {
+  if (!Number.isFinite(value)) {
+    throw new Error('cannot canonicalize a non-finite number');
+  }
+  return String(value);
 }

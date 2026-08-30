@@ -8,10 +8,11 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.simple.json",
-    "test": "npm run build && node --test \"test/*.test.ts\"",
-    "typecheck": "tsc --noEmit -p tsconfig.simple.json",
-    "clean": "rm -rf dist"
+    "build": "tsc -p tsconfig.json",
+    "build:tests": "tsc -p tsconfig.test.json",
+    "test": "npm run build:tests && node --test \"dist-test/test/*.test.js\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "clean": "rm -rf dist dist-test"
   },
   "devDependencies": {
     "@types/node": "^22.10.7",

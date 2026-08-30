@@ -1,6 +1,13 @@
-export type * from './schemas.js';
+export * from './schemas.js';
 export { ScenarioV2Validator } from './validator.js';
-export { ScenarioV2Builder } from './builder.js';
-export { LegacySpecMigration } from './legacy-migration.js';
-export type { ValidationError } from './validator.js';
-export type { MigrationResult, MigrationError, MigrationWarning, MigrationReport } from './legacy-migration.js';
+export type { Diagnostic, ScenarioBundle } from './validator.js';
+export { ScenarioV2Builder, calculateInputChecksum, canonicalStringify, BUILDER_CONTRACT_VERSION } from './builder.js';
+export type { BuildResult, WorldProjection } from './builder.js';
+export { LegacySpecAdapter, slugify } from './legacy-adapter.js';
+export type {
+  LegacyLoss,
+  LegacyWarning,
+  CollisionEntry,
+  LegacyMigrationReport,
+  LegacyMigrationResult,
+} from './legacy-adapter.js';
