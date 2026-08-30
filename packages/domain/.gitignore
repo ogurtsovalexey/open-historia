@@ -1,0 +1,15 @@
+# Generated build outputs
+dist/
+dist-test/
+node_modules/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Editor files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
