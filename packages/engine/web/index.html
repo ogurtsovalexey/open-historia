@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Open Historia — Economy Playtest</title>
+<style>
+  :root {
+    --bg: #14161a; --panel: #1c1f26; --panel-2: #232732; --line: #2f3542;
+    --text: #e6e9ef; --dim: #9aa3b2; --accent: #6ea8fe; --good: #6bcf8a;
+    --bad: #f2777a; --warn: #e8c26a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.5 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: var(--panel);
+    border-bottom: 1px solid var(--line); padding: 10px 16px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  .clock { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+  .rev { color: var(--dim); font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px; }
+  button { background: var(--accent); color: #10131a; border: 0; border-radius: 6px;
+    padding: 7px 14px; font-weight: 600; font-size: 13px; cursor: pointer; }
+  button:hover { filter: brightness(1.1); }
+  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  button:disabled { opacity: .5; cursor: default; }
+  main { padding: 16px; display: grid; gap: 16px; max-width: 1500px; }
+  .tabs { display: flex; gap: 8px; }
+  .tab { padding: 7px 14px; border: 1px solid var(--line); border-radius: 6px;
+    background: transparent; color: var(--dim); font-weight: 600; }
+  .tab.on { background: var(--panel-2); color: var(--text); border-color: var(--accent); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 12px; }
+  .card, section.panel { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 12px 14px; }
+  .card h3 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--dim); font-weight: 600; }
+  .big { font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .delta { font-size: 12px; font-variant-numeric: tabular-nums; }
+  .up { color: var(--good); } .down { color: var(--bad); } .flat { color: var(--dim); }
+  section.panel > h2 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--dim); }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--dim); font-size: 11px; text-transform: uppercase;
+    letter-spacing: .05em; font-weight: 600; }
+  tbody tr:hover { background: var(--panel-2); }
+  .why { cursor: pointer; border-bottom: 1px dotted var(--dim); }
+  .why:hover { color: var(--accent); border-color: var(--accent); }
+  details.reasons { margin-top: 8px; }
+  details.reasons summary { cursor: pointer; color: var(--dim); font-size: 12px; }
+  details.reasons ul { margin: 6px 0 0; padding-left: 18px; color: var(--dim); font-size: 12px; }
+  .scroll { overflow-x: auto; }
+  pre { margin: 0; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px; color: var(--dim); max-height: 460px; overflow: auto; }
+  form.invest { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  label { display: grid; gap: 4px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--dim); font-weight: 600; }
+  select, input { background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 6px; padding: 7px 9px; font: inherit; min-width: 130px; }
+  .pending { background: var(--panel-2); border: 1px dashed var(--accent); border-radius: 6px;
+    padding: 8px 10px; font-size: 13px; display: flex; gap: 10px; align-items: center; }
+  .alert { border-left: 3px solid var(--warn); padding: 6px 10px; background: var(--panel-2);
+    border-radius: 4px; margin-bottom: 6px; font-size: 13px; }
+  .alert.rejected { border-left-color: var(--bad); }
+  .muted { color: var(--dim); }
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 1000px) { .cols2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Open Historia — Economy Playtest</h1>
+  <span class="clock" id="clock">—</span>
+  <span class="muted" id="turn"></span>
+  <span class="rev" id="rev"></span>
+  <span style="flex:1"></span>
+  <button id="advance">Advance month ▸</button>
+  <button id="advance12" class="ghost">+12 months</button>
+  <button id="reset" class="ghost">Reset</button>
+</header>
+
+<main>
+  <div class="tabs" id="tabs"></div>
+  <div id="alerts"></div>
+  <div class="cards" id="cards"></div>
+
+  <section class="panel">
+    <h2>Regions</h2>
+    <div class="scroll"><table id="regions"></table></div>
+  </section>
+
+  <div class="cols2">
+    <section class="panel">
+      <h2>Resources</h2>
+      <div class="scroll"><table id="resources"></table></div>
+    </section>
+    <section class="panel">
+      <h2>Order for <span id="orderMonth"></span></h2>
+      <form class="invest" id="investForm">
+        <label>Region
+          <select id="investRegion"></select>
+        </label>
+        <label>Spend (gold)
+          <input id="investSpend" type="number" min="1" step="100" value="1000" />
+        </label>
+        <button type="submit">Queue investment</button>
+      </form>
+      <p class="muted" id="investPreview" style="margin:10px 0 0"></p>
+      <div id="pendingBox" style="margin-top:10px"></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Turn report</h2>
+    <pre id="report">No month resolved yet. Press “Advance month”.</pre>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let snap = null;
+let selected = null;
+let pending = [];
+
+const fmt = (n) => n.toLocaleString('en-US');
+const signed = (n) => (n > 0 ? '+' + fmt(n) : fmt(n));
+const cls = (n) => (n > 0 ? 'up' : n < 0 ? 'down' : 'flat');
+const bp = (n) => (n / 100).toFixed(0) + '%';
+
+async function api(path, body) {
+  const res = await fetch(path, body
+    ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }
+    : {});
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || data.error || 'request failed');
+  return data;
+}
+
+function ledgerFor(id) {
+  return snap.lastTurn?.ledger.polities.find((p) => p.polityId === id) ?? null;
+}
+
+function render() {
+  $('clock').textContent = snap.month;
+  $('turn').textContent = 'turn ' + snap.turn;
+  $('rev').textContent = snap.revision.slice(0, 21) + '…';
+  $('orderMonth').textContent = snap.month;
+
+  if (!selected || !snap.polities.some((p) => p.id === selected)) selected = snap.polities[0].id;
+
+  $('tabs').innerHTML = '';
+  for (const polity of snap.polities) {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (polity.id === selected ? ' on' : '');
+    btn.textContent = polity.displayName.en;
+    btn.onclick = () => { selected = polity.id; render(); };
+    $('tabs').append(btn);
+  }
+
+  const polity = snap.polities.find((p) => p.id === selected);
+  const led = ledgerFor(selected);
+  const regions = snap.regions.filter((r) => r.controllerId === selected);
+  const population = regions.reduce((sum, r) => sum + r.population, 0);
+
+  // Alerts and rejected commands come first — they explain surprises.
+  const alerts = [];
+  for (const rejection of snap.lastTurn?.rejections ?? []) {
+    alerts.push(`<div class="alert rejected"><b>Command rejected:</b> ${rejection.reason} — ${rejection.detail} <span class="muted">State unchanged.</span></div>`);
+  }
+  for (const event of snap.lastTurn?.events ?? []) {
+    if (event.type === 'alert' && event.polityId === selected) {
+      alerts.push(`<div class="alert"><b>${event.alert}:</b> ${event.detail}</div>`);
+    }
+  }
+  $('alerts').innerHTML = alerts.join('');
+
+  const food = led?.food;
+  const foodLine = food
+    ? (food.shortfall > 0
+        ? `<div class="big down">−${fmt(food.shortfall)}</div><div class="delta muted">need ${fmt(food.need)}, consumed ${fmt(food.consumed)}</div>`
+        : `<div class="big up">+${fmt(food.surplus)}</div><div class="delta muted">need ${fmt(food.need)}, consumed ${fmt(food.consumed)}</div>`)
+    : '<div class="big flat">—</div>';
+
+  const popDelta = led ? led.populationClosing - led.populationOpening : 0;
+  const treasuryDelta = led ? led.treasuryClosing - led.treasuryOpening : 0;
+
+  $('cards').innerHTML = `
+    <div class="card">
+      <h3>Population</h3>
+      <div class="big">${fmt(population)}</div>
+      <div class="delta ${cls(popDelta)}">${led ? signed(popDelta) + ' last month' : 'no month resolved'}</div>
+      ${led ? reasonsBlock('Why changed', led.populationByRegion.map((r) =>
+        `${r.regionId.split(':').pop()}: births +${fmt(r.births)}, deaths −${fmt(r.deaths)}`)) : ''}
+    </div>
+    <div class="card">
+      <h3>Treasury (gold)</h3>
+      <div class="big">${fmt(polity.treasury)}</div>
+      <div class="delta ${cls(treasuryDelta)}">${led ? signed(treasuryDelta) + ' last month' : 'no month resolved'}</div>
+      ${led ? reasonsBlock('Why changed', [
+        `tax revenue +${fmt(led.taxTotal)}`,
+        `spending −${fmt(led.investment?.spend ?? 0)}`,
+        ...led.taxByRegion.map((t) => `tax ${t.regionId.split(':').pop()} (${t.resource}): +${fmt(t.amount)}`),
+      ]) : ''}
+    </div>
+    <div class="card">
+      <h3>Food balance</h3>
+      ${foodLine}
+    </div>
+    <div class="card">
+      <h3>Goods chain</h3>
+      ${led?.goods
+        ? `<div class="big">${fmt(led.goods.actual)}<span class="muted" style="font-size:14px"> / ${fmt(led.goods.potential)}</span></div>
+           <div class="delta ${led.goods.limitedBy === 'inputs' ? 'down' : 'flat'}">limited by ${
+             led.goods.limitedBy === 'inputs' ? led.goods.limitingInputs.join(' + ') : 'capacity / labour'}</div>`
+        : '<div class="big flat">—</div>'}
+    </div>`;
+
+  const productionByRegion = new Map();
+  for (const entry of led?.production ?? []) {
+    for (const row of entry.byRegion) productionByRegion.set(row.regionId, { resource: entry.resource, amount: row.amount });
+  }
+  const popByRegion = new Map((led?.populationByRegion ?? []).map((r) => [r.regionId, r]));
+
+  $('regions').innerHTML = `
+    <thead><tr>
+      <th>Region</th><th>Activity</th><th>Population</th><th>Δ</th>
+      <th>Output</th><th>Infra</th><th>Damage</th>
+    </tr></thead>
+    <tbody>${regions.map((region) => {
+      const production = productionByRegion.get(region.regionId);
+      const populationRow = popByRegion.get(region.regionId);
+      const delta = populationRow ? populationRow.births - populationRow.deaths : 0;
+      const activity = region.activity.kind === 'extraction'
+        ? region.activity.resource
+        : region.activity.activity;
+      return `<tr>
+        <td>${region.displayName.en} <span class="muted">${region.regionId.split(':').pop()}</span></td>
+        <td>${activity}</td>
+        <td>${fmt(region.population)}</td>
+        <td class="${cls(delta)}">${populationRow ? signed(delta) : '—'}</td>
+        <td>${production ? fmt(production.amount) + ' ' + production.resource : '—'}</td>
+        <td>${bp(region.infrastructureBp)}</td>
+        <td>${region.damageBp ? bp(region.damageBp) : '—'}</td>
+      </tr>`;
+    }).join('')}</tbody>`;
+
+  const movements = new Map((led?.stockMovements ?? []).map((m) => [m.resource, m]));
+  $('resources').innerHTML = `
+    <thead><tr><th>Resource</th><th>Stock</th><th>Produced</th><th>Used</th><th>Balance</th></tr></thead>
+    <tbody>${polity.stockpile.map((entry) => {
+      const movement = movements.get(entry.resource);
+      const used = movement ? movement.processingUse + movement.populationUse : 0;
+      const balance = movement ? movement.produced - used : 0;
+      return `<tr>
+        <td>${entry.resource}</td>
+        <td>${fmt(entry.amount)}</td>
+        <td class="${cls(movement?.produced ?? 0)}">${movement ? signed(movement.produced) : '—'}</td>
+        <td class="${used ? 'down' : 'flat'}">${movement ? (used ? '−' + fmt(used) : '0') : '—'}</td>
+        <td class="${cls(balance)}">${movement ? signed(balance) : '—'}</td>
+      </tr>`;
+    }).join('')}</tbody>`;
+
+  $('investRegion').innerHTML = regions
+    .map((r) => `<option value="${r.regionId}">${r.displayName.en} — infra ${bp(r.infrastructureBp)}</option>`)
+    .join('');
+  updatePreview();
+  renderPending();
+
+  $('report').textContent = snap.lastTurn?.report ?? 'No month resolved yet. Press “Advance month”.';
+}
+
+function reasonsBlock(title, lines) {
+  return `<details class="reasons"><summary>${title}</summary><ul>${
+    lines.map((line) => `<li>${line}</li>`).join('')}</ul></details>`;
+}
+
+function updatePreview() {
+  const regionId = $('investRegion').value;
+  const region = snap.regions.find((r) => r.regionId === regionId);
+  const spend = Number($('investSpend').value);
+  if (!region || !Number.isFinite(spend) || spend <= 0) { $('investPreview').textContent = ''; return; }
+  const polity = snap.polities.find((p) => p.id === selected);
+  const rawGain = spend * snap.economy.infrastructureBpPerMoney;
+  const after = Math.min(10000, region.infrastructureBp + rawGain);
+  const applied = after - region.infrastructureBp;
+  const affordable = spend <= polity.treasury;
+  $('investPreview').innerHTML = affordable
+    ? `Infrastructure ${bp(region.infrastructureBp)} → <b>${bp(after)}</b> (+${applied} bp${
+        applied < rawGain ? ', clamped at 100%' : ''}). Treasury ${fmt(polity.treasury)} → ${fmt(polity.treasury - spend)}.`
+    : `<span class="down">Insufficient treasury: spend ${fmt(spend)} &gt; ${fmt(polity.treasury)}. The engine would reject this command.</span>`;
+}
+
+function renderPending() {
+  if (pending.length === 0) {
+    $('pendingBox').innerHTML = '<span class="muted">No queued orders — advancing resolves the month with no commands.</span>';
+    return;
+  }
+  $('pendingBox').innerHTML = pending.map((command, index) =>
+    `<div class="pending"><span><b>${command.actorPolityId.split(':').pop()}</b> invests ${fmt(command.spend)} gold in ${
+      command.targetRegionId.split(':').pop()}</span>
+      <button class="ghost" data-drop="${index}">remove</button></div>`).join('');
+  for (const button of $('pendingBox').querySelectorAll('[data-drop]')) {
+    button.onclick = () => { pending.splice(Number(button.dataset.drop), 1); renderPending(); };
+  }
+}
+
+async function advance(months) {
+  const buttons = [$('advance'), $('advance12'), $('reset')];
+  buttons.forEach((b) => (b.disabled = true));
+  try {
+    for (let i = 0; i < months; i += 1) {
+      const commands = pending.map((command) => ({
+        ...command, effectiveMonth: snap.month, expectedRevision: snap.revision,
+      }));
+      snap = await api('/api/turn', { commands });
+      pending = [];
+      render();
+    }
+  } catch (error) {
+    alert('Turn failed: ' + error.message);
+  } finally {
+    buttons.forEach((b) => (b.disabled = false));
+  }
+}
+
+$('advance').onclick = () => advance(1);
+$('advance12').onclick = () => advance(12);
+$('reset').onclick = async () => { snap = await api('/api/reset', {}); pending = []; render(); };
+$('investRegion').onchange = updatePreview;
+$('investSpend').oninput = updatePreview;
+$('investForm').onsubmit = (event) => {
+  event.preventDefault();
+  const spend = Number($('investSpend').value);
+  if (!Number.isInteger(spend) || spend <= 0) { alert('Spend must be a positive whole number.'); return; }
+  pending = pending.filter((command) => command.actorPolityId !== selected);
+  pending.push({
+    kind: 'economy.invest-region',
+    commandId: crypto.randomUUID(),
+    actorPolityId: selected,
+    targetRegionId: $('investRegion').value,
+    effectiveMonth: snap.month,
+    spend,
+  });
+  renderPending();
+};
+
+api('/api/state').then((data) => { snap = data; render(); })
+  .catch((error) => { document.body.innerHTML = '<pre style="padding:20px">Failed to load: ' + error.message + '</pre>'; });
+</script>
+</body>
+</html>

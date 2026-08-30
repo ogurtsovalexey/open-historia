@@ -4,7 +4,21 @@ Deterministic economy engine for Open Historia. Headless: no UI, no LLM calls,
 no randomness, no wall clock in state. Contracts: [`docs/canon/03-simulation-core.md`](../../docs/canon/03-simulation-core.md)
 and [`docs/canon/04-economy-slice.md`](../../docs/canon/04-economy-slice.md).
 
-## Run the 2×5 playtest
+## Play it in a browser (phase P1)
+
+```bash
+npm run play          # from this directory
+# or from the repo root:  npm run play:engine
+```
+
+Opens a local server on http://localhost:5174 with the playtest dashboard:
+region table, national totals with "why changed" pulled from the contribution
+ledger, resource flows, an investment order with a preview of its
+infrastructure effect, advance one month / twelve months, reset, and the full
+turn report. In-memory session, zero model calls, no network egress.
+`--scenario <file>` and `--port <n>` are supported.
+
+## Run the 2×5 playtest headlessly
 
 ```bash
 npm run build            # from this directory (domain + data-packs must be built first)

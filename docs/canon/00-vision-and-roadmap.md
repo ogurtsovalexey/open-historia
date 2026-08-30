@@ -93,8 +93,8 @@ opponent → deterministic consequences) comes second.
 | Phase | Delivers | Status |
 |---|---|---|
 | **P0 — Deterministic economy core** | Headless slice: 2 countries × 5 regions, monthly tick, ledger, report with causes, atomic run dirs, byte-identical replay, golden tests | **Done** (canon 04) |
-| **P1 — See it with your eyes** | Minimal dashboard reading engine output: region table, national totals, "why changed" from the ledger, advance-turn button. Zero model calls. | Next |
-| **P2 — The loop (fun gate)** | Free-text orders → typed commands (interpreter, canon 07); LLM opponent playing rival countries from a bounded engine-built brief; difficulty levels; relations/agreements state so opponents have something to do with each other | Core bet |
+| **P1 — See it with your eyes** | Local playtest dashboard: region table, national totals, "why changed" from the ledger, resource flows, investment order with preview, advance one month / twelve, reset, full turn report. Zero model calls (`npm run play:engine`). | **Done** |
+| **P2 — The loop (fun gate)** | Free-text orders → typed commands (interpreter, canon 07); LLM opponent playing rival countries from a bounded engine-built brief; difficulty levels; relations/agreements state so opponents have something to do with each other | **Next** — core bet |
 | **P3 — Internal politics** | Factions/estates fed by existing economy outputs (tax pressure, food shortfall, investment neglect), legitimacy, unrest, rulers | |
 | **P4 — War and army** | Forces and mobilization from population, supply on a bounded map, aggregate combat, occupation → region transfer (transfer semantics already specified) | |
 | **P5 — Identity and people** | Culture/religion static (unrest, annexation resistance); rulers/dynasties with succession | |
