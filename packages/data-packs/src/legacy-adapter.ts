@@ -1,4 +1,7 @@
 import { createHash } from 'node:crypto';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { canonicalStringify } from './builder.js';
 
 // The adapter operates on the resolved `export default` of a legacy `.spec.mjs`
@@ -37,6 +40,11 @@ export interface LegacyMigrationResult {
   draftChecksum: string;
 }
 
+export interface WrittenLegacyMigration extends LegacyMigrationResult {
+  outputDirectory: string;
+  files: readonly string[];
+}
+
 interface LegacyPolity {
   name?: unknown;
   color?: unknown;
@@ -58,6 +66,42 @@ interface LegacySpec {
 }
 
 export class LegacySpecAdapter {
+  async migrateFile(sourcePath: string, outputDirectory?: string): Promise<WrittenLegacyMigration> {
+    const absoluteSource = path.resolve(sourcePath);
+    if (!absoluteSource.endsWith('.spec.mjs')) {
+      throw new Error('legacy migration source must be a .spec.mjs file');
+    }
+    const sourceBefore = readFileSync(absoluteSource);
+    const module = (await import(`${pathToFileURL(absoluteSource).href}?migration=${createHash('sha256').update(sourceBefore).digest('hex')}`)) as { default?: unknown };
+    if (!('default' in module)) {
+      throw new Error('legacy .spec.mjs must export default');
+    }
+
+    const result = this.migrate(module.default);
+    const target = path.resolve(outputDirectory ?? absoluteSource.replace(/\.spec\.mjs$/, '.v2-draft'));
+    if (target === absoluteSource || target.startsWith(`${absoluteSource}${path.sep}`)) {
+      throw new Error('migration output must be a side-by-side directory, not the source path');
+    }
+    mkdirSync(target, { recursive: true });
+
+    const draft = result.draft as { manifest: unknown; scenario: unknown; sources: unknown };
+    const files: Array<[string, unknown]> = [
+      ['manifest.json', draft.manifest],
+      ['scenario.json', draft.scenario],
+      ['sources.json', draft.sources],
+      ['migration-report.json', result.report],
+    ];
+    for (const [name, value] of files) {
+      writeDeterministic(path.join(target, name), `${canonicalStringify(value)}\n`);
+    }
+
+    const sourceAfter = readFileSync(absoluteSource);
+    if (!sourceBefore.equals(sourceAfter)) {
+      throw new Error('legacy source changed during migration');
+    }
+    return { ...result, outputDirectory: target, files: files.map(([name]) => name) };
+  }
+
   migrate(spec: unknown): LegacyMigrationResult {
     const losses: LegacyLoss[] = [];
     const warnings: LegacyWarning[] = [];
@@ -189,6 +233,19 @@ export class LegacySpecAdapter {
     };
 
     return { draft, report, draftChecksum };
+  }
+}
+
+function writeDeterministic(filePath: string, content: string): void {
+  try {
+    writeFileSync(filePath, content, { encoding: 'utf8', flag: 'wx' });
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code !== 'EEXIST') throw error;
+    const existing = readFileSync(filePath, 'utf8');
+    if (existing !== content) {
+      throw new Error(`migration output already exists with different content: ${filePath}`);
+    }
   }
 }
 

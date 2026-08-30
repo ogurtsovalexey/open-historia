@@ -17,17 +17,33 @@ import {
 } from '@open-historia/domain';
 
 // ── SemVer (no leading "v") ───────────────────────────────────────────────────
+const semverPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
+const semverRangePattern = /^(?:\*|(?:\^|~|>=?|<=?)?\s*(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\s+(?:>=?|<=?)?\s*(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?)*)$/;
+
 export const contentVersionSchema = z
   .string()
-  .regex(/^\d+\.\d+\.\d+$/, 'Content version must be SemVer without a leading v');
+  .regex(semverPattern, 'Content version must be SemVer without a leading v');
 export type ContentVersion = z.infer<typeof contentVersionSchema>;
+
+export const engineRangeSchema = z
+  .string()
+  .regex(semverRangePattern, 'Engine range must be a deterministic SemVer range');
+
+export const relativePackagePathSchema = z
+  .string()
+  .min(1)
+  .refine((path) => {
+    if (path.includes('\\') || path.startsWith('/') || /^[A-Za-z]:/.test(path)) return false;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(path)) return false;
+    return path.split('/').every((segment) => segment !== '' && segment !== '.' && segment !== '..');
+  }, 'Asset path must be a safe package-relative path using / separators');
 
 // ── Package manifest ──────────────────────────────────────────────────────────
 export const assetRefSchema = z
   .object({
     id: assetIdSchema,
     kind: z.enum(['regions', 'cities', 'background', 'other']),
-    path: z.string().optional(),
+    path: relativePackagePathSchema.optional(),
     contentAddress: z
       .string()
       .regex(/^sha256:[a-f0-9]{64}$/, 'contentAddress must be `sha256:<hex>`')
@@ -43,7 +59,7 @@ export const scenarioManifestSchema = z
     schemaVersion: z.literal(2),
     id: scenarioIdSchema,
     contentVersion: contentVersionSchema,
-    engineRange: z.string().min(1),
+    engineRange: engineRangeSchema,
     defaultLocale: z.string().min(1),
     scenarioPath: z.literal('scenario.json'),
     sourcesPath: z.literal('sources.json'),
@@ -159,7 +175,7 @@ export const macroRegionDefSchema = z
   .object({
     id: macroRegionIdSchema,
     name: z.string(),
-    members: z.array(regionIdSchema),
+    members: z.array(regionIdSchema).min(1),
     purpose: z.enum(['aggregation', 'fixture', 'historical-area']),
     geometryAssetRef: assetIdSchema.optional(),
   })
@@ -168,7 +184,7 @@ export type MacroRegionDef = z.infer<typeof macroRegionDefSchema>;
 
 export const fidelityGapSchema = z
   .object({
-    path: z.string().startsWith('/'),
+    path: z.string().regex(/^(?:\/(?:[^~/]|~0|~1)*)+$/, 'Path must be an RFC 6901 JSON pointer'),
     disposition: z.enum(['unknown', 'assumption', 'not-applicable']),
     reason: z.string(),
     assumptionRef: assumptionIdSchema.optional(),
@@ -235,7 +251,7 @@ export const inferredClaimSchema = z
   .object({
     id: z.string(),
     claim: z.string(),
-    evidenceRefs: z.array(factIdSchema),
+    evidenceRefs: z.array(factIdSchema).min(1),
     confidence: z.enum(['high', 'medium', 'low']),
     assertion: z
       .object({
@@ -276,7 +292,7 @@ export const draftPatchOperationSchema = z
   .object({
     op: z.enum(['add', 'replace', 'remove']),
     path: z.string().startsWith('/'),
-    value: z.unknown().optional(),
+    value: z.json().optional(),
     sourceRefs: z.array(sourceIdSchema),
     assumptionRefs: z.array(assumptionIdSchema),
     rationale: z.string(),

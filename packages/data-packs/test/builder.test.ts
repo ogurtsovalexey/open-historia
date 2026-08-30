@@ -1,5 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
+import { createHash } from 'node:crypto';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { ScenarioV2Builder, calculateInputChecksum, canonicalStringify } from '../src/builder.js';
 import { makeBundle } from './fixtures.js';
 
@@ -60,6 +64,114 @@ describe('ScenarioV2Builder — determinism and checksums', () => {
     assert.strictEqual(projections.scenarioId, 'scenario:world-1916');
     assert.strictEqual(projections.startDate, '1916-01-01');
     assert.strictEqual(projections.polities.length, 2);
+  });
+
+  it('rejects a required asset absent from the local package/store', () => {
+    const bytes = 'fixture-regions';
+    const contentAddress = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+    const bundle = makeBundle({
+      manifest: {
+        assets: [{
+          id: 'asset:world-1916:regions',
+          kind: 'regions',
+          path: 'assets/regions.json',
+          contentAddress,
+          mediaType: 'application/json',
+          required: true,
+        }],
+      },
+    });
+    const result = builder.build(bundle);
+    assert.strictEqual(result.success, false);
+    assert(result.errors.some((error) => error.code === 'build.missing-local-asset'));
+  });
+
+  it('verifies required asset bytes before producing a checksum', () => {
+    const bytes = 'fixture-regions';
+    const contentAddress = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+    const bundle = makeBundle({
+      manifest: {
+        assets: [{
+          id: 'asset:world-1916:regions',
+          kind: 'regions',
+          contentAddress,
+          mediaType: 'application/json',
+          required: true,
+        }],
+      },
+    });
+
+    const mismatch = builder.build(bundle, { assets: { 'asset:world-1916:regions': 'wrong' } });
+    assert(mismatch.errors.some((error) => error.code === 'build.asset-checksum-mismatch'));
+    const valid = builder.build(bundle, { assets: { 'asset:world-1916:regions': bytes } });
+    assert.strictEqual(valid.success, true, JSON.stringify(valid.errors));
+  });
+
+  it('normalizes set-like arrays before checksumming', () => {
+    const first = makeBundle({
+      scenario: { regions: [
+        { id: 'region:gadm-4-1:RUS.33_1', dataset: 'gadm', datasetVersion: '4.1', nativeId: 'RUS.33_1' },
+        { id: 'region:gadm-4-1:DEU.1_1', dataset: 'gadm', datasetVersion: '4.1', nativeId: 'DEU.1_1' },
+      ] },
+    });
+    const second = makeBundle({
+      scenario: { regions: [
+        { id: 'region:gadm-4-1:DEU.1_1', dataset: 'gadm', datasetVersion: '4.1', nativeId: 'DEU.1_1' },
+        { id: 'region:gadm-4-1:RUS.33_1', dataset: 'gadm', datasetVersion: '4.1', nativeId: 'RUS.33_1' },
+      ] },
+    });
+    const firstResult = builder.build(first);
+    const secondResult = builder.build(second);
+    assert.strictEqual(firstResult.success, true, JSON.stringify(firstResult.errors));
+    assert.strictEqual(secondResult.success, true, JSON.stringify(secondResult.errors));
+    assert.strictEqual(firstResult.inputChecksum, secondResult.inputChecksum);
+  });
+
+  it('loads manifest-driven JSON and assets offline from a package directory', () => {
+    const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'open-historia-v2-build-'));
+    const bytes = 'fixture-regions';
+    const contentAddress = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+    const bundle = makeBundle({ manifest: { assets: [{
+      id: 'asset:world-1916:regions', kind: 'regions', path: 'assets/regions.bin',
+      contentAddress, mediaType: 'application/octet-stream', required: true,
+    }] } }) as { manifest: unknown; scenario: unknown; sources: unknown };
+    try {
+      mkdirSync(path.join(tempRoot, 'assets'));
+      writeFileSync(path.join(tempRoot, 'manifest.json'), JSON.stringify(bundle.manifest));
+      writeFileSync(path.join(tempRoot, 'scenario.json'), JSON.stringify(bundle.scenario));
+      writeFileSync(path.join(tempRoot, 'sources.json'), JSON.stringify(bundle.sources));
+      writeFileSync(path.join(tempRoot, 'assets', 'regions.bin'), bytes);
+
+      const result = builder.buildFromDirectory(tempRoot);
+      assert.strictEqual(result.success, true, JSON.stringify(result.errors));
+    } finally {
+      rmSync(tempRoot, { recursive: true, force: true });
+    }
+  });
+
+  it('rejects a package asset symlink that escapes the package root', () => {
+    const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'open-historia-v2-escape-'));
+    const packageRoot = path.join(tempRoot, 'package');
+    const outside = path.join(tempRoot, 'outside.bin');
+    const bytes = 'outside';
+    const contentAddress = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+    const bundle = makeBundle({ manifest: { assets: [{
+      id: 'asset:world-1916:regions', kind: 'regions', path: 'assets/regions.bin',
+      contentAddress, mediaType: 'application/octet-stream', required: true,
+    }] } }) as { manifest: unknown; scenario: unknown; sources: unknown };
+    try {
+      mkdirSync(path.join(packageRoot, 'assets'), { recursive: true });
+      writeFileSync(path.join(packageRoot, 'manifest.json'), JSON.stringify(bundle.manifest));
+      writeFileSync(path.join(packageRoot, 'scenario.json'), JSON.stringify(bundle.scenario));
+      writeFileSync(path.join(packageRoot, 'sources.json'), JSON.stringify(bundle.sources));
+      writeFileSync(outside, bytes);
+      symlinkSync(outside, path.join(packageRoot, 'assets', 'regions.bin'));
+
+      const result = builder.buildFromDirectory(packageRoot);
+      assert(result.errors.some((error) => error.code === 'build.path-escape'));
+    } finally {
+      rmSync(tempRoot, { recursive: true, force: true });
+    }
   });
 });
 

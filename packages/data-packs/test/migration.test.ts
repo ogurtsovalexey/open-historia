@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { LegacySpecAdapter } from '../src/legacy-adapter.js';
@@ -58,6 +59,25 @@ describe('LegacySpecAdapter — side-by-side migration', () => {
     };
     assert.strictEqual(draft.scenario.simulationRules.constraints.narrativeRules.length, 1);
     assert(result.report.warnings.some((w) => w.path === '/scenario/simulationRules'));
+  });
+
+  it('writes a real deterministic side-by-side Draft directory without changing the source', async () => {
+    const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'open-historia-v2-migration-'));
+    const output = path.join(tempRoot, 'legacy-rome.v2-draft');
+    const before = readFileSync(fixturePath);
+    try {
+      const adapter = new LegacySpecAdapter();
+      const first = await adapter.migrateFile(fixturePath, output);
+      const firstBytes = Object.fromEntries(first.files.map((name) => [name, readFileSync(path.join(output, name), 'utf8')]));
+      const second = await adapter.migrateFile(fixturePath, output);
+      const secondBytes = Object.fromEntries(second.files.map((name) => [name, readFileSync(path.join(output, name), 'utf8')]));
+
+      assert.deepStrictEqual(readdirSync(output).sort(), ['manifest.json', 'migration-report.json', 'scenario.json', 'sources.json']);
+      assert.deepStrictEqual(firstBytes, secondBytes);
+      assert(before.equals(readFileSync(fixturePath)));
+    } finally {
+      rmSync(tempRoot, { recursive: true, force: true });
+    }
   });
 });
 

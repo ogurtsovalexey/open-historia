@@ -46,6 +46,47 @@ function refError(code: string, path: string, message: string, refs: string[]): 
   return { code, path, message, refs };
 }
 
+function sortDiagnostics(errors: Diagnostic[]): Diagnostic[] {
+  return [...errors].sort((a, b) =>
+    a.path.localeCompare(b.path) || a.code.localeCompare(b.code) || a.message.localeCompare(b.message));
+}
+
+function duplicateDiagnostics(
+  values: readonly string[],
+  path: string,
+  code: string,
+): Diagnostic[] {
+  const seen = new Set<string>();
+  const errors: Diagnostic[] = [];
+  values.forEach((value, index) => {
+    if (seen.has(value)) {
+      errors.push(refError(code, `${path}/${index}`, `duplicate ID "${value}"`, [value]));
+    }
+    seen.add(value);
+  });
+  return errors;
+}
+
+function isProtectedScenarioPath(path: string): boolean {
+  if (isProtectedPath(path)) return true;
+  return [
+    /^\/manifest\/(?:schemaVersion|id|contentVersion)(?:\/|$)/,
+    /^\/scenario\/(?:id|schemaVersion)(?:\/|$)/,
+    /^\/scenario\/game\/startDate(?:\/|$)/,
+    /^\/scenario\/polities\/[^/]+\/id(?:\/|$)/,
+    /^\/scenario\/regions\/[^/]+\/(?:id|datasetVersion|nativeId)(?:\/|$)/,
+    /^\/scenario\/regionAssignments\/[^/]+(?:\/|$)/,
+    /^\/scenario\/simulationRules(?:\/|$)/,
+    /^\/scenario\/(?:historicalFacts|assumptions)\/[^/]+(?:\/|$)/,
+    /^\/scenario\/macroRegions\/[^/]+\/members(?:\/|$)/,
+    /^\/sources\/[^/]+(?:\/|$)/,
+  ].some((pattern) => pattern.test(path));
+}
+
+function isJsonPointer(value: string): boolean {
+  return /^(?:\/(?:[^~/]|~0|~1)*)+$/.test(value);
+}
+
 export class ScenarioV2Validator {
   validateBundle(input: unknown): { valid: boolean; bundle?: ScenarioBundle; errors: Diagnostic[] } {
     if (typeof input !== 'object' || input === null) {
@@ -53,12 +94,24 @@ export class ScenarioV2Validator {
     }
 
     const raw = input as { manifest?: unknown; scenario?: unknown; sources?: unknown };
+    const rootKeys = Object.keys(raw);
+    const rootErrors: Diagnostic[] = [];
+    for (const key of rootKeys) {
+      if (!['manifest', 'scenario', 'sources'].includes(key)) {
+        rootErrors.push({ code: 'schema.unrecognized_keys', path: `/${key}`, message: `Unrecognized bundle key "${key}"` });
+      }
+    }
+    for (const key of ['manifest', 'scenario', 'sources'] as const) {
+      if (!(key in raw)) {
+        rootErrors.push({ code: 'schema.missing-document', path: `/${key}`, message: `Missing required ${key} document` });
+      }
+    }
 
     const manifestParsed = scenarioManifestSchema.safeParse(raw.manifest);
     const scenarioParsed = scenarioV2Schema.safeParse(raw.scenario);
-    const sourcesParsed = sourceRefSchema.array().safeParse(raw.sources ?? []);
+    const sourcesParsed = sourceRefSchema.array().safeParse(raw.sources);
 
-    const errors: Diagnostic[] = [];
+    const errors: Diagnostic[] = [...rootErrors];
     if (!manifestParsed.success) {
       errors.push(...toDiagnostics(manifestParsed.error.issues).map((d) => ({ ...d, path: `/manifest${d.path}` })));
     }
@@ -70,7 +123,7 @@ export class ScenarioV2Validator {
     }
 
     if (!manifestParsed.success || !scenarioParsed.success || !sourcesParsed.success) {
-      return { valid: false, errors };
+      return { valid: false, errors: sortDiagnostics(errors) };
     }
 
     const bundle: ScenarioBundle = {
@@ -83,7 +136,8 @@ export class ScenarioV2Validator {
     errors.push(...this.validateProvenance(bundle));
     errors.push(...this.validateIntegrity(bundle));
 
-    return errors.length === 0 ? { valid: true, bundle, errors: [] } : { valid: false, bundle, errors };
+    const sorted = sortDiagnostics(errors);
+    return sorted.length === 0 ? { valid: true, bundle, errors: [] } : { valid: false, bundle, errors: sorted };
   }
 
   validatePregameNarrative(
@@ -121,6 +175,11 @@ export class ScenarioV2Validator {
       }
     });
 
+    errors.push(...duplicateDiagnostics(draft.factsUsed, '/factsUsed', 'integrity.duplicate-facts-used'));
+    errors.push(...duplicateDiagnostics(draft.inferredClaims.map((claim) => claim.id), '/inferredClaims', 'integrity.duplicate-claim'));
+
+    const knownClaims = new Set(draft.inferredClaims.map((claim) => claim.id));
+
     const referenced = new Set<string>();
     draft.segments.forEach((seg) => seg.factRefs.forEach((f) => referenced.add(f)));
     draft.inferredClaims.forEach((claim) => claim.evidenceRefs.forEach((f) => referenced.add(f)));
@@ -134,6 +193,16 @@ export class ScenarioV2Validator {
     }
 
     draft.segments.forEach((seg, i) => {
+      seg.factRefs.forEach((factId, factIndex) => {
+        if (!knownFacts.has(factId)) {
+          errors.push(refError('reference.unknown-fact', `/segments/${i}/factRefs/${factIndex}`, `unknown fact "${factId}"`, [factId]));
+        }
+      });
+      seg.claimRefs.forEach((claimId, claimIndex) => {
+        if (!knownClaims.has(claimId)) {
+          errors.push(refError('reference.unknown-claim', `/segments/${i}/claimRefs/${claimIndex}`, `unknown claim "${claimId}"`, [claimId]));
+        }
+      });
       if (seg.kind === 'fact' && seg.factRefs.length === 0) {
         errors.push({ code: 'integrity.fact-segment-missing-ref', path: `/segments/${i}`, message: 'fact segment requires at least one factRefs entry' });
       }
@@ -149,10 +218,21 @@ export class ScenarioV2Validator {
     });
 
     draft.inferredClaims.forEach((claim, i) => {
+      claim.evidenceRefs.forEach((factId, evidenceIndex) => {
+        if (!knownFacts.has(factId)) {
+          errors.push(refError('reference.unknown-fact', `/inferredClaims/${i}/evidenceRefs/${evidenceIndex}`, `unknown fact "${factId}"`, [factId]));
+        }
+      });
+      const assumptionEvidence = baseBundle.scenario.historicalFacts.some((fact) =>
+        claim.evidenceRefs.includes(fact.id) && (fact.confidence === 'assumption' || fact.assumptionRefs.length > 0));
+      if (assumptionEvidence && claim.confidence !== 'low') {
+        errors.push({ code: 'integrity.assumption-confidence-too-high', path: `/inferredClaims/${i}/confidence`, message: `claim "${claim.id}" cites assumption-backed evidence and must have low confidence`, refs: [claim.id] });
+      }
       errors.push(...this.checkClaim(claim, i, baseBundle));
     });
 
-    return errors.length === 0 ? { valid: true, draft, errors: [] } : { valid: false, draft, errors };
+    const sorted = sortDiagnostics(errors);
+    return sorted.length === 0 ? { valid: true, draft, errors: [] } : { valid: false, draft, errors: sorted };
   }
 
   validateDraftPatch(
@@ -190,8 +270,13 @@ export class ScenarioV2Validator {
       });
     }
 
+    const scenarioSlug = baseBundle.manifest.id.replace(/^scenario:/, '');
+    if (!patch.id.startsWith(`draft-patch:${scenarioSlug}:`)) {
+      errors.push(refError('reference.wrong-scenario', '/id', `draft patch "${patch.id}" is not scenario-qualified under ${baseBundle.manifest.id}`, [patch.id]));
+    }
+
     patch.operations.forEach((op, i) => {
-      if (isProtectedPath(op.path)) {
+      if (isProtectedScenarioPath(op.path)) {
         errors.push({
           code: 'integrity.protected-path-mutation',
           path: `/operations/${i}/path`,
@@ -199,9 +284,26 @@ export class ScenarioV2Validator {
           refs: [op.path],
         });
       }
+      if (op.op === 'remove' && op.value !== undefined) {
+        errors.push({ code: 'integrity.remove-has-value', path: `/operations/${i}/value`, message: 'remove operation cannot carry value' });
+      }
+      if (op.op !== 'remove' && op.value === undefined) {
+        errors.push({ code: 'integrity.mutation-missing-value', path: `/operations/${i}/value`, message: `${op.op} operation requires value` });
+      }
+      op.sourceRefs.forEach((sourceId, sourceIndex) => {
+        if (!this.knownSources(baseBundle).has(sourceId)) {
+          errors.push(refError('reference.unknown-source', `/operations/${i}/sourceRefs/${sourceIndex}`, `unknown source "${sourceId}"`, [sourceId]));
+        }
+      });
+      op.assumptionRefs.forEach((assumptionId, assumptionIndex) => {
+        if (!this.knownAssumptions(baseBundle).has(assumptionId)) {
+          errors.push(refError('reference.unknown-assumption', `/operations/${i}/assumptionRefs/${assumptionIndex}`, `unknown assumption "${assumptionId}"`, [assumptionId]));
+        }
+      });
     });
 
-    return errors.length === 0 ? { valid: true, patch, errors: [] } : { valid: false, patch, errors };
+    const sorted = sortDiagnostics(errors);
+    return sorted.length === 0 ? { valid: true, patch, errors: [] } : { valid: false, patch, errors: sorted };
   }
 
   // ── Reference validation ────────────────────────────────────────────────────
@@ -221,9 +323,39 @@ export class ScenarioV2Validator {
     const slug = scenario.id.replace(/^scenario:/, '');
     const expectPrefix = (prefix: string): string => `${prefix}:${slug}:`;
 
+    errors.push(...duplicateDiagnostics(sources.map((source) => source.id), '/sources', 'reference.duplicate-source'));
+    errors.push(...duplicateDiagnostics(scenario.historicalFacts.map((fact) => fact.id), '/scenario/historicalFacts', 'reference.duplicate-fact'));
+    errors.push(...duplicateDiagnostics(scenario.assumptions.map((assumption) => assumption.id), '/scenario/assumptions', 'reference.duplicate-assumption'));
+    errors.push(...duplicateDiagnostics(scenario.regions.map((region) => region.id), '/scenario/regions', 'reference.duplicate-region'));
+    errors.push(...duplicateDiagnostics(scenario.macroRegions.map((macro) => macro.id), '/scenario/macroRegions', 'reference.duplicate-macro-region'));
+    errors.push(...duplicateDiagnostics(manifest.assets.map((asset) => asset.id), '/manifest/assets', 'reference.duplicate-asset'));
+
+    Object.entries(scenario.polities).forEach(([key, polity]) => {
+      if (key !== polity.id) {
+        errors.push(refError('reference.polity-key-mismatch', `/scenario/polities/${key}/id`, `polity record key "${key}" does not equal embedded id "${polity.id}"`, [key, polity.id]));
+      }
+    });
+
+    scenario.regions.forEach((region, i) => {
+      const datasetSlug = `${region.dataset}-${region.datasetVersion}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      const expected = `region:${datasetSlug}:${region.nativeId}`;
+      if (region.id !== expected) {
+        errors.push(refError('reference.region-id-mismatch', `/scenario/regions/${i}/id`, `region id must be "${expected}" for its dataset, version and nativeId`, [region.id, expected]));
+      }
+    });
+
     sources.forEach((source, i) => {
       if (!source.id.startsWith(expectPrefix('source'))) {
         errors.push(refError('reference.wrong-scenario', `/sources/${i}/id`, `source "${source.id}" is not scenario-qualified under ${scenario.id}`, [source.id]));
+      }
+    });
+
+    manifest.assets.forEach((asset, i) => {
+      if (!asset.id.startsWith(expectPrefix('asset'))) {
+        errors.push(refError('reference.wrong-scenario', `/manifest/assets/${i}/id`, `asset "${asset.id}" is not scenario-qualified under ${scenario.id}`, [asset.id]));
       }
     });
 
@@ -246,12 +378,30 @@ export class ScenarioV2Validator {
           errors.push(refError('reference.unknown-assumption', `/scenario/historicalFacts/${i}/assumptionRefs/${j}`, `unknown assumption "${aid}"`, [aid]));
         }
       });
+      fact.transformation.forEach((step, stepIndex) => {
+        step.inputSourceRefs.forEach((sid, sourceIndex) => {
+          if (!this.knownSources(bundle).has(sid)) {
+            errors.push(refError('reference.unknown-source', `/scenario/historicalFacts/${i}/transformation/${stepIndex}/inputSourceRefs/${sourceIndex}`, `unknown source "${sid}"`, [sid]));
+          }
+        });
+      });
+      if (fact.value.kind === 'entity-ref' && !this.isKnownEntity(bundle, fact.value.value)) {
+        errors.push(refError('reference.unknown-entity', `/scenario/historicalFacts/${i}/value/value`, `unknown entity reference "${fact.value.value}"`, [fact.value.value]));
+      }
     });
 
     scenario.assumptions.forEach((assumption, i) => {
+      if (!assumption.id.startsWith(expectPrefix('assumption'))) {
+        errors.push(refError('reference.wrong-scenario', `/scenario/assumptions/${i}/id`, `assumption "${assumption.id}" is not scenario-qualified under ${scenario.id}`, [assumption.id]));
+      }
       assumption.sourceRefs.forEach((sid, j) => {
         if (!this.knownSources(bundle).has(sid)) {
           errors.push(refError('reference.unknown-source', `/scenario/assumptions/${i}/sourceRefs/${j}`, `unknown source "${sid}"`, [sid]));
+        }
+      });
+      assumption.affectedPaths.forEach((affectedPath, pathIndex) => {
+        if (!isJsonPointer(affectedPath)) {
+          errors.push({ code: 'schema.invalid-json-pointer', path: `/scenario/assumptions/${i}/affectedPaths/${pathIndex}`, message: `invalid JSON pointer "${affectedPath}"`, refs: [assumption.id] });
         }
       });
     });
@@ -267,7 +417,24 @@ export class ScenarioV2Validator {
       });
     }
 
+    scenario.cities?.forEach((city, i) => {
+      if (!this.knownRegions(bundle).has(city.regionId)) {
+        errors.push(refError('reference.unknown-region', `/scenario/cities/${i}/regionId`, `unknown region "${city.regionId}"`, [city.regionId]));
+      }
+    });
+
+    scenario.simulationRules.activeConflicts?.forEach((conflict, i) => {
+      conflict.participants.forEach((polityId, j) => {
+        if (!this.knownPolities(bundle).has(polityId)) {
+          errors.push(refError('reference.unknown-polity', `/scenario/simulationRules/activeConflicts/${i}/participants/${j}`, `unknown polity "${polityId}"`, [polityId]));
+        }
+      });
+    });
+
     scenario.macroRegions.forEach((macro, i) => {
+      if (!macro.id.startsWith(expectPrefix('macro-region'))) {
+        errors.push(refError('reference.wrong-scenario', `/scenario/macroRegions/${i}/id`, `macro-region "${macro.id}" is not scenario-qualified under ${scenario.id}`, [macro.id]));
+      }
       macro.members.forEach((regionId, j) => {
         if (!this.knownRegions(bundle).has(regionId)) {
           errors.push(refError('reference.unknown-region', `/scenario/macroRegions/${i}/members/${j}`, `unknown region "${regionId}"`, [regionId]));
@@ -294,6 +461,10 @@ export class ScenarioV2Validator {
       errors.push(refError('reference.unknown-polity', '/scenario/game/defaultPlayer', `unknown default player polity "${scenario.game.defaultPlayer}"`, [scenario.game.defaultPlayer]));
     }
 
+    if (scenario.meta.locales && !(manifest.defaultLocale in scenario.meta.locales)) {
+      errors.push(refError('reference.unknown-default-locale', '/manifest/defaultLocale', `default locale "${manifest.defaultLocale}" is absent from scenario.meta.locales`, [manifest.defaultLocale]));
+    }
+
     return errors;
   }
 
@@ -302,6 +473,7 @@ export class ScenarioV2Validator {
     const errors: Diagnostic[] = [];
     bundle.scenario.historicalFacts.forEach((fact, i) => {
       const basePath = `/scenario/historicalFacts/${i}`;
+      const scenarioPath = `/historicalFacts/${i}`;
 
       if (fact.confidence === 'assumption') {
         if (fact.assumptionRefs.length === 0) {
@@ -310,10 +482,38 @@ export class ScenarioV2Validator {
         if (!fact.transformation.some((step) => step.operation === 'scenario-choice')) {
           errors.push({ code: 'provenance.assumption-missing-scenario-choice', path: `${basePath}/transformation`, message: `fact "${fact.id}" with confidence "assumption" must carry a "scenario-choice" transformation`, refs: [fact.id] });
         }
+        for (const assumptionId of fact.assumptionRefs) {
+          const assumption = bundle.scenario.assumptions.find((candidate) => candidate.id === assumptionId);
+          if (assumption && !assumption.affectedPaths.some((path) => path === scenarioPath || path.startsWith(`${scenarioPath}/`))) {
+            errors.push({ code: 'provenance.assumption-path-mismatch', path: `${basePath}/assumptionRefs`, message: `assumption "${assumptionId}" does not cover fact path "${scenarioPath}"`, refs: [fact.id, assumptionId] });
+          }
+          const hasGap = bundle.scenario.fidelity.gaps.some((gap) =>
+            gap.assumptionRef === assumptionId && (gap.path === scenarioPath || gap.path.startsWith(`${scenarioPath}/`)));
+          if (assumption && !hasGap) {
+            errors.push({ code: 'provenance.assumption-gap-missing', path: `${basePath}/assumptionRefs`, message: `assumption-backed fact "${fact.id}" has no linked fidelity gap`, refs: [fact.id, assumptionId] });
+          }
+        }
       }
 
       if (fact.value.kind !== 'unknown' && fact.sourceRefs.length === 0 && fact.assumptionRefs.length === 0) {
         errors.push({ code: 'provenance.missing-source-or-assumption', path: basePath, message: `known fact "${fact.id}" has neither sourceRefs nor assumptionRefs`, refs: [fact.id] });
+      }
+
+      if (fact.value.kind === 'unknown') {
+        const valuePath = `${scenarioPath}/value`;
+        const hasGap = bundle.scenario.fidelity.gaps.some((gap) => gap.disposition === 'unknown' && gap.path === valuePath);
+        if (!hasGap) {
+          errors.push({ code: 'provenance.unknown-gap-missing', path: `${basePath}/value`, message: `unknown fact "${fact.id}" requires a matching fidelity gap at "${valuePath}"`, refs: [fact.id] });
+        }
+      }
+    });
+
+    bundle.scenario.fidelity.gaps.forEach((gap, i) => {
+      if (gap.disposition === 'assumption' && !gap.assumptionRef) {
+        errors.push({ code: 'provenance.gap-assumption-missing-ref', path: `/scenario/fidelity/gaps/${i}/assumptionRef`, message: 'assumption gap requires assumptionRef' });
+      }
+      if (gap.disposition !== 'assumption' && gap.assumptionRef) {
+        errors.push({ code: 'provenance.gap-unexpected-assumption-ref', path: `/scenario/fidelity/gaps/${i}/assumptionRef`, message: `${gap.disposition} gap cannot carry assumptionRef`, refs: [gap.assumptionRef] });
       }
     });
     return errors;
@@ -326,7 +526,31 @@ export class ScenarioV2Validator {
       if (asset.required && !asset.contentAddress) {
         errors.push({ code: 'integrity.missing-required-asset', path: `/manifest/assets/${i}`, message: `required asset "${asset.id}" lacks a contentAddress`, refs: [asset.id] });
       }
+      if (!asset.path && !asset.contentAddress) {
+        errors.push({ code: 'integrity.unresolved-asset-reference', path: `/manifest/assets/${i}`, message: `asset "${asset.id}" requires a path or contentAddress`, refs: [asset.id] });
+      }
     });
+
+    if (bundle.scenario.fidelity.intendedUse === 'playable-scenario') {
+      Object.keys(bundle.scenario.polities).forEach((polityId) => {
+        if (!Object.prototype.hasOwnProperty.call(bundle.scenario.fidelity.polityLevels, polityId)) {
+          errors.push(refError('integrity.playable-polity-missing-baseline', `/scenario/fidelity/polityLevels/${polityId}`, `playable polity "${polityId}" has no fidelity level`, [polityId]));
+        }
+      });
+    }
+
+    const startingFacts = bundle.scenario.historicalFacts.filter((fact) => fact.role === 'starting-value');
+    for (let leftIndex = 0; leftIndex < startingFacts.length; leftIndex += 1) {
+      for (let rightIndex = leftIndex + 1; rightIndex < startingFacts.length; rightIndex += 1) {
+        const left = startingFacts[leftIndex];
+        const right = startingFacts[rightIndex];
+        const sameSubject = left.subjectRefs.some((subject) => right.subjectRefs.includes(subject));
+        const comparable = left.predicate === right.predicate && comparableFactValues(left, right);
+        if (sameSubject && comparable && rangesOverlap(left.effectiveRange, right.effectiveRange)) {
+          errors.push(refError('integrity.multiple-starting-values', '/scenario/historicalFacts', `starting values "${left.id}" and "${right.id}" overlap for the same subject and predicate`, [left.id, right.id]));
+        }
+      }
+    }
 
     bundle.scenario.macroRegions.forEach((macro, i) => {
       const seen = new Set<string>();
@@ -338,19 +562,27 @@ export class ScenarioV2Validator {
       });
     });
 
-    // One source region may not belong to two macro-regions with the same purpose.
+    // One source region may not belong to two macro-regions with the same purpose
+    // unless an authored assumption explicitly covers both membership paths.
     const byPurpose = new Map<string, Map<string, string>>();
     bundle.scenario.macroRegions.forEach((macro) => {
       const base = byPurpose.get(macro.purpose) ?? new Map<string, string>();
       macro.members.forEach((regionId) => {
         const prior = base.get(regionId);
         if (prior && prior !== macro.id) {
-          errors.push({
-            code: 'integrity.macro-member-overlap',
-            path: '/scenario/macroRegions',
-            message: `region "${regionId}" belongs to both "${prior}" and "${macro.id}" (purpose "${macro.purpose}")`,
-            refs: [regionId, prior, macro.id],
-          });
+          const priorIndex = bundle.scenario.macroRegions.findIndex((candidate) => candidate.id === prior);
+          const currentIndex = bundle.scenario.macroRegions.findIndex((candidate) => candidate.id === macro.id);
+          const expectedPaths = [`/macroRegions/${priorIndex}/members`, `/macroRegions/${currentIndex}/members`];
+          const declared = bundle.scenario.assumptions.some((assumption) =>
+            expectedPaths.every((path) => assumption.affectedPaths.some((affected) => affected === path || affected.startsWith(`${path}/`))));
+          if (!declared) {
+            errors.push({
+              code: 'integrity.macro-member-overlap',
+              path: '/scenario/macroRegions',
+              message: `region "${regionId}" belongs to both "${prior}" and "${macro.id}" (purpose "${macro.purpose}") without an overlap assumption`,
+              refs: [regionId, prior, macro.id],
+            });
+          }
         }
         base.set(regionId, macro.id);
       });
@@ -363,6 +595,26 @@ export class ScenarioV2Validator {
   private checkClaim(claim: InferredClaim, index: number, baseBundle: ScenarioBundle): Diagnostic[] {
     const errors: Diagnostic[] = [];
     const { subjectRef, predicate, operator, value } = claim.assertion;
+
+    if (!this.isKnownEntity(baseBundle, subjectRef)) {
+      errors.push(refError('reference.unknown-entity', `/inferredClaims/${index}/assertion/subjectRef`, `unknown entity reference "${subjectRef}"`, [subjectRef]));
+    }
+
+    const evidence = baseBundle.scenario.historicalFacts.filter((fact) => claim.evidenceRefs.includes(fact.id));
+    for (const fact of evidence) {
+      if (!fact.subjectRefs.includes(subjectRef) || fact.predicate !== predicate) {
+        errors.push({ code: 'integrity.incomparable-evidence', path: `/inferredClaims/${index}/evidenceRefs`, message: `evidence fact "${fact.id}" does not match assertion subject and predicate`, refs: [claim.id, fact.id] });
+        continue;
+      }
+      const outcome = compareAssertionToFact(value, operator, fact);
+      if (outcome === 'unknown-evidence') {
+        errors.push({ code: 'integrity.unknown-evidence', path: `/inferredClaims/${index}/evidenceRefs`, message: `unknown fact "${fact.id}" cannot prove assertion "${claim.id}"`, refs: [claim.id, fact.id] });
+      } else if (outcome === 'unsupported') {
+        errors.push({ code: 'integrity.unsupported-comparison', path: `/inferredClaims/${index}/assertion`, message: `claim "${claim.id}" is not comparable with evidence fact "${fact.id}"`, refs: [claim.id, fact.id] });
+      } else if (outcome === 'contradiction') {
+        errors.push({ code: 'integrity.claim-evidence-contradiction', path: `/inferredClaims/${index}/assertion`, message: `claim "${claim.id}" contradicts evidence fact "${fact.id}"`, refs: [claim.id, fact.id] });
+      }
+    }
 
     const protectedFacts = baseBundle.scenario.historicalFacts.filter(
       (f) => f.role === 'starting-value' && f.subjectRefs.includes(subjectRef) && f.predicate === predicate,
@@ -416,6 +668,23 @@ export class ScenarioV2Validator {
 
 type ComparisonOutcome = 'consistent' | 'contradiction' | 'unsupported' | 'unknown-evidence';
 
+function rangesOverlap(
+  left: { from: string; until?: string },
+  right: { from: string; until?: string },
+): boolean {
+  const leftUntil = left.until ?? '9999-12-31';
+  const rightUntil = right.until ?? '9999-12-31';
+  return left.from <= rightUntil && right.from <= leftUntil;
+}
+
+function comparableFactValues(left: HistoricalFact, right: HistoricalFact): boolean {
+  if (left.value.kind !== right.value.kind) return false;
+  if (left.value.kind === 'quantity' && right.value.kind === 'quantity') {
+    return left.value.unit === right.value.unit && (left.value.scope ?? '') === (right.value.scope ?? '');
+  }
+  return true;
+}
+
 export function compareAssertionToFact(value: AssertionValue, operator: string, fact: HistoricalFact): ComparisonOutcome {
   const factValue = fact.value;
   if (factValue.kind === 'unknown') return 'unknown-evidence';
@@ -429,10 +698,10 @@ export function compareAssertionToFact(value: AssertionValue, operator: string, 
       switch (operator) {
         case 'equals': return cmp === 0 ? 'consistent' : 'contradiction';
         case 'not-equals': return cmp !== 0 ? 'consistent' : 'contradiction';
-        case 'less-than': return cmp < 0 ? 'contradiction' : 'consistent';
-        case 'less-or-equal': return cmp <= 0 ? 'contradiction' : 'consistent';
-        case 'greater-than': return cmp > 0 ? 'contradiction' : 'consistent';
-        case 'greater-or-equal': return cmp >= 0 ? 'contradiction' : 'consistent';
+        case 'less-than': return cmp > 0 ? 'consistent' : 'contradiction';
+        case 'less-or-equal': return cmp >= 0 ? 'consistent' : 'contradiction';
+        case 'greater-than': return cmp < 0 ? 'consistent' : 'contradiction';
+        case 'greater-or-equal': return cmp <= 0 ? 'consistent' : 'contradiction';
         default: return 'unsupported';
       }
     }

@@ -40,6 +40,29 @@ describe('Scenario V2 schemas', () => {
     assert.strictEqual(result.success, false);
   });
 
+  it('rejects unsafe package asset paths and malformed engine ranges', () => {
+    const unsafe = assetRefSchema.safeParse({
+      id: 'asset:world-1916:regions',
+      kind: 'regions',
+      path: '../outside.json',
+      mediaType: 'application/json',
+      required: false,
+    });
+    assert.strictEqual(unsafe.success, false);
+
+    const manifest = scenarioManifestSchema.safeParse({
+      schemaVersion: 2,
+      id: 'scenario:world-1916',
+      contentVersion: '0.1.0',
+      engineRange: 'latest please',
+      defaultLocale: 'en',
+      scenarioPath: 'scenario.json',
+      sourcesPath: 'sources.json',
+      assets: [],
+    });
+    assert.strictEqual(manifest.success, false);
+  });
+
   it('rejects a manifest with a non-2 schema version', () => {
     const result = scenarioManifestSchema.safeParse({
       schemaVersion: 1,

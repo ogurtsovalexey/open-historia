@@ -6,7 +6,9 @@ import { calculateInputChecksum } from '../src/builder.js';
 import {
   SCENARIO_ID,
   POLITY_RU,
+  POLITY_DE,
   FACT_REVENUE,
+  ASSUMPTION_TERRITORY,
   makeBundle,
   makeFact,
   makeSource,
@@ -91,6 +93,34 @@ describe('ScenarioV2Validator — references', () => {
     assert.strictEqual(result.valid, false);
     assert(result.errors.some((e) => e.code === 'reference.wrong-scenario'));
   });
+
+  it('rejects missing/extra bundle documents and duplicate typed IDs', () => {
+    const missing = validator.validateBundle({ manifest: {}, scenario: {} });
+    assert(missing.errors.some((e) => e.code === 'schema.missing-document' && e.path === '/sources'));
+
+    const extra = validator.validateBundle({ ...makeBundle(), surprise: true });
+    assert(extra.errors.some((e) => e.code === 'schema.unrecognized_keys'));
+
+    const duplicate = validator.validateBundle(makeBundle({ sources: [makeSource(), makeSource()] }));
+    assert(duplicate.errors.some((e) => e.code === 'reference.duplicate-source'));
+  });
+
+  it('rejects polity key, region identity and default-locale mismatches', () => {
+    const polityMismatch = validator.validateBundle(makeBundle({
+      scenario: { polities: { [POLITY_RU]: { id: POLITY_DE, name: 'Wrong', color: '#112233' } } },
+    }));
+    assert(polityMismatch.errors.some((e) => e.code === 'reference.polity-key-mismatch'));
+
+    const regionMismatch = validator.validateBundle(makeBundle({
+      scenario: { regions: [{ id: 'region:gadm-4-1:RUS.33_1', dataset: 'other', datasetVersion: '4.1', nativeId: 'RUS.33_1' }] },
+    }));
+    assert(regionMismatch.errors.some((e) => e.code === 'reference.region-id-mismatch'));
+
+    const localeMismatch = validator.validateBundle(makeBundle({
+      scenario: { meta: { title: 'Fixture', locales: { ru: { title: 'Тест' } } } },
+    }));
+    assert(localeMismatch.errors.some((e) => e.code === 'reference.unknown-default-locale'));
+  });
 });
 
 describe('ScenarioV2Validator — provenance', () => {
@@ -121,6 +151,44 @@ describe('ScenarioV2Validator — provenance', () => {
     );
     assert.strictEqual(result.valid, false);
     assert(result.errors.some((e) => e.code === 'provenance.assumption-confidence-missing-ref'));
+  });
+
+  it('requires explicit fidelity linkage for unknown and assumption-backed facts', () => {
+    const unknown = validator.validateBundle(makeBundle({
+      scenario: { historicalFacts: [makeFact({
+        value: { kind: 'unknown', expectedKind: 'quantity', reason: 'Search completed without a reconciled value.' },
+        sourceRefs: [],
+        transformation: [],
+      })] },
+    }));
+    assert(unknown.errors.some((e) => e.code === 'provenance.unknown-gap-missing'));
+
+    const assumption = {
+      id: ASSUMPTION_TERRITORY,
+      statement: 'Synthetic fixture choice',
+      rationale: 'Required only for the test',
+      affectedPaths: ['/different/path'],
+      sourceRefs: [],
+      status: 'authored',
+    };
+    const assumed = validator.validateBundle(makeBundle({
+      scenario: {
+        historicalFacts: [makeFact({
+          sourceRefs: [],
+          assumptionRefs: [ASSUMPTION_TERRITORY],
+          confidence: 'assumption',
+          transformation: [{ operation: 'scenario-choice', description: 'fixture choice', inputSourceRefs: [] }],
+        })],
+        assumptions: [assumption],
+        fidelity: {
+          intendedUse: 'test-fixture',
+          polityLevels: { [POLITY_RU]: 'Baseline', [POLITY_DE]: 'Baseline' },
+          gaps: [{ path: '/different/path', disposition: 'assumption', reason: 'fixture choice', assumptionRef: ASSUMPTION_TERRITORY }],
+        },
+      },
+    }));
+    assert(assumed.errors.some((e) => e.code === 'provenance.assumption-path-mismatch'));
+    assert(assumed.errors.some((e) => e.code === 'provenance.assumption-gap-missing'));
   });
 });
 
@@ -188,6 +256,26 @@ describe('ScenarioV2Validator — pregame narrative', () => {
     const result = validator.validatePregameNarrative(consistent, checksum, bundle);
     assert.strictEqual(result.valid, true, JSON.stringify(result.errors));
   });
+
+  it('evaluates numeric bounds against the authored fact value', () => {
+    const consistent = draft();
+    const assertion = (consistent.inferredClaims as Array<{ assertion: { operator: string; value: { amount: string } } }>)[0].assertion;
+    assertion.operator = 'less-than';
+    assertion.value.amount = '2000000';
+    const accepted = validator.validatePregameNarrative(consistent, checksum, bundle);
+    assert.strictEqual(accepted.valid, true, JSON.stringify(accepted.errors));
+
+    assertion.value.amount = '500000';
+    const rejected = validator.validatePregameNarrative(consistent, checksum, bundle);
+    assert(rejected.errors.some((e) => e.code === 'integrity.claim-contradiction'));
+  });
+
+  it('rejects unknown claim references in narrative segments', () => {
+    const input = draft();
+    (input.segments as Array<{ claimRefs: string[] }>)[0].claimRefs = ['missing-claim'];
+    const result = validator.validatePregameNarrative(input, checksum, bundle);
+    assert(result.errors.some((e) => e.code === 'reference.unknown-claim'));
+  });
 });
 
 describe('ScenarioV2Validator — draft patch protection', () => {
@@ -223,5 +311,10 @@ describe('ScenarioV2Validator — draft patch protection', () => {
   it('accepts a patch on an unprotected path', () => {
     const result = validator.validateDraftPatch(patch('/scenario/meta/description'), checksum, bundle);
     assert.strictEqual(result.valid, true, JSON.stringify(result.errors));
+  });
+
+  it('rejects descendants of protected authored collections', () => {
+    const result = validator.validateDraftPatch(patch('/scenario/historicalFacts/0/value'), checksum, bundle);
+    assert(result.errors.some((e) => e.code === 'integrity.protected-path-mutation'));
   });
 });
