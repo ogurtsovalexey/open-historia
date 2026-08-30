@@ -79,6 +79,11 @@ export const scenarioRegionSchema = z
     damageBp: bpSchema,
     baseMonthlyCapacity: nonNegInt,
     outputPerWorker: nonNegInt,
+    /**
+     * Upper bound construction may raise `baseMonthlyCapacity` to. Required
+     * when the projects module is on; absent means capacity cannot grow.
+     */
+    capacityCeiling: nonNegInt.optional(),
   })
   .strict();
 export type ScenarioRegion = z.infer<typeof scenarioRegionSchema>;
@@ -119,6 +124,25 @@ export const economyParamsSchema = z
   .strict();
 export type EconomyParams = z.infer<typeof economyParamsSchema>;
 
+/**
+ * Optional mechanics, per canon 00 "Modular mechanics". A module that is absent
+ * or false is completely absent from the tick, the state and the UI — which is
+ * also what keeps an older scenario's canonical state byte-identical.
+ */
+export const modulesSchema = z
+  .object({
+    projects: z.boolean().optional(),
+    budget: z.boolean().optional(),
+    trade: z.boolean().optional(),
+    shortages: z.boolean().optional(),
+    unrest: z.boolean().optional(),
+  })
+  .strict();
+export type Modules = z.infer<typeof modulesSchema>;
+
+export const MODULE_NAMES = ['projects', 'budget', 'trade', 'shortages', 'unrest'] as const;
+export type ModuleName = (typeof MODULE_NAMES)[number];
+
 export const econScenarioSchema = z
   .object({
     schemaVersion: z.literal('open-historia-engine-scenario/1'),
@@ -133,6 +157,8 @@ export const econScenarioSchema = z
     /** Reserved for future seeded mechanics; the MVP tick uses no randomness. */
     rngSeed: z.number().int().nonnegative().optional(),
     activeResources: z.array(resourceIdSchema).min(1),
+    /** Omit to run the base economy exactly as before. */
+    modules: modulesSchema.optional(),
     economy: economyParamsSchema,
     polities: z.array(scenarioPolitySchema).min(2),
     regions: z.array(scenarioRegionSchema).min(1),
@@ -171,6 +197,20 @@ export const econScenarioSchema = z
           code: 'custom',
           message: `region ${region.regionId} controller ${region.controllerId} is not a scenario polity`,
           path: ['regions', index, 'controllerId'],
+        });
+      }
+      if (region.capacityCeiling !== undefined && region.capacityCeiling < region.baseMonthlyCapacity) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `region ${region.regionId} capacityCeiling ${region.capacityCeiling} is below its starting capacity ${region.baseMonthlyCapacity}`,
+          path: ['regions', index, 'capacityCeiling'],
+        });
+      }
+      if (scenario.modules?.projects === true && region.capacityCeiling === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `region ${region.regionId} needs a capacityCeiling because the projects module is enabled`,
+          path: ['regions', index, 'capacityCeiling'],
         });
       }
       if (region.activity.kind === 'extraction' && !active.has(region.activity.resource)) {

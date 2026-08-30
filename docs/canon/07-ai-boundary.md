@@ -19,6 +19,36 @@ Sources: `docs/spec/ai-call-registry.md`, `docs/product/04-ai-orchestration-spec
    May explain, may recommend an available typed command; may not create
    resources, recipes, percentages or numeric effects.
 
+## Two model roles (owner decision 2026-08-31)
+
+The app configures **two independent providers/keys**, because the work splits
+into two kinds with very different cost and quality needs:
+
+| Role | What it does | Quality bar |
+|---|---|---|
+| **Strategic** | Plays rival polities, diplomacy, narrative over engine results, interprets free-text orders | The good model; its mistakes change the game |
+| **Utility** | Auxiliary, mechanical work: translating generated text, resolving an ambiguous name, reformatting, cheap parsing | The cheapest or a free model; its mistakes are recoverable and visible |
+
+`principles.md` §3 already anticipates the utility role ("a utility model is only
+an optional fallback for unresolved names or ambiguous scope"). This makes it a
+first-class, separately-keyed connection rather than a fallback of the strategic
+one, so a cheap key can carry all the mechanical volume.
+
+Rules for the utility role:
+
+- It may never decide a numeric outcome, own state, or act as an opponent.
+- Its output is always either (a) text shown to the player, or (b) an input that
+  the engine re-validates against a schema. Never a direct state change.
+- Every call is recorded through the call registry like any other (below), so
+  the two roles' spend is visible separately.
+- If the utility key is absent, the feature that needs it degrades to a plain,
+  honest fallback — never to a strategic-model call, and never to silence.
+
+**Current status:** designed, not built. Static localisation deliberately does
+**not** use it: a missing pack entry shows English so the gap stays visible
+(canon: localisation track). Routing translation through the utility model is a
+later option, not a substitute for a complete pack.
+
 ## Hard rules
 
 - The engine (`packages/engine`) imports nothing AI-related; dependency

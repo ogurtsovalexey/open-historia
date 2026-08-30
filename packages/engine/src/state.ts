@@ -16,9 +16,11 @@ import {
 import type { EconScenario } from './scenario.js';
 import {
   economyParamsSchema,
+  modulesSchema,
   regionActivitySchema,
   resourceIdSchema,
 } from './scenario.js';
+import type { ModuleName } from './scenario.js';
 import { stateChecksum } from './canonical.js';
 
 const nonNegInt = z.number().int().nonnegative();
@@ -42,6 +44,8 @@ export const econRegionStateSchema = z
     damageBp: bpSchema,
     baseMonthlyCapacity: nonNegInt,
     outputPerWorker: nonNegInt,
+    /** Present only when construction can raise this region's capacity. */
+    capacityCeiling: nonNegInt.optional(),
   })
   .strict();
 export type EconRegionState = z.infer<typeof econRegionStateSchema>;
@@ -74,6 +78,12 @@ export const econWorldStateSchema = z
     /** Number of resolved months since scenario start. */
     turn: nonNegInt,
     activeResources: z.array(resourceIdSchema).min(1),
+    /**
+     * Absent means every optional mechanic is off. Absence is load-bearing: a
+     * scenario that enables nothing serialises exactly as it did before modules
+     * existed, so its recorded revisions stay valid.
+     */
+    modules: modulesSchema.optional(),
     economy: economyParamsSchema,
     /** Sorted by polity id. */
     polities: z.array(econPolityStateSchema).min(2),
@@ -108,6 +118,13 @@ function sortedStockpile(entries: StockEntry[], activeResources: string[]): Stoc
 
 /** Deterministically build the starting world state from a validated scenario. */
 export function initState(scenario: EconScenario): EconWorldState {
+  const enabledModules = scenario.modules
+    ? Object.fromEntries(
+        Object.entries(scenario.modules)
+          .filter(([, enabled]) => enabled === true)
+          .sort(([left], [right]) => (left < right ? -1 : 1))
+      )
+    : {};
   const base = {
     schemaVersion: ECON_STATE_SCHEMA_VERSION,
     scenarioId: scenario.scenarioId,
@@ -115,6 +132,7 @@ export function initState(scenario: EconScenario): EconWorldState {
     month: scenario.startMonth,
     turn: 0,
     activeResources: [...scenario.activeResources].sort(),
+    ...(Object.keys(enabledModules).length > 0 ? { modules: enabledModules } : {}),
     economy: {
       ...scenario.economy,
       resourceParams: [...scenario.economy.resourceParams].sort((a, b) =>
@@ -151,6 +169,11 @@ export function getRegion(state: EconWorldState, id: RegionId): EconRegionState 
 
 export function getStock(polity: EconPolityState, resource: StockEntry['resource']): number {
   return polity.stockpile.find((entry) => entry.resource === resource)?.amount ?? 0;
+}
+
+/** Whether an optional mechanic runs for this world. */
+export function moduleEnabled(state: EconWorldState, module: ModuleName): boolean {
+  return state.modules?.[module] === true;
 }
 
 /** YYYY-MM-DD plus one calendar month, day clamped — no Date object, fully deterministic. */

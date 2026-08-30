@@ -14,6 +14,13 @@
     "iron",
     "goods"
   ],
+  "modules": {
+    "projects": true,
+    "budget": true,
+    "trade": true,
+    "shortages": true,
+    "unrest": true
+  },
   "economy": {
     "foodNeedPerPersonMilli": 50,
     "infrastructureBpPerMoney": 1,
@@ -186,7 +193,8 @@
       "infrastructureBp": 3500,
       "damageBp": 0,
       "baseMonthlyCapacity": 7000,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 14000
     },
     {
       "regionId": "region:gadm:AUT.3_1",
@@ -206,7 +214,8 @@
       "infrastructureBp": 3970,
       "damageBp": 0,
       "baseMonthlyCapacity": 107000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 219350
     },
     {
       "regionId": "region:gadm:AUT.4_1",
@@ -226,7 +235,8 @@
       "infrastructureBp": 4440,
       "damageBp": 0,
       "baseMonthlyCapacity": 124000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 260400
     },
     {
       "regionId": "region:gadm:AUT.1_1",
@@ -246,7 +256,8 @@
       "infrastructureBp": 4910,
       "damageBp": 1500,
       "baseMonthlyCapacity": 141000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 303150
     },
     {
       "regionId": "region:gadm:AUT.2_1",
@@ -266,7 +277,8 @@
       "infrastructureBp": 5380,
       "damageBp": 0,
       "baseMonthlyCapacity": 30400,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 66880
     },
     {
       "regionId": "region:gadm:AUT.5_1",
@@ -286,7 +298,8 @@
       "infrastructureBp": 5850,
       "damageBp": 0,
       "baseMonthlyCapacity": 33500,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 75375
     },
     {
       "regionId": "region:gadm:AUT.7_1",
@@ -306,7 +319,8 @@
       "infrastructureBp": 6320,
       "damageBp": 2500,
       "baseMonthlyCapacity": 27800,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 63940
     },
     {
       "regionId": "region:gadm:AUT.8_1",
@@ -326,7 +340,8 @@
       "infrastructureBp": 6790,
       "damageBp": 0,
       "baseMonthlyCapacity": 30100,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 60200
     },
     {
       "regionId": "region:gadm:AUT.6_1",
@@ -346,7 +361,8 @@
       "infrastructureBp": 7260,
       "damageBp": 0,
       "baseMonthlyCapacity": 27200,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 55760
     },
     {
       "regionId": "region:gadm:CZE.11_1",
@@ -366,7 +382,8 @@
       "infrastructureBp": 3500,
       "damageBp": 0,
       "baseMonthlyCapacity": 7000,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 14700
     },
     {
       "regionId": "region:gadm:CZE.12_1",
@@ -386,7 +403,8 @@
       "infrastructureBp": 3970,
       "damageBp": 0,
       "baseMonthlyCapacity": 107000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 230050
     },
     {
       "regionId": "region:gadm:CZE.1_1",
@@ -406,7 +424,8 @@
       "infrastructureBp": 4440,
       "damageBp": 0,
       "baseMonthlyCapacity": 124000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 272800
     },
     {
       "regionId": "region:gadm:CZE.2_1",
@@ -426,7 +445,8 @@
       "infrastructureBp": 4910,
       "damageBp": 1500,
       "baseMonthlyCapacity": 141000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 317250
     },
     {
       "regionId": "region:gadm:CZE.9_1",
@@ -446,7 +466,8 @@
       "infrastructureBp": 5380,
       "damageBp": 0,
       "baseMonthlyCapacity": 158000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 363400
     },
     {
       "regionId": "region:gadm:CZE.4_1",
@@ -466,7 +487,8 @@
       "infrastructureBp": 5850,
       "damageBp": 0,
       "baseMonthlyCapacity": 33500,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 67000
     },
     {
       "regionId": "region:gadm:CZE.5_1",
@@ -486,7 +508,8 @@
       "infrastructureBp": 6320,
       "damageBp": 2500,
       "baseMonthlyCapacity": 36600,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 75030
     },
     {
       "regionId": "region:gadm:CZE.6_1",
@@ -506,7 +529,8 @@
       "infrastructureBp": 6790,
       "damageBp": 0,
       "baseMonthlyCapacity": 39700,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 83370
     },
     {
       "regionId": "region:gadm:CZE.7_1",
@@ -526,7 +550,8 @@
       "infrastructureBp": 7260,
       "damageBp": 0,
       "baseMonthlyCapacity": 32400,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 69660
     },
     {
       "regionId": "region:gadm:CZE.13_1",
@@ -546,7 +571,8 @@
       "infrastructureBp": 7730,
       "damageBp": 800,
       "baseMonthlyCapacity": 34700,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 76340
     },
     {
       "regionId": "region:gadm:CZE.3_1",
@@ -566,7 +592,8 @@
       "infrastructureBp": 8200,
       "damageBp": 0,
       "baseMonthlyCapacity": 37000,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 83250
     },
     {
       "regionId": "region:gadm:CZE.10_1",
@@ -586,7 +613,8 @@
       "infrastructureBp": 8670,
       "damageBp": 0,
       "baseMonthlyCapacity": 32900,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 75670
     },
     {
       "regionId": "region:gadm:CZE.8_1",
@@ -606,7 +634,8 @@
       "infrastructureBp": 3640,
       "damageBp": 0,
       "baseMonthlyCapacity": 34800,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 69600
     },
     {
       "regionId": "region:gadm:CZE.14_1",
@@ -626,7 +655,8 @@
       "infrastructureBp": 4110,
       "damageBp": 1500,
       "baseMonthlyCapacity": 36700,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 75235
     },
     {
       "regionId": "region:gadm:DEU.3_1",
@@ -646,7 +676,8 @@
       "infrastructureBp": 3500,
       "damageBp": 0,
       "baseMonthlyCapacity": 7000,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 14700
     },
     {
       "regionId": "region:gadm:DEU.9_1",
@@ -666,7 +697,8 @@
       "infrastructureBp": 3970,
       "damageBp": 0,
       "baseMonthlyCapacity": 107000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 230050
     },
     {
       "regionId": "region:gadm:DEU.2_1",
@@ -686,7 +718,8 @@
       "infrastructureBp": 4440,
       "damageBp": 0,
       "baseMonthlyCapacity": 124000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 272800
     },
     {
       "regionId": "region:gadm:DEU.1_1",
@@ -706,7 +739,8 @@
       "infrastructureBp": 4910,
       "damageBp": 1500,
       "baseMonthlyCapacity": 141000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 317250
     },
     {
       "regionId": "region:gadm:DEU.4_1",
@@ -726,7 +760,8 @@
       "infrastructureBp": 5380,
       "damageBp": 0,
       "baseMonthlyCapacity": 158000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 363400
     },
     {
       "regionId": "region:gadm:DEU.15_1",
@@ -746,7 +781,8 @@
       "infrastructureBp": 5850,
       "damageBp": 0,
       "baseMonthlyCapacity": 175000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 350000
     },
     {
       "regionId": "region:gadm:DEU.11_1",
@@ -766,7 +802,8 @@
       "infrastructureBp": 6320,
       "damageBp": 2500,
       "baseMonthlyCapacity": 36600,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 75030
     },
     {
       "regionId": "region:gadm:DEU.8_1",
@@ -786,7 +823,8 @@
       "infrastructureBp": 6790,
       "damageBp": 0,
       "baseMonthlyCapacity": 39700,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 83370
     },
     {
       "regionId": "region:gadm:DEU.5_1",
@@ -806,7 +844,8 @@
       "infrastructureBp": 7260,
       "damageBp": 0,
       "baseMonthlyCapacity": 42800,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 92020
     },
     {
       "regionId": "region:gadm:DEU.10_1",
@@ -826,7 +865,8 @@
       "infrastructureBp": 7730,
       "damageBp": 800,
       "baseMonthlyCapacity": 34700,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 76340
     },
     {
       "regionId": "region:gadm:DEU.13_1",
@@ -846,7 +886,8 @@
       "infrastructureBp": 8200,
       "damageBp": 0,
       "baseMonthlyCapacity": 37000,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 83250
     },
     {
       "regionId": "region:gadm:DEU.14_1",
@@ -866,7 +907,8 @@
       "infrastructureBp": 8670,
       "damageBp": 0,
       "baseMonthlyCapacity": 39300,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 90390
     },
     {
       "regionId": "region:gadm:DEU.12_1",
@@ -886,7 +928,8 @@
       "infrastructureBp": 3640,
       "damageBp": 0,
       "baseMonthlyCapacity": 41600,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 83200
     },
     {
       "regionId": "region:gadm:DEU.16_1",
@@ -906,7 +949,8 @@
       "infrastructureBp": 4110,
       "damageBp": 1500,
       "baseMonthlyCapacity": 36700,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 75235
     },
     {
       "regionId": "region:gadm:DEU.7_1",
@@ -926,7 +970,8 @@
       "infrastructureBp": 4580,
       "damageBp": 0,
       "baseMonthlyCapacity": 38600,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 81060
     },
     {
       "regionId": "region:gadm:DEU.6_1",
@@ -946,7 +991,8 @@
       "infrastructureBp": 5050,
       "damageBp": 0,
       "baseMonthlyCapacity": 40500,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 87075
     },
     {
       "regionId": "region:gadm:SVK.2_1",
@@ -966,7 +1012,8 @@
       "infrastructureBp": 3500,
       "damageBp": 0,
       "baseMonthlyCapacity": 7000,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 15400
     },
     {
       "regionId": "region:gadm:SVK.4_1",
@@ -986,7 +1033,8 @@
       "infrastructureBp": 3970,
       "damageBp": 0,
       "baseMonthlyCapacity": 107000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 240750
     },
     {
       "regionId": "region:gadm:SVK.7_1",
@@ -1006,7 +1054,8 @@
       "infrastructureBp": 4440,
       "damageBp": 0,
       "baseMonthlyCapacity": 124000,
-      "outputPerWorker": 2
+      "outputPerWorker": 2,
+      "capacityCeiling": 285200
     },
     {
       "regionId": "region:gadm:SVK.5_1",
@@ -1026,7 +1075,8 @@
       "infrastructureBp": 4910,
       "damageBp": 1500,
       "baseMonthlyCapacity": 27300,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 54600
     },
     {
       "regionId": "region:gadm:SVK.6_1",
@@ -1046,7 +1096,8 @@
       "infrastructureBp": 5380,
       "damageBp": 0,
       "baseMonthlyCapacity": 23200,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 47560
     },
     {
       "regionId": "region:gadm:SVK.8_1",
@@ -1066,7 +1117,8 @@
       "infrastructureBp": 5850,
       "damageBp": 0,
       "baseMonthlyCapacity": 25500,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 53550
     },
     {
       "regionId": "region:gadm:SVK.1_1",
@@ -1086,7 +1138,8 @@
       "infrastructureBp": 6320,
       "damageBp": 2500,
       "baseMonthlyCapacity": 23400,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 50310
     },
     {
       "regionId": "region:gadm:SVK.3_1",
@@ -1106,7 +1159,8 @@
       "infrastructureBp": 6790,
       "damageBp": 0,
       "baseMonthlyCapacity": 25300,
-      "outputPerWorker": 1
+      "outputPerWorker": 1,
+      "capacityCeiling": 55660
     }
   ]
 }

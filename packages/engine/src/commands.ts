@@ -78,6 +78,9 @@ export const REJECTION_REASONS = [
   'unknown-new-controller',
   'same-controller',
   'processing-competition',
+  // A selector that matched no region is a rejection, never a silent no-op:
+  // "invest in my oil regions" when you hold none must say so.
+  'selector-matched-nothing',
 ] as const;
 export type RejectionReason = (typeof REJECTION_REASONS)[number];
 
