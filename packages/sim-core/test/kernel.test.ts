@@ -175,6 +175,54 @@ describe('Economy MVP Kernel', () => {
       }
     });
 
+    it('should maintain inventory and treasury identities', () => {
+      const result = resolveMonth(regions, polityStocks, constants);
+
+      for (const stocks of result.nextPolityStocks) {
+        const opening = polityStocks.find(p => p.polityId === stocks.polityId)!;
+        const ledger = result.nationalLedgers.find(l => l.polityId === stocks.polityId)!;
+
+        // inventory' = inventory + production - consumption, never negative
+        const foodNeed = ledger.foodNeedContribution;
+        const foodProduction = ledger.foodProductionContribution;
+        const available = opening.inventory.food + foodProduction;
+        const expectedFood = Math.max(0, available - foodNeed);
+        assert.strictEqual(stocks.inventory.food, expectedFood);
+        assert.ok(stocks.inventory.food >= 0);
+
+        // treasury' = opening - accepted spending + tax revenue
+        const expectedTreasury = opening.treasuryMicros + ledger.taxRevenueContribution;
+        assert.strictEqual(stocks.treasuryMicros, expectedTreasury);
+        assert.ok(stocks.treasuryMicros >= 0);
+      }
+    });
+
+    it('should apply the same investment calculation in preview and resolution', () => {
+      const spendMicros = 100000000;
+      const region = regions[0]!;
+      const polityA = polityStocks[0]!;
+
+      const preview = calculateInvestmentPreview(
+        region,
+        polityA,
+        constants,
+        spendMicros,
+        region.regionId,
+        polityA.polityId
+      );
+
+      const modifiedStocks = structuredClone(polityStocks);
+      modifiedStocks[0]!.acceptedInvestment = {
+        targetRegionId: region.regionId,
+        spendMicros,
+        effectiveMonth: '1900-01-01'
+      };
+      const result = resolveMonth(regions, modifiedStocks, constants);
+      const delta = result.regionalDeltas.find(d => d.regionId === region.regionId)!;
+
+      assert.strictEqual(delta.infrastructureChange, preview.infrastructureChange);
+    });
+
     it('should calculate polity population correctly', () => {
       const polityAId = 'polity:test-a';
       const calculated = calculatePolityPopulation(regions, polityAId);
