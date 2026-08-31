@@ -1,0 +1,194 @@
+/*! Open Historia — content-addressed, atomically published engine sessions. */
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+
+export const ENGINE_SESSION_SCHEMA = "open-historia-engine-session/1";
+const POINTER_FILE = "current.json";
+const MANIFEST_FILE = "manifest.json";
+const FILES = Object.freeze({ state: "state.json", lastTurn: "last-turn.json", ownership: "ownership.json" });
+
+export class EngineSessionError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = "EngineSessionError";
+    this.code = code;
+  }
+}
+
+const canonical = (value) => {
+  if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`).join(",")}}`;
+  }
+  return JSON.stringify(value);
+};
+const sha256 = (value) => `sha256:${crypto.createHash("sha256").update(value).digest("hex")}`;
+const jsonBytes = (value) => `${canonical(value)}\n`;
+const assertToken = (value, field) => {
+  if (typeof value !== "string" || !value || value !== value.trim() || /[\\/\0]/.test(value) || value === "." || value === "..") {
+    throw new EngineSessionError("INVALID_PATH_TOKEN", `${field} is not a safe path token`);
+  }
+};
+
+const rootFor = (gameDir) => path.join(gameDir, "engine-session");
+const revisionsFor = (gameDir) => path.join(rootFor(gameDir), "revisions");
+const pointerFor = (gameDir) => path.join(rootFor(gameDir), POINTER_FILE);
+const revisionDiskToken = (revision) => revision.replace(":", "-");
+const revisionFor = (gameDir, revision) => {
+  if (!/^sha256:[a-f0-9]{64}$/.test(revision)) {
+    throw new EngineSessionError("INVALID_PATH_TOKEN", "session revision must be a SHA-256 content id");
+  }
+  // ':' is not a legal Windows filename character. Keep it in the public
+  // content id but use a portable directory token on disk.
+  return path.join(revisionsFor(gameDir), revisionDiskToken(revision));
+};
+
+let hooks = Object.freeze({});
+export const setEngineSessionTestHooks = (next = {}) => {
+  const previous = hooks;
+  hooks = Object.freeze({ ...next });
+  return () => { hooks = previous; };
+};
+const hook = (name, context) => {
+  if (hooks[name]) hooks[name](Object.freeze({ ...context }));
+};
+
+const descriptor = (bytes) => ({ sha256: sha256(bytes), bytes: Buffer.byteLength(bytes) });
+const parseJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
+
+const verifyDirectoryFiles = (dir, manifest) => {
+  for (const [key, filename] of Object.entries(FILES)) {
+    const bytes = fs.readFileSync(path.join(dir, filename), "utf8");
+    const expected = manifest.files?.[key];
+    if (!expected || expected.sha256 !== sha256(bytes) || expected.bytes !== Buffer.byteLength(bytes)) {
+      throw new EngineSessionError("CORRUPT_SESSION", `engine session ${key} hash does not match`);
+    }
+  }
+};
+
+const verifyManifest = (gameDir, manifest, visited = new Set()) => {
+  if (!manifest || manifest.schema !== ENGINE_SESSION_SCHEMA || typeof manifest.revision !== "string") {
+    throw new EngineSessionError("CORRUPT_SESSION", "engine session manifest has an invalid schema");
+  }
+  const { revision, ...content } = manifest;
+  if (sha256(canonical(content)) !== revision) {
+    throw new EngineSessionError("CORRUPT_SESSION", "engine session manifest revision hash does not match");
+  }
+  if (visited.has(revision)) throw new EngineSessionError("CORRUPT_SESSION", "engine session parent chain contains a cycle");
+  visited.add(revision);
+  const dir = revisionFor(gameDir, revision);
+  verifyDirectoryFiles(dir, manifest);
+  if (manifest.parentRevision) {
+    const parentPath = path.join(revisionFor(gameDir, manifest.parentRevision), MANIFEST_FILE);
+    if (!fs.existsSync(parentPath)) {
+      throw new EngineSessionError("CORRUPT_SESSION", "engine session parent revision is missing");
+    }
+    const parent = parseJson(parentPath);
+    if (parent.revision !== manifest.parentRevision) throw new EngineSessionError("CORRUPT_SESSION", "engine session parent revision does not match");
+    verifyManifest(gameDir, parent, visited);
+  }
+  return manifest;
+};
+
+export const readEngineSession = (gameDir) => {
+  const pointerPath = pointerFor(gameDir);
+  if (!fs.existsSync(pointerPath)) return null;
+  let pointer;
+  try {
+    pointer = parseJson(pointerPath);
+    assertToken(pointer?.revision, "session revision");
+    const dir = revisionFor(gameDir, pointer.revision);
+    const manifest = verifyManifest(gameDir, parseJson(path.join(dir, MANIFEST_FILE)));
+    if (manifest.revision !== pointer.revision) throw new Error("pointer mismatch");
+    return {
+      manifest,
+      state: parseJson(path.join(dir, FILES.state)),
+      lastTurn: parseJson(path.join(dir, FILES.lastTurn)),
+      ownership: parseJson(path.join(dir, FILES.ownership)),
+    };
+  } catch (error) {
+    if (error instanceof EngineSessionError) throw error;
+    throw new EngineSessionError("CORRUPT_SESSION", `engine session is unreadable: ${error.message}`);
+  }
+};
+
+const writeExclusive = (file, bytes) => {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, bytes, { flag: "wx" });
+};
+
+export const commitEngineSession = (gameDir, { expectedRevision = null, gameId, engineScenario, gameDate, round, state, lastTurn = null, ownership = {}, monthlyTicks = 0 }) => {
+  const current = readEngineSession(gameDir);
+  const actual = current?.manifest.revision ?? null;
+  if (expectedRevision !== actual) {
+    throw new EngineSessionError("STALE_SESSION", `stale engine session: expected ${expectedRevision ?? "none"}, current is ${actual ?? "none"}`);
+  }
+
+  const payloads = { state: jsonBytes(state), lastTurn: jsonBytes(lastTurn), ownership: jsonBytes(ownership) };
+  const content = {
+    schema: ENGINE_SESSION_SCHEMA,
+    gameId,
+    engineScenario,
+    parentRevision: actual,
+    engineRevision: state.revision,
+    gameDate,
+    round,
+    monthlyTicks,
+    files: Object.fromEntries(Object.entries(payloads).map(([key, bytes]) => [key, descriptor(bytes)])),
+  };
+  const manifest = { ...content, revision: sha256(canonical(content)) };
+  const root = rootFor(gameDir);
+  const staging = path.join(root, "staging", revisionDiskToken(manifest.revision));
+  const finalDir = revisionFor(gameDir, manifest.revision);
+  fs.mkdirSync(path.dirname(staging), { recursive: true });
+  fs.rmSync(staging, { recursive: true, force: true });
+  fs.mkdirSync(staging, { recursive: true });
+  try {
+    hook("beforeFiles", { gameId, revision: manifest.revision });
+    for (const [key, filename] of Object.entries(FILES)) writeExclusive(path.join(staging, filename), payloads[key]);
+    hook("afterFiles", { gameId, revision: manifest.revision });
+    writeExclusive(path.join(staging, MANIFEST_FILE), `${canonical(manifest)}\n`);
+    hook("afterManifest", { gameId, revision: manifest.revision });
+    verifyDirectoryFiles(staging, manifest);
+    hook("beforeRevisionPublish", { gameId, revision: manifest.revision });
+    fs.mkdirSync(revisionsFor(gameDir), { recursive: true });
+    if (!fs.existsSync(finalDir)) fs.renameSync(staging, finalDir);
+    hook("beforePointerPublish", { gameId, revision: manifest.revision });
+    const tempPointer = path.join(root, `.current-${process.pid}.tmp`);
+    fs.writeFileSync(tempPointer, `${canonical({ revision: manifest.revision })}\n`, "utf8");
+    fs.renameSync(tempPointer, pointerFor(gameDir));
+    hook("afterPointerPublish", { gameId, revision: manifest.revision });
+    return readEngineSession(gameDir);
+  } catch (error) {
+    fs.rmSync(staging, { recursive: true, force: true });
+    fs.rmSync(path.join(root, `.current-${process.pid}.tmp`), { force: true });
+    let candidateWasPublished = false;
+    try { candidateWasPublished = parseJson(pointerFor(gameDir))?.revision === manifest.revision; } catch { /* rollback below */ }
+    if (candidateWasPublished) {
+      if (actual) {
+        const rollback = path.join(root, `.rollback-${process.pid}.tmp`);
+        fs.writeFileSync(rollback, `${canonical({ revision: actual })}\n`, "utf8");
+        fs.renameSync(rollback, pointerFor(gameDir));
+      } else {
+        fs.rmSync(pointerFor(gameDir), { force: true });
+      }
+    }
+    throw error;
+  }
+};
+
+export const backupLegacyEconomySave = (gameDir) => {
+  const legacy = path.join(gameDir, "economy");
+  if (!fs.existsSync(legacy) || fs.existsSync(pointerFor(gameDir))) return null;
+  const backups = path.join(gameDir, "backups");
+  fs.mkdirSync(backups, { recursive: true });
+  let index = 1;
+  let destination;
+  do {
+    destination = path.join(backups, `economy-engine-v0-${String(index).padStart(3, "0")}`);
+    index += 1;
+  } while (fs.existsSync(destination));
+  fs.renameSync(legacy, destination);
+  return destination;
+};

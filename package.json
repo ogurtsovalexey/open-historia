@@ -7,6 +7,8 @@
     "node": "^20.19.0 || >=22.12.0"
   },
   "scripts": {
+    "agents:disable": "bash scripts/agent-orchestrator.sh disable",
+    "agents:enable": "bash scripts/agent-orchestrator.sh enable",
     "agents:install": "bash scripts/agent-orchestrator.sh install",
     "agents:start": "bash scripts/agent-orchestrator.sh start",
     "agents:status": "bash scripts/agent-orchestrator.sh status",
@@ -25,6 +27,7 @@
     "preview:web": "vite preview --outDir dist-web",
     "test": "cd packages/domain && npm run build && npm run build:tests && cd ../data-packs && npm run build && npm run build:tests && cd ../sim-core && npm run build:tests && cd ../engine && npm run build && npm run build:tests && cd ../.. && node --test \"server/**/*.test.js\" \"src/**/*.test.js\" \"packages/domain/dist-test/test/*.test.js\" \"packages/data-packs/dist-test/test/*.test.js\" \"packages/sim-core/dist-test/test/*.test.js\" \"packages/engine/dist-test/test/*.test.js\"",
     "test:server": "node --test \"server/**/*.test.js\"",
+    "test:ui": "playwright test",
     "test:domain": "cd packages/domain && npm test",
     "test:data-packs": "cd packages/data-packs && npm test",
     "test:sim-core": "cd packages/sim-core && npm test",
@@ -36,7 +39,7 @@
     "typecheck:data-packs": "cd packages/data-packs && npm run typecheck",
     "typecheck:sim-core": "cd packages/sim-core && npm run typecheck",
     "check:cycles": "cd packages/domain && npm run check:cycles",
-    "ci": "npm run lint && npm run test && npm run build && npm run agents:test && npm run check:cycles",
+    "ci": "npm run lint && npm run test && npm run build && npm run test:ui && npm run agents:test && npm run check:cycles",
     "electron": "electron .",
     "dist:win": "npm run build && electron-builder --win",
     "dist:mac": "npm run build && electron-builder --mac",
@@ -87,6 +90,7 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "eslint": "^9.39.3",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.26",

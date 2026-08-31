@@ -116,7 +116,7 @@ const WebGLWarningPopup = () => (
 );
 
 const AdvisorButton = ({ isAdvisorOpen, rightShift, onToggle }) => (
-  <button onClick={onToggle} style={{
+  <button aria-label="Open advisor and economy" onClick={onToggle} style={{
     ...baseStyle,
     bottom: "0.5rem", right: rightShift,
     height: "4rem", width: "4rem",

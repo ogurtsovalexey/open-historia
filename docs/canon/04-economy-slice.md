@@ -86,12 +86,34 @@ The first map fixture is `packages/engine/fixtures/scenario-dev-map-2x5/`:
 Ostreya holds five Austrian lands, Vindar five Czech regions — adjacent, in
 central Europe, visually unambiguous.
 
+## In-game integration (P2, shipped 2026-08-31)
+
+Central Europe is now the product playtest scenario. Each game owns a
+content-addressed engine session (canon 06). The product API is explicitly
+game-scoped:
+
+- `GET /api/games/:gameId/economy/state`;
+- `POST /api/games/:gameId/economy/advance` with `targetDate`,
+  `expectedSessionRevision` and typed `commands`.
+
+Calendar month boundaries, not rounded day counts, determine the number of
+monthly engine ticks. A player jump increments the game round exactly once,
+including a jump within one month; at most 120 monthly boundaries may be
+crossed. The saved player country resolves through the authored
+`polityOwnerNames` mapping. Ambiguous players, foreign actors, investments in
+foreign regions and stale session revisions fail before publication.
+
+The Economy drawer defaults to the player's first controlled region, permits
+read-only inspection of foreign regions, queues investments for the shared
+time control, and has no product-only reset or advance button. Date, round,
+session revision, last report and ledger causes are visible in EN/RU. The
+Playwright smoke verifies the Central Europe map/UI/API path and blocks model
+calls.
+
 ## Not doing (deferred from the archived spec)
 
-- §8 in-game dashboard UI and §9 in-app playtest script (the headless CLI +
-  golden replay covers the logic; UI is the next slice).
-- Region transfer command (spec §7) — stretch task T9, state model ready
-  (`controllerId`).
+- Player-facing region-transfer controls (the deterministic engine command and
+  re-aggregation semantics are ready; P2 does not expose that command in UI).
 - Six-projection atomic world revision (AC-2) — engine run dirs instead, see
   canon 06.
 - Everything in spec §11 (prices, trade, migration, combat, NPC AI…).

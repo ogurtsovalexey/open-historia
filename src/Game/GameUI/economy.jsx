@@ -3,10 +3,27 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { setRegionClickObserver } from "../Selection/Regions.jsx";
 import {
   fetchEconomyState,
-  isEngineDrivenGame,
-  resetEconomy,
-  runEconomyMonths,
+  getActiveEngineGame,
+  queueEconomyCommand,
 } from "../../runtime/economy.js";
+import { getStoredLanguage } from "../../runtime/i18n.js";
+
+const COPY = {
+  en: {
+    date: "Date", round: "Round", revision: "Session revision", selected: "Selected region",
+    click: "click the map", controller: "Controller", foreign: "Foreign region — view only",
+    invest: "Queue investment", queued: "Investment queued for the next time jump",
+    report: "Last economic report", why: "Why changed", loading: "Loading economy…",
+    unavailable: "This game does not use the deterministic economy engine.",
+  },
+  ru: {
+    date: "Дата", round: "Ход", revision: "Ревизия сессии", selected: "Выбранный регион",
+    click: "нажмите на карту", controller: "Контролирующая страна", foreign: "Чужой регион — только просмотр",
+    invest: "Запланировать инвестицию", queued: "Инвестиция запланирована на следующий переход времени",
+    report: "Последний экономический отчёт", why: "Причины изменений", loading: "Загрузка экономики…",
+    unavailable: "Эта игра не использует детерминированный экономический движок.",
+  },
+};
 
 const fmt = (value) => (typeof value === "number" ? value.toLocaleString("en-US") : "—");
 const signed = (value) => (value > 0 ? `+${fmt(value)}` : fmt(value));
@@ -64,11 +81,11 @@ const Row = ({ label, value, tone }) => (
   </div>
 );
 
-const Reasons = ({ lines }) => {
+const Reasons = ({ lines, label = "Why changed" }) => {
   if (!lines || lines.length === 0) return null;
   return (
     <details style={{ marginTop: 6 }}>
-      <summary style={{ cursor: "pointer", color: COLORS.dim, fontSize: 12 }}>Why changed</summary>
+      <summary style={{ cursor: "pointer", color: COLORS.dim, fontSize: 12 }}>{label}</summary>
       <ul style={{ margin: "6px 0 0", paddingLeft: 18, color: COLORS.dim, fontSize: 12 }}>
         {lines.map((line, index) => (
           <li key={index}>{line}</li>
@@ -91,13 +108,17 @@ const EconomyPane = ({ active }) => {
   const [selectedMapRegion, setSelectedMapRegion] = useState("");
   const [spend, setSpend] = useState(1000);
   const [engineDriven, setEngineDriven] = useState(null);
+  const [gameId, setGameId] = useState("");
+  const [queued, setQueued] = useState(false);
+  const text = COPY[getStoredLanguage()] ?? COPY.en;
 
   const load = useCallback(async () => {
     try {
-      const driven = await isEngineDrivenGame();
-      setEngineDriven(driven);
-      if (!driven) return;
-      setSnapshot(await fetchEconomyState());
+      const game = await getActiveEngineGame();
+      setEngineDriven(Boolean(game));
+      if (!game) return;
+      setGameId(game.id);
+      setSnapshot(await fetchEconomyState(game.id));
       setError("");
     } catch (loadError) {
       setError(loadError?.message || String(loadError));
@@ -151,7 +172,7 @@ const EconomyPane = ({ active }) => {
     const byClick = engineId ? snapshot.regions.find((region) => region.regionId === engineId) : null;
     // Nothing selected yet (or a region outside our scenario): show the first
     // region of the player's own polity, by stable id.
-    return byClick ?? snapshot.regions[0] ?? null;
+    return byClick ?? snapshot.regions.find((region) => region.controllerId === snapshot.playerPolityId) ?? null;
   }, [snapshot, engineIdByMapId, selectedMapRegion]);
 
   const controller = useMemo(() => {
@@ -180,59 +201,34 @@ const EconomyPane = ({ active }) => {
     );
   }, [controllerLedger, selectedRegion]);
 
-  const advance = useCallback(
-    async (months) => {
-      setBusy(true);
-      try {
-        setSnapshot(await runEconomyMonths({ months }));
-        setError("");
-      } catch (turnError) {
-        setError(turnError?.message || String(turnError));
-      } finally {
-        setBusy(false);
-      }
-    },
-    []
-  );
-
   const invest = useCallback(async () => {
-    if (!snapshot || !selectedRegion || !controller) return;
+    if (!snapshot || !selectedRegion || !controller || selectedRegion.controllerId !== snapshot.playerPolityId) return;
     const amount = Number(spend);
     if (!Number.isInteger(amount) || amount <= 0) {
       setError("Spend must be a positive whole number.");
       return;
     }
-    setBusy(true);
     try {
-      setSnapshot(
-        await runEconomyMonths({
-          months: 1,
-          commands: [
-            {
-              kind: "economy.invest-region",
-              commandId: crypto.randomUUID(),
-              actorPolityId: selectedRegion.controllerId,
-              targetRegionId: selectedRegion.regionId,
-              effectiveMonth: snapshot.month,
-              expectedRevision: snapshot.revision,
-              spend: amount,
-            },
-          ],
-        })
-      );
+      queueEconomyCommand(gameId, {
+        kind: "economy.invest-region",
+        commandId: crypto.randomUUID(),
+        actorPolityId: snapshot.playerPolityId,
+        targetRegionId: selectedRegion.regionId,
+        effectiveMonth: snapshot.month,
+        expectedRevision: snapshot.revision,
+        spend: amount,
+      });
+      setQueued(true);
       setError("");
     } catch (investError) {
       setError(investError?.message || String(investError));
-    } finally {
-      setBusy(false);
-    }
-  }, [snapshot, selectedRegion, controller, spend]);
+    } finally { setBusy(false); }
+  }, [snapshot, selectedRegion, controller, spend, gameId]);
 
   if (engineDriven === false) {
     return (
       <div style={{ padding: 16, color: COLORS.dim, fontSize: 13, lineHeight: 1.6 }}>
-        This game is not engine-driven. Start a game from an engine scenario (for example
-        “Ostreya vs Vindar”) to see deterministic economy numbers here.
+        {text.unavailable}
       </div>
     );
   }
@@ -240,7 +236,7 @@ const EconomyPane = ({ active }) => {
   if (!snapshot) {
     return (
       <div style={{ padding: 16, color: COLORS.dim, fontSize: 13 }}>
-        {error ? `Failed to load: ${error}` : "Loading economy…"}
+        {error ? `Failed to load: ${error}` : text.loading}
       </div>
     );
   }
@@ -255,7 +251,7 @@ const EconomyPane = ({ active }) => {
   );
 
   return (
-    <div style={{ padding: "12px 14px", overflowY: "auto", fontSize: 13 }}>
+    <div data-testid="economy-pane" data-game-id={gameId} style={{ padding: "12px 14px", overflowY: "auto", fontSize: 13 }}>
       <div
         style={{
           display: "flex",
@@ -265,26 +261,9 @@ const EconomyPane = ({ active }) => {
           marginBottom: 12,
         }}
       >
-        <strong style={{ fontVariantNumeric: "tabular-nums" }}>{snapshot.month}</strong>
-        <span style={{ color: COLORS.dim }}>turn {snapshot.turn}</span>
-        <span style={{ flex: 1 }} />
-        <button type="button" disabled={busy} onClick={() => advance(1)}>
-          {busy ? "…" : "Advance month"}
-        </button>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={async () => {
-            setBusy(true);
-            try {
-              setSnapshot(await resetEconomy());
-            } finally {
-              setBusy(false);
-            }
-          }}
-        >
-          Reset
-        </button>
+        <strong style={{ fontVariantNumeric: "tabular-nums" }}>{text.date}: {snapshot.gameDate}</strong>
+        <span style={{ color: COLORS.dim }}>{text.round} {snapshot.round}</span>
+        <span style={{ color: COLORS.dim }}>{text.revision}: {snapshot.sessionRevision.slice(0, 18)}…</span>
       </div>
 
       {error ? (
@@ -322,10 +301,10 @@ const EconomyPane = ({ active }) => {
 
       {selectedRegion ? (
         <Section
-          title="Selected region"
-          right={selectedMapRegion ? mapIdByEngineId.get(selectedRegion.regionId) : "click the map"}
+          title={text.selected}
+          right={selectedMapRegion ? mapIdByEngineId.get(selectedRegion.regionId) : text.click}
         >
-          <div style={{ fontSize: 15, fontWeight: 650, marginBottom: 4 }}>
+          <div data-testid="economy-selected-region" style={{ fontSize: 15, fontWeight: 650, marginBottom: 4 }}>
             {selectedRegion.displayName?.en ?? shortRegion(selectedRegion.regionId)}
           </div>
           <Row
@@ -356,7 +335,7 @@ const EconomyPane = ({ active }) => {
             value={regionProduction ? `${fmt(regionProduction.amount)} ${regionProduction.resource}` : "—"}
           />
           {populationRow ? (
-            <Reasons
+            <Reasons label={text.why}
               lines={[
                 `births +${fmt(populationRow.births)}, deaths −${fmt(populationRow.deaths)}`,
                 `workforce rate ${bp(selectedRegion.workforceRateBp)}, output per worker ${fmt(
@@ -369,7 +348,7 @@ const EconomyPane = ({ active }) => {
       ) : null}
 
       {controller ? (
-        <Section title="Controller" right={link?.polityOwnerNames?.[controller.id] ?? ""}>
+        <Section title={text.controller} right={link?.polityOwnerNames?.[controller.id] ?? ""}>
           <div style={{ fontSize: 15, fontWeight: 650, marginBottom: 4 }}>
             {controller.displayName?.en ?? controller.id}
           </div>
@@ -385,7 +364,7 @@ const EconomyPane = ({ active }) => {
                     : COLORS.bad
                 }
               />
-              <Reasons
+              <Reasons label={text.why}
                 lines={[
                   `tax revenue +${fmt(controllerLedger.taxTotal)}`,
                   `spending −${fmt(controllerLedger.investment?.spend ?? 0)}`,
@@ -442,7 +421,7 @@ const EconomyPane = ({ active }) => {
         </Section>
       ) : null}
 
-      {selectedRegion && controller ? (
+      {selectedRegion && controller && selectedRegion.controllerId === snapshot.playerPolityId ? (
         <Section title={`Invest in ${selectedRegion.displayName?.en ?? shortRegion(selectedRegion.regionId)}`}>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <input
@@ -453,8 +432,8 @@ const EconomyPane = ({ active }) => {
               onChange={(event) => setSpend(event.target.value)}
               style={{ width: 110 }}
             />
-            <button type="button" disabled={busy} onClick={invest}>
-              Invest and advance a month
+            <button data-testid="economy-invest" type="button" disabled={busy} onClick={invest}>
+              {text.invest}
             </button>
           </div>
           <div style={{ color: COLORS.dim, marginTop: 6, fontSize: 12 }}>
@@ -468,11 +447,12 @@ const EconomyPane = ({ active }) => {
             )}
             . Treasury {fmt(controller.treasury)} → {fmt(controller.treasury - Number(spend))}.
           </div>
+          {queued ? <div style={{ color: COLORS.good, marginTop: 6 }}>{text.queued}</div> : null}
         </Section>
-      ) : null}
+      ) : selectedRegion && controller ? <Section title={text.foreign}><div style={{ color: COLORS.dim }}>{text.foreign}</div></Section> : null}
 
       {snapshot.lastTurn?.report ? (
-        <Section title="Turn report">
+        <Section title={text.report}>
           <pre
             style={{
               whiteSpace: "pre-wrap",

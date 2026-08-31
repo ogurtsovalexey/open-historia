@@ -67,6 +67,7 @@ read_pending_tick
 assert_status missing-marker
 
 launchctl() {
+  printf '%s\n' "$*" >>"$TEST_ROOT/launchctl.calls"
   if [[ "${1:-}" == "print" ]]; then
     return 1
   fi
@@ -329,5 +330,48 @@ if integrate_handoff_range "$HANDOFF_REPO" "$HOOK_BASE" "$HOOK_BASE..$HOOK_TIP" 
 preflight_worktree "$HANDOFF_REPO"
 git -C "$HANDOFF_REPO" config user.name 'Test User'
 git -C "$HANDOFF_REPO" config user.email test@example.com
+
+# The external kill switch is fail-closed across repo and installed runtime
+# entrypoints. It preserves evidence while stopping dispatch infrastructure.
+rm -f "$DISABLED_PATH"
+printf 'pending evidence\n' >"$PENDING_TICK_PATH"
+screen() {
+  if [[ "${1:-}" == "-ls" ]]; then
+    printf 'There is a screen on:\n\t123.historia-issue-77\t(Detached)\n1 Socket in /tmp/screens.\n'
+    return 0
+  fi
+  printf '%s\n' "$*" >>"$TEST_ROOT/screen.calls"
+  return 0
+}
+
+disable_orchestrator >/dev/null
+[[ -f "$DISABLED_PATH" ]]
+grep -Fq 'reason=owner-disabled-orchestration' "$DISABLED_PATH"
+[[ ! -f "$PENDING_TICK_PATH" ]]
+find "$STATE_DIR" -maxdepth 1 -type f -name 'disabled-pending-tick-*' | grep -q .
+grep -Fq -- '-S historia-issue-77 -X quit' "$TEST_ROOT/screen.calls"
+[[ -x "$RUNTIME_SCRIPT_PATH" ]]
+grep -Fq 'require_orchestrator_enabled' "$RUNTIME_SCRIPT_PATH"
+
+for blocked_action in install_watchdog start_watchdog restart_watchdog bootstrap_watchdog run_tick; do
+  if ( "$blocked_action" "$SESSION_ID" ) >/dev/null 2>&1; then
+    printf 'Disabled orchestrator allowed %s.\n' "$blocked_action" >&2
+    exit 1
+  fi
+done
+if OPEN_HISTORIA_ORCHESTRATOR_LIBRARY_ONLY=0 bash "$RUNTIME_SCRIPT_PATH" tick >/dev/null 2>&1; then
+  printf 'Installed runtime bypassed the disabled marker.\n' >&2
+  exit 1
+fi
+
+status_output="$(print_status)"
+grep -Fq 'orchestrator: DISABLED' <<<"$status_output"
+check_output="$(check_board)"
+grep -Fq 'decision=disabled' <<<"$check_output"
+
+launchctl_calls_before="$(wc -l <"$TEST_ROOT/launchctl.calls")"
+enable_orchestrator >/dev/null
+[[ ! -e "$DISABLED_PATH" ]]
+[[ "$(wc -l <"$TEST_ROOT/launchctl.calls")" == "$launchctl_calls_before" ]]
 
 printf 'agent-orchestrator state tests passed\n'

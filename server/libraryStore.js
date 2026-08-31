@@ -13,6 +13,7 @@ import {
   needsMigration as needsOwnerMigration,
   rekeyOwnerMap,
 } from "./ownerMigration.js";
+import { readEngineSession } from "./engineSessionStore.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.join(__dirname, "..");
@@ -432,6 +433,7 @@ const invalidateCatalogs = () => {
   gameCatalogCache = null;
   scenarioCatalogCache = null;
 };
+export const invalidateLibraryCatalogs = invalidateCatalogs;
 
 const normalizeId = (rawValue, prefix) => {
   const value = String(rawValue ?? "")
@@ -1245,7 +1247,13 @@ const buildGameCatalog = () => {
 
     const meta = readGameMeta(gameId);
     const assetStatus = getGameAssetStatus(gameId);
-    const gameData = readJsonFile(getGameJsonPath(gameId, "game"), {});
+    let gameData = readJsonFile(getGameJsonPath(gameId, "game"), {});
+    if (meta.engineDriven) {
+      const session = readEngineSession(getGameDirectory(gameId));
+      if (session) {
+        gameData = { ...gameData, gameDate: session.manifest.gameDate, round: session.manifest.round };
+      }
+    }
     const actions = readJsonFile(getGameJsonPath(gameId, "actions"), []);
     const events = readJsonFile(getGameJsonPath(gameId, "events"), []);
     const scenario = scenarioLookup.get(meta.scenarioId) ?? readScenarioMeta(meta.scenarioId);
@@ -2291,9 +2299,24 @@ const readRuntimeJsonAsset = (assetKey) => {
   : null;
 
   if (gamePath && fs.existsSync(gamePath)) {
+    let data = readJsonFile(gamePath, JSON_ASSET_DEFAULTS[assetKey] ?? {});
+    if (activeGame?.engineDriven && (assetKey === "game" || assetKey === "world")) {
+      const session = readEngineSession(getGameDirectory(activeGame.id));
+      if (session && assetKey === "game") {
+        data = { ...data, gameDate: session.manifest.gameDate, round: session.manifest.round };
+      } else if (session && assetKey === "world") {
+        data = {
+          ...data,
+          regionOwnershipOverrides: {
+            ...(data.regionOwnershipOverrides ?? {}),
+            ...session.ownership,
+          },
+        };
+      }
+    }
     return {
       contentType: "application/json; charset=utf-8",
-      data: normalizeRuntimeWorld(assetKey, readJsonFile(gamePath, JSON_ASSET_DEFAULTS[assetKey] ?? {})),
+      data: normalizeRuntimeWorld(assetKey, data),
       sourcePath: gamePath,
     };
   }

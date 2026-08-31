@@ -1,5 +1,5 @@
-/*! Open Historia — client access to the deterministic economy engine. */
-import { ensureLibraryCatalog, getLibraryState } from "./library.js";
+/*! Open Historia — client access to game-scoped deterministic economy sessions. */
+import { ensureLibraryCatalog, getLibraryState, refreshLibraryCatalog } from "./library.js";
 
 const request = async (url, init) => {
   const response = await fetch(url, {
@@ -9,40 +9,44 @@ const request = async (url, init) => {
   });
   const text = await response.text();
   let data = null;
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    data = null;
-  }
+  try { data = text ? JSON.parse(text) : null; } catch { data = null; }
   if (!response.ok) {
-    throw new Error(data?.error || data?.message || `${url} failed with ${response.status}`);
+    const error = new Error(data?.error || data?.message || `${url} failed with ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
   return data;
 };
 
-/**
- * True when the active game routes time through the engine. The flag lives on
- * the game (inherited from its scenario), so a legacy game is never affected.
- */
-export const isEngineDrivenGame = async () => {
+export const getActiveEngineGame = async () => {
   await ensureLibraryCatalog();
   const state = getLibraryState();
-  if (state?.activeGame) return state.activeGame.engineDriven === true;
-  return state?.runtimeScenario?.engineDriven === true;
+  const game = state?.activeGame ?? null;
+  return game?.engineDriven === true ? game : null;
 };
 
-export const fetchEconomyState = () => request("/api/economy/state");
+export const isEngineDrivenGame = async () => Boolean(await getActiveEngineGame());
 
-/** Resolve `months` monthly ticks; commands apply to the first month only. */
-export const runEconomyMonths = ({ months = 1, commands = [] } = {}) =>
-  request("/api/economy/turn", { method: "POST", body: JSON.stringify({ months, commands }) });
-
-export const resetEconomy = () => request("/api/economy/reset", { method: "POST", body: JSON.stringify({}) });
-
-/** Whole months between two YYYY-MM-DD dates, floored at zero. */
-export const monthsBetween = (fromDate, toDate) => {
-  const [fy, fm] = String(fromDate).split("-").map(Number);
-  const [ty, tm] = String(toDate).split("-").map(Number);
-  if (!fy || !fm || !ty || !tm) return 0;
-  return Math.max(0, (ty - fy) * 12 + (tm - fm));
+export const fetchEconomyState = (gameId) => {
+  if (!gameId) throw new Error("gameId is required to read economy state");
+  return request(`/api/games/${encodeURIComponent(gameId)}/economy/state`);
 };
+
+export const advanceEconomy = async ({ gameId, targetDate, expectedSessionRevision, commands = [] }) => {
+  if (!gameId) throw new Error("gameId is required to advance economy state");
+  const result = await request(`/api/games/${encodeURIComponent(gameId)}/economy/advance`, {
+    method: "POST",
+    body: JSON.stringify({ targetDate, expectedSessionRevision, commands }),
+  });
+  await refreshLibraryCatalog({ force: true });
+  return result;
+};
+
+const pendingCommands = new Map();
+export const queueEconomyCommand = (gameId, command) => {
+  if (!gameId) throw new Error("gameId is required to queue an economy command");
+  pendingCommands.set(gameId, [...(pendingCommands.get(gameId) ?? []), command]);
+  return pendingCommands.get(gameId).length;
+};
+export const getQueuedEconomyCommands = (gameId) => [...(pendingCommands.get(gameId) ?? [])];
+export const clearQueuedEconomyCommands = (gameId) => pendingCommands.delete(gameId);

@@ -11,7 +11,13 @@ import {
     loadRegionCatalog,
 } from "../../runtime/assets.js";
 import { loadRollbackSnapshots, maybeGeneratePregameHistory, rollBackToSnapshot, simulateAutoJump, simulateTimelineJump } from "../AI/gameplay.js";
-import { isEngineDrivenGame, runEconomyMonths } from "../../runtime/economy.js";
+import {
+    advanceEconomy,
+    clearQueuedEconomyCommands,
+    fetchEconomyState,
+    getActiveEngineGame,
+    getQueuedEconomyCommands,
+} from "../../runtime/economy.js";
 import { isMainMenuOpen } from "./libraryBar";
 import {
     applyEventImpactsToWorld,
@@ -831,7 +837,7 @@ const JumpNode = ({ isLoading, opt, onJump }) => {
                 return;
             }
 
-            onJump(opt.days);
+            onJump(opt.days, opt.targetDate);
         }}
         style={{
             background: hovered ? "rgba(109,40,217,0.35)" : "rgba(109,40,217,0.15)",
@@ -875,17 +881,20 @@ const TimelineSkipPanel = ({
     const runCustomJump = () => {
         const amount = Number(customValue);
         if (!Number.isFinite(amount) || amount <= 0 || isLoading) return;
-        onJump(amount * (unitToDays[customUnit] ?? 1));
+        onJump(
+            amount * (unitToDays[customUnit] ?? 1),
+            dayjs(currentDate).add(amount, customUnit === "hours" ? "hour" : customUnit.slice(0, -1)).format("YYYY-MM-DD"),
+        );
     };
     const jumpOptions = [
-        { label: "6 hours", sublabel: dayjs(currentDate).format("M/D/YYYY"), days: 0.25 },
-        { label: "1 day", sublabel: dayjs(currentDate).add(1, "day").format("M/D/YYYY"), days: 1 },
-        { label: "3 days", sublabel: dayjs(currentDate).add(3, "day").format("M/D/YYYY"), days: 3 },
-        { label: "1 week", sublabel: dayjs(currentDate).add(7, "day").format("M/D/YYYY"), days: 7 },
-        { label: "1 month", sublabel: dayjs(currentDate).add(1, "month").format("M/D/YYYY"), days: 30 },
-        { label: "3 months", sublabel: dayjs(currentDate).add(3, "month").format("M/D/YYYY"), days: 90 },
-        { label: "6 months", sublabel: dayjs(currentDate).add(6, "month").format("M/D/YYYY"), days: 180 },
-        { label: "1 year", sublabel: dayjs(currentDate).add(1, "year").format("M/D/YYYY"), days: 365 },
+        { label: "6 hours", sublabel: dayjs(currentDate).format("M/D/YYYY"), days: 0.25, targetDate: dayjs(currentDate).format("YYYY-MM-DD") },
+        { label: "1 day", sublabel: dayjs(currentDate).add(1, "day").format("M/D/YYYY"), days: 1, targetDate: dayjs(currentDate).add(1, "day").format("YYYY-MM-DD") },
+        { label: "3 days", sublabel: dayjs(currentDate).add(3, "day").format("M/D/YYYY"), days: 3, targetDate: dayjs(currentDate).add(3, "day").format("YYYY-MM-DD") },
+        { label: "1 week", sublabel: dayjs(currentDate).add(7, "day").format("M/D/YYYY"), days: 7, targetDate: dayjs(currentDate).add(7, "day").format("YYYY-MM-DD") },
+        { label: "1 month", sublabel: dayjs(currentDate).add(1, "month").format("M/D/YYYY"), days: 30, targetDate: dayjs(currentDate).add(1, "month").format("YYYY-MM-DD") },
+        { label: "3 months", sublabel: dayjs(currentDate).add(3, "month").format("M/D/YYYY"), days: 90, targetDate: dayjs(currentDate).add(3, "month").format("YYYY-MM-DD") },
+        { label: "6 months", sublabel: dayjs(currentDate).add(6, "month").format("M/D/YYYY"), days: 180, targetDate: dayjs(currentDate).add(6, "month").format("YYYY-MM-DD") },
+        { label: "1 year", sublabel: dayjs(currentDate).add(1, "year").format("M/D/YYYY"), days: 365, targetDate: dayjs(currentDate).add(1, "year").format("YYYY-MM-DD") },
     ];
 
     return (
@@ -1437,7 +1446,7 @@ const DateWidget = ({
         setLocalOpenPanel((current) => (current === panelName ? null : panelName));
     }
 
-    const runJump = async (days, mode = "jump") => {
+    const runJump = async (days, mode = "jump", explicitTargetDate = "") => {
         if (!gameData || days == null || isLoading) {
             return;
         }
@@ -1453,9 +1462,17 @@ const DateWidget = ({
             // An engine-driven scenario advances by running deterministic monthly
             // ticks — one per 1st of month crossed — instead of asking a model to
             // invent the period. Every other scenario keeps the legacy path.
-            if (await isEngineDrivenGame()) {
-                const months = Math.max(1, Math.round(days / 30));
-                await runEconomyMonths({ months });
+            const engineGame = await getActiveEngineGame();
+            if (engineGame) {
+                const current = await fetchEconomyState(engineGame.id);
+                const targetDate = explicitTargetDate || dayjs(current.gameDate).add(days, "day").format("YYYY-MM-DD");
+                await advanceEconomy({
+                    gameId: engineGame.id,
+                    targetDate,
+                    expectedSessionRevision: current.sessionRevision,
+                    commands: getQueuedEconomyCommands(engineGame.id),
+                });
+                clearQueuedEconomyCommands(engineGame.id);
                 const [nextGame, nextWorld, nextEvents] = await Promise.all([
                     readGameData({ force: true }),
                     readWorldState({ force: true }),
@@ -1707,10 +1724,10 @@ const DateWidget = ({
         error={error}
         isLoading={isLoading}
         isOpen={openPanel === "skip"}
-        onAutoJump={() => runJump(365, "auto")}
+        onAutoJump={() => runJump(365, "auto", dayjs(currentDate).add(1, "year").format("YYYY-MM-DD"))}
         onCancel={cancelJump}
         onClose={() => setPanel(null)}
-        onJump={(days) => runJump(days, "jump")}
+        onJump={(days, targetDate) => runJump(days, "jump", targetDate)}
         onUndo={runUndo}
         topOffset={topOffset}
         undoCount={undoCount}

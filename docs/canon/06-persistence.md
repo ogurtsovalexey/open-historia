@@ -24,6 +24,25 @@ Writes are atomic: staging dir → `rename`. Revisions are content-addressed
 whole campaign from the copied scenario + recorded commands and byte-compares
 every revision. That replay IS the integrity check.
 
+## In-game engine sessions (active)
+
+Product games publish a separate atomic manifest under
+`games/<gameId>/engine-session/`. A content-addressed revision binds the engine
+state, exact game date, game round, last economic turn and complete ownership
+projection. Each payload has a SHA-256 and byte length; the manifest hashes its
+own canonical content and names its parent revision. A staged revision is
+verified before its directory is renamed, then becomes visible through one
+atomic `current.json` pointer rename.
+
+Every advance is compare-and-swap against `expectedSessionRevision`. A stale
+writer, broken parent chain, malformed pointer or payload/hash mismatch is
+rejected without changing the current readable revision. Runtime readers overlay
+engine-owned date, round and ownership from this manifest; those fields are not
+copied back into legacy `game.json` or `world.json`. A pre-session engine dev
+save in `economy/` is moved once into `backups/economy-engine-v0-NNN/`, then the
+new session is initialized from the immutable scenario. Legacy games never
+enter this path.
+
 ## Legacy six-projection contract (frozen)
 
 `src/runtime/worldRevisionCore.js` + `server/worldRevisionFilesystem.js`

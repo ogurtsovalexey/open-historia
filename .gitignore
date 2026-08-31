@@ -57,3 +57,7 @@ electron/build-id.json
 
 # engine playtest run output
 runs
+
+# Browser smoke artifacts and isolated mutable data store
+/test-results/
+/playwright-report/

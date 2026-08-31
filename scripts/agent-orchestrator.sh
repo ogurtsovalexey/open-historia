@@ -7,6 +7,7 @@ SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SO
 DEFAULT_REPO_ROOT="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
 CONFIG_DIR="${OPEN_HISTORIA_ORCHESTRATOR_CONFIG_DIR:-${HOME}/.config/open-historia-orchestrator}"
 CONFIG_FILE="${CONFIG_DIR}/config"
+DISABLED_PATH="${CONFIG_DIR}/disabled"
 STATE_DIR="${OPEN_HISTORIA_ORCHESTRATOR_STATE_DIR:-${HOME}/Library/Application Support/OpenHistoriaAgentOrchestrator}"
 RUNTIME_SCRIPT_PATH="${STATE_DIR}/agent-orchestrator.sh"
 PLIST_PATH="${OPEN_HISTORIA_ORCHESTRATOR_PLIST_PATH:-${HOME}/Library/LaunchAgents/${LABEL}.plist}"
@@ -30,6 +31,18 @@ require_command() {
     printf 'Missing required command: %s\n' "$1" >&2
     exit 1
   }
+}
+
+orchestrator_disabled() {
+  [[ -f "$DISABLED_PATH" ]]
+}
+
+require_orchestrator_enabled() {
+  if orchestrator_disabled; then
+    printf 'Orchestrator is disabled by %s. Run `%s enable` to allow launches again.\n' \
+      "$DISABLED_PATH" "$SCRIPT_PATH" >&2
+    return 1
+  fi
 }
 
 load_config() {
@@ -634,6 +647,7 @@ notify_owner() {
 }
 
 run_tick() (
+  require_orchestrator_enabled || return 1
   load_config
   require_command codex
   require_command gh
@@ -764,6 +778,11 @@ print_status() {
   require_command gh
   require_command jq
 
+  if orchestrator_disabled; then
+    printf 'orchestrator: DISABLED (%s)\n' "$DISABLED_PATH"
+  else
+    printf 'orchestrator: enabled\n'
+  fi
   if launchd_loaded; then
     printf 'watchdog: running (%ss interval)\n' "$TICK_SECONDS"
   else
@@ -836,7 +855,9 @@ check_board() {
   claimed_deepseek="$(printf '%s' "$board" | jq '[.[] | select(any(.labels[]; .name == "status:claimed")) | select(any(.labels[]; .name == "agent:deepseek"))] | length')"
 
   printf 'ready=%s plan_review=%s review=%s claimed_deepseek=%s\n' "$ready" "$plan_review" "$review" "$claimed_deepseek"
-  if needs_tick "$board"; then
+  if orchestrator_disabled; then
+    printf 'decision=disabled\n'
+  elif needs_tick "$board"; then
     printf 'decision=wake\n'
   else
     printf 'decision=idle\n'
@@ -844,6 +865,7 @@ check_board() {
 }
 
 install_watchdog() {
+  require_orchestrator_enabled || return 1
   require_command codex
   require_command gh
   require_command jq
@@ -876,6 +898,7 @@ load_start_settings() {
 }
 
 bootstrap_watchdog() {
+  require_orchestrator_enabled || return 1
   write_plist
   launchctl bootstrap "gui/${UID}" "$PLIST_PATH"
 }
@@ -887,6 +910,7 @@ stop_watchdog_silently() {
 }
 
 start_bound_session() {
+  require_orchestrator_enabled || return 1
   local session_id="${1:?session id required}"
   valid_session_id "$session_id" || {
     printf 'Invalid Codex session UUID: %s\n' "$session_id" >&2
@@ -939,6 +963,7 @@ detect_new_orchestrator_session() {
 }
 
 start_new_terminal_session() {
+  require_orchestrator_enabled || return 1
   require_command codex
   require_command gh
   require_command jq
@@ -993,6 +1018,7 @@ APPLESCRIPT
 }
 
 start_watchdog() {
+  require_orchestrator_enabled || return 1
   if [[ -n "${1:-}" ]]; then
     start_bound_session "$1"
   else
@@ -1010,6 +1036,7 @@ stop_watchdog() {
 }
 
 restart_watchdog() {
+  require_orchestrator_enabled || return 1
   load_config
   stop_watchdog_silently
   bootstrap_watchdog
@@ -1022,11 +1049,64 @@ uninstall_watchdog() {
   printf 'Watchdog configuration removed; logs remain in %s.\n' "$STATE_DIR"
 }
 
+stop_active_workers() {
+  command -v screen >/dev/null 2>&1 || return 0
+
+  local name
+  while IFS= read -r name; do
+    [[ -n "$name" ]] || continue
+    screen -S "$name" -X quit >/dev/null 2>&1 || true
+    printf 'Stopped worker session %s.\n' "$name"
+  done < <(screen -ls 2>/dev/null | sed -nE 's/^[[:space:]]*[0-9]+\.(historia-issue-[0-9]+)[[:space:]].*/\1/p' || true)
+}
+
+disable_orchestrator() {
+  local temp_path archived_pending
+  temp_path="$(mktemp "${CONFIG_DIR}/disabled.XXXXXX")"
+  {
+    printf 'disabled_at=%s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+    printf 'reason=owner-disabled-orchestration\n'
+  } >"$temp_path"
+  chmod 600 "$temp_path"
+  mv "$temp_path" "$DISABLED_PATH"
+
+  if [[ "$SCRIPT_PATH" != "$RUNTIME_SCRIPT_PATH" ]]; then
+    cp "$SCRIPT_PATH" "$RUNTIME_SCRIPT_PATH"
+    chmod 700 "$RUNTIME_SCRIPT_PATH"
+  fi
+
+  stop_watchdog_silently
+  stop_active_workers
+
+  if [[ -f "$PENDING_TICK_PATH" ]]; then
+    archived_pending="${STATE_DIR}/disabled-pending-tick-$(date '+%Y%m%dT%H%M%S')-$$"
+    mv "$PENDING_TICK_PATH" "$archived_pending"
+    printf 'Archived pending delivery at %s.\n' "$archived_pending"
+  fi
+
+  printf 'Orchestrator disabled. New watchdog ticks and worker launches are blocked.\n'
+}
+
+enable_orchestrator() {
+  if orchestrator_disabled; then
+    rm -f "$DISABLED_PATH"
+    printf 'Orchestrator launch permission enabled. Watchdog remains stopped.\n'
+  else
+    printf 'Orchestrator launch permission is already enabled. Watchdog remains unchanged.\n'
+  fi
+}
+
 if [[ "${OPEN_HISTORIA_ORCHESTRATOR_LIBRARY_ONLY:-0}" == "1" ]]; then
   return 0 2>/dev/null || exit 0
 fi
 
 case "${1:-status}" in
+  disable)
+    disable_orchestrator
+    ;;
+  enable)
+    enable_orchestrator
+    ;;
   install)
     install_watchdog "${2:-}"
     ;;
@@ -1067,7 +1147,7 @@ case "${1:-status}" in
     uninstall_watchdog
     ;;
   *)
-    printf 'Usage: %s {install [session-id]|start [session-id]|stop|restart|check|run-now|status|preflight [repo]|validate-range <repo> <base> <range> <integration>|integrate-range <repo> <base> <range> [integration]|uninstall}\n' "$SCRIPT_PATH" >&2
+    printf 'Usage: %s {disable|enable|install [session-id]|start [session-id]|stop|restart|check|run-now|status|preflight [repo]|validate-range <repo> <base> <range> <integration>|integrate-range <repo> <base> <range> [integration]|uninstall}\n' "$SCRIPT_PATH" >&2
     exit 2
     ;;
 esac

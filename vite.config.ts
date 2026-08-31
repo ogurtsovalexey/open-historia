@@ -116,7 +116,15 @@ export default defineConfig(({ mode }) => ({
   // save/load (and the game's runtime endpoints) work with hot-reload too.
   server: {
     proxy: {
-      '/api': 'http://localhost:3000',
+      // Rewrite Host/Origin at the trusted local dev boundary so the server's
+      // CSRF guard recognises Vite-proxied writes as same-origin gameplay.
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        configure(proxy) {
+          proxy.on('proxyReq', (proxyReq) => proxyReq.setHeader('Origin', 'http://localhost:3000'))
+        },
+      },
     },
   },
   build: {

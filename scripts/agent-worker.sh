@@ -4,6 +4,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_PROMPT_FILE="${SCRIPT_DIR}/../docs/agent-worker-baseline.md"
+CONFIG_DIR="${OPEN_HISTORIA_ORCHESTRATOR_CONFIG_DIR:-${HOME}/.config/open-historia-orchestrator}"
+DISABLED_PATH="${CONFIG_DIR}/disabled"
 STATE_DIR="${OPEN_HISTORIA_ORCHESTRATOR_WORKER_STATE_DIR:-${HOME}/Library/Application Support/OpenHistoriaAgentOrchestrator/workers}"
 WORKER_MODEL="openrouter/deepseek/deepseek-v4-pro-0813"
 DEFAULT_PLANNING_TOKEN_BUDGET=400000
@@ -86,6 +88,12 @@ is_running() {
 }
 
 start_worker() {
+  if [[ -f "$DISABLED_PATH" ]]; then
+    printf 'Worker launch is disabled by %s. Run `bash scripts/agent-orchestrator.sh enable` to allow launches again.\n' \
+      "$DISABLED_PATH" >&2
+    return 1
+  fi
+
   local issue="${1:?issue number required}"
   local model="${2:?model required}"
   local worktree="${3:?worktree required}"

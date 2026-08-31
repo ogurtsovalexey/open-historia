@@ -163,6 +163,8 @@ the board is stable.
 ## Watchdog commands
 
 ```bash
+npm run agents:disable
+npm run agents:enable
 npm run agents:install
 npm run agents:start
 npm run agents:start <CODEX-session-UUID>
@@ -173,6 +175,18 @@ npm run agents:stop
 npm run agents:run-now
 npm run agents:test
 ```
+
+Orchestration is globally disabled when
+`~/.config/open-historia-orchestrator/disabled` exists. `agents:disable`
+creates that fail-closed marker before unloading the watchdog, stopping active
+`historia-issue-*` worker sessions and archiving any pending delivery record.
+While disabled, every watchdog launch path and direct `agent-worker.sh start`
+fails before a model process can start. Status, board inspection, worker usage,
+archive, stop and Git handoff diagnostics remain available.
+
+`agents:enable` only removes the launch prohibition. It never installs, starts
+or restarts the watchdog; a later launch always requires a separate explicit
+command.
 
 `npm run agents:workers` shows only unarchived worker runs. After GPT has
 integrated and closed an Issue, `bash scripts/agent-worker.sh archive <issue>`

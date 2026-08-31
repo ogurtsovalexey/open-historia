@@ -6,6 +6,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKER_SCRIPT="$SCRIPT_DIR/agent-worker.sh"
 TEST_STATE_DIR="$(mktemp -d)"
 trap 'rm -rf "$TEST_STATE_DIR"' EXIT
+export OPEN_HISTORIA_ORCHESTRATOR_CONFIG_DIR="$TEST_STATE_DIR/config"
+mkdir -p "$OPEN_HISTORIA_ORCHESTRATOR_CONFIG_DIR"
 
 printf '%s\n' 'test prompt' >"$TEST_STATE_DIR/942.prompt"
 printf '%s\n' \
@@ -89,5 +91,18 @@ set -e
 [[ "$(cat "$TEST_STATE_DIR/945.exit")" == '125' ]]
 grep -Fq 'used_tokens=100' "$TEST_STATE_DIR/945.budget"
 grep -Fq 'budget_tokens=50' "$TEST_STATE_DIR/945.budget"
+
+# Direct worker launches obey the same persistent kill switch, while read-only
+# status remains available.
+printf 'disabled_at=test\n' >"$OPEN_HISTORIA_ORCHESTRATOR_CONFIG_DIR/disabled"
+if OPEN_HISTORIA_ORCHESTRATOR_WORKER_STATE_DIR="$TEST_STATE_DIR" bash "$WORKER_SCRIPT" \
+  start 946 openrouter/deepseek/deepseek-v4-pro-0813 \
+  "$TEST_STATE_DIR/worktree" "$TEST_STATE_DIR/task.prompt" '' planning 50 >/dev/null 2>&1; then
+  echo 'Disabled worker launch unexpectedly succeeded.' >&2
+  exit 1
+fi
+[[ ! -e "$TEST_STATE_DIR/946.meta" ]]
+status_output="$(OPEN_HISTORIA_ORCHESTRATOR_WORKER_STATE_DIR="$TEST_STATE_DIR" bash "$WORKER_SCRIPT" status)"
+[[ -n "$status_output" ]]
 
 printf '%s\n' 'agent-worker archive tests passed'

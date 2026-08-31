@@ -97,9 +97,13 @@ clean. Any model call is mocked via `page.route`, so smoke costs zero tokens.
 Runs in CI on PRs; traces and screenshots on failure are the diagnostic
 artifact.
 
-Until those screens exist, the headless bench covers the same logic more
-cheaply: `packages/engine/test/devServer.test.ts` pins the data contract the UI
-will read.
+The P2 screen now exists. `npm run test:ui` creates an isolated Central Europe
+game, opens the Economy drawer with an explicit game id, advances across a
+calendar month boundary, and checks the economy revision plus the runtime date,
+round and ownership overlay. It also asserts stale-session rejection, absence
+of product reset/advance buttons and zero model calls. CI installs Chromium and
+runs this smoke after the production build. The headless bench remains the
+faster engine-only contract check.
 
 Note for browser-driven checks: the Chrome automation screenshot is scaled
 relative to the real viewport, so coordinate clicks can miss silently. Prefer
