@@ -45,6 +45,7 @@ async function executeAgentTask(task, { signal, definition, budget, profile }) {
       signal,
       languageMode: "none",
       reasoningMode: "off",
+      providerRole: definition.modelRole,
     });
     ledger.finishTransport(record.invocationId, 1, started.transportAttempt, {
       latencyMs: Math.max(0, performance.now() - startedAt), terminalStatus: "success",

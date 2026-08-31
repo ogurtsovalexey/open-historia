@@ -7,6 +7,7 @@ import { JSON_URLS, readJson, writeJson } from "../../runtime/assets.js";
 import { chatLanguageDiffersFromUi, isRtlLanguage, resolveChatLanguage } from "../../runtime/i18n.js";
 import StatsPane from "./stats.jsx";
 import EconomyPane from "./economy.jsx";
+import DiplomacyPane from "./diplomacy.jsx";
 
 Chart.register(...registerables);
 
@@ -376,6 +377,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
         {/* Header: tabs to flip between the advisor chat and national stats. */}
         <div style={{ alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", display: "flex", padding: "0 0.75rem 0 0.35rem" }}>
         <TabButton icon="🏭" label="Economy" active={activeTab === "economy"} onClick={() => setActiveTab("economy")} />
+        <TabButton icon="🤝" label="Diplomacy" active={activeTab === "diplomacy"} onClick={() => setActiveTab("diplomacy")} />
         <TabButton icon="🧭" label="Advisor" active={activeTab === "advisor"} onClick={() => setActiveTab("advisor")} />
         <TabButton icon="📊" label="Stats" active={activeTab === "stats"} onClick={() => setActiveTab("stats")} />
         <div style={{ flex: 1 }} />
@@ -400,6 +402,10 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
         {/* Deterministic economy pane — engine numbers only, zero model calls. */}
         <div style={{ display: activeTab === "economy" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
         <EconomyPane active={isAdvisorOpen && activeTab === "economy"} />
+        </div>
+
+        <div style={{ display: activeTab === "diplomacy" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
+        <DiplomacyPane active={isAdvisorOpen && activeTab === "diplomacy"} />
         </div>
 
         {/* National stats pane — kept mounted so flipping tabs is instant. */}

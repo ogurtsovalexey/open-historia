@@ -6,6 +6,7 @@ import type { PolityId, RegionId } from '@open-historia/domain';
 import type { ResourceId } from './scenario.js';
 import type { EconWorldState } from './state.js';
 import { getStock } from './state.js';
+import type { ResourceTransferRecord, TradeExecutionRecord, TreasuryTransferRecord } from './diplomacyReducer.js';
 
 export interface RegionPopulationRow {
   regionId: RegionId;
@@ -39,6 +40,8 @@ export interface StockMovement {
   processingUse: number;
   /** Population consumption actually used this month. */
   populationUse: number;
+  tradeIn?: number;
+  tradeOut?: number;
   closing: number;
 }
 
@@ -83,6 +86,7 @@ export interface PolityLedger {
   food: FoodRecord;
   treasuryOpening: number;
   treasuryClosing: number;
+  treasuryTradeNet?: number;
   stockMovements: StockMovement[];
 }
 
@@ -105,6 +109,11 @@ export interface TurnLedger {
   turn: number;
   polities: PolityLedger[];
   transfers: TransferRecord[];
+  trade?: {
+    executions: TradeExecutionRecord[];
+    resourceTransfers: ResourceTransferRecord[];
+    treasuryTransfers: TreasuryTransferRecord[];
+  };
 }
 
 /**
@@ -158,7 +167,8 @@ export function checkInvariants(
 
     // inventory' = inventory + production - consumption, exactly, no negatives.
     for (const movement of polityLedger.stockMovements) {
-      const expected = movement.opening + movement.produced - movement.processingUse - movement.populationUse;
+      const expected = movement.opening + (movement.tradeIn ?? 0) - (movement.tradeOut ?? 0)
+        + movement.produced - movement.processingUse - movement.populationUse;
       if (expected !== movement.closing) {
         fail('inventory-identity', `${id}/${movement.resource}: ${movement.opening}+${movement.produced}-${movement.processingUse}-${movement.populationUse} != ${movement.closing}`);
       }
@@ -189,7 +199,7 @@ export function checkInvariants(
 
     // treasury' = treasury + tax revenue - accepted spending.
     const spend = polityLedger.investment?.spend ?? 0;
-    const expectedTreasury = polityLedger.treasuryOpening + polityLedger.taxTotal - spend;
+    const expectedTreasury = polityLedger.treasuryOpening + (polityLedger.treasuryTradeNet ?? 0) + polityLedger.taxTotal - spend;
     if (expectedTreasury !== polityLedger.treasuryClosing) {
       fail('treasury-identity', `${id}: ${polityLedger.treasuryOpening}+${polityLedger.taxTotal}-${spend} != ${polityLedger.treasuryClosing}`);
     }
@@ -198,6 +208,42 @@ export function checkInvariants(
     }
     if (nextPolity.treasury < 0) fail('no-negative-treasury', `${id}: ${nextPolity.treasury}`);
     checked.push('treasury-identity');
+  }
+
+  if (ledger.trade) {
+    const resourceIn = new Map<string, number>();
+    const resourceOut = new Map<string, number>();
+    const treasuryNet = new Map<string, number>();
+    for (const transfer of ledger.trade.resourceTransfers) {
+      const outKey = `${transfer.fromPolityId}|${transfer.resource}`;
+      const inKey = `${transfer.toPolityId}|${transfer.resource}`;
+      resourceOut.set(outKey, (resourceOut.get(outKey) ?? 0) + transfer.amount);
+      resourceIn.set(inKey, (resourceIn.get(inKey) ?? 0) + transfer.amount);
+    }
+    for (const polity of ledger.polities) {
+      for (const movement of polity.stockMovements) {
+        const key = `${polity.polityId}|${movement.resource}`;
+        if ((movement.tradeIn ?? 0) !== (resourceIn.get(key) ?? 0)
+          || (movement.tradeOut ?? 0) !== (resourceOut.get(key) ?? 0)) {
+          fail('trade-resource-conservation', `${key}: ledger trade movements do not match bilateral transfers`);
+        }
+      }
+    }
+    for (const transfer of ledger.trade.treasuryTransfers) {
+      treasuryNet.set(transfer.fromPolityId, (treasuryNet.get(transfer.fromPolityId) ?? 0) - transfer.amount);
+      treasuryNet.set(transfer.toPolityId, (treasuryNet.get(transfer.toPolityId) ?? 0) + transfer.amount);
+    }
+    for (const polity of ledger.polities) {
+      if ((polity.treasuryTradeNet ?? 0) !== (treasuryNet.get(polity.polityId) ?? 0)) {
+        fail('trade-treasury-conservation', `${polity.polityId}: ledger treasury net does not match bilateral transfers`);
+      }
+    }
+    const totalResourceNet = [...resourceIn.values()].reduce((sum, value) => sum + value, 0)
+      - [...resourceOut.values()].reduce((sum, value) => sum + value, 0);
+    if (totalResourceNet !== 0) fail('trade-resource-conservation', `resource net is ${totalResourceNet}`);
+    const totalTreasuryNet = [...treasuryNet.values()].reduce((sum, value) => sum + value, 0);
+    if (totalTreasuryNet !== 0) fail('trade-treasury-conservation', `treasury net is ${totalTreasuryNet}`);
+    checked.push('trade-resource-conservation', 'trade-treasury-conservation');
   }
 
   // Transfers move the region and its attached values, nothing else (§7).

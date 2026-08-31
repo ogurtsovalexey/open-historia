@@ -14,6 +14,7 @@ import {
   regionIdSchema,
   worldRevisionIdSchema,
 } from '@open-historia/domain';
+import { agreementIdSchema, negotiationTermsSchema, proposalIdSchema } from './diplomacy.js';
 
 export const investInRegionCommandSchema = z
   .object({
@@ -53,9 +54,61 @@ export const transferRegionCommandSchema = z
   .strict();
 export type TransferRegionCommand = z.infer<typeof transferRegionCommandSchema>;
 
+const diplomaticCommandFields = {
+  commandId: commandIdSchema,
+  actorPolityId: polityIdSchema,
+  expectedRevision: worldRevisionIdSchema.optional(),
+  effectiveMonth: gameDateSchema,
+};
+
+export const proposeNegotiationCommandSchema = z.object({
+  kind: z.literal('diplomacy.propose'),
+  ...diplomaticCommandFields,
+  proposalId: proposalIdSchema,
+  recipientPolityId: polityIdSchema,
+  terms: negotiationTermsSchema,
+}).strict();
+
+export const counterNegotiationCommandSchema = z.object({
+  kind: z.literal('diplomacy.counter'),
+  ...diplomaticCommandFields,
+  proposalId: proposalIdSchema,
+  counterProposalId: proposalIdSchema,
+  terms: negotiationTermsSchema,
+}).strict();
+
+export const respondNegotiationCommandSchema = z.object({
+  kind: z.literal('diplomacy.respond'),
+  ...diplomaticCommandFields,
+  proposalId: proposalIdSchema,
+  response: z.enum(['accept', 'reject']),
+}).strict();
+
+export const terminateAgreementCommandSchema = z.object({
+  kind: z.literal('diplomacy.terminate-agreement'),
+  ...diplomaticCommandFields,
+  agreementId: agreementIdSchema,
+}).strict();
+
+export type DiplomacyCommand = z.infer<typeof proposeNegotiationCommandSchema>
+  | z.infer<typeof counterNegotiationCommandSchema>
+  | z.infer<typeof respondNegotiationCommandSchema>
+  | z.infer<typeof terminateAgreementCommandSchema>;
+
+export const diplomacyCommandSchema = z.discriminatedUnion('kind', [
+  proposeNegotiationCommandSchema,
+  counterNegotiationCommandSchema,
+  respondNegotiationCommandSchema,
+  terminateAgreementCommandSchema,
+]);
+
 export const econCommandSchema = z.discriminatedUnion('kind', [
   investInRegionCommandSchema,
   transferRegionCommandSchema,
+  proposeNegotiationCommandSchema,
+  counterNegotiationCommandSchema,
+  respondNegotiationCommandSchema,
+  terminateAgreementCommandSchema,
 ]);
 export type EconCommand = z.infer<typeof econCommandSchema>;
 
@@ -81,6 +134,15 @@ export const REJECTION_REASONS = [
   // A selector that matched no region is a rejection, never a silent no-op:
   // "invest in my oil regions" when you hold none must say so.
   'selector-matched-nothing',
+  'module-disabled',
+  'unknown-polity',
+  'unknown-proposal',
+  'unknown-agreement',
+  'unauthorized',
+  'duplicate-id',
+  'invalid-terms',
+  'duplicate-agreement',
+  'route-unavailable',
 ] as const;
 export type RejectionReason = (typeof REJECTION_REASONS)[number];
 

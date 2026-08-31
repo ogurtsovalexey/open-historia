@@ -7,6 +7,7 @@ import { parseTurnCommands, runTurn } from "@open-historia/engine";
 import {
   EMPTY_AGENT_STATE,
   agentStateSchema,
+  buildDiplomacyBatch,
   buildFallbackBatch,
   buildOpponentBatches,
   buildPolityBrief,
@@ -16,6 +17,8 @@ import {
   playerReportResultSchema,
   selectOpponentPolities,
   validateOpponentBatch,
+  validateDiplomacyBatch,
+  opponentDiplomacyBatchResultSchema,
 } from "@open-historia/agent-runtime";
 import { getGameDirectory, getScenarioAgentProfiles } from "./libraryStore.js";
 import { commitAgentEconomy, countMonthlyTicks, loadEconomyContext } from "./economyStore.js";
@@ -61,6 +64,16 @@ const hydrateOpponentCommandIds = (raw, batch) => ({
     command: decision?.command && typeof decision.command === "object" ? {
       ...decision.command,
       commandId: deterministicCommandId(`${batch.baseRevision}|${batch.month}|${decision.polityId}|${index}`),
+    } : decision?.command,
+  })) : raw?.decisions,
+});
+const hydrateStrategicCommandIds = (raw, batch) => ({
+  ...raw,
+  decisions: Array.isArray(raw?.decisions) ? raw.decisions.map((decision, index) => ({
+    ...decision,
+    command: decision?.command && typeof decision.command === "object" ? {
+      ...decision.command,
+      commandId: deterministicCommandId(`${batch.baseRevision}|${batch.month}|strategy|${decision.polityId}|${index}`),
     } : decision?.command,
   })) : raw?.decisions,
 });
@@ -156,6 +169,36 @@ const makeOpponentTasks = (draft) => {
   }));
   draft.phase = batches.length ? "plan-opponents" : "resolve-empty-month";
   return draft;
+};
+
+const makeStrategicTasks = (draft) => {
+  const batch = buildDiplomacyBatch(draft.state, draft.playerPolityId);
+  if (!batch) return makeOpponentTasks(draft);
+  draft.pendingStrategicBatch = batch;
+  const schema = withoutModelCommandIds(exportJsonSchema(opponentDiplomacyBatchResultSchema));
+  draft.tasks = [{
+    taskId: "opponents.plan-diplomacy",
+    taskVersion: 1,
+    taskKey: batch.batchId,
+    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity. Use hold with a null command unless a material diplomatic or trade action is justified by the supplied relations, proposals, agreements, treasury and stockpiles. Commands must use the supplied month and revision. Do not invent actors, resources, routes or effects.",
+    userPrompt: JSON.stringify({ month: batch.month, revision: batch.baseRevision, briefs: batch.briefs }),
+    tool: { name: "submit_opponent_diplomacy_decisions", description: "Submit every requested polity strategic decision", schema },
+    context: { fullMapIncluded: false, characterCount: batch.characterCount, polityCount: batch.polityIds.length },
+  }];
+  draft.phase = "plan-strategy";
+  return draft;
+};
+
+export const resolveStrategicMonth = (draft, outputs) => {
+  if (!draft.pendingStrategicBatch) throw new Error("strategic batch is missing");
+  if (!Array.isArray(outputs) || outputs.length !== 1) throw new Error("exactly one strategic output is required");
+  const batch = draft.pendingStrategicBatch;
+  const result = validateDiplomacyBatch(hydrateStrategicCommandIds(outputs[0], batch), batch);
+  draft.strategicCommands = result.decisions.flatMap((entry) => entry.command ? [entry.command] : []);
+  draft.strategicDecisions = result.decisions;
+  draft.pendingStrategicBatch = null;
+  draft.tasks = [];
+  makeOpponentTasks(draft);
 };
 
 const makePlayerReportTask = (draft) => {
@@ -288,8 +331,9 @@ const resolveOpponentMonth = (draft, outcomes) => {
   }
   const commands = [
     ...(draft.monthlyCommands.length === 0 ? draft.playerCommands : []),
+    ...(draft.strategicCommands ?? []),
     ...decisions.flatMap((entry) => entry.command ? [entry.command] : []),
-  ].sort((left, right) => left.actorPolityId.localeCompare(right.actorPolityId));
+  ].sort((left, right) => left.actorPolityId.localeCompare(right.actorPolityId) || left.kind.localeCompare(right.kind));
   const result = runTurn(draft.state, { commands });
   if (result.result.rejections.length) throw new Error(`agent month rejected a prevalidated command: ${result.result.rejections.map((entry) => entry.reason).join(", ")}`);
   const sourceById = new Map(sources);
@@ -317,14 +361,17 @@ const resolveOpponentMonth = (draft, outcomes) => {
     month: draft.state.month,
     baseRevision: draft.state.revision,
     batchOutcomes,
+    strategicDecisions: (draft.strategicDecisions ?? []).map((entry) => ({ ...entry, source: "model" })),
     decisions: decisions.map((entry) => ({ ...entry, source: sourceById.get(entry.polityId) })),
   });
   draft.state = result.result.state;
   draft.lastLedger = result.result.ledger;
   draft.pendingBatches = [];
+  draft.strategicCommands = [];
+  draft.strategicDecisions = [];
   draft.tasks = [];
   if (draft.monthlyCommands.length >= draft.monthlyTicks) makePlayerReportTask(draft);
-  else makeOpponentTasks(draft);
+  else makeStrategicTasks(draft);
 };
 
 export const prepareAgentTurn = (gameId, { targetDate, expectedSessionRevision, actions = [], commands = [], locale = "en" } = {}) => {
@@ -338,12 +385,12 @@ export const prepareAgentTurn = (gameId, { targetDate, expectedSessionRevision, 
   if (normalized.some((entry) => !entry.id || !entry.text)) throw new Error("every action requires id and text");
   if (new Set(normalized.map((entry) => entry.id)).size !== normalized.length) throw new Error("action ids must be unique");
   const directCommands = parseTurnCommands({ commands }).commands;
-  if (directCommands.length > 1) throw new Error("P3a permits at most one player investment per monthly tick");
+  if (directCommands.length > 8) throw new Error("a player turn accepts at most eight direct commands");
   const controlled = new Set(session.state.regions.filter((entry) => entry.controllerId === playerPolityId).map((entry) => entry.regionId));
   for (const command of directCommands) {
-    if (command.kind !== "economy.invest-region" || command.actorPolityId !== playerPolityId || !controlled.has(command.targetRegionId)) {
-      throw new Error("direct player command actor or target is not controlled");
-    }
+    if (command.actorPolityId !== playerPolityId) throw new Error("direct player command actor is not the player's polity");
+    if (command.kind === "territory.transfer-region") throw new Error("direct territorial transfer is not a player action");
+    if (command.kind === "economy.invest-region" && !controlled.has(command.targetRegionId)) throw new Error("direct player command target is not controlled");
     if (command.expectedRevision !== session.state.revision || command.effectiveMonth !== session.state.month) {
       throw new Error("direct player command is stale or for the wrong month");
     }
@@ -374,17 +421,26 @@ export const prepareAgentTurn = (gameId, { targetDate, expectedSessionRevision, 
     reports: [],
     readOnly: false,
     pendingBatches: [],
+    pendingStrategicBatch: null,
+    strategicCommands: [],
+    strategicDecisions: [],
     tasks: [],
     phase: normalized.length ? "interpret-player" : "confirm-player",
     confirmation: normalized.length ? null : directCommands.map((command) => ({
       actionId: null,
-      summary: `Invest ${command.spend} in ${session.state.regions.find((region) => region.regionId === command.targetRegionId)?.displayName.en ?? command.targetRegionId}`,
+      summary: command.kind === "economy.invest-region"
+        ? `Invest ${command.spend} in ${session.state.regions.find((region) => region.regionId === command.targetRegionId)?.displayName.en ?? command.targetRegionId}`
+        : command.kind === "diplomacy.propose" ? `Send proposal ${command.proposalId} to ${command.recipientPolityId}`
+          : command.kind === "diplomacy.counter" ? `Counter proposal ${command.proposalId}`
+            : command.kind === "diplomacy.respond" ? `${command.response} proposal ${command.proposalId}`
+              : command.kind === "diplomacy.terminate-agreement" ? `Terminate ${command.agreementId}`
+                : command.kind,
       disposition: "command",
-      command: {
+      command: command.kind === "economy.invest-region" ? {
         kind: command.kind,
         region: session.state.regions.find((region) => region.regionId === command.targetRegionId)?.displayName ?? command.targetRegionId,
         spend: command.spend,
-      },
+      } : { kind: command.kind },
     })),
   };
   if (normalized.length) draft.tasks = interpreterTasks(draft);
@@ -399,7 +455,9 @@ export const stepAgentTurn = (gameId, { turnToken, action, outputs, outcomes } =
   if (action === "submit-interpretation" && draft.phase === "interpret-player") validatePlayerInterpretations(draft, outputs);
   else if (action === "confirm-player" && draft.phase === "confirm-player") {
     if (draft.monthlyTicks === 0) makePlayerReportTask(draft);
-    else makeOpponentTasks(draft);
+    else makeStrategicTasks(draft);
+  } else if (action === "submit-strategy" && draft.phase === "plan-strategy") {
+    resolveStrategicMonth(draft, outputs);
   } else if (action === "submit-opponents" && draft.phase === "plan-opponents") resolveOpponentMonth(draft, outcomes);
   else if (action === "resolve-empty-month" && draft.phase === "resolve-empty-month") resolveOpponentMonth(draft, []);
   else if (action === "submit-reports" && draft.phase === "report-player") resolvePlayerReports(draft, outputs);

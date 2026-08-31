@@ -37,6 +37,19 @@ scenario.displayName = {
   en: "European Crisis, 1938 — Alternate History",
   ru: "Европейский кризис, 1938 — альтернативная история",
 };
+scenario.modules.diplomacy = true;
+const polityIds = ["polity:austria", "polity:czechia", "polity:france", "polity:germany", "polity:poland", "polity:slovakia"];
+const relations = [];
+const tradeRoutes = [];
+for (let left = 0; left < polityIds.length; left += 1) {
+  for (let right = left + 1; right < polityIds.length; right += 1) {
+    const pair = [polityIds[left], polityIds[right]];
+    const germanPair = pair.includes("polity:germany");
+    relations.push({ polities: pair, opinion: germanPair ? -1200 : 500, trust: germanPair ? 3200 : 5000, threat: germanPair ? 5800 : 2200 });
+    tradeRoutes.push({ polities: pair, monthlyCapacity: pair.includes("polity:france") ? 180000 : 120000 });
+  }
+}
+scenario.diplomacy = { relations, tradeRoutes };
 
 const stockpile = (food, wood, coal, iron, goods) => [
   { resource: "food", amount: food }, { resource: "wood", amount: wood },

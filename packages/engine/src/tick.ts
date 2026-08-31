@@ -5,7 +5,7 @@
  * uses no randomness, no wall clock, no I/O.
  */
 import type { PolityId, RegionId, WorldRevisionId } from '@open-historia/domain';
-import type { CommandRejection, EconCommand, TurnCommandsFile } from './commands.js';
+import type { CommandRejection, DiplomacyCommand, EconCommand, TurnCommandsFile } from './commands.js';
 import {
   ANNUAL_BP_MONTHLY_DIVISOR,
   BP_SCALE,
@@ -33,8 +33,11 @@ import { BASIC_GOODS_RECIPE } from './scenario.js';
 import type { EconRegionState, EconWorldState } from './state.js';
 import { addMonth } from './state.js';
 import { stateChecksum } from './canonical.js';
+import { resolveDiplomacyPhase } from './diplomacyReducer.js';
+import type { DiplomacyEngineEvent } from './diplomacyReducer.js';
 
 export type EngineEvent =
+  DiplomacyEngineEvent
   | { type: 'command-rejected'; commandId: string; reason: CommandRejection['reason']; detail: string }
   | { type: 'region-transferred'; regionId: RegionId; fromPolityId: PolityId; toPolityId: PolityId; population: number }
   | { type: 'investment-applied'; polityId: PolityId; regionId: RegionId; spend: number; infrastructureGainBp: number; infrastructureBp: number }
@@ -60,6 +63,8 @@ interface MutablePolity {
   treasury: number;
   stock: Map<ResourceId, number>;
 }
+
+type EconomyPhaseCommand = Exclude<EconCommand, DiplomacyCommand>;
 
 /**
  * Capacity-side output before material inputs (rre §5).
@@ -105,8 +110,17 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
     );
   }
 
+  const diplomacyCommands = commandsFile.commands.filter((command): command is DiplomacyCommand =>
+    command.kind.startsWith('diplomacy.'));
+  const diplomacyPhase = resolveDiplomacyPhase(state, diplomacyCommands, polities);
+  events.push(...diplomacyPhase.events);
+  for (const rejection of diplomacyPhase.rejections) {
+    rejections.push(rejection);
+    events.push({ type: 'command-rejected', commandId: rejection.command.commandId, reason: rejection.reason, detail: rejection.detail });
+  }
+
   // ---- 1. Validate commands: any failure rejects the command, changes nothing.
-  const accepted: EconCommand[] = [];
+  const accepted: EconomyPhaseCommand[] = [];
   const investedPolities = new Set<PolityId>();
   const transferredRegions = new Set<RegionId>();
   /** Controllership as it will stand after the accepted transfers so far. */
@@ -118,7 +132,8 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
       .filter((region) => region.activity.kind === 'processing' && projectedController.get(region.regionId) === polityId)
       .map((region) => region.regionId);
 
-  for (const command of commandsFile.commands) {
+  const economyCommands = commandsFile.commands.filter((entry): entry is EconomyPhaseCommand => !entry.kind.startsWith('diplomacy.'));
+  for (const command of economyCommands) {
     const reject = (reason: CommandRejection['reason'], detail: string) => {
       rejections.push({ command, reason, detail });
       events.push({ type: 'command-rejected', commandId: command.commandId, reason, detail });
@@ -428,6 +443,8 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   // ---- 10. Assemble next state, ledger; verify identities; commit revision.
   const nextBase = {
     ...state,
+    ...(diplomacyPhase.diplomacy ? { diplomacy: diplomacyPhase.diplomacy } : {}),
+    ...(diplomacyPhase.trade ? { trade: diplomacyPhase.trade } : {}),
     month: addMonth(state.month),
     turn: state.turn + 1,
     polities: polities.map((polity) => ({
@@ -472,13 +489,20 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
         const produced = producedByResource.get(resource) ?? 0;
         const processing = processingUse.get(id)?.get(resource) ?? 0;
         const populationConsumption = populationUse.get(id)?.get(resource) ?? 0;
+        const tradeIn = diplomacyPhase.resourceTransfers
+          .filter((transfer) => transfer.toPolityId === id && transfer.resource === resource)
+          .reduce((sum, transfer) => sum + transfer.amount, 0);
+        const tradeOut = diplomacyPhase.resourceTransfers
+          .filter((transfer) => transfer.fromPolityId === id && transfer.resource === resource)
+          .reduce((sum, transfer) => sum + transfer.amount, 0);
         return {
           resource,
           opening,
           produced,
           processingUse: processing,
           populationUse: populationConsumption,
-          closing: opening + produced - processing - populationConsumption,
+          ...(state.trade ? { tradeIn, tradeOut } : {}),
+          closing: opening + tradeIn - tradeOut + produced - processing - populationConsumption,
         };
       });
       const tax = taxByPolity.get(id)!;
@@ -494,6 +518,10 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
         food,
         treasuryOpening: openingTreasury.get(id)!,
         treasuryClosing: polityById.get(id)!.treasury,
+        ...(state.trade ? {
+          treasuryTradeNet: diplomacyPhase.treasuryTransfers.reduce((sum, transfer) =>
+            sum + (transfer.toPolityId === id ? transfer.amount : 0) - (transfer.fromPolityId === id ? transfer.amount : 0), 0),
+        } : {}),
         stockMovements,
       };
       const investment = investments.get(id);
@@ -502,6 +530,13 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
       if (goods) entry.goods = goods;
       return entry;
     }),
+    ...(state.trade ? {
+      trade: {
+        executions: diplomacyPhase.executions,
+        resourceTransfers: diplomacyPhase.resourceTransfers,
+        treasuryTransfers: diplomacyPhase.treasuryTransfers,
+      },
+    } : {}),
   };
 
   const invariantsChecked = checkInvariants(state, nextState, ledger);

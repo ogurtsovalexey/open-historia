@@ -22,6 +22,7 @@ import {
 } from './scenario.js';
 import type { ModuleName } from './scenario.js';
 import { stateChecksum } from './canonical.js';
+import { diplomacyStateSchema, tradeStateSchema } from './diplomacy.js';
 
 const nonNegInt = z.number().int().nonnegative();
 const bpSchema = z.number().int().min(0).max(10000);
@@ -84,6 +85,8 @@ export const econWorldStateSchema = z
      * existed, so its recorded revisions stay valid.
      */
     modules: modulesSchema.optional(),
+    diplomacy: diplomacyStateSchema.optional(),
+    trade: tradeStateSchema.optional(),
     economy: economyParamsSchema,
     /** Sorted by polity id. */
     polities: z.array(econPolityStateSchema).min(2),
@@ -139,6 +142,22 @@ export function initState(scenario: EconScenario): EconWorldState {
         a.resource < b.resource ? -1 : a.resource > b.resource ? 1 : 0
       ),
     },
+    ...(scenario.modules?.diplomacy === true && scenario.diplomacy ? {
+      diplomacy: {
+        relations: [...scenario.diplomacy.relations]
+          .sort((left, right) => `${left.polities[0]}|${left.polities[1]}`.localeCompare(`${right.polities[0]}|${right.polities[1]}`))
+          .map((relation) => ({ ...relation, updatedMonth: scenario.startMonth })),
+        proposals: [],
+        agreements: [],
+      },
+      ...(scenario.modules?.trade === true ? {
+        trade: {
+          routes: [...scenario.diplomacy.tradeRoutes]
+            .sort((left, right) => `${left.polities[0]}|${left.polities[1]}`.localeCompare(`${right.polities[0]}|${right.polities[1]}`)),
+          contracts: [],
+        },
+      } : {}),
+    } : {}),
     polities: [...scenario.polities]
       .sort((a, b) => (a.id < b.id ? -1 : 1))
       .map((polity) => ({

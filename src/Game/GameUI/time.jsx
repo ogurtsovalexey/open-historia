@@ -1495,7 +1495,7 @@ const DateWidget = ({
         if (draft.phase === "confirm-player") {
             draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "confirm-player" });
         }
-        while (draft.phase === "plan-opponents" || draft.phase === "resolve-empty-month" || draft.phase === "report-player") {
+        while (draft.phase === "plan-strategy" || draft.phase === "plan-opponents" || draft.phase === "resolve-empty-month" || draft.phase === "report-player") {
             if (controller.signal.aborted) throw controller.signal.reason;
             if (draft.phase === "report-player") {
                 let outputs = [];
@@ -1510,6 +1510,11 @@ const DateWidget = ({
             }
             if (draft.phase === "resolve-empty-month") {
                 draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "resolve-empty-month" });
+                continue;
+            }
+            if (draft.phase === "plan-strategy") {
+                const outputs = await Promise.all(draft.tasks.map(async (task) => (await dispatchAgentTask(task, { signal: controller.signal })).output));
+                draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "submit-strategy", outputs });
                 continue;
             }
             const outcomes = await Promise.all(draft.tasks.map(async (task) => {

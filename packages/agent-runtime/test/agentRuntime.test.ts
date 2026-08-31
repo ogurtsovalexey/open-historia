@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import {
   buildFallbackBatch,
+  buildDiplomacyBatch,
   buildOpponentBatches,
   buildPolityBrief,
   EMPTY_AGENT_STATE,
@@ -14,6 +15,7 @@ import {
   opponentBatchResultSchema,
   selectOpponentPolities,
   validateOpponentBatch,
+  validateDiplomacyBatch,
   type AgentState,
 } from '../src/index.js';
 import { initState, parseScenario, runTurn, stateChecksum, type EconWorldState } from '@open-historia/engine';
@@ -21,6 +23,40 @@ import { initState, parseScenario, runTurn, stateChecksum, type EconWorldState }
 const fixture = fileURLToPath(new URL('../../../engine/fixtures/scenario-dev-map-4c/scenario.json', import.meta.url));
 const fallbackGolden = fileURLToPath(new URL('../../test/golden/p3a-fallback-chain.json', import.meta.url));
 const initial = () => initState(parseScenario(JSON.parse(readFileSync(fixture, 'utf8'))));
+const diplomacyFixture = fileURLToPath(new URL('../../../engine/fixtures/scenario-dev-map-6c/scenario.json', import.meta.url));
+const diplomacyInitial = () => initState(parseScenario(JSON.parse(readFileSync(diplomacyFixture, 'utf8'))));
+
+test('strategic diplomacy batch is bounded, deterministic and contains no full map', () => {
+  const state = diplomacyInitial();
+  const first = buildDiplomacyBatch(state, 'polity:austria');
+  const second = buildDiplomacyBatch(state, 'polity:austria');
+  assert.deepEqual(first, second);
+  assert.ok(first);
+  assert.equal(first.polityIds.length, 5);
+  assert.ok(first.characterCount <= MAX_BATCH_BRIEF_CHARS);
+  assert.equal(JSON.stringify(first).includes('geometry'), false);
+  assert.equal(JSON.stringify(first).includes('regionId'), false);
+  assert.equal(buildDiplomacyBatch(initial(), 'polity:austria'), null);
+});
+
+test('strategic diplomacy validation requires one bound decision per polity', () => {
+  const state = diplomacyInitial();
+  const batch = buildDiplomacyBatch(state, 'polity:austria')!;
+  const holds = { decisions: batch.polityIds.map((polityId) => ({ polityId, intent: 'hold' as const, rationale: 'No material action.', command: null })) };
+  assert.deepEqual(validateDiplomacyBatch(holds, batch), holds);
+  assert.throws(() => validateDiplomacyBatch({ decisions: holds.decisions.slice(1) }, batch), /every and only/);
+  const wrongActor: { decisions: Array<Record<string, unknown>> } = structuredClone(holds);
+  wrongActor.decisions[0] = {
+    polityId: batch.polityIds[0]!, intent: 'propose', rationale: 'Test proposal.',
+    command: {
+      kind: 'diplomacy.propose', commandId: '00000000-0000-4000-8000-000000000001',
+      actorPolityId: 'polity:austria', recipientPolityId: batch.polityIds[0]!,
+      expectedRevision: state.revision, effectiveMonth: state.month, proposalId: 'proposal:test',
+      terms: { kind: 'agreement', agreementType: 'non-aggression', fromPolityId: 'polity:austria', toPolityId: batch.polityIds[0]! },
+    },
+  };
+  assert.throws(() => validateDiplomacyBatch(wrongActor, batch), /actor mismatch/);
+});
 
 test('bounded briefs and batches never include the full map', () => {
   const state = initial();

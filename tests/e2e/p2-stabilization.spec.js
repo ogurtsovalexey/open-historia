@@ -139,7 +139,7 @@ async function runTenTurns({ request, gameId, gameIndex, onReload }) {
         commands: command ? [command] : [],
       },
     });
-    expect(advanced.ok()).toBeTruthy();
+    expect(advanced.ok(), `advance failed: ${advanced.status()} ${await advanced.text()}`).toBeTruthy();
     snapshot = await advanced.json();
     expect(snapshot.actualMonthlyTicks).toBe(1);
     expect(snapshot.gameDate).toBe(targetDate);

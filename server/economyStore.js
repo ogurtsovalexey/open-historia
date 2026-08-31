@@ -84,8 +84,48 @@ const playerPolityId = (game, link) => {
 
 const ownershipFor = (link, state) => link ? buildOwnershipOverrides(link, state.regions) : {};
 
+const diplomacyForPlayer = (state, playerId) => {
+  if (!state.diplomacy) return null;
+  const maySee = (terms) => terms?.fromPolityId === playerId || terms?.toPolityId === playerId;
+  return {
+    relations: state.diplomacy.relations,
+    proposals: state.diplomacy.proposals.map((proposal) => maySee(proposal.terms) ? proposal : {
+      proposalId: proposal.proposalId, proposerId: proposal.proposerId, recipientId: proposal.recipientId,
+      createdMonth: proposal.createdMonth, parentProposalId: proposal.parentProposalId, terms: null,
+    }),
+    agreements: state.diplomacy.agreements.map((agreement) => maySee(agreement.terms) ? agreement : {
+      agreementId: agreement.agreementId, sourceProposalId: agreement.sourceProposalId,
+      acceptedMonth: agreement.acceptedMonth,
+      parties: [agreement.terms.fromPolityId, agreement.terms.toPolityId].sort(), terms: null,
+    }),
+  };
+};
+
+const tradeForPlayer = (state, playerId) => state.trade ? ({
+  routes: state.trade.routes.filter((route) => route.polities.includes(playerId)),
+  contracts: state.trade.contracts.filter((contract) =>
+    contract.terms.fromPolityId === playerId || contract.terms.toPolityId === playerId),
+}) : null;
+
+const turnForPlayer = (turn, playerId) => {
+  if (!turn?.ledger?.trade) return turn;
+  const involved = (entry) => entry.fromPolityId === playerId || entry.toPolityId === playerId;
+  return {
+    ...turn,
+    ledger: {
+      ...turn.ledger,
+      trade: {
+        executions: turn.ledger.trade.executions.filter(involved),
+        resourceTransfers: turn.ledger.trade.resourceTransfers.filter(involved),
+        treasuryTransfers: turn.ledger.trade.treasuryTransfers.filter(involved),
+      },
+    },
+  };
+};
+
 const makeSnapshot = (game, fixture, session, actualMonthlyTicks = session.manifest.monthlyTicks) => {
   const { state, lastTurn, ownership, manifest } = session;
+  const playerId = playerPolityId(game, fixture.link);
   return {
     gameId: game.id,
     engineScenario: game.engineScenario,
@@ -99,14 +139,17 @@ const makeSnapshot = (game, fixture, session, actualMonthlyTicks = session.manif
     turn: state.turn,
     month: state.month,
     revision: state.revision,
-    playerPolityId: playerPolityId(game, fixture.link),
+    playerPolityId: playerId,
     activeResources: state.activeResources,
+    modules: state.modules ?? null,
     economy: state.economy,
+    diplomacy: diplomacyForPlayer(state, playerId),
+    trade: tradeForPlayer(state, playerId),
     polities: state.polities,
     regions: state.regions,
     ownershipOverrides: ownership,
     mapLink: fixture.link ? { dataset: fixture.link.dataset, polityOwnerNames: fixture.link.polityOwnerNames, regions: fixture.link.regions } : null,
-    lastTurn,
+    lastTurn: turnForPlayer(lastTurn, playerId),
     agentState: session.agentState ?? null,
     agentTurn: session.agentTurn ?? null,
   };
@@ -158,7 +201,6 @@ export const commitAgentEconomy = (gameId, {
   for (let index = 0; index < monthlyTicks; index += 1) {
     const commands = parseTurnCommands({ commands: monthlyCommands[index] ?? [] }).commands;
     for (const command of commands) {
-      if (command.kind !== "economy.invest-region") throw new Error("P3a agent turns accept investment commands only");
       if (command.expectedRevision !== state.revision || command.effectiveMonth !== state.month) {
         throw new Error(`agent command ${command.commandId} is not bound to the replayed month revision`);
       }

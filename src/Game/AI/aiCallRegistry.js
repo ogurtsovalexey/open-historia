@@ -174,6 +174,18 @@ const TASK_DEFINITIONS = [
     mayMutateState: true
   },
   {
+    taskId: 'opponents.plan-diplomacy',
+    version: 1,
+    kind: 'structured',
+    authority: 'proposal',
+    contextPolicyId: 'opponent-diplomacy-batch',
+    budgetPolicyId: 'large-generation',
+    outputContractId: 'opponent-diplomacy-batch-schema',
+    allowedVariants: [],
+    fallbackPolicy: 'surface-error',
+    mayMutateState: true
+  },
+  {
     taskId: 'reports.explain-economy',
     version: 1,
     kind: 'structured',
@@ -372,6 +384,7 @@ const STRATEGIC_TASKS = new Set([
   'catalyst.create',
   'catalyst.advance',
   'game-master.resolve',
+  'opponents.plan-diplomacy',
   'chat.diplomacy.plan',
   'chat.diplomacy.reply'
 ]);

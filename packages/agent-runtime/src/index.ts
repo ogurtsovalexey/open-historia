@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { commandIdSchema, polityIdSchema, worldRevisionIdSchema } from '@open-historia/domain';
 import {
   investInRegionCommandSchema,
+  diplomacyCommandSchema,
   potentialOutput,
   runTurn,
   sha256OfString,
@@ -9,12 +10,14 @@ import {
   type InvestInRegionCommand,
   type PolityLedger,
 } from '@open-historia/engine';
+import type { DiplomacyCommand } from '@open-historia/engine';
 
 export const MAX_POLITIES_PER_BATCH = 12;
 export const MAX_BATCHES_PER_MONTH = 2;
 export const MAX_POLITIES_PER_MONTH = MAX_POLITIES_PER_BATCH * MAX_BATCHES_PER_MONTH;
 export const MAX_POLITY_BRIEF_CHARS = 1600;
 export const MAX_BATCH_BRIEF_CHARS = 24000;
+export const MAX_STRATEGIC_POLITIES = 6;
 
 export const strategyIntentSchema = z.enum([
   'invest-food', 'invest-extraction', 'invest-processing', 'conserve',
@@ -32,6 +35,103 @@ export const opponentBatchResultSchema = z.object({
   decisions: z.array(opponentDecisionSchema).max(MAX_POLITIES_PER_BATCH),
 }).strict();
 export type OpponentBatchResult = z.infer<typeof opponentBatchResultSchema>;
+
+export const opponentDiplomacyDecisionSchema = z.object({
+  polityId: polityIdSchema,
+  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'hold']),
+  rationale: z.string().max(320),
+  command: diplomacyCommandSchema.nullable(),
+}).strict().superRefine((decision, ctx) => {
+  const expectedKind = decision.intent === 'propose' ? 'diplomacy.propose'
+    : decision.intent === 'counter' ? 'diplomacy.counter'
+      : decision.intent === 'accept' || decision.intent === 'reject' ? 'diplomacy.respond'
+        : decision.intent === 'terminate' ? 'diplomacy.terminate-agreement'
+          : null;
+  if ((decision.command?.kind ?? null) !== expectedKind) {
+    ctx.addIssue({ code: 'custom', path: ['command'], message: 'intent and diplomacy command must match' });
+  }
+  if (decision.command?.kind === 'diplomacy.respond' && decision.command.response !== decision.intent) {
+    ctx.addIssue({ code: 'custom', path: ['command', 'response'], message: 'response and intent must match' });
+  }
+});
+
+export const opponentDiplomacyBatchResultSchema = z.object({
+  decisions: z.array(opponentDiplomacyDecisionSchema).max(MAX_STRATEGIC_POLITIES),
+}).strict();
+export type OpponentDiplomacyBatchResult = z.infer<typeof opponentDiplomacyBatchResultSchema>;
+
+export interface DiplomacyPolityBrief {
+  polityId: string;
+  name: string;
+  month: string;
+  revision: string;
+  treasury: number;
+  stockpile: Record<string, number>;
+  relations: Array<{ polityId: string; opinion: number; trust: number; threat: number }>;
+  proposals: Array<Record<string, unknown>>;
+  agreements: Array<Record<string, unknown>>;
+  allowedAgreementTypes: string[];
+  allowedTradeResources: string[];
+}
+
+export interface DiplomacyBatch {
+  batchId: string;
+  month: string;
+  baseRevision: string;
+  polityIds: string[];
+  briefs: DiplomacyPolityBrief[];
+  characterCount: number;
+}
+
+export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: string): DiplomacyBatch | null {
+  if (state.modules?.diplomacy !== true || !state.diplomacy) return null;
+  const polityIds = state.polities.filter((entry) => entry.id !== playerPolityId)
+    .map((entry) => entry.id).sort().slice(0, MAX_STRATEGIC_POLITIES);
+  const briefs = polityIds.map((polityId): DiplomacyPolityBrief => {
+    const polity = state.polities.find((entry) => entry.id === polityId)!;
+    const relations = state.diplomacy!.relations.filter((entry) => entry.polities.includes(polityId)).map((entry) => ({
+      polityId: entry.polities.find((id) => id !== polityId)!, opinion: entry.opinion, trust: entry.trust, threat: entry.threat,
+    })).sort((left, right) => left.polityId.localeCompare(right.polityId));
+    const proposals = state.diplomacy!.proposals.filter((entry) => entry.proposerId === polityId || entry.recipientId === polityId)
+      .map((entry) => ({ proposalId: entry.proposalId, proposerId: entry.proposerId, recipientId: entry.recipientId, terms: entry.terms }));
+    const agreements = state.diplomacy!.agreements.filter((entry) =>
+      entry.terms.fromPolityId === polityId || entry.terms.toPolityId === polityId)
+      .map((entry) => ({ agreementId: entry.agreementId, terms: entry.terms }));
+    return {
+      polityId, name: polity.displayName.en, month: state.month, revision: state.revision,
+      treasury: polity.treasury,
+      stockpile: Object.fromEntries(polity.stockpile.map((entry) => [entry.resource, entry.amount])),
+      relations, proposals, agreements,
+      allowedAgreementTypes: ['non-aggression', 'defensive-alliance', 'guarantee', 'military-access'],
+      allowedTradeResources: [...state.activeResources].sort(),
+    };
+  });
+  const characterCount = briefs.reduce((sum, brief) => sum + JSON.stringify(brief).length, 0);
+  if (characterCount > MAX_BATCH_BRIEF_CHARS) throw new Error(`diplomacy batch exceeds ${MAX_BATCH_BRIEF_CHARS} characters`);
+  return {
+    batchId: `diplomacy:${state.month}:${state.revision.slice(-12)}`,
+    month: state.month, baseRevision: state.revision, polityIds, briefs, characterCount,
+  };
+}
+
+export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): OpponentDiplomacyBatchResult {
+  const parsed = opponentDiplomacyBatchResultSchema.parse(raw);
+  const expected = [...batch.polityIds].sort();
+  const actual = parsed.decisions.map((entry) => entry.polityId).sort();
+  if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error('strategic batch must decide every and only requested polity');
+  const known = new Set(batch.briefs.map((entry) => entry.polityId));
+  for (const decision of parsed.decisions) {
+    const command = decision.command as DiplomacyCommand | null;
+    if (!command) continue;
+    if (command.actorPolityId !== decision.polityId) throw new Error('diplomacy command actor mismatch');
+    if (command.expectedRevision !== batch.baseRevision || command.effectiveMonth !== batch.month) throw new Error('diplomacy command is stale or for the wrong month');
+    if (command.kind === 'diplomacy.propose' && !known.has(command.recipientPolityId) && !batch.briefs.some((brief) =>
+      brief.relations.some((relation) => relation.polityId === command.recipientPolityId))) {
+      throw new Error('diplomacy proposal names an unknown recipient');
+    }
+  }
+  return parsed;
+}
 
 export const interpretedActionSchema = z.object({
   actionId: z.string().min(1).max(200),

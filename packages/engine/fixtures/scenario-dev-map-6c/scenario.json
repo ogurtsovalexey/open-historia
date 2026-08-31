@@ -19,7 +19,8 @@
     "budget": true,
     "trade": true,
     "shortages": true,
-    "unrest": true
+    "unrest": true,
+    "diplomacy": true
   },
   "economy": {
     "foodNeedPerPersonMilli": 50,
@@ -1831,5 +1832,251 @@
       "outputPerWorker": 2,
       "capacityCeiling": 840000
     }
-  ]
+  ],
+  "diplomacy": {
+    "relations": [
+      {
+        "polities": [
+          "polity:austria",
+          "polity:czechia"
+        ],
+        "opinion": 500,
+        "trust": 5000,
+        "threat": 2200
+      },
+      {
+        "polities": [
+          "polity:austria",
+          "polity:france"
+        ],
+        "opinion": 500,
+        "trust": 5000,
+        "threat": 2200
+      },
+      {
+        "polities": [
+          "polity:austria",
+          "polity:germany"
+        ],
+        "opinion": -1200,
+        "trust": 3200,
+        "threat": 5800
+      },
+      {
+        "polities": [
+          "polity:austria",
+          "polity:poland"
+        ],
+        "opinion": 500,
+        "trust": 5000,
+        "threat": 2200
+      },
+      {
+        "polities": [
+          "polity:austria",
+          "polity:slovakia"
+        ],
+        "opinion": 500,
+        "trust": 5000,
+        "threat": 2200
+      },
+      {
+        "polities": [
+          "polity:czechia",
+          "polity:france"
+        ],
+        "opinion": 500,
+        "trust": 5000,
+        "threat": 2200
+      },
+      {
+        "polities": [
+          "polity:czechia",
+          "polity:germany"
+        ],
+        "opinion": -1200,
+        "trust": 3200,
+        "threat": 5800
+      },
+      {
+        "polities": [
+          "polity:czechia",
+          "polity:poland"
+        ],
+        "opinion": 500,
+        "trust": 5000,
+        "threat": 2200
+      },
+      {
+        "polities": [
+          "polity:czechia",
+          "polity:slovakia"
+        ],
+        "opinion": 500,
+        "trust": 5000,
+        "threat": 2200
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:germany"
+        ],
+        "opinion": -1200,
+        "trust": 3200,
+        "threat": 5800
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:poland"
+        ],
+        "opinion": 500,
+        "trust": 5000,
+        "threat": 2200
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:slovakia"
+        ],
+        "opinion": 500,
+        "trust": 5000,
+        "threat": 2200
+      },
+      {
+        "polities": [
+          "polity:germany",
+          "polity:poland"
+        ],
+        "opinion": -1200,
+        "trust": 3200,
+        "threat": 5800
+      },
+      {
+        "polities": [
+          "polity:germany",
+          "polity:slovakia"
+        ],
+        "opinion": -1200,
+        "trust": 3200,
+        "threat": 5800
+      },
+      {
+        "polities": [
+          "polity:poland",
+          "polity:slovakia"
+        ],
+        "opinion": 500,
+        "trust": 5000,
+        "threat": 2200
+      }
+    ],
+    "tradeRoutes": [
+      {
+        "polities": [
+          "polity:austria",
+          "polity:czechia"
+        ],
+        "monthlyCapacity": 120000
+      },
+      {
+        "polities": [
+          "polity:austria",
+          "polity:france"
+        ],
+        "monthlyCapacity": 180000
+      },
+      {
+        "polities": [
+          "polity:austria",
+          "polity:germany"
+        ],
+        "monthlyCapacity": 120000
+      },
+      {
+        "polities": [
+          "polity:austria",
+          "polity:poland"
+        ],
+        "monthlyCapacity": 120000
+      },
+      {
+        "polities": [
+          "polity:austria",
+          "polity:slovakia"
+        ],
+        "monthlyCapacity": 120000
+      },
+      {
+        "polities": [
+          "polity:czechia",
+          "polity:france"
+        ],
+        "monthlyCapacity": 180000
+      },
+      {
+        "polities": [
+          "polity:czechia",
+          "polity:germany"
+        ],
+        "monthlyCapacity": 120000
+      },
+      {
+        "polities": [
+          "polity:czechia",
+          "polity:poland"
+        ],
+        "monthlyCapacity": 120000
+      },
+      {
+        "polities": [
+          "polity:czechia",
+          "polity:slovakia"
+        ],
+        "monthlyCapacity": 120000
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:germany"
+        ],
+        "monthlyCapacity": 180000
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:poland"
+        ],
+        "monthlyCapacity": 180000
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:slovakia"
+        ],
+        "monthlyCapacity": 180000
+      },
+      {
+        "polities": [
+          "polity:germany",
+          "polity:poland"
+        ],
+        "monthlyCapacity": 120000
+      },
+      {
+        "polities": [
+          "polity:germany",
+          "polity:slovakia"
+        ],
+        "monthlyCapacity": 120000
+      },
+      {
+        "polities": [
+          "polity:poland",
+          "polity:slovakia"
+        ],
+        "monthlyCapacity": 120000
+      }
+    ]
+  }
 }

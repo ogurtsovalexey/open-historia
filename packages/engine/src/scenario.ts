@@ -131,6 +131,7 @@ export type EconomyParams = z.infer<typeof economyParamsSchema>;
  */
 export const modulesSchema = z
   .object({
+    diplomacy: z.boolean().optional(),
     projects: z.boolean().optional(),
     budget: z.boolean().optional(),
     trade: z.boolean().optional(),
@@ -140,8 +141,25 @@ export const modulesSchema = z
   .strict();
 export type Modules = z.infer<typeof modulesSchema>;
 
-export const MODULE_NAMES = ['projects', 'budget', 'trade', 'shortages', 'unrest'] as const;
+export const MODULE_NAMES = ['diplomacy', 'projects', 'budget', 'trade', 'shortages', 'unrest'] as const;
 export type ModuleName = (typeof MODULE_NAMES)[number];
+
+export const authoredRelationSchema = z.object({
+  polities: z.tuple([polityIdSchema, polityIdSchema]),
+  opinion: z.number().int().min(-10000).max(10000),
+  trust: bpSchema,
+  threat: bpSchema,
+}).strict();
+
+export const authoredTradeRouteSchema = z.object({
+  polities: z.tuple([polityIdSchema, polityIdSchema]),
+  monthlyCapacity: z.number().int().positive(),
+}).strict();
+
+export const authoredDiplomacySchema = z.object({
+  relations: z.array(authoredRelationSchema),
+  tradeRoutes: z.array(authoredTradeRouteSchema),
+}).strict();
 
 export const econScenarioSchema = z
   .object({
@@ -159,6 +177,8 @@ export const econScenarioSchema = z
     activeResources: z.array(resourceIdSchema).min(1),
     /** Omit to run the base economy exactly as before. */
     modules: modulesSchema.optional(),
+    /** Required only by scenarios that enable executable diplomacy. */
+    diplomacy: authoredDiplomacySchema.optional(),
     economy: economyParamsSchema,
     polities: z.array(scenarioPolitySchema).min(2),
     regions: z.array(scenarioRegionSchema).min(1),
@@ -171,6 +191,31 @@ export const econScenarioSchema = z
         ctx.addIssue({ code: 'custom', message: `duplicate polity id ${polity.id}`, path: ['polities'] });
       }
       polityIds.add(polity.id);
+    }
+    if (scenario.modules?.diplomacy === true && !scenario.diplomacy) {
+      ctx.addIssue({ code: 'custom', message: 'diplomacy module requires authored diplomacy inputs', path: ['diplomacy'] });
+    }
+    if (scenario.diplomacy) {
+      const relationPairs = new Set<string>();
+      for (const [index, relation] of scenario.diplomacy.relations.entries()) {
+        const [left, right] = relation.polities;
+        if (left >= right || !polityIds.has(left) || !polityIds.has(right)) {
+          ctx.addIssue({ code: 'custom', message: 'relation pair must contain two known polities in ascending order', path: ['diplomacy', 'relations', index, 'polities'] });
+        }
+        const key = `${left}|${right}`;
+        if (relationPairs.has(key)) ctx.addIssue({ code: 'custom', message: `duplicate relation pair ${key}`, path: ['diplomacy', 'relations', index] });
+        relationPairs.add(key);
+      }
+      const routePairs = new Set<string>();
+      for (const [index, route] of scenario.diplomacy.tradeRoutes.entries()) {
+        const [left, right] = route.polities;
+        if (left >= right || !polityIds.has(left) || !polityIds.has(right)) {
+          ctx.addIssue({ code: 'custom', message: 'trade route pair must contain two known polities in ascending order', path: ['diplomacy', 'tradeRoutes', index, 'polities'] });
+        }
+        const key = `${left}|${right}`;
+        if (routePairs.has(key)) ctx.addIssue({ code: 'custom', message: `duplicate trade route pair ${key}`, path: ['diplomacy', 'tradeRoutes', index] });
+        routePairs.add(key);
+      }
     }
     const active = new Set<string>(scenario.activeResources);
     if (active.size !== scenario.activeResources.length) {

@@ -492,8 +492,8 @@ function toAnthropicMessages(history) {
     }));
 }
 
-async function resolveModel(provider, { endpoint = "", headers = {}, fallbackModel = "", providerLabel, signal } = {}) {
-    const settings = getProviderSettings(provider);
+async function resolveModel(provider, { endpoint = "", headers = {}, fallbackModel = "", providerLabel, signal, providerRole = "strategic" } = {}) {
+    const settings = getProviderSettings(provider, providerRole);
     const configuredModel = settings.model.trim();
 
     if (configuredModel) {
@@ -548,8 +548,9 @@ async function callGemini(systemPrompt, history, {
     signal,
     tool,
     reasoningMode,
+    providerRole = "strategic",
 } = {}) {
-    const settings = getProviderSettings("gemini");
+    const settings = getProviderSettings("gemini", providerRole);
     const apiKey = settings.apiKey.trim();
 
     if (!apiKey) {
@@ -560,6 +561,7 @@ async function callGemini(systemPrompt, history, {
         fallbackModel: GEMINI_DEFAULT_MODEL,
         providerLabel: "Gemini",
         signal,
+        providerRole,
     });
 
     const customParams = parseCustomParams(settings.customParams, "Gemini");
@@ -846,7 +848,7 @@ async function callOpenAIStyleChatCompletions({
 }
 
 async function callOpenAI(systemPrompt, history, opts = {}) {
-    const settings = getProviderSettings("openai");
+    const settings = getProviderSettings("openai", opts.providerRole);
     const apiKey = settings.apiKey.trim();
 
     if (!apiKey) {
@@ -863,6 +865,7 @@ async function callOpenAI(systemPrompt, history, opts = {}) {
         headers,
         providerLabel: "OpenAI",
         signal: opts.signal,
+        providerRole: opts.providerRole,
     });
 
     return callOpenAIStyleChatCompletions({
@@ -880,7 +883,7 @@ async function callOpenAI(systemPrompt, history, opts = {}) {
 }
 
 async function callOpenAICompatible(systemPrompt, history, opts = {}) {
-    const settings = getProviderSettings("openai-compatible");
+    const settings = getProviderSettings("openai-compatible", opts.providerRole);
     const endpoint = normalizeEndpoint(settings.endpoint);
 
     if (!endpoint) {
@@ -897,6 +900,7 @@ async function callOpenAICompatible(systemPrompt, history, opts = {}) {
         headers,
         providerLabel: "OpenAI Compatible",
         signal: opts.signal,
+        providerRole: opts.providerRole,
     });
 
     return callOpenAIStyleChatCompletions({
@@ -929,8 +933,9 @@ async function callAnthropic(systemPrompt, history, {
     retryDelay = 15000,
     signal,
     tool,
+    providerRole = "strategic",
 } = {}) {
-    const settings = getProviderSettings("anthropic");
+    const settings = getProviderSettings("anthropic", providerRole);
     const apiKey = settings.apiKey.trim();
 
     if (!apiKey) {
@@ -941,6 +946,7 @@ async function callAnthropic(systemPrompt, history, {
         fallbackModel: ANTHROPIC_DEFAULT_MODEL,
         providerLabel: "Anthropic",
         signal,
+        providerRole,
     });
 
     const headers = {
@@ -1039,8 +1045,9 @@ async function callAnthropicCompatible(systemPrompt, history, {
     retryDelay = 15000,
     signal,
     tool,
+    providerRole = "strategic",
 } = {}) {
-    const settings = getProviderSettings("anthropic-compatible");
+    const settings = getProviderSettings("anthropic-compatible", providerRole);
     const endpoint = normalizeEndpoint(settings.endpoint);
 
     if (!endpoint) {
@@ -1052,6 +1059,7 @@ async function callAnthropicCompatible(systemPrompt, history, {
         fallbackModel: ANTHROPIC_DEFAULT_MODEL,
         providerLabel: "Anthropic Compatible",
         signal,
+        providerRole,
     });
 
     // Self-hosted proxy: tried directly first, falling back to the local relay
@@ -1138,7 +1146,8 @@ async function callAnthropicCompatible(systemPrompt, history, {
 export async function callAI(systemPrompt, history, opts = {}) {
     // Non-English players get replies in their language at the source —
     // native answers beat post-translating them (see runtime/i18n.js).
-    const { languageMode = "ui", ...providerOpts } = opts;
+    const { languageMode = "ui", providerRole = "strategic", ...providerOpts } = opts;
+    providerOpts.providerRole = providerRole;
     const directive = languageMode === "none" ? ""
         : languageMode === "chat" ? chatLanguageDirective()
         : languageDirective();
@@ -1146,7 +1155,7 @@ export async function callAI(systemPrompt, history, opts = {}) {
         systemPrompt = `${systemPrompt}\n\n${directive}`;
     }
 
-    switch (getStoredProvider()) {
+    switch (getStoredProvider(providerRole)) {
     case "openai":
         return callOpenAI(systemPrompt, history, providerOpts);
     case "anthropic":
