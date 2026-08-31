@@ -98,7 +98,7 @@ Stored in world so they share every read/write/poll/normalize path with no serve
 |---|---|---|---|
 | `activeCatalyst` | `Catalyst \| null` | `null` | A running branching scenario prompt: `{title,premise,opening,choices[],history[]}` (`normalizeCatalyst` `:264`). Advanced by `advanceActiveCatalyst` (`gameplay.js:1701`). |
 | `actionSuggestions` | `Topic[]` | `[]` | AI-proposed action topics `{id,title,description,actions[]}` (`:777`); cleared each jump (`gameplay.js:1339`). |
-| `campaignMemory` | `{version,facts[]}` | `{version:1,facts:[]}` | Evidence-backed durable canon (treaties, wars, promises, grievances, divergences, etc.). Facts are changed by validated `upsert`/`resolve` operations and never replaced wholesale; see [Durable Campaign Memory](campaign-memory.md). |
+| `campaignMemory` | `{version,facts[]}` | `{version:2,facts:[]}` | Evidence-backed durable canon with bounded relevance metadata (entity refs, domains, salience and causal refs). Facts are changed by validated `upsert`/`resolve` operations and never replaced wholesale; v1 reads compatibly until the next real memory update. See [Durable Campaign Memory](campaign-memory.md). |
 | `simulationHistory` | `Turn[]` | `[]` | Last ≤12 turns: `{catalyst,date,eventIds[],fallbackReason,fromDate,mode,plannedActions[],round,summary,source,toDate}` (built `gameplay.js:1343`, normalized `:875`). |
 | `consolidatedHistory` | `Summary[]` | `[]` | Compacted older-turn summaries `{summary,chatIds[],throughDate,throughEventId,throughRound,source,createdAt}` (`normalizeConsolidatedHistory` `:796`) — produced by `compactHistoryIfNeeded`. |
 | `lastJumpMode` | `string` | `""` | Mode of the most recent jump (`jump`/`auto`/…) (`:867`). |

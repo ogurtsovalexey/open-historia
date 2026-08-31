@@ -44,7 +44,7 @@ import {
 import { dedupeGeneratedEvents } from "../../runtime/eventDedup.js";
 import { difficultyDirective } from "../../runtime/difficulty.js";
 import { MAP_SETTING_KEYS, getMapSetting } from "../../runtime/mapSettings.js";
-import { applyCampaignMemoryOps } from "../../runtime/campaignMemory.js";
+import { applyCampaignMemoryOps, buildCampaignMemoryText } from "../../runtime/campaignMemory.js";
 
 const CHAT_HINT_PATTERNS = [
   /\bchat\b/i,
@@ -413,9 +413,32 @@ const runJsonTask = async (taskKey, {
     "catalystSummary", "countryStatSheet", "eventConsolidator", "gameMaster",
     "idleDiplomacy", "jumpForward",
   ]);
-  const durableMemory = normalizeString(variables?.campaignMemory);
+  const memoryDomainsByTask = {
+    actions: ["economy", "diplomacy", "dynasty", "politics", "war", "other"],
+    autoJumpForward: ["economy", "diplomacy", "dynasty", "politics", "war", "other"],
+    catalystCreation: ["diplomacy", "dynasty", "politics", "war", "other"],
+    catalystExecutor: ["diplomacy", "dynasty", "politics", "war", "other"],
+    catalystSummary: ["diplomacy", "dynasty", "politics", "war", "other"],
+    countryStatSheet: ["economy", "diplomacy", "dynasty", "politics", "war"],
+    eventConsolidator: ["economy", "diplomacy", "dynasty", "politics", "war", "other"],
+    gameMaster: ["economy", "diplomacy", "dynasty", "politics", "war", "other"],
+    idleDiplomacy: ["diplomacy", "dynasty", "politics", "war"],
+    jumpForward: ["economy", "diplomacy", "dynasty", "politics", "war", "other"],
+  };
+  const memoryDomains = memoryDomainsByTask[taskKey] ?? normalizeArray(variables?.campaignMemoryDomains);
+  const durableMemory = variables?._campaignMemory
+    ? buildCampaignMemoryText(variables._campaignMemory, { context: {
+      task: taskKey,
+      actorEntityId: variables.campaignMemoryActorEntityId,
+      targetEntityIds: variables.campaignMemoryTargetEntityIds,
+      domains: memoryDomains,
+      requiredFactIds: variables.campaignMemoryRequiredFactIds,
+      currentRound: variables.round,
+    } })
+    : normalizeString(variables?.campaignMemory);
   if (memoryAwareTasks.has(taskKey) && durableMemory && !durableMemory.startsWith("No durable ")) {
-    systemPrompt = `${systemPrompt}\n\n[Durable Campaign Memory — Binding Canon]\n${durableMemory}\nTreat every ACTIVE fact above as true and causally binding. Do not silently undo, contradict, or forget it. A broken/resolved/superseded fact remains historical context but is no longer in force.`;
+    const targets = normalizeArray(variables?.campaignMemoryTargetEntityIds).join(", ") || "none";
+    systemPrompt = `${systemPrompt}\n\n[Durable Campaign Memory — Binding Canon]\nContext: task=${taskKey}; actor=${variables?.campaignMemoryActorEntityId || "none"}; targets=${targets}; domains=${memoryDomains.join(",")}\n${durableMemory}\nTreat every ACTIVE fact above as true and causally binding. Do not silently undo, contradict, or forget it. A broken/resolved/superseded fact remains historical context but is no longer in force.`;
   }
 
   // The chosen difficulty steers every simulation task (see runtime/difficulty.js).
@@ -459,7 +482,7 @@ const runJsonTask = async (taskKey, {
   // is gone from the campaign for good. Existing games carry frozen prompts, so
   // both the instruction and the order list have to arrive at call time.
   if (taskKey === "eventConsolidator") {
-    systemPrompt = `${systemPrompt}\n\n[Durable Canon]\nThis summary REPLACES the material it covers: once consolidated, those events, conversations and player orders are never sent to the simulation again, so whatever you omit is lost permanently. Aim for roughly 800–1200 words when the material warrants it; brevity must never erase a divergence or commitment. Carry forward explicitly:\n1. How this world DIVERGED from real history — states that never formed, wars that never happened, rulers who never fell, borders that never moved.\n2. The lasting CONSEQUENCES of the player's own orders, not merely the order text.\n3. Commitments and pressures still in force: treaties, alliances, wars, occupations, promises, debts, trade arrangements, grievances and unresolved crises.\n\nAlso return memoryOps. Use upsert for each new or materially changed durable fact and resolve only when this batch ends/breaks/supersedes an existing fact. Every operation MUST cite one or more exact [event ...], [chat ...], or [action ...] ids from the supplied batch in evidenceIds. Never invent an evidence id. Reuse an existing fact's exact id when updating or resolving it; leave id blank only for a genuinely new upsert. Do not copy transient color into memory.`;
+    systemPrompt = `${systemPrompt}\n\n[Durable Canon]\nThis summary REPLACES the material it covers: once consolidated, those events, conversations and player orders are never sent to the simulation again, so whatever you omit is lost permanently. Aim for roughly 800–1200 words when the material warrants it; brevity must never erase a divergence or commitment. Carry forward explicitly:\n1. How this world DIVERGED from real history — states that never formed, wars that never happened, rulers who never fell, borders that never moved.\n2. The lasting CONSEQUENCES of the player's own orders, not merely the order text.\n3. Commitments and pressures still in force: treaties, alliances, wars, occupations, promises, debts, trade arrangements, grievances and unresolved crises.\n\nAlso return memoryOps. Use upsert for each new or materially changed durable fact and resolve only when this batch ends/breaks/supersedes an existing fact. Every operation MUST cite one or more exact [event ...], [chat ...], or [action ...] ids from the supplied batch in evidenceIds. Never invent an evidence id. Reuse an existing fact's exact id when updating or resolving it; leave id blank only for a genuinely new upsert. Classify each fact with qualitative domains and salience; do not propose a numeric effect. entityRefs may contain only these known stable ids: ${normalizeArray(variables?.campaignMemoryKnownEntityIds).join(", ") || "none"}. causedBy may contain only an existing fact id or an exact evidence id from this batch. Do not copy transient color into memory.`;
     const resolvedOrders = normalizeString(variables?.actionsToConsolidate);
     if (resolvedOrders && !resolvedOrders.startsWith("No ")) {
       systemPrompt = `${systemPrompt}\n\n[Player Orders Being Consolidated]\nThese are the player's own resolved orders for the period covered by this summary. Record what they CHANGED about the world; the order text itself is being discarded.\n${resolvedOrders}`;
@@ -713,8 +736,15 @@ const compactHistoryIfNeeded = async (bundle) => {
     ...closedChats.map((chat) => chat.id),
     ...actionsToConsolidate.map((action) => action.id),
   ].filter(Boolean);
+  const knownEntityIds = mergePolityCatalog(await loadCountryNames(), world)
+    .flatMap((polity) => [polity.code, polity.name]);
   const campaignMemory = applyCampaignMemoryOps(world.campaignMemory, memoryOps, {
     allowedEvidenceIds: evidenceIds,
+    allowedEntityIds: [
+      bundle.game.country,
+      ...knownEntityIds,
+      ...Object.entries(world.polityOverrides ?? {}).flatMap(([id, polity]) => [id, polity?.code, polity?.name]),
+    ].map(normalizeString).filter(Boolean),
     currentDate: throughEvent?.date || bundle.game.gameDate,
     currentRound: bundle.game.round,
   });
@@ -1845,8 +1875,8 @@ export const generateCountryStats = async ({ code, name } = {}) => {
 // campaign context as the intelligence briefing.
 export const generateCountryStatSheet = async ({ code, name } = {}) => {
   const bundle = await readGameStateBundle({ force: true });
-  const variables = await buildTemplateVariables(bundle);
   const target = name || code || "the polity";
+  const variables = await buildTemplateVariables(bundle, { memoryTargetEntityIds: [code, name].filter(Boolean) });
   const dossier = await buildTargetDossier(bundle, normalizeString(code));
   const era = normalizeString(bundle.world?.simulationRules).slice(0, 700);
   const { payload } = await runJsonTask("countryStatSheet", {

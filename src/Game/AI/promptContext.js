@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { JSON_URLS, getNationTags, loadRegionCatalog, readJson } from "../../runtime/assets.js";
+import { JSON_URLS, getNationTags, loadCountryNames, loadRegionCatalog, readJson } from "../../runtime/assets.js";
 import { resolveAllCountryTags, resolveCountryTags } from "../../runtime/countryTags.js";
 import { toCountryName } from "../../runtime/ownerNames.js";
 import { buildCampaignMemoryText } from "../../runtime/campaignMemory.js";
@@ -463,11 +463,16 @@ export const buildPromptContext = async (bundle, {
   eventsToConsolidate = "",
   gameMasterRequest = "",
   longEventLimit = 60,
+  memoryDomains = ["economy", "diplomacy", "dynasty", "politics", "war", "other"],
+  memoryRequiredFactIds = [],
+  memoryTargetEntityIds = [],
+  memoryTask = "general",
   respondingPolityName = "",
   targetDate = "",
 } = {}) => {
   const normalizedChat = chat && typeof chat === "object" ? normalizeChats([chat])[0] : null;
   const regionCatalog = await loadRegions();
+  const countryCatalog = await loadCountryNames().catch(() => []);
   const date = bundle.game.gameDate || "";
   const target = targetDate || date;
   const worldSummary = await buildWorldSummary(bundle, regionCatalog);
@@ -482,8 +487,29 @@ export const buildPromptContext = async (bundle, {
   const unconsolidatedChats = normalizeChats(bundle.chats)
     .filter((entry) => !consolidatedChatIds.has(entry.id));
   const currentChat = normalizedChat ?? unconsolidatedChats[0] ?? null;
+  const memoryActorEntityId = normalizeString(bundle.game.country);
+  const resolvedMemoryTargets = normalizeArray(memoryTargetEntityIds).length > 0
+    ? normalizeArray(memoryTargetEntityIds)
+    : [respondingPolityName || currentChat?.countries.find((country) => country.name !== bundle.game.country)?.name]
+      .map(normalizeString)
+      .filter(Boolean);
+  const memoryContext = {
+    task: memoryTask,
+    actorEntityId: memoryActorEntityId,
+    targetEntityIds: resolvedMemoryTargets,
+    domains: memoryDomains,
+    requiredFactIds: memoryRequiredFactIds,
+    currentRound: bundle.game.round,
+  };
+  const campaignMemoryKnownEntityIds = [
+    memoryActorEntityId,
+    ...countryCatalog.flatMap((country) => [country?.code, country?.name]),
+    ...Object.entries(bundle.world?.polityOverrides ?? {})
+      .flatMap(([id, polity]) => [id, polity?.code, polity?.name]),
+  ].map(normalizeString).filter(Boolean);
 
   return {
+    _campaignMemory: bundle.world?.campaignMemory,
     actionInput,
     actions: actionText,
     advisorMessages: buildAdvisorHistoryText(bundle.advisor || [], { limit: advisorLimit }),
@@ -496,7 +522,12 @@ export const buildPromptContext = async (bundle, {
       ? `${Math.min(100, normalizeArray(bundle.world.activeCatalyst.history).length * 50)}%`
       : "0%",
     catalystPremise,
-    campaignMemory: buildCampaignMemoryText(bundle.world?.campaignMemory),
+    campaignMemory: buildCampaignMemoryText(bundle.world?.campaignMemory, { context: memoryContext }),
+    campaignMemoryActorEntityId: memoryActorEntityId,
+    campaignMemoryDomains: memoryDomains,
+    campaignMemoryKnownEntityIds,
+    campaignMemoryRequiredFactIds: memoryRequiredFactIds,
+    campaignMemoryTargetEntityIds: resolvedMemoryTargets,
     citiesSummary,
     chat: JSON.stringify(unconsolidatedChats),
     chatHistory: currentChat?.messages?.map((message) => `${message.speaker || message.role}: ${message.text}`).join("\n") || "No chat history.",

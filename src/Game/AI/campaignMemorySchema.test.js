@@ -27,9 +27,23 @@ test("event consolidation accepts a fully structured evidence-backed operation",
       sinceDate: "1810-04-12",
       endedDate: "",
       evidenceIds: ["event-1810-settlement"],
+      entityRefs: ["FRA", "RUS"],
+      domains: ["diplomacy"],
+      salience: "major",
+      causedBy: [],
     }],
   });
 
   assert.deepEqual(result, { valid: true, error: "" });
 });
 
+test("event consolidation rejects missing or invalid v2 relevance metadata", () => {
+  const base = {
+    op: "upsert", id: "fact-1", category: "other", statement: "A durable fact.",
+    parties: [], status: "active", sinceDate: "", endedDate: "", evidenceIds: ["event-1"],
+    entityRefs: [], domains: ["politics"], salience: "material", causedBy: [],
+  };
+  assert.equal(validateGameplayPayload("eventConsolidator", { summary: "Summary", memoryOps: [{ ...base, domains: ["science"] }] }).valid, false);
+  const { salience: _salience, ...missingSalience } = base;
+  assert.equal(validateGameplayPayload("eventConsolidator", { summary: "Summary", memoryOps: [missingSalience] }).valid, false);
+});

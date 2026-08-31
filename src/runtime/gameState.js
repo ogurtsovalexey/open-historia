@@ -21,7 +21,7 @@ export const WORLD_DEFAULTS = {
   // Evidence-backed durable facts extracted when old events and chats are
   // consolidated. Unlike narrative summaries, facts are updated by operations,
   // so one weak consolidation cannot silently erase the campaign's canon.
-  campaignMemory: { version: 1, facts: [] },
+  campaignMemory: { version: 2, facts: [] },
   consolidatedHistory: [],
   // Per-polity international reputation (0-100), evolved by the AI each turn via
   // polityChanges and fed back into prompts. Authoritative, unlike the on-demand

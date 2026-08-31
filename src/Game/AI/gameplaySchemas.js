@@ -41,10 +41,23 @@ const campaignMemoryOperationSchema = {
     sinceDate: textSchema("Date the fact began, or an empty string when unknown."),
     endedDate: textSchema("Date the fact ended, or an empty string while active."),
     evidenceIds: stringArraySchema("One or more exact event/chat/action ids from the supplied consolidation batch."),
+    entityRefs: stringArraySchema("Stable ids of materially involved polities, people, or factions. Use only ids present in context."),
+    domains: {
+      type: "array",
+      description: "One or more qualitative relevance domains for this fact.",
+      minItems: 1,
+      items: { type: "string", enum: ["economy", "diplomacy", "dynasty", "politics", "war", "other"] },
+    },
+    salience: {
+      type: "string",
+      enum: ["minor", "material", "major", "critical"],
+      description: "Qualitative durable importance; never a numeric effect.",
+    },
+    causedBy: stringArraySchema("Stable fact ids or exact event/chat/action ids that directly caused this fact."),
   },
   required: [
     "op", "id", "category", "statement", "parties", "status",
-    "sinceDate", "endedDate", "evidenceIds",
+    "sinceDate", "endedDate", "evidenceIds", "entityRefs", "domains", "salience", "causedBy",
   ],
   additionalProperties: false,
 };

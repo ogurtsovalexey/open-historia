@@ -14,6 +14,7 @@ import {
     resolveChatLanguage,
 } from "../../runtime/i18n.js";
 import { difficultyDirective } from "../../runtime/difficulty.js";
+import { buildCampaignMemoryText } from "../../runtime/campaignMemory.js";
 import { normalizePromptPack } from "./gameplayPrompts.js";
 import {
     buildFocusedDiplomaticMapContext,
@@ -1200,10 +1201,21 @@ async function buildPromptVariables({
     });
 }
 
-const appendDurableCampaignMemory = (prompt, variables) => {
-    const memory = String(variables?.campaignMemory ?? "").trim();
+const appendDurableCampaignMemory = (prompt, variables, context = {}) => {
+    const memoryContext = {
+        task: context.task || "advisor",
+        actorEntityId: variables?.campaignMemoryActorEntityId,
+        targetEntityIds: context.targetEntityIds ?? variables?.campaignMemoryTargetEntityIds,
+        domains: context.domains ?? variables?.campaignMemoryDomains,
+        requiredFactIds: context.requiredFactIds ?? variables?.campaignMemoryRequiredFactIds,
+        currentRound: variables?.round,
+    };
+    const memory = String(variables?._campaignMemory
+        ? buildCampaignMemoryText(variables._campaignMemory, { context: memoryContext })
+        : variables?.campaignMemory ?? "").trim();
     if (!memory || memory.startsWith("No durable ")) return prompt;
-    return `${prompt}\n\n[Durable Campaign Memory — Binding Canon]\n${memory}\nTreat every ACTIVE fact as true and causally binding. Do not silently undo or forget it. Broken/resolved/superseded facts remain historical context but are no longer in force.`;
+    const targets = (memoryContext.targetEntityIds ?? []).join(", ") || "none";
+    return `${prompt}\n\n[Durable Campaign Memory — Binding Canon]\nContext: task=${memoryContext.task}; actor=${memoryContext.actorEntityId || "none"}; targets=${targets}; domains=${(memoryContext.domains ?? []).join(",")}\n${memory}\nTreat every ACTIVE fact as true and causally binding. Do not silently undo or forget it. Broken/resolved/superseded facts remain historical context but are no longer in force.`;
 };
 
 async function buildAdvisorSystemPrompt() {
@@ -1284,6 +1296,11 @@ export async function buildDiplomaticSystemPrompt(countries, playerCountry, spea
     return `${appendDurableCampaignMemory(
         renderTemplate(promptPack.leader, { ...variables, ...helperValues }),
         variables,
+        {
+            task: "diplomatic-conversation",
+            targetEntityIds: normalizedCountries.flatMap((country) => [country.code, country.name]).filter(Boolean),
+            domains: ["diplomacy", "dynasty", "politics", "war"],
+        },
     )}\n\n${difficultyDirective(gameData?.difficulty)}`;
 }
 
