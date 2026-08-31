@@ -67,7 +67,7 @@ const acceptedEffect = () => ({
 
 test('registry exposes every accepted Phase 1 task and immutable definitions', () => {
   const tasks = registry.getAllTaskDefinitions();
-  assert.equal(tasks.length, 19);
+  assert.equal(tasks.length, 20);
   assert.equal(registry.validateTask('orders.interpret-economy').outputContractId, 'player-economy-orders-schema');
   assert.equal(registry.validateTask('opponents.plan-economy').fallbackPolicy, 'deterministic');
   assert.equal(registry.validateTask('reports.explain-economy').authority, 'explanation');
@@ -85,6 +85,7 @@ test('every task is routed to an explicit utility or strategic model role', () =
   assert.equal(registry.validateTask('reports.explain-economy').modelRole, 'utility');
   assert.equal(registry.validateTask('chat.diplomacy.plan').modelRole, 'strategic');
   assert.equal(registry.validateTask('opponents.plan-diplomacy').modelRole, 'strategic');
+  assert.equal(registry.validateTask('opponents.plan-statecraft').modelRole, 'strategic');
   assert.equal(registry.validateTask('timeline.advance', 'manual').modelRole, 'strategic');
 });
 

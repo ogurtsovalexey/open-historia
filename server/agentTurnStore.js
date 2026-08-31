@@ -177,12 +177,12 @@ const makeStrategicTasks = (draft) => {
   draft.pendingStrategicBatch = batch;
   const schema = withoutModelCommandIds(exportJsonSchema(opponentDiplomacyBatchResultSchema));
   draft.tasks = [{
-    taskId: "opponents.plan-diplomacy",
+    taskId: draft.state.modules?.finance || draft.state.modules?.projects ? "opponents.plan-statecraft" : "opponents.plan-diplomacy",
     taskVersion: 1,
     taskKey: batch.batchId,
-    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity. Use hold with a null command unless a material diplomatic or trade action is justified by the supplied relations, proposals, agreements, treasury and stockpiles. Commands must use the supplied month and revision. Do not invent actors, resources, routes or effects.",
+    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity and at most one material command. Use hold with a null command unless diplomacy, trade, finance or a listed project is justified by the supplied public state. Intelligence may target a polity but must never name a hidden fact id. Commands must use the supplied month and revision. Do not invent actors, resources, routes, templates, regions or effects.",
     userPrompt: JSON.stringify({ month: batch.month, revision: batch.baseRevision, briefs: batch.briefs }),
-    tool: { name: "submit_opponent_diplomacy_decisions", description: "Submit every requested polity strategic decision", schema },
+    tool: { name: "submit_opponent_strategy_decisions", description: "Submit every requested polity strategic decision", schema },
     context: { fullMapIncluded: false, characterCount: batch.characterCount, polityCount: batch.polityIds.length },
   }];
   draft.phase = "plan-strategy";

@@ -38,6 +38,8 @@ scenario.displayName = {
   ru: "Европейский кризис, 1938 — альтернативная история",
 };
 scenario.modules.diplomacy = true;
+scenario.modules.finance = true;
+scenario.modules.intelligence = true;
 const polityIds = ["polity:austria", "polity:czechia", "polity:france", "polity:germany", "polity:poland", "polity:slovakia"];
 const relations = [];
 const tradeRoutes = [];
@@ -106,6 +108,57 @@ const newRegions = features.filter((feature) => ["FRA", "POL"].includes(feature.
   };
 });
 scenario.regions.push(...newRegions);
+const finance = scenario.polities.map((polity) => ({
+  polityId: polity.id,
+  taxBurdenBp: 10000,
+  exemptionBp: 500,
+  priorities: { administration: 2500, science: 1500, industry: 2500, security: 1500, military: 2000 },
+  debtPrincipal: 0,
+  annualInterestBp: 600,
+  creditLimit: polity.treasury * 3,
+}));
+const capacities = scenario.polities.map((polity) => {
+  const count = scenario.regions.filter((region) => region.controllerId === polity.id).length;
+  return { polityId: polity.id, administration: Math.max(2, Math.ceil(count / 4)), science: Math.max(1, Math.ceil(count / 8)), industry: Math.max(2, Math.ceil(count / 3)) };
+});
+const projectTemplates = [{
+  templateId: "project-template:infrastructure", displayName: { en: "Regional infrastructure", ru: "Региональная инфраструктура" },
+  kind: "construction", budgetCategory: "industry", totalCost: 600, durationMonths: 3,
+  capacity: { kind: "industry", amount: 2 }, effect: { kind: "infrastructure", gainBp: 500 },
+}, {
+  templateId: "project-template:tax-administration", displayName: { en: "Tax administration reform", ru: "Реформа налогового управления" },
+  kind: "reform", budgetCategory: "administration", totalCost: 500, durationMonths: 3,
+  capacity: { kind: "administration", amount: 2 }, effect: { kind: "credit-limit", amount: 1000 },
+}, {
+  templateId: "project-template:intelligence-assessment", displayName: { en: "Intelligence assessment", ru: "Разведывательная оценка" },
+  kind: "intelligence", budgetCategory: "security", totalCost: 300, durationMonths: 2,
+  capacity: { kind: "administration", amount: 1 }, effect: { kind: "reveal-intelligence" },
+}];
+const factSummaries = {
+  austria: ["Austria's public debt administration has limited emergency headroom.", "Управление государственным долгом Австрии имеет ограниченный резерв для чрезвычайных расходов."],
+  czechia: ["Czechoslovak border fortifications consume substantial industrial maintenance capacity.", "Чехословацкие пограничные укрепления требуют значительных промышленных мощностей для обслуживания."],
+  france: ["The French cabinet is divided over the cost of new eastern guarantees.", "Французский кабинет разделён во мнениях о цене новых восточных гарантий."],
+  germany: ["German liquid-fuel reserves are insufficient for a prolonged high-tempo campaign.", "Германских запасов жидкого топлива недостаточно для длительной кампании высокого темпа."],
+  poland: ["Poland's east-west rail network has a documented mobilisation bottleneck.", "Польская железнодорожная сеть восток-запад имеет подтверждённое узкое место для мобилизации."],
+  slovakia: ["Slovakia's new administration lacks experienced provincial officials.", "Новой администрации Словакии не хватает опытных провинциальных чиновников."],
+};
+const intelligenceFacts = polityIds.map((polityId) => {
+  const slug = polityId.split(":")[1];
+  return {
+    factId: `intel:${slug}-statecraft-1938`, subjectPolityId: polityId,
+    domain: slug === "france" || slug === "slovakia" ? "politics" : slug === "austria" ? "economy" : "war",
+    summary: { en: factSummaries[slug][0], ru: factSummaries[slug][1] },
+    evidenceId: `evidence:scenario-1938-${slug}-brief`,
+  };
+});
+const knowledgeSeeds = polityIds.map((polityId) => {
+  const slug = polityId.split(":")[1];
+  return {
+    observerPolityId: polityId, factId: `intel:${slug}-statecraft-1938`, confidence: "high",
+    evidenceId: `evidence:scenario-1938-${slug}-brief`, staleAfterMonths: 24,
+  };
+});
+scenario.statecraft = { finance, capacities, projectTemplates, intelligenceFacts, knowledgeSeeds };
 writeJson(path.join(fixtureDir, "scenario.json"), scenario);
 
 const baseLink = readJson(path.join(baseFixtureDir, "map-link.json"));

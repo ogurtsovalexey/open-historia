@@ -23,6 +23,7 @@ import {
 import type { ModuleName } from './scenario.js';
 import { stateChecksum } from './canonical.js';
 import { diplomacyStateSchema, tradeStateSchema } from './diplomacy.js';
+import { financeStateSchema, intelligenceStateSchema, projectsStateSchema } from './statecraft.js';
 
 const nonNegInt = z.number().int().nonnegative();
 const bpSchema = z.number().int().min(0).max(10000);
@@ -87,6 +88,9 @@ export const econWorldStateSchema = z
     modules: modulesSchema.optional(),
     diplomacy: diplomacyStateSchema.optional(),
     trade: tradeStateSchema.optional(),
+    finance: financeStateSchema.optional(),
+    projects: projectsStateSchema.optional(),
+    intelligence: intelligenceStateSchema.optional(),
     economy: economyParamsSchema,
     /** Sorted by polity id. */
     polities: z.array(econPolityStateSchema).min(2),
@@ -157,6 +161,28 @@ export function initState(scenario: EconScenario): EconWorldState {
           contracts: [],
         },
       } : {}),
+    } : {}),
+    ...(scenario.modules?.finance === true && scenario.statecraft ? {
+      finance: {
+        polities: [...scenario.statecraft.finance].sort((a, b) => a.polityId.localeCompare(b.polityId)).map((entry) => ({
+          ...entry, priorities: { ...entry.priorities }, interestRemainder: 0, defaultCount: 0, lastDefaultMonth: null,
+        })),
+      },
+    } : {}),
+    ...(scenario.modules?.projects === true && scenario.statecraft ? {
+      projects: {
+        capacities: [...scenario.statecraft.capacities].sort((a, b) => a.polityId.localeCompare(b.polityId)),
+        templates: [...scenario.statecraft.projectTemplates].sort((a, b) => a.templateId.localeCompare(b.templateId)),
+        projects: [], familiarity: [],
+      },
+    } : {}),
+    ...(scenario.modules?.intelligence === true && scenario.statecraft ? {
+      intelligence: {
+        truths: [...scenario.statecraft.intelligenceFacts].sort((a, b) => a.factId.localeCompare(b.factId)),
+        knownFacts: [...scenario.statecraft.knowledgeSeeds].map((entry) => ({
+          ...entry, observedMonth: entry.observedMonth ?? scenario.startMonth, source: 'scenario' as const,
+        })).sort((a, b) => `${a.observerPolityId}|${a.factId}`.localeCompare(`${b.observerPolityId}|${b.factId}`)),
+      },
     } : {}),
     polities: [...scenario.polities]
       .sort((a, b) => (a.id < b.id ? -1 : 1))

@@ -8,6 +8,7 @@ import { chatLanguageDiffersFromUi, isRtlLanguage, resolveChatLanguage } from ".
 import StatsPane from "./stats.jsx";
 import EconomyPane from "./economy.jsx";
 import DiplomacyPane from "./diplomacy.jsx";
+import StatecraftPane from "./statecraft.jsx";
 
 Chart.register(...registerables);
 
@@ -378,6 +379,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
         <div style={{ alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", display: "flex", padding: "0 0.75rem 0 0.35rem" }}>
         <TabButton icon="🏭" label="Economy" active={activeTab === "economy"} onClick={() => setActiveTab("economy")} />
         <TabButton icon="🤝" label="Diplomacy" active={activeTab === "diplomacy"} onClick={() => setActiveTab("diplomacy")} />
+        <TabButton icon="🏛" label="Statecraft" active={activeTab === "statecraft"} onClick={() => setActiveTab("statecraft")} />
         <TabButton icon="🧭" label="Advisor" active={activeTab === "advisor"} onClick={() => setActiveTab("advisor")} />
         <TabButton icon="📊" label="Stats" active={activeTab === "stats"} onClick={() => setActiveTab("stats")} />
         <div style={{ flex: 1 }} />
@@ -406,6 +408,10 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
 
         <div style={{ display: activeTab === "diplomacy" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
         <DiplomacyPane active={isAdvisorOpen && activeTab === "diplomacy"} />
+        </div>
+
+        <div style={{ display: activeTab === "statecraft" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
+        <StatecraftPane active={isAdvisorOpen && activeTab === "statecraft"} />
         </div>
 
         {/* National stats pane — kept mounted so flipping tabs is instant. */}

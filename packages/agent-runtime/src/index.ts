@@ -3,6 +3,7 @@ import { commandIdSchema, polityIdSchema, worldRevisionIdSchema } from '@open-hi
 import {
   investInRegionCommandSchema,
   diplomacyCommandSchema,
+  statecraftCommandSchema,
   potentialOutput,
   runTurn,
   sha256OfString,
@@ -11,6 +12,7 @@ import {
   type PolityLedger,
 } from '@open-historia/engine';
 import type { DiplomacyCommand } from '@open-historia/engine';
+import type { StatecraftCommand } from '@open-historia/engine';
 
 export const MAX_POLITIES_PER_BATCH = 12;
 export const MAX_BATCHES_PER_MONTH = 2;
@@ -38,15 +40,21 @@ export type OpponentBatchResult = z.infer<typeof opponentBatchResultSchema>;
 
 export const opponentDiplomacyDecisionSchema = z.object({
   polityId: polityIdSchema,
-  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'hold']),
+  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'set-policy', 'issue-bonds', 'restructure', 'start-project', 'update-project', 'cancel-project', 'hold']),
   rationale: z.string().max(320),
-  command: diplomacyCommandSchema.nullable(),
+  command: z.union([diplomacyCommandSchema, statecraftCommandSchema]).nullable(),
 }).strict().superRefine((decision, ctx) => {
   const expectedKind = decision.intent === 'propose' ? 'diplomacy.propose'
     : decision.intent === 'counter' ? 'diplomacy.counter'
       : decision.intent === 'accept' || decision.intent === 'reject' ? 'diplomacy.respond'
         : decision.intent === 'terminate' ? 'diplomacy.terminate-agreement'
-          : null;
+          : decision.intent === 'set-policy' ? 'finance.set-policy'
+            : decision.intent === 'issue-bonds' ? 'finance.issue-bonds'
+              : decision.intent === 'restructure' ? 'finance.restructure'
+                : decision.intent === 'start-project' ? 'project.start'
+                  : decision.intent === 'update-project' ? 'project.update'
+                    : decision.intent === 'cancel-project' ? 'project.cancel'
+                      : null;
   if ((decision.command?.kind ?? null) !== expectedKind) {
     ctx.addIssue({ code: 'custom', path: ['command'], message: 'intent and diplomacy command must match' });
   }
@@ -72,6 +80,13 @@ export interface DiplomacyPolityBrief {
   agreements: Array<Record<string, unknown>>;
   allowedAgreementTypes: string[];
   allowedTradeResources: string[];
+  finance: Record<string, unknown> | null;
+  capacities: Record<string, unknown> | null;
+  projects: Array<Record<string, unknown>>;
+  projectTemplates: Array<Record<string, unknown>>;
+  projectRegionCandidates: Array<{ regionId: string; name: string }>;
+  knownFacts: Array<Record<string, unknown>>;
+  intelligenceTargetPolityIds: string[];
 }
 
 export interface DiplomacyBatch {
@@ -104,6 +119,18 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
       relations, proposals, agreements,
       allowedAgreementTypes: ['non-aggression', 'defensive-alliance', 'guarantee', 'military-access'],
       allowedTradeResources: [...state.activeResources].sort(),
+      finance: state.finance?.polities.find((entry) => entry.polityId === polityId) ?? null,
+      capacities: state.projects?.capacities.find((entry) => entry.polityId === polityId) ?? null,
+      projects: (state.projects?.projects ?? []).filter((entry) => entry.actorPolityId === polityId),
+      projectTemplates: state.projects?.templates ?? [],
+      projectRegionCandidates: state.regions.filter((entry) => entry.controllerId === polityId)
+        .sort((a, b) => a.regionId.localeCompare(b.regionId)).slice(0, 3)
+        .map((entry) => ({ regionId: entry.regionId, name: entry.displayName.en })),
+      // A single strategic batch contains several autonomous actors. Private
+      // knowledge cannot be co-located in that shared prompt without leaking
+      // it across actors, so P3c keeps the batch on public state only.
+      knownFacts: [],
+      intelligenceTargetPolityIds: state.polities.filter((entry) => entry.id !== polityId).map((entry) => entry.id).sort(),
     };
   });
   const characterCount = briefs.reduce((sum, brief) => sum + JSON.stringify(brief).length, 0);
@@ -121,7 +148,7 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
   if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error('strategic batch must decide every and only requested polity');
   const known = new Set(batch.briefs.map((entry) => entry.polityId));
   for (const decision of parsed.decisions) {
-    const command = decision.command as DiplomacyCommand | null;
+    const command = decision.command as DiplomacyCommand | StatecraftCommand | null;
     if (!command) continue;
     if (command.actorPolityId !== decision.polityId) throw new Error('diplomacy command actor mismatch');
     if (command.expectedRevision !== batch.baseRevision || command.effectiveMonth !== batch.month) throw new Error('diplomacy command is stale or for the wrong month');
@@ -129,6 +156,15 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
       brief.relations.some((relation) => relation.polityId === command.recipientPolityId))) {
       throw new Error('diplomacy proposal names an unknown recipient');
     }
+    const brief = batch.briefs.find((entry) => entry.polityId === decision.polityId)!;
+    if (command.kind === 'project.start') {
+      if (!brief.projectTemplates.some((entry) => entry.templateId === command.templateId)) throw new Error('project command names an unknown template');
+      if (command.targetPolityId && !brief.intelligenceTargetPolityIds.includes(command.targetPolityId)) throw new Error('project command names an unknown target polity');
+      if (command.targetRegionId && !brief.projectRegionCandidates.some((entry) => entry.regionId === command.targetRegionId)) throw new Error('project command names a region outside the bounded candidates');
+      if (command.targetFactId) throw new Error('strategic batch may not receive a hidden intelligence fact id');
+    }
+    if ((command.kind === 'project.update' || command.kind === 'project.cancel')
+      && !brief.projects.some((entry) => entry.projectId === command.projectId)) throw new Error('project command names another polity project');
   }
   return parsed;
 }

@@ -7,6 +7,7 @@ import type { ResourceId } from './scenario.js';
 import type { EconWorldState } from './state.js';
 import { getStock } from './state.js';
 import type { ResourceTransferRecord, TradeExecutionRecord, TreasuryTransferRecord } from './diplomacyReducer.js';
+import type { FinanceResolutionRecord, ProjectAllocationRecord } from './statecraftReducer.js';
 
 export interface RegionPopulationRow {
   regionId: RegionId;
@@ -87,6 +88,8 @@ export interface PolityLedger {
   treasuryOpening: number;
   treasuryClosing: number;
   treasuryTradeNet?: number;
+  finance?: FinanceResolutionRecord;
+  projectSpend?: number;
   stockMovements: StockMovement[];
 }
 
@@ -113,6 +116,10 @@ export interface TurnLedger {
     executions: TradeExecutionRecord[];
     resourceTransfers: ResourceTransferRecord[];
     treasuryTransfers: TreasuryTransferRecord[];
+  };
+  statecraft?: {
+    finance: FinanceResolutionRecord[];
+    projectAllocations: ProjectAllocationRecord[];
   };
 }
 
@@ -199,7 +206,9 @@ export function checkInvariants(
 
     // treasury' = treasury + tax revenue - accepted spending.
     const spend = polityLedger.investment?.spend ?? 0;
-    const expectedTreasury = polityLedger.treasuryOpening + (polityLedger.treasuryTradeNet ?? 0) + polityLedger.taxTotal - spend;
+    const expectedTreasury = polityLedger.treasuryOpening + (polityLedger.treasuryTradeNet ?? 0)
+      + (polityLedger.finance?.bondsIssued ?? 0) + polityLedger.taxTotal - spend
+      - (polityLedger.projectSpend ?? 0) - (polityLedger.finance?.interestPaid ?? 0);
     if (expectedTreasury !== polityLedger.treasuryClosing) {
       fail('treasury-identity', `${id}: ${polityLedger.treasuryOpening}+${polityLedger.taxTotal}-${spend} != ${polityLedger.treasuryClosing}`);
     }
@@ -208,6 +217,27 @@ export function checkInvariants(
     }
     if (nextPolity.treasury < 0) fail('no-negative-treasury', `${id}: ${nextPolity.treasury}`);
     checked.push('treasury-identity');
+  }
+
+  if (ledger.statecraft) {
+    for (const record of ledger.statecraft.finance) {
+      const expectedDebt = record.debtOpening + record.bondsIssued - record.voluntaryHaircut - record.automaticHaircut;
+      if (expectedDebt !== record.debtClosing) fail('debt-identity', `${record.polityId}: expected debt ${expectedDebt}, closed ${record.debtClosing}`);
+      if (record.interestPaid > record.interestAccrued) fail('debt-identity', `${record.polityId}: paid more interest than accrued`);
+    }
+    const capacityUsed = new Map<string, number>();
+    for (const allocation of ledger.statecraft.projectAllocations) {
+      if (allocation.spent < 0 || allocation.spent > allocation.requested) fail('project-budget-conservation', `${allocation.projectId}: invalid spend`);
+      const key = `${allocation.polityId}|${allocation.capacityKind}`;
+      capacityUsed.set(key, (capacityUsed.get(key) ?? 0) + allocation.capacityUsed);
+    }
+    for (const capacity of prev.projects?.capacities ?? next.projects?.capacities ?? []) {
+      for (const kind of ['administration', 'science', 'industry'] as const) {
+        const used = capacityUsed.get(`${capacity.polityId}|${kind}`) ?? 0;
+        if (used > capacity[kind]) fail('project-capacity-conservation', `${capacity.polityId}/${kind}: used ${used} > ${capacity[kind]}`);
+      }
+    }
+    checked.push('debt-identity', 'project-budget-conservation', 'project-capacity-conservation');
   }
 
   if (ledger.trade) {

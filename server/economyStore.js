@@ -107,18 +107,38 @@ const tradeForPlayer = (state, playerId) => state.trade ? ({
     contract.terms.fromPolityId === playerId || contract.terms.toPolityId === playerId),
 }) : null;
 
+const statecraftForPlayer = (state, playerId) => {
+  if (!state.finance && !state.projects && !state.intelligence) return null;
+  const known = (state.intelligence?.knownFacts ?? []).filter((entry) => entry.observerPolityId === playerId).map((entry) => {
+    const truth = state.intelligence.truths.find((fact) => fact.factId === entry.factId);
+    return { ...entry, subjectPolityId: truth?.subjectPolityId, domain: truth?.domain, summary: truth?.summary };
+  });
+  return {
+    finance: state.finance?.polities.find((entry) => entry.polityId === playerId) ?? null,
+    capacities: state.projects?.capacities.find((entry) => entry.polityId === playerId) ?? null,
+    templates: state.projects?.templates ?? [],
+    projects: (state.projects?.projects ?? []).filter((entry) => entry.actorPolityId === playerId),
+    familiarity: (state.projects?.familiarity ?? []).filter((entry) => entry.polityId === playerId),
+    knownFacts: known,
+  };
+};
+
 const turnForPlayer = (turn, playerId) => {
-  if (!turn?.ledger?.trade) return turn;
+  if (!turn?.ledger) return turn;
   const involved = (entry) => entry.fromPolityId === playerId || entry.toPolityId === playerId;
   return {
     ...turn,
     ledger: {
       ...turn.ledger,
-      trade: {
+      ...(turn.ledger.trade ? { trade: {
         executions: turn.ledger.trade.executions.filter(involved),
         resourceTransfers: turn.ledger.trade.resourceTransfers.filter(involved),
         treasuryTransfers: turn.ledger.trade.treasuryTransfers.filter(involved),
-      },
+      } } : {}),
+      ...(turn.ledger.statecraft ? { statecraft: {
+        finance: turn.ledger.statecraft.finance.filter((entry) => entry.polityId === playerId),
+        projectAllocations: turn.ledger.statecraft.projectAllocations.filter((entry) => entry.polityId === playerId),
+      } } : {}),
     },
   };
 };
@@ -145,6 +165,7 @@ const makeSnapshot = (game, fixture, session, actualMonthlyTicks = session.manif
     economy: state.economy,
     diplomacy: diplomacyForPlayer(state, playerId),
     trade: tradeForPlayer(state, playerId),
+    statecraft: statecraftForPlayer(state, playerId),
     polities: state.polities,
     regions: state.regions,
     ownershipOverrides: ownership,

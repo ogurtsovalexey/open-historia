@@ -3,6 +3,8 @@ export * from './canonical.js';
 export * from './scenario.js';
 export * from './diplomacy.js';
 export * from './diplomacyReducer.js';
+export * from './statecraft.js';
+export * from './statecraftReducer.js';
 export * from './mapLink.js';
 export * from './selectors.js';
 export * from './state.js';

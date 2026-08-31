@@ -16,7 +16,7 @@ const finishMonth = async (request, gameId, draft, strategicDecision) => {
   expect(draft.phase).toBe("plan-strategy");
   const strategicPrompt = JSON.parse(draft.tasks[0].userPrompt);
   expect(JSON.stringify(strategicPrompt)).not.toContain("FeatureCollection");
-  expect(JSON.stringify(strategicPrompt)).not.toContain("regionId");
+  expect(strategicPrompt.briefs.flatMap((brief) => brief.projectRegionCandidates ?? [])).toHaveLength(15);
   const outputs = [{ decisions: strategicPrompt.briefs.map((brief) => strategicDecision?.(brief, strategicPrompt) ?? ({
     polityId: brief.polityId, intent: "hold", rationale: "No material action.", command: null,
   })) }];

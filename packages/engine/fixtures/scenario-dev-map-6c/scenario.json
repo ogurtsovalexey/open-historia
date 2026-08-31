@@ -20,7 +20,9 @@
     "trade": true,
     "shortages": true,
     "unrest": true,
-    "diplomacy": true
+    "diplomacy": true,
+    "finance": true,
+    "intelligence": true
   },
   "economy": {
     "foodNeedPerPersonMilli": 50,
@@ -2076,6 +2078,302 @@
           "polity:slovakia"
         ],
         "monthlyCapacity": 120000
+      }
+    ]
+  },
+  "statecraft": {
+    "finance": [
+      {
+        "polityId": "polity:austria",
+        "taxBurdenBp": 10000,
+        "exemptionBp": 500,
+        "priorities": {
+          "administration": 2500,
+          "science": 1500,
+          "industry": 2500,
+          "security": 1500,
+          "military": 2000
+        },
+        "debtPrincipal": 0,
+        "annualInterestBp": 600,
+        "creditLimit": 15000
+      },
+      {
+        "polityId": "polity:czechia",
+        "taxBurdenBp": 10000,
+        "exemptionBp": 500,
+        "priorities": {
+          "administration": 2500,
+          "science": 1500,
+          "industry": 2500,
+          "security": 1500,
+          "military": 2000
+        },
+        "debtPrincipal": 0,
+        "annualInterestBp": 600,
+        "creditLimit": 24000
+      },
+      {
+        "polityId": "polity:germany",
+        "taxBurdenBp": 10000,
+        "exemptionBp": 500,
+        "priorities": {
+          "administration": 2500,
+          "science": 1500,
+          "industry": 2500,
+          "security": 1500,
+          "military": 2000
+        },
+        "debtPrincipal": 0,
+        "annualInterestBp": 600,
+        "creditLimit": 42000
+      },
+      {
+        "polityId": "polity:slovakia",
+        "taxBurdenBp": 10000,
+        "exemptionBp": 500,
+        "priorities": {
+          "administration": 2500,
+          "science": 1500,
+          "industry": 2500,
+          "security": 1500,
+          "military": 2000
+        },
+        "debtPrincipal": 0,
+        "annualInterestBp": 600,
+        "creditLimit": 10500
+      },
+      {
+        "polityId": "polity:france",
+        "taxBurdenBp": 10000,
+        "exemptionBp": 500,
+        "priorities": {
+          "administration": 2500,
+          "science": 1500,
+          "industry": 2500,
+          "security": 1500,
+          "military": 2000
+        },
+        "debtPrincipal": 0,
+        "annualInterestBp": 600,
+        "creditLimit": 54000
+      },
+      {
+        "polityId": "polity:poland",
+        "taxBurdenBp": 10000,
+        "exemptionBp": 500,
+        "priorities": {
+          "administration": 2500,
+          "science": 1500,
+          "industry": 2500,
+          "security": 1500,
+          "military": 2000
+        },
+        "debtPrincipal": 0,
+        "annualInterestBp": 600,
+        "creditLimit": 30000
+      }
+    ],
+    "capacities": [
+      {
+        "polityId": "polity:austria",
+        "administration": 3,
+        "science": 2,
+        "industry": 3
+      },
+      {
+        "polityId": "polity:czechia",
+        "administration": 4,
+        "science": 2,
+        "industry": 5
+      },
+      {
+        "polityId": "polity:germany",
+        "administration": 4,
+        "science": 2,
+        "industry": 6
+      },
+      {
+        "polityId": "polity:slovakia",
+        "administration": 2,
+        "science": 1,
+        "industry": 3
+      },
+      {
+        "polityId": "polity:france",
+        "administration": 4,
+        "science": 2,
+        "industry": 5
+      },
+      {
+        "polityId": "polity:poland",
+        "administration": 4,
+        "science": 2,
+        "industry": 6
+      }
+    ],
+    "projectTemplates": [
+      {
+        "templateId": "project-template:infrastructure",
+        "displayName": {
+          "en": "Regional infrastructure",
+          "ru": "Региональная инфраструктура"
+        },
+        "kind": "construction",
+        "budgetCategory": "industry",
+        "totalCost": 600,
+        "durationMonths": 3,
+        "capacity": {
+          "kind": "industry",
+          "amount": 2
+        },
+        "effect": {
+          "kind": "infrastructure",
+          "gainBp": 500
+        }
+      },
+      {
+        "templateId": "project-template:tax-administration",
+        "displayName": {
+          "en": "Tax administration reform",
+          "ru": "Реформа налогового управления"
+        },
+        "kind": "reform",
+        "budgetCategory": "administration",
+        "totalCost": 500,
+        "durationMonths": 3,
+        "capacity": {
+          "kind": "administration",
+          "amount": 2
+        },
+        "effect": {
+          "kind": "credit-limit",
+          "amount": 1000
+        }
+      },
+      {
+        "templateId": "project-template:intelligence-assessment",
+        "displayName": {
+          "en": "Intelligence assessment",
+          "ru": "Разведывательная оценка"
+        },
+        "kind": "intelligence",
+        "budgetCategory": "security",
+        "totalCost": 300,
+        "durationMonths": 2,
+        "capacity": {
+          "kind": "administration",
+          "amount": 1
+        },
+        "effect": {
+          "kind": "reveal-intelligence"
+        }
+      }
+    ],
+    "intelligenceFacts": [
+      {
+        "factId": "intel:austria-statecraft-1938",
+        "subjectPolityId": "polity:austria",
+        "domain": "economy",
+        "summary": {
+          "en": "Austria's public debt administration has limited emergency headroom.",
+          "ru": "Управление государственным долгом Австрии имеет ограниченный резерв для чрезвычайных расходов."
+        },
+        "evidenceId": "evidence:scenario-1938-austria-brief"
+      },
+      {
+        "factId": "intel:czechia-statecraft-1938",
+        "subjectPolityId": "polity:czechia",
+        "domain": "war",
+        "summary": {
+          "en": "Czechoslovak border fortifications consume substantial industrial maintenance capacity.",
+          "ru": "Чехословацкие пограничные укрепления требуют значительных промышленных мощностей для обслуживания."
+        },
+        "evidenceId": "evidence:scenario-1938-czechia-brief"
+      },
+      {
+        "factId": "intel:france-statecraft-1938",
+        "subjectPolityId": "polity:france",
+        "domain": "politics",
+        "summary": {
+          "en": "The French cabinet is divided over the cost of new eastern guarantees.",
+          "ru": "Французский кабинет разделён во мнениях о цене новых восточных гарантий."
+        },
+        "evidenceId": "evidence:scenario-1938-france-brief"
+      },
+      {
+        "factId": "intel:germany-statecraft-1938",
+        "subjectPolityId": "polity:germany",
+        "domain": "war",
+        "summary": {
+          "en": "German liquid-fuel reserves are insufficient for a prolonged high-tempo campaign.",
+          "ru": "Германских запасов жидкого топлива недостаточно для длительной кампании высокого темпа."
+        },
+        "evidenceId": "evidence:scenario-1938-germany-brief"
+      },
+      {
+        "factId": "intel:poland-statecraft-1938",
+        "subjectPolityId": "polity:poland",
+        "domain": "war",
+        "summary": {
+          "en": "Poland's east-west rail network has a documented mobilisation bottleneck.",
+          "ru": "Польская железнодорожная сеть восток-запад имеет подтверждённое узкое место для мобилизации."
+        },
+        "evidenceId": "evidence:scenario-1938-poland-brief"
+      },
+      {
+        "factId": "intel:slovakia-statecraft-1938",
+        "subjectPolityId": "polity:slovakia",
+        "domain": "politics",
+        "summary": {
+          "en": "Slovakia's new administration lacks experienced provincial officials.",
+          "ru": "Новой администрации Словакии не хватает опытных провинциальных чиновников."
+        },
+        "evidenceId": "evidence:scenario-1938-slovakia-brief"
+      }
+    ],
+    "knowledgeSeeds": [
+      {
+        "observerPolityId": "polity:austria",
+        "factId": "intel:austria-statecraft-1938",
+        "confidence": "high",
+        "evidenceId": "evidence:scenario-1938-austria-brief",
+        "staleAfterMonths": 24
+      },
+      {
+        "observerPolityId": "polity:czechia",
+        "factId": "intel:czechia-statecraft-1938",
+        "confidence": "high",
+        "evidenceId": "evidence:scenario-1938-czechia-brief",
+        "staleAfterMonths": 24
+      },
+      {
+        "observerPolityId": "polity:france",
+        "factId": "intel:france-statecraft-1938",
+        "confidence": "high",
+        "evidenceId": "evidence:scenario-1938-france-brief",
+        "staleAfterMonths": 24
+      },
+      {
+        "observerPolityId": "polity:germany",
+        "factId": "intel:germany-statecraft-1938",
+        "confidence": "high",
+        "evidenceId": "evidence:scenario-1938-germany-brief",
+        "staleAfterMonths": 24
+      },
+      {
+        "observerPolityId": "polity:poland",
+        "factId": "intel:poland-statecraft-1938",
+        "confidence": "high",
+        "evidenceId": "evidence:scenario-1938-poland-brief",
+        "staleAfterMonths": 24
+      },
+      {
+        "observerPolityId": "polity:slovakia",
+        "factId": "intel:slovakia-statecraft-1938",
+        "confidence": "high",
+        "evidenceId": "evidence:scenario-1938-slovakia-brief",
+        "staleAfterMonths": 24
       }
     ]
   }

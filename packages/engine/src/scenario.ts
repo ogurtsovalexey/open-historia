@@ -11,6 +11,7 @@ import {
   regionIdSchema,
   scenarioIdSchema,
 } from '@open-historia/domain';
+import { authoredStatecraftSchema } from './statecraft.js';
 
 /** Game resource catalog per regional-resource-economy.md §2. Engine-owned. */
 export const RESOURCE_CATALOG = [
@@ -132,6 +133,8 @@ export type EconomyParams = z.infer<typeof economyParamsSchema>;
 export const modulesSchema = z
   .object({
     diplomacy: z.boolean().optional(),
+    finance: z.boolean().optional(),
+    intelligence: z.boolean().optional(),
     projects: z.boolean().optional(),
     budget: z.boolean().optional(),
     trade: z.boolean().optional(),
@@ -141,7 +144,7 @@ export const modulesSchema = z
   .strict();
 export type Modules = z.infer<typeof modulesSchema>;
 
-export const MODULE_NAMES = ['diplomacy', 'projects', 'budget', 'trade', 'shortages', 'unrest'] as const;
+export const MODULE_NAMES = ['diplomacy', 'finance', 'intelligence', 'projects', 'budget', 'trade', 'shortages', 'unrest'] as const;
 export type ModuleName = (typeof MODULE_NAMES)[number];
 
 export const authoredRelationSchema = z.object({
@@ -179,6 +182,8 @@ export const econScenarioSchema = z
     modules: modulesSchema.optional(),
     /** Required only by scenarios that enable executable diplomacy. */
     diplomacy: authoredDiplomacySchema.optional(),
+    /** Authored catalogs and seeds for finance/projects/intelligence. */
+    statecraft: authoredStatecraftSchema.optional(),
     economy: economyParamsSchema,
     polities: z.array(scenarioPolitySchema).min(2),
     regions: z.array(scenarioRegionSchema).min(1),
@@ -194,6 +199,47 @@ export const econScenarioSchema = z
     }
     if (scenario.modules?.diplomacy === true && !scenario.diplomacy) {
       ctx.addIssue({ code: 'custom', message: 'diplomacy module requires authored diplomacy inputs', path: ['diplomacy'] });
+    }
+    if ((scenario.modules?.finance === true || scenario.modules?.intelligence === true) && !scenario.statecraft) {
+      ctx.addIssue({ code: 'custom', message: 'finance/intelligence modules require authored statecraft inputs', path: ['statecraft'] });
+    }
+    if (scenario.statecraft) {
+      const unique = (values: string[], path: (string | number)[]) => {
+        const seen = new Set<string>();
+        for (const value of values) {
+          if (seen.has(value)) ctx.addIssue({ code: 'custom', message: `duplicate statecraft id ${value}`, path });
+          seen.add(value);
+        }
+      };
+      unique(scenario.statecraft.finance.map((entry) => entry.polityId), ['statecraft', 'finance']);
+      unique(scenario.statecraft.capacities.map((entry) => entry.polityId), ['statecraft', 'capacities']);
+      unique(scenario.statecraft.projectTemplates.map((entry) => entry.templateId), ['statecraft', 'projectTemplates']);
+      unique(scenario.statecraft.intelligenceFacts.map((entry) => entry.factId), ['statecraft', 'intelligenceFacts']);
+      if (scenario.modules?.finance === true && scenario.statecraft.finance.length !== polityIds.size) {
+        ctx.addIssue({ code: 'custom', message: 'finance module requires exactly one finance row per polity', path: ['statecraft', 'finance'] });
+      }
+      if (scenario.modules?.projects === true && scenario.statecraft.capacities.length !== polityIds.size) {
+        ctx.addIssue({ code: 'custom', message: 'projects module requires exactly one capacity row per polity', path: ['statecraft', 'capacities'] });
+      }
+      for (const [index, entry] of scenario.statecraft.finance.entries()) {
+        if (!polityIds.has(entry.polityId)) ctx.addIssue({ code: 'custom', message: `unknown finance polity ${entry.polityId}`, path: ['statecraft', 'finance', index, 'polityId'] });
+      }
+      for (const [index, entry] of scenario.statecraft.capacities.entries()) {
+        if (!polityIds.has(entry.polityId)) ctx.addIssue({ code: 'custom', message: `unknown capacity polity ${entry.polityId}`, path: ['statecraft', 'capacities', index, 'polityId'] });
+      }
+      const factIds = new Set(scenario.statecraft.intelligenceFacts.map((entry) => entry.factId));
+      for (const [index, fact] of scenario.statecraft.intelligenceFacts.entries()) {
+        if (!polityIds.has(fact.subjectPolityId)) ctx.addIssue({ code: 'custom', message: `unknown intelligence subject ${fact.subjectPolityId}`, path: ['statecraft', 'intelligenceFacts', index, 'subjectPolityId'] });
+      }
+      for (const [index, seed] of scenario.statecraft.knowledgeSeeds.entries()) {
+        if (!polityIds.has(seed.observerPolityId) || !factIds.has(seed.factId)) {
+          ctx.addIssue({ code: 'custom', message: 'knowledge seed must reference a known observer and fact', path: ['statecraft', 'knowledgeSeeds', index] });
+        }
+        const fact = scenario.statecraft.intelligenceFacts.find((entry) => entry.factId === seed.factId);
+        if (fact && fact.evidenceId !== seed.evidenceId) {
+          ctx.addIssue({ code: 'custom', message: 'knowledge seed evidence must match authored fact evidence', path: ['statecraft', 'knowledgeSeeds', index, 'evidenceId'] });
+        }
+      }
     }
     if (scenario.diplomacy) {
       const relationPairs = new Set<string>();

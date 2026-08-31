@@ -35,7 +35,10 @@ test('strategic diplomacy batch is bounded, deterministic and contains no full m
   assert.equal(first.polityIds.length, 5);
   assert.ok(first.characterCount <= MAX_BATCH_BRIEF_CHARS);
   assert.equal(JSON.stringify(first).includes('geometry'), false);
-  assert.equal(JSON.stringify(first).includes('regionId'), false);
+  assert.ok((JSON.stringify(first).match(/regionId/g) ?? []).length <= 15);
+  assert.equal(JSON.stringify(first).includes('truths'), false);
+  assert.equal(JSON.stringify(first).includes('liquid-fuel reserves'), false);
+  assert.ok(first.briefs.every((brief) => brief.projectRegionCandidates.length <= 3));
   assert.equal(buildDiplomacyBatch(initial(), 'polity:austria'), null);
 });
 
@@ -56,6 +59,18 @@ test('strategic diplomacy validation requires one bound decision per polity', ()
     },
   };
   assert.throws(() => validateDiplomacyBatch(wrongActor, batch), /actor mismatch/);
+
+  const policy: { decisions: Array<Record<string, unknown>> } = structuredClone(holds);
+  policy.decisions[0] = {
+    polityId: batch.polityIds[0]!, intent: 'set-policy', rationale: 'Rebalance public spending.',
+    command: {
+      kind: 'finance.set-policy', commandId: '00000000-0000-4000-8000-000000000002',
+      actorPolityId: batch.polityIds[0]!, expectedRevision: state.revision, effectiveMonth: state.month,
+      taxBurdenBp: 10000, exemptionBp: 500,
+      priorities: { administration: 2500, science: 1500, industry: 2500, security: 1500, military: 2000 },
+    },
+  };
+  assert.equal(validateDiplomacyBatch(policy, batch).decisions[0]?.intent, 'set-policy');
 });
 
 test('bounded briefs and batches never include the full map', () => {

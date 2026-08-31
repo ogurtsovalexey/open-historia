@@ -15,6 +15,7 @@ import {
   worldRevisionIdSchema,
 } from '@open-historia/domain';
 import { agreementIdSchema, negotiationTermsSchema, proposalIdSchema } from './diplomacy.js';
+import { budgetPrioritiesSchema, intelligenceFactIdSchema, projectIdSchema, projectTemplateIdSchema } from './statecraft.js';
 
 export const investInRegionCommandSchema = z
   .object({
@@ -102,6 +103,64 @@ export const diplomacyCommandSchema = z.discriminatedUnion('kind', [
   terminateAgreementCommandSchema,
 ]);
 
+const statecraftCommandFields = {
+  commandId: commandIdSchema,
+  actorPolityId: polityIdSchema,
+  expectedRevision: worldRevisionIdSchema.optional(),
+  effectiveMonth: gameDateSchema,
+};
+
+export const setFinancePolicyCommandSchema = z.object({
+  kind: z.literal('finance.set-policy'), ...statecraftCommandFields,
+  taxBurdenBp: z.number().int().min(5000).max(15000),
+  exemptionBp: z.number().int().min(0).max(5000),
+  priorities: budgetPrioritiesSchema,
+}).strict();
+
+export const issueBondsCommandSchema = z.object({
+  kind: z.literal('finance.issue-bonds'), ...statecraftCommandFields,
+  amount: z.number().int().positive(),
+}).strict();
+
+export const restructureDebtCommandSchema = z.object({
+  kind: z.literal('finance.restructure'), ...statecraftCommandFields,
+}).strict();
+
+export const startProjectCommandSchema = z.object({
+  kind: z.literal('project.start'), ...statecraftCommandFields,
+  projectId: projectIdSchema,
+  templateId: projectTemplateIdSchema,
+  targetPolityId: polityIdSchema.optional(),
+  targetRegionId: regionIdSchema.optional(),
+  targetFactId: intelligenceFactIdSchema.optional(),
+  monthlyFunding: z.number().int().positive(),
+  priority: z.number().int().min(1).max(5),
+}).strict();
+
+export const updateProjectCommandSchema = z.object({
+  kind: z.literal('project.update'), ...statecraftCommandFields,
+  projectId: projectIdSchema,
+  monthlyFunding: z.number().int().positive(),
+  priority: z.number().int().min(1).max(5),
+}).strict();
+
+export const cancelProjectCommandSchema = z.object({
+  kind: z.literal('project.cancel'), ...statecraftCommandFields,
+  projectId: projectIdSchema,
+}).strict();
+
+export type StatecraftCommand = z.infer<typeof setFinancePolicyCommandSchema>
+  | z.infer<typeof issueBondsCommandSchema>
+  | z.infer<typeof restructureDebtCommandSchema>
+  | z.infer<typeof startProjectCommandSchema>
+  | z.infer<typeof updateProjectCommandSchema>
+  | z.infer<typeof cancelProjectCommandSchema>;
+
+export const statecraftCommandSchema = z.discriminatedUnion('kind', [
+  setFinancePolicyCommandSchema, issueBondsCommandSchema, restructureDebtCommandSchema,
+  startProjectCommandSchema, updateProjectCommandSchema, cancelProjectCommandSchema,
+]);
+
 export const econCommandSchema = z.discriminatedUnion('kind', [
   investInRegionCommandSchema,
   transferRegionCommandSchema,
@@ -109,6 +168,12 @@ export const econCommandSchema = z.discriminatedUnion('kind', [
   counterNegotiationCommandSchema,
   respondNegotiationCommandSchema,
   terminateAgreementCommandSchema,
+  setFinancePolicyCommandSchema,
+  issueBondsCommandSchema,
+  restructureDebtCommandSchema,
+  startProjectCommandSchema,
+  updateProjectCommandSchema,
+  cancelProjectCommandSchema,
 ]);
 export type EconCommand = z.infer<typeof econCommandSchema>;
 
@@ -143,6 +208,11 @@ export const REJECTION_REASONS = [
   'invalid-terms',
   'duplicate-agreement',
   'route-unavailable',
+  'unknown-project',
+  'unknown-template',
+  'unknown-fact',
+  'invalid-target',
+  'credit-limit',
 ] as const;
 export type RejectionReason = (typeof REJECTION_REASONS)[number];
 

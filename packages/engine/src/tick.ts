@@ -5,7 +5,7 @@
  * uses no randomness, no wall clock, no I/O.
  */
 import type { PolityId, RegionId, WorldRevisionId } from '@open-historia/domain';
-import type { CommandRejection, DiplomacyCommand, EconCommand, TurnCommandsFile } from './commands.js';
+import type { CommandRejection, DiplomacyCommand, EconCommand, StatecraftCommand, TurnCommandsFile } from './commands.js';
 import {
   ANNUAL_BP_MONTHLY_DIVISOR,
   BP_SCALE,
@@ -35,9 +35,12 @@ import { addMonth } from './state.js';
 import { stateChecksum } from './canonical.js';
 import { resolveDiplomacyPhase } from './diplomacyReducer.js';
 import type { DiplomacyEngineEvent } from './diplomacyReducer.js';
+import { applyStatecraftCommands, effectiveTax, resolveStatecraftMonth } from './statecraftReducer.js';
+import type { StatecraftEngineEvent } from './statecraftReducer.js';
 
 export type EngineEvent =
   DiplomacyEngineEvent
+  | StatecraftEngineEvent
   | { type: 'command-rejected'; commandId: string; reason: CommandRejection['reason']; detail: string }
   | { type: 'region-transferred'; regionId: RegionId; fromPolityId: PolityId; toPolityId: PolityId; population: number }
   | { type: 'investment-applied'; polityId: PolityId; regionId: RegionId; spend: number; infrastructureGainBp: number; infrastructureBp: number }
@@ -64,7 +67,7 @@ interface MutablePolity {
   stock: Map<ResourceId, number>;
 }
 
-type EconomyPhaseCommand = Exclude<EconCommand, DiplomacyCommand>;
+type EconomyPhaseCommand = Exclude<EconCommand, DiplomacyCommand | StatecraftCommand>;
 
 /**
  * Capacity-side output before material inputs (rre §5).
@@ -110,6 +113,15 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
     );
   }
 
+  const statecraftCommands = commandsFile.commands.filter((command): command is StatecraftCommand =>
+    command.kind.startsWith('finance.') || command.kind.startsWith('project.'));
+  const statecraftCommandPhase = applyStatecraftCommands(state, statecraftCommands, polities, regions);
+  events.push(...statecraftCommandPhase.events);
+  for (const rejection of statecraftCommandPhase.rejections) {
+    rejections.push(rejection);
+    events.push({ type: 'command-rejected', commandId: rejection.command.commandId, reason: rejection.reason, detail: rejection.detail });
+  }
+
   const diplomacyCommands = commandsFile.commands.filter((command): command is DiplomacyCommand =>
     command.kind.startsWith('diplomacy.'));
   const diplomacyPhase = resolveDiplomacyPhase(state, diplomacyCommands, polities);
@@ -132,7 +144,8 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
       .filter((region) => region.activity.kind === 'processing' && projectedController.get(region.regionId) === polityId)
       .map((region) => region.regionId);
 
-  const economyCommands = commandsFile.commands.filter((entry): entry is EconomyPhaseCommand => !entry.kind.startsWith('diplomacy.'));
+  const economyCommands = commandsFile.commands.filter((entry): entry is EconomyPhaseCommand =>
+    entry.kind === 'economy.invest-region' || entry.kind === 'territory.transfer-region');
   for (const command of economyCommands) {
     const reject = (reason: CommandRejection['reason'], detail: string) => {
       rejections.push({ command, reason, detail });
@@ -418,9 +431,10 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   }
 
   // ---- 9. Tax revenue on this month's regional output; update treasuries.
-  const taxByPolity = new Map<PolityId, { total: number; rows: TaxRow[] }>();
+  const taxByPolity = new Map<PolityId, { base: number; total: number; rows: TaxRow[] }>();
   for (const polity of polities) {
     const rows: TaxRow[] = [];
+    let base = 0;
     let total = 0;
     const byResource = production.get(polity.id);
     if (byResource) {
@@ -429,15 +443,38 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
         if (!params) throw new Error(`no authored params for produced resource ${resource}`);
         for (const row of byResource.get(resource)!) {
           const value = addChecked(row.amount * params.accountingValue, 0, 'taxable value');
-          const tax = applyBp(value, params.taxRateBp, `tax ${row.regionId}/${resource}`);
+          const baseTax = applyBp(value, params.taxRateBp, `tax ${row.regionId}/${resource}`);
+          const tax = effectiveTax(baseTax, statecraftCommandPhase.finance, polity.id);
           rows.push({ regionId: row.regionId, resource, amount: tax });
+          base = addChecked(base + baseTax, 0, 'base tax total');
           total = addChecked(total + tax, 0, 'tax total');
         }
       }
     }
     polity.treasury = addChecked(polity.treasury + total, 0, `treasury ${polity.id}`);
-    taxByPolity.set(polity.id, { total, rows });
+    taxByPolity.set(polity.id, { base, total, rows });
     events.push({ type: 'tax-collected', polityId: polity.id, amount: total });
+  }
+
+  const statecraftPhase = resolveStatecraftMonth(
+    state,
+    statecraftCommandPhase.finance,
+    statecraftCommandPhase.projects,
+    statecraftCommandPhase.intelligence,
+    statecraftCommandPhase.flows,
+    polities,
+    regions,
+    new Map([...taxByPolity].map(([id, value]) => [id, value.base])),
+    new Map([...taxByPolity].map(([id, value]) => [id, value.total])),
+  );
+  events.push(...statecraftPhase.events);
+  for (const penalty of statecraftPhase.trustPenalties) {
+    for (const relation of diplomacyPhase.diplomacy?.relations ?? []) {
+      if (relation.polities.includes(penalty.polityId)) {
+        relation.trust = Math.max(0, relation.trust + penalty.delta);
+        relation.updatedMonth = state.month;
+      }
+    }
   }
 
   // ---- 10. Assemble next state, ledger; verify identities; commit revision.
@@ -445,6 +482,9 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
     ...state,
     ...(diplomacyPhase.diplomacy ? { diplomacy: diplomacyPhase.diplomacy } : {}),
     ...(diplomacyPhase.trade ? { trade: diplomacyPhase.trade } : {}),
+    ...(statecraftPhase.finance ? { finance: statecraftPhase.finance } : {}),
+    ...(statecraftPhase.projects ? { projects: statecraftPhase.projects } : {}),
+    ...(statecraftPhase.intelligence ? { intelligence: statecraftPhase.intelligence } : {}),
     month: addMonth(state.month),
     turn: state.turn + 1,
     polities: polities.map((polity) => ({
@@ -518,6 +558,10 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
         food,
         treasuryOpening: openingTreasury.get(id)!,
         treasuryClosing: polityById.get(id)!.treasury,
+        ...(statecraftPhase.finance ? {
+          finance: statecraftPhase.financeRecords.find((record) => record.polityId === id),
+          projectSpend: statecraftPhase.allocations.filter((allocation) => allocation.polityId === id).reduce((sum, allocation) => sum + allocation.spent, 0),
+        } : {}),
         ...(state.trade ? {
           treasuryTradeNet: diplomacyPhase.treasuryTransfers.reduce((sum, transfer) =>
             sum + (transfer.toPolityId === id ? transfer.amount : 0) - (transfer.fromPolityId === id ? transfer.amount : 0), 0),
@@ -536,6 +580,9 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
         resourceTransfers: diplomacyPhase.resourceTransfers,
         treasuryTransfers: diplomacyPhase.treasuryTransfers,
       },
+    } : {}),
+    ...((statecraftPhase.finance || statecraftPhase.projects) ? {
+      statecraft: { finance: statecraftPhase.financeRecords, projectAllocations: statecraftPhase.allocations },
     } : {}),
   };
 
