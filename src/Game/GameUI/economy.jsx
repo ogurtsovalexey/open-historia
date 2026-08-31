@@ -12,16 +12,32 @@ const COPY = {
   en: {
     date: "Date", round: "Round", revision: "Session revision", selected: "Selected region",
     click: "click the map", controller: "Controller", foreign: "Foreign region — view only",
-    invest: "Queue investment", queued: "Investment queued for the next time jump",
+    invest: "Queue investment", investIn: "Invest in", queued: "Investment queued for the next time jump",
     report: "Last economic report", why: "Why changed", loading: "Loading economy…",
-    unavailable: "This game does not use the deterministic economy engine.",
+    unavailable: "This game does not use the deterministic economy engine.", failedLoad: "Failed to load",
+    activity: "Activity", population: "Population", changeLastMonth: "Change last month",
+    infrastructure: "Infrastructure", damage: "Damage", capacity: "Capacity", outputLastMonth: "Output last month",
+    treasury: "Treasury", food: "Food", goods: "Goods", stockpile: "National stockpile",
+    commandRejected: "Command rejected", births: "births", deaths: "deaths", workforceRate: "workforce rate",
+    outputPerWorker: "output per worker", taxRevenue: "tax revenue", spending: "spending", tax: "tax",
+    shortfall: "shortfall", surplus: "surplus", of: "of", limitedBy: "limited by", capacityLimited: "capacity limited",
+    invalidSpend: "Spend must be a positive whole number.", basicGoods: "basic goods",
+    resources: { coal: "coal", food: "food", goods: "goods", iron: "iron", wood: "wood" },
   },
   ru: {
     date: "Дата", round: "Ход", revision: "Ревизия сессии", selected: "Выбранный регион",
     click: "нажмите на карту", controller: "Контролирующая страна", foreign: "Чужой регион — только просмотр",
-    invest: "Запланировать инвестицию", queued: "Инвестиция запланирована на следующий переход времени",
+    invest: "Запланировать инвестицию", investIn: "Инвестиции в", queued: "Инвестиция запланирована на следующий переход времени",
     report: "Последний экономический отчёт", why: "Причины изменений", loading: "Загрузка экономики…",
-    unavailable: "Эта игра не использует детерминированный экономический движок.",
+    unavailable: "Эта игра не использует детерминированный экономический движок.", failedLoad: "Не удалось загрузить",
+    activity: "Деятельность", population: "Население", changeLastMonth: "Изменение за прошлый месяц",
+    infrastructure: "Инфраструктура", damage: "Ущерб", capacity: "Мощность", outputLastMonth: "Выпуск за прошлый месяц",
+    treasury: "Казна", food: "Продовольствие", goods: "Товары", stockpile: "Национальные запасы",
+    commandRejected: "Команда отклонена", births: "родилось", deaths: "умерло", workforceRate: "доля рабочей силы",
+    outputPerWorker: "выпуск на работника", taxRevenue: "налоговые поступления", spending: "расходы", tax: "налог",
+    shortfall: "дефицит", surplus: "излишек", of: "из", limitedBy: "ограничено ресурсами", capacityLimited: "ограничено мощностью",
+    invalidSpend: "Сумма должна быть положительным целым числом.", basicGoods: "базовые товары",
+    resources: { coal: "уголь", food: "продовольствие", goods: "товары", iron: "железо", wood: "древесина" },
   },
 };
 
@@ -96,6 +112,9 @@ const Reasons = ({ lines, label = "Why changed" }) => {
 };
 
 const shortRegion = (regionId) => String(regionId || "").split(":").pop();
+const localizedName = (entity, locale, fallback) =>
+  entity?.displayName?.[locale] ?? entity?.displayName?.en ?? fallback;
+const localizedResource = (resource, text) => text.resources?.[resource] ?? resource;
 
 /**
  * Deterministic economy for the engine-driven scenario. Every number here comes
@@ -110,7 +129,8 @@ const EconomyPane = ({ active }) => {
   const [engineDriven, setEngineDriven] = useState(null);
   const [gameId, setGameId] = useState("");
   const [queued, setQueued] = useState(false);
-  const text = COPY[getStoredLanguage()] ?? COPY.en;
+  const locale = getStoredLanguage();
+  const text = COPY[locale] ?? COPY.en;
 
   const load = useCallback(async () => {
     try {
@@ -205,7 +225,7 @@ const EconomyPane = ({ active }) => {
     if (!snapshot || !selectedRegion || !controller || selectedRegion.controllerId !== snapshot.playerPolityId) return;
     const amount = Number(spend);
     if (!Number.isInteger(amount) || amount <= 0) {
-      setError("Spend must be a positive whole number.");
+      setError(text.invalidSpend);
       return;
     }
     try {
@@ -236,7 +256,7 @@ const EconomyPane = ({ active }) => {
   if (!snapshot) {
     return (
       <div style={{ padding: 16, color: COLORS.dim, fontSize: 13 }}>
-        {error ? `Failed to load: ${error}` : text.loading}
+        {error ? `${text.failedLoad}: ${error}` : text.loading}
       </div>
     );
   }
@@ -281,7 +301,7 @@ const EconomyPane = ({ active }) => {
             marginBottom: 6,
           }}
         >
-          <b>Command rejected:</b> {rejection.reason} — {rejection.detail}
+          <b>{text.commandRejected}:</b> {rejection.reason} — {rejection.detail}
         </div>
       ))}
       {alerts.map((alert, index) => (
@@ -305,40 +325,40 @@ const EconomyPane = ({ active }) => {
           right={selectedMapRegion ? mapIdByEngineId.get(selectedRegion.regionId) : text.click}
         >
           <div data-testid="economy-selected-region" style={{ fontSize: 15, fontWeight: 650, marginBottom: 4 }}>
-            {selectedRegion.displayName?.en ?? shortRegion(selectedRegion.regionId)}
+            {localizedName(selectedRegion, locale, shortRegion(selectedRegion.regionId))}
           </div>
           <Row
-            label="Activity"
+            label={text.activity}
             value={
               selectedRegion.activity.kind === "extraction"
-                ? selectedRegion.activity.resource
-                : selectedRegion.activity.activity
+                ? localizedResource(selectedRegion.activity.resource, text)
+                : selectedRegion.activity.activity === "basic_goods" ? text.basicGoods : selectedRegion.activity.activity
             }
           />
-          <Row label="Population" value={fmt(selectedRegion.population)} />
+          <Row label={text.population} value={fmt(selectedRegion.population)} />
           {populationRow ? (
             <Row
-              label="Change last month"
+              label={text.changeLastMonth}
               value={`${signed(populationRow.births - populationRow.deaths)}`}
               tone={populationRow.births - populationRow.deaths >= 0 ? COLORS.good : COLORS.bad}
             />
           ) : null}
-          <Row label="Infrastructure" value={bp(selectedRegion.infrastructureBp)} />
+          <Row label={text.infrastructure} value={bp(selectedRegion.infrastructureBp)} />
           <Row
-            label="Damage"
+            label={text.damage}
             value={selectedRegion.damageBp ? bp(selectedRegion.damageBp) : "—"}
             tone={selectedRegion.damageBp ? COLORS.bad : undefined}
           />
-          <Row label="Capacity" value={fmt(selectedRegion.baseMonthlyCapacity)} />
+          <Row label={text.capacity} value={fmt(selectedRegion.baseMonthlyCapacity)} />
           <Row
-            label="Output last month"
-            value={regionProduction ? `${fmt(regionProduction.amount)} ${regionProduction.resource}` : "—"}
+            label={text.outputLastMonth}
+            value={regionProduction ? `${fmt(regionProduction.amount)} ${localizedResource(regionProduction.resource, text)}` : "—"}
           />
           {populationRow ? (
             <Reasons label={text.why}
               lines={[
-                `births +${fmt(populationRow.births)}, deaths −${fmt(populationRow.deaths)}`,
-                `workforce rate ${bp(selectedRegion.workforceRateBp)}, output per worker ${fmt(
+                `${text.births} +${fmt(populationRow.births)}, ${text.deaths} −${fmt(populationRow.deaths)}`,
+                `${text.workforceRate} ${bp(selectedRegion.workforceRateBp)}, ${text.outputPerWorker} ${fmt(
                   selectedRegion.outputPerWorker
                 )}`,
               ]}
@@ -348,15 +368,18 @@ const EconomyPane = ({ active }) => {
       ) : null}
 
       {controller ? (
-        <Section title={text.controller} right={link?.polityOwnerNames?.[controller.id] ?? ""}>
+        <Section
+          title={text.controller}
+          right={localizedName(controller, locale, link?.polityOwnerNames?.[controller.id] ?? "")}
+        >
           <div style={{ fontSize: 15, fontWeight: 650, marginBottom: 4 }}>
-            {controller.displayName?.en ?? controller.id}
+            {localizedName(controller, locale, controller.id)}
           </div>
-          <Row label="Treasury (gold)" value={fmt(controller.treasury)} />
+          <Row label={text.treasury} value={fmt(controller.treasury)} />
           {controllerLedger ? (
             <>
               <Row
-                label="Change last month"
+                label={text.changeLastMonth}
                 value={signed(controllerLedger.treasuryClosing - controllerLedger.treasuryOpening)}
                 tone={
                   controllerLedger.treasuryClosing - controllerLedger.treasuryOpening >= 0
@@ -366,32 +389,32 @@ const EconomyPane = ({ active }) => {
               />
               <Reasons label={text.why}
                 lines={[
-                  `tax revenue +${fmt(controllerLedger.taxTotal)}`,
-                  `spending −${fmt(controllerLedger.investment?.spend ?? 0)}`,
+                  `${text.taxRevenue} +${fmt(controllerLedger.taxTotal)}`,
+                  `${text.spending} −${fmt(controllerLedger.investment?.spend ?? 0)}`,
                   ...controllerLedger.taxByRegion.map(
-                    (tax) => `tax ${shortRegion(tax.regionId)} (${tax.resource}): +${fmt(tax.amount)}`
+                    (tax) => `${text.tax} ${shortRegion(tax.regionId)} (${localizedResource(tax.resource, text)}): +${fmt(tax.amount)}`
                   ),
                 ]}
               />
-              <Row label="Population" value={fmt(controllerLedger.populationClosing)} />
+              <Row label={text.population} value={fmt(controllerLedger.populationClosing)} />
               <Row
-                label="Food"
+                label={text.food}
                 value={
                   controllerLedger.food.shortfall > 0
-                    ? `shortfall ${fmt(controllerLedger.food.shortfall)}`
-                    : `surplus ${fmt(controllerLedger.food.surplus)}`
+                    ? `${text.shortfall} ${fmt(controllerLedger.food.shortfall)}`
+                    : `${text.surplus} ${fmt(controllerLedger.food.surplus)}`
                 }
                 tone={controllerLedger.food.shortfall > 0 ? COLORS.bad : COLORS.good}
               />
               {controllerLedger.goods ? (
                 <Row
-                  label="Goods"
-                  value={`${fmt(controllerLedger.goods.actual)} of ${fmt(
+                  label={text.goods}
+                  value={`${fmt(controllerLedger.goods.actual)} ${text.of} ${fmt(
                     controllerLedger.goods.potential
                   )} — ${
                     controllerLedger.goods.limitedBy === "inputs"
-                      ? `limited by ${controllerLedger.goods.limitingInputs.join(" + ")}`
-                      : "capacity limited"
+                      ? `${text.limitedBy}: ${controllerLedger.goods.limitingInputs.map((resource) => localizedResource(resource, text)).join(" + ")}`
+                      : text.capacityLimited
                   }`}
                   tone={controllerLedger.goods.limitedBy === "inputs" ? COLORS.warn : undefined}
                 />
@@ -402,14 +425,14 @@ const EconomyPane = ({ active }) => {
       ) : null}
 
       {controller ? (
-        <Section title="National stockpile">
+        <Section title={text.stockpile}>
           {controller.stockpile.map((entry) => {
             const movement = movements.get(entry.resource);
             const used = movement ? movement.processingUse + movement.populationUse : 0;
             return (
               <Row
                 key={entry.resource}
-                label={entry.resource}
+                label={localizedResource(entry.resource, text)}
                 value={
                   movement
                     ? `${fmt(entry.amount)}   (${signed(movement.produced)} / −${fmt(used)})`
@@ -422,7 +445,7 @@ const EconomyPane = ({ active }) => {
       ) : null}
 
       {selectedRegion && controller && selectedRegion.controllerId === snapshot.playerPolityId ? (
-        <Section title={`Invest in ${selectedRegion.displayName?.en ?? shortRegion(selectedRegion.regionId)}`}>
+        <Section title={`${text.investIn} ${localizedName(selectedRegion, locale, shortRegion(selectedRegion.regionId))}`}>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <input
               type="number"
@@ -437,7 +460,7 @@ const EconomyPane = ({ active }) => {
             </button>
           </div>
           <div style={{ color: COLORS.dim, marginTop: 6, fontSize: 12 }}>
-            Infrastructure {bp(selectedRegion.infrastructureBp)} →{" "}
+            {text.infrastructure} {bp(selectedRegion.infrastructureBp)} →{" "}
             {bp(
               Math.min(
                 10000,
@@ -445,7 +468,7 @@ const EconomyPane = ({ active }) => {
                   Number(spend) * (snapshot.economy?.infrastructureBpPerMoney ?? 0)
               )
             )}
-            . Treasury {fmt(controller.treasury)} → {fmt(controller.treasury - Number(spend))}.
+            . {text.treasury} {fmt(controller.treasury)} → {fmt(controller.treasury - Number(spend))}.
           </div>
           {queued ? <div style={{ color: COLORS.good, marginTop: 6 }}>{text.queued}</div> : null}
         </Section>

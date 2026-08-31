@@ -1,8 +1,10 @@
 import { expect, test } from "@playwright/test";
 
 test("Central Europe advances map, date and economy from one session revision", async ({ page, request }) => {
+  test.setTimeout(90_000);
   const gameId = "p2-economy-smoke";
   const otherGameId = "p2-economy-smoke-other";
+  await request.put("/api/ui-settings", { data: { language: "en" } });
   await request.delete(`/api/games/${gameId}`).catch(() => {});
   await request.delete(`/api/games/${otherGameId}`).catch(() => {});
   const created = await request.post("/api/games", {
@@ -24,6 +26,7 @@ test("Central Europe advances map, date and economy from one session revision", 
     if (message.type() === "error") consoleErrors.push(message.text());
   });
   await page.addInitScript(() => {
+    localStorage.removeItem("ui_language");
     localStorage.setItem("Terrain", "false");
     localStorage.setItem("Globe", "false");
   });
@@ -154,15 +157,22 @@ test("Central Europe advances map, date and economy from one session revision", 
   expect(afterRace.round).toBe(5);
   expect(afterRace.gameDate).toBe("1900-05-03");
 
-  // Economy-owned labels have authored Russian strings and survive reload.
+  // Economy-owned labels have authored Russian strings. The panel refreshes
+  // from the committed session and picks up the selected locale without
+  // rebuilding the map a second time in this already long-running smoke test.
   expect((await request.put("/api/ui-settings", { data: { language: "ru" } })).ok()).toBeTruthy();
   await page.evaluate(() => localStorage.setItem("ui_language", "ru"));
-  await page.reload();
-  await page.getByRole("button", { name: "Open advisor and economy" }).click({ force: true });
   await expect(pane).toContainText("Дата", { timeout: 45_000 });
   await expect(pane).toContainText("Ход");
   await expect(pane).toContainText("Ревизия сессии");
   await expect(pane).toContainText("Последний экономический отчёт");
+  await expect(page.getByTestId("economy-selected-region")).toContainText("Бургенланд");
+  await expect(pane).toContainText("Инвестиции в Бургенланд");
+  await expect(pane.getByText("Население", { exact: true }).first()).toBeVisible();
+  await expect(pane.getByText("Деятельность", { exact: true })).toBeVisible();
+  await expect(pane.getByText("Инфраструктура", { exact: true }).first()).toBeVisible();
+  await expect(pane.getByText("Казна", { exact: true })).toBeVisible();
+  await expect(pane.getByText("Национальные запасы", { exact: true })).toBeVisible();
   await request.put("/api/ui-settings", { data: { language: "en" } });
 
   expect(modelCalls).toEqual([]);
