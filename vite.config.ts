@@ -65,6 +65,7 @@ const dropMapBinaries = (isWeb) => {
 // always agree. A plain timestamp is enough — it only ever has to differ from the last
 // deploy and compare as "newer".
 const WEB_BUILD_ID = String(Date.now())
+const API_PROXY_TARGET = process.env.OH_API_PROXY_TARGET || 'http://localhost:3000'
 
 // Emits version.json into the web build output. Deployed as /play/version.json (the
 // assemble step copies dist-web wholesale), which is what the update banner polls.
@@ -119,10 +120,10 @@ export default defineConfig(({ mode }) => ({
       // Rewrite Host/Origin at the trusted local dev boundary so the server's
       // CSRF guard recognises Vite-proxied writes as same-origin gameplay.
       '/api': {
-        target: 'http://localhost:3000',
+        target: API_PROXY_TARGET,
         changeOrigin: true,
         configure(proxy) {
-          proxy.on('proxyReq', (proxyReq) => proxyReq.setHeader('Origin', 'http://localhost:3000'))
+          proxy.on('proxyReq', (proxyReq) => proxyReq.setHeader('Origin', API_PROXY_TARGET))
         },
       },
     },

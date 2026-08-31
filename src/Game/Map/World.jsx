@@ -163,6 +163,7 @@ const buildWorldStyle = (basemapId, customBg, backgroundDeclared, isGlobe) => {
 
 function World({ mapRef, projection, terrainEnabled, onInitialIdle }) {
   const hasReportedInitialIdleRef = useRef(false);
+  const regionClickHandlerRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const loadTimerRef = useRef(null);
   // A scenario may open the camera over its own territory; without it the world
@@ -233,6 +234,9 @@ function World({ mapRef, projection, terrainEnabled, onInitialIdle }) {
     setLoading(true);
     clearTimeout(loadTimerRef.current);
     loadTimerRef.current = setTimeout(() => setLoading(false), 8000);
+  }, []);
+  const handleMapClick = useCallback((event) => {
+    regionClickHandlerRef.current?.(event);
   }, []);
 
   return (
@@ -317,8 +321,9 @@ function World({ mapRef, projection, terrainEnabled, onInitialIdle }) {
         onIdle={handleIdle}
         onLoading={handleLoading}
         onMove={handleMove}
+        onClick={handleMapClick}
       >
-        <Nations isGlobe={isGlobe} />
+        <Nations isGlobe={isGlobe} regionClickHandlerRef={regionClickHandlerRef} />
         <Cities />
         <MarkersLayer />
         <Units />

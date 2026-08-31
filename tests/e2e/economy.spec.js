@@ -64,15 +64,20 @@ test("Central Europe advances map, date and economy from one session revision", 
   }));
   expect((await (await request.get(`/api/games/${gameId}/economy/state`)).json()).sessionRevision).toBe(initial.sessionRevision);
   await expect(page.getByTestId("economy-invest")).toBeVisible();
-  await page.evaluate(async () => {
-    const { onRegionSelected } = await import("/src/Game/Selection/Regions.jsx");
-    onRegionSelected({
-      id: "CZE.11_1", GID_1: "CZE.11_1", GID_0: "CZE", gid0: "CZE",
-      COUNTRY: "Czechia", NAME_1: "Prague", owner: "Czechia", lngLat: { lng: 14.4, lat: 50.1 },
-    });
-  });
+  // Exercise the real pointer path. At the scenario's fixed 1280×720 start
+  // view this point is inside Czechia and outside the right-hand drawer.
+  await page.locator("canvas.maplibregl-canvas").click({ position: { x: 780, y: 400 } });
   await expect(pane).toContainText("Foreign region — view only");
   await expect(page.getByTestId("economy-invest")).toHaveCount(0);
+
+  await page.locator("canvas.maplibregl-canvas").click({ position: { x: 720, y: 570 } });
+  await expect(page.getByTestId("economy-invest")).toBeVisible();
+  const investedRegionName = await page.getByTestId("economy-selected-region").textContent();
+  const investedInitial = initial.regions.find((region) => region.displayName.en === investedRegionName);
+  expect(investedInitial?.controllerId).toBe(initial.playerPolityId);
+  await pane.locator('input[type="number"]').fill("100");
+  await page.getByTestId("economy-invest").click();
+  await expect(pane).toContainText("Investment queued for the next time jump");
 
   await page.getByRole("button", { name: "»" }).click();
   await page.getByRole("button", { name: "2/1/1900 1 month" }).click();
@@ -82,6 +87,8 @@ test("Central Europe advances map, date and economy from one session revision", 
   expect(advanced.actualMonthlyTicks).toBe(1);
   expect(advanced.sessionRevision).not.toBe(initial.sessionRevision);
   expect(advanced.revision).not.toBe(initial.revision);
+  expect(advanced.regions.find((region) => region.regionId === investedInitial.regionId)?.infrastructureBp)
+    .toBe(investedInitial.infrastructureBp + 100);
   const otherAfterAdvance = await (await request.get(`/api/games/${otherGameId}/economy/state`)).json();
   expect(otherAfterAdvance.sessionRevision).toBe(otherInitial.sessionRevision);
   expect(otherAfterAdvance.gameDate).toBe(otherInitial.gameDate);

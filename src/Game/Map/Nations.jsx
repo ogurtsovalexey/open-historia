@@ -454,7 +454,7 @@ const buildOwnerLabelCollection = (regionsFC, overrides, polityOverrides, nameRe
 };
 
 
-const WorldMap = ({ isGlobe = false }) => {
+const WorldMap = ({ isGlobe = false, regionClickHandlerRef }) => {
   const { current: map } = useMap();
   const [colorMap, setColorMap] = useState({});
   const {
@@ -656,7 +656,7 @@ const WorldMap = ({ isGlobe = false }) => {
     // map, and its high-zoom hit-testing has no custom-layer equivalent.
     const queryLayers = (hasDrawnGeometry
       ? ["custom-regions-fill", "custom-regions-fill-far"]
-      : ["custom-regions-fill", "regions-fill"]
+      : ["custom-regions-fill", "custom-regions-fill-far", "regions-fill"]
     ).filter((id) => map.getLayer(id));
     const features = map.queryRenderedFeatures(event.point, { layers: queryLayers });
     if (!features.length) return;
@@ -694,10 +694,13 @@ const WorldMap = ({ isGlobe = false }) => {
   }, [hasDrawnGeometry, map]);
 
   useEffect(() => {
-    if (!map) return;
-    map.on("click", handleRegionClick);
-    return () => map.off("click", handleRegionClick);
-  }, [handleRegionClick, map]);
+    regionClickHandlerRef.current = handleRegionClick;
+    return () => {
+      if (regionClickHandlerRef.current === handleRegionClick) {
+        regionClickHandlerRef.current = null;
+      }
+    };
+  }, [handleRegionClick, regionClickHandlerRef]);
 
   // The palette is re-read whenever colors.json is written (every AI turn can mint
   // or recolour a polity, and the main menu's faction creator writes the player's
