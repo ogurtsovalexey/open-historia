@@ -123,6 +123,15 @@ const statecraftForPlayer = (state, playerId) => {
   };
 };
 
+const politicsForPlayer = (state, playerId) => {
+  if (!state.politics) return null;
+  return {
+    polity: state.politics.polities.find((entry) => entry.polityId === playerId) ?? null,
+    factions: state.politics.factions.filter((entry) => entry.polityId === playerId),
+    characters: state.politics.characters.filter((entry) => entry.polityId === playerId),
+  };
+};
+
 const turnForPlayer = (turn, playerId) => {
   if (!turn?.ledger) return turn;
   const involved = (entry) => entry.fromPolityId === playerId || entry.toPolityId === playerId;
@@ -138,6 +147,10 @@ const turnForPlayer = (turn, playerId) => {
       ...(turn.ledger.statecraft ? { statecraft: {
         finance: turn.ledger.statecraft.finance.filter((entry) => entry.polityId === playerId),
         projectAllocations: turn.ledger.statecraft.projectAllocations.filter((entry) => entry.polityId === playerId),
+      } } : {}),
+      ...(turn.ledger.politics ? { politics: {
+        commands: turn.ledger.politics.commands.filter((entry) => entry.polityId === playerId),
+        factionChanges: turn.ledger.politics.factionChanges.filter((entry) => entry.polityId === playerId),
       } } : {}),
     },
   };
@@ -166,6 +179,7 @@ const makeSnapshot = (game, fixture, session, actualMonthlyTicks = session.manif
     diplomacy: diplomacyForPlayer(state, playerId),
     trade: tradeForPlayer(state, playerId),
     statecraft: statecraftForPlayer(state, playerId),
+    politics: politicsForPlayer(state, playerId),
     polities: state.polities,
     regions: state.regions,
     ownershipOverrides: ownership,

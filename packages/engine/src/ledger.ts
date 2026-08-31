@@ -8,6 +8,7 @@ import type { EconWorldState } from './state.js';
 import { getStock } from './state.js';
 import type { ResourceTransferRecord, TradeExecutionRecord, TreasuryTransferRecord } from './diplomacyReducer.js';
 import type { FinanceResolutionRecord, ProjectAllocationRecord } from './statecraftReducer.js';
+import type { PoliticalCommandRecord, PoliticalResolutionRecord } from './politicsReducer.js';
 
 export interface RegionPopulationRow {
   regionId: RegionId;
@@ -90,6 +91,7 @@ export interface PolityLedger {
   treasuryTradeNet?: number;
   finance?: FinanceResolutionRecord;
   projectSpend?: number;
+  politicalSpend?: number;
   stockMovements: StockMovement[];
 }
 
@@ -120,6 +122,10 @@ export interface TurnLedger {
   statecraft?: {
     finance: FinanceResolutionRecord[];
     projectAllocations: ProjectAllocationRecord[];
+  };
+  politics?: {
+    commands: PoliticalCommandRecord[];
+    factionChanges: PoliticalResolutionRecord[];
   };
 }
 
@@ -209,7 +215,8 @@ export function checkInvariants(
     const expectedTreasury = polityLedger.treasuryOpening + (polityLedger.treasuryTradeNet ?? 0)
       + (polityLedger.finance?.bondsIssued ?? 0) + polityLedger.taxTotal - spend
       - (polityLedger.projectSpend ?? 0) - (polityLedger.finance?.interestPaid ?? 0);
-    if (expectedTreasury !== polityLedger.treasuryClosing) {
+    const expectedAfterPolitics = expectedTreasury - (polityLedger.politicalSpend ?? 0);
+    if (expectedAfterPolitics !== polityLedger.treasuryClosing) {
       fail('treasury-identity', `${id}: ${polityLedger.treasuryOpening}+${polityLedger.taxTotal}-${spend} != ${polityLedger.treasuryClosing}`);
     }
     if (nextPolity.treasury !== polityLedger.treasuryClosing) {
@@ -307,6 +314,21 @@ export function checkInvariants(
     seenRegions.add(region.regionId);
   }
   checked.push('region-single-controller');
+
+  if (next.politics) {
+    for (const polity of next.politics.polities) {
+      const characters = next.politics.characters.filter((entry) => entry.polityId === polity.polityId);
+      const offices = characters.filter((entry) => entry.office !== null).map((entry) => entry.office);
+      if (new Set(offices).size !== offices.length) fail('political-office-uniqueness', `${polity.polityId}: duplicate office`);
+      if (!characters.some((entry) => entry.characterId === polity.rulerCharacterId && entry.office === 'ruler')) {
+        fail('political-succession-integrity', `${polity.polityId}: ruler reference does not hold ruler office`);
+      }
+      if (polity.heirCharacterId && !characters.some((entry) => entry.characterId === polity.heirCharacterId && entry.office === 'heir')) {
+        fail('political-succession-integrity', `${polity.polityId}: heir reference does not hold heir office`);
+      }
+    }
+    checked.push('political-office-uniqueness', 'political-succession-integrity');
+  }
 
   if (next.turn !== prev.turn + 1) fail('turn-increment', `${prev.turn} -> ${next.turn}`);
   checked.push('turn-increment');

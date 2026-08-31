@@ -40,6 +40,7 @@ scenario.displayName = {
 scenario.modules.diplomacy = true;
 scenario.modules.finance = true;
 scenario.modules.intelligence = true;
+scenario.modules.politics = true;
 const polityIds = ["polity:austria", "polity:czechia", "polity:france", "polity:germany", "polity:poland", "polity:slovakia"];
 const relations = [];
 const tradeRoutes = [];
@@ -52,6 +53,42 @@ for (let left = 0; left < polityIds.length; left += 1) {
   }
 }
 scenario.diplomacy = { relations, tradeRoutes };
+
+const politySlugs = polityIds.map((id) => id.slice("polity:".length));
+const polityNames = {
+  austria: { en: "Austria", ru: "Австрия" }, czechia: { en: "Czechia", ru: "Чехия" },
+  france: { en: "France", ru: "Франция" }, germany: { en: "Germany", ru: "Германия" },
+  poland: { en: "Poland", ru: "Польша" }, slovakia: { en: "Slovakia", ru: "Словакия" },
+};
+const politics = { polities: [], factions: [], characters: [] };
+for (const slug of politySlugs) {
+  const polityId = `polity:${slug}`;
+  const names = polityNames[slug] || { en: slug, ru: slug };
+  const rulerId = `character:${slug}-ruler`;
+  const heirId = `character:${slug}-heir`;
+  const laborId = `character:${slug}-labor`;
+  const nationalistId = `character:${slug}-nationalist`;
+  politics.polities.push({
+    polityId, legitimacyBp: 6200, stabilityBp: 6000, unrestBp: 2800,
+    successionLaw: "hereditary", rulerCharacterId: rulerId, heirCharacterId: heirId,
+  });
+  politics.factions.push(
+    { factionId: `faction:${slug}-establishment`, polityId, displayName: { en: `${names.en} Establishment`, ru: `${names.ru}: истеблишмент` }, leaderCharacterId: rulerId, powerBp: 4200, supportBp: 6200, idealTaxBurdenBp: 9500, preferredBudgetCategory: "administration", foreignPolicy: "status-quo", ideology: "traditionalist", traditionalismBp: 7500, escalation: "calm" },
+    { factionId: `faction:${slug}-labor`, polityId, displayName: { en: `${names.en} Labour`, ru: `${names.ru}: трудящиеся` }, leaderCharacterId: laborId, powerBp: 3000, supportBp: slug === "austria" ? 2800 : 5200, idealTaxBurdenBp: 11500, preferredBudgetCategory: "industry", foreignPolicy: "pacifist", ideology: "socialist", traditionalismBp: 2500, escalation: slug === "austria" ? "demands" : "calm" },
+    { factionId: `faction:${slug}-national`, polityId, displayName: { en: `${names.en} National Bloc`, ru: `${names.ru}: национальный блок` }, leaderCharacterId: nationalistId, powerBp: 2800, supportBp: slug === "germany" ? 1800 : 5000, idealTaxBurdenBp: 10500, preferredBudgetCategory: "military", foreignPolicy: "hawk", ideology: "nationalist", traditionalismBp: 6000, escalation: slug === "germany" ? "protest" : "calm" },
+  );
+  const character = (characterId, en, ru, factionId, office, traits, loyaltyBp, ambitionBp, relations) => ({
+    characterId, polityId, displayName: { en, ru }, origin: "authored", factionId, office,
+    startingTraits: traits, experienceTraits: [], loyaltyBp, ambitionBp, relations,
+  });
+  politics.characters.push(
+    character(rulerId, `${names.en} Ruler`, `${names.ru}: правитель`, `faction:${slug}-establishment`, "ruler", ["administrator"], 7200, 4200, [{ characterId: heirId, sentiment: "family" }, { characterId: nationalistId, sentiment: "rival" }]),
+    character(heirId, `${names.en} Heir`, `${names.ru}: наследник`, `faction:${slug}-establishment`, "heir", ["diplomat"], 6800, 4800, [{ characterId: rulerId, sentiment: "family" }]),
+    character(laborId, `${names.en} Labour Leader`, `${names.ru}: лидер трудящихся`, `faction:${slug}-labor`, null, ["populist"], 4600, 6500, [{ characterId: nationalistId, sentiment: "rival" }]),
+    character(nationalistId, `${names.en} National Leader`, `${names.ru}: национальный лидер`, `faction:${slug}-national`, null, ["commander", "ambitious"], 3800, 8200, [{ characterId: rulerId, sentiment: "rival" }, { characterId: laborId, sentiment: "rival" }]),
+  );
+}
+scenario.politics = politics;
 
 const stockpile = (food, wood, coal, iron, goods) => [
   { resource: "food", amount: food }, { resource: "wood", amount: wood },

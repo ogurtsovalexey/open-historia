@@ -38,6 +38,7 @@ test('strategic diplomacy batch is bounded, deterministic and contains no full m
   assert.ok((JSON.stringify(first).match(/regionId/g) ?? []).length <= 15);
   assert.equal(JSON.stringify(first).includes('truths'), false);
   assert.equal(JSON.stringify(first).includes('liquid-fuel reserves'), false);
+  assert.equal(JSON.stringify(first).includes('character:'), false);
   assert.ok(first.briefs.every((brief) => brief.projectRegionCandidates.length <= 3));
   assert.equal(buildDiplomacyBatch(initial(), 'polity:austria'), null);
 });
@@ -71,6 +72,17 @@ test('strategic diplomacy validation requires one bound decision per polity', ()
     },
   };
   assert.equal(validateDiplomacyBatch(policy, batch).decisions[0]?.intent, 'set-policy');
+
+  const politics: { decisions: Array<Record<string, unknown>> } = structuredClone(holds);
+  const actor = batch.briefs.find((brief) => brief.factions.some((entry) => entry.escalation !== 'calm'))!;
+  const faction = actor.factions.find((entry) => entry.escalation !== 'calm')!;
+  const index = batch.polityIds.indexOf(actor.polityId);
+  politics.decisions[index] = {
+    polityId: actor.polityId, intent: 'repress', rationale: 'Contain an active crisis.',
+    command: { kind: 'politics.respond', commandId: '00000000-0000-4000-8000-000000000003', actorPolityId: actor.polityId,
+      expectedRevision: state.revision, effectiveMonth: state.month, factionId: faction.factionId, response: 'repress' },
+  };
+  assert.equal(validateDiplomacyBatch(politics, batch).decisions[index]?.intent, 'repress');
 });
 
 test('bounded briefs and batches never include the full map', () => {

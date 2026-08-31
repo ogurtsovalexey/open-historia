@@ -198,6 +198,18 @@ const TASK_DEFINITIONS = [
     mayMutateState: true
   },
   {
+    taskId: 'opponents.plan-politics',
+    version: 1,
+    kind: 'structured',
+    authority: 'proposal',
+    contextPolicyId: 'opponent-public-politics-batch',
+    budgetPolicyId: 'large-generation',
+    outputContractId: 'opponent-public-strategy-batch-schema',
+    allowedVariants: [],
+    fallbackPolicy: 'surface-error',
+    mayMutateState: true
+  },
+  {
     taskId: 'reports.explain-economy',
     version: 1,
     kind: 'structured',
@@ -398,6 +410,7 @@ const STRATEGIC_TASKS = new Set([
   'game-master.resolve',
   'opponents.plan-diplomacy',
   'opponents.plan-statecraft',
+  'opponents.plan-politics',
   'chat.diplomacy.plan',
   'chat.diplomacy.reply'
 ]);

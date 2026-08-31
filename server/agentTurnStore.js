@@ -132,7 +132,7 @@ const interpreterTasks = (draft) => {
     taskId: "orders.interpret-economy",
     taskVersion: 1,
     taskKey: `interpreter-${index}`,
-    systemPrompt: "Route every player action exactly once. Investment orders become typed economy commands. Requests to inspect, summarize, brief or report on the player's economy use disposition report with command null. Unsupported diplomacy, war, transfers and other unavailable mechanics use unsupported. Never invent effects.",
+    systemPrompt: "Route every player action exactly once. Investment orders and enabled political actions become typed commands. For a new historical or fictional character, propose only a supplied faction, one qualitative aptitude trait, loyalty band and ambition band; the engine owns numeric traits and the player must confirm. Requests to inspect, summarize, brief or report use disposition report with command null. Unsupported war, transfers and unavailable mechanics use unsupported. Never invent effects, faction ids or existing characters.",
     userPrompt: JSON.stringify({
       polityId: draft.playerPolityId,
       month: draft.state.month,
@@ -141,6 +141,13 @@ const interpreterTasks = (draft) => {
       controlledRegions: draft.state.regions.filter((entry) => entry.controllerId === draft.playerPolityId).map((entry) => ({
         regionId: entry.regionId, name: entry.displayName, activity: entry.activity, infrastructureBp: entry.infrastructureBp,
       })),
+      politics: draft.state.politics ? {
+        polity: draft.state.politics.polities.find((entry) => entry.polityId === draft.playerPolityId),
+        factions: draft.state.politics.factions.filter((entry) => entry.polityId === draft.playerPolityId),
+        characters: draft.state.politics.characters.filter((entry) => entry.polityId === draft.playerPolityId),
+        allowedCharacterOrigins: ["historical-runtime", "fictional-runtime"],
+        allowedCharacterBands: ["low", "medium", "high"],
+      } : null,
       actions,
     }),
     tool: { name: "submit_player_economy_orders", description: "Submit the strict interpretation", schema: toolSchema },
@@ -177,10 +184,11 @@ const makeStrategicTasks = (draft) => {
   draft.pendingStrategicBatch = batch;
   const schema = withoutModelCommandIds(exportJsonSchema(opponentDiplomacyBatchResultSchema));
   draft.tasks = [{
-    taskId: draft.state.modules?.finance || draft.state.modules?.projects ? "opponents.plan-statecraft" : "opponents.plan-diplomacy",
+    taskId: draft.state.modules?.politics ? "opponents.plan-politics"
+      : draft.state.modules?.finance || draft.state.modules?.projects ? "opponents.plan-statecraft" : "opponents.plan-diplomacy",
     taskVersion: 1,
     taskKey: batch.batchId,
-    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity and at most one material command. Use hold with a null command unless diplomacy, trade, finance or a listed project is justified by the supplied public state. Intelligence may target a polity but must never name a hidden fact id. Commands must use the supplied month and revision. Do not invent actors, resources, routes, templates, regions or effects.",
+    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity and at most one material command. Use hold with a null command unless diplomacy, trade, finance, a listed project or an active faction crisis justifies action. Political responses may name only a listed faction; shared batches may not appoint, create or replace characters. Intelligence may target a polity but must never name a hidden fact id. Commands must use the supplied month and revision. Do not invent actors, resources, routes, templates, regions or effects.",
     userPrompt: JSON.stringify({ month: batch.month, revision: batch.baseRevision, briefs: batch.briefs }),
     tool: { name: "submit_opponent_strategy_decisions", description: "Submit every requested polity strategic decision", schema },
     context: { fullMapIncluded: false, characterCount: batch.characterCount, polityCount: batch.polityIds.length },
@@ -276,9 +284,17 @@ const validatePlayerInterpretations = (draft, outputs) => {
   if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error("interpreter must return every and only submitted action id");
   const controlled = new Set(draft.state.regions.filter((entry) => entry.controllerId === draft.playerPolityId).map((entry) => entry.regionId));
   const commands = actions.flatMap((entry) => entry.command ? [entry.command] : []);
-  if (commands.length + draft.playerCommands.length > 1) throw new Error("P3a permits at most one player investment per monthly tick");
+  if (commands.length + draft.playerCommands.length > 8) throw new Error("a player month permits at most eight commands");
+  if (commands.filter((command) => command.kind === "economy.invest-region").length
+    + draft.playerCommands.filter((command) => command.kind === "economy.invest-region").length > 1) {
+    throw new Error("at most one player investment is allowed per monthly tick");
+  }
   for (const command of commands) {
-    if (command.actorPolityId !== draft.playerPolityId || !controlled.has(command.targetRegionId)) throw new Error("player command actor or target is not controlled");
+    if (command.actorPolityId !== draft.playerPolityId) throw new Error("player command actor is not the player's polity");
+    if (command.kind === "economy.invest-region" && !controlled.has(command.targetRegionId)) throw new Error("player investment target is not controlled");
+    if (command.kind === "politics.respond" && !draft.state.politics?.factions.some((entry) => entry.polityId === draft.playerPolityId && entry.factionId === command.factionId)) throw new Error("player political response names an unknown faction");
+    if (command.kind === "politics.appoint" && !draft.state.politics?.characters.some((entry) => entry.polityId === draft.playerPolityId && entry.characterId === command.characterId)) throw new Error("player appointment names an unknown character");
+    if (command.kind === "character.create" && !draft.state.politics?.factions.some((entry) => entry.polityId === draft.playerPolityId && entry.factionId === command.factionId)) throw new Error("player-created character names an unknown faction");
     if (command.expectedRevision !== draft.state.revision || command.effectiveMonth !== draft.state.month) throw new Error("player command is stale or for the wrong month");
   }
   draft.playerCommands.push(...commands);
@@ -291,10 +307,17 @@ const validatePlayerInterpretations = (draft, outputs) => {
     actionId: entry.actionId,
     summary: entry.summary,
     disposition: entry.disposition,
-    command: entry.command ? {
-      kind: entry.command.kind,
-      region: draft.state.regions.find((region) => region.regionId === entry.command.targetRegionId)?.displayName ?? entry.command.targetRegionId,
-      spend: entry.command.spend,
+    command: entry.command ? { kind: entry.command.kind,
+      ...(entry.command.kind === "economy.invest-region" ? {
+        region: draft.state.regions.find((region) => region.regionId === entry.command.targetRegionId)?.displayName ?? entry.command.targetRegionId,
+        spend: entry.command.spend,
+      } : entry.command.kind === "character.create" ? {
+        character: entry.command.displayName, origin: entry.command.origin, factionId: entry.command.factionId,
+      } : entry.command.kind === "politics.respond" ? {
+        factionId: entry.command.factionId, response: entry.command.response,
+      } : entry.command.kind === "politics.appoint" ? {
+        characterId: entry.command.characterId, office: entry.command.office,
+      } : {}),
     } : null,
   }));
   draft.tasks = [];

@@ -24,6 +24,7 @@ escalate, do not silently "fix" either side.
 | 10 | [`10-playable-game-next-steps.md`](10-playable-game-next-steps.md) | Binding minimal sequence from P3a to a complete playable campaign |
 | 11 | [`11-p3b-diplomacy-and-trade.md`](11-p3b-diplomacy-and-trade.md) | P3b six-polity world, two-tier AI routing, diplomacy and bilateral trade |
 | 12 | [`12-p3c-statecraft.md`](12-p3c-statecraft.md) | P3c finance, unified projects and evidence-backed intelligence |
+| 13 | [`13-p4-politics-and-characters.md`](13-p4-politics-and-characters.md) | P4 factions, political escalation, rulers, appointments and succession |
 
 Sources of each doc are cited inline. The full archived corpus stays under
 `docs/spec/` and `docs/product/` for provenance; their READMEs carry a

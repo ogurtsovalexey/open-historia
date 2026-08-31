@@ -4,6 +4,7 @@ import {
   investInRegionCommandSchema,
   diplomacyCommandSchema,
   statecraftCommandSchema,
+  politicsCommandSchema,
   potentialOutput,
   runTurn,
   sha256OfString,
@@ -13,6 +14,7 @@ import {
 } from '@open-historia/engine';
 import type { DiplomacyCommand } from '@open-historia/engine';
 import type { StatecraftCommand } from '@open-historia/engine';
+import type { PoliticsCommand } from '@open-historia/engine';
 
 export const MAX_POLITIES_PER_BATCH = 12;
 export const MAX_BATCHES_PER_MONTH = 2;
@@ -40,9 +42,9 @@ export type OpponentBatchResult = z.infer<typeof opponentBatchResultSchema>;
 
 export const opponentDiplomacyDecisionSchema = z.object({
   polityId: polityIdSchema,
-  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'set-policy', 'issue-bonds', 'restructure', 'start-project', 'update-project', 'cancel-project', 'hold']),
+  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'set-policy', 'issue-bonds', 'restructure', 'start-project', 'update-project', 'cancel-project', 'concede', 'repress', 'refuse', 'hold']),
   rationale: z.string().max(320),
-  command: z.union([diplomacyCommandSchema, statecraftCommandSchema]).nullable(),
+  command: z.union([diplomacyCommandSchema, statecraftCommandSchema, politicsCommandSchema]).nullable(),
 }).strict().superRefine((decision, ctx) => {
   const expectedKind = decision.intent === 'propose' ? 'diplomacy.propose'
     : decision.intent === 'counter' ? 'diplomacy.counter'
@@ -54,6 +56,7 @@ export const opponentDiplomacyDecisionSchema = z.object({
                 : decision.intent === 'start-project' ? 'project.start'
                   : decision.intent === 'update-project' ? 'project.update'
                     : decision.intent === 'cancel-project' ? 'project.cancel'
+                      : decision.intent === 'concede' || decision.intent === 'repress' || decision.intent === 'refuse' ? 'politics.respond'
                       : null;
   if ((decision.command?.kind ?? null) !== expectedKind) {
     ctx.addIssue({ code: 'custom', path: ['command'], message: 'intent and diplomacy command must match' });
@@ -87,6 +90,8 @@ export interface DiplomacyPolityBrief {
   projectRegionCandidates: Array<{ regionId: string; name: string }>;
   knownFacts: Array<Record<string, unknown>>;
   intelligenceTargetPolityIds: string[];
+  politics: Record<string, unknown> | null;
+  factions: Array<Record<string, unknown>>;
 }
 
 export interface DiplomacyBatch {
@@ -131,6 +136,16 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
       // it across actors, so P3c keeps the batch on public state only.
       knownFacts: [],
       intelligenceTargetPolityIds: state.polities.filter((entry) => entry.id !== polityId).map((entry) => entry.id).sort(),
+      politics: (() => {
+        const row = state.politics?.polities.find((entry) => entry.polityId === polityId);
+        return row ? { polityId: row.polityId, legitimacyBp: row.legitimacyBp, stabilityBp: row.stabilityBp,
+          unrestBp: row.unrestBp, successionLaw: row.successionLaw, governmentChanges: row.governmentChanges } : null;
+      })(),
+      factions: (state.politics?.factions ?? []).filter((entry) => entry.polityId === polityId).map((entry) => ({
+        factionId: entry.factionId, powerBp: entry.powerBp, supportBp: entry.supportBp,
+        idealTaxBurdenBp: entry.idealTaxBurdenBp, preferredBudgetCategory: entry.preferredBudgetCategory,
+        foreignPolicy: entry.foreignPolicy, ideology: entry.ideology, traditionalismBp: entry.traditionalismBp, escalation: entry.escalation,
+      })),
     };
   });
   const characterCount = briefs.reduce((sum, brief) => sum + JSON.stringify(brief).length, 0);
@@ -148,7 +163,7 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
   if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error('strategic batch must decide every and only requested polity');
   const known = new Set(batch.briefs.map((entry) => entry.polityId));
   for (const decision of parsed.decisions) {
-    const command = decision.command as DiplomacyCommand | StatecraftCommand | null;
+    const command = decision.command as DiplomacyCommand | StatecraftCommand | PoliticsCommand | null;
     if (!command) continue;
     if (command.actorPolityId !== decision.polityId) throw new Error('diplomacy command actor mismatch');
     if (command.expectedRevision !== batch.baseRevision || command.effectiveMonth !== batch.month) throw new Error('diplomacy command is stale or for the wrong month');
@@ -165,6 +180,15 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
     }
     if ((command.kind === 'project.update' || command.kind === 'project.cancel')
       && !brief.projects.some((entry) => entry.projectId === command.projectId)) throw new Error('project command names another polity project');
+    if (command.kind === 'politics.respond') {
+      const faction = brief.factions.find((entry) => entry.factionId === command.factionId);
+      if (!faction) throw new Error('politics command names another polity faction');
+      if (faction.escalation === 'calm') throw new Error('politics command answers an inactive faction');
+      if (command.response !== decision.intent) throw new Error('politics response and intent must match');
+    }
+    if (command.kind === 'politics.appoint' || command.kind === 'politics.abdicate' || command.kind === 'character.create') {
+      throw new Error('shared strategic batch may not manipulate private character choices');
+    }
   }
   return parsed;
 }
@@ -172,7 +196,7 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
 export const interpretedActionSchema = z.object({
   actionId: z.string().min(1).max(200),
   summary: z.string().min(1).max(240),
-  command: investInRegionCommandSchema.nullable(),
+  command: z.union([investInRegionCommandSchema, politicsCommandSchema]).nullable(),
   disposition: z.enum(['command', 'report', 'unsupported', 'ambiguous']),
 }).strict().refine(
   (value) => (value.disposition === 'command') === (value.command !== null),

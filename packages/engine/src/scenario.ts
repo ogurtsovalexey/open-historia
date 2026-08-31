@@ -12,6 +12,7 @@ import {
   scenarioIdSchema,
 } from '@open-historia/domain';
 import { authoredStatecraftSchema } from './statecraft.js';
+import { authoredPoliticsSchema } from './politics.js';
 
 /** Game resource catalog per regional-resource-economy.md §2. Engine-owned. */
 export const RESOURCE_CATALOG = [
@@ -135,6 +136,7 @@ export const modulesSchema = z
     diplomacy: z.boolean().optional(),
     finance: z.boolean().optional(),
     intelligence: z.boolean().optional(),
+    politics: z.boolean().optional(),
     projects: z.boolean().optional(),
     budget: z.boolean().optional(),
     trade: z.boolean().optional(),
@@ -144,7 +146,7 @@ export const modulesSchema = z
   .strict();
 export type Modules = z.infer<typeof modulesSchema>;
 
-export const MODULE_NAMES = ['diplomacy', 'finance', 'intelligence', 'projects', 'budget', 'trade', 'shortages', 'unrest'] as const;
+export const MODULE_NAMES = ['diplomacy', 'finance', 'intelligence', 'politics', 'projects', 'budget', 'trade', 'shortages', 'unrest'] as const;
 export type ModuleName = (typeof MODULE_NAMES)[number];
 
 export const authoredRelationSchema = z.object({
@@ -184,6 +186,8 @@ export const econScenarioSchema = z
     diplomacy: authoredDiplomacySchema.optional(),
     /** Authored catalogs and seeds for finance/projects/intelligence. */
     statecraft: authoredStatecraftSchema.optional(),
+    /** Authored factions, offices and succession state. */
+    politics: authoredPoliticsSchema.optional(),
     economy: economyParamsSchema,
     polities: z.array(scenarioPolitySchema).min(2),
     regions: z.array(scenarioRegionSchema).min(1),
@@ -202,6 +206,58 @@ export const econScenarioSchema = z
     }
     if ((scenario.modules?.finance === true || scenario.modules?.intelligence === true) && !scenario.statecraft) {
       ctx.addIssue({ code: 'custom', message: 'finance/intelligence modules require authored statecraft inputs', path: ['statecraft'] });
+    }
+    if (scenario.modules?.politics === true && !scenario.politics) {
+      ctx.addIssue({ code: 'custom', message: 'politics module requires authored political inputs', path: ['politics'] });
+    }
+    if (scenario.politics) {
+      const factionIds = new Set(scenario.politics.factions.map((entry) => entry.factionId));
+      const characterIds = new Set(scenario.politics.characters.map((entry) => entry.characterId));
+      const politicalPolityIds = new Set(scenario.politics.polities.map((entry) => entry.polityId));
+      if (factionIds.size !== scenario.politics.factions.length) {
+        ctx.addIssue({ code: 'custom', message: 'political faction ids must be unique', path: ['politics', 'factions'] });
+      }
+      if (characterIds.size !== scenario.politics.characters.length) {
+        ctx.addIssue({ code: 'custom', message: 'political character ids must be unique', path: ['politics', 'characters'] });
+      }
+      if (scenario.modules?.politics === true && (politicalPolityIds.size !== polityIds.size
+        || scenario.politics.polities.length !== polityIds.size)) {
+        ctx.addIssue({ code: 'custom', message: 'politics module requires exactly one political row per polity', path: ['politics', 'polities'] });
+      }
+      for (const polityId of polityIds) {
+        const count = scenario.politics.factions.filter((entry) => entry.polityId === polityId).length;
+        if (scenario.modules?.politics === true && (count < 3 || count > 6)) {
+          ctx.addIssue({ code: 'custom', message: `${polityId} must have 3-6 factions`, path: ['politics', 'factions'] });
+        }
+      }
+      const offices = new Set<string>();
+      for (const [index, character] of scenario.politics.characters.entries()) {
+        if (!polityIds.has(character.polityId) || !factionIds.has(character.factionId)) {
+          ctx.addIssue({ code: 'custom', message: 'character must reference known polity and faction', path: ['politics', 'characters', index] });
+        }
+        if (character.office) {
+          const key = `${character.polityId}|${character.office}`;
+          if (offices.has(key)) ctx.addIssue({ code: 'custom', message: `duplicate political office ${key}`, path: ['politics', 'characters', index, 'office'] });
+          offices.add(key);
+        }
+        for (const relation of character.relations) {
+          if (!characterIds.has(relation.characterId)) ctx.addIssue({ code: 'custom', message: 'character relation references unknown character', path: ['politics', 'characters', index, 'relations'] });
+        }
+      }
+      for (const [index, faction] of scenario.politics.factions.entries()) {
+        const leader = scenario.politics.characters.find((entry) => entry.characterId === faction.leaderCharacterId);
+        if (!polityIds.has(faction.polityId) || !leader || leader.polityId !== faction.polityId) {
+          ctx.addIssue({ code: 'custom', message: 'faction leader must be a character of the same known polity', path: ['politics', 'factions', index, 'leaderCharacterId'] });
+        }
+      }
+      for (const [index, polity] of scenario.politics.polities.entries()) {
+        const ruler = scenario.politics.characters.find((entry) => entry.characterId === polity.rulerCharacterId);
+        const heir = polity.heirCharacterId ? scenario.politics.characters.find((entry) => entry.characterId === polity.heirCharacterId) : null;
+        if (!polityIds.has(polity.polityId) || !ruler || ruler.polityId !== polity.polityId || ruler.office !== 'ruler'
+          || (polity.heirCharacterId && (!heir || heir.polityId !== polity.polityId || heir.office !== 'heir'))) {
+          ctx.addIssue({ code: 'custom', message: 'political ruler/heir must match their polity and offices', path: ['politics', 'polities', index] });
+        }
+      }
     }
     if (scenario.statecraft) {
       const unique = (values: string[], path: (string | number)[]) => {

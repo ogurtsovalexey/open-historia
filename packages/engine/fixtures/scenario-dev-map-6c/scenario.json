@@ -22,7 +22,8 @@
     "unrest": true,
     "diplomacy": true,
     "finance": true,
-    "intelligence": true
+    "intelligence": true,
+    "politics": true
   },
   "economy": {
     "foodNeedPerPersonMilli": 50,
@@ -2078,6 +2079,980 @@
           "polity:slovakia"
         ],
         "monthlyCapacity": 120000
+      }
+    ]
+  },
+  "politics": {
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "legitimacyBp": 6200,
+        "stabilityBp": 6000,
+        "unrestBp": 2800,
+        "successionLaw": "hereditary",
+        "rulerCharacterId": "character:austria-ruler",
+        "heirCharacterId": "character:austria-heir"
+      },
+      {
+        "polityId": "polity:czechia",
+        "legitimacyBp": 6200,
+        "stabilityBp": 6000,
+        "unrestBp": 2800,
+        "successionLaw": "hereditary",
+        "rulerCharacterId": "character:czechia-ruler",
+        "heirCharacterId": "character:czechia-heir"
+      },
+      {
+        "polityId": "polity:france",
+        "legitimacyBp": 6200,
+        "stabilityBp": 6000,
+        "unrestBp": 2800,
+        "successionLaw": "hereditary",
+        "rulerCharacterId": "character:france-ruler",
+        "heirCharacterId": "character:france-heir"
+      },
+      {
+        "polityId": "polity:germany",
+        "legitimacyBp": 6200,
+        "stabilityBp": 6000,
+        "unrestBp": 2800,
+        "successionLaw": "hereditary",
+        "rulerCharacterId": "character:germany-ruler",
+        "heirCharacterId": "character:germany-heir"
+      },
+      {
+        "polityId": "polity:poland",
+        "legitimacyBp": 6200,
+        "stabilityBp": 6000,
+        "unrestBp": 2800,
+        "successionLaw": "hereditary",
+        "rulerCharacterId": "character:poland-ruler",
+        "heirCharacterId": "character:poland-heir"
+      },
+      {
+        "polityId": "polity:slovakia",
+        "legitimacyBp": 6200,
+        "stabilityBp": 6000,
+        "unrestBp": 2800,
+        "successionLaw": "hereditary",
+        "rulerCharacterId": "character:slovakia-ruler",
+        "heirCharacterId": "character:slovakia-heir"
+      }
+    ],
+    "factions": [
+      {
+        "factionId": "faction:austria-establishment",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Austria Establishment",
+          "ru": "Австрия: истеблишмент"
+        },
+        "leaderCharacterId": "character:austria-ruler",
+        "powerBp": 4200,
+        "supportBp": 6200,
+        "idealTaxBurdenBp": 9500,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:austria-labor",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Austria Labour",
+          "ru": "Австрия: трудящиеся"
+        },
+        "leaderCharacterId": "character:austria-labor",
+        "powerBp": 3000,
+        "supportBp": 2800,
+        "idealTaxBurdenBp": 11500,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 2500,
+        "escalation": "demands"
+      },
+      {
+        "factionId": "faction:austria-national",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Austria National Bloc",
+          "ru": "Австрия: национальный блок"
+        },
+        "leaderCharacterId": "character:austria-nationalist",
+        "powerBp": 2800,
+        "supportBp": 5000,
+        "idealTaxBurdenBp": 10500,
+        "preferredBudgetCategory": "military",
+        "foreignPolicy": "hawk",
+        "ideology": "nationalist",
+        "traditionalismBp": 6000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:czechia-establishment",
+        "polityId": "polity:czechia",
+        "displayName": {
+          "en": "Czechia Establishment",
+          "ru": "Чехия: истеблишмент"
+        },
+        "leaderCharacterId": "character:czechia-ruler",
+        "powerBp": 4200,
+        "supportBp": 6200,
+        "idealTaxBurdenBp": 9500,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:czechia-labor",
+        "polityId": "polity:czechia",
+        "displayName": {
+          "en": "Czechia Labour",
+          "ru": "Чехия: трудящиеся"
+        },
+        "leaderCharacterId": "character:czechia-labor",
+        "powerBp": 3000,
+        "supportBp": 5200,
+        "idealTaxBurdenBp": 11500,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 2500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:czechia-national",
+        "polityId": "polity:czechia",
+        "displayName": {
+          "en": "Czechia National Bloc",
+          "ru": "Чехия: национальный блок"
+        },
+        "leaderCharacterId": "character:czechia-nationalist",
+        "powerBp": 2800,
+        "supportBp": 5000,
+        "idealTaxBurdenBp": 10500,
+        "preferredBudgetCategory": "military",
+        "foreignPolicy": "hawk",
+        "ideology": "nationalist",
+        "traditionalismBp": 6000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:france-establishment",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "France Establishment",
+          "ru": "Франция: истеблишмент"
+        },
+        "leaderCharacterId": "character:france-ruler",
+        "powerBp": 4200,
+        "supportBp": 6200,
+        "idealTaxBurdenBp": 9500,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:france-labor",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "France Labour",
+          "ru": "Франция: трудящиеся"
+        },
+        "leaderCharacterId": "character:france-labor",
+        "powerBp": 3000,
+        "supportBp": 5200,
+        "idealTaxBurdenBp": 11500,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 2500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:france-national",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "France National Bloc",
+          "ru": "Франция: национальный блок"
+        },
+        "leaderCharacterId": "character:france-nationalist",
+        "powerBp": 2800,
+        "supportBp": 5000,
+        "idealTaxBurdenBp": 10500,
+        "preferredBudgetCategory": "military",
+        "foreignPolicy": "hawk",
+        "ideology": "nationalist",
+        "traditionalismBp": 6000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:germany-establishment",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Germany Establishment",
+          "ru": "Германия: истеблишмент"
+        },
+        "leaderCharacterId": "character:germany-ruler",
+        "powerBp": 4200,
+        "supportBp": 6200,
+        "idealTaxBurdenBp": 9500,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:germany-labor",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Germany Labour",
+          "ru": "Германия: трудящиеся"
+        },
+        "leaderCharacterId": "character:germany-labor",
+        "powerBp": 3000,
+        "supportBp": 5200,
+        "idealTaxBurdenBp": 11500,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 2500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:germany-national",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Germany National Bloc",
+          "ru": "Германия: национальный блок"
+        },
+        "leaderCharacterId": "character:germany-nationalist",
+        "powerBp": 2800,
+        "supportBp": 1800,
+        "idealTaxBurdenBp": 10500,
+        "preferredBudgetCategory": "military",
+        "foreignPolicy": "hawk",
+        "ideology": "nationalist",
+        "traditionalismBp": 6000,
+        "escalation": "protest"
+      },
+      {
+        "factionId": "faction:poland-establishment",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Poland Establishment",
+          "ru": "Польша: истеблишмент"
+        },
+        "leaderCharacterId": "character:poland-ruler",
+        "powerBp": 4200,
+        "supportBp": 6200,
+        "idealTaxBurdenBp": 9500,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:poland-labor",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Poland Labour",
+          "ru": "Польша: трудящиеся"
+        },
+        "leaderCharacterId": "character:poland-labor",
+        "powerBp": 3000,
+        "supportBp": 5200,
+        "idealTaxBurdenBp": 11500,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 2500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:poland-national",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Poland National Bloc",
+          "ru": "Польша: национальный блок"
+        },
+        "leaderCharacterId": "character:poland-nationalist",
+        "powerBp": 2800,
+        "supportBp": 5000,
+        "idealTaxBurdenBp": 10500,
+        "preferredBudgetCategory": "military",
+        "foreignPolicy": "hawk",
+        "ideology": "nationalist",
+        "traditionalismBp": 6000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:slovakia-establishment",
+        "polityId": "polity:slovakia",
+        "displayName": {
+          "en": "Slovakia Establishment",
+          "ru": "Словакия: истеблишмент"
+        },
+        "leaderCharacterId": "character:slovakia-ruler",
+        "powerBp": 4200,
+        "supportBp": 6200,
+        "idealTaxBurdenBp": 9500,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:slovakia-labor",
+        "polityId": "polity:slovakia",
+        "displayName": {
+          "en": "Slovakia Labour",
+          "ru": "Словакия: трудящиеся"
+        },
+        "leaderCharacterId": "character:slovakia-labor",
+        "powerBp": 3000,
+        "supportBp": 5200,
+        "idealTaxBurdenBp": 11500,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 2500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:slovakia-national",
+        "polityId": "polity:slovakia",
+        "displayName": {
+          "en": "Slovakia National Bloc",
+          "ru": "Словакия: национальный блок"
+        },
+        "leaderCharacterId": "character:slovakia-nationalist",
+        "powerBp": 2800,
+        "supportBp": 5000,
+        "idealTaxBurdenBp": 10500,
+        "preferredBudgetCategory": "military",
+        "foreignPolicy": "hawk",
+        "ideology": "nationalist",
+        "traditionalismBp": 6000,
+        "escalation": "calm"
+      }
+    ],
+    "characters": [
+      {
+        "characterId": "character:austria-ruler",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Austria Ruler",
+          "ru": "Австрия: правитель"
+        },
+        "origin": "authored",
+        "factionId": "faction:austria-establishment",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 4200,
+        "relations": [
+          {
+            "characterId": "character:austria-heir",
+            "sentiment": "family"
+          },
+          {
+            "characterId": "character:austria-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:austria-heir",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Austria Heir",
+          "ru": "Австрия: наследник"
+        },
+        "origin": "authored",
+        "factionId": "faction:austria-establishment",
+        "office": "heir",
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6800,
+        "ambitionBp": 4800,
+        "relations": [
+          {
+            "characterId": "character:austria-ruler",
+            "sentiment": "family"
+          }
+        ]
+      },
+      {
+        "characterId": "character:austria-labor",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Austria Labour Leader",
+          "ru": "Австрия: лидер трудящихся"
+        },
+        "origin": "authored",
+        "factionId": "faction:austria-labor",
+        "office": null,
+        "startingTraits": [
+          "populist"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 4600,
+        "ambitionBp": 6500,
+        "relations": [
+          {
+            "characterId": "character:austria-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:austria-nationalist",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Austria National Leader",
+          "ru": "Австрия: национальный лидер"
+        },
+        "origin": "authored",
+        "factionId": "faction:austria-national",
+        "office": null,
+        "startingTraits": [
+          "commander",
+          "ambitious"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 3800,
+        "ambitionBp": 8200,
+        "relations": [
+          {
+            "characterId": "character:austria-ruler",
+            "sentiment": "rival"
+          },
+          {
+            "characterId": "character:austria-labor",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:czechia-ruler",
+        "polityId": "polity:czechia",
+        "displayName": {
+          "en": "Czechia Ruler",
+          "ru": "Чехия: правитель"
+        },
+        "origin": "authored",
+        "factionId": "faction:czechia-establishment",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 4200,
+        "relations": [
+          {
+            "characterId": "character:czechia-heir",
+            "sentiment": "family"
+          },
+          {
+            "characterId": "character:czechia-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:czechia-heir",
+        "polityId": "polity:czechia",
+        "displayName": {
+          "en": "Czechia Heir",
+          "ru": "Чехия: наследник"
+        },
+        "origin": "authored",
+        "factionId": "faction:czechia-establishment",
+        "office": "heir",
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6800,
+        "ambitionBp": 4800,
+        "relations": [
+          {
+            "characterId": "character:czechia-ruler",
+            "sentiment": "family"
+          }
+        ]
+      },
+      {
+        "characterId": "character:czechia-labor",
+        "polityId": "polity:czechia",
+        "displayName": {
+          "en": "Czechia Labour Leader",
+          "ru": "Чехия: лидер трудящихся"
+        },
+        "origin": "authored",
+        "factionId": "faction:czechia-labor",
+        "office": null,
+        "startingTraits": [
+          "populist"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 4600,
+        "ambitionBp": 6500,
+        "relations": [
+          {
+            "characterId": "character:czechia-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:czechia-nationalist",
+        "polityId": "polity:czechia",
+        "displayName": {
+          "en": "Czechia National Leader",
+          "ru": "Чехия: национальный лидер"
+        },
+        "origin": "authored",
+        "factionId": "faction:czechia-national",
+        "office": null,
+        "startingTraits": [
+          "commander",
+          "ambitious"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 3800,
+        "ambitionBp": 8200,
+        "relations": [
+          {
+            "characterId": "character:czechia-ruler",
+            "sentiment": "rival"
+          },
+          {
+            "characterId": "character:czechia-labor",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:france-ruler",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "France Ruler",
+          "ru": "Франция: правитель"
+        },
+        "origin": "authored",
+        "factionId": "faction:france-establishment",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 4200,
+        "relations": [
+          {
+            "characterId": "character:france-heir",
+            "sentiment": "family"
+          },
+          {
+            "characterId": "character:france-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:france-heir",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "France Heir",
+          "ru": "Франция: наследник"
+        },
+        "origin": "authored",
+        "factionId": "faction:france-establishment",
+        "office": "heir",
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6800,
+        "ambitionBp": 4800,
+        "relations": [
+          {
+            "characterId": "character:france-ruler",
+            "sentiment": "family"
+          }
+        ]
+      },
+      {
+        "characterId": "character:france-labor",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "France Labour Leader",
+          "ru": "Франция: лидер трудящихся"
+        },
+        "origin": "authored",
+        "factionId": "faction:france-labor",
+        "office": null,
+        "startingTraits": [
+          "populist"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 4600,
+        "ambitionBp": 6500,
+        "relations": [
+          {
+            "characterId": "character:france-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:france-nationalist",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "France National Leader",
+          "ru": "Франция: национальный лидер"
+        },
+        "origin": "authored",
+        "factionId": "faction:france-national",
+        "office": null,
+        "startingTraits": [
+          "commander",
+          "ambitious"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 3800,
+        "ambitionBp": 8200,
+        "relations": [
+          {
+            "characterId": "character:france-ruler",
+            "sentiment": "rival"
+          },
+          {
+            "characterId": "character:france-labor",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:germany-ruler",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Germany Ruler",
+          "ru": "Германия: правитель"
+        },
+        "origin": "authored",
+        "factionId": "faction:germany-establishment",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 4200,
+        "relations": [
+          {
+            "characterId": "character:germany-heir",
+            "sentiment": "family"
+          },
+          {
+            "characterId": "character:germany-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:germany-heir",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Germany Heir",
+          "ru": "Германия: наследник"
+        },
+        "origin": "authored",
+        "factionId": "faction:germany-establishment",
+        "office": "heir",
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6800,
+        "ambitionBp": 4800,
+        "relations": [
+          {
+            "characterId": "character:germany-ruler",
+            "sentiment": "family"
+          }
+        ]
+      },
+      {
+        "characterId": "character:germany-labor",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Germany Labour Leader",
+          "ru": "Германия: лидер трудящихся"
+        },
+        "origin": "authored",
+        "factionId": "faction:germany-labor",
+        "office": null,
+        "startingTraits": [
+          "populist"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 4600,
+        "ambitionBp": 6500,
+        "relations": [
+          {
+            "characterId": "character:germany-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:germany-nationalist",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Germany National Leader",
+          "ru": "Германия: национальный лидер"
+        },
+        "origin": "authored",
+        "factionId": "faction:germany-national",
+        "office": null,
+        "startingTraits": [
+          "commander",
+          "ambitious"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 3800,
+        "ambitionBp": 8200,
+        "relations": [
+          {
+            "characterId": "character:germany-ruler",
+            "sentiment": "rival"
+          },
+          {
+            "characterId": "character:germany-labor",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:poland-ruler",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Poland Ruler",
+          "ru": "Польша: правитель"
+        },
+        "origin": "authored",
+        "factionId": "faction:poland-establishment",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 4200,
+        "relations": [
+          {
+            "characterId": "character:poland-heir",
+            "sentiment": "family"
+          },
+          {
+            "characterId": "character:poland-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:poland-heir",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Poland Heir",
+          "ru": "Польша: наследник"
+        },
+        "origin": "authored",
+        "factionId": "faction:poland-establishment",
+        "office": "heir",
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6800,
+        "ambitionBp": 4800,
+        "relations": [
+          {
+            "characterId": "character:poland-ruler",
+            "sentiment": "family"
+          }
+        ]
+      },
+      {
+        "characterId": "character:poland-labor",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Poland Labour Leader",
+          "ru": "Польша: лидер трудящихся"
+        },
+        "origin": "authored",
+        "factionId": "faction:poland-labor",
+        "office": null,
+        "startingTraits": [
+          "populist"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 4600,
+        "ambitionBp": 6500,
+        "relations": [
+          {
+            "characterId": "character:poland-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:poland-nationalist",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Poland National Leader",
+          "ru": "Польша: национальный лидер"
+        },
+        "origin": "authored",
+        "factionId": "faction:poland-national",
+        "office": null,
+        "startingTraits": [
+          "commander",
+          "ambitious"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 3800,
+        "ambitionBp": 8200,
+        "relations": [
+          {
+            "characterId": "character:poland-ruler",
+            "sentiment": "rival"
+          },
+          {
+            "characterId": "character:poland-labor",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:slovakia-ruler",
+        "polityId": "polity:slovakia",
+        "displayName": {
+          "en": "Slovakia Ruler",
+          "ru": "Словакия: правитель"
+        },
+        "origin": "authored",
+        "factionId": "faction:slovakia-establishment",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 4200,
+        "relations": [
+          {
+            "characterId": "character:slovakia-heir",
+            "sentiment": "family"
+          },
+          {
+            "characterId": "character:slovakia-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:slovakia-heir",
+        "polityId": "polity:slovakia",
+        "displayName": {
+          "en": "Slovakia Heir",
+          "ru": "Словакия: наследник"
+        },
+        "origin": "authored",
+        "factionId": "faction:slovakia-establishment",
+        "office": "heir",
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6800,
+        "ambitionBp": 4800,
+        "relations": [
+          {
+            "characterId": "character:slovakia-ruler",
+            "sentiment": "family"
+          }
+        ]
+      },
+      {
+        "characterId": "character:slovakia-labor",
+        "polityId": "polity:slovakia",
+        "displayName": {
+          "en": "Slovakia Labour Leader",
+          "ru": "Словакия: лидер трудящихся"
+        },
+        "origin": "authored",
+        "factionId": "faction:slovakia-labor",
+        "office": null,
+        "startingTraits": [
+          "populist"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 4600,
+        "ambitionBp": 6500,
+        "relations": [
+          {
+            "characterId": "character:slovakia-nationalist",
+            "sentiment": "rival"
+          }
+        ]
+      },
+      {
+        "characterId": "character:slovakia-nationalist",
+        "polityId": "polity:slovakia",
+        "displayName": {
+          "en": "Slovakia National Leader",
+          "ru": "Словакия: национальный лидер"
+        },
+        "origin": "authored",
+        "factionId": "faction:slovakia-national",
+        "office": null,
+        "startingTraits": [
+          "commander",
+          "ambitious"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 3800,
+        "ambitionBp": 8200,
+        "relations": [
+          {
+            "characterId": "character:slovakia-ruler",
+            "sentiment": "rival"
+          },
+          {
+            "characterId": "character:slovakia-labor",
+            "sentiment": "rival"
+          }
+        ]
       }
     ]
   },

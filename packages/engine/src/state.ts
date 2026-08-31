@@ -24,6 +24,7 @@ import type { ModuleName } from './scenario.js';
 import { stateChecksum } from './canonical.js';
 import { diplomacyStateSchema, tradeStateSchema } from './diplomacy.js';
 import { financeStateSchema, intelligenceStateSchema, projectsStateSchema } from './statecraft.js';
+import { politicsStateSchema } from './politics.js';
 
 const nonNegInt = z.number().int().nonnegative();
 const bpSchema = z.number().int().min(0).max(10000);
@@ -91,6 +92,7 @@ export const econWorldStateSchema = z
     finance: financeStateSchema.optional(),
     projects: projectsStateSchema.optional(),
     intelligence: intelligenceStateSchema.optional(),
+    politics: politicsStateSchema.optional(),
     economy: economyParamsSchema,
     /** Sorted by polity id. */
     polities: z.array(econPolityStateSchema).min(2),
@@ -182,6 +184,17 @@ export function initState(scenario: EconScenario): EconWorldState {
         knownFacts: [...scenario.statecraft.knowledgeSeeds].map((entry) => ({
           ...entry, observedMonth: entry.observedMonth ?? scenario.startMonth, source: 'scenario' as const,
         })).sort((a, b) => `${a.observerPolityId}|${a.factId}`.localeCompare(`${b.observerPolityId}|${b.factId}`)),
+      },
+    } : {}),
+    ...(scenario.modules?.politics === true && scenario.politics ? {
+      politics: {
+        polities: [...scenario.politics.polities].map((entry) => ({
+          ...entry, governmentChanges: 0, lastTransferMonth: null,
+        })).sort((a, b) => a.polityId.localeCompare(b.polityId)),
+        factions: [...scenario.politics.factions].map((entry) => ({
+          ...entry, lastResponseMonth: null,
+        })).sort((a, b) => a.factionId.localeCompare(b.factionId)),
+        characters: [...scenario.politics.characters].sort((a, b) => a.characterId.localeCompare(b.characterId)),
       },
     } : {}),
     polities: [...scenario.polities]

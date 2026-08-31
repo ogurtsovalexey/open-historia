@@ -10,12 +10,13 @@ const completePreparedMonth = async (request, gameId, draft, decide) => {
     turnToken: draft.turnToken, action: 'confirm-player',
   } })).json();
   expect(draft.phase).toBe('plan-strategy');
-  expect(draft.tasks[0].taskId).toBe('opponents.plan-statecraft');
+  expect(draft.tasks[0].taskId).toBe('opponents.plan-politics');
   const prompt = JSON.parse(draft.tasks[0].userPrompt);
   const promptText = JSON.stringify(prompt);
   expect(promptText).not.toContain('FeatureCollection');
   expect(promptText).not.toContain('liquid-fuel reserves');
   expect(promptText).not.toContain('truths');
+  expect(promptText).not.toContain('character:');
   expect((promptText.match(/regionId/g) ?? []).length).toBeLessThanOrEqual(15);
   const outputs = [{ decisions: prompt.briefs.map((brief) => decide?.(brief, prompt) ?? ({
     polityId: brief.polityId, intent: 'hold', rationale: 'No justified material action.', command: null,

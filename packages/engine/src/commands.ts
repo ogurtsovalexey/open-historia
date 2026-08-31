@@ -16,6 +16,7 @@ import {
 } from '@open-historia/domain';
 import { agreementIdSchema, negotiationTermsSchema, proposalIdSchema } from './diplomacy.js';
 import { budgetPrioritiesSchema, intelligenceFactIdSchema, projectIdSchema, projectTemplateIdSchema } from './statecraft.js';
+import { characterIdSchema, characterTraitSchema, factionIdSchema, qualitativeBandSchema } from './politics.js';
 
 export const investInRegionCommandSchema = z
   .object({
@@ -161,6 +162,43 @@ export const statecraftCommandSchema = z.discriminatedUnion('kind', [
   startProjectCommandSchema, updateProjectCommandSchema, cancelProjectCommandSchema,
 ]);
 
+export const respondToFactionCommandSchema = z.object({
+  kind: z.literal('politics.respond'), ...statecraftCommandFields,
+  factionId: factionIdSchema,
+  response: z.enum(['concede', 'repress', 'refuse']),
+}).strict();
+
+export const appointCharacterCommandSchema = z.object({
+  kind: z.literal('politics.appoint'), ...statecraftCommandFields,
+  characterId: characterIdSchema,
+  office: z.enum(['head-of-government', 'finance', 'foreign', 'military']),
+}).strict();
+
+export const abdicateCommandSchema = z.object({
+  kind: z.literal('politics.abdicate'), ...statecraftCommandFields,
+}).strict();
+
+export const createCharacterCommandSchema = z.object({
+  kind: z.literal('character.create'), ...statecraftCommandFields,
+  characterId: characterIdSchema,
+  displayName: z.object({ en: z.string().min(1).max(120), ru: z.string().min(1).max(120) }).strict(),
+  origin: z.enum(['historical-runtime', 'fictional-runtime']),
+  factionId: factionIdSchema,
+  aptitudeTrait: characterTraitSchema,
+  loyaltyBand: qualitativeBandSchema,
+  ambitionBand: qualitativeBandSchema,
+}).strict();
+
+export type PoliticsCommand = z.infer<typeof respondToFactionCommandSchema>
+  | z.infer<typeof appointCharacterCommandSchema>
+  | z.infer<typeof abdicateCommandSchema>
+  | z.infer<typeof createCharacterCommandSchema>;
+
+export const politicsCommandSchema = z.discriminatedUnion('kind', [
+  respondToFactionCommandSchema, appointCharacterCommandSchema,
+  abdicateCommandSchema, createCharacterCommandSchema,
+]);
+
 export const econCommandSchema = z.discriminatedUnion('kind', [
   investInRegionCommandSchema,
   transferRegionCommandSchema,
@@ -174,6 +212,10 @@ export const econCommandSchema = z.discriminatedUnion('kind', [
   startProjectCommandSchema,
   updateProjectCommandSchema,
   cancelProjectCommandSchema,
+  respondToFactionCommandSchema,
+  appointCharacterCommandSchema,
+  abdicateCommandSchema,
+  createCharacterCommandSchema,
 ]);
 export type EconCommand = z.infer<typeof econCommandSchema>;
 
@@ -213,6 +255,11 @@ export const REJECTION_REASONS = [
   'unknown-fact',
   'invalid-target',
   'credit-limit',
+  'unknown-faction',
+  'unknown-character',
+  'inactive-crisis',
+  'no-successor',
+  'office-conflict',
 ] as const;
 export type RejectionReason = (typeof REJECTION_REASONS)[number];
 
