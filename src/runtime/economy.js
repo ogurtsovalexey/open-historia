@@ -42,6 +42,30 @@ export const advanceEconomy = async ({ gameId, targetDate, expectedSessionRevisi
   return result;
 };
 
+export const prepareAgentTurn = ({ gameId, targetDate, expectedSessionRevision, actions = [], commands = [], locale = "en" }) =>
+  request(`/api/games/${encodeURIComponent(gameId)}/agent-turn/prepare`, {
+    method: "POST",
+    body: JSON.stringify({ targetDate, expectedSessionRevision, actions, commands, locale }),
+  });
+
+export const stepAgentTurn = ({ gameId, ...body }) =>
+  request(`/api/games/${encodeURIComponent(gameId)}/agent-turn/step`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+export const commitAgentTurn = async ({ gameId, turnToken, turnDigest }) => {
+  const result = await request(`/api/games/${encodeURIComponent(gameId)}/agent-turn/commit`, {
+    method: "POST",
+    body: JSON.stringify({ turnToken, turnDigest }),
+  });
+  await refreshLibraryCatalog({ force: true });
+  return result;
+};
+
+export const cancelAgentTurn = (gameId) =>
+  request(`/api/games/${encodeURIComponent(gameId)}/agent-turn/draft`, { method: "DELETE" });
+
 const pendingCommands = new Map();
 export const queueEconomyCommand = (gameId, command) => {
   if (!gameId) throw new Error("gameId is required to queue an economy command");

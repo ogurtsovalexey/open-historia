@@ -1375,6 +1375,18 @@ const getScenarioDetails = (scenarioId) => {
   };
 };
 
+// Internal, bounded metadata projection for strategic agents. Keeping this
+// separate from the public scenario response avoids expanding that API and
+// makes it impossible for callers to accidentally forward map geometry.
+const getScenarioAgentProfiles = (scenarioId) => {
+  const world = readJsonFile(getScenarioJsonPath(scenarioId, "world"), {});
+  const tags = readJsonFile(getScenarioJsonPath(scenarioId, "tags"), {});
+  return Object.fromEntries(Object.entries(world.polityOverrides ?? {}).map(([name, polity]) => [name, {
+    note: String(polity?.note ?? ""),
+    tags: Array.isArray(tags?.[name]) ? tags[name].map(String) : [],
+  }]));
+};
+
 const getGameDetails = (gameId) => {
   const summary = getGameSummary(gameId);
 
@@ -2807,6 +2819,7 @@ export {
   getLibraryCatalog,
   getScenarioCatalog,
   getScenarioDetails,
+  getScenarioAgentProfiles,
   getSelectedScenarioSummary,
   importScenarioBundle,
   updateScenarioFromBundle,

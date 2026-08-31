@@ -107,6 +107,8 @@ const makeSnapshot = (game, fixture, session, actualMonthlyTicks = session.manif
     ownershipOverrides: ownership,
     mapLink: fixture.link ? { dataset: fixture.link.dataset, polityOwnerNames: fixture.link.polityOwnerNames, regions: fixture.link.regions } : null,
     lastTurn,
+    agentState: session.agentState ?? null,
+    agentTurn: session.agentTurn ?? null,
   };
 };
 
@@ -130,6 +132,56 @@ const loadOrInitialize = (game) => {
   }
   session.state = parseWorldState(session.state);
   return { fixture, session };
+};
+
+/** Trusted orchestration context. Model-facing code receives projections, never this raw object. */
+export const loadEconomyContext = (gameId) => {
+  const game = requireEngineGame(gameId);
+  const { fixture, session } = loadOrInitialize(game);
+  return { game, fixture, session, playerPolityId: playerPolityId(game, fixture.link) };
+};
+
+export const commitAgentEconomy = (gameId, {
+  targetDate, expectedSessionRevision, monthlyCommands, agentState, agentTurn, advanceRound = true,
+}) => {
+  const { game, fixture, session } = loadEconomyContext(gameId);
+  if (expectedSessionRevision !== session.manifest.revision) {
+    throw new EngineSessionError("STALE_SESSION", `stale engine session: expected ${expectedSessionRevision}, current is ${session.manifest.revision}`);
+  }
+  const monthlyTicks = countMonthlyTicks(session.manifest.gameDate, targetDate);
+  if (!Array.isArray(monthlyCommands) || monthlyCommands.length !== monthlyTicks) {
+    throw new Error(`agent trace must contain exactly ${monthlyTicks} monthly command sets`);
+  }
+  let state = session.state;
+  let last = null;
+  const resolvedMonths = [];
+  for (let index = 0; index < monthlyTicks; index += 1) {
+    const commands = parseTurnCommands({ commands: monthlyCommands[index] ?? [] }).commands;
+    for (const command of commands) {
+      if (command.kind !== "economy.invest-region") throw new Error("P3a agent turns accept investment commands only");
+      if (command.expectedRevision !== state.revision || command.effectiveMonth !== state.month) {
+        throw new Error(`agent command ${command.commandId} is not bound to the replayed month revision`);
+      }
+    }
+    last = runTurn(state, { commands });
+    if (last.result.rejections.length) {
+      throw new Error(`agent trace replay rejected command: ${last.result.rejections.map((entry) => `${entry.reason}: ${entry.detail}`).join("; ")}`);
+    }
+    resolvedMonths.push(turnPayload(last));
+    state = last.result.state;
+  }
+  const completeAgentTurn = { ...agentTurn, resolvedMonths };
+  const committed = commitEngineSession(getGameDirectory(game.id), {
+    expectedRevision: expectedSessionRevision,
+    gameId: game.id, engineScenario: game.engineScenario,
+    gameDate: parseCalendarDate(targetDate, "targetDate").text,
+    round: session.manifest.round + (advanceRound ? 1 : 0), state,
+    lastTurn: monthlyTicks ? turnPayload(last) : session.lastTurn,
+    ownership: ownershipFor(fixture.link, state), monthlyTicks,
+    agentState, agentTurn: completeAgentTurn,
+  });
+  invalidateLibraryCatalogs();
+  return makeSnapshot(game, fixture, committed, monthlyTicks);
 };
 
 export const readEconomyState = (gameId) => {
@@ -181,6 +233,7 @@ export const advanceEconomy = (gameId, { targetDate, expectedSessionRevision, co
     round: session.manifest.round + 1, state,
     lastTurn: monthlyTicks ? turnPayload(last) : session.lastTurn,
     ownership: ownershipFor(fixture.link, state), monthlyTicks,
+    ...(session.agentState ? { agentState: session.agentState, agentTurn: session.agentTurn } : {}),
   });
   invalidateLibraryCatalogs();
   return makeSnapshot(game, fixture, committed, monthlyTicks);

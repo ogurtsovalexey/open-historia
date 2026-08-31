@@ -36,6 +36,13 @@ import {
 import { advanceEconomy, readEconomyState } from "./economyStore.js";
 import { EngineSessionError } from "./engineSessionStore.js";
 import {
+  cancelAgentTurnDraft,
+  commitPreparedAgentTurn,
+  prepareAgentTurn,
+  readAgentTurnDraft,
+  stepAgentTurn,
+} from "./agentTurnStore.js";
+import {
   createMapEditorDocument,
   deleteMapEditorDocument,
   ensureMapEditorStore,
@@ -573,6 +580,47 @@ app.post("/api/games/:gameId/economy/advance", jsonParser, (req, res) => {
   } catch (error) {
     sendError(res, error instanceof EngineSessionError && error.code === "STALE_SESSION" ? 409 : 400, error);
   }
+});
+
+app.get("/api/games/:gameId/agent-turn/draft", (req, res) => {
+  try {
+    res.setHeader("Cache-Control", "no-store");
+    res.json(readAgentTurnDraft(req.params.gameId));
+  } catch (error) {
+    sendError(res, error instanceof EngineSessionError && error.code === "STALE_SESSION" ? 409 : 400, error);
+  }
+});
+
+app.post("/api/games/:gameId/agent-turn/prepare", jsonParser, (req, res) => {
+  try {
+    res.setHeader("Cache-Control", "no-store");
+    res.json(prepareAgentTurn(req.params.gameId, req.body));
+  } catch (error) {
+    sendError(res, error instanceof EngineSessionError && error.code === "STALE_SESSION" ? 409 : 400, error);
+  }
+});
+
+app.post("/api/games/:gameId/agent-turn/step", jsonParser, (req, res) => {
+  try {
+    res.setHeader("Cache-Control", "no-store");
+    res.json(stepAgentTurn(req.params.gameId, req.body));
+  } catch (error) {
+    sendError(res, error instanceof EngineSessionError && error.code === "STALE_SESSION" ? 409 : 400, error);
+  }
+});
+
+app.post("/api/games/:gameId/agent-turn/commit", jsonParser, (req, res) => {
+  try {
+    res.setHeader("Cache-Control", "no-store");
+    res.json(commitPreparedAgentTurn(req.params.gameId, req.body));
+  } catch (error) {
+    sendError(res, error instanceof EngineSessionError && error.code === "STALE_SESSION" ? 409 : 400, error);
+  }
+});
+
+app.delete("/api/games/:gameId/agent-turn/draft", (req, res) => {
+  try { res.json(cancelAgentTurnDraft(req.params.gameId)); }
+  catch (error) { sendError(res, 400, error); }
 });
 
 app.get("/api/runtime/pmtiles/:assetKey", (req, res) => {

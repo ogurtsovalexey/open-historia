@@ -113,3 +113,52 @@ test("live Gemini advisor and diplomacy stay grounded in the 1938 engine session
 
   await request.delete(`/api/games/${gameId}`);
 });
+
+test("live Gemini returns a bounded opponent-economy proposal with reasoning off", async ({ page, request }) => {
+  test.setTimeout(180_000);
+  const gameId = "p3a-gemini-agent-smoke";
+  await request.delete(`/api/games/${gameId}`).catch(() => {});
+  expect((await request.post("/api/games", {
+    data: { id: gameId, name: "P3a Gemini Agent Smoke", scenarioId: "dev-map-4c", setActive: true },
+  })).ok()).toBeTruthy();
+  await page.addInitScript(({ key }) => {
+    localStorage.setItem("api_provider", "gemini");
+    localStorage.setItem("gemini_api_key", key);
+    localStorage.setItem("gemini_model", "gemini-3.5-flash-lite");
+    localStorage.setItem("gemini_custom_params", "");
+    localStorage.setItem("ai_reasoning_enabled", "0");
+    localStorage.setItem("Terrain", "false");
+    localStorage.setItem("Globe", "false");
+  }, { key: apiKey });
+  const requests = [];
+  page.on("request", (event) => {
+    if (/generativelanguage\.googleapis\.com/.test(event.url())) requests.push(event.postDataJSON());
+  });
+  await page.goto(`/?gameId=${gameId}`);
+  const initial = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
+  let draft = await (await request.post(`/api/games/${gameId}/agent-turn/prepare`, { data: {
+    targetDate: "1938-02-01", expectedSessionRevision: initial.sessionRevision, actions: [],
+  } })).json();
+  draft = await (await request.post(`/api/games/${gameId}/agent-turn/step`, { data: {
+    turnToken: draft.turnToken, action: "confirm-player",
+  } })).json();
+  expect(draft.tasks).toHaveLength(1);
+  expect(draft.tasks[0].context).toEqual(expect.objectContaining({ fullMapIncluded: false, polityCount: 3 }));
+  const outcome = await page.evaluate(async (task) => {
+    const module = await import("/src/Game/AI/agentTasks.js");
+    return module.dispatchAgentTask(task);
+  }, draft.tasks[0]);
+  draft = await (await request.post(`/api/games/${gameId}/agent-turn/step`, { data: {
+    turnToken: draft.turnToken, action: "submit-opponents", outcomes: [outcome],
+  } })).json();
+  const committed = await (await request.post(`/api/games/${gameId}/agent-turn/commit`, { data: {
+    turnToken: draft.turnToken, turnDigest: draft.turnDigest,
+  } })).json();
+  expect(requests).toHaveLength(1);
+  expect(requests[0].generationConfig?.thinkingConfig).toBeUndefined();
+  expect(JSON.stringify(requests[0])).not.toContain("FeatureCollection");
+  expect(committed.agentState.polities).toHaveLength(3);
+  expect(committed.agentState.polities.every((entry) => entry.source === "model")).toBeTruthy();
+  expect(committed.gameDate).toBe("1938-02-01");
+  await request.delete(`/api/games/${gameId}`);
+});

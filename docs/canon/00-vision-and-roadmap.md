@@ -12,7 +12,7 @@ it. Success = "I want to keep playing it", not downloads or revenue. Secondary
 purpose: a polygon for a solo-dev + AI-agent-fleet methodology.
 
 The player picks a country in a **bounded world** (one region/continent,
-10–30 countries, dozens to a few hundred regions), writes orders in free text,
+50–100 actively simulated countries, dozens to a few hundred regions), writes orders in free text,
 chooses how far to advance time, and reads what the world did with the numbers
 and why. Rival countries are played by an LLM that competes for real, reasoning
 over the same numbers the player sees, with configurable difficulty.

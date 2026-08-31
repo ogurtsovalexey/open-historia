@@ -18,6 +18,9 @@
     },
     {
       "path": "./packages/engine/tsconfig.json"
+    },
+    {
+      "path": "./packages/agent-runtime/tsconfig.json"
     }
   ]
 }

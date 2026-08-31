@@ -67,7 +67,10 @@ const acceptedEffect = () => ({
 
 test('registry exposes every accepted Phase 1 task and immutable definitions', () => {
   const tasks = registry.getAllTaskDefinitions();
-  assert.equal(tasks.length, 15);
+  assert.equal(tasks.length, 18);
+  assert.equal(registry.validateTask('orders.interpret-economy').outputContractId, 'player-economy-orders-schema');
+  assert.equal(registry.validateTask('opponents.plan-economy').fallbackPolicy, 'deterministic');
+  assert.equal(registry.validateTask('reports.explain-economy').authority, 'explanation');
   assert.deepEqual(registry.validateTask('timeline.advance', 'manual').allowedVariants, ['manual', 'automatic']);
   assert.throws(() => { registry.validateTask('timeline.advance').taskId = 'mutated'; });
   assert.throws(() => registry.validateTask('timeline.advance', 'other'), /not allowed/);

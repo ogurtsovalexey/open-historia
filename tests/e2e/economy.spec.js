@@ -84,6 +84,8 @@ test("Central Europe advances map, date and economy from one session revision", 
 
   await page.getByRole("button", { name: "»" }).click();
   await page.getByRole("button", { name: "2/1/1938 1 month" }).click();
+  await expect(page.getByTestId("agent-order-confirmation")).toBeVisible();
+  await page.getByTestId("confirm-agent-turn").click();
   await expect(pane).toContainText("1938-02-01", { timeout: 15_000 });
   const advancedResponse = await request.get(`/api/games/${gameId}/economy/state`);
   const advanced = await advancedResponse.json();
@@ -141,17 +143,19 @@ test("Central Europe advances map, date and economy from one session revision", 
   // Force a genuine race: another writer commits after the UI reads state but
   // before its POST arrives. The loser must surface stale-session and not commit.
   let winningRevision = "";
-  await page.route(`**/api/games/${gameId}/economy/advance`, async (route) => {
+  await page.route(`**/api/games/${gameId}/agent-turn/prepare`, async (route) => {
     const body = route.request().postDataJSON();
-    const winner = await request.post(`/api/games/${gameId}/economy/advance`, { data: body });
+    const winner = await request.post(`/api/games/${gameId}/economy/advance`, {
+      data: { targetDate: body.targetDate, expectedSessionRevision: body.expectedSessionRevision, commands: [] },
+    });
     expect(winner.ok()).toBeTruthy();
     winningRevision = (await winner.json()).sessionRevision;
     await route.continue();
   });
   await page.getByRole("button", { name: "»" }).click();
   await page.getByRole("button", { name: "5/3/1938 1 day" }).click();
-  await expect(page.getByText(/stale engine session/i)).toBeVisible({ timeout: 15_000 });
-  await page.unroute(`**/api/games/${gameId}/economy/advance`);
+  await expect(page.getByText(/stale agent-turn preparation/i)).toBeVisible({ timeout: 15_000 });
+  await page.unroute(`**/api/games/${gameId}/agent-turn/prepare`);
   const afterRace = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
   expect(afterRace.sessionRevision).toBe(winningRevision);
   expect(afterRace.round).toBe(5);
@@ -179,9 +183,9 @@ test("Central Europe advances map, date and economy from one session revision", 
 
   expect(modelCalls).toEqual([]);
   expect(consoleErrors.filter((message) => /status of 409/.test(message))).toHaveLength(1);
-  expect(consoleErrors.some((message) => /Failed to simulate jump: Error: stale engine session/.test(message))).toBeTruthy();
+  expect(consoleErrors.some((message) => /Failed to simulate jump: Error: stale agent-turn preparation/.test(message))).toBeTruthy();
   const unexpectedConsoleErrors = consoleErrors.filter((message) =>
-    !/Bad response code: 404|Failed to load resource: the server responded with a status of (404|409)|Startup preload failed during|Failed to load (country names|country labels|timeline lookups|region catalog)|Failed to simulate jump: Error: stale engine session/.test(message)
+    !/Bad response code: 404|Failed to load resource: the server responded with a status of (404|409)|Startup preload failed during|Failed to load (country names|country labels|timeline lookups|region catalog)|Failed to simulate jump: Error: stale agent-turn preparation/.test(message)
   );
   expect(unexpectedConsoleErrors).toEqual([]);
 

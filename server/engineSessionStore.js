@@ -4,9 +4,16 @@ import fs from "node:fs";
 import path from "node:path";
 
 export const ENGINE_SESSION_SCHEMA = "open-historia-engine-session/1";
+export const ENGINE_SESSION_SCHEMA_V2 = "open-historia-engine-session/2";
 const POINTER_FILE = "current.json";
 const MANIFEST_FILE = "manifest.json";
-const FILES = Object.freeze({ state: "state.json", lastTurn: "last-turn.json", ownership: "ownership.json" });
+const FILES_V1 = Object.freeze({ state: "state.json", lastTurn: "last-turn.json", ownership: "ownership.json" });
+const FILES_V2 = Object.freeze({
+  ...FILES_V1,
+  agentState: "agent-state.json",
+  agentTurn: "agent-turn.json",
+});
+const filesForSchema = (schema) => schema === ENGINE_SESSION_SCHEMA_V2 ? FILES_V2 : FILES_V1;
 
 export class EngineSessionError extends Error {
   constructor(code, message) {
@@ -58,7 +65,7 @@ const descriptor = (bytes) => ({ sha256: sha256(bytes), bytes: Buffer.byteLength
 const parseJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
 
 const verifyDirectoryFiles = (dir, manifest) => {
-  for (const [key, filename] of Object.entries(FILES)) {
+  for (const [key, filename] of Object.entries(filesForSchema(manifest.schema))) {
     const bytes = fs.readFileSync(path.join(dir, filename), "utf8");
     const expected = manifest.files?.[key];
     if (!expected || expected.sha256 !== sha256(bytes) || expected.bytes !== Buffer.byteLength(bytes)) {
@@ -68,7 +75,7 @@ const verifyDirectoryFiles = (dir, manifest) => {
 };
 
 const verifyManifest = (gameDir, manifest, visited = new Set()) => {
-  if (!manifest || manifest.schema !== ENGINE_SESSION_SCHEMA || typeof manifest.revision !== "string") {
+  if (!manifest || ![ENGINE_SESSION_SCHEMA, ENGINE_SESSION_SCHEMA_V2].includes(manifest.schema) || typeof manifest.revision !== "string") {
     throw new EngineSessionError("CORRUPT_SESSION", "engine session manifest has an invalid schema");
   }
   const { revision, ...content } = manifest;
@@ -103,9 +110,11 @@ export const readEngineSession = (gameDir) => {
     if (manifest.revision !== pointer.revision) throw new Error("pointer mismatch");
     return {
       manifest,
-      state: parseJson(path.join(dir, FILES.state)),
-      lastTurn: parseJson(path.join(dir, FILES.lastTurn)),
-      ownership: parseJson(path.join(dir, FILES.ownership)),
+      state: parseJson(path.join(dir, FILES_V1.state)),
+      lastTurn: parseJson(path.join(dir, FILES_V1.lastTurn)),
+      ownership: parseJson(path.join(dir, FILES_V1.ownership)),
+      agentState: manifest.schema === ENGINE_SESSION_SCHEMA_V2 ? parseJson(path.join(dir, FILES_V2.agentState)) : null,
+      agentTurn: manifest.schema === ENGINE_SESSION_SCHEMA_V2 ? parseJson(path.join(dir, FILES_V2.agentTurn)) : null,
     };
   } catch (error) {
     if (error instanceof EngineSessionError) throw error;
@@ -118,16 +127,25 @@ const writeExclusive = (file, bytes) => {
   fs.writeFileSync(file, bytes, { flag: "wx" });
 };
 
-export const commitEngineSession = (gameDir, { expectedRevision = null, gameId, engineScenario, gameDate, round, state, lastTurn = null, ownership = {}, monthlyTicks = 0 }) => {
+export const commitEngineSession = (gameDir, {
+  expectedRevision = null, gameId, engineScenario, gameDate, round, state,
+  lastTurn = null, ownership = {}, monthlyTicks = 0, agentState, agentTurn,
+}) => {
   const current = readEngineSession(gameDir);
   const actual = current?.manifest.revision ?? null;
   if (expectedRevision !== actual) {
     throw new EngineSessionError("STALE_SESSION", `stale engine session: expected ${expectedRevision ?? "none"}, current is ${actual ?? "none"}`);
   }
 
-  const payloads = { state: jsonBytes(state), lastTurn: jsonBytes(lastTurn), ownership: jsonBytes(ownership) };
+  const useV2 = agentState !== undefined || agentTurn !== undefined || current?.manifest.schema === ENGINE_SESSION_SCHEMA_V2;
+  const effectiveAgentState = agentState ?? current?.agentState ?? { schemaVersion: "open-historia-agent-state/1", polities: [] };
+  const effectiveAgentTurn = agentTurn ?? current?.agentTurn ?? null;
+  const payloads = {
+    state: jsonBytes(state), lastTurn: jsonBytes(lastTurn), ownership: jsonBytes(ownership),
+    ...(useV2 ? { agentState: jsonBytes(effectiveAgentState), agentTurn: jsonBytes(effectiveAgentTurn) } : {}),
+  };
   const content = {
-    schema: ENGINE_SESSION_SCHEMA,
+    schema: useV2 ? ENGINE_SESSION_SCHEMA_V2 : ENGINE_SESSION_SCHEMA,
     gameId,
     engineScenario,
     parentRevision: actual,
@@ -146,7 +164,7 @@ export const commitEngineSession = (gameDir, { expectedRevision = null, gameId, 
   fs.mkdirSync(staging, { recursive: true });
   try {
     hook("beforeFiles", { gameId, revision: manifest.revision });
-    for (const [key, filename] of Object.entries(FILES)) writeExclusive(path.join(staging, filename), payloads[key]);
+    for (const [key, filename] of Object.entries(filesForSchema(content.schema))) writeExclusive(path.join(staging, filename), payloads[key]);
     hook("afterFiles", { gameId, revision: manifest.revision });
     writeExclusive(path.join(staging, MANIFEST_FILE), `${canonical(manifest)}\n`);
     hook("afterManifest", { gameId, revision: manifest.revision });

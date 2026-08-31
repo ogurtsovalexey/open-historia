@@ -236,11 +236,16 @@ function extractAnthropicToolInput(data, tool) {
 function toGeminiSchema(value) {
     if (Array.isArray(value)) return value.map(toGeminiSchema);
     if (!value || typeof value !== "object") return value;
-    return Object.fromEntries(
+    const schema = Object.fromEntries(
         Object.entries(value)
-        .filter(([key]) => key !== "additionalProperties" && key !== "$schema")
+        .filter(([key]) => key !== "additionalProperties" && key !== "$schema" && key !== "const")
         .map(([key, entry]) => [key, toGeminiSchema(entry)]),
     );
+    // Gemini function declarations accept only a subset of JSON Schema. Zod's
+    // exported literal schemas use `const`, while Gemini represents the same
+    // constraint as a single-value enum.
+    if (Object.hasOwn(value, "const")) schema.enum = [value.const];
+    return schema;
 }
 
 function getGeminiUrl(model, apiKey) {
@@ -542,6 +547,7 @@ async function callGemini(systemPrompt, history, {
     retryDelay = 15000,
     signal,
     tool,
+    reasoningMode,
 } = {}) {
     const settings = getProviderSettings("gemini");
     const apiKey = settings.apiKey.trim();
@@ -557,6 +563,7 @@ async function callGemini(systemPrompt, history, {
     });
 
     const customParams = parseCustomParams(settings.customParams, "Gemini");
+    const thinkingEnabled = reasoningMode === "off" ? false : getReasoningEnabled();
 
     // Advisor/chat streaming: with an onChunk callback (and no tool), use the
     // streaming endpoint so the reply appears token-by-token. maxOutputTokens
@@ -572,7 +579,7 @@ async function callGemini(systemPrompt, history, {
                 contents: history,
                 generationConfig: {
                     maxOutputTokens: Math.max(1, Number(maxTokens) || 8192),
-                    ...(getReasoningEnabled() ? { thinkingConfig: { thinkingBudget: 8192 } } : {}),
+                    ...(thinkingEnabled ? { thinkingConfig: { thinkingBudget: 8192 } } : {}),
                 },
                 ...customParams,
             }),
@@ -595,7 +602,7 @@ async function callGemini(systemPrompt, history, {
                 system_instruction: { parts: [{ text: systemPrompt }] },
                 contents: history,
                 // Reasoning toggle (settings): let thinking-capable Gemini models think.
-                ...(getReasoningEnabled()
+                ...(thinkingEnabled
                      ? { generationConfig: { thinkingConfig: { thinkingBudget: 8192 } } }
                      : {}),
                 ...customParams,

@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./dist/tsconfig.agent-runtime.tsbuildinfo",
+    "composite": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "allowImportingTsExtensions": false,
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*"]
+}

@@ -51,6 +51,24 @@ describe("atomic engine session store", { concurrency: false }, () => {
     assert.throws(() => readEngineSession(root), (error) => error.code === "CORRUPT_SESSION");
   });
 
+  it("upgrades a v1 parent to v2 and preserves agent projections on later economy commits", () => {
+    const root = gameDir();
+    const first = commitEngineSession(root, { expectedRevision: null, ...data("engine:1") });
+    const agentState = { schemaVersion: "open-historia-agent-state/1", polities: [] };
+    const second = commitEngineSession(root, {
+      expectedRevision: first.manifest.revision, ...data("engine:2", "1900-02-01"),
+      agentState, agentTurn: { schemaVersion: "open-historia-agent-turn/1", months: [] },
+    });
+    assert.equal(second.manifest.schema, "open-historia-engine-session/2");
+    assert.deepEqual(second.agentState, agentState);
+    const third = commitEngineSession(root, {
+      expectedRevision: second.manifest.revision, ...data("engine:3", "1900-03-01"),
+    });
+    assert.equal(third.manifest.schema, "open-historia-engine-session/2");
+    assert.deepEqual(third.agentState, agentState);
+    assert.equal(third.manifest.parentRevision, second.manifest.revision);
+  });
+
   it("keeps the previous revision readable when every commit stage fails", () => {
     const root = gameDir();
     const first = commitEngineSession(root, { expectedRevision: null, ...data("engine:1") });

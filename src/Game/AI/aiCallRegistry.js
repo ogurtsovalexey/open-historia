@@ -149,6 +149,42 @@
 /** @type {AiTaskDefinition[]} */
 const TASK_DEFINITIONS = [
   {
+    taskId: 'orders.interpret-economy',
+    version: 1,
+    kind: 'structured',
+    authority: 'proposal',
+    contextPolicyId: 'player-order-interpreter',
+    budgetPolicyId: 'medium-classification',
+    outputContractId: 'player-economy-orders-schema',
+    allowedVariants: [],
+    fallbackPolicy: 'surface-error',
+    mayMutateState: true
+  },
+  {
+    taskId: 'opponents.plan-economy',
+    version: 1,
+    kind: 'structured',
+    authority: 'proposal',
+    contextPolicyId: 'opponent-economy-batch',
+    budgetPolicyId: 'medium-generation',
+    outputContractId: 'opponent-economy-batch-schema',
+    allowedVariants: [],
+    fallbackPolicy: 'deterministic',
+    mayMutateState: true
+  },
+  {
+    taskId: 'reports.explain-economy',
+    version: 1,
+    kind: 'structured',
+    authority: 'explanation',
+    contextPolicyId: 'player-economy-report',
+    budgetPolicyId: 'medium-generation',
+    outputContractId: 'player-economy-report-schema',
+    allowedVariants: [],
+    fallbackPolicy: 'deterministic',
+    mayMutateState: false
+  },
+  {
     taskId: 'timeline.advance',
     version: 1,
     kind: 'structured',

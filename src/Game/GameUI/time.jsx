@@ -12,19 +12,26 @@ import {
 } from "../../runtime/assets.js";
 import { loadRollbackSnapshots, maybeGeneratePregameHistory, rollBackToSnapshot, simulateAutoJump, simulateTimelineJump } from "../AI/gameplay.js";
 import {
-    advanceEconomy,
+    cancelAgentTurn,
     clearQueuedEconomyCommands,
+    commitAgentTurn,
     fetchEconomyState,
     getActiveEngineGame,
     getQueuedEconomyCommands,
+    prepareAgentTurn,
+    stepAgentTurn,
 } from "../../runtime/economy.js";
+import { dispatchAgentTask } from "../AI/agentTasks.js";
 import { isMainMenuOpen } from "./libraryBar";
+import { getStoredLanguage } from "../../runtime/i18n.js";
 import {
     applyEventImpactsToWorld,
     normalizeActions,
+    readActionsState,
     readEventsState,
     readGameData,
     readWorldState,
+    writeActionsState,
 } from "../../runtime/gameState.js";
 import { setWorldStateOverride } from "../Map/useWorldState.js";
 import { setUnitsOverride } from "../Map/unitsController.js";
@@ -862,12 +869,14 @@ const JumpNode = ({ isLoading, opt, onJump }) => {
 };
 
 const TimelineSkipPanel = ({
+    agentConfirmation,
     canUndo,
     currentDate,
     error,
     isLoading,
     isOpen,
     onAutoJump,
+    onConfirmAgent,
     onCancel,
     onClose,
     onJump,
@@ -905,7 +914,23 @@ const TimelineSkipPanel = ({
         title="Timeline"
         topOffset={topOffset}
         >
-        <div
+        {agentConfirmation ? (
+            <div data-testid="agent-order-confirmation" style={{ width: "100%", display: "flex", flexDirection: "column", gap: "0.65rem" }}>
+            <div style={{ color: "rgba(255,255,255,0.9)", fontSize: "0.86rem", fontWeight: 700 }}>Confirm interpreted actions</div>
+            <div style={{ color: "rgba(255,255,255,0.62)", fontSize: "0.72rem" }}>Unsupported or ambiguous actions will have no executable effect. Confirming still advances time.</div>
+            {agentConfirmation.items.map((item) => (
+                <div key={item.actionId} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "0.6rem" }}>
+                <div style={{ color: item.disposition === "command" || item.disposition === "report" ? "#bbf7d0" : "#fde68a", fontSize: "0.76rem", fontWeight: 700 }}>{item.disposition}</div>
+                <div style={{ color: "rgba(255,255,255,0.82)", fontSize: "0.78rem" }}>{item.summary}</div>
+                {item.command ? <div style={{ color: "rgba(196,165,255,0.8)", fontSize: "0.72rem" }}>{item.command.region?.en ?? item.command.region}: {item.command.spend} gold</div> : null}
+                </div>
+            ))}
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button type="button" onClick={onCancel} style={{ flex: 1, padding: "0.55rem", borderRadius: 9, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.06)", color: "white" }}>Back</button>
+                {agentConfirmation.canAdvance !== false && <button data-testid="confirm-agent-turn" type="button" onClick={onConfirmAgent} style={{ flex: 1, padding: "0.55rem", borderRadius: 9, border: "1px solid rgba(139,92,246,0.7)", background: "rgba(109,40,217,0.4)", color: "white", fontWeight: 700 }}>Confirm &amp; advance</button>}
+            </div>
+            </div>
+        ) : <div
         style={{
             alignItems: "center",
             display: "flex",
@@ -1065,7 +1090,7 @@ const TimelineSkipPanel = ({
         Go
         </button>
         </div>
-        </div>
+        </div>}
 
         {isLoading && (
             <div
@@ -1300,6 +1325,8 @@ const DateWidget = ({
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [fallbackWarning, setFallbackWarning] = useState("");
+    const [agentConfirmation, setAgentConfirmation] = useState(null);
+    const [engineSnapshot, setEngineSnapshot] = useState(null);
     // Holds the in-flight jump's AbortController so the Cancel button can stop it.
     const jumpAbortRef = React.useRef(null);
     // Mirrors the latest applied turn (round + date) so the 5s refresh poll can tell a
@@ -1357,10 +1384,12 @@ const DateWidget = ({
 
         const loadState = async () => {
             try {
-                const [game, nextEvents, world] = await Promise.all([
+                const engineGame = await getActiveEngineGame();
+                const [game, nextEvents, world, nextEngineSnapshot] = await Promise.all([
                     readGameData({ force: true }),
                                                                     readEventsState({ force: true }),
                                                                     readWorldState({ force: true }),
+                                                                    engineGame ? fetchEconomyState(engineGame.id) : Promise.resolve(null),
                 ]);
 
                 if (cancelled) {
@@ -1382,6 +1411,7 @@ const DateWidget = ({
                 setGameData(game);
                 setEvents(nextEvents);
                 setWorldState(world);
+                setEngineSnapshot(nextEngineSnapshot);
             } catch (loadError) {
                 if (!cancelled) {
                     console.error("Failed to load timeline state:", loadError);
@@ -1446,6 +1476,87 @@ const DateWidget = ({
         setLocalOpenPanel((current) => (current === panelName ? null : panelName));
     }
 
+    const refreshAfterEngineTurn = async () => {
+        clearQueuedEconomyCommands((await getActiveEngineGame())?.id);
+        const [nextGame, nextWorld, nextEvents] = await Promise.all([
+            readGameData({ force: true }),
+            readWorldState({ force: true }),
+            readEventsState({ force: true }),
+        ]);
+        setGameData(nextGame);
+        setWorldState(nextWorld);
+        setEvents(nextEvents);
+        setVisibleEventCount(1);
+        setPanel("history");
+    };
+
+    const runPreparedAgentTurn = async (gameId, initialDraft, controller) => {
+        let draft = initialDraft;
+        if (draft.phase === "confirm-player") {
+            draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "confirm-player" });
+        }
+        while (draft.phase === "plan-opponents" || draft.phase === "resolve-empty-month" || draft.phase === "report-player") {
+            if (controller.signal.aborted) throw controller.signal.reason;
+            if (draft.phase === "report-player") {
+                let outputs = [];
+                try {
+                    outputs = await Promise.all(draft.tasks.map(async (task) => (await dispatchAgentTask(task, { signal: controller.signal })).output));
+                } catch (reportError) {
+                    outputs = [{ reports: [] }];
+                    console.warn("Player economy report used fallback:", reportError);
+                }
+                draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "submit-reports", outputs });
+                continue;
+            }
+            if (draft.phase === "resolve-empty-month") {
+                draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "resolve-empty-month" });
+                continue;
+            }
+            const outcomes = await Promise.all(draft.tasks.map(async (task) => {
+                try { return await dispatchAgentTask(task, { signal: controller.signal }); }
+                catch (taskError) { return { taskKey: task.taskKey, failureCode: taskError?.message || "request-failed" }; }
+            }));
+            draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "submit-opponents", outcomes });
+        }
+        if (draft.phase !== "ready") throw new Error(`agent turn stopped in unexpected phase ${draft.phase}`);
+        const committed = await commitAgentTurn({ gameId, turnToken: draft.turnToken, turnDigest: draft.turnDigest });
+        setEngineSnapshot(committed);
+        const fallbackFailures = (committed.agentTurn?.months ?? [])
+            .flatMap((month) => month.batchOutcomes ?? [])
+            .filter((batch) => batch.source === "fallback")
+            .map((batch) => batch.failureCode || "unknown provider failure");
+        if (fallbackFailures.length) {
+            setFallbackWarning(`Opponent AI used deterministic fallback: ${[...new Set(fallbackFailures)].join("; ")}`);
+        } else {
+            setFallbackWarning("");
+        }
+        const dispositions = new Map((committed.agentTurn?.actionDispositions ?? []).map((entry) => [entry.actionId, entry]));
+        if (dispositions.size) {
+            const actions = normalizeActions(await readActionsState({ force: true }));
+            await writeActionsState(actions.map((action) => dispositions.has(action.id)
+                ? { ...action, status: ["command", "report"].includes(dispositions.get(action.id).disposition) ? "resolved" : "unsupported" }
+                : action));
+        }
+        setAgentConfirmation(null);
+        await refreshAfterEngineTurn();
+    };
+
+    const confirmPreparedAgentTurn = async () => {
+        const pending = agentConfirmation;
+        if (!pending || isLoading) return;
+        setIsLoading(true);
+        setError("");
+        const controller = new AbortController();
+        jumpAbortRef.current = controller;
+        try { await runPreparedAgentTurn(pending.gameId, pending.draft, controller); }
+        catch (confirmError) {
+            if (!controller.signal.aborted) setError(confirmError?.message || "Failed to run agent turn.");
+        } finally {
+            jumpAbortRef.current = null;
+            setIsLoading(false);
+        }
+    };
+
     const runJump = async (days, mode = "jump", explicitTargetDate = "") => {
         if (!gameData || days == null || isLoading) {
             return;
@@ -1466,23 +1577,37 @@ const DateWidget = ({
             if (engineGame) {
                 const current = await fetchEconomyState(engineGame.id);
                 const targetDate = explicitTargetDate || dayjs(current.gameDate).add(days, "day").format("YYYY-MM-DD");
-                await advanceEconomy({
+                const directCommands = getQueuedEconomyCommands(engineGame.id);
+                const plannedActions = normalizeActions(await readActionsState())
+                    .filter((action) => action.status === "planned")
+                    .map((action) => ({ id: action.id, text: action.text || action.rawInput || action.title }));
+                let draft = await prepareAgentTurn({
                     gameId: engineGame.id,
                     targetDate,
                     expectedSessionRevision: current.sessionRevision,
-                    commands: getQueuedEconomyCommands(engineGame.id),
+                    actions: plannedActions,
+                    commands: directCommands,
+                    locale: getStoredLanguage(),
                 });
-                clearQueuedEconomyCommands(engineGame.id);
-                const [nextGame, nextWorld, nextEvents] = await Promise.all([
-                    readGameData({ force: true }),
-                    readWorldState({ force: true }),
-                    readEventsState({ force: true }),
-                ]);
-                setGameData(nextGame);
-                setWorldState(nextWorld);
-                setEvents(nextEvents);
-                setVisibleEventCount(1);
-                setPanel("history");
+                if (draft.phase === "interpret-player") {
+                    const outputs = await Promise.all(draft.tasks.map(async (task) => (await dispatchAgentTask(task, { signal: controller.signal })).output));
+                    draft = await stepAgentTurn({ gameId: engineGame.id, turnToken: draft.turnToken, action: "submit-interpretation", outputs });
+                }
+                if (draft.phase === "no-executable-action") {
+                    const dispositions = new Map((draft.confirmation ?? []).map((entry) => [entry.actionId, entry]));
+                    const actions = normalizeActions(await readActionsState({ force: true }));
+                    await writeActionsState(actions.map((action) => dispositions.has(action.id)
+                        ? { ...action, status: "unsupported" }
+                        : action));
+                    await cancelAgentTurn(engineGame.id);
+                    setAgentConfirmation({ gameId: engineGame.id, draft, items: draft.confirmation, canAdvance: false });
+                    return;
+                }
+                if (draft.phase === "confirm-player" && (plannedActions.length || directCommands.length)) {
+                    setAgentConfirmation({ gameId: engineGame.id, draft, items: draft.confirmation, canAdvance: true });
+                    return;
+                }
+                await runPreparedAgentTurn(engineGame.id, draft, controller);
                 return;
             }
             const result = mode === "auto"
@@ -1512,6 +1637,8 @@ const DateWidget = ({
 
     const cancelJump = () => {
         jumpAbortRef.current?.abort(new DOMException("Timeline jump cancelled.", "AbortError"));
+        if (agentConfirmation?.gameId) cancelAgentTurn(agentConfirmation.gameId).catch(() => {});
+        setAgentConfirmation(null);
     };
 
     // How many turns can be undone (a restore point is captured at the start of
@@ -1569,7 +1696,30 @@ const DateWidget = ({
         .filter(Boolean);
     }, [eventLookup, gameData, lookups, worldState]);
 
-    const latestTurnRecord = historyRecords[0] || null;
+    const engineTurnRecord = useMemo(() => {
+        const agentTurn = engineSnapshot?.agentTurn;
+        if (!agentTurn || !(agentTurn.reports?.length > 0)) return null;
+        const reportEvents = agentTurn.reports.map((report, index) => ({
+            id: `agent-report-${engineSnapshot.sessionRevision}-${index}`,
+            date: engineSnapshot.gameDate,
+            title: report.title,
+            description: report.body,
+            importance: "minor",
+            kind: "economy-report",
+            notable: false,
+            playerRelated: true,
+            source: report.source,
+            impacts: {},
+        }));
+        return {
+            id: `engine-${engineSnapshot.sessionRevision}`,
+            events: reportEvents,
+            rangeLabel: `Through ${formatDate(engineSnapshot.gameDate)}`,
+            source: reportEvents.some((event) => event.source === "fallback") ? "fallback" : "ai",
+            fallbackReason: agentTurn.reports.find((report) => report.failureCode)?.failureCode || "",
+        };
+    }, [engineSnapshot]);
+    const latestTurnRecord = engineTurnRecord || historyRecords[0] || null;
     const persistedFallbackWarning = latestTurnRecord?.source === "fallback"
     ? `Turn generated by fallback: ${latestTurnRecord.fallbackReason || "structured AI output was unavailable"}`
     : "";
@@ -1719,12 +1869,14 @@ const DateWidget = ({
     return (
         <>
         <TimelineSkipPanel
+        agentConfirmation={agentConfirmation}
         canUndo={undoCount > 0}
         currentDate={currentDate}
         error={error}
         isLoading={isLoading}
         isOpen={openPanel === "skip"}
         onAutoJump={() => runJump(365, "auto", dayjs(currentDate).add(1, "year").format("YYYY-MM-DD"))}
+        onConfirmAgent={confirmPreparedAgentTurn}
         onCancel={cancelJump}
         onClose={() => setPanel(null)}
         onJump={(days, targetDate) => runJump(days, "jump", targetDate)}
