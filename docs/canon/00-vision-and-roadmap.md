@@ -36,23 +36,25 @@ The game is "done enough to play" when all four exist at working depth:
    aggregate combat resolution, territorial change feeding straight back into
    regional re-aggregation.
 
-## The four later layers (all wanted, none blocking "playable")
+## The four later layers (all wanted, none blocking the first playable loop)
 
-Confirmed by the owner as part of the finished game, in dependency order — each
-only becomes meaningful once it has something to modify:
+Confirmed by the owner as part of the finished game. Small enabling slices may
+ship earlier than the full layer when they unlock interaction (for example,
+bilateral trade contracts precede a full market simulation):
 
-5. **Culture and religion** (`societyAndIdentity`) — regional/group identity.
+5. **Rulers and dynasties** — rulers/ministers as entities with traits and
+   reputation, succession, transfers of power, personal relations.
+6. **Culture and religion** (`societyAndIdentity`) — regional/group identity.
    **Static first**: identity comes from the scenario, mismatch with the state
    religion/language produces unrest and penalties and affects annexation.
    **Simple dynamics later**: assimilation, conversion and migration by plain,
    readable rules — deliberately not a Victoria-grade diffusion model.
-6. **Rulers and dynasties** — rulers/ministers as entities with traits and
-   reputation, succession, transfers of power, personal relations.
 7. **Technology and projects** — research as capabilities and efficiencies (not
    a linear tech year); construction/reform as projects with cost schedules,
    prerequisites and visible progress.
-8. **Prices, markets and trade** — external trade, prices and shortages,
-   currency/inflation, blockade as an economic weapon.
+8. **Prices and full markets** — prices and shortages, currency/inflation,
+   blockade as an economic weapon. Basic bilateral resource exchange ships in
+   P3b and does not wait for this layer.
 
 Out of scope for "finished" unless they emerge naturally: curated multi-scenario
 historical content at scale, scenario authoring tools for third parties,
@@ -95,24 +97,32 @@ opponent → deterministic consequences) comes second.
 | **P0 — Deterministic economy core** | Headless slice (originally 2 countries × 5 regions; superseded as a playtest target by the four-polity Central Europe scenario, kept as a regression fixture), monthly tick, ledger, report with causes, atomic run dirs, byte-identical replay, golden tests | **Done** (canon 04) |
 | **P1 — Headless bench** | UI-free playtest surface for fast checks: region table, national totals, "why changed" from the ledger, resource flows, investment order, advance one/twelve months, reset, turn report. Zero model calls (`npm run play:engine`). A test bench, not the product. | **Done** |
 | **P2 — The engine inside the game** | The Central Europe scenario (4 polities, 47 real regions) visible on the map; clicking a region selects it; the `Economy` drawer tab shows region + controller numbers and "why changed" from the ledger; advancing time runs the engine, not a model. Date, round, ownership and economy publish as one game-scoped session revision. Zero model calls. | **Done** |
-| **P3 — The loop (fun gate)** | Free-text orders → typed commands (interpreter, canon 07); LLM opponent playing rival countries from a bounded engine-built brief; difficulty levels; relations/agreements state so opponents have something to do with each other | **Next — core bet** |
-| **P4 — Internal politics** | Factions/estates fed by existing economy outputs (tax pressure, food shortfall, investment neglect), legitimacy, unrest, rulers | |
-| **P5 — War and army** | Forces and mobilization from population, supply on a bounded map, aggregate combat, occupation → region transfer (transfer semantics already specified) | |
-| **P6 — Identity and people** | Culture/religion static (unrest, annexation resistance); rulers/dynasties with succession | |
-| **P7 — Technology and markets** | Research as capabilities/efficiencies; projects with cost schedules; trade, prices, shortages, blockade | |
-| **P8 — World and balance** | Grow the fictional world to full bounded size, tune coefficients to historically plausible magnitudes, playtest for actual fun; simple culture dynamics if wanted | |
+| **P3a — Economic agent loop** | Free-text economy orders → typed commands; bounded opponent briefs, scheduling, difficulty and atomic agent turns | **Done** (canon 09) |
+| **P3b — Playable diplomacy and trade** | Six-polity Central Europe (add metropolitan France and Poland), two-tier AI orchestration, relations, proposals/counters, four agreement types, calls to arms and bilateral resource/treasury contracts | **Next — unlock interaction** |
+| **P3c — Statecraft tools** | Tax burden, budget priorities, debt/default; unified projects for construction/reform/research/mobilization/intelligence; evidence-backed country knowledge | |
+| **P4 — Politics and characters** | Scenario-defined factions, legitimacy/stability/unrest, escalation to coups/rebellions; rulers, heirs, appointments, succession and significant personal relations | |
+| **P5 — War and peace** | Formations and commanders, mobilization, connected supply, fronts, deterministic aggregate combat, occupation and validated free-form peace bargaining | |
+| **P6 — Capabilities and identity** | Non-linear capabilities; culture/religion mismatch, accepted identities and slow causal policy-driven change | |
+| **P7 — Campaign and balance** | Adaptive goals, generated crises, soft horizon and multidimensional legacy; tune the complete diplomacy → economy → politics → war loop for replayable campaigns | |
+| **P8 — World and deeper markets** | Grow toward the bounded target only after the loop is fun; full markets/prices, optional simple migration and other proven depth | |
 | **P9 — Optional** | One curated historical scenario; anything else | Optional |
+
+The decision-complete implementation sequence and minimum acceptance scenario
+for each remaining slice are binding in
+[`10-playable-game-next-steps.md`](10-playable-game-next-steps.md). It refines
+the former coarse P3–P8 ordering without reopening completed P0–P3a contracts.
 
 **Gates** (a phase is passable, not a calendar promise):
 
-- **Gate A — playable loop**: P0-P3. A campaign of ≥12 months can be played
-  end to end with orders in prose, an opponent that visibly reacts to the
-  numbers, and every change explainable from the ledger.
-- **Gate B — core four**: +P4+P5. All four systems interact; a war changes the
-  economy, which changes politics, which constrains the war.
-- **Gate C — full game**: +P6+P7. All eight systems present; identity, people,
-  technology and trade all feed the same numbers.
-- **Gate D — playable-for-real**: +P8. Balanced enough that the author chooses
+- **Gate A — interactive loop**: P0-P3b. A campaign of ≥12 months can be played
+  end to end with orders in prose, rival countries that negotiate and trade,
+  and every numeric change explainable from the ledger.
+- **Gate B — core four**: +P3c+P4+P5. All four core systems interact; a war
+  changes the economy, which changes politics, which constrains the war.
+- **Gate C — full campaign**: +P6+P7. Identity, people, capabilities, crises
+  and legacy all feed the same canonical state and complete campaign loop.
+- **Gate D — playable-for-real**: balance work in P7, then optional P8 depth.
+  The game is balanced enough that the author chooses
   to play it for its own sake. This is "finished".
 - Optional Gate E: a curated historical scenario on top, if wanted.
 

@@ -21,6 +21,7 @@ escalate, do not silently "fix" either side.
 | 07 | [`07-ai-boundary.md`](07-ai-boundary.md) | Where LLMs plug in; what they may and may not do |
 | 08 | [`08-testing-gates.md`](08-testing-gates.md) | Definition of Done, golden fixtures, worker task rules |
 | 09 | [`09-p3-economic-agent-loop.md`](09-p3-economic-agent-loop.md) | P3a free-text economy orders, scalable opponent scheduling and atomic agent turns |
+| 10 | [`10-playable-game-next-steps.md`](10-playable-game-next-steps.md) | Binding minimal sequence from P3a to a complete playable campaign |
 
 Sources of each doc are cited inline. The full archived corpus stays under
 `docs/spec/` and `docs/product/` for provenance; their READMEs carry a
