@@ -173,6 +173,8 @@ test("Central Europe advances map, date and economy from one session revision", 
   await expect(pane.getByText("Инфраструктура", { exact: true }).first()).toBeVisible();
   await expect(pane.getByText("Казна", { exact: true })).toBeVisible();
   await expect(pane.getByText("Национальные запасы", { exact: true })).toBeVisible();
+  await page.locator("canvas.maplibregl-canvas").click({ position: { x: 720, y: 570 } });
+  await expect(page.getByTestId("region-popup-region-name")).toHaveText(investedInitial.displayName.ru);
   await request.put("/api/ui-settings", { data: { language: "en" } });
 
   expect(modelCalls).toEqual([]);

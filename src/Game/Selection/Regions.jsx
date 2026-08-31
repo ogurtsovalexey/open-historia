@@ -4,7 +4,9 @@ import { createPortal } from "react-dom";
 import { useMap } from "react-map-gl/maplibre";
 import { getNationFlags, resolveCountryDisplayName } from "../../runtime/assets.js";
 import { flagImageUrlFromGid, flagEmojiFromGid } from "../../runtime/countryFlags.js";
+import { fetchEconomyState, getActiveEngineGame } from "../../runtime/economy.js";
 import { readWorldState } from "../../runtime/gameState.js";
+import { getStoredLanguage } from "../../runtime/i18n.js";
 import { requestDiplomaticChat } from "../GameUI/chat.jsx";
 import { openCountryPanel } from "./CountryPanel.jsx";
 
@@ -31,7 +33,7 @@ export const onRegionSelected = (props) => {
     try { _clickObserver?.(props); } catch { /* observers must never break clicks */ }
     if (_clickInterceptor && _clickInterceptor(props)) return;
 
-    const { COUNTRY, NAME_1, GID_0, gid0, owner, lngLat } = props;
+    const { COUNTRY, NAME_1, GID_0, GID_1, gid0, owner, lngLat } = props;
     if (!_setSelection) return;
 
     const isSame =
@@ -44,7 +46,7 @@ export const onRegionSelected = (props) => {
     } else if (_currentSelection !== null) {
         _dismiss?.();
     } else {
-        _setSelection({ COUNTRY, NAME_1, GID_0, gid0, owner, lngLat });
+        _setSelection({ COUNTRY, NAME_1, GID_0, GID_1, gid0, owner, lngLat });
     }
 };
 
@@ -144,6 +146,9 @@ const RegionPopup = () => {
     // Author-set flags from the scenario's flags.json (owner code -> data URL).
     // Memoized in assets.js, so this is one fetch per scenario, not per selection.
     const [customFlags, setCustomFlags] = useState({});
+    // Engine scenarios author localized region names. The PMTiles NAME_1 is
+    // only the dataset fallback and must not override scenario presentation.
+    const [localizedRegionNames, setLocalizedRegionNames] = useState({});
     const { current: map } = useMap();
 
     // Refresh the polity registry whenever a selection opens (cheap; keeps the
@@ -159,6 +164,24 @@ const RegionPopup = () => {
         getNationFlags()
             .then((flags) => {
                 if (!cancelled) setCustomFlags(flags || {});
+            })
+            .catch(() => {});
+        getActiveEngineGame()
+            .then(async (game) => game ? fetchEconomyState(game.id) : null)
+            .then((snapshot) => {
+                if (cancelled || !snapshot) return;
+                const locale = getStoredLanguage();
+                const regionsById = new Map(
+                    (snapshot.regions ?? []).map((region) => [region.regionId, region]),
+                );
+                const names = {};
+                for (const link of snapshot.mapLink?.regions ?? []) {
+                    const region = regionsById.get(link.engineRegionId);
+                    names[link.mapRegionId] = region?.displayName?.[locale]
+                        ?? region?.displayName?.en
+                        ?? link.mapName;
+                }
+                setLocalizedRegionNames(names);
             })
             .catch(() => {});
         return () => {
@@ -320,6 +343,7 @@ const RegionPopup = () => {
     if (!selection || !screenPos) return null;
 
     const { COUNTRY, NAME_1 } = selection;
+    const displayRegion = localizedRegionNames[selection.GID_1] || NAME_1;
     // Custom regions with an empty owner are deliberately unclaimed land.
     const isUnclaimed = selection.owner === "";
     // Era name first: the scenario's polity name for the owner ("Holy Roman
@@ -443,10 +467,10 @@ const RegionPopup = () => {
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "6px", minHeight: "22px" }}>
         <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "12px", minWidth: 0, wordBreak: "break-word" }}>
-        {NAME_1}
+        <span data-testid="region-popup-region-name">{displayRegion}</span>
         </span>
         <div style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
-        <IconBtn title="Copy region name" onClick={() => navigator.clipboard?.writeText(NAME_1)}>{"\u29C9"}</IconBtn>
+        <IconBtn title="Copy region name" onClick={() => navigator.clipboard?.writeText(displayRegion)}>{"\u29C9"}</IconBtn>
         <IconBtn title="Region info">{"\u24D8"}</IconBtn>
         </div>
         </div>
