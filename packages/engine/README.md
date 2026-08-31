@@ -6,9 +6,12 @@ and [`docs/canon/04-economy-slice.md`](../../docs/canon/04-economy-slice.md).
 
 ## Scenarios
 
-- `fixtures/scenario-dev-map-4c` — **Central Europe, the playtest scenario.**
-  Four polities on 47 real map regions, all optional mechanics enabled. This is
-  where mechanics are tried and where the game is played.
+- `fixtures/scenario-dev-map-6c` — **Europe, the current P3b playtest
+  scenario.** Six polities on 76 real map regions, all optional mechanics
+  enabled. This is where new interactive mechanics are tried.
+- `fixtures/scenario-dev-map-4c` — **P2/P3a regression scenario.** Four
+  polities on 47 regions; retained so the shipped map/economy and agent-loop
+  contracts remain reproducible.
 - `fixtures/scenario-dev-2x5` — **regression fixture only.** Enables no modules;
   its golden campaign exists to prove the base economy stays byte-identical as
   the economy grows. Do not author new mechanics into it.

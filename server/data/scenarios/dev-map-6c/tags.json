@@ -1,0 +1,38 @@
+{
+  "Austria": [
+    "independent",
+    "sovereignty-focused",
+    "defensive",
+    "regional-crisis"
+  ],
+  "Czechia": [
+    "independent",
+    "industrial",
+    "defensive",
+    "economic-cooperation"
+  ],
+  "Germany": [
+    "independent",
+    "regional-power",
+    "expansionist",
+    "territorial-pressure"
+  ],
+  "Slovakia": [
+    "independent-since-1937",
+    "neutral",
+    "balancing",
+    "food-security"
+  ],
+  "France": [
+    "independent",
+    "regional-power",
+    "collective-security",
+    "defensive"
+  ],
+  "Poland": [
+    "independent",
+    "sovereignty-focused",
+    "guarantee-seeking",
+    "balancing"
+  ]
+}

@@ -1,0 +1,45 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  getProviderSettings,
+  getStoredProvider,
+  setProviderField,
+  setStoredProvider,
+} from './providerConfig.js';
+
+const installStorage = () => {
+  const values = new Map();
+  globalThis.localStorage = {
+    getItem: (key) => values.has(key) ? values.get(key) : null,
+    setItem: (key, value) => values.set(key, String(value)),
+    removeItem: (key) => values.delete(key),
+    clear: () => values.clear(),
+  };
+  return values;
+};
+
+test('strategic and utility roles can use independent providers and credentials', () => {
+  const values = installStorage();
+  setStoredProvider('openai', 'strategic');
+  setProviderField('openai', 'apiKey', 'strategic-key', 'strategic');
+  setProviderField('openai', 'model', 'strategic-model', 'strategic');
+  setStoredProvider('anthropic', 'utility');
+  setProviderField('anthropic', 'apiKey', 'utility-key', 'utility');
+  setProviderField('anthropic', 'model', 'utility-model', 'utility');
+
+  assert.equal(getStoredProvider('strategic'), 'openai');
+  assert.equal(getStoredProvider('utility'), 'anthropic');
+  assert.equal(getProviderSettings('openai', 'strategic').apiKey, 'strategic-key');
+  assert.equal(getProviderSettings('anthropic', 'utility').apiKey, 'utility-key');
+  assert.equal(getProviderSettings('anthropic', 'utility').model, 'utility-model');
+  assert.equal(values.get('utility_anthropic_api_key'), 'utility-key');
+  assert.equal(values.get('anthropic_api_key'), undefined);
+});
+
+test('an unconfigured utility role inherits the strategic profile for old saves', () => {
+  installStorage();
+  setStoredProvider('gemini');
+  setProviderField('gemini', 'apiKey', 'existing-key');
+  assert.equal(getStoredProvider('utility'), 'gemini');
+  assert.equal(getProviderSettings('gemini', 'utility').apiKey, 'existing-key');
+});

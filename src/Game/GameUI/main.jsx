@@ -13,6 +13,7 @@ import {
   loadProviderSettingsFormState,
   normalizeProvider,
   persistProviderSetting,
+  setStoredProvider,
 } from "../AI/providerConfig.js";
 
 // The advisor drawer is user-resizable — drag its left edge (see advisor.jsx).
@@ -145,6 +146,8 @@ const Main = ({
 
   const [apiProvider, setApiProvider] = useState(() => getStoredProvider());
   const [providerSettings, setProviderSettings] = useState(() => loadProviderSettingsFormState());
+  const [utilityProvider, setUtilityProvider] = useState(() => getStoredProvider("utility"));
+  const [utilityProviderSettings, setUtilityProviderSettings] = useState(() => loadProviderSettingsFormState("utility"));
   const { games, loaded } = useLibraryState();
   // No games -> nothing to simulate (the main menu covers the empty world).
   const hasNoGames = loaded && (games?.length ?? 0) === 0;
@@ -183,15 +186,26 @@ const Main = ({
   }, [apiProvider]);
 
   useEffect(() => {
+    setStoredProvider(utilityProvider, "utility");
+  }, [utilityProvider]);
+
+  useEffect(() => {
     if (isSettingsOpen) {
       setApiProvider(getStoredProvider());
       setProviderSettings(loadProviderSettingsFormState());
+      setUtilityProvider(getStoredProvider("utility"));
+      setUtilityProviderSettings(loadProviderSettingsFormState("utility"));
     }
   }, [isSettingsOpen]);
 
   const handleProviderSettingChange = (key, value) => {
     setProviderSettings((prev) => ({ ...prev, [key]: value }));
     persistProviderSetting(key, value);
+  };
+
+  const handleUtilityProviderSettingChange = (key, value) => {
+    setUtilityProviderSettings((prev) => ({ ...prev, [key]: value }));
+    persistProviderSetting(key, value, "utility");
   };
 
   const toggleFullscreen = (shouldBeFull) => {
@@ -326,6 +340,10 @@ const Main = ({
           onApiProviderChange={setApiProvider}
           providerSettings={providerSettings}
           onProviderSettingChange={handleProviderSettingChange}
+          utilityProvider={utilityProvider}
+          onUtilityProviderChange={setUtilityProvider}
+          utilityProviderSettings={utilityProviderSettings}
+          onUtilityProviderSettingChange={handleUtilityProviderSettingChange}
         />
       )}
     </>

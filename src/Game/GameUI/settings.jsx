@@ -232,7 +232,7 @@ const Toggle = ({ label, enabled, onToggle }) => (
     </div>
 );
 
-const ApiProviderSelector = ({ provider, onProviderChange }) => {
+const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider" }) => {
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
     const [query, setQuery] = useState("");
     const selectedProvider = getProviderMeta(provider);
@@ -254,7 +254,7 @@ const ApiProviderSelector = ({ provider, onProviderChange }) => {
     return (
         <div style={{ marginBottom: "1rem" }}>
         <label style={{ display: "block", fontSize: "0.9rem", marginBottom: "0.6rem", color: "white" }}>
-        AI Provider
+        {label}
         </label>
 
         <button
@@ -410,7 +410,7 @@ const SettingsInput = ({
     </div>
 );
 
-const ProviderSettingsPanel = ({ provider, settings, onSettingChange }) => {
+const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReasoning = true }) => {
     const meta = getProviderMeta(provider);
     const supportsModelDiscovery = providerSupportsModelDiscovery(provider);
     // Global reasoning toggle — one switch, applied in every provider mode.
@@ -601,7 +601,7 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange }) => {
             </>
         )}
 
-        <div style={{ marginTop: "0.5rem" }}>
+        {showReasoning && <div style={{ marginTop: "0.5rem" }}>
         <Toggle
         label="Model reasoning"
         enabled={reasoningOn}
@@ -612,7 +612,7 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange }) => {
         reasoning effort, Claude extended thinking). Slower and costs more tokens;
         needs a model that supports it.
         </div>
-        </div>
+        </div>}
         </div>
     );
 };
@@ -774,6 +774,10 @@ const SettingsMenu = ({
     onApiProviderChange,
     providerSettings,
     onProviderSettingChange,
+    utilityProvider,
+    onUtilityProviderChange,
+    utilityProviderSettings,
+    onUtilityProviderSettingChange,
     onOpenCheats,
     discordUrl,
     redditUrl,
@@ -827,12 +831,26 @@ const SettingsMenu = ({
         <ApiProviderSelector
         provider={selectedProvider}
         onProviderChange={onApiProviderChange ?? (() => {})}
+        label="Strategic AI provider"
         />
 
         <ProviderSettingsPanel
         provider={selectedProvider}
         settings={providerSettings ?? {}}
         onSettingChange={onProviderSettingChange ?? (() => {})}
+        />
+
+        <ApiProviderSelector
+        provider={utilityProvider ?? selectedProvider}
+        onProviderChange={onUtilityProviderChange ?? (() => {})}
+        label="Utility AI provider"
+        />
+
+        <ProviderSettingsPanel
+        provider={utilityProvider ?? selectedProvider}
+        settings={utilityProviderSettings ?? {}}
+        onSettingChange={onUtilityProviderSettingChange ?? (() => {})}
+        showReasoning={false}
         />
 
         <LanguageSelector />

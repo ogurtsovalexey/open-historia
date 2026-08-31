@@ -2,10 +2,11 @@ import { callAI } from "./main.jsx";
 import { createContextManifest, getBudgetPolicy, validateTask } from "./aiCallRegistry.js";
 import { ledger } from "./aiCallLedger.js";
 import { getProviderSettings, getStoredProvider } from "./providerConfig.js";
+import { createAgentTaskScheduler } from "./agentTaskScheduler.js";
 
-const profileFor = () => {
-  const provider = getStoredProvider();
-  const settings = getProviderSettings(provider);
+const profileFor = (role) => {
+  const provider = getStoredProvider(role);
+  const settings = getProviderSettings(provider, role);
   return {
     providerKind: provider,
     model: settings.model || "configured-model",
@@ -14,9 +15,9 @@ const profileFor = () => {
   };
 };
 
-export async function dispatchAgentTask(task, { signal } = {}) {
-  const definition = validateTask(task.taskId);
-  const budget = getBudgetPolicy(definition.budgetPolicyId);
+const scheduler = createAgentTaskScheduler({ maxUtilityConcurrency: 6, maxCacheEntries: 128 });
+
+async function executeAgentTask(task, { signal, definition, budget, profile }) {
   const context = createContextManifest([{
     kind: "world-summary",
     itemCount: task.context?.polityCount ?? 1,
@@ -26,7 +27,7 @@ export async function dispatchAgentTask(task, { signal } = {}) {
   const record = ledger.startInvocation({
     taskId: definition.taskId,
     taskVersion: definition.version,
-    profile: profileFor(), context, budget,
+    profile, context, budget,
   });
   ledger.startGeneration(record.invocationId, { purpose: "initial" });
   const started = ledger.startTransport(record.invocationId, 1, {
@@ -70,4 +71,17 @@ export async function dispatchAgentTask(task, { signal } = {}) {
     }
     throw error;
   }
+}
+
+export async function dispatchAgentTask(task, { signal } = {}) {
+  const definition = validateTask(task.taskId);
+  const budget = getBudgetPolicy(definition.budgetPolicyId);
+  const profile = profileFor(definition.modelRole);
+  return scheduler.run({
+    task: { ...task, taskVersion: definition.version },
+    role: definition.modelRole,
+    profile,
+    signal,
+    execute: () => executeAgentTask(task, { signal, definition, budget, profile }),
+  });
 }

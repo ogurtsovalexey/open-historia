@@ -78,6 +78,15 @@ test('registry exposes every accepted Phase 1 task and immutable definitions', (
   assert.throws(() => { tasks[0].allowedVariants.push('unsafe'); });
 });
 
+test('every task is routed to an explicit utility or strategic model role', () => {
+  const tasks = registry.getAllTaskDefinitions();
+  assert.ok(tasks.every((task) => ['utility', 'strategic'].includes(task.modelRole)));
+  assert.equal(registry.validateTask('opponents.plan-economy').modelRole, 'utility');
+  assert.equal(registry.validateTask('reports.explain-economy').modelRole, 'utility');
+  assert.equal(registry.validateTask('chat.diplomacy.plan').modelRole, 'strategic');
+  assert.equal(registry.validateTask('timeline.advance', 'manual').modelRole, 'strategic');
+});
+
 test('production unknown-task path returns a stable non-dispatchable registry failure', () => {
   assert.throws(() => registry.resolveTaskForDispatch('unknown.task'), /Unknown task ID/);
   assert.deepEqual(registry.resolveTaskForDispatch('unknown.task', null, { production: true }), {

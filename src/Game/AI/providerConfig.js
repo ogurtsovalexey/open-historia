@@ -129,7 +129,11 @@ export function normalizeProvider(provider) {
     return isSupportedProvider(provider) ? provider : DEFAULT_PROVIDER;
 }
 
-export function getStoredProvider() {
+export function getStoredProvider(role = "strategic") {
+    if (role === "utility") {
+        const configured = localStorage.getItem("utility_api_provider");
+        return configured === null ? normalizeProvider(localStorage.getItem("api_provider")) : normalizeProvider(configured);
+    }
     return normalizeProvider(localStorage.getItem("api_provider"));
 }
 
@@ -143,26 +147,35 @@ export function providerSupportsModelDiscovery(provider) {
     return normalized === "openai" || normalized === "openai-compatible";
 }
 
-export function getProviderField(provider, field) {
+export function getProviderField(provider, field, role = "strategic") {
     const setting = getSettingConfig(provider, field);
-    return setting ? readStoredValue(setting) : "";
+    if (!setting) return "";
+    if (role === "utility") {
+        const utilityValue = localStorage.getItem(`utility_${setting.storageKey}`);
+        if (utilityValue !== null) return utilityValue;
+    }
+    return readStoredValue(setting);
 }
 
-export function setProviderField(provider, field, value) {
+export function setProviderField(provider, field, value, role = "strategic") {
     const setting = getSettingConfig(provider, field);
     if (!setting?.storageKey) return;
-    localStorage.setItem(setting.storageKey, value ?? "");
+    localStorage.setItem(role === "utility" ? `utility_${setting.storageKey}` : setting.storageKey, value ?? "");
 }
 
-export function getProviderSettings(provider) {
+export function getProviderSettings(provider, role = "strategic") {
     const normalized = normalizeProvider(provider);
     return {
         provider: normalized,
-        apiKey: getProviderField(normalized, "apiKey"),
-        endpoint: getProviderField(normalized, "endpoint"),
-        model: getProviderField(normalized, "model"),
-        customParams: getProviderField(normalized, "customParams"),
+        apiKey: getProviderField(normalized, "apiKey", role),
+        endpoint: getProviderField(normalized, "endpoint", role),
+        model: getProviderField(normalized, "model", role),
+        customParams: getProviderField(normalized, "customParams", role),
     };
+}
+
+export function setStoredProvider(provider, role = "strategic") {
+    localStorage.setItem(role === "utility" ? "utility_api_provider" : "api_provider", normalizeProvider(provider));
 }
 
 // Global "model reasoning" toggle — applied by callAI in every provider mode
@@ -179,18 +192,18 @@ export function setReasoningEnabled(enabled) {
     localStorage.setItem(REASONING_STORAGE_KEY, enabled ? "1" : "0");
 }
 
-export function loadProviderSettingsFormState() {
+export function loadProviderSettingsFormState(role = "strategic") {
     const state = {};
 
     for (const [stateKey, mapping] of Object.entries(FORM_FIELD_MAP)) {
-        state[stateKey] = getProviderField(mapping.provider, mapping.field);
+        state[stateKey] = getProviderField(mapping.provider, mapping.field, role);
     }
 
     return state;
 }
 
-export function persistProviderSetting(stateKey, value) {
+export function persistProviderSetting(stateKey, value, role = "strategic") {
     const mapping = FORM_FIELD_MAP[stateKey];
     if (!mapping) return;
-    setProviderField(mapping.provider, mapping.field, value);
+    setProviderField(mapping.provider, mapping.field, value, role);
 }

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "scenario-slovakia-independence-1937",
+    "createdAt": "1937-01-01T00:00:00.000Z",
+    "date": "1937-01-01",
+    "title": "Slovakia becomes independent",
+    "description": "In this alternate timeline Slovakia became an independent sovereign state in 1937 and now balances between Austria, Germany and Czechia.",
+    "importance": "major",
+    "kind": "politics",
+    "notable": true,
+    "playerRelated": false,
+    "source": "scenario",
+    "impacts": {
+      "actionIds": [],
+      "createdChats": [],
+      "markerOps": [],
+      "polityChanges": [],
+      "regionTransfers": [],
+      "unitOps": []
+    }
+  }
+]

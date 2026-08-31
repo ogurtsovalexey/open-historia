@@ -1,0 +1,191 @@
+{
+  "regionOwnershipOverrides": {
+    "AUT.1_1": "Austria",
+    "AUT.2_1": "Austria",
+    "AUT.3_1": "Austria",
+    "AUT.4_1": "Austria",
+    "AUT.5_1": "Austria",
+    "AUT.6_1": "Austria",
+    "AUT.7_1": "Austria",
+    "AUT.8_1": "Austria",
+    "AUT.9_1": "Austria",
+    "CZE.1_1": "Czechia",
+    "CZE.10_1": "Czechia",
+    "CZE.11_1": "Czechia",
+    "CZE.12_1": "Czechia",
+    "CZE.13_1": "Czechia",
+    "CZE.14_1": "Czechia",
+    "CZE.2_1": "Czechia",
+    "CZE.3_1": "Czechia",
+    "CZE.4_1": "Czechia",
+    "CZE.5_1": "Czechia",
+    "CZE.6_1": "Czechia",
+    "CZE.7_1": "Czechia",
+    "CZE.8_1": "Czechia",
+    "CZE.9_1": "Czechia",
+    "DEU.1_1": "Germany",
+    "DEU.10_1": "Germany",
+    "DEU.11_1": "Germany",
+    "DEU.12_1": "Germany",
+    "DEU.13_1": "Germany",
+    "DEU.14_1": "Germany",
+    "DEU.15_1": "Germany",
+    "DEU.16_1": "Germany",
+    "DEU.2_1": "Germany",
+    "DEU.3_1": "Germany",
+    "DEU.4_1": "Germany",
+    "DEU.5_1": "Germany",
+    "DEU.6_1": "Germany",
+    "DEU.7_1": "Germany",
+    "DEU.8_1": "Germany",
+    "DEU.9_1": "Germany",
+    "FRA.1_1": "France",
+    "FRA.10_1": "France",
+    "FRA.11_1": "France",
+    "FRA.12_1": "France",
+    "FRA.13_1": "France",
+    "FRA.2_1": "France",
+    "FRA.3_1": "France",
+    "FRA.4_1": "France",
+    "FRA.5_1": "France",
+    "FRA.6_1": "France",
+    "FRA.7_1": "France",
+    "FRA.8_1": "France",
+    "FRA.9_1": "France",
+    "POL.1_1": "Poland",
+    "POL.10_1": "Poland",
+    "POL.11_1": "Poland",
+    "POL.12_1": "Poland",
+    "POL.13_1": "Poland",
+    "POL.14_1": "Poland",
+    "POL.15_1": "Poland",
+    "POL.16_1": "Poland",
+    "POL.2_1": "Poland",
+    "POL.3_1": "Poland",
+    "POL.4_1": "Poland",
+    "POL.5_1": "Poland",
+    "POL.6_1": "Poland",
+    "POL.7_1": "Poland",
+    "POL.8_1": "Poland",
+    "POL.9_1": "Poland",
+    "SVK.1_1": "Slovakia",
+    "SVK.2_1": "Slovakia",
+    "SVK.3_1": "Slovakia",
+    "SVK.4_1": "Slovakia",
+    "SVK.5_1": "Slovakia",
+    "SVK.6_1": "Slovakia",
+    "SVK.7_1": "Slovakia",
+    "SVK.8_1": "Slovakia"
+  },
+  "polityOverrides": {
+    "Austria": {
+      "name": "Austria",
+      "aliases": [
+        "Republic of Austria",
+        "Австрия",
+        "Австрийская Республика"
+      ],
+      "color": [
+        110,
+        168,
+        254
+      ],
+      "note": "EN: Austria is determined to preserve its independence and sovereignty amid mounting German pressure. RU: Австрия намерена сохранить независимость и суверенитет перед лицом растущего давления Германии."
+    },
+    "Czechia": {
+      "name": "Czechia",
+      "aliases": [
+        "Czech Republic",
+        "Чехия",
+        "Чешская Республика"
+      ],
+      "color": [
+        242,
+        119,
+        122
+      ],
+      "note": "EN: Czechia relies on its industrial base, defensive preparedness and economic partnerships. RU: Чехия опирается на промышленную базу, оборонную готовность и экономическое сотрудничество."
+    },
+    "Germany": {
+      "name": "Germany",
+      "aliases": [
+        "German Reich",
+        "Германия",
+        "Германский рейх"
+      ],
+      "color": [
+        107,
+        207,
+        138
+      ],
+      "note": "EN: Germany seeks regional dominance through political and territorial pressure, but no outcome is predetermined. RU: Германия стремится к региональному господству через политическое и территориальное давление, но исход не предопределён."
+    },
+    "Slovakia": {
+      "name": "Slovakia",
+      "aliases": [
+        "Slovak Republic",
+        "Словакия",
+        "Словацкая Республика"
+      ],
+      "color": [
+        232,
+        194,
+        106
+      ],
+      "note": "EN: Independent since 1937 in this timeline, Slovakia balances between its neighbours while protecting food security and neutrality. RU: Независимая с 1937 года в этой временной линии Словакия балансирует между соседями, защищая продовольственную безопасность и нейтралитет."
+    },
+    "France": {
+      "name": "France",
+      "aliases": [
+        "French Republic",
+        "Франция",
+        "Французская Республика"
+      ],
+      "color": [
+        74,
+        126,
+        211
+      ],
+      "note": "EN: France balances collective security, domestic caution and protection of its eastern frontier. RU: Франция балансирует между коллективной безопасностью, внутренней осторожностью и защитой восточной границы."
+    },
+    "Poland": {
+      "name": "Poland",
+      "aliases": [
+        "Republic of Poland",
+        "Польша",
+        "Польская Республика"
+      ],
+      "color": [
+        220,
+        120,
+        165
+      ],
+      "note": "EN: Poland protects sovereignty between stronger neighbours and seeks credible guarantees. RU: Польша защищает суверенитет между более сильными соседями и ищет надёжные гарантии."
+    }
+  },
+  "customRegions": true,
+  "author": "",
+  "mapCredit": "",
+  "difficulty": "standard",
+  "language": "English",
+  "simulationRules": "Alternate history, 1 January 1938. Austria, Czechia, France, Germany, Poland and Slovakia are independent sovereign states. Slovakia became independent in 1937. There are no active or predetermined wars, annexations, occupations or territorial transfers. The deterministic engine owns every authoritative number and state transition. All authored economic values are synthetic development-test balance. Runtime diplomacy and trade require validated typed commands; AI may propose strategy but never invent outcomes.",
+  "startingTimelineText": "January 1938. Six European states enter an open alternate-history crisis. Germany seeks regional dominance; Austria, Czechia, France, Poland and Slovakia pursue their own security and economic interests. Every state begins independent and at peace; no historical annexation or war is scripted.",
+  "ownerCodes": [
+    "Austria",
+    "Czechia",
+    "France",
+    "Germany",
+    "Poland",
+    "Slovakia"
+  ],
+  "allowedUnitTypes": [
+    "infantry",
+    "armor",
+    "air",
+    "naval",
+    "artillery",
+    "garrison"
+  ],
+  "ownerSchema": 2,
+  "regionClaimants": {}
+}

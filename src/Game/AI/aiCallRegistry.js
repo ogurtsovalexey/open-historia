@@ -16,6 +16,7 @@
  * @property {string[]} allowedVariants - Allowed variant strings
  * @property {'deterministic'|'surface-error'|'silent-none'} fallbackPolicy - Fallback behavior
  * @property {boolean} mayMutateState - Whether validated output may lead to state effects
+ * @property {'utility'|'strategic'} modelRole - Required provider quality/cost role
  */
 
 /**
@@ -366,7 +367,17 @@ const TASK_DEFINITIONS = [
   }
 ];
 
+const STRATEGIC_TASKS = new Set([
+  'timeline.advance',
+  'catalyst.create',
+  'catalyst.advance',
+  'game-master.resolve',
+  'chat.diplomacy.plan',
+  'chat.diplomacy.reply'
+]);
+
 for (const task of TASK_DEFINITIONS) {
+  task.modelRole = STRATEGIC_TASKS.has(task.taskId) ? 'strategic' : 'utility';
   Object.freeze(task.allowedVariants);
   Object.freeze(task);
 }
