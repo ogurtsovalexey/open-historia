@@ -88,6 +88,29 @@ const collectSpecStrings = () => {
   return strings;
 };
 
+// Engine-driven development scenarios are checked-in product cards rather than
+// preset source modules. Their metadata is just as visible in the scenario
+// picker, so it belongs in the same static locale catalog.
+const collectEngineScenarioStrings = () => {
+  const strings = [];
+  const dir = path.join(ROOT, "server", "data", "scenarios");
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const file = path.join(dir, entry.name, "scenario.json");
+    let scenario;
+    try {
+      scenario = JSON.parse(readFileSync(file, "utf8"));
+    } catch {
+      continue;
+    }
+    if (scenario?.engineDriven !== true) continue;
+    for (const key of ["name", "description", "subtitle", "eyebrow", "heroTitle", "heroSubtitle"]) {
+      if (typeof scenario[key] === "string") strings.push(scenario[key]);
+    }
+  }
+  return strings;
+};
+
 const collectDifficulty = async () => {
   const { DIFFICULTY_LEVELS } = await import(url.pathToFileURL(path.join(ROOT, "src/runtime/difficulty.js")));
   return DIFFICULTY_LEVELS.flatMap((level) => [level.label, level.blurb]);
@@ -98,6 +121,7 @@ const catalog = [...new Set([
   ...UI_STRINGS,
   ...(await collectDifficulty()),
   ...collectSpecStrings(),
+  ...collectEngineScenarioStrings(),
   ...countries,
 ])].filter((value) => typeof value === "string" && value.trim().length > 1).sort();
 

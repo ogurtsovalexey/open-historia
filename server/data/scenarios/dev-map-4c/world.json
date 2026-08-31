@@ -50,32 +50,60 @@
   },
   "polityOverrides": {
     "Austria": {
+      "name": "Austria",
+      "aliases": [
+        "Republic of Austria",
+        "Австрия",
+        "Австрийская Республика"
+      ],
       "color": [
         110,
         168,
         254
-      ]
+      ],
+      "note": "EN: Austria is determined to preserve its independence and sovereignty amid mounting German pressure. RU: Австрия намерена сохранить независимость и суверенитет перед лицом растущего давления Германии."
     },
     "Czechia": {
+      "name": "Czechia",
+      "aliases": [
+        "Czech Republic",
+        "Чехия",
+        "Чешская Республика"
+      ],
       "color": [
         242,
         119,
         122
-      ]
+      ],
+      "note": "EN: Czechia relies on its industrial base, defensive preparedness and economic partnerships. RU: Чехия опирается на промышленную базу, оборонную готовность и экономическое сотрудничество."
     },
     "Germany": {
+      "name": "Germany",
+      "aliases": [
+        "German Reich",
+        "Германия",
+        "Германский рейх"
+      ],
       "color": [
         107,
         207,
         138
-      ]
+      ],
+      "note": "EN: Germany seeks regional dominance through political and territorial pressure, but no outcome is predetermined. RU: Германия стремится к региональному господству через политическое и территориальное давление, но исход не предопределён."
     },
     "Slovakia": {
+      "name": "Slovakia",
+      "aliases": [
+        "Slovak Republic",
+        "Словакия",
+        "Словацкая Республика"
+      ],
       "color": [
         232,
         194,
         106
-      ]
+      ],
+      "note": "EN: Independent since 1937 in this timeline, Slovakia balances between its neighbours while protecting food security and neutrality. RU: Независимая с 1937 года в этой временной линии Словакия балансирует между соседями, защищая продовольственную безопасность и нейтралитет."
     }
   },
   "customRegions": true,
@@ -83,8 +111,8 @@
   "mapCredit": "",
   "difficulty": "standard",
   "language": "English",
-  "simulationRules": "Deterministic economy engine owns all numbers. No model may invent a quantity.",
-  "startingTimelineText": "Four neighbouring states, each with its own regions, resources and industry.",
+  "simulationRules": "Alternate history, 1 January 1938. Austria, Germany, Czechia and Slovakia are four independent sovereign states. Slovakia became independent in 1937, which is the scenario's explicit divergence from history. Germany seeks regional dominance; Austria defends its independence; Czechia relies on industry; Slovakia balances between its neighbours. There are no active or predetermined wars, annexations, occupations or territorial transfers. Diplomacy is textual unless a human QA operator deliberately issues an existing typed engine command. The deterministic economy engine owns every authoritative number and state transition. All authored economic values are synthetic development-test balance, not historical statistics. AI may discuss strategy but must never invent authoritative quantities or claim that an uncommitted state change occurred.",
+  "startingTimelineText": "January 1938. Central Europe enters a tense alternate-history crisis. Slovakia has been independent since 1937 and now balances between Germany, Austria and Czechia. Germany presses for regional dominance, Austria protects its sovereignty, and Czechia trusts its industrial strength. All four states begin independent and at peace; no Anschluss, war, occupation or territorial transfer is scripted.",
   "ownerCodes": [
     "Austria",
     "Czechia",

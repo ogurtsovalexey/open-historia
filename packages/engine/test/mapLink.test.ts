@@ -123,7 +123,7 @@ describe('map link (canon 04, "Map linkage")', () => {
       revisions.push(state.revision);
     }
     assert.strictEqual(state.turn, 12);
-    assert.strictEqual(state.month, '1901-01-01');
+    assert.strictEqual(state.month, '1939-01-01');
     assert.strictEqual(new Set(revisions).size, revisions.length, 'every month produces a new revision');
 
     let replay = initState(scenario);

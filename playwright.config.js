@@ -4,6 +4,10 @@ export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 60_000,
   retries: process.env.CI ? 1 : 0,
+  // The product runtime endpoints intentionally follow one global active game.
+  // Economy specs create and activate isolated games, so running files in
+  // parallel would make one spec observe another spec's runtime overlay.
+  workers: 1,
   use: {
     baseURL: "http://127.0.0.1:5174",
     trace: "retain-on-failure",

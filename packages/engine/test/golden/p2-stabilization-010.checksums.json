@@ -1,0 +1,46 @@
+[
+  {
+    "turn": 0,
+    "revision": "sha256:2179501da5d4b8df6cab5a1a58e1ea71cc8a3d4a8ab84d86b3af613f46e59d22"
+  },
+  {
+    "turn": 1,
+    "revision": "sha256:ed200fb693e22c4b204e35553ff08627a1b7596cecc7b43c4b6c9fd5aa2be576"
+  },
+  {
+    "turn": 2,
+    "revision": "sha256:65faac19920994c8f5c4a424e852ba13b1abb3bc388dd6238aeabfd5e8f68613"
+  },
+  {
+    "turn": 3,
+    "revision": "sha256:b459e28e0db2fae2e061c0c1b6fd2aede32ae55452f2a08ccef7b75279c0ad63"
+  },
+  {
+    "turn": 4,
+    "revision": "sha256:05a2e896ae743ad1732384b92f23e04236ccec934b6dcd48c521e6f6b4d41657"
+  },
+  {
+    "turn": 5,
+    "revision": "sha256:6dd54f7d2452ecbd36f44e7fc229c66b4958eb5a551d6a32ce67ace90e59ad77"
+  },
+  {
+    "turn": 6,
+    "revision": "sha256:2941016b8e218581482df0faa4d2c83484335f13a9b539dbef481fc008b364f8"
+  },
+  {
+    "turn": 7,
+    "revision": "sha256:1e1b18ed5c72f090d72a8296f3ade8e0078d21e0690460cd544ca0d538e9928a"
+  },
+  {
+    "turn": 8,
+    "revision": "sha256:8a9bf1f320c152c37c0b700b791dfc313bacce4da53d7382b1d9454c8ff76dcc"
+  },
+  {
+    "turn": 9,
+    "revision": "sha256:46b23ba5e38f0affe7b1e8dfd277361daabbe6d1369425ff31f5941efc832855"
+  },
+  {
+    "turn": 10,
+    "revision": "sha256:8976cf506326a766e60eb227f0a5716adbe724214d1255d62d9a9f4891405184"
+  }
+]

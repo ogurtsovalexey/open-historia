@@ -3,10 +3,10 @@
   "scenarioId": "scenario:dev-map-4c",
   "label": "development-test",
   "displayName": {
-    "en": "Central Europe (4 polities)",
-    "ru": "Центральная Европа (4 страны)"
+    "en": "Central European Crisis, 1938 — Alternate History",
+    "ru": "Центральноевропейский кризис, 1938 — альтернативная история"
   },
-  "startMonth": "1900-01-01",
+  "startMonth": "1938-01-01",
   "activeResources": [
     "food",
     "wood",

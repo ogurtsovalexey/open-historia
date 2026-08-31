@@ -48,7 +48,7 @@ test("Central Europe advances map, date and economy from one session revision", 
 
   const foreignCommand = await request.post(`/api/games/${gameId}/economy/advance`, {
     data: {
-      targetDate: "1900-02-01",
+      targetDate: "1938-02-01",
       expectedSessionRevision: initial.sessionRevision,
       commands: [{
         kind: "economy.invest-region",
@@ -83,8 +83,8 @@ test("Central Europe advances map, date and economy from one session revision", 
   await expect(pane).toContainText("Investment queued for the next time jump");
 
   await page.getByRole("button", { name: "»" }).click();
-  await page.getByRole("button", { name: "2/1/1900 1 month" }).click();
-  await expect(pane).toContainText("1900-02-01", { timeout: 15_000 });
+  await page.getByRole("button", { name: "2/1/1938 1 month" }).click();
+  await expect(pane).toContainText("1938-02-01", { timeout: 15_000 });
   const advancedResponse = await request.get(`/api/games/${gameId}/economy/state`);
   const advanced = await advancedResponse.json();
   expect(advanced.actualMonthlyTicks).toBe(1);
@@ -97,13 +97,13 @@ test("Central Europe advances map, date and economy from one session revision", 
   expect(otherAfterAdvance.gameDate).toBe(otherInitial.gameDate);
 
   const stale = await request.post(`/api/games/${gameId}/economy/advance`, {
-    data: { targetDate: "1900-03-01", expectedSessionRevision: initial.sessionRevision, commands: [] },
+    data: { targetDate: "1938-03-01", expectedSessionRevision: initial.sessionRevision, commands: [] },
   });
   expect(stale.status()).toBe(409);
 
   await expect(pane).toContainText("Round 2");
   await expect(pane).toContainText("Last economic report");
-  await expect(page.getByText("P2 Economy Smoke / Austria / 1900-02-01")).toBeVisible();
+  await expect(page.getByText("P2 Economy Smoke / Austria / 1938-02-01")).toBeVisible();
   const runtimeGame = await (await request.get("/api/runtime/json/game")).json();
   const runtimeWorld = await (await request.get("/api/runtime/json/world")).json();
   expect(runtimeGame.gameDate).toBe(advanced.gameDate);
@@ -114,7 +114,7 @@ test("Central Europe advances map, date and economy from one session revision", 
   // current manifest instead of falling back to stale game/world JSON.
   await page.reload();
   await page.getByRole("button", { name: "Open advisor and economy" }).click({ force: true });
-  await expect(pane).toContainText("1900-02-01", { timeout: 45_000 });
+  await expect(pane).toContainText("1938-02-01", { timeout: 45_000 });
   await expect(pane).toContainText("Round 2");
   const reloaded = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
   expect(reloaded.sessionRevision).toBe(advanced.sessionRevision);
@@ -122,8 +122,8 @@ test("Central Europe advances map, date and economy from one session revision", 
   // Crossing no calendar boundary still publishes date + round exactly once,
   // but must not run an economy tick or change the engine revision.
   await page.getByRole("button", { name: "»" }).click();
-  await page.getByRole("button", { name: "2/2/1900 1 day" }).click();
-  await expect(pane).toContainText("1900-02-02", { timeout: 15_000 });
+  await page.getByRole("button", { name: "2/2/1938 1 day" }).click();
+  await expect(pane).toContainText("1938-02-02", { timeout: 15_000 });
   const withinMonth = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
   expect(withinMonth.round).toBe(3);
   expect(withinMonth.actualMonthlyTicks).toBe(0);
@@ -132,8 +132,8 @@ test("Central Europe advances map, date and economy from one session revision", 
 
   // One user jump across three boundaries is three monthly ticks but one round.
   await page.getByRole("button", { name: "»" }).click();
-  await page.getByRole("button", { name: "5/2/1900 3 months" }).click();
-  await expect(pane).toContainText("1900-05-02", { timeout: 15_000 });
+  await page.getByRole("button", { name: "5/2/1938 3 months" }).click();
+  await expect(pane).toContainText("1938-05-02", { timeout: 15_000 });
   const multiMonth = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
   expect(multiMonth.round).toBe(4);
   expect(multiMonth.actualMonthlyTicks).toBe(3);
@@ -149,13 +149,13 @@ test("Central Europe advances map, date and economy from one session revision", 
     await route.continue();
   });
   await page.getByRole("button", { name: "»" }).click();
-  await page.getByRole("button", { name: "5/3/1900 1 day" }).click();
+  await page.getByRole("button", { name: "5/3/1938 1 day" }).click();
   await expect(page.getByText(/stale engine session/i)).toBeVisible({ timeout: 15_000 });
   await page.unroute(`**/api/games/${gameId}/economy/advance`);
   const afterRace = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
   expect(afterRace.sessionRevision).toBe(winningRevision);
   expect(afterRace.round).toBe(5);
-  expect(afterRace.gameDate).toBe("1900-05-03");
+  expect(afterRace.gameDate).toBe("1938-05-03");
 
   // Economy-owned labels have authored Russian strings. The panel refreshes
   // from the committed session and picks up the selected locale without

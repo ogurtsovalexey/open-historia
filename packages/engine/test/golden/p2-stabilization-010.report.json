@@ -1,0 +1,982 @@
+[
+  {
+    "turn": 1,
+    "date": "1938-02-01",
+    "round": 2,
+    "monthlyTicks": 1,
+    "engineRevision": "sha256:ed200fb693e22c4b204e35553ff08627a1b7596cecc7b43c4b6c9fd5aa2be576",
+    "command": "none",
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "treasury": 49952,
+        "population": 4292072,
+        "stockpile": {
+          "coal": 31223,
+          "food": 0,
+          "goods": 2460,
+          "iron": 17342,
+          "wood": 36032
+        },
+        "infrastructureBp": 48420,
+        "regionCount": 9,
+        "production": {
+          "coal": 33613,
+          "food": 156381,
+          "goods": 2450,
+          "iron": 19747,
+          "wood": 35952
+        },
+        "tax": 44952
+      },
+      {
+        "polityId": "polity:czechia",
+        "treasury": 97959,
+        "population": 7575131,
+        "stockpile": {
+          "coal": 76204,
+          "food": 0,
+          "goods": 2475,
+          "iron": 51641,
+          "wood": 64021
+        },
+        "infrastructureBp": 80770,
+        "regionCount": 14,
+        "production": {
+          "coal": 78539,
+          "food": 241385,
+          "goods": 2450,
+          "iron": 54011,
+          "wood": 63901
+        },
+        "tax": 89959
+      },
+      {
+        "polityId": "polity:germany",
+        "treasury": 122224,
+        "population": 9393011,
+        "stockpile": {
+          "coal": 101952,
+          "food": 0,
+          "goods": 2490,
+          "iron": 48615,
+          "wood": 75536
+        },
+        "infrastructureBp": 90400,
+        "regionCount": 16,
+        "production": {
+          "coal": 104232,
+          "food": 343760,
+          "goods": 2450,
+          "iron": 50950,
+          "wood": 75376
+        },
+        "tax": 108224
+      },
+      {
+        "polityId": "polity:slovakia",
+        "treasury": 40686,
+        "population": 3383602,
+        "stockpile": {
+          "coal": 25173,
+          "food": 0,
+          "goods": 2505,
+          "iron": 25969,
+          "wood": 11593
+        },
+        "infrastructureBp": 41160,
+        "regionCount": 8,
+        "production": {
+          "coal": 27398,
+          "food": 97535,
+          "goods": 2450,
+          "iron": 28269,
+          "wood": 11393
+        },
+        "tax": 37186
+      }
+    ]
+  },
+  {
+    "turn": 2,
+    "date": "1938-03-01",
+    "round": 3,
+    "monthlyTicks": 1,
+    "engineRevision": "sha256:65faac19920994c8f5c4a424e852ba13b1abb3bc388dd6238aeabfd5e8f68613",
+    "command": "economy.invest-region",
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "treasury": 94909,
+        "population": 4294144,
+        "stockpile": {
+          "coal": 62316,
+          "food": 0,
+          "goods": 4980,
+          "iron": 34569,
+          "wood": 71984
+        },
+        "infrastructureBp": 48520,
+        "regionCount": 9,
+        "production": {
+          "coal": 33613,
+          "food": 156381,
+          "goods": 2520,
+          "iron": 19747,
+          "wood": 35952
+        },
+        "tax": 45057
+      },
+      {
+        "polityId": "polity:czechia",
+        "treasury": 187918,
+        "population": 7579265,
+        "stockpile": {
+          "coal": 152293,
+          "food": 0,
+          "goods": 4925,
+          "iron": 103202,
+          "wood": 127922
+        },
+        "infrastructureBp": 80770,
+        "regionCount": 14,
+        "production": {
+          "coal": 78539,
+          "food": 241385,
+          "goods": 2450,
+          "iron": 54011,
+          "wood": 63901
+        },
+        "tax": 89959
+      },
+      {
+        "polityId": "polity:germany",
+        "treasury": 230448,
+        "population": 9398022,
+        "stockpile": {
+          "coal": 203734,
+          "food": 0,
+          "goods": 4940,
+          "iron": 97115,
+          "wood": 150912
+        },
+        "infrastructureBp": 90400,
+        "regionCount": 16,
+        "production": {
+          "coal": 104232,
+          "food": 343760,
+          "goods": 2450,
+          "iron": 50950,
+          "wood": 75376
+        },
+        "tax": 108224
+      },
+      {
+        "polityId": "polity:slovakia",
+        "treasury": 77872,
+        "population": 3385201,
+        "stockpile": {
+          "coal": 50121,
+          "food": 0,
+          "goods": 4955,
+          "iron": 51788,
+          "wood": 22986
+        },
+        "infrastructureBp": 41160,
+        "regionCount": 8,
+        "production": {
+          "coal": 27398,
+          "food": 97535,
+          "goods": 2450,
+          "iron": 28269,
+          "wood": 11393
+        },
+        "tax": 37186
+      }
+    ]
+  },
+  {
+    "turn": 3,
+    "date": "1938-04-01",
+    "round": 4,
+    "monthlyTicks": 1,
+    "engineRevision": "sha256:b459e28e0db2fae2e061c0c1b6fd2aede32ae55452f2a08ccef7b75279c0ad63",
+    "command": "economy.invest-region",
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "treasury": 139941,
+        "population": 4296219,
+        "stockpile": {
+          "coal": 93618,
+          "food": 0,
+          "goods": 7500,
+          "iron": 51796,
+          "wood": 107936
+        },
+        "infrastructureBp": 48620,
+        "regionCount": 9,
+        "production": {
+          "coal": 33822,
+          "food": 156381,
+          "goods": 2520,
+          "iron": 19747,
+          "wood": 35952
+        },
+        "tax": 45132
+      },
+      {
+        "polityId": "polity:czechia",
+        "treasury": 277877,
+        "population": 7583402,
+        "stockpile": {
+          "coal": 228382,
+          "food": 0,
+          "goods": 7375,
+          "iron": 154763,
+          "wood": 191823
+        },
+        "infrastructureBp": 80770,
+        "regionCount": 14,
+        "production": {
+          "coal": 78539,
+          "food": 241385,
+          "goods": 2450,
+          "iron": 54011,
+          "wood": 63901
+        },
+        "tax": 89959
+      },
+      {
+        "polityId": "polity:germany",
+        "treasury": 338672,
+        "population": 9403040,
+        "stockpile": {
+          "coal": 305516,
+          "food": 0,
+          "goods": 7390,
+          "iron": 145615,
+          "wood": 226288
+        },
+        "infrastructureBp": 90400,
+        "regionCount": 16,
+        "production": {
+          "coal": 104232,
+          "food": 343760,
+          "goods": 2450,
+          "iron": 50950,
+          "wood": 75376
+        },
+        "tax": 108224
+      },
+      {
+        "polityId": "polity:slovakia",
+        "treasury": 115058,
+        "population": 3386804,
+        "stockpile": {
+          "coal": 75069,
+          "food": 0,
+          "goods": 7405,
+          "iron": 77607,
+          "wood": 34379
+        },
+        "infrastructureBp": 41160,
+        "regionCount": 8,
+        "production": {
+          "coal": 27398,
+          "food": 97535,
+          "goods": 2450,
+          "iron": 28269,
+          "wood": 11393
+        },
+        "tax": 37186
+      }
+    ]
+  },
+  {
+    "turn": 4,
+    "date": "1938-05-01",
+    "round": 5,
+    "monthlyTicks": 1,
+    "engineRevision": "sha256:05a2e896ae743ad1732384b92f23e04236ccec934b6dcd48c521e6f6b4d41657",
+    "command": "economy.invest-region",
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "treasury": 185104,
+        "population": 4298295,
+        "stockpile": {
+          "coal": 124920,
+          "food": 0,
+          "goods": 10020,
+          "iron": 69295,
+          "wood": 143888
+        },
+        "infrastructureBp": 48720,
+        "regionCount": 9,
+        "production": {
+          "coal": 33822,
+          "food": 156381,
+          "goods": 2520,
+          "iron": 20019,
+          "wood": 35952
+        },
+        "tax": 45263
+      },
+      {
+        "polityId": "polity:czechia",
+        "treasury": 367836,
+        "population": 7587544,
+        "stockpile": {
+          "coal": 304471,
+          "food": 0,
+          "goods": 9825,
+          "iron": 206324,
+          "wood": 255724
+        },
+        "infrastructureBp": 80770,
+        "regionCount": 14,
+        "production": {
+          "coal": 78539,
+          "food": 241385,
+          "goods": 2450,
+          "iron": 54011,
+          "wood": 63901
+        },
+        "tax": 89959
+      },
+      {
+        "polityId": "polity:germany",
+        "treasury": 446896,
+        "population": 9408061,
+        "stockpile": {
+          "coal": 407298,
+          "food": 0,
+          "goods": 9840,
+          "iron": 194115,
+          "wood": 301664
+        },
+        "infrastructureBp": 90400,
+        "regionCount": 16,
+        "production": {
+          "coal": 104232,
+          "food": 343760,
+          "goods": 2450,
+          "iron": 50950,
+          "wood": 75376
+        },
+        "tax": 108224
+      },
+      {
+        "polityId": "polity:slovakia",
+        "treasury": 152244,
+        "population": 3388408,
+        "stockpile": {
+          "coal": 100017,
+          "food": 0,
+          "goods": 9855,
+          "iron": 103426,
+          "wood": 45772
+        },
+        "infrastructureBp": 41160,
+        "regionCount": 8,
+        "production": {
+          "coal": 27398,
+          "food": 97535,
+          "goods": 2450,
+          "iron": 28269,
+          "wood": 11393
+        },
+        "tax": 37186
+      }
+    ]
+  },
+  {
+    "turn": 5,
+    "date": "1938-06-01",
+    "round": 6,
+    "monthlyTicks": 1,
+    "engineRevision": "sha256:6dd54f7d2452ecbd36f44e7fc229c66b4958eb5a551d6a32ce67ace90e59ad77",
+    "command": "economy.invest-region",
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "treasury": 230352,
+        "population": 4300374,
+        "stockpile": {
+          "coal": 156222,
+          "food": 0,
+          "goods": 12540,
+          "iron": 86794,
+          "wood": 179840
+        },
+        "infrastructureBp": 48820,
+        "regionCount": 9,
+        "production": {
+          "coal": 33822,
+          "food": 157451,
+          "goods": 2520,
+          "iron": 20019,
+          "wood": 35952
+        },
+        "tax": 45348
+      },
+      {
+        "polityId": "polity:czechia",
+        "treasury": 457795,
+        "population": 7591684,
+        "stockpile": {
+          "coal": 380560,
+          "food": 0,
+          "goods": 12275,
+          "iron": 257885,
+          "wood": 319625
+        },
+        "infrastructureBp": 80770,
+        "regionCount": 14,
+        "production": {
+          "coal": 78539,
+          "food": 241385,
+          "goods": 2450,
+          "iron": 54011,
+          "wood": 63901
+        },
+        "tax": 89959
+      },
+      {
+        "polityId": "polity:germany",
+        "treasury": 555120,
+        "population": 9413082,
+        "stockpile": {
+          "coal": 509080,
+          "food": 0,
+          "goods": 12290,
+          "iron": 242615,
+          "wood": 377040
+        },
+        "infrastructureBp": 90400,
+        "regionCount": 16,
+        "production": {
+          "coal": 104232,
+          "food": 343760,
+          "goods": 2450,
+          "iron": 50950,
+          "wood": 75376
+        },
+        "tax": 108224
+      },
+      {
+        "polityId": "polity:slovakia",
+        "treasury": 189430,
+        "population": 3390013,
+        "stockpile": {
+          "coal": 124965,
+          "food": 0,
+          "goods": 12305,
+          "iron": 129245,
+          "wood": 57165
+        },
+        "infrastructureBp": 41160,
+        "regionCount": 8,
+        "production": {
+          "coal": 27398,
+          "food": 97535,
+          "goods": 2450,
+          "iron": 28269,
+          "wood": 11393
+        },
+        "tax": 37186
+      }
+    ]
+  },
+  {
+    "turn": 6,
+    "date": "1938-07-01",
+    "round": 7,
+    "monthlyTicks": 1,
+    "engineRevision": "sha256:2941016b8e218581482df0faa4d2c83484335f13a9b539dbef481fc008b364f8",
+    "command": "territory.transfer-region",
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "treasury": 271296,
+        "population": 3754973,
+        "stockpile": {
+          "coal": 187524,
+          "food": 0,
+          "goods": 15060,
+          "iron": 104293,
+          "wood": 215792
+        },
+        "infrastructureBp": 44380,
+        "regionCount": 8,
+        "production": {
+          "coal": 33822,
+          "food": 102395,
+          "goods": 2520,
+          "iron": 20019,
+          "wood": 35952
+        },
+        "tax": 40944
+      },
+      {
+        "polityId": "polity:czechia",
+        "treasury": 547754,
+        "population": 7595827,
+        "stockpile": {
+          "coal": 456649,
+          "food": 0,
+          "goods": 14725,
+          "iron": 309446,
+          "wood": 383526
+        },
+        "infrastructureBp": 80770,
+        "regionCount": 14,
+        "production": {
+          "coal": 78539,
+          "food": 241385,
+          "goods": 2450,
+          "iron": 54011,
+          "wood": 63901
+        },
+        "tax": 89959
+      },
+      {
+        "polityId": "polity:germany",
+        "treasury": 667748,
+        "population": 9965581,
+        "stockpile": {
+          "coal": 610862,
+          "food": 0,
+          "goods": 14740,
+          "iron": 291115,
+          "wood": 452416
+        },
+        "infrastructureBp": 94840,
+        "regionCount": 17,
+        "production": {
+          "coal": 104232,
+          "food": 398816,
+          "goods": 2450,
+          "iron": 50950,
+          "wood": 75376
+        },
+        "tax": 112628
+      },
+      {
+        "polityId": "polity:slovakia",
+        "treasury": 226616,
+        "population": 3391616,
+        "stockpile": {
+          "coal": 149913,
+          "food": 0,
+          "goods": 14755,
+          "iron": 155064,
+          "wood": 68558
+        },
+        "infrastructureBp": 41160,
+        "regionCount": 8,
+        "production": {
+          "coal": 27398,
+          "food": 97535,
+          "goods": 2450,
+          "iron": 28269,
+          "wood": 11393
+        },
+        "tax": 37186
+      }
+    ]
+  },
+  {
+    "turn": 7,
+    "date": "1938-08-01",
+    "round": 8,
+    "monthlyTicks": 1,
+    "engineRevision": "sha256:1e1b18ed5c72f090d72a8296f3ade8e0078d21e0690460cd544ca0d538e9928a",
+    "command": "economy.invest-region",
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "treasury": 312245,
+        "population": 3756807,
+        "stockpile": {
+          "coal": 218756,
+          "food": 0,
+          "goods": 17650,
+          "iron": 121722,
+          "wood": 251744
+        },
+        "infrastructureBp": 44480,
+        "regionCount": 8,
+        "production": {
+          "coal": 33822,
+          "food": 102395,
+          "goods": 2590,
+          "iron": 20019,
+          "wood": 35952
+        },
+        "tax": 41049
+      },
+      {
+        "polityId": "polity:czechia",
+        "treasury": 637713,
+        "population": 7599978,
+        "stockpile": {
+          "coal": 532738,
+          "food": 0,
+          "goods": 17175,
+          "iron": 361007,
+          "wood": 447427
+        },
+        "infrastructureBp": 80770,
+        "regionCount": 14,
+        "production": {
+          "coal": 78539,
+          "food": 241385,
+          "goods": 2450,
+          "iron": 54011,
+          "wood": 63901
+        },
+        "tax": 89959
+      },
+      {
+        "polityId": "polity:germany",
+        "treasury": 780376,
+        "population": 9970860,
+        "stockpile": {
+          "coal": 712644,
+          "food": 0,
+          "goods": 17190,
+          "iron": 339615,
+          "wood": 527792
+        },
+        "infrastructureBp": 94840,
+        "regionCount": 17,
+        "production": {
+          "coal": 104232,
+          "food": 398816,
+          "goods": 2450,
+          "iron": 50950,
+          "wood": 75376
+        },
+        "tax": 112628
+      },
+      {
+        "polityId": "polity:slovakia",
+        "treasury": 263802,
+        "population": 3393222,
+        "stockpile": {
+          "coal": 174861,
+          "food": 0,
+          "goods": 17205,
+          "iron": 180883,
+          "wood": 79951
+        },
+        "infrastructureBp": 41160,
+        "regionCount": 8,
+        "production": {
+          "coal": 27398,
+          "food": 97535,
+          "goods": 2450,
+          "iron": 28269,
+          "wood": 11393
+        },
+        "tax": 37186
+      }
+    ]
+  },
+  {
+    "turn": 8,
+    "date": "1938-09-01",
+    "round": 9,
+    "monthlyTicks": 1,
+    "engineRevision": "sha256:8a9bf1f320c152c37c0b700b791dfc313bacce4da53d7382b1d9454c8ff76dcc",
+    "command": "economy.invest-region",
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "treasury": 353254,
+        "population": 3758637,
+        "stockpile": {
+          "coal": 249988,
+          "food": 0,
+          "goods": 20240,
+          "iron": 139151,
+          "wood": 288000
+        },
+        "infrastructureBp": 44580,
+        "regionCount": 8,
+        "production": {
+          "coal": 33822,
+          "food": 102395,
+          "goods": 2590,
+          "iron": 20019,
+          "wood": 36256
+        },
+        "tax": 41109
+      },
+      {
+        "polityId": "polity:czechia",
+        "treasury": 727672,
+        "population": 7604126,
+        "stockpile": {
+          "coal": 608827,
+          "food": 0,
+          "goods": 19625,
+          "iron": 412568,
+          "wood": 511328
+        },
+        "infrastructureBp": 80770,
+        "regionCount": 14,
+        "production": {
+          "coal": 78539,
+          "food": 241385,
+          "goods": 2450,
+          "iron": 54011,
+          "wood": 63901
+        },
+        "tax": 89959
+      },
+      {
+        "polityId": "polity:germany",
+        "treasury": 893004,
+        "population": 9976137,
+        "stockpile": {
+          "coal": 814426,
+          "food": 0,
+          "goods": 19640,
+          "iron": 388115,
+          "wood": 603168
+        },
+        "infrastructureBp": 94840,
+        "regionCount": 17,
+        "production": {
+          "coal": 104232,
+          "food": 398816,
+          "goods": 2450,
+          "iron": 50950,
+          "wood": 75376
+        },
+        "tax": 112628
+      },
+      {
+        "polityId": "polity:slovakia",
+        "treasury": 300988,
+        "population": 3394830,
+        "stockpile": {
+          "coal": 199809,
+          "food": 0,
+          "goods": 19655,
+          "iron": 206702,
+          "wood": 91344
+        },
+        "infrastructureBp": 41160,
+        "regionCount": 8,
+        "production": {
+          "coal": 27398,
+          "food": 97535,
+          "goods": 2450,
+          "iron": 28269,
+          "wood": 11393
+        },
+        "tax": 37186
+      }
+    ]
+  },
+  {
+    "turn": 9,
+    "date": "1938-10-01",
+    "round": 10,
+    "monthlyTicks": 1,
+    "engineRevision": "sha256:46b23ba5e38f0affe7b1e8dfd277361daabbe6d1369425ff31f5941efc832855",
+    "command": "economy.invest-region",
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "treasury": 394330,
+        "population": 3760472,
+        "stockpile": {
+          "coal": 281220,
+          "food": 0,
+          "goods": 22830,
+          "iron": 156580,
+          "wood": 324591
+        },
+        "infrastructureBp": 44680,
+        "regionCount": 8,
+        "production": {
+          "coal": 33822,
+          "food": 102395,
+          "goods": 2590,
+          "iron": 20019,
+          "wood": 36591
+        },
+        "tax": 41176
+      },
+      {
+        "polityId": "polity:czechia",
+        "treasury": 817631,
+        "population": 7608276,
+        "stockpile": {
+          "coal": 684916,
+          "food": 0,
+          "goods": 22075,
+          "iron": 464129,
+          "wood": 575229
+        },
+        "infrastructureBp": 80770,
+        "regionCount": 14,
+        "production": {
+          "coal": 78539,
+          "food": 241385,
+          "goods": 2450,
+          "iron": 54011,
+          "wood": 63901
+        },
+        "tax": 89959
+      },
+      {
+        "polityId": "polity:germany",
+        "treasury": 1005632,
+        "population": 9981417,
+        "stockpile": {
+          "coal": 916208,
+          "food": 0,
+          "goods": 22090,
+          "iron": 436615,
+          "wood": 678544
+        },
+        "infrastructureBp": 94840,
+        "regionCount": 17,
+        "production": {
+          "coal": 104232,
+          "food": 398816,
+          "goods": 2450,
+          "iron": 50950,
+          "wood": 75376
+        },
+        "tax": 112628
+      },
+      {
+        "polityId": "polity:slovakia",
+        "treasury": 338174,
+        "population": 3396435,
+        "stockpile": {
+          "coal": 224757,
+          "food": 0,
+          "goods": 22105,
+          "iron": 232521,
+          "wood": 102737
+        },
+        "infrastructureBp": 41160,
+        "regionCount": 8,
+        "production": {
+          "coal": 27398,
+          "food": 97535,
+          "goods": 2450,
+          "iron": 28269,
+          "wood": 11393
+        },
+        "tax": 37186
+      }
+    ]
+  },
+  {
+    "turn": 10,
+    "date": "1938-11-01",
+    "round": 11,
+    "monthlyTicks": 1,
+    "engineRevision": "sha256:8976cf506326a766e60eb227f0a5716adbe724214d1255d62d9a9f4891405184",
+    "command": "none",
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "treasury": 435506,
+        "population": 3762308,
+        "stockpile": {
+          "coal": 312452,
+          "food": 0,
+          "goods": 25420,
+          "iron": 174009,
+          "wood": 361182
+        },
+        "infrastructureBp": 44680,
+        "regionCount": 8,
+        "production": {
+          "coal": 33822,
+          "food": 102395,
+          "goods": 2590,
+          "iron": 20019,
+          "wood": 36591
+        },
+        "tax": 41176
+      },
+      {
+        "polityId": "polity:czechia",
+        "treasury": 907590,
+        "population": 7612431,
+        "stockpile": {
+          "coal": 761005,
+          "food": 0,
+          "goods": 24525,
+          "iron": 515690,
+          "wood": 639130
+        },
+        "infrastructureBp": 80770,
+        "regionCount": 14,
+        "production": {
+          "coal": 78539,
+          "food": 241385,
+          "goods": 2450,
+          "iron": 54011,
+          "wood": 63901
+        },
+        "tax": 89959
+      },
+      {
+        "polityId": "polity:germany",
+        "treasury": 1118260,
+        "population": 9986699,
+        "stockpile": {
+          "coal": 1017990,
+          "food": 0,
+          "goods": 24540,
+          "iron": 485115,
+          "wood": 753920
+        },
+        "infrastructureBp": 94840,
+        "regionCount": 17,
+        "production": {
+          "coal": 104232,
+          "food": 398816,
+          "goods": 2450,
+          "iron": 50950,
+          "wood": 75376
+        },
+        "tax": 112628
+      },
+      {
+        "polityId": "polity:slovakia",
+        "treasury": 375360,
+        "population": 3398044,
+        "stockpile": {
+          "coal": 249705,
+          "food": 0,
+          "goods": 24555,
+          "iron": 258340,
+          "wood": 114130
+        },
+        "infrastructureBp": 41160,
+        "regionCount": 8,
+        "production": {
+          "coal": 27398,
+          "food": 97535,
+          "goods": 2450,
+          "iron": 28269,
+          "wood": 11393
+        },
+        "tax": 37186
+      }
+    ]
+  }
+]
