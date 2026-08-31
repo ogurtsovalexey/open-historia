@@ -334,7 +334,27 @@ const persistResponse = async (url, response) => {
 const buildRuntimeCacheUrl = (key) =>
   `${origin || "https://pax-historia.local"}/__runtime-cache/${encodeURIComponent(key)}.json`;
 
-const fetchWithPersistence = async (url, { signal } = {}) => {
+const isMutableRuntimeJsonUrl = (url) => {
+  try {
+    return new URL(url, origin || "https://pax-historia.local").pathname.startsWith("/api/runtime/json/");
+  } catch {
+    return false;
+  }
+};
+
+const fetchWithPersistence = async (url, { forceNetwork = false, signal } = {}) => {
+  // Runtime game/world projections change without changing the scenario asset
+  // token. A forced state read must therefore reach the server: comparing only
+  // Content-Length can accept stale JSON whenever dates/revisions have the same
+  // byte length (e.g. 1900-02-01 -> 1900-02-02). Keep the fresh response as the
+  // offline fallback after it has been read.
+  if (forceNetwork) {
+    const response = await fetch(url, { cache: "no-store", signal });
+    if (!response.ok) throw new Error(`Failed to load ${url}: HTTP ${response.status}`);
+    persistResponse(url, response.clone());
+    return { response, fromCache: false };
+  }
+
   const cached = await readPersistedResponse(url);
   if (cached) {
     // Updates replace assets on disk; a cached copy must not outlive them.
@@ -563,7 +583,10 @@ export const readJson = async (url, { cache, defaultValue, force = false, signal
   }
 
   const request = (async () => {
-    const { response } = await fetchWithPersistence(url, { signal });
+    const { response } = await fetchWithPersistence(url, {
+      forceNetwork: force && isMutableRuntimeJsonUrl(url),
+      signal,
+    });
     const data = await response.json();
     // Recorded INSIDE the try, before the catch below: a failed read must leave
     // this false so loadRegionCatalog retries instead of pinning a stock-only

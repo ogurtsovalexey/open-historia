@@ -106,9 +106,70 @@ test("Central Europe advances map, date and economy from one session revision", 
   expect(runtimeGame.gameDate).toBe(advanced.gameDate);
   expect(runtimeGame.round).toBe(advanced.round);
   expect(runtimeWorld.regionOwnershipOverrides).toEqual(expect.objectContaining(advanced.ownershipOverrides));
+
+  // A hard reload must reconstruct every engine-owned projection from the
+  // current manifest instead of falling back to stale game/world JSON.
+  await page.reload();
+  await page.getByRole("button", { name: "Open advisor and economy" }).click({ force: true });
+  await expect(pane).toContainText("1900-02-01", { timeout: 45_000 });
+  await expect(pane).toContainText("Round 2");
+  const reloaded = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
+  expect(reloaded.sessionRevision).toBe(advanced.sessionRevision);
+
+  // Crossing no calendar boundary still publishes date + round exactly once,
+  // but must not run an economy tick or change the engine revision.
+  await page.getByRole("button", { name: "»" }).click();
+  await page.getByRole("button", { name: "2/2/1900 1 day" }).click();
+  await expect(pane).toContainText("1900-02-02", { timeout: 15_000 });
+  const withinMonth = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
+  expect(withinMonth.round).toBe(3);
+  expect(withinMonth.actualMonthlyTicks).toBe(0);
+  expect(withinMonth.revision).toBe(advanced.revision);
+  expect(withinMonth.sessionRevision).not.toBe(advanced.sessionRevision);
+
+  // One user jump across three boundaries is three monthly ticks but one round.
+  await page.getByRole("button", { name: "»" }).click();
+  await page.getByRole("button", { name: "5/2/1900 3 months" }).click();
+  await expect(pane).toContainText("1900-05-02", { timeout: 15_000 });
+  const multiMonth = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
+  expect(multiMonth.round).toBe(4);
+  expect(multiMonth.actualMonthlyTicks).toBe(3);
+
+  // Force a genuine race: another writer commits after the UI reads state but
+  // before its POST arrives. The loser must surface stale-session and not commit.
+  let winningRevision = "";
+  await page.route(`**/api/games/${gameId}/economy/advance`, async (route) => {
+    const body = route.request().postDataJSON();
+    const winner = await request.post(`/api/games/${gameId}/economy/advance`, { data: body });
+    expect(winner.ok()).toBeTruthy();
+    winningRevision = (await winner.json()).sessionRevision;
+    await route.continue();
+  });
+  await page.getByRole("button", { name: "»" }).click();
+  await page.getByRole("button", { name: "5/3/1900 1 day" }).click();
+  await expect(page.getByText(/stale engine session/i)).toBeVisible({ timeout: 15_000 });
+  await page.unroute(`**/api/games/${gameId}/economy/advance`);
+  const afterRace = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
+  expect(afterRace.sessionRevision).toBe(winningRevision);
+  expect(afterRace.round).toBe(5);
+  expect(afterRace.gameDate).toBe("1900-05-03");
+
+  // Economy-owned labels have authored Russian strings and survive reload.
+  expect((await request.put("/api/ui-settings", { data: { language: "ru" } })).ok()).toBeTruthy();
+  await page.evaluate(() => localStorage.setItem("ui_language", "ru"));
+  await page.reload();
+  await page.getByRole("button", { name: "Open advisor and economy" }).click({ force: true });
+  await expect(pane).toContainText("Дата", { timeout: 45_000 });
+  await expect(pane).toContainText("Ход");
+  await expect(pane).toContainText("Ревизия сессии");
+  await expect(pane).toContainText("Последний экономический отчёт");
+  await request.put("/api/ui-settings", { data: { language: "en" } });
+
   expect(modelCalls).toEqual([]);
+  expect(consoleErrors.filter((message) => /status of 409/.test(message))).toHaveLength(1);
+  expect(consoleErrors.some((message) => /Failed to simulate jump: Error: stale engine session/.test(message))).toBeTruthy();
   const unexpectedConsoleErrors = consoleErrors.filter((message) =>
-    !/Bad response code: 404|Failed to load resource: the server responded with a status of 404|Startup preload failed during|Failed to load (country names|country labels|timeline lookups|region catalog)/.test(message)
+    !/Bad response code: 404|Failed to load resource: the server responded with a status of (404|409)|Startup preload failed during|Failed to load (country names|country labels|timeline lookups|region catalog)|Failed to simulate jump: Error: stale engine session/.test(message)
   );
   expect(unexpectedConsoleErrors).toEqual([]);
 
