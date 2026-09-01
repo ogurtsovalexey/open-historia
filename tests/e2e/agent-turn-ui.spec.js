@@ -92,7 +92,7 @@ test("timeline confirms a prose order and runs bounded opponent planning", async
   await expect(page.getByTestId("agent-order-confirmation")).toContainText("report");
   await expect(page.getByTestId("agent-order-confirmation")).toContainText("Confirm & advance");
   expect(calls).toHaveLength(1);
-  expect(calls[0].body.generationConfig?.thinkingConfig).toBeUndefined();
+  expect(calls[0].body.generationConfig?.thinkingConfig).toEqual({ thinkingLevel: "minimal" });
   expect(JSON.stringify(calls[0].prompt)).not.toContain("FeatureCollection");
   await page.getByTestId("confirm-agent-turn").click();
 

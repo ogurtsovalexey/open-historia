@@ -27,10 +27,26 @@ at material checkpoints: ultimatum/treaty, war/call, occupation/peace,
 default/government transfer. At most six opponent polities share one request;
 all opponents are covered by stable, sequential batches.
 
-Live campaigns use `gemini-3.5-flash-lite` with reasoning disabled, at most 60
-provider calls, two transport retries and one schema-correction generation.
-There is no hidden strategic fallback. Deterministic mocked mode is mandatory
-for tests and costs no provider calls.
+Live campaigns use `gemini-3.5-flash-lite` with `thinkingLevel=minimal` (Gemini
+3 cannot disable thinking), `maxOutputTokens=8192`, at most 60 provider attempts,
+two transport retries and one separate schema-correction generation. A passing
+primary preflight artifact for the exact model and code revision is mandatory
+before a live run can be frozen. There is no hidden strategic fallback.
+Deterministic mocked mode is mandatory for tests and costs no provider calls.
+
+All live attempts share a persisted Pacific-time quota ledger. Dispatch is
+paced to at most 10 RPM and 200,000 TPM and stops at 490 attempts per Pacific
+quota day. The run enters `quota-paused` rather than probing through the limit;
+`resume` may continue only after the Pacific date changes. The per-campaign
+60-attempt limit is checked before every retry. Only network failures, 429, 503
+and other 5xx responses are transport-retryable; parse/schema correction is a
+new generation and 4xx contract errors are terminal.
+
+Chronicle inclusion and decision checkpoints are separate. Repeated monthly
+resource alerts are diagnostics, not strategic triggers. The chronicle records
+alert start, material worsening/change and resolution. Extra decisions are
+triggered only by material diplomacy, war/call, occupation/peace, government,
+default or crisis transitions, plus the first active food shortfall.
 
 ## Chronicle and telemetry
 
@@ -54,4 +70,3 @@ aggregate dataset and the cross-run report may be committed.
 - `status`, `resume` and `report` tolerate process restart and reject manifest
   drift.
 - Live smoke is an explicit, separate command and skips honestly without a key.
-

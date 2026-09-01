@@ -26,3 +26,17 @@ test("mock Campaign Lab start/status/resume produces a deterministic final card 
   assert.equal(card.telemetry.engineResolutions, 66);
   assert.ok(fs.statSync(path.join(temp, "test-mock", "chronicle.jsonl")).size > 0);
 });
+
+test("free10 creates only the requested ten player cells and freezes one matrix manifest", () => {
+  const ids = run("start", "--matrix", "free10", "--mode", "mock");
+  assert.deepEqual(ids, [
+    "free10-germany-historical", "free10-germany-alternative", "free10-germany-free",
+    "free10-poland-historical", "free10-poland-alternative", "free10-poland-free",
+    "free10-france-historical", "free10-france-alternative", "free10-france-free",
+    "free10-united-kingdom-historical",
+  ]);
+  const freeze = JSON.parse(fs.readFileSync(path.join(temp, "matrix-free10.json"), "utf8"));
+  assert.equal(freeze.cells.length, 10);
+  assert.equal(freeze.thinkingLevel, "off");
+  assert.equal(ids.some((id) => /austria|czechoslovakia|italy/.test(id)), false);
+});

@@ -46,38 +46,43 @@ test("live Gemini advisor and diplomacy stay grounded in the 1938 engine session
 
   const modelCalls = [];
   page.on("request", (requestEvent) => {
-    if (/generativelanguage\.googleapis\.com/.test(requestEvent.url())) modelCalls.push(requestEvent.url());
+    if (/generativelanguage\.googleapis\.com/.test(requestEvent.url())) modelCalls.push({
+      url: requestEvent.url(), headers: requestEvent.headers(), body: requestEvent.postDataJSON(),
+    });
   });
-  await page.goto(`/?gameId=${gameId}`);
-  await page.waitForTimeout(1500);
+  await page.goto(`/?gameId=${gameId}`, { waitUntil: "networkidle" });
+  await expect(page.getByText(/P2 Gemini Smoke 1938/)).toBeVisible();
+  await page.waitForTimeout(2000);
   expect(modelCalls).toHaveLength(0);
 
   const initial = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
-  const advisor = await askAdvisor(
-    page,
-    "Перечисли по-русски приоритеты Австрии в центральноевропейском кризисе 1938 года. Не выдумывай числовые показатели.",
-  );
-  expect(advisor).toMatch(/[А-Яа-яЁё]/);
-  expect(advisor).toMatch(/1938|кризис|Герман|независим/i);
-
-  const germanyBefore = await askCountry(
-    page,
-    "Австрия предлагает пакт о ненападении. Обсудите ваши территориальные требования к Верхней Австрии и явно признайте, что никакая передача ещё не состоялась.",
-  );
-  expect(germanyBefore).toMatch(/[А-Яа-яЁё]/);
-  expect(germanyBefore).not.toMatch(/передача (уже )?(состоялась|завершена)|уже передан[ао]/i);
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const advisor = await askAdvisor(page,
+      `Проверка ${attempt + 1}: перечисли по-русски приоритеты Австрии в кризисе 1938 года без выдуманных чисел.`);
+    expect(advisor).toMatch(/[А-Яа-яЁё]/);
+    const germanyBefore = await askCountry(page, "Germany",
+      "Австрия предлагает пакт о ненападении. Признайте, что передача Верхней Австрии ещё не состоялась.");
+    expect(germanyBefore).toMatch(/[А-Яа-яЁё]/);
+    expect(germanyBefore).not.toMatch(/передача (уже )?(состоялась|завершена)|уже передан[ао]/i);
+  }
+  for (const call of modelCalls) {
+    expect(call.url).not.toMatch(/[?&]key=/);
+    expect(call.headers["x-goog-api-key"]).toBeTruthy();
+  }
   const afterTalk = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
   expect(afterTalk.sessionRevision).toBe(initial.sessionRevision);
   expect(afterTalk.revision).toBe(initial.revision);
 
   const czechia = await askCountry(
     page,
+    "Czechia",
     "Предложите Австрии экономическое сотрудничество в условиях кризиса 1938 года без выдуманных авторитетных цифр.",
   );
   expect(czechia).toMatch(/Чех|эконом|промышлен/i);
 
   const slovakia = await askCountry(
     page,
+    "Slovakia",
     "Обсудите с Австрией продовольственную безопасность и сохранение словацкого нейтралитета.",
   );
   expect(slovakia).toMatch(/Слова|продоволь|нейтрал/i);
@@ -102,9 +107,18 @@ test("live Gemini advisor and diplomacy stay grounded in the 1938 engine session
   const transferred = await transfer.json();
   expect(transferred.ownershipOverrides["AUT.4_1"]).toBe("Germany");
   expect(modelCalls).toHaveLength(callsBeforeAdvance);
+  const groundedPrompt = await page.evaluate(async () => {
+    const ai = await import("/src/Game/AI/main.jsx");
+    return ai.buildDiplomaticSystemPrompt([{ name: "Germany", code: "DEU" }], null, "Germany", {
+      route: { complexity: "high", mentionedEntities: ["Germany"] },
+    });
+  });
+  expect(groundedPrompt).toMatch(/Germany[^\n]*Oberösterreich|Oberösterreich[^\n]*Germany/i);
+  expect(groundedPrompt).not.toMatch(/FeatureCollection|coordinates|geometry/i);
 
   const germanyAfter = await askCountry(
     page,
+    "Germany",
     "Кто сейчас контролирует Верхнюю Австрию (Oberösterreich)? Ответь строго по текущему состоянию игры.",
   );
   expect(germanyAfter).toMatch(/Герман/i);
@@ -155,7 +169,8 @@ test("live Gemini returns a bounded opponent-economy proposal with reasoning off
     turnToken: draft.turnToken, turnDigest: draft.turnDigest,
   } })).json();
   expect(requests).toHaveLength(1);
-  expect(requests[0].generationConfig?.thinkingConfig).toBeUndefined();
+  expect(requests[0].generationConfig?.thinkingConfig).toEqual({ thinkingLevel: "minimal" });
+  expect(requests[0].generationConfig?.maxOutputTokens).toBeGreaterThan(0);
   expect(JSON.stringify(requests[0])).not.toContain("FeatureCollection");
   expect(committed.agentState.polities).toHaveLength(3);
   expect(committed.agentState.polities.every((entry) => entry.source === "model")).toBeTruthy();

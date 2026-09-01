@@ -40,6 +40,21 @@ Once the first matrix run begins, scenario checksum, code revision, model and
 parameters are frozen for the entire matrix. Problems are recorded and fixed
 only after the matrix completes.
 
+### Free-tier live profile (`free10`)
+
+The canonical 21-cell mocked/infrastructure matrix remains available. The
+quota-bounded live evaluation uses a separately named ten-cell profile:
+
+- Germany, Poland and France: historical, alternative and free;
+- United Kingdom: historical only.
+
+Austria, Czechoslovakia and Italy remain fully simulated opponents but are not
+player cells in this profile. Run ids and committed aggregate artifacts carry
+the `free10` name so they cannot be confused with the earlier 21-cell mock
+baseline. The profile uses only `gemini-3.5-flash-lite`,
+`thinkingLevel=minimal`, a 490-attempt Pacific-day safety ceiling and the
+Campaign Lab preflight/freeze contract in canon 18.
+
 ## Acceptance
 
 All 21 runs are complete or explicitly terminal; every run has a chronicle,

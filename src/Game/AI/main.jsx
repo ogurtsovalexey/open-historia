@@ -7,6 +7,7 @@ import {
     setProviderField,
 } from "./providerConfig.js";
 import { JSON_URLS, loadCountryNames, loadRegionCatalog, readJson } from "../../runtime/assets.js";
+import { fetchEconomyState, getActiveEngineGame } from "../../runtime/economy.js";
 import {
     chatLanguageDirective,
     languageDirective,
@@ -17,6 +18,14 @@ import { difficultyDirective } from "../../runtime/difficulty.js";
 import { buildCampaignMemoryText } from "../../runtime/campaignMemory.js";
 import { normalizePromptPack } from "./gameplayPrompts.js";
 import { normalizeGeminiUsage } from "./usageMetadata.js";
+import {
+    canonicalizeGeminiContents,
+    fitGeminiFunctionSchema,
+    getGeminiHeaders,
+    getGeminiThinkingConfig,
+    getGeminiUrl,
+    normalizeGeminiModel,
+} from "./geminiProtocol.js";
 import {
     buildFocusedDiplomaticMapContext,
     classifyDiplomaticTurn,
@@ -82,10 +91,6 @@ const canRetryBeforeDeadline = (deadline, retryDelay) =>
 
 function normalizeEndpoint(endpoint) {
     return (endpoint ?? "").trim().replace(/\/$/, "");
-}
-
-function normalizeGeminiModel(model) {
-    return (model ?? "").replace(/^models\//, "").trim();
 }
 
 async function readErrorPayload(response) {
@@ -232,25 +237,6 @@ function extractAnthropicToolInput(data, tool) {
     const block = (data?.content ?? [])
     .find((entry) => entry?.type === "tool_use" && entry?.name === tool?.name);
     return block?.input && typeof block.input === "object" ? block.input : null;
-}
-
-function toGeminiSchema(value) {
-    if (Array.isArray(value)) return value.map(toGeminiSchema);
-    if (!value || typeof value !== "object") return value;
-    const schema = Object.fromEntries(
-        Object.entries(value)
-        .filter(([key]) => key !== "additionalProperties" && key !== "$schema" && key !== "const")
-        .map(([key, entry]) => [key, toGeminiSchema(entry)]),
-    );
-    // Gemini function declarations accept only a subset of JSON Schema. Zod's
-    // exported literal schemas use `const`, while Gemini represents the same
-    // constraint as a single-value enum.
-    if (Object.hasOwn(value, "const")) schema.enum = [value.const];
-    return schema;
-}
-
-function getGeminiUrl(model, apiKey) {
-    return `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`;
 }
 
 // AI calls go straight from the browser to the provider so the player's API key
@@ -540,6 +526,29 @@ async function resolveModel(provider, { endpoint = "", headers = {}, fallbackMod
     }
 }
 
+async function fetchGeminiWithRetry(url, apiKey, body, { retries, retryDelay, deadline, signal }) {
+    let lastError;
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        let response;
+        try {
+            response = await fetch(url, {
+                method: "POST", headers: getGeminiHeaders(apiKey), body: JSON.stringify(body), signal,
+            });
+        } catch (error) {
+            if (signal?.aborted || !(error instanceof TypeError) || attempt === retries || !canRetryBeforeDeadline(deadline, retryDelay)) throw error;
+            lastError = error; await sleep(retryDelay, signal); continue;
+        }
+        if (response.ok) return response;
+        const payload = await readErrorPayload(response);
+        const retryable = response.status === 429 || response.status === 503 || response.status >= 500;
+        const message = extractErrorMessage(payload, `Gemini API request failed (${response.status})`);
+        lastError = new Error(response.status === 429 ? `Gemini returned 429. ${message}` : message);
+        if (!retryable || attempt === retries || !canRetryBeforeDeadline(deadline, retryDelay)) throw lastError;
+        await sleep(retryDelay, signal);
+    }
+    throw lastError;
+}
+
 async function callGemini(systemPrompt, history, {
     deadline,
     maxTokens = 8192,
@@ -567,99 +576,54 @@ async function callGemini(systemPrompt, history, {
 
     const customParams = parseCustomParams(settings.customParams, "Gemini");
     const thinkingEnabled = reasoningMode === "off" ? false : getReasoningEnabled();
+    const contents = canonicalizeGeminiContents(history);
+    const { generationConfig: customGenerationConfig = {}, ...customBody } = customParams;
+    const generationConfig = {
+        ...(customGenerationConfig && typeof customGenerationConfig === "object" && !Array.isArray(customGenerationConfig)
+            ? customGenerationConfig
+            : {}),
+        maxOutputTokens: Math.max(1, Number(maxTokens) || 8192),
+        thinkingConfig: getGeminiThinkingConfig(model, { reasoningEnabled: thinkingEnabled, reasoningMode }),
+    };
 
     // Advisor/chat streaming: with an onChunk callback (and no tool), use the
-    // streaming endpoint so the reply appears token-by-token. maxOutputTokens
-    // caps this reply at the requested budget — the buffered jump path below
-    // deliberately sends NO cap so long simulations are never truncated.
+    // streaming endpoint so the reply appears token-by-token. Every Gemini
+    // request is capped at the caller's registered output budget.
     if (onChunk && !tool) {
-        const streamUrl = getGeminiUrl(model, apiKey).replace(":generateContent?", ":streamGenerateContent?alt=sse&");
-        const response = await fetch(streamUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                system_instruction: { parts: [{ text: systemPrompt }] },
-                contents: history,
-                generationConfig: {
-                    maxOutputTokens: Math.max(1, Number(maxTokens) || 8192),
-                    ...(thinkingEnabled ? { thinkingConfig: { thinkingBudget: 8192 } } : {}),
-                },
-                ...customParams,
-            }),
-            signal,
+        const streamUrl = getGeminiUrl(model, { stream: true });
+        const response = await fetchGeminiWithRetry(streamUrl, apiKey, {
+            system_instruction: { parts: [{ text: systemPrompt }] }, contents, ...customBody, generationConfig,
+        }, {
+            retries, retryDelay, deadline, signal,
         });
-        if (!response.ok) {
-            const payload = await readErrorPayload(response);
-            throw new Error(extractErrorMessage(payload, `Gemini API request failed (${response.status})`));
-        }
         const streamed = await streamTextSSE(response, geminiStreamDelta, onChunk);
         if (!streamed) throw new Error("Gemini response did not contain text.");
         return streamed;
     }
 
-    for (let attempt = 1; attempt <= retries; attempt++) {
-        const response = await fetch(getGeminiUrl(model, apiKey), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                system_instruction: { parts: [{ text: systemPrompt }] },
-                contents: history,
-                // Reasoning toggle (settings): let thinking-capable Gemini models think.
-                ...(thinkingEnabled
-                     ? { generationConfig: { thinkingConfig: { thinkingBudget: 8192 } } }
-                     : {}),
-                ...customParams,
-                ...(tool ? {
-                    tools: [{ functionDeclarations: [{
-                        name: tool.name,
-                        description: tool.description,
-                        parameters: toGeminiSchema(tool.schema),
-                    }] }],
-                    toolConfig: { functionCallingConfig: {
-                        mode: "ANY",
-                        allowedFunctionNames: [tool.name],
-                    } },
-                } : {}),
-            }),
-            signal,
-        });
-
-        if (response.status === 429) {
-            const payload = await readErrorPayload(response);
-            const details = extractErrorMessage(payload, "Gemini returned 429.");
-            throw new Error(`Gemini returned 429. Your balance or quota appears to be exhausted. ${details}`.trim());
-        }
-
-        if (response.status === 503) {
-            if (attempt === retries || !canRetryBeforeDeadline(deadline, retryDelay)) {
-                throw new Error(`Gemini is temporarily unavailable after ${retries} attempts. Try again in a minute.`);
-            }
-
-            console.warn(`Gemini is busy. Retrying in ${retryDelay / 1000}s... (attempt ${attempt}/${retries})`);
-            await sleep(retryDelay, signal);
-            continue;
-        }
-
-        if (!response.ok) {
-            const payload = await readErrorPayload(response);
-            throw new Error(extractErrorMessage(payload, `Gemini API request failed (${response.status})`));
-        }
-
-        const data = await response.json();
-        if (tool) {
-            const toolInput = extractGeminiToolInput(data, tool);
-            const usage = normalizeGeminiUsage(data?.usageMetadata);
-            if (toolInput) return { rawText: joinGeminiParts(data?.candidates?.[0]?.content?.parts), toolInput, usage };
-            return { rawText: joinGeminiParts(data?.candidates?.[0]?.content?.parts), toolInput: null, usage };
-        }
-        const text = joinGeminiParts(data?.candidates?.[0]?.content?.parts);
-
-        if (!text) {
-            throw new Error("Gemini response did not contain text.");
-        }
-
-        return text;
+    const response = await fetchGeminiWithRetry(getGeminiUrl(model), apiKey, {
+        system_instruction: { parts: [{ text: systemPrompt }] }, contents, ...customBody, generationConfig,
+        ...(tool ? {
+            tools: [{ functionDeclarations: [{
+                name: tool.name, description: tool.description, parameters: fitGeminiFunctionSchema(tool.schema),
+            }] }],
+            toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames: [tool.name] } },
+        } : {}),
+    }, { retries, retryDelay, deadline, signal });
+    const data = await response.json();
+    if (tool) {
+        const toolInput = extractGeminiToolInput(data, tool);
+        const usage = normalizeGeminiUsage(data?.usageMetadata);
+        if (toolInput) return { rawText: joinGeminiParts(data?.candidates?.[0]?.content?.parts), toolInput, usage };
+        return { rawText: joinGeminiParts(data?.candidates?.[0]?.content?.parts), toolInput: null, usage };
     }
+    const text = joinGeminiParts(data?.candidates?.[0]?.content?.parts);
+
+    if (!text) {
+        throw new Error("Gemini response did not contain text.");
+    }
+
+    return text;
 }
 
 async function callOpenAIStyleChatCompletions({
@@ -1219,6 +1183,40 @@ async function buildPromptVariables({
     });
 }
 
+async function loadFreshPromptRuntimeState() {
+    const [gameData, actionData, chatData, worldData, eventData, advisorData] = await Promise.all([
+        readJson(JSON_URLS.game, { defaultValue: {}, force: true }),
+        readJson(JSON_URLS.actions, { defaultValue: [], force: true }),
+        readJson(JSON_URLS.chat, { defaultValue: [], force: true }),
+        readJson(JSON_URLS.world, { defaultValue: {}, force: true }),
+        readJson(JSON_URLS.events, { defaultValue: [], force: true }),
+        readJson(JSON_URLS.advisor, { defaultValue: [], force: true }),
+    ]);
+    try {
+        const engineGame = await getActiveEngineGame();
+        if (!engineGame) return { gameData, actionData, chatData, worldData, eventData, advisorData, engineRegionCatalog: null };
+        const snapshot = await fetchEconomyState(engineGame.id);
+        const polityNames = new Map((snapshot.polities ?? []).map((polity) => [polity.id,
+            polity.displayName?.en ?? polity.displayName?.ru ?? polity.id]));
+        const engineRegions = new Map((snapshot.regions ?? []).map((region) => [region.regionId, region]));
+        const engineRegionCatalog = (snapshot.mapLink?.regions ?? []).flatMap((link) => {
+            const region = engineRegions.get(link.engineRegionId);
+            if (!region) return [];
+            return [{ id: link.mapRegionId, name: link.mapName ?? region.displayName?.en ?? link.mapRegionId,
+                country: snapshot.ownershipOverrides?.[link.mapRegionId] ?? polityNames.get(region.controllerId) ?? region.controllerId }];
+        });
+        return {
+            gameData: { ...gameData, gameDate: snapshot.gameDate ?? gameData.gameDate },
+            actionData, chatData, eventData, advisorData, engineRegionCatalog,
+            // Principle 3: carry only the deterministic ownership semantics,
+            // never the engine region rows or map geometry, into the AI path.
+            worldData: { ...worldData, regionOwnershipOverrides: snapshot.ownershipOverrides ?? worldData.regionOwnershipOverrides },
+        };
+    } catch {
+        return { gameData, actionData, chatData, worldData, eventData, advisorData, engineRegionCatalog: null };
+    }
+}
+
 const appendDurableCampaignMemory = (prompt, variables, context = {}) => {
     const memoryContext = {
         task: context.task || "advisor",
@@ -1238,14 +1236,7 @@ const appendDurableCampaignMemory = (prompt, variables, context = {}) => {
 
 async function buildAdvisorSystemPrompt() {
     await ensurePromptsLoaded();
-    const [gameData, actionData, chatData, worldData, eventData, advisorData] = await Promise.all([
-        readJson(JSON_URLS.game, { defaultValue: {} }),
-        readJson(JSON_URLS.actions, { defaultValue: [] }),
-        readJson(JSON_URLS.chat, { defaultValue: [] }),
-        readJson(JSON_URLS.world, { defaultValue: {} }),
-        readJson(JSON_URLS.events, { defaultValue: [] }),
-        readJson(JSON_URLS.advisor, { defaultValue: [] }),
-    ]);
+    const { gameData, actionData, chatData, worldData, eventData, advisorData } = await loadFreshPromptRuntimeState();
 
     const variables = await buildPromptVariables({
         actionData,
@@ -1267,14 +1258,7 @@ export async function buildDiplomaticSystemPrompt(countries, playerCountry, spea
     await ensurePromptsLoaded();
     const normalizedCountries = normalizeDiplomaticCountries(countries);
     const participantList = normalizedCountries.map((country) => `- ${country.name}`).join("\n");
-    const [gameData, actionData, chatData, worldData, eventData, advisorData] = await Promise.all([
-        readJson(JSON_URLS.game, { defaultValue: {} }),
-        readJson(JSON_URLS.actions, { defaultValue: [] }),
-        readJson(JSON_URLS.chat, { defaultValue: [] }),
-        readJson(JSON_URLS.world, { defaultValue: {} }),
-        readJson(JSON_URLS.events, { defaultValue: [] }),
-        readJson(JSON_URLS.advisor, { defaultValue: [] }),
-    ]);
+    const { gameData, actionData, chatData, worldData, eventData, advisorData, engineRegionCatalog } = await loadFreshPromptRuntimeState();
 
     const resolvedPlayerCountry = playerCountry || gameData?.country || "";
     const resolvedSpeaker = speakingAs || normalizedCountries.find((country) => country.name !== resolvedPlayerCountry)?.name || "";
@@ -1290,7 +1274,7 @@ export async function buildDiplomaticSystemPrompt(countries, playerCountry, spea
     const focusedMap = buildFocusedDiplomaticMapContext({
         game: gameData,
         participants: normalizedCountries,
-        regions: await loadRegionCatalog().catch(() => []),
+        regions: engineRegionCatalog ?? await loadRegionCatalog().catch(() => []),
         route,
         speakingAs: resolvedSpeaker,
         world: worldData,
@@ -1335,6 +1319,16 @@ const parseDiplomaticPlan = (raw) => {
     }
 };
 
+const currentRegionFacts = async (message) => {
+    const { engineRegionCatalog } = await loadFreshPromptRuntimeState();
+    const normalized = String(message ?? "").toLocaleLowerCase();
+    return (engineRegionCatalog ?? []).filter((region) => {
+        const name = String(region.name ?? "").toLocaleLowerCase();
+        const id = String(region.id ?? "").toLocaleLowerCase();
+        return (name.length >= 3 && normalized.includes(name)) || (id && normalized.includes(id));
+    }).slice(0, 4).map((region) => `${region.name} (${region.id}) is currently controlled by ${region.country}`);
+};
+
 const planDiplomaticContext = async (message, countries, recentText, signal) => {
     const participantNames = normalizeDiplomaticCountries(countries).map((country) => country.name);
     const prompt =
@@ -1377,7 +1371,7 @@ function compactConversationHistory(history) {
 
 export async function sendMessage(userMessage, opts) {
     const systemPrompt = await buildAdvisorSystemPrompt();
-    advisorHistory.push({ role: "user", parts: [{ text: userMessage }] });
+    advisorHistory.push({ role: "user", parts: [{ text: `${userMessage}\n\n[Reply only in ${languageDisplayName(resolveChatLanguage())}.]` }] });
     advisorHistory = compactConversationHistory(advisorHistory);
 
     try {
@@ -1447,12 +1441,18 @@ export async function sendDiplomaticMessage(playerMessage, speakingAs, countries
             // high-complexity route remains intact and simply uses core parties.
         }
     }
-    const freshPrompt = await buildDiplomaticSystemPrompt(countries, null, speakingAs, { route });
+    const [freshPrompt, regionFacts] = await Promise.all([
+        buildDiplomaticSystemPrompt(countries, null, speakingAs, { route }),
+        currentRegionFacts(playerMessage),
+    ]);
 
     diplomaticHistory.push({ role: "user", parts: [{ text: playerMessage }] });
     diplomaticHistory = compactConversationHistory(diplomaticHistory);
 
-    const turnInstruction = `[It is now ${speakingAs}'s turn to respond to the above. Respond only as the leader of ${speakingAs}, naturally, without prefixing your country name.\n\nOptionally, if the message warrants a emotional reaction (surprise, offense, delight, suspicion, confusion etc.), append a single line at the very end in this exact format:\nREACTION:<emoji>\n- use only a single emoji in utf-8 format after the colon, no spaces, no extra text. Otherwise omit it entirely.]`;
+    const bindingFacts = regionFacts.length
+        ? ` Binding engine facts: ${regionFacts.join("; ")}. State the current controller explicitly if the user asks who controls the region.`
+        : "";
+    const turnInstruction = `[It is now ${speakingAs}'s turn to respond to the above. Respond only as the leader of ${speakingAs}, naturally, without prefixing your country name. Reply only in ${languageDisplayName(resolveChatLanguage())}. The current engine snapshot in the system prompt is authoritative and supersedes any contradictory ownership or world-state claim in earlier chat messages; re-check it before answering.${bindingFacts}\n\nOptionally, if the message warrants a emotional reaction (surprise, offense, delight, suspicion, confusion etc.), append a single line at the very end in this exact format:\nREACTION:<emoji>\n- use only a single emoji in utf-8 format after the colon, no spaces, no extra text. Otherwise omit it entirely.]`;
 
     const historyWithInstruction = [
         ...diplomaticHistory,
