@@ -98,3 +98,15 @@ export const normalizeCampaignDecisionWire = (raw) => ({
       revisit: { afterMonths: decision.revisitAfterMonths, triggers: decision.revisitTriggers } },
   })) : raw?.decisions,
 });
+
+export const salvageCampaignDecisionBatch = (raw, polityIds, { acceptDecision, fallbackDecision }) => {
+  const source = Array.isArray(raw?.decisions) ? raw.decisions : [];
+  const replacedPolityIds = [];
+  const decisions = polityIds.map((polityId) => {
+    const matches = source.filter((decision) => decision?.polityId === polityId);
+    if (matches.length === 1 && acceptDecision(matches[0])) return matches[0];
+    replacedPolityIds.push(polityId);
+    return fallbackDecision(polityId);
+  });
+  return { batch: { decisions }, replacedPolityIds };
+};

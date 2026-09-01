@@ -8,7 +8,10 @@ import {
   pacificQuotaDay,
   reduceChronicleAlerts,
 } from "../scripts/lib/campaign-lab-policy.mjs";
-import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS, encodeCampaignDecisionWire, normalizeCampaignDecisionWire } from "../scripts/lib/campaign-lab-contract.mjs";
+import {
+  CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS, encodeCampaignDecisionWire, normalizeCampaignDecisionWire,
+  salvageCampaignDecisionBatch,
+} from "../scripts/lib/campaign-lab-contract.mjs";
 
 test("Campaign Lab sends the bounded StrategicDecisionV2 schema without raw commands", () => {
   assert.ok(CAMPAIGN_DECISION_TOOLS.includes("conserve"));
@@ -41,6 +44,18 @@ test("compact Gemini trade actions normalize an unambiguous qualifier swap", () 
   assert.deepEqual(normalized.decisions[0].actions[0], {
     tool: "negotiate-trade", partner: "polity:partner", resource: "iron", desiredRunway: "medium", budgetAttitude: "balanced",
   });
+});
+
+test("campaign batches retain valid actors and replace only invalid actors with typed holds", () => {
+  const raw = { decisions: [{ polityId: "polity:a", valid: true }, { polityId: "polity:b", valid: false }] };
+  const result = salvageCampaignDecisionBatch(raw, ["polity:a", "polity:b", "polity:c"], {
+    acceptDecision: (decision) => decision.valid === true,
+    fallbackDecision: (polityId) => ({ polityId, hold: { reason: "plan-sequencing" } }),
+  });
+  assert.deepEqual(result.replacedPolityIds, ["polity:b", "polity:c"]);
+  assert.deepEqual(result.batch.decisions.map((decision) => [decision.polityId, decision.valid ?? false]), [
+    ["polity:a", true], ["polity:b", false], ["polity:c", false],
+  ]);
 });
 
 test("autonomy-v2 pilot is deliberately limited to the three German doctrines", () => {

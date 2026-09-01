@@ -15,7 +15,9 @@ import {
   AUTONOMY_V2_CELLS, CAMPAIGN_MAX_CALLS, FREE10_CELLS, MAX_OUTPUT_TOKENS, PACIFIC_DAILY_CALL_LIMIT, PACING_RPM, PACING_TPM,
   decisionTriggerReasons, isRetryableGeminiFailure, pacificQuotaDay, reduceChronicleAlerts,
 } from "./lib/campaign-lab-policy.mjs";
-import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS, normalizeCampaignDecisionWire } from "./lib/campaign-lab-contract.mjs";
+import {
+  CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS, normalizeCampaignDecisionWire, salvageCampaignDecisionBatch,
+} from "./lib/campaign-lab-contract.mjs";
 import { getGeminiHeaders, getGeminiThinkingConfig, getGeminiUrl } from "../src/Game/AI/geminiProtocol.js";
 import { GAMEPLAY_TOOLS } from "../src/Game/AI/gameplaySchemas.js";
 
@@ -280,6 +282,26 @@ const opponentCommands = async ({ id, manifest, state, authoring, memory }) => {
           appendJsonl(fileOf(id, "telemetry.jsonl"), { month: batch.month, batchId: batch.batchId, generation,
             latencyMs: 0, status: "schema-error", usage: null, parseResult: text ? "failed" : "empty", schemaResult: "failed",
             acceptedCommands: 0, rejectedCommands: 0, detail: String(error).slice(0, 500) });
+          if (parsed) {
+            const salvaged = salvageCampaignDecisionBatch(parsed, batch.polityIds, {
+              acceptDecision: (candidate) => {
+                const checked = strategicDecisionV2Schema.safeParse(candidate);
+                return checked.success && materializeStrategicDecisionV2(state, checked.data, {
+                  expectedRevision: batch.baseRevision, effectiveMonth: batch.month,
+                }).rejected.length === 0;
+              },
+              fallbackDecision: (polityId) => holdDecision(polityId, "Provider proposal was rejected before state change; wait for the next bounded review."),
+            });
+            const salvagedMaterialization = materializeStrategicBatchV2(state, salvaged.batch, batch);
+            if (salvaged.replacedPolityIds.length > 0 && salvagedMaterialization.rejected.length === 0) {
+              parsed = salvaged.batch;
+              appendJsonl(fileOf(id, "telemetry.jsonl"), { month: batch.month, batchId: batch.batchId, generation,
+                latencyMs: 0, status: "generation-salvaged", usage: null, parseResult: "partial", schemaResult: "accepted",
+                acceptedCommands: salvagedMaterialization.commands.length, rejectedCommands: salvaged.replacedPolityIds.length,
+                replacedPolityIds: salvaged.replacedPolityIds });
+              break;
+            }
+          }
           if (generation === 2) throw error;
           correction = `Previous response failed validation: ${String(error).slice(0, 500)}. Return corrected strict JSON only.`;
         }
