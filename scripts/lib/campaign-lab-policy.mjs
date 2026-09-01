@@ -43,6 +43,7 @@ export const reduceChronicleAlerts = (events, previous = {}) => {
     else if (event.alert === "inputs-limited" && value.detail !== before.detail) lifecycle = "changed";
     if (lifecycle) records.push({ ...event, lifecycle });
     if (event.alert === "food-shortfall" && lifecycle === "started") triggerReasons.push(`critical-food-shortfall:${event.polityId}`);
+    if (event.alert === "inputs-limited" && lifecycle === "started") triggerReasons.push(`new-resource-deficit:${event.polityId}`);
   }
 
   for (const [key, before] of Object.entries(previous)) {
@@ -70,3 +71,7 @@ export const FREE10_CELLS = Object.freeze([
   ...["germany", "poland", "france"].flatMap((player) => ["historical", "alternative", "free"].map((strategy) => ({ player, strategy }))),
   { player: "united-kingdom", strategy: "historical" },
 ]);
+
+export const AUTONOMY_V2_CELLS = Object.freeze(
+  ["historical", "alternative", "free"].map((strategy) => ({ player: "germany", strategy })),
+);

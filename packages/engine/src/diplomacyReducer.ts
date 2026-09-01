@@ -2,7 +2,8 @@ import type { PolityId, RegionId } from '@open-historia/domain';
 import type { CommandRejection, DiplomacyCommand } from './commands.js';
 import type { NegotiationTerms } from './diplomacy.js';
 import { relationKey } from './diplomacy.js';
-import type { ResourceId } from './scenario.js';
+import type { RawResourceId, ResourceId } from './scenario.js';
+import { hasProcessingActivity } from './scenario.js';
 import type { EconWorldState } from './state.js';
 import { addMonth } from './state.js';
 
@@ -18,7 +19,8 @@ export interface MutableSettlementRegion {
   population: number;
   infrastructureBp: number;
   damageBp: number;
-  activity: { kind: 'processing'; activity: string } | { kind: 'extraction'; resource: string };
+  activity?: { kind: 'processing'; activity: 'basic_goods' } | { kind: 'extraction'; resource: RawResourceId };
+  activities?: Array<{ activity: { kind: 'processing'; activity: 'basic_goods' } | { kind: 'extraction'; resource: RawResourceId }; allocationBp: number }>;
 }
 
 export interface TerritorialSettlementTransfer {
@@ -186,8 +188,8 @@ export function resolveDiplomacyPhase(
         const { fromPolityId, toPolityId, regionIds } = proposal.terms;
         const selected = regionIds.map((regionId) => regions.find((entry) => entry.regionId === regionId));
         const occupied = new Set((state.military?.occupations ?? []).map((entry) => entry.regionId));
-        const receiverProcessing = regions.filter((entry) => entry.controllerId === toPolityId && entry.activity.kind === 'processing').length;
-        const incomingProcessing = selected.filter((entry) => entry?.activity.kind === 'processing').length;
+        const receiverProcessing = regions.filter((entry) => entry.controllerId === toPolityId && hasProcessingActivity(entry)).length;
+        const incomingProcessing = selected.filter((entry) => entry && hasProcessingActivity(entry)).length;
         if (!polityById.has(fromPolityId) || !polityById.has(toPolityId)
           || selected.some((entry) => !entry || entry.controllerId !== fromPolityId)
           || regionIds.some((regionId) => occupied.has(regionId))

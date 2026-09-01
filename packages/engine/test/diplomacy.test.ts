@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { CommandId, PolityId } from '@open-historia/domain';
 import type { DiplomacyCommand, EconCommand } from '../src/commands.js';
-import { parseScenario } from '../src/scenario.js';
+import { activitiesOf, parseScenario } from '../src/scenario.js';
 import { initState, getStock } from '../src/state.js';
 import type { EconWorldState } from '../src/state.js';
 import { resolveMonth } from '../src/tick.js';
@@ -81,7 +81,7 @@ describe('P3b negotiation state machine (canon 11)', () => {
 
   it('accepts a peaceful territorial settlement atomically and rejects stale ownership', () => {
     const state = initState(scenario);
-    const target = state.regions.find((entry) => entry.controllerId === POLAND && entry.activity.kind === 'extraction')!;
+    const target = state.regions.find((entry) => entry.controllerId === POLAND && activitiesOf(entry).some((activity) => activity.activity.kind === 'extraction'))!;
     const proposalId = 'proposal:peaceful-cession';
     const propose: DiplomacyCommand = {
       kind: 'diplomacy.propose', ...common(state, POLAND), proposalId, recipientPolityId: FRANCE,

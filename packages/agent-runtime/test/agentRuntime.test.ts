@@ -17,6 +17,11 @@ import {
   selectOpponentPolities,
   validateOpponentBatch,
   validateDiplomacyBatch,
+  buildStrategicBriefV2,
+  buildStrategicBatchesV2,
+  materializeStrategicDecisionV2,
+  materializeStrategicBatchV2,
+  strategicDecisionV2Schema,
   type AgentState,
 } from '../src/index.js';
 import { initState, parseScenario, runTurn, stateChecksum, type EconWorldState } from '@open-historia/engine';
@@ -26,6 +31,90 @@ const fallbackGolden = fileURLToPath(new URL('../../test/golden/p3a-fallback-cha
 const initial = () => initState(parseScenario(JSON.parse(readFileSync(fixture, 'utf8'))));
 const diplomacyFixture = fileURLToPath(new URL('../../../engine/fixtures/scenario-dev-map-6c/scenario.json', import.meta.url));
 const diplomacyInitial = () => initState(parseScenario(JSON.parse(readFileSync(diplomacyFixture, 'utf8'))));
+const benchmarkFixture = fileURLToPath(new URL('../../../data-packs/fixtures/europe-1935-benchmark/engine/scenario.json', import.meta.url));
+const benchmarkInitial = () => initState(parseScenario(JSON.parse(readFileSync(benchmarkFixture, 'utf8'))));
+
+const holdV2 = (polityId: string) => ({
+  polityId, objective: { domain: 'economy' as const, summary: 'Preserve room to manoeuvre.', horizon: 'short' as const },
+  actions: [{ tool: 'conserve' as const }], futurePlan: [], contingency: 'Review after new evidence.', rationale: 'No supported material action is justified.',
+  hold: { reason: 'plan-sequencing' as const, detail: 'Wait for the next checkpoint.', revisit: { afterMonths: 1, triggers: ['resource-deficit' as const] } },
+});
+
+test('StrategicBriefV2 exposes monthly flows, iron runway and parameterized tools without geometry', () => {
+  const state = benchmarkInitial();
+  const brief = buildStrategicBriefV2(state, 'polity:germany');
+  assert.equal(brief.schemaVersion, 'open-historia-strategic-brief/2');
+  const iron = brief.economy.resources.find((entry) => entry.resource === 'iron')!;
+  assert.ok(iron.monthlyConsumption > iron.monthlyProduction);
+  assert.ok(iron.runwayMonths !== null && iron.runwayMonths > 0);
+  assert.ok(brief.tools.some((entry) => entry.tool === 'negotiate-trade'));
+  assert.equal(JSON.stringify(brief).includes('geometry'), false);
+  assert.equal(JSON.stringify(brief).includes('coordinates'), false);
+});
+
+test('StrategicDecisionV2 requires typed hold and limits compatible material actions', () => {
+  assert.deepEqual(strategicDecisionV2Schema.parse(holdV2('polity:germany')), holdV2('polity:germany'));
+  assert.throws(() => strategicDecisionV2Schema.parse({ ...holdV2('polity:germany'), hold: null }), /hold is required/);
+  assert.throws(() => strategicDecisionV2Schema.parse({ ...holdV2('polity:germany'), actions: [
+    { tool: 'invest', targetRegionId: 'region:benchmark-1:DE', scale: 'small' },
+    { tool: 'conserve' },
+  ], hold: null }), /conserve cannot/);
+});
+
+test('materializer creates deterministic ids and engine-priced trade commands', () => {
+  const state = benchmarkInitial();
+  const decision = { polityId: 'polity:germany', objective: { domain: 'economy', summary: 'Protect industrial production.', horizon: 'medium' },
+    actions: [{ tool: 'negotiate-trade', partner: 'polity:soviet-union', resource: 'iron', desiredRunway: 'medium', budgetAttitude: 'urgent' }],
+    futurePlan: [{ summary: 'Seek another supplier.', condition: 'The proposal is rejected.' }], contingency: 'Use another authored route.',
+    rationale: 'Iron has a finite runway.', hold: null };
+  const first = materializeStrategicDecisionV2(state, decision);
+  const second = materializeStrategicDecisionV2(state, decision);
+  assert.deepEqual(first, second);
+  assert.equal(first.rejected.length, 0);
+  assert.equal(first.commands[0]?.kind, 'diplomacy.propose');
+  assert.equal(runTurn(state, { commands: first.commands }).result.rejections.length, 0);
+  const stale = materializeStrategicDecisionV2(runTurn(state, { commands: [] }).result.state, decision, { expectedRevision: state.revision });
+  assert.match(stale.rejected[0]?.reason ?? '', /stale-revision/);
+});
+
+test('materializer turns qualitative production priority into exact conserved allocations', () => {
+  const state = benchmarkInitial();
+  const decision = { polityId: 'polity:germany', objective: { domain: 'economy', summary: 'Extend raw-material runway.', horizon: 'short' },
+    actions: [{ tool: 'reallocate-production', targetRegionId: 'region:benchmark-1:DE', priority: 'raw-materials', scale: 'medium' }],
+    futurePlan: [], contingency: 'Seek imports if domestic allocation is insufficient.', rationale: 'Processing is consuming iron faster than domestic extraction replaces it.', hold: null };
+  const result = materializeStrategicDecisionV2(state, decision);
+  assert.equal(result.rejected.length, 0);
+  assert.equal(result.commands[0]?.kind, 'economy.reallocate-production');
+  if (result.commands[0]?.kind !== 'economy.reallocate-production') return;
+  assert.equal(result.commands[0].allocations.reduce((sum, entry) => sum + entry.allocationBp, 0), 10000);
+  assert.equal(runTurn(state, { commands: result.commands }).result.rejections.length, 0);
+});
+
+test('materializer rejects incompatible actions atomically and reports unsupported residuals', () => {
+  const state = benchmarkInitial();
+  const incompatible = materializeStrategicDecisionV2(state, { polityId: 'polity:germany', objective: { domain: 'military', summary: 'Coerce Austria.', horizon: 'short' },
+    actions: [{ tool: 'propose-agreement', partner: 'polity:austria', agreementType: 'non-aggression' },
+      { tool: 'declare-war', defender: 'polity:austria', reason: 'rivalry' }], futurePlan: [], contingency: 'Pause.', rationale: 'Probe compatibility.', hold: null });
+  assert.equal(incompatible.commands.length, 0);
+  assert.match(incompatible.rejected[0]?.reason ?? '', /cannot negotiate/);
+  const residual = materializeStrategicDecisionV2(state, { polityId: 'polity:germany', objective: { domain: 'diplomacy', summary: 'Seek a policy concession.', horizon: 'medium' },
+    actions: [{ tool: 'apply-diplomatic-pressure', partner: 'polity:austria', demand: 'policy-change', pressure: 'medium' }], futurePlan: [], contingency: 'Continue talks.',
+    rationale: 'Use supported pressure channels.', intendedOutcome: 'Austria changes an internal policy.', hold: null });
+  assert.equal(residual.commands.length, 0);
+  assert.ok(residual.unsupportedResidual.some((entry) => entry.startsWith('diplomatic-pressure:')));
+});
+
+test('Strategic V2 batches are bounded and materialize all actors against one revision', () => {
+  const state = benchmarkInitial();
+  const batches = buildStrategicBatchesV2(state, 'polity:germany');
+  assert.equal(batches.length, 2);
+  assert.ok(batches.every((entry) => entry.polityIds.length <= 6 && entry.characterCount <= 40000));
+  const batch = batches[0]!;
+  const materialized = materializeStrategicBatchV2(state, { decisions: batch.polityIds.map(holdV2) }, batch);
+  assert.deepEqual(materialized, { commands: [], unsupportedResidual: [], rejected: [] });
+  const advanced = runTurn(state, { commands: [] }).result.state;
+  assert.match(materializeStrategicBatchV2(advanced, { decisions: batch.polityIds.map(holdV2) }, batch).rejected[0]?.reason ?? '', /stale-revision/);
+});
 
 test('strategic diplomacy batch is bounded, deterministic and contains no full map', () => {
   const state = diplomacyInitial();

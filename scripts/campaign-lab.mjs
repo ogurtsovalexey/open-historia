@@ -8,13 +8,14 @@ import {
   compileHistoricalProjection, initState, parseTurnCommands, parseWorldState, runTurn,
 } from "../packages/engine/dist/index.js";
 import {
-  buildDiplomacyBatches, opponentDiplomacyBatchResultSchema, validateDiplomacyBatch,
+  buildStrategicBatchesV2, buildStrategicBriefV2, materializeStrategicBatchV2,
+  materializeStrategicDecisionV2, strategicDecisionBatchV2Schema, strategicDecisionV2Schema,
 } from "../packages/agent-runtime/dist/index.js";
 import {
-  CAMPAIGN_MAX_CALLS, FREE10_CELLS, MAX_OUTPUT_TOKENS, PACIFIC_DAILY_CALL_LIMIT, PACING_RPM, PACING_TPM,
+  AUTONOMY_V2_CELLS, CAMPAIGN_MAX_CALLS, FREE10_CELLS, MAX_OUTPUT_TOKENS, PACIFIC_DAILY_CALL_LIMIT, PACING_RPM, PACING_TPM,
   decisionTriggerReasons, isRetryableGeminiFailure, pacificQuotaDay, reduceChronicleAlerts,
 } from "./lib/campaign-lab-policy.mjs";
-import { CAMPAIGN_DECISION_INTENTS, CAMPAIGN_DECISION_RESPONSE_SCHEMA } from "./lib/campaign-lab-contract.mjs";
+import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS } from "./lib/campaign-lab-contract.mjs";
 import { getGeminiHeaders, getGeminiThinkingConfig, getGeminiUrl } from "../src/Game/AI/geminiProtocol.js";
 import { GAMEPLAY_TOOLS } from "../src/Game/AI/gameplaySchemas.js";
 
@@ -42,6 +43,10 @@ const sha256 = (value) => `sha256:${crypto.createHash("sha256").update(value).di
 const canonical = (value) => Array.isArray(value) ? `[${value.map(canonical).join(",")}]`
   : value && typeof value === "object" ? `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`).join(",")}}`
     : JSON.stringify(value);
+const addMonths = (month, count) => {
+  const [year, value] = month.slice(0, 7).split("-").map(Number); const absolute = year * 12 + value - 1 + count;
+  return `${String(Math.floor(absolute / 12)).padStart(4, "0")}-${String((absolute % 12) + 1).padStart(2, "0")}-01`;
+};
 const gitRevision = () => {
   try { return execFileSync("git", ["rev-parse", "HEAD"], { cwd: ROOT, encoding: "utf8" }).trim(); }
   catch { return "unknown"; }
@@ -107,14 +112,24 @@ const loadPackage = () => {
 };
 const loadRun = (id) => ({ manifest: readJson(fileOf(id, "manifest.json")), state: parseWorldState(readJson(fileOf(id, "state.json"))) });
 const writeManifest = (id, manifest) => atomicJson(fileOf(id, "manifest.json"), manifest);
-const commandId = (seed) => {
-  const hex = crypto.createHash("sha256").update(seed).digest("hex").slice(0, 32).split("");
-  hex[12] = "4"; hex[16] = ["8", "9", "a", "b"][Number.parseInt(hex[16], 16) % 4];
-  const raw = hex.join(""); return `${raw.slice(0, 8)}-${raw.slice(8, 12)}-${raw.slice(12, 16)}-${raw.slice(16, 20)}-${raw.slice(20)}`;
-};
-const hydrate = (raw, batch) => ({ ...raw, decisions: Array.isArray(raw?.decisions) ? raw.decisions.map((decision, index) => ({
-  ...decision, command: decision?.command ? { ...decision.command, commandId: commandId(`${batch.baseRevision}|${batch.batchId}|${decision.polityId}|${index}`) } : null,
-})) : raw?.decisions });
+const holdDecision = (polityId, rationale = "No supported material action is justified at this checkpoint.") => ({
+  polityId, objective: { domain: "campaign", summary: "Preserve strategic flexibility.", horizon: "short" },
+  actions: [{ tool: "conserve" }], futurePlan: [], contingency: "Reassess when canonical conditions change.", rationale,
+  hold: { reason: "plan-sequencing", detail: "Wait for a material trigger or scheduled review.",
+    revisit: { afterMonths: 1, triggers: ["resource-deficit", "diplomatic-response", "war", "crisis"] } },
+});
+
+const PLAYER_DOCTRINES = Object.freeze({
+  historical: "Pursue revisionism and militarization; pressure Austria and Czechoslovakia; later aggression and the regime's coercive policies, only through supported generic mechanics and without fabricating demographic consequences.",
+  alternative: "Seek alliance, trade and military coordination with the Soviet Union, then pursue coordinated expansion through supported generic mechanics.",
+  free: "Build a peaceful trading Germany: de-escalation, non-aggression and integration; do not begin an offensive war unless Germany is attacked.",
+});
+
+const writePlayerBrief = (id, manifest, state, reasons) => atomicJson(fileOf(id, "player-brief.json"), {
+  schemaVersion: "open-historia-player-brief/2", private: true, doctrine: PLAYER_DOCTRINES[manifest.strategy],
+  checkpoint: { month: state.month, revision: state.revision, reasons }, strategicBrief: buildStrategicBriefV2(state, manifest.playerPolityId),
+  responseContract: "StrategicDecisionV2; submit with campaign-lab decide --decision <json>. Technical ids and numeric amounts are materialized by the engine adapter.",
+});
 
 const verifyPreflight = (file, model) => {
   if (!file) throw new Error("live Campaign Lab start requires --preflight <passing primary-suite JSON>");
@@ -137,23 +152,25 @@ const createOne = ({ id, playerPolityId, strategy, mode, model, preflight = null
   fs.mkdirSync(path.join(runDir(id), "raw"), { recursive: true });
   const state = initState(loaded.projection.scenario);
   const manifest = {
-    schemaVersion: "open-historia-campaign-lab-run/1", runId: id,
+    schemaVersion: "open-historia-campaign-lab-run/2", runId: id,
     scenarioId: loaded.projection.scenario.scenarioId, scenarioChecksum: loaded.projection.checksum,
     codeRevision: gitRevision(), playerPolityId, strategy, mode,
     model: mode === "live" ? model : "deterministic-mock", reasoningMode: mode === "live" ? "minimal" : "off",
     maxOutputTokens: MAX_OUTPUT_TOKENS, maxCalls: CAMPAIGN_MAX_CALLS, transportRetries: 2, schemaCorrections: 1,
     pacing: { rpm: PACING_RPM, tpm: PACING_TPM, dailyCalls: PACIFIC_DAILY_CALL_LIMIT, timezone: "America/Los_Angeles" },
-    preflight, promptVersions: { campaignLabDecision: "campaign-lab-strategy/3", geminiWire: "gemini-wire/2" },
+    preflight, promptVersions: { campaignLabDecision: "campaign-lab-strategy/4", strategicContract: "StrategicDecisionV2", geminiWire: "gemini-wire/2" },
     startMonth: state.month, horizonMonth: loaded.authoring.horizonDate,
     status: mode === "live" ? "awaiting-player-decision" : "ready", calls: 0,
     createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), checkpoint: { month: state.month, reasons: ["campaign-start"] },
     alertState: {}, triggerReasons: [],
+    plannerDueByPolity: {}, playerDueMonth: state.month,
   };
   atomicJson(fileOf(id, "state.json"), state); writeManifest(id, manifest);
   fs.writeFileSync(fileOf(id, "chronicle.jsonl"), "", "utf8");
   fs.writeFileSync(fileOf(id, "chronicle.md"), `# ${id}\n\nPlayer: ${playerPolityId}; strategy: ${strategy}; mode: ${mode}.\n\n`, "utf8");
   fs.writeFileSync(fileOf(id, "telemetry.jsonl"), "", "utf8");
   fs.writeFileSync(fileOf(id, "decisions.jsonl"), "", "utf8");
+  writePlayerBrief(id, manifest, state, ["campaign-start"]);
   return manifest;
 };
 
@@ -178,7 +195,7 @@ const strategicContexts = (authoring, memory) => Object.fromEntries(authoring.na
 
 const geminiDecision = async ({ id, manifest, batch, correction = null }) => {
   if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is required for live mode and is never stored");
-  const system = `Play each requested polity independently. Return strict JSON {decisions:[{polityId,intent,rationale,command}]}. intent must be exactly one of: ${CAMPAIGN_DECISION_INTENTS.join(", ")}. Use hold and null command unless a supplied bounded action is justified. Never invent numeric outcomes, ids, regions or geometry. Commands use the supplied month and revision.`;
+  const system = `Play each requested polity independently. Return strict StrategicDecisionV2 JSON. Select zero to three compatible material tools from: ${CAMPAIGN_DECISION_TOOLS.join(", ")}. Choose qualitative goals, partners, risk, sequence and contingency; never emit engine commands, technical ids, numeric effects, regions outside allowed values, or geometry. If no material action is justified, use conserve plus a typed hold reason and revisit triggers. Unsupported consequences belong only in intendedOutcome and must not be narrated as completed.`;
   const payload = { month: batch.month, revision: batch.baseRevision, briefs: batch.briefs, ...(correction ? { correction } : {}) };
   const serialized = JSON.stringify(payload);
   if (serialized.length > MAX_CONTEXT_CHARS || /coordinates|geometry|FeatureCollection/.test(serialized)) throw new Error("AI context gate failed");
@@ -227,13 +244,17 @@ const geminiDecision = async ({ id, manifest, batch, correction = null }) => {
 };
 
 const opponentCommands = async ({ id, manifest, state, authoring, memory }) => {
-  if ((state.turn % 3) !== 0 && (manifest.triggerReasons?.length ?? 0) === 0) return [];
-  const batches = buildDiplomacyBatches(state, manifest.playerPolityId, { strategicContextByPolity: strategicContexts(authoring, memory) });
+  const triggered = (manifest.triggerReasons?.length ?? 0) > 0;
+  const quarterly = (state.turn % 3) === 0;
+  const due = state.polities.filter((entry) => entry.id !== manifest.playerPolityId && (manifest.plannerDueByPolity?.[entry.id] ?? "9999-12-01") <= state.month).map((entry) => entry.id);
+  if (!quarterly && !triggered && due.length === 0) return [];
+  const requestedPolityIds = quarterly || triggered ? undefined : due;
+  const batches = buildStrategicBatchesV2(state, manifest.playerPolityId, { strategicContextByPolity: strategicContexts(authoring, memory), requestedPolityIds });
   const commands = [];
   for (const batch of batches) {
     let parsed;
     if (manifest.mode === "mock") {
-      parsed = { decisions: batch.polityIds.map((polityId) => ({ polityId, intent: "hold", rationale: "Deterministic mocked hold.", command: null })) };
+      parsed = { decisions: batch.polityIds.map((polityId) => holdDecision(polityId, "Deterministic mocked typed hold.")) };
     } else {
       let correction = null;
       for (let generation = 1; generation <= 2; generation += 1) {
@@ -244,10 +265,12 @@ const opponentCommands = async ({ id, manifest, state, authoring, memory }) => {
           throw error;
         }
         try {
-          parsed = JSON.parse(text); validateDiplomacyBatch(hydrate(parsed, batch), batch);
+          parsed = JSON.parse(text);
+          const materialized = materializeStrategicBatchV2(state, parsed, batch);
+          if (materialized.rejected.length) throw new Error(materialized.rejected.map((entry) => entry.reason).join("; "));
           appendJsonl(fileOf(id, "telemetry.jsonl"), { month: batch.month, batchId: batch.batchId, generation,
             latencyMs: 0, status: "generation-accepted", usage: null, parseResult: "accepted", schemaResult: "accepted",
-            acceptedCommands: parsed.decisions.filter((entry) => entry.command).length, rejectedCommands: 0 });
+            acceptedCommands: materialized.commands.length, rejectedCommands: 0 });
           break;
         } catch (error) {
           appendJsonl(fileOf(id, "telemetry.jsonl"), { month: batch.month, batchId: batch.batchId, generation,
@@ -258,9 +281,13 @@ const opponentCommands = async ({ id, manifest, state, authoring, memory }) => {
         }
       }
     }
-    const validated = validateDiplomacyBatch(hydrate(opponentDiplomacyBatchResultSchema.parse(parsed), batch), batch);
-    appendJsonl(fileOf(id, "decisions.jsonl"), { month: state.month, actor: "opponents", batchId: batch.batchId, decisions: validated.decisions });
-    commands.push(...validated.decisions.flatMap((entry) => entry.command ? [entry.command] : []));
+    const validated = strategicDecisionBatchV2Schema.parse(parsed);
+    const materialized = materializeStrategicBatchV2(state, validated, batch);
+    if (materialized.rejected.length) throw new Error(`strategic materialization rejected: ${materialized.rejected.map((entry) => entry.reason).join(", ")}`);
+    appendJsonl(fileOf(id, "decisions.jsonl"), { month: state.month, actor: "opponents", batchId: batch.batchId,
+      decisions: validated.decisions, commands: materialized.commands, unsupportedResidual: materialized.unsupportedResidual });
+    for (const decision of validated.decisions) manifest.plannerDueByPolity[decision.polityId] = addMonths(state.month, decision.hold?.revisit.afterMonths ?? 3);
+    commands.push(...materialized.commands);
   }
   return commands;
 };
@@ -353,6 +380,19 @@ const renderFinalCard = (card) => {
     `- Problems: ${card.logicalOrTechnicalProblems.join("; ") || "none recorded"}.`, "",
   ].join("\n");
 };
+const writeCheckpointReport = (id) => {
+  const file = fileOf(id, "decisions.jsonl");
+  const rows = fs.readFileSync(file, "utf8").trim().split("\n").filter(Boolean).map(JSON.parse);
+  const lines = [`# ${id} checkpoint report`, ""];
+  for (const row of rows) {
+    const decisions = row.decision ? [row.decision] : row.decisions ?? [];
+    lines.push(`## ${row.month} — ${row.actor}`, "");
+    for (const decision of decisions) lines.push(`- ${decision.polityId}: ${decision.objective?.summary ?? "No objective recorded"}; tools ${(decision.actions ?? []).map((entry) => entry.tool).join(", ") || "none"}; rationale ${decision.rationale ?? "none"}.`);
+    lines.push(`- Materialized commands: ${(row.commands ?? []).map((entry) => entry.kind).join(", ") || "none"}.`,
+      `- Unsupported residual: ${(row.unsupportedResidual ?? []).join("; ") || "none"}.`, "");
+  }
+  fs.writeFileSync(fileOf(id, "checkpoint-report.md"), `${lines.join("\n")}\n`, "utf8");
+};
 const summarizeTelemetry = (id) => {
   const file = fileOf(id, "telemetry.jsonl");
   const rows = fs.existsSync(file) ? fs.readFileSync(file, "utf8").trim().split("\n").filter(Boolean).map(JSON.parse) : [];
@@ -366,6 +406,7 @@ const summarizeTelemetry = (id) => {
 
 const resume = async (id) => {
   const loaded = loadPackage(); const current = loadRun(id); const { manifest } = current; let { state } = current;
+  if (manifest.schemaVersion !== "open-historia-campaign-lab-run/2") throw new Error("diagnostic-hold-v1 run cannot continue after the StrategicDecisionV2 revision; start an autonomy-v2 run");
   if (loaded.projection.checksum !== manifest.scenarioChecksum) throw new Error("frozen scenario checksum changed; start a new matrix after fixing it");
   if (gitRevision() !== manifest.codeRevision) throw new Error("frozen code revision changed; finish this matrix with its original revision");
   if (manifest.status === "completed") return manifest;
@@ -374,13 +415,14 @@ const resume = async (id) => {
   if (manifest.status === "quota-paused" && manifest.quotaDay === pacificQuotaDay()) return manifest;
   if (manifest.status === "quota-paused") { manifest.status = "ready"; manifest.quotaDay = null; manifest.lastError = null; }
   while (state.month < manifest.horizonMonth) {
-    const scheduledPlayer = state.turn % 6 === 0 || (manifest.triggerReasons?.length ?? 0) > 0;
+    const scheduledPlayer = state.turn % 6 === 0 || (manifest.triggerReasons?.length ?? 0) > 0 || (manifest.playerDueMonth ?? "9999-12-01") <= state.month;
     let player = [];
     if (scheduledPlayer) {
       const decision = pendingPlayerCommands(id, state, manifest);
       if (decision === null) {
         manifest.status = "awaiting-player-decision"; manifest.checkpoint = { month: state.month,
           reasons: manifest.triggerReasons?.length ? manifest.triggerReasons : [state.turn === 0 ? "campaign-start" : "six-month-review"] };
+        writePlayerBrief(id, manifest, state, manifest.checkpoint.reasons);
         manifest.updatedAt = new Date().toISOString(); writeManifest(id, manifest); atomicJson(fileOf(id, "state.json"), state); return manifest;
       }
       player = decision;
@@ -413,29 +455,31 @@ const resume = async (id) => {
   manifest.status = "completed"; manifest.completedAt = new Date().toISOString(); manifest.triggerReasons = [];
   const card = finalCard(manifest, state, chronicle, loaded.authoring, lastLedger); atomicJson(fileOf(id, "final-card.json"), card);
   fs.writeFileSync(fileOf(id, "final-card.md"), renderFinalCard(card), "utf8");
+  writeCheckpointReport(id);
   writeManifest(id, manifest); return manifest;
 };
 
 const decide = (id, args) => {
   const { manifest, state } = loadRun(id);
   if (manifest.status !== "awaiting-player-decision") throw new Error("run is not awaiting a player decision");
-  let commands = [];
-  if (args.commands) commands = parseTurnCommands(readJson(path.resolve(args.commands))).commands;
-  else if (args.hold !== "true") throw new Error("decide requires --commands <json> or --hold true");
-  for (const command of commands) {
-    if (command.actorPolityId !== manifest.playerPolityId || command.expectedRevision !== state.revision || command.effectiveMonth !== state.month) throw new Error("player command actor/month/revision mismatch");
-    if (command.kind === "territory.transfer-region") throw new Error("direct territorial transfer is not a player campaign action");
-  }
+  if (!args.decision) throw new Error("decide requires --decision <StrategicDecisionV2 json>");
+  const decision = strategicDecisionV2Schema.parse(readJson(path.resolve(args.decision)));
+  if (decision.polityId !== manifest.playerPolityId) throw new Error("player strategic actor mismatch");
+  const materialized = materializeStrategicDecisionV2(state, decision, { expectedRevision: state.revision, effectiveMonth: state.month });
+  if (materialized.rejected.length) throw new Error(`player strategic materialization rejected: ${materialized.rejected.map((entry) => entry.reason).join(", ")}`);
+  const commands = materialized.commands;
   atomicJson(fileOf(id, "pending-player-decision.json"), { month: state.month, revision: state.revision, actor: manifest.playerPolityId,
-    strategy: manifest.strategy, rationale: args.rationale ?? "Hold at checkpoint.", commands });
+    strategy: manifest.strategy, decision, commands, unsupportedResidual: materialized.unsupportedResidual });
+  manifest.playerDueMonth = addMonths(state.month, decision.hold?.revisit.afterMonths ?? 6);
   manifest.status = "ready"; manifest.updatedAt = new Date().toISOString(); writeManifest(id, manifest); return manifest;
 };
 
 const aggregateReport = (allowPartial, matrixName = "legacy21") => {
   fs.mkdirSync(RUNS_DIR, { recursive: true });
   const free10 = matrixName === "free10";
-  const expectedRuns = free10 ? FREE10_CELLS.length : 21;
-  const expectedId = (manifest) => `${free10 ? "free10-" : ""}${manifest.playerPolityId.slice(7)}-${manifest.strategy}`;
+  const autonomyV2 = matrixName === "free10-autonomy-v2";
+  const expectedRuns = autonomyV2 ? AUTONOMY_V2_CELLS.length : free10 ? FREE10_CELLS.length : 21;
+  const expectedId = (manifest) => `${autonomyV2 ? "free10-autonomy-v2-" : free10 ? "free10-" : ""}${manifest.playerPolityId.slice(7)}-${manifest.strategy}`;
   const runs = fs.readdirSync(RUNS_DIR, { withFileTypes: true }).filter((entry) => entry.isDirectory() && fs.existsSync(path.join(RUNS_DIR, entry.name, "final-card.json")))
     .map((entry) => ({ manifest: readJson(path.join(RUNS_DIR, entry.name, "manifest.json")), card: readJson(path.join(RUNS_DIR, entry.name, "final-card.json")) }))
     .filter((entry) => entry.manifest.scenarioId === "scenario:europe-1935-benchmark"
@@ -466,7 +510,7 @@ const aggregateReport = (allowPartial, matrixName = "legacy21") => {
       materialEvents: card.materialEvents, historicalScore: card.historicalScore, historicalMilestones: card.historicalMilestones,
       logicalOrTechnicalProblems: card.logicalOrTechnicalProblems, polities: card.polities })), eventFrequency, auxiliaryModelProbes, quotaDays };
   const reportsDir = path.join(ROOT, "docs/reports"); fs.mkdirSync(reportsDir, { recursive: true });
-  const reportStem = free10 ? "europe-1935-campaign-lab-free10" : "europe-1935-campaign-lab";
+  const reportStem = autonomyV2 ? "europe-1935-campaign-lab-free10-autonomy-v2" : free10 ? "europe-1935-campaign-lab-free10" : "europe-1935-campaign-lab";
   atomicJson(path.join(reportsDir, `${reportStem}.dataset.json`), dataset);
   const sortedRuns = dataset.runs.sort((a, b) => `${a.playerPolityId}|${a.strategy}`.localeCompare(`${b.playerPolityId}|${b.strategy}`));
   const playerRows = sortedRuns.map((run) => ({ run, polity: run.polities.find((entry) => entry.polityId === run.playerPolityId) }));
@@ -513,16 +557,16 @@ const aggregateReport = (allowPartial, matrixName = "legacy21") => {
 };
 
 const startMatrix = ({ matrixName, mode, model, preflight }) => {
-  const cells = matrixName === "free10" ? FREE10_CELLS : SUPPORTED_PLAYERS.flatMap((playerPolityId) =>
+  const cells = matrixName === "free10-autonomy-v2" ? AUTONOMY_V2_CELLS : matrixName === "free10" ? FREE10_CELLS : SUPPORTED_PLAYERS.flatMap((playerPolityId) =>
     STRATEGIES.map((strategy) => ({ player: playerPolityId.slice(7), strategy })));
-  const prefix = matrixName === "free10" ? "free10-" : "";
+  const prefix = matrixName === "free10-autonomy-v2" ? "free10-autonomy-v2-" : matrixName === "free10" ? "free10-" : "";
   const ids = cells.map((cell) => `${prefix}${cell.player}-${cell.strategy}`);
   for (const id of ids) if (fs.existsSync(runDir(id))) throw new Error(`run ${id} already exists; matrix start is atomic at the run-set boundary`);
   const loaded = loadPackage(); const freeze = {
     schemaVersion: "open-historia-campaign-lab-matrix/1", matrix: matrixName, scenarioId: loaded.projection.scenario.scenarioId,
     scenarioChecksum: loaded.projection.checksum, codeRevision: gitRevision(), model: mode === "live" ? model : "deterministic-mock",
     thinkingLevel: mode === "live" ? "minimal" : "off", maxOutputTokens: MAX_OUTPUT_TOKENS,
-    preflight, promptVersions: { campaignLabDecision: "campaign-lab-strategy/3", geminiWire: "gemini-wire/2" },
+    preflight, promptVersions: { campaignLabDecision: "campaign-lab-strategy/4", strategicContract: "StrategicDecisionV2", geminiWire: "gemini-wire/2" },
     pacing: { rpm: PACING_RPM, tpm: PACING_TPM, dailyCalls: PACIFIC_DAILY_CALL_LIMIT, timezone: "America/Los_Angeles" },
     cells: ids, createdAt: new Date().toISOString(),
   };
@@ -541,8 +585,8 @@ const main = async () => {
     const mode = args.mode ?? "live"; const model = args.model ?? DEFAULT_MODEL;
     if (mode === "live") assertCleanWorktree();
     const preflight = mode === "live" ? verifyPreflight(args.preflight, model) : null;
-    if (args.matrix === "true" || args.matrix === "free10") {
-      const created = startMatrix({ matrixName: args.matrix === "free10" ? "free10" : "legacy21", mode, model, preflight });
+    if (args.matrix === "true" || args.matrix === "free10" || args.matrix === "free10-autonomy-v2") {
+      const created = startMatrix({ matrixName: args.matrix === "free10-autonomy-v2" ? "free10-autonomy-v2" : args.matrix === "free10" ? "free10" : "legacy21", mode, model, preflight });
       process.stdout.write(`${JSON.stringify(created.map((entry) => entry.runId), null, 2)}\n`); return;
     }
     const playerPolityId = args.player?.startsWith("polity:") ? args.player : `polity:${args.player ?? "germany"}`;

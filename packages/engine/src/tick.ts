@@ -29,7 +29,7 @@ import type {
 } from './ledger.js';
 import { checkInvariants } from './ledger.js';
 import type { ResourceId } from './scenario.js';
-import { BASIC_GOODS_RECIPE } from './scenario.js';
+import { activitiesOf, BASIC_GOODS_RECIPE, hasProcessingActivity } from './scenario.js';
 import type { EconRegionState, EconWorldState } from './state.js';
 import { addMonth } from './state.js';
 import { stateChecksum } from './canonical.js';
@@ -57,6 +57,7 @@ export type EngineEvent =
   | { type: 'command-rejected'; commandId: string; reason: CommandRejection['reason']; detail: string }
   | { type: 'region-transferred'; regionId: RegionId; fromPolityId: PolityId; toPolityId: PolityId; population: number }
   | { type: 'investment-applied'; polityId: PolityId; regionId: RegionId; spend: number; infrastructureGainBp: number; infrastructureBp: number }
+  | { type: 'production-reallocated'; polityId: PolityId; regionId: RegionId; allocations: Array<{ activity: string; allocationBp: number }> }
   | { type: 'population-changed'; regionId: RegionId; births: number; deaths: number; population: number }
   | { type: 'region-produced'; regionId: RegionId; resource: ResourceId; potential: number; actual: number }
   | { type: 'goods-resolved'; polityId: PolityId; regionId: RegionId; potential: number; actual: number; limitingInputs: ResourceId[]; limitedBy: 'inputs' | 'capacity' }
@@ -193,6 +194,7 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   // ---- 1. Validate commands: any failure rejects the command, changes nothing.
   const accepted: EconomyPhaseCommand[] = [];
   const investedPolities = new Set<PolityId>();
+  const reallocatedRegions = new Set<RegionId>();
   const transferredRegions = new Set<RegionId>([
     ...militaryCommandPhase.transfers.map((entry) => entry.regionId),
     ...diplomacyPhase.territorialTransfers.map((entry) => entry.regionId),
@@ -203,11 +205,11 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   );
   const processingRegionsOf = (polityId: PolityId): RegionId[] =>
     regions
-      .filter((region) => region.activity.kind === 'processing' && projectedController.get(region.regionId) === polityId)
+      .filter((region) => hasProcessingActivity(region) && projectedController.get(region.regionId) === polityId)
       .map((region) => region.regionId);
 
   const economyCommands = commandsFile.commands.filter((entry): entry is EconomyPhaseCommand =>
-    entry.kind === 'economy.invest-region' || entry.kind === 'territory.transfer-region');
+    entry.kind === 'economy.invest-region' || entry.kind === 'economy.reallocate-production' || entry.kind === 'territory.transfer-region');
   for (const command of economyCommands) {
     const reject = (reason: CommandRejection['reason'], detail: string) => {
       rejections.push({ command, reason, detail });
@@ -252,7 +254,7 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
       }
       // rre §5 assumes exactly one processing region per polity; allocation
       // between competing factories needs an accepted contract first.
-      if (target.activity.kind === 'processing' && processingRegionsOf(command.newControllerId).length > 0) {
+      if (hasProcessingActivity(target) && processingRegionsOf(command.newControllerId).length > 0) {
         reject(
           'processing-competition',
           `${command.newControllerId} would control two processing regions (${processingRegionsOf(command.newControllerId).join(', ')} and ${command.targetRegionId})`
@@ -265,6 +267,15 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
       continue;
     }
 
+    if (command.kind === 'economy.reallocate-production') {
+      if (!target.activities) { reject('invalid-allocation', 'legacy single-activity region has nothing to reallocate'); continue; }
+      if (reallocatedRegions.has(target.regionId)) { reject('command-limit', `${target.regionId} is already reallocated this month`); continue; }
+      const key = (activity: (typeof command.allocations)[number]['activity']) => activity.kind === 'processing' ? `processing:${activity.activity}` : `extraction:${activity.resource}`;
+      const before = target.activities.map((entry) => key(entry.activity)).sort();
+      const after = command.allocations.map((entry) => key(entry.activity)).sort();
+      if (JSON.stringify(before) !== JSON.stringify(after)) { reject('invalid-allocation', 'reallocation must preserve the authored activity catalog'); continue; }
+      reallocatedRegions.add(target.regionId); accepted.push(command); continue;
+    }
     if (!Number.isSafeInteger(command.spend) || command.spend <= 0) {
       reject('invalid-amount', `spend ${command.spend}`);
       continue;
@@ -306,6 +317,13 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
       infrastructureGainBp: record.infrastructureGainBp,
       infrastructureBp: region.infrastructureBp,
     });
+  }
+  for (const command of accepted) {
+    if (command.kind !== 'economy.reallocate-production') continue;
+    const region = regionById.get(command.targetRegionId)!;
+    region.activities = command.allocations.map((entry) => ({ activity: { ...entry.activity }, allocationBp: entry.allocationBp }));
+    events.push({ type: 'production-reallocated', polityId: command.actorPolityId, regionId: command.targetRegionId,
+      allocations: command.allocations.map((entry) => ({ activity: entry.activity.kind === 'processing' ? `processing:${entry.activity.activity}` : `extraction:${entry.activity.resource}`, allocationBp: entry.allocationBp })) });
   }
 
   // ---- 2b. Apply accepted transfers. Investments are paid first, so a region
@@ -388,9 +406,8 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
     const mobilizedShare = Math.floor((mobilized * region.population) / Math.max(1, controlledPopulation.get(region.controllerId) ?? 1));
     const workforce = Math.max(0, baseWorkforce - mobilizedShare);
     workforceByRegion.set(region.regionId, workforce);
-    const capabilityKind = region.activity.kind === 'extraction' ? 'extraction-output' : 'processing-output';
-    const capabilityMultiplierBp = 10000 + capabilityBonusBp(state.capabilities, region.controllerId, capabilityKind);
-    potentialByRegion.set(region.regionId, applyBp(potentialOutput(region, workforce), capabilityMultiplierBp, `capability output ${region.regionId}`));
+    const backgroundBp = 10000 + (state.economy.backgroundProductivityBpMonthly ?? 0) * state.turn;
+    potentialByRegion.set(region.regionId, applyBp(potentialOutput(region, workforce), backgroundBp, `background productivity ${region.regionId}`));
   }
 
   // ---- 6a. Raw extraction for all regions; 6b. add to controller stockpiles.
@@ -406,13 +423,16 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   };
 
   for (const region of regions) {
-    if (region.activity.kind !== 'extraction') continue;
-    const resource = region.activity.resource;
-    const amount = potentialByRegion.get(region.regionId)!;
-    const polity = polityById.get(region.controllerId)!;
-    polity.stock.set(resource, addChecked((polity.stock.get(resource) ?? 0) + amount, 0, 'stock add'));
-    recordProduction(region.controllerId, resource, region.regionId, amount);
-    events.push({ type: 'region-produced', regionId: region.regionId, resource, potential: amount, actual: amount });
+    for (const allocated of activitiesOf(region)) {
+      if (allocated.activity.kind !== 'extraction' || allocated.allocationBp === 0) continue;
+      const resource = allocated.activity.resource;
+      const allocatedPotential = applyBp(potentialByRegion.get(region.regionId)!, allocated.allocationBp, `activity allocation ${region.regionId}/${resource}`);
+      const amount = applyBp(allocatedPotential, 10000 + capabilityBonusBp(state.capabilities, region.controllerId, 'extraction-output'), `capability output ${region.regionId}/${resource}`);
+      const polity = polityById.get(region.controllerId)!;
+      polity.stock.set(resource, addChecked((polity.stock.get(resource) ?? 0) + amount, 0, 'stock add'));
+      recordProduction(region.controllerId, resource, region.regionId, amount);
+      events.push({ type: 'region-produced', regionId: region.regionId, resource, potential: amount, actual: amount });
+    }
   }
 
   // ---- 6c/7. basic_goods per polity: same-month extraction is available;
@@ -420,10 +440,12 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   const goodsByPolity = new Map<PolityId, GoodsResolution>();
   for (const polity of polities) {
     const goodsRegion = regions.find(
-      (region) => region.controllerId === polity.id && region.activity.kind === 'processing'
+      (region) => region.controllerId === polity.id && hasProcessingActivity(region)
     );
     if (!goodsRegion) continue;
-    const potential = potentialByRegion.get(goodsRegion.regionId)!;
+    const processingAllocation = activitiesOf(goodsRegion).find((entry) => entry.activity.kind === 'processing')?.allocationBp ?? 0;
+    const allocatedPotential = applyBp(potentialByRegion.get(goodsRegion.regionId)!, processingAllocation, `processing allocation ${goodsRegion.regionId}`);
+    const potential = applyBp(allocatedPotential, 10000 + capabilityBonusBp(state.capabilities, goodsRegion.controllerId, 'processing-output'), `processing capability ${goodsRegion.regionId}`);
     const availableCoal = polity.stock.get('coal') ?? 0;
     const availableIron = polity.stock.get('iron') ?? 0;
     const actual = Math.min(potential, availableCoal, availableIron);

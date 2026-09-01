@@ -23,6 +23,7 @@ import {
 } from './military.js';
 import { cultureIdSchema, identityPolicySchema, religionIdSchema } from './society.js';
 import { campaignGoalIdSchema, crisisIdSchema, crisisPositionSchema, legacyAssessmentIdSchema } from './campaign.js';
+import { allocatedRegionActivitySchema } from './scenario.js';
 
 export const investInRegionCommandSchema = z
   .object({
@@ -42,6 +43,19 @@ export const investInRegionCommandSchema = z
   })
   .strict();
 export type InvestInRegionCommand = z.infer<typeof investInRegionCommandSchema>;
+
+export const reallocateProductionCommandSchema = z.object({
+  kind: z.literal('economy.reallocate-production'),
+  commandId: commandIdSchema,
+  actorPolityId: polityIdSchema,
+  targetRegionId: regionIdSchema,
+  expectedRevision: worldRevisionIdSchema.optional(),
+  effectiveMonth: gameDateSchema,
+  allocations: z.array(allocatedRegionActivitySchema).min(2).max(8),
+}).strict().superRefine((command, ctx) => {
+  if (command.allocations.reduce((sum, entry) => sum + entry.allocationBp, 0) !== 10000) ctx.addIssue({ code: 'custom', message: 'production allocations must sum to 10000 basis points' });
+});
+export type ReallocateProductionCommand = z.infer<typeof reallocateProductionCommandSchema>;
 
 /**
  * Region control transfer (first-economy-mvp.md §7). In the finished game this
@@ -285,6 +299,7 @@ export const militaryCommandSchema = z.discriminatedUnion('kind', [
 
 export const econCommandSchema = z.discriminatedUnion('kind', [
   investInRegionCommandSchema,
+  reallocateProductionCommandSchema,
   transferRegionCommandSchema,
   proposeNegotiationCommandSchema,
   counterNegotiationCommandSchema,
@@ -337,6 +352,7 @@ export const REJECTION_REASONS = [
   'unknown-new-controller',
   'same-controller',
   'processing-competition',
+  'invalid-allocation',
   // A selector that matched no region is a rejection, never a silent no-op:
   // "invest in my oil regions" when you hold none must say so.
   'selector-matched-nothing',

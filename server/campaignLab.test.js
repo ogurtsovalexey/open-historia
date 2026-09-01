@@ -25,6 +25,17 @@ test("mock Campaign Lab start/status/resume produces a deterministic final card 
   assert.equal(card.polities.length, 9);
   assert.equal(card.telemetry.engineResolutions, 66);
   assert.ok(fs.statSync(path.join(temp, "test-mock", "chronicle.jsonl")).size > 0);
+  assert.ok(fs.statSync(path.join(temp, "test-mock", "checkpoint-report.md")).size > 0);
+  const playerBrief = JSON.parse(fs.readFileSync(path.join(temp, "test-mock", "player-brief.json"), "utf8"));
+  assert.equal(playerBrief.private, true);
+  assert.equal(playerBrief.strategicBrief.schemaVersion, "open-historia-strategic-brief/2");
+});
+
+test("free10-autonomy-v2 creates only three German pilot cells", () => {
+  const ids = run("start", "--matrix", "free10-autonomy-v2", "--mode", "mock");
+  assert.deepEqual(ids, ["free10-autonomy-v2-germany-historical", "free10-autonomy-v2-germany-alternative", "free10-autonomy-v2-germany-free"]);
+  const freeze = JSON.parse(fs.readFileSync(path.join(temp, "matrix-free10-autonomy-v2.json"), "utf8"));
+  assert.equal(freeze.cells.length, 3);
 });
 
 test("free10 creates only the requested ten player cells and freezes one matrix manifest", () => {

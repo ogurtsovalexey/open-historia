@@ -9,7 +9,7 @@ import {
   canonicalizeGeminiContents, fitGeminiFunctionSchema, getGeminiHeaders, getGeminiThinkingConfig, getGeminiUrl,
 } from "../src/Game/AI/geminiProtocol.js";
 import {
-  opponentBatchResultSchema, opponentDiplomacyBatchResultSchema, playerOrderInterpretationSchema, playerReportResultSchema,
+  opponentBatchResultSchema, playerOrderInterpretationSchema, playerReportResultSchema, strategicDecisionBatchV2Schema,
 } from "../packages/agent-runtime/dist/index.js";
 import { CAMPAIGN_DECISION_RESPONSE_SCHEMA } from "./lib/campaign-lab-contract.mjs";
 
@@ -106,7 +106,7 @@ const main = async () => {
   const engineSchemas = {
     playerInterpreter: playerOrderInterpretationSchema,
     opponentEconomy: opponentBatchResultSchema,
-    opponentStrategy: opponentDiplomacyBatchResultSchema,
+    opponentStrategy: strategicDecisionBatchV2Schema,
     playerReport: playerReportResultSchema,
   };
   const registry = registryContracts();
@@ -151,12 +151,32 @@ const main = async () => {
     ], generationConfig: { responseMimeType: "application/json", thinkingConfig: minimal } });
     if (JSON.parse(corrected.text).corrected !== true) throw new Error("correction checkpoint failed semantic validation");
     const campaignIds = ["polity:austria", "polity:france"];
-    const campaignExpected = { decisions: campaignIds.map((polityId) => ({ polityId, intent: "hold", rationale: "Bounded probe hold.", command: null })) };
+    const campaignExpected = { decisions: campaignIds.map((polityId) => ({ polityId,
+      objective: { domain: "campaign", summary: "Preserve flexibility.", horizon: "short" }, actions: [{ tool: "conserve" }],
+      futurePlan: [], contingency: "Reassess after new evidence.", rationale: "Bounded typed hold.",
+      hold: { reason: "plan-sequencing", detail: "Wait for a material trigger.", revisit: { afterMonths: 1, triggers: ["resource-deficit"] } },
+    })) };
     const campaignJson = await client.generate({ name: "campaign-lab-json-schema",
       contents: user(`Return exactly this decision batch: ${JSON.stringify(campaignExpected)}`),
       generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
-    const campaignParsed = opponentDiplomacyBatchResultSchema.parse(JSON.parse(campaignJson.text));
+    const campaignParsed = strategicDecisionBatchV2Schema.parse(JSON.parse(campaignJson.text));
     if (campaignParsed.decisions.map((decision) => decision.polityId).join("|") !== campaignIds.join("|")) throw new Error("Campaign Lab JSON schema checkpoint changed polity IDs");
+    const familyActions = [
+      ["economy", { tool: "reallocate-production", targetRegionId: "region:probe:DE", priority: "raw-materials", scale: "medium" }],
+      ["trade", { tool: "negotiate-trade", partner: "polity:partner", resource: "iron", desiredRunway: "medium", budgetAttitude: "urgent" }],
+      ["diplomacy", { tool: "propose-agreement", partner: "polity:partner", agreementType: "non-aggression" }],
+      ["statecraft", { tool: "start-project", templateId: "project-template:probe", scale: "medium", targetRegionId: "region:probe:DE" }],
+      ["politics", { tool: "respond-faction", factionId: "faction:probe", response: "concede" }],
+      ["military", { tool: "mobilize", locationRegionId: "region:probe:DE", scale: "small", commanderId: null }],
+    ];
+    for (const [family, action] of familyActions) {
+      const expected = { decisions: [{ polityId: "polity:probe", objective: { domain: family === "trade" ? "economy" : family, summary: `Exercise ${family} tools.`, horizon: "short" },
+        actions: [action], futurePlan: [], contingency: "Use another supported tool.", rationale: "Non-hold preflight probe.", hold: null }] };
+      const probe = await client.generate({ name: `strategic-family:${family}`, contents: user(`Return exactly this non-hold StrategicDecisionV2 batch: ${JSON.stringify(expected)}`),
+        generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
+      const parsed = strategicDecisionBatchV2Schema.parse(JSON.parse(probe.text));
+      if (parsed.decisions[0]?.actions[0]?.tool !== action.tool) throw new Error(`${family} strategic family probe returned hold or the wrong tool`);
+    }
   }
   for (const level of suite === "primary" ? ["minimal", "low", "medium"] : ["low", "medium"]) {
     const reasoned = await client.generate({ name: `reasoning-${level}`,

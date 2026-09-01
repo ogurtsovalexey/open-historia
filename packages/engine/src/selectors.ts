@@ -11,7 +11,7 @@
 import { z } from 'zod';
 import { polityIdSchema, regionIdSchema } from '@open-historia/domain';
 import type { PolityId, RegionId } from '@open-historia/domain';
-import { rawResourceIdSchema } from './scenario.js';
+import { activitiesOf, rawResourceIdSchema } from './scenario.js';
 import type { EconRegionState, EconWorldState } from './state.js';
 
 export const activityFilterSchema = z.union([
@@ -36,8 +36,8 @@ export const regionSelectorSchema = z.union([
 export type RegionSelector = z.infer<typeof regionSelectorSchema>;
 
 const matchesActivity = (region: EconRegionState, filter: ActivityFilter): boolean => {
-  if (filter.kind === 'processing') return region.activity.kind === 'processing';
-  return region.activity.kind === 'extraction' && region.activity.resource === filter.resource;
+  if (filter.kind === 'processing') return activitiesOf(region).some((entry) => entry.activity.kind === 'processing' && entry.allocationBp > 0);
+  return activitiesOf(region).some((entry) => entry.activity.kind === 'extraction' && entry.activity.resource === filter.resource && entry.allocationBp > 0);
 };
 
 /**

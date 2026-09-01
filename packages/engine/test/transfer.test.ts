@@ -6,6 +6,7 @@ import type { EconCommand } from '../src/commands.js';
 import { resolveMonth } from '../src/tick.js';
 import { renderReport } from '../src/report.js';
 import { getStock } from '../src/state.js';
+import { hasProcessingActivity } from '../src/scenario.js';
 import { loadInitialState } from './helpers.js';
 
 const OSTREYA = 'polity:ostreya' as PolityId;
@@ -177,7 +178,7 @@ describe('region transfer (first-economy-mvp §7, §10)', () => {
     // Cede every region except the processing one, which Vindar cannot take.
     for (const [index, regionId] of ostreyaRegions.entries()) {
       const region = state.regions.find((r) => r.regionId === regionId)!;
-      if (region.activity.kind === 'processing') continue;
+      if (hasProcessingActivity(region)) continue;
       const result = resolveMonth(state, {
         commands: [
           transfer({

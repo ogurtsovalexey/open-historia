@@ -17,6 +17,7 @@ import type { EconScenario } from './scenario.js';
 import {
   economyParamsSchema,
   modulesSchema,
+  regionActivitiesSchema,
   regionActivitySchema,
   resourceIdSchema,
 } from './scenario.js';
@@ -38,7 +39,8 @@ export const econRegionStateSchema = z
     regionId: regionIdSchema,
     controllerId: polityIdSchema,
     displayName: displayNameSchema,
-    activity: regionActivitySchema,
+    activity: regionActivitySchema.optional(),
+    activities: regionActivitiesSchema.optional(),
     population: nonNegInt,
     annualBirthRateBp: bpSchema,
     annualDeathRateBp: bpSchema,
@@ -53,7 +55,9 @@ export const econRegionStateSchema = z
     /** Present only when construction can raise this region's capacity. */
     capacityCeiling: nonNegInt.optional(),
   })
-  .strict();
+  .strict().superRefine((region, ctx) => {
+    if ((region.activity === undefined) === (region.activities === undefined)) ctx.addIssue({ code: 'custom', message: 'region requires exactly one of legacy activity or activities' });
+  });
 export type EconRegionState = z.infer<typeof econRegionStateSchema>;
 
 export const stockEntrySchema = z

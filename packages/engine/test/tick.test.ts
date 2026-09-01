@@ -4,7 +4,7 @@ import type { CommandId, PolityId, RegionId } from '@open-historia/domain';
 import { EMPTY_TURN_COMMANDS } from '../src/commands.js';
 import type { EconCommand } from '../src/commands.js';
 import { potentialOutput, resolveMonth } from '../src/tick.js';
-import { canonicalState } from '../src/canonical.js';
+import { canonicalState, stateChecksum } from '../src/canonical.js';
 import { getStock } from '../src/state.js';
 import type { EconWorldState } from '../src/state.js';
 import { loadInitialState } from './helpers.js';
@@ -121,6 +121,53 @@ describe('monthly tick — hand-checked fixture numbers (see fixtures/scenario-d
     }
     assert.strictEqual(births, expected);
     assert.strictEqual(region(state, 'A4').population, pop);
+  });
+});
+
+describe('multi-activity production allocation', () => {
+  const allocatedState = () => {
+    const state = loadInitialState();
+    const regions = state.regions.map((entry) => entry.regionId.endsWith(':A1') ? {
+      ...entry, activity: undefined,
+      activities: [
+        { activity: { kind: 'extraction' as const, resource: 'food' as const }, allocationBp: 5000 },
+        { activity: { kind: 'extraction' as const, resource: 'coal' as const }, allocationBp: 5000 },
+      ],
+    } : entry).map((entry) => {
+      const { activity, ...rest } = entry;
+      return activity === undefined ? rest : entry;
+    }) as EconWorldState['regions'];
+    const draft = { ...state, regions, revision: 'pending' as EconWorldState['revision'] };
+    return { ...draft, revision: stateChecksum(draft) as EconWorldState['revision'] };
+  };
+
+  it('splits one regional capacity across authored activities and conserves the old schema', () => {
+    const legacy = loadInitialState();
+    assert.ok(legacy.regions.every((entry) => entry.activity !== undefined && entry.activities === undefined));
+    const result = resolveMonth(allocatedState(), EMPTY_TURN_COMMANDS);
+    const ledger = polityLedger(result, OSTREYA);
+    const food = ledger.production.find((entry) => entry.resource === 'food')?.byRegion.find((entry) => entry.regionId.endsWith(':A1'))?.amount ?? 0;
+    const coal = ledger.production.find((entry) => entry.resource === 'coal')?.byRegion.find((entry) => entry.regionId.endsWith(':A1'))?.amount ?? 0;
+    assert.equal(food, coal);
+    assert.ok(food > 0);
+  });
+
+  it('reallocates only among the authored catalog and rejects stale or invented activities', () => {
+    const state = allocatedState();
+    const base = { kind: 'economy.reallocate-production' as const, commandId: '91000000-0000-4000-8000-000000000001' as CommandId,
+      actorPolityId: OSTREYA, targetRegionId: state.regions.find((entry) => entry.regionId.endsWith(':A1'))!.regionId,
+      expectedRevision: state.revision, effectiveMonth: state.month };
+    const accepted = resolveMonth(state, { commands: [{ ...base, allocations: [
+      { activity: { kind: 'extraction', resource: 'food' }, allocationBp: 2500 },
+      { activity: { kind: 'extraction', resource: 'coal' }, allocationBp: 7500 },
+    ] } as EconCommand] });
+    assert.equal(accepted.rejections.length, 0);
+    assert.deepEqual(accepted.state.regions.find((entry) => entry.regionId === base.targetRegionId)?.activities?.map((entry) => entry.allocationBp), [2500, 7500]);
+    const invented = resolveMonth(state, { commands: [{ ...base, commandId: '91000000-0000-4000-8000-000000000002' as CommandId, allocations: [
+      { activity: { kind: 'extraction', resource: 'food' }, allocationBp: 2500 },
+      { activity: { kind: 'extraction', resource: 'iron' }, allocationBp: 7500 },
+    ] } as EconCommand] });
+    assert.equal(invented.rejections[0]?.reason, 'invalid-allocation');
   });
 });
 

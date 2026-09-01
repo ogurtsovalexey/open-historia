@@ -70,12 +70,29 @@ export const regionActivitySchema = z.discriminatedUnion('kind', [
 ]);
 export type RegionActivity = z.infer<typeof regionActivitySchema>;
 
+export const allocatedRegionActivitySchema = z.object({
+  activity: regionActivitySchema,
+  allocationBp: z.number().int().min(0).max(10000),
+}).strict();
+export const regionActivitiesSchema = z.array(allocatedRegionActivitySchema).min(1).max(8).superRefine((rows, ctx) => {
+  if (rows.reduce((sum, entry) => sum + entry.allocationBp, 0) !== 10000) ctx.addIssue({ code: 'custom', message: 'activity allocations must sum to 10000 basis points' });
+  const keys = rows.map((entry) => entry.activity.kind === 'processing' ? `processing:${entry.activity.activity}` : `extraction:${entry.activity.resource}`);
+  if (new Set(keys).size !== keys.length) ctx.addIssue({ code: 'custom', message: 'region activities must be unique' });
+});
+export type AllocatedRegionActivity = z.infer<typeof allocatedRegionActivitySchema>;
+
+export const activitiesOf = (region: { activity?: RegionActivity; activities?: AllocatedRegionActivity[] }): AllocatedRegionActivity[] =>
+  region.activities ?? (region.activity ? [{ activity: region.activity, allocationBp: 10000 }] : []);
+export const hasProcessingActivity = (region: { activity?: RegionActivity; activities?: AllocatedRegionActivity[] }): boolean =>
+  activitiesOf(region).some((entry) => entry.activity.kind === 'processing' && entry.allocationBp > 0);
+
 export const scenarioRegionSchema = z
   .object({
     regionId: regionIdSchema,
     controllerId: polityIdSchema,
     displayName: displayNameSchema,
-    activity: regionActivitySchema,
+    activity: regionActivitySchema.optional(),
+    activities: regionActivitiesSchema.optional(),
     population: nonNegInt,
     annualBirthRateBp: bpSchema,
     annualDeathRateBp: bpSchema,
@@ -90,7 +107,9 @@ export const scenarioRegionSchema = z
      */
     capacityCeiling: nonNegInt.optional(),
   })
-  .strict();
+  .strict().superRefine((region, ctx) => {
+    if ((region.activity === undefined) === (region.activities === undefined)) ctx.addIssue({ code: 'custom', message: 'region requires exactly one of legacy activity or activities' });
+  });
 export type ScenarioRegion = z.infer<typeof scenarioRegionSchema>;
 
 export const scenarioPolitySchema = z
@@ -124,6 +143,8 @@ export const economyParamsSchema = z
     foodNeedPerPersonMilli: nonNegInt,
     /** Infrastructure basis points gained per gold of accepted investment. */
     infrastructureBpPerMoney: nonNegInt,
+    /** Scenario-authored background productivity trend; actions and shocks still determine the realised path. */
+    backgroundProductivityBpMonthly: z.number().int().min(0).max(100).optional(),
     resourceParams: z.array(resourceParamsSchema).min(1),
   })
   .strict();
@@ -547,29 +568,15 @@ export const econScenarioSchema = z
           path: ['regions', index, 'capacityCeiling'],
         });
       }
-      if (region.activity.kind === 'extraction' && !active.has(region.activity.resource)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `region ${region.regionId} extracts ${region.activity.resource} which is not an active resource`,
-          path: ['regions', index, 'activity'],
-        });
-      }
-      if (region.activity.kind === 'processing') {
-        for (const input of BASIC_GOODS_RECIPE.inputs) {
-          if (!active.has(input.resource)) {
-            ctx.addIssue({
-              code: 'custom',
-              message: `basic_goods input ${input.resource} is not an active resource`,
-              path: ['regions', index, 'activity'],
-            });
-          }
+      for (const allocated of activitiesOf(region)) {
+        if (allocated.activity.kind === 'extraction' && !active.has(allocated.activity.resource)) {
+          ctx.addIssue({ code: 'custom', message: `region ${region.regionId} extracts ${allocated.activity.resource} which is not an active resource`, path: ['regions', index, region.activities ? 'activities' : 'activity'] });
         }
-        if (!active.has(BASIC_GOODS_RECIPE.output)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: `basic_goods output ${BASIC_GOODS_RECIPE.output} is not an active resource`,
-            path: ['regions', index, 'activity'],
-          });
+        if (allocated.activity.kind === 'processing') {
+          for (const input of BASIC_GOODS_RECIPE.inputs) if (!active.has(input.resource)) {
+            ctx.addIssue({ code: 'custom', message: `basic_goods input ${input.resource} is not an active resource`, path: ['regions', index, region.activities ? 'activities' : 'activity'] });
+          }
+          if (!active.has(BASIC_GOODS_RECIPE.output)) ctx.addIssue({ code: 'custom', message: `basic_goods output ${BASIC_GOODS_RECIPE.output} is not an active resource`, path: ['regions', index, region.activities ? 'activities' : 'activity'] });
         }
       }
     }

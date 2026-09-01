@@ -1,24 +1,28 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  AUTONOMY_V2_CELLS,
   FREE10_CELLS,
   decisionTriggerReasons,
   isRetryableGeminiFailure,
   pacificQuotaDay,
   reduceChronicleAlerts,
 } from "../scripts/lib/campaign-lab-policy.mjs";
-import { CAMPAIGN_DECISION_INTENTS, CAMPAIGN_DECISION_RESPONSE_SCHEMA } from "../scripts/lib/campaign-lab-contract.mjs";
+import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS } from "../scripts/lib/campaign-lab-contract.mjs";
 
-test("Campaign Lab sends the exact bounded decision enum as a Gemini response schema", () => {
-  assert.ok(CAMPAIGN_DECISION_INTENTS.includes("hold"));
-  assert.ok(CAMPAIGN_DECISION_INTENTS.includes("declare-war"));
-  assert.deepEqual(
-    CAMPAIGN_DECISION_RESPONSE_SCHEMA.properties.decisions.items.properties.intent.enum,
-    CAMPAIGN_DECISION_INTENTS,
-  );
-  assert.ok(CAMPAIGN_DECISION_RESPONSE_SCHEMA.properties.decisions.items.properties.command.anyOf
-    .some((entry) => entry.type === "null"));
-  assert.ok(JSON.stringify(CAMPAIGN_DECISION_RESPONSE_SCHEMA).length < 30_000);
+test("Campaign Lab sends the bounded StrategicDecisionV2 schema without raw commands", () => {
+  assert.ok(CAMPAIGN_DECISION_TOOLS.includes("conserve"));
+  assert.ok(CAMPAIGN_DECISION_TOOLS.includes("declare-war"));
+  const serialized = JSON.stringify(CAMPAIGN_DECISION_RESPONSE_SCHEMA);
+  for (const tool of CAMPAIGN_DECISION_TOOLS) assert.ok(serialized.includes(tool));
+  assert.equal(serialized.includes('"command"'), false);
+  assert.ok(serialized.length < 30_000);
+});
+
+test("autonomy-v2 pilot is deliberately limited to the three German doctrines", () => {
+  assert.deepEqual(AUTONOMY_V2_CELLS, [
+    { player: "germany", strategy: "historical" }, { player: "germany", strategy: "alternative" }, { player: "germany", strategy: "free" },
+  ]);
 });
 
 test("free10 matrix contains the requested ten campaign cells", () => {
@@ -44,7 +48,7 @@ test("monthly alerts are deduplicated and do not become recurring decision trigg
     { type: "alert", polityId: "polity:a", alert: "food-shortfall", detail: "need 100, available 80, shortfall 20" },
   ]);
   assert.deepEqual(first.records.map((event) => event.lifecycle), ["started", "started"]);
-  assert.deepEqual(first.triggerReasons, ["critical-food-shortfall:polity:a"]);
+  assert.deepEqual(first.triggerReasons, ["new-resource-deficit:polity:a", "critical-food-shortfall:polity:a"]);
   const repeated = reduceChronicleAlerts([
     { type: "alert", polityId: "polity:a", alert: "inputs-limited", detail: "iron" },
     { type: "alert", polityId: "polity:a", alert: "food-shortfall", detail: "need 100, available 80, shortfall 20" },

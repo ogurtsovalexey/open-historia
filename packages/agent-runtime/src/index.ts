@@ -16,6 +16,7 @@ import {
   type EconWorldState,
   type InvestInRegionCommand,
   type PolityLedger,
+  activitiesOf,
 } from '@open-historia/engine';
 import type { DiplomacyCommand } from '@open-historia/engine';
 import type { StatecraftCommand } from '@open-historia/engine';
@@ -23,6 +24,8 @@ import type { PoliticsCommand } from '@open-historia/engine';
 import type { MilitaryCommand } from '@open-historia/engine';
 import type { IdentityCommand } from '@open-historia/engine';
 import type { CampaignCommand } from '@open-historia/engine';
+
+export * from './strategic.js';
 
 export const MAX_POLITIES_PER_BATCH = 6;
 export const MAX_BATCHES_PER_MONTH = 4;
@@ -533,7 +536,7 @@ const deterministicUuid = (seed: string): string => {
 };
 
 const activityName = (region: EconWorldState['regions'][number]): string =>
-  region.activity.kind === 'processing' ? 'processing' : `extraction:${region.activity.resource}`;
+  activitiesOf(region).map((entry) => entry.activity.kind === 'processing' ? `processing:${entry.allocationBp}` : `extraction:${entry.activity.resource}:${entry.allocationBp}`).join(',');
 
 export function previewInvestments(
   state: EconWorldState,

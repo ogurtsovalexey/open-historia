@@ -15,6 +15,7 @@ escalate, do not silently "fix" either side.
 | 18 | [`18-autonomous-campaign-lab.md`](18-autonomous-campaign-lab.md) | Opt-in long-run campaign runner, checkpoints, telemetry and reports |
 | 19 | [`19-reusable-scenario-authoring-profile.md`](19-reusable-scenario-authoring-profile.md) | Historical ScenarioV2 authoring and deterministic engine projection profile |
 | 20 | [`20-europe-1935-benchmark.md`](20-europe-1935-benchmark.md) | Binding contract and evaluation rubric for the 1935–1940 benchmark |
+| 21 | [`21-autonomous-strategic-tools-v2.md`](21-autonomous-strategic-tools-v2.md) | Parameterized StrategicBrief/Decision V2, deterministic materializer, multi-activity economy and German autonomy pilot |
 | 01 | [`../principles.md`](../principles.md) | Architectural principles (Scenario is Law, Engine+Brain, Map not into AI). Kept in place — already canonical. |
 | 02 | [`02-target-architecture.md`](02-target-architecture.md) | Target architecture, the three world models and which one is SSOT |
 | 03 | [`03-simulation-core.md`](03-simulation-core.md) | Numeric types, determinism rules, time model |
