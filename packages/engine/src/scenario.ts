@@ -179,7 +179,7 @@ export const econScenarioSchema = z
     schemaVersion: z.literal('open-historia-engine-scenario/1'),
     scenarioId: scenarioIdSchema,
     /** The fixture must be visibly labelled as synthetic (first-economy-mvp §2). */
-    label: z.literal('development-test'),
+    label: z.enum(['development-test', 'historical-projection']),
     displayName: displayNameSchema,
     /** First day of the starting month. */
     startMonth: gameDateSchema.refine((d) => d.endsWith('-01'), {

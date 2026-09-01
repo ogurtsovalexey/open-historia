@@ -33,11 +33,11 @@ describe('map link (canon 04, "Map linkage")', () => {
   it('engine region ids encode the dataset and the real map region id', () => {
     const link = parseMapLink(loadLinkRaw());
     for (const entry of link.regions) {
-      assert.strictEqual(entry.engineRegionId, `region:gadm:${entry.mapRegionId}`);
+      assert.strictEqual(entry.engineRegionId, `region:gadm:${entry.mapRegionIds[0]}`);
     }
-    assert.ok(link.regions.some((entry) => entry.mapRegionId === 'AUT.3_1'));
-    assert.ok(link.regions.some((entry) => entry.mapRegionId === 'CZE.11_1'));
-    assert.ok(link.regions.some((entry) => entry.mapRegionId === 'DEU.3_1'));
+    assert.ok(link.regions.some((entry) => entry.mapRegionIds.includes('AUT.3_1')));
+    assert.ok(link.regions.some((entry) => entry.mapRegionIds.includes('CZE.11_1')));
+    assert.ok(link.regions.some((entry) => entry.mapRegionIds.includes('DEU.3_1')));
   });
 
   it('rejects a link whose engine id does not match its map id', () => {
@@ -111,6 +111,20 @@ describe('map link (canon 04, "Map linkage")', () => {
     const link = parseMapLink(loadLinkRaw());
     assert.strictEqual(engineRegionForMapRegion(link, 'CZE.2_1'), 'region:gadm:CZE.2_1');
     assert.strictEqual(engineRegionForMapRegion(link, 'FRA.1_1'), undefined);
+  });
+
+  it('v2 projects one engine macro-region onto multiple map polygons', () => {
+    const raw = loadLinkRaw() as { schemaVersion: string; regions: Array<{ engineRegionId: string; mapRegionId: string; mapName?: string }> };
+    const link = parseMapLink({ ...raw, schemaVersion: 'open-historia-engine-map-link/2', regions: raw.regions.map((entry, index) => ({
+      engineRegionId: entry.engineRegionId,
+      mapRegionIds: index === 0 ? [entry.mapRegionId, `${entry.mapRegionId}.part-2`] : [entry.mapRegionId],
+      ...(entry.mapName ? { mapName: entry.mapName } : {}),
+    })) });
+    const scenario = parseScenario(loadScenarioRaw());
+    const overrides = buildOwnershipOverrides(link, initState(scenario).regions);
+    const first = raw.regions[0]!;
+    assert.equal(overrides[first.mapRegionId], overrides[`${first.mapRegionId}.part-2`]);
+    assert.equal(engineRegionForMapRegion(link, `${first.mapRegionId}.part-2`), first.engineRegionId);
   });
 
   it('the map scenario runs twelve months deterministically', () => {

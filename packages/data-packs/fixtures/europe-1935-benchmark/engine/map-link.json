@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "open-historia-engine-map-link/2",
+  "dataset": "benchmark-1",
+  "note": "Macro-region to multiple display polygons; geometry remains outside the engine and AI context.",
+  "polityOwnerNames": {
+    "polity:germany":"Germany","polity:austria":"Austria","polity:czechoslovakia":"Czechoslovakia","polity:poland":"Poland","polity:france":"France","polity:united-kingdom":"United Kingdom","polity:italy":"Italy","polity:soviet-union":"Soviet Union","polity:united-states":"United States"
+  },
+  "regions": [
+    {"engineRegionId":"region:benchmark-1:DE","mapRegionIds":["DE.1","DE.2","DE.3"],"mapName":"Germany"},
+    {"engineRegionId":"region:benchmark-1:AT","mapRegionIds":["AT.1","AT.2"],"mapName":"Austria"},
+    {"engineRegionId":"region:benchmark-1:CS","mapRegionIds":["CS.1","CS.2","CS.3"],"mapName":"Czechoslovakia"},
+    {"engineRegionId":"region:benchmark-1:PL","mapRegionIds":["PL.1","PL.2","PL.3"],"mapName":"Poland"},
+    {"engineRegionId":"region:benchmark-1:FR","mapRegionIds":["FR.1","FR.2","FR.3"],"mapName":"France"},
+    {"engineRegionId":"region:benchmark-1:GB","mapRegionIds":["GB.1","GB.2"],"mapName":"United Kingdom"},
+    {"engineRegionId":"region:benchmark-1:IT","mapRegionIds":["IT.1","IT.2","IT.3"],"mapName":"Italy"},
+    {"engineRegionId":"region:benchmark-1:SU","mapRegionIds":["SU.WEST","SU.CENTRAL","SU.EAST"],"mapName":"Soviet Union"},
+    {"engineRegionId":"region:benchmark-1:US","mapRegionIds":["US.EAST","US.CENTRAL","US.WEST"],"mapName":"United States"}
+  ]
+}

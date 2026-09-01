@@ -176,13 +176,15 @@ const EconomyPane = ({ active }) => {
 
   const engineIdByMapId = useMemo(() => {
     const map = new Map();
-    for (const entry of link?.regions ?? []) map.set(entry.mapRegionId, entry.engineRegionId);
+    for (const entry of link?.regions ?? []) {
+      for (const mapRegionId of entry.mapRegionIds ?? [entry.mapRegionId]) map.set(mapRegionId, entry.engineRegionId);
+    }
     return map;
   }, [link]);
 
   const mapIdByEngineId = useMemo(() => {
     const map = new Map();
-    for (const entry of link?.regions ?? []) map.set(entry.engineRegionId, entry.mapRegionId);
+    for (const entry of link?.regions ?? []) map.set(entry.engineRegionId, (entry.mapRegionIds ?? [entry.mapRegionId])[0]);
     return map;
   }, [link]);
 

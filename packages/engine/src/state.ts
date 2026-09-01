@@ -78,7 +78,7 @@ export const econWorldStateSchema = z
   .object({
     schemaVersion: z.literal(ECON_STATE_SCHEMA_VERSION),
     scenarioId: scenarioIdSchema,
-    label: z.literal('development-test'),
+    label: z.enum(['development-test', 'historical-projection']),
     /** First day of the month this state is valid for (the NEXT month to resolve). */
     month: gameDateSchema,
     /** Number of resolved months since scenario start. */

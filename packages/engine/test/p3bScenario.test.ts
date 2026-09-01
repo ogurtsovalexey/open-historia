@@ -48,10 +48,12 @@ describe('P3b six-polity product scenario (canon 11)', () => {
     const byId = new Map(geo.features.map((feature) => [feature.properties.id, feature.properties]));
     const controllerByRegion = new Map(scenario.regions.map((region) => [region.regionId, region.controllerId]));
     for (const entry of link.regions) {
-      const properties = byId.get(entry.mapRegionId);
-      assert.ok(properties, `${entry.mapRegionId} is rendered`);
-      assert.strictEqual(properties.name, entry.mapName);
-      assert.strictEqual(properties.owner, link.polityOwnerNames[controllerByRegion.get(entry.engineRegionId)!]);
+      for (const mapRegionId of entry.mapRegionIds) {
+        const properties = byId.get(mapRegionId);
+        assert.ok(properties, `${mapRegionId} is rendered`);
+        assert.strictEqual(properties.name, entry.mapName);
+        assert.strictEqual(properties.owner, link.polityOwnerNames[controllerByRegion.get(entry.engineRegionId)!]);
+      }
     }
     assert.strictEqual(byId.get('FRA.8_1')?.owner, 'France');
     assert.strictEqual(byId.get('POL.7_1')?.owner, 'Poland');

@@ -22,3 +22,4 @@ export * from './tick.js';
 export * from './report.js';
 export * from './persist.js';
 export * from './pipeline.js';
+export * from './historicalScenario.js';

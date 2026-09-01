@@ -177,9 +177,11 @@ const RegionPopup = () => {
                 const names = {};
                 for (const link of snapshot.mapLink?.regions ?? []) {
                     const region = regionsById.get(link.engineRegionId);
-                    names[link.mapRegionId] = region?.displayName?.[locale]
-                        ?? region?.displayName?.en
-                        ?? link.mapName;
+                    for (const mapRegionId of link.mapRegionIds ?? [link.mapRegionId]) {
+                        names[mapRegionId] = region?.displayName?.[locale]
+                            ?? region?.displayName?.en
+                            ?? link.mapName;
+                    }
                 }
                 setLocalizedRegionNames(names);
             })
