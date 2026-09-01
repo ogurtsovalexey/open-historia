@@ -158,7 +158,7 @@ const main = async () => {
     })) };
     const campaignJson = await client.generate({ name: "campaign-lab-json-schema",
       contents: user(`Return exactly this decision batch: ${JSON.stringify(campaignExpected)}`),
-      generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
+      generationConfig: { responseMimeType: "application/json", responseSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
     const campaignParsed = strategicDecisionBatchV2Schema.parse(normalizeCampaignDecisionWire(JSON.parse(campaignJson.text)));
     if (campaignParsed.decisions.map((decision) => decision.polityId).join("|") !== campaignIds.join("|")) throw new Error("Campaign Lab JSON schema checkpoint changed polity IDs");
     const familyActions = [
@@ -173,7 +173,7 @@ const main = async () => {
       const expected = { decisions: [encodeCampaignDecisionWire({ polityId: "polity:probe", objective: { domain: family === "trade" ? "economy" : family, summary: `Exercise ${family} tools.`, horizon: "short" },
         actions: [action], futurePlan: [], contingency: "Use another supported tool.", rationale: "Non-hold preflight probe.", hold: null })] };
       const probe = await client.generate({ name: `strategic-family:${family}`, contents: user(`Return exactly this non-hold StrategicDecisionV2 batch: ${JSON.stringify(expected)}`),
-        generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
+        generationConfig: { responseMimeType: "application/json", responseSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
       const parsed = strategicDecisionBatchV2Schema.parse(normalizeCampaignDecisionWire(JSON.parse(probe.text)));
       if (parsed.decisions[0]?.actions[0]?.tool !== action.tool) throw new Error(`${family} strategic family probe returned hold or the wrong tool`);
     }

@@ -201,7 +201,7 @@ const geminiDecision = async ({ id, manifest, batch, correction = null }) => {
   if (serialized.length > MAX_CONTEXT_CHARS || /coordinates|geometry|FeatureCollection/.test(serialized)) throw new Error("AI context gate failed");
   const request = {
     system_instruction: { parts: [{ text: system }] }, contents: [{ role: "user", parts: [{ text: serialized }] }],
-    generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, maxOutputTokens: MAX_OUTPUT_TOKENS,
+    generationConfig: { responseMimeType: "application/json", responseSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, maxOutputTokens: MAX_OUTPUT_TOKENS,
       thinkingConfig: getGeminiThinkingConfig(manifest.model, { reasoningMode: "minimal" }) },
   };
   let lastError;
