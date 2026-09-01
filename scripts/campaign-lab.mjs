@@ -13,7 +13,7 @@ import {
 } from "../packages/agent-runtime/dist/index.js";
 import {
   AUTONOMY_V2_CELLS, CAMPAIGN_MAX_CALLS, FREE10_CELLS, MAX_OUTPUT_TOKENS, PACIFIC_DAILY_CALL_LIMIT, PACING_RPM, PACING_TPM,
-  decisionTriggerReasons, isRetryableGeminiFailure, pacificQuotaDay, reduceChronicleAlerts,
+  decisionTriggerReasons, isRetryableGeminiFailure, pacificQuotaDay, playerDecisionTriggerReasons, reduceChronicleAlerts,
 } from "./lib/campaign-lab-policy.mjs";
 import {
   CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS, normalizeCampaignDecisionWire, salvageCampaignDecisionBatch,
@@ -164,7 +164,7 @@ const createOne = ({ id, playerPolityId, strategy, mode, model, preflight = null
     startMonth: state.month, horizonMonth: loaded.authoring.horizonDate,
     status: mode === "live" ? "awaiting-player-decision" : "ready", calls: 0,
     createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), checkpoint: { month: state.month, reasons: ["campaign-start"] },
-    alertState: {}, triggerReasons: [],
+    alertState: {}, triggerReasons: [], playerTriggerReasons: [],
     plannerDueByPolity: {}, playerDueMonth: state.month,
   };
   atomicJson(fileOf(id, "state.json"), state); writeManifest(id, manifest);
@@ -331,7 +331,7 @@ const pendingPlayerCommands = (id, state, manifest) => {
   return parseTurnCommands({ commands: decision.commands }).commands;
 };
 
-const chronicleTurn = (id, completed, commands, previousAlertState) => {
+const chronicleTurn = (id, completed, commands, previousAlertState, playerPolityId) => {
   const alerts = reduceChronicleAlerts(completed.result.events, previousAlertState);
   const chronicleEvents = [...completed.result.events.filter(chronicleEvent), ...alerts.records];
   for (const event of chronicleEvents) {
@@ -351,8 +351,11 @@ const chronicleTurn = (id, completed, commands, previousAlertState) => {
     appendJsonl(fileOf(id, "chronicle.jsonl"), record);
     fs.appendFileSync(fileOf(id, "chronicle.md"), `## ${record.month} — ${record.eventType}\n\n${record.causalExplanation}\n\nRevision: ${record.closingRevision}.\n\n`, "utf8");
   }
-  return { chronicleEvents, alertState: alerts.alertState,
-    triggerReasons: [...new Set([...decisionTriggerReasons(completed.result.events), ...alerts.triggerReasons])].sort() };
+  const triggerReasons = [...new Set([...decisionTriggerReasons(completed.result.events), ...alerts.triggerReasons])].sort();
+  const playerTriggerReasons = [...new Set([
+    ...playerDecisionTriggerReasons(completed.result.events, playerPolityId), ...alerts.triggerReasons,
+  ])].sort();
+  return { chronicleEvents, alertState: alerts.alertState, triggerReasons, playerTriggerReasons };
 };
 
 const finalCard = (manifest, state, chronicle, authoring, lastLedger) => {
@@ -441,13 +444,14 @@ const resume = async (id) => {
   if (manifest.status === "quota-paused" && manifest.quotaDay === pacificQuotaDay()) return manifest;
   if (manifest.status === "quota-paused") { manifest.status = "ready"; manifest.quotaDay = null; manifest.lastError = null; }
   while (state.month < manifest.horizonMonth) {
-    const scheduledPlayer = state.turn % 6 === 0 || (manifest.triggerReasons?.length ?? 0) > 0 || (manifest.playerDueMonth ?? "9999-12-01") <= state.month;
+    const playerTriggers = manifest.playerTriggerReasons ?? manifest.triggerReasons ?? [];
+    const scheduledPlayer = state.turn % 6 === 0 || playerTriggers.length > 0 || (manifest.playerDueMonth ?? "9999-12-01") <= state.month;
     let player = [];
     if (scheduledPlayer) {
       const decision = pendingPlayerCommands(id, state, manifest);
       if (decision === null) {
         manifest.status = "awaiting-player-decision"; manifest.checkpoint = { month: state.month,
-          reasons: manifest.triggerReasons?.length ? manifest.triggerReasons : [state.turn === 0 ? "campaign-start" : "six-month-review"] };
+          reasons: playerTriggers.length ? playerTriggers : [state.turn === 0 ? "campaign-start" : "six-month-review"] };
         writePlayerBrief(id, manifest, state, manifest.checkpoint.reasons);
         manifest.updatedAt = new Date().toISOString(); writeManifest(id, manifest); atomicJson(fileOf(id, "state.json"), state); return manifest;
       }
@@ -468,17 +472,18 @@ const resume = async (id) => {
       latencyMs: 0, usage: null });
     if (completed.result.rejections.length) throw new Error(`validated campaign commands rejected: ${completed.result.rejections.map((entry) => entry.reason).join(", ")}`);
     const allCommands = [...player, ...opponents];
-    const chronicled = chronicleTurn(id, completed, allCommands, manifest.alertState ?? {});
+    const chronicled = chronicleTurn(id, completed, allCommands, manifest.alertState ?? {}, manifest.playerPolityId);
     chronicle.push(...chronicled.chronicleEvents.map((event) => ({ month: completed.result.ledger.month, eventType: event.type,
       participants: Object.entries(event).filter(([key]) => /polityId$/i.test(key)).map(([, value]) => value).filter((value) => typeof value === "string") })));
     lastLedger = completed.result.ledger;
     atomicJson(fileOf(id, "last-turn.json"), { baseRevision: completed.baseRevision, revision: completed.result.state.revision,
       events: completed.result.events, ledger: completed.result.ledger, commands: allCommands });
     state = completed.result.state; manifest.alertState = chronicled.alertState; manifest.triggerReasons = chronicled.triggerReasons;
+    manifest.playerTriggerReasons = chronicled.playerTriggerReasons;
     manifest.status = "running"; manifest.checkpoint = null;
     manifest.updatedAt = new Date().toISOString(); atomicJson(fileOf(id, "state.json"), state); writeManifest(id, manifest);
   }
-  manifest.status = "completed"; manifest.completedAt = new Date().toISOString(); manifest.triggerReasons = [];
+  manifest.status = "completed"; manifest.completedAt = new Date().toISOString(); manifest.triggerReasons = []; manifest.playerTriggerReasons = [];
   const card = finalCard(manifest, state, chronicle, loaded.authoring, lastLedger); atomicJson(fileOf(id, "final-card.json"), card);
   fs.writeFileSync(fileOf(id, "final-card.md"), renderFinalCard(card), "utf8");
   writeCheckpointReport(id);

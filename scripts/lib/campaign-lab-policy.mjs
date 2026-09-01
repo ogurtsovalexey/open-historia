@@ -58,12 +58,22 @@ export const reduceChronicleAlerts = (events, previous = {}) => {
 export const decisionTriggerReasons = (events) => {
   const reasons = [];
   const triggerKinds = new Set([
-    "proposal-created", "agreement-created", "agreement-terminated", "territorial-settlement-accepted",
+    "agreement-created", "agreement-terminated", "territorial-settlement-accepted",
     "war-declared", "war-ended", "call-to-arms-created", "call-to-arms-resolved", "region-occupied",
     "peace-offered", "peace-resolved", "government-transferred", "default",
     "crisis-opened", "crisis-escalated", "crisis-resolved",
   ]);
   for (const event of events) if (triggerKinds.has(event.type)) reasons.push(event.type);
+  return [...new Set(reasons)].sort();
+};
+
+export const playerDecisionTriggerReasons = (events, playerPolityId) => {
+  const reasons = decisionTriggerReasons(events);
+  for (const event of events) {
+    if (event.type === "proposal-created" && event.recipientId === playerPolityId) reasons.push("proposal-created");
+    if (["proposal-countered", "proposal-rejected"].includes(event.type)
+      && (event.proposerId === playerPolityId || event.recipientId === playerPolityId)) reasons.push(event.type);
+  }
   return [...new Set(reasons)].sort();
 };
 

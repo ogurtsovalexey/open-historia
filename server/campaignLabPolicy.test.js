@@ -6,6 +6,7 @@ import {
   decisionTriggerReasons,
   isRetryableGeminiFailure,
   pacificQuotaDay,
+  playerDecisionTriggerReasons,
   reduceChronicleAlerts,
 } from "../scripts/lib/campaign-lab-policy.mjs";
 import {
@@ -105,7 +106,17 @@ test("monthly alerts are deduplicated and do not become recurring decision trigg
 
 test("only material diplomatic, war, government, default and crisis events trigger decisions", () => {
   assert.deepEqual(decisionTriggerReasons([
-    { type: "alert" }, { type: "goal-achieved" }, { type: "inputs-limited" },
+    { type: "alert" }, { type: "goal-achieved" }, { type: "inputs-limited" }, { type: "proposal-created" },
     { type: "war-declared" }, { type: "government-transferred" },
   ]), ["government-transferred", "war-declared"]);
+});
+
+test("new proposals wake only their player recipient, not the global planner", () => {
+  const events = [
+    { type: "proposal-created", proposerId: "polity:a", recipientId: "polity:player" },
+    { type: "proposal-created", proposerId: "polity:b", recipientId: "polity:c" },
+  ];
+  assert.deepEqual(decisionTriggerReasons(events), []);
+  assert.deepEqual(playerDecisionTriggerReasons(events, "polity:player"), ["proposal-created"]);
+  assert.deepEqual(playerDecisionTriggerReasons(events, "polity:other"), []);
 });
