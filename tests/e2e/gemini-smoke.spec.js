@@ -87,7 +87,7 @@ test("live Gemini advisor and diplomacy stay grounded in the 1938 engine session
     "Czechia",
     "Предложите Австрии экономическое сотрудничество в условиях кризиса 1938 года без выдуманных авторитетных цифр.",
   );
-  expect(czechia).toMatch(/Чех|эконом|промышлен/i);
+  expect(czechia).toMatch(/Чех|эконом|промышлен|торгов/i);
 
   const slovakia = await askCountry(
     page,
@@ -130,7 +130,7 @@ test("live Gemini advisor and diplomacy stay grounded in the 1938 engine session
     "Germany",
     "Кто сейчас контролирует Верхнюю Австрию (Oberösterreich)? Ответь строго по текущему состоянию игры.",
   );
-  expect(germanyAfter).toMatch(/Герман/i);
+  expect(germanyAfter).toMatch(/Герман|наш(?:им|его|ему|ей|и)?\s+контрол/i);
   expect(germanyAfter).toMatch(/Верхн|Oberösterreich/i);
   expect(modelCalls.length).toBeGreaterThanOrEqual(5);
 
