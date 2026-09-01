@@ -201,8 +201,10 @@ const geminiDecision = async ({ id, manifest, batch, correction = null }) => {
   if (serialized.length > MAX_CONTEXT_CHARS || /coordinates|geometry|FeatureCollection/.test(serialized)) throw new Error("AI context gate failed");
   const request = {
     system_instruction: { parts: [{ text: system }] }, contents: [{ role: "user", parts: [{ text: serialized }] }],
-    generationConfig: { responseMimeType: "application/json", responseSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, maxOutputTokens: MAX_OUTPUT_TOKENS,
+    generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS,
       thinkingConfig: getGeminiThinkingConfig(manifest.model, { reasoningMode: "minimal" }) },
+    tools: [{ functionDeclarations: [{ name: "submit_strategic_decisions", description: "Submit the complete bounded strategic decision batch.", parameters: CAMPAIGN_DECISION_RESPONSE_SCHEMA }] }],
+    toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames: ["submit_strategic_decisions"] } },
   };
   let lastError;
   const generation = correction ? 2 : 1;
@@ -231,7 +233,9 @@ const geminiDecision = async ({ id, manifest, batch, correction = null }) => {
         error.httpStatus = response.status; throw error;
       }
       if (!data.usageMetadata || !Number.isFinite(data.usageMetadata.totalTokenCount)) throw new Error("Gemini success response omitted usageMetadata.totalTokenCount");
-      return data?.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("") ?? "";
+      const args = data?.candidates?.[0]?.content?.parts?.find((part) => part.functionCall?.name === "submit_strategic_decisions")?.functionCall?.args;
+      if (!args) throw new Error("Gemini omitted the required submit_strategic_decisions tool call");
+      return JSON.stringify(args);
     } catch (error) {
       lastError = error;
       const networkError = error instanceof TypeError;

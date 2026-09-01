@@ -156,10 +156,10 @@ const main = async () => {
       futurePlan: [], contingency: "Reassess after new evidence.", rationale: "Bounded typed hold.",
       hold: { reason: "plan-sequencing", detail: "Wait for a material trigger.", revisit: { afterMonths: 1, triggers: ["resource-deficit"] } },
     })) };
-    const campaignJson = await client.generate({ name: "campaign-lab-json-schema",
+    const campaignJson = await client.generate({ name: "campaign-lab-tool-schema",
       contents: user(`Return exactly this decision batch: ${JSON.stringify(campaignExpected)}`),
-      generationConfig: { responseMimeType: "application/json", responseSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
-    const campaignParsed = strategicDecisionBatchV2Schema.parse(normalizeCampaignDecisionWire(JSON.parse(campaignJson.text)));
+      generationConfig: { thinkingConfig: minimal }, extra: functionDeclaration("submit_strategic_decisions", "Submit the strategic batch.", CAMPAIGN_DECISION_RESPONSE_SCHEMA) });
+    const campaignParsed = strategicDecisionBatchV2Schema.parse(normalizeCampaignDecisionWire(functionArgs(campaignJson.data, "submit_strategic_decisions")));
     if (campaignParsed.decisions.map((decision) => decision.polityId).join("|") !== campaignIds.join("|")) throw new Error("Campaign Lab JSON schema checkpoint changed polity IDs");
     const familyActions = [
       ["economy", { tool: "reallocate-production", targetRegionId: "region:probe:DE", priority: "raw-materials", scale: "medium" }],
@@ -173,8 +173,8 @@ const main = async () => {
       const expected = { decisions: [encodeCampaignDecisionWire({ polityId: "polity:probe", objective: { domain: family === "trade" ? "economy" : family, summary: `Exercise ${family} tools.`, horizon: "short" },
         actions: [action], futurePlan: [], contingency: "Use another supported tool.", rationale: "Non-hold preflight probe.", hold: null })] };
       const probe = await client.generate({ name: `strategic-family:${family}`, contents: user(`Return exactly this non-hold StrategicDecisionV2 batch: ${JSON.stringify(expected)}`),
-        generationConfig: { responseMimeType: "application/json", responseSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
-      const parsed = strategicDecisionBatchV2Schema.parse(normalizeCampaignDecisionWire(JSON.parse(probe.text)));
+        generationConfig: { thinkingConfig: minimal }, extra: functionDeclaration("submit_strategic_decisions", "Submit the strategic batch.", CAMPAIGN_DECISION_RESPONSE_SCHEMA) });
+      const parsed = strategicDecisionBatchV2Schema.parse(normalizeCampaignDecisionWire(functionArgs(probe.data, "submit_strategic_decisions")));
       if (parsed.decisions[0]?.actions[0]?.tool !== action.tool) throw new Error(`${family} strategic family probe returned hold or the wrong tool`);
     }
   }
