@@ -24,11 +24,15 @@ import type { MilitaryCommand } from '@open-historia/engine';
 import type { IdentityCommand } from '@open-historia/engine';
 import type { CampaignCommand } from '@open-historia/engine';
 
-export const MAX_POLITIES_PER_BATCH = 12;
-export const MAX_BATCHES_PER_MONTH = 2;
+export const MAX_POLITIES_PER_BATCH = 6;
+export const MAX_BATCHES_PER_MONTH = 4;
 export const MAX_POLITIES_PER_MONTH = MAX_POLITIES_PER_BATCH * MAX_BATCHES_PER_MONTH;
 export const MAX_POLITY_BRIEF_CHARS = 1600;
-export const MAX_BATCH_BRIEF_CHARS = 26000;
+// The Campaign Lab contract permits a bounded strategic prompt of at most
+// 40,000 characters. This shared ceiling leaves enough room for the public
+// causal context and territorial-settlement candidates without dropping an
+// actor from a six-polity batch.
+export const MAX_BATCH_BRIEF_CHARS = 40000;
 export const MAX_STRATEGIC_POLITIES = 6;
 
 export const strategyIntentSchema = z.enum([
@@ -103,6 +107,7 @@ export interface DiplomacyPolityBrief {
   relations: Array<{ polityId: string; opinion: number; trust: number; threat: number }>;
   proposals: Array<Record<string, unknown>>;
   agreements: Array<Record<string, unknown>>;
+  allowedNegotiationKinds: string[];
   allowedAgreementTypes: string[];
   allowedTradeResources: string[];
   finance: Record<string, unknown> | null;
@@ -123,11 +128,20 @@ export interface DiplomacyPolityBrief {
   mobilizationRegionCandidates: Array<{ regionId: string; name: string }>;
   frontRegionCandidates: Array<{ formationId: string; regionId: string; legalControllerId: string; actualControllerId: string }>;
   peaceRegionCandidates: Array<{ regionId: string; legalControllerId: string; actualControllerId: string }>;
+  settlementRegionCandidates: Array<{ regionId: string; name: string }>;
   capabilities: Array<Record<string, unknown>>;
   identity: Record<string, unknown> | null;
   campaignGoals: Array<Record<string, unknown>>;
   campaignCrises: Array<Record<string, unknown>>;
   latestLegacy: Record<string, unknown> | null;
+  strategicContext?: {
+    interests: string[];
+    threats: string[];
+    obligations: string[];
+    redLines: string[];
+    causalAnchors: Array<{ anchorId: string; interest: string; applicability: string[]; invalidators: string[] }>;
+    memory: string[];
+  };
 }
 
 export interface DiplomacyBatch {
@@ -139,10 +153,16 @@ export interface DiplomacyBatch {
   characterCount: number;
 }
 
-export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: string): DiplomacyBatch | null {
+export interface DiplomacyBriefOptions {
+  strategicContextByPolity?: Record<string, DiplomacyPolityBrief['strategicContext']>;
+}
+
+export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: string, requestedPolityIds?: string[], options: DiplomacyBriefOptions = {}): DiplomacyBatch | null {
   if (state.modules?.diplomacy !== true || !state.diplomacy) return null;
-  const polityIds = state.polities.filter((entry) => entry.id !== playerPolityId)
-    .map((entry) => entry.id).sort().slice(0, MAX_STRATEGIC_POLITIES);
+  const available = state.polities.filter((entry) => entry.id !== playerPolityId).map((entry) => entry.id).sort();
+  const allowed = new Set<string>(available);
+  const polityIds = (requestedPolityIds ?? available).filter((entry) => allowed.has(entry)).slice(0, MAX_STRATEGIC_POLITIES)
+    .map((entry) => entry as EconWorldState['polities'][number]['id']);
   const briefs = polityIds.map((polityId): DiplomacyPolityBrief => {
     const polity = state.polities.find((entry) => entry.id === polityId)!;
     const militaryLocations = new Set((state.military?.formations ?? []).filter((entry) => entry.polityId === polityId)
@@ -185,6 +205,7 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
       treasury: polity.treasury,
       stockpile: Object.fromEntries(polity.stockpile.map((entry) => [entry.resource, entry.amount])),
       relations, proposals, agreements,
+      allowedNegotiationKinds: ['agreement', 'trade', 'territorial-settlement'],
       allowedAgreementTypes: ['non-aggression', 'defensive-alliance', 'guarantee', 'military-access'],
       allowedTradeResources: [...state.activeResources].sort(),
       finance: state.finance?.polities.find((entry) => entry.polityId === polityId) ?? null,
@@ -248,6 +269,10 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
         return war && (war.attackers.includes(polityId as never) || war.defenders.includes(polityId as never));
       }).map((entry) => ({ regionId: entry.regionId, legalControllerId: entry.legalControllerId, actualControllerId: entry.actualControllerId }))
         .sort((a, b) => a.regionId.localeCompare(b.regionId)).slice(0, 6),
+      settlementRegionCandidates: state.regions.filter((entry) => entry.controllerId === polityId
+        && !(state.military?.occupations ?? []).some((occupation) => occupation.regionId === entry.regionId))
+        .sort((a, b) => a.regionId.localeCompare(b.regionId)).slice(0, 6)
+        .map((entry) => ({ regionId: entry.regionId, name: entry.displayName.en })),
       capabilities: (state.capabilities?.catalog ?? []).filter((entry) => unlockedCapabilityIds.has(entry.capabilityId))
         .map((entry) => ({ capabilityId: entry.capabilityId, domain: entry.domain, modifier: entry.modifier })),
       identity: identityPolity ? {
@@ -273,6 +298,9 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
         })),
       latestLegacy: (state.campaign?.assessments ?? []).filter((entry) => entry.polityId === polityId)
         .sort((a, b) => b.month.localeCompare(a.month) || b.assessmentId.localeCompare(a.assessmentId))[0] ?? null,
+      ...(options.strategicContextByPolity?.[polityId]
+        ? { strategicContext: options.strategicContextByPolity[polityId] }
+        : {}),
     };
   });
   const characterCount = briefs.reduce((sum, brief) => sum + JSON.stringify(brief).length, 0);
@@ -281,6 +309,18 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
     batchId: `diplomacy:${state.month}:${state.revision.slice(-12)}`,
     month: state.month, baseRevision: state.revision, polityIds, briefs, characterCount,
   };
+}
+
+/** Stable strategic batches. Unlike the legacy singular helper, this never drops an opponent. */
+export function buildDiplomacyBatches(state: EconWorldState, playerPolityId: string, options: DiplomacyBriefOptions = {}): DiplomacyBatch[] {
+  if (state.modules?.diplomacy !== true || !state.diplomacy) return [];
+  const polityIds = state.polities.filter((entry) => entry.id !== playerPolityId).map((entry) => entry.id).sort();
+  const batches: DiplomacyBatch[] = [];
+  for (let index = 0; index < polityIds.length; index += MAX_STRATEGIC_POLITIES) {
+    const batch = buildDiplomacyBatch(state, playerPolityId, polityIds.slice(index, index + MAX_STRATEGIC_POLITIES), options);
+    if (batch) batches.push({ ...batch, batchId: `${batch.batchId}:${String(batches.length + 1).padStart(2, '0')}` });
+  }
+  return batches;
 }
 
 export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): OpponentDiplomacyBatchResult {
@@ -299,6 +339,11 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
       throw new Error('diplomacy proposal names an unknown recipient');
     }
     const brief = batch.briefs.find((entry) => entry.polityId === decision.polityId)!;
+    if (command.kind === 'diplomacy.propose' && command.terms.kind === 'territorial-settlement'
+      && (command.terms.fromPolityId !== decision.polityId || command.terms.toPolityId !== command.recipientPolityId
+        || command.terms.regionIds.some((regionId) => !brief.settlementRegionCandidates.some((entry) => entry.regionId === regionId)))) {
+      throw new Error('territorial settlement names a region outside bounded owned candidates');
+    }
     if (command.kind === 'project.start') {
       if (!brief.projectTemplates.some((entry) => entry.templateId === command.templateId)) throw new Error('project command names an unknown template');
       if (command.targetPolityId && !brief.intelligenceTargetPolityIds.includes(command.targetPolityId)) throw new Error('project command names an unknown target polity');

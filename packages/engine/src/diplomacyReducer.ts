@@ -1,4 +1,4 @@
-import type { PolityId } from '@open-historia/domain';
+import type { PolityId, RegionId } from '@open-historia/domain';
 import type { CommandRejection, DiplomacyCommand } from './commands.js';
 import type { NegotiationTerms } from './diplomacy.js';
 import { relationKey } from './diplomacy.js';
@@ -10,6 +10,24 @@ export interface MutableTradePolity {
   id: PolityId;
   treasury: number;
   stock: Map<ResourceId, number>;
+}
+
+export interface MutableSettlementRegion {
+  regionId: RegionId;
+  controllerId: PolityId;
+  population: number;
+  infrastructureBp: number;
+  damageBp: number;
+  activity: { kind: 'processing'; activity: string } | { kind: 'extraction'; resource: string };
+}
+
+export interface TerritorialSettlementTransfer {
+  regionId: RegionId;
+  fromPolityId: PolityId;
+  toPolityId: PolityId;
+  population: number;
+  infrastructureBp: number;
+  damageBp: number;
 }
 
 export interface ResourceTransferRecord {
@@ -44,6 +62,7 @@ export type DiplomacyEngineEvent =
   | { type: 'proposal-countered'; proposalId: string; counterProposalId: string; proposerId: PolityId; recipientId: PolityId }
   | { type: 'proposal-rejected'; proposalId: string; actorPolityId: PolityId }
   | { type: 'agreement-created'; agreementId: string; proposalId: string; parties: [PolityId, PolityId]; agreementKind: string }
+  | { type: 'territorial-settlement-accepted'; proposalId: string; fromPolityId: PolityId; toPolityId: PolityId; regionIds: RegionId[] }
   | { type: 'agreement-terminated'; agreementId: string; actorPolityId: PolityId; penaltyPaid: number }
   | { type: 'trade-settled'; contractId: string; fulfillmentBp: number; breach: boolean };
 
@@ -74,6 +93,7 @@ export function resolveDiplomacyPhase(
   state: EconWorldState,
   commands: DiplomacyCommand[],
   polities: MutableTradePolity[],
+  regions: MutableSettlementRegion[],
 ): {
   diplomacy: EconWorldState['diplomacy'];
   trade: EconWorldState['trade'];
@@ -82,6 +102,7 @@ export function resolveDiplomacyPhase(
   executions: TradeExecutionRecord[];
   resourceTransfers: ResourceTransferRecord[];
   treasuryTransfers: TreasuryTransferRecord[];
+  territorialTransfers: TerritorialSettlementTransfer[];
 } {
   const diplomacy = state.diplomacy ? {
     relations: state.diplomacy.relations.map((entry) => ({ ...entry, polities: [...entry.polities] as [PolityId, PolityId] })),
@@ -98,6 +119,7 @@ export function resolveDiplomacyPhase(
   const executions: TradeExecutionRecord[] = [];
   const resourceTransfers: ResourceTransferRecord[] = [];
   const treasuryTransfers: TreasuryTransferRecord[] = [];
+  const territorialTransfers: TerritorialSettlementTransfer[] = [];
 
   const reject = (command: DiplomacyCommand, reason: CommandRejection['reason'], detail: string) => {
     rejections.push({ command, reason, detail });
@@ -160,13 +182,34 @@ export function resolveDiplomacyPhase(
         events.push({ type: 'proposal-rejected', proposalId: proposal.proposalId, actorPolityId: command.actorPolityId });
         continue;
       }
+      if (proposal.terms.kind === 'territorial-settlement') {
+        const { fromPolityId, toPolityId, regionIds } = proposal.terms;
+        const selected = regionIds.map((regionId) => regions.find((entry) => entry.regionId === regionId));
+        const occupied = new Set((state.military?.occupations ?? []).map((entry) => entry.regionId));
+        const receiverProcessing = regions.filter((entry) => entry.controllerId === toPolityId && entry.activity.kind === 'processing').length;
+        const incomingProcessing = selected.filter((entry) => entry?.activity.kind === 'processing').length;
+        if (!polityById.has(fromPolityId) || !polityById.has(toPolityId)
+          || selected.some((entry) => !entry || entry.controllerId !== fromPolityId)
+          || regionIds.some((regionId) => occupied.has(regionId))
+          || receiverProcessing + incomingProcessing > 1) {
+          reject(command, 'invalid-terms', 'settlement requires unoccupied regions currently owned by the ceding party and a valid resulting economy');
+          continue;
+        }
+        for (const region of selected as MutableSettlementRegion[]) {
+          territorialTransfers.push({ regionId: region.regionId, fromPolityId, toPolityId,
+            population: region.population, infrastructureBp: region.infrastructureBp, damageBp: region.damageBp });
+          region.controllerId = toPolityId;
+        }
+        diplomacy.proposals = diplomacy.proposals.filter((entry) => entry.proposalId !== proposal.proposalId);
+        events.push({ type: 'territorial-settlement-accepted', proposalId: proposal.proposalId,
+          fromPolityId, toPolityId, regionIds: [...regionIds].sort() });
+        continue;
+      }
       const duplicate = diplomacy.agreements.some((entry) =>
-        entry.terms.kind === proposal.terms.kind
-        && (entry.terms.kind === 'trade' || proposal.terms.kind === 'trade'
-          ? false
-          : entry.terms.agreementType === proposal.terms.agreementType
-            && entry.terms.fromPolityId === proposal.terms.fromPolityId
-            && entry.terms.toPolityId === proposal.terms.toPolityId));
+        entry.terms.kind === 'agreement' && proposal.terms.kind === 'agreement'
+        && entry.terms.agreementType === proposal.terms.agreementType
+        && entry.terms.fromPolityId === proposal.terms.fromPolityId
+        && entry.terms.toPolityId === proposal.terms.toPolityId);
       if (duplicate) { reject(command, 'duplicate-agreement', 'the same agreement is already active'); continue; }
       if (proposal.terms.kind === 'trade') {
         if (!trade || state.modules?.trade !== true) { reject(command, 'module-disabled', 'trade module is not enabled'); continue; }
@@ -255,5 +298,5 @@ export function resolveDiplomacyPhase(
     diplomacy.agreements.sort((left, right) => left.agreementId.localeCompare(right.agreementId));
   }
   if (trade) trade.contracts.sort((left, right) => left.contractId.localeCompare(right.contractId));
-  return { diplomacy, trade, events, rejections, executions, resourceTransfers, treasuryTransfers };
+  return { diplomacy, trade, events, rejections, executions, resourceTransfers, treasuryTransfers, territorialTransfers };
 }

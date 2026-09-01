@@ -7,7 +7,7 @@ import { parseTurnCommands, polityIdentityEffects, runTurn } from "@open-histori
 import {
   EMPTY_AGENT_STATE,
   agentStateSchema,
-  buildDiplomacyBatch,
+  buildDiplomacyBatches,
   buildFallbackBatch,
   buildOpponentBatches,
   buildPolityBrief,
@@ -272,11 +272,11 @@ const makeOpponentTasks = (draft) => {
 };
 
 const makeStrategicTasks = (draft) => {
-  const batch = buildDiplomacyBatch(draft.state, draft.playerPolityId);
-  if (!batch) return makeOpponentTasks(draft);
-  draft.pendingStrategicBatch = batch;
+  const batches = buildDiplomacyBatches(draft.state, draft.playerPolityId);
+  if (!batches.length) return makeOpponentTasks(draft);
+  draft.pendingStrategicBatches = batches;
   const schema = withoutModelCommandIds(exportJsonSchema(opponentDiplomacyBatchResultSchema));
-  draft.tasks = [{
+  draft.tasks = batches.map((batch) => ({
     taskId: draft.state.modules?.campaign ? "opponents.plan-campaign"
       : draft.state.modules?.societyAndIdentity || draft.state.modules?.technology ? "opponents.plan-society"
       : draft.state.modules?.combat ? "opponents.plan-war"
@@ -288,19 +288,19 @@ const makeStrategicTasks = (draft) => {
     userPrompt: JSON.stringify({ month: batch.month, revision: batch.baseRevision, briefs: batch.briefs }),
     tool: { name: "submit_opponent_strategy_decisions", description: "Submit every requested polity strategic decision", schema },
     context: { fullMapIncluded: false, characterCount: batch.characterCount, polityCount: batch.polityIds.length },
-  }];
+  }));
   draft.phase = "plan-strategy";
   return draft;
 };
 
 export const resolveStrategicMonth = (draft, outputs) => {
-  if (!draft.pendingStrategicBatch) throw new Error("strategic batch is missing");
-  if (!Array.isArray(outputs) || outputs.length !== 1) throw new Error("exactly one strategic output is required");
-  const batch = draft.pendingStrategicBatch;
-  const result = validateDiplomacyBatch(hydrateStrategicCommandIds(outputs[0], batch), batch);
-  draft.strategicCommands = result.decisions.flatMap((entry) => entry.command ? [entry.command] : []);
-  draft.strategicDecisions = result.decisions;
-  draft.pendingStrategicBatch = null;
+  const batches = draft.pendingStrategicBatches ?? [];
+  if (!batches.length) throw new Error("strategic batches are missing");
+  if (!Array.isArray(outputs) || outputs.length !== batches.length) throw new Error("one strategic output per batch is required");
+  const results = batches.map((batch, index) => validateDiplomacyBatch(hydrateStrategicCommandIds(outputs[index], batch), batch));
+  draft.strategicCommands = results.flatMap((result) => result.decisions.flatMap((entry) => entry.command ? [entry.command] : []));
+  draft.strategicDecisions = results.flatMap((result) => result.decisions);
+  draft.pendingStrategicBatches = [];
   draft.tasks = [];
   makeOpponentTasks(draft);
 };
@@ -611,7 +611,7 @@ export const prepareAgentTurn = (gameId, { targetDate, expectedSessionRevision, 
     reports: [],
     readOnly: false,
     pendingBatches: [],
-    pendingStrategicBatch: null,
+    pendingStrategicBatches: [],
     strategicCommands: [],
     strategicDecisions: [],
     tasks: [],

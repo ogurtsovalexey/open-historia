@@ -79,6 +79,29 @@ describe('P3b negotiation state machine (canon 11)', () => {
     });
   });
 
+  it('accepts a peaceful territorial settlement atomically and rejects stale ownership', () => {
+    const state = initState(scenario);
+    const target = state.regions.find((entry) => entry.controllerId === POLAND && entry.activity.kind === 'extraction')!;
+    const proposalId = 'proposal:peaceful-cession';
+    const propose: DiplomacyCommand = {
+      kind: 'diplomacy.propose', ...common(state, POLAND), proposalId, recipientPolityId: FRANCE,
+      terms: { kind: 'territorial-settlement', fromPolityId: POLAND, toPolityId: FRANCE, regionIds: [target.regionId] },
+    };
+    const accept: DiplomacyCommand = { kind: 'diplomacy.respond', ...common(state, FRANCE), proposalId, response: 'accept' };
+    const accepted = resolveMonth(state, { commands: [propose, accept] });
+    assert.deepEqual(accepted.rejections, []);
+    assert.equal(accepted.state.regions.find((entry) => entry.regionId === target.regionId)?.controllerId, FRANCE);
+    assert.equal(accepted.ledger.transfers.find((entry) => entry.regionId === target.regionId)?.fromPolityId, POLAND);
+    assert.ok(accepted.events.some((entry) => entry.type === 'territorial-settlement-accepted'));
+
+    const drifted = structuredClone(state);
+    drifted.regions.find((entry) => entry.regionId === target.regionId)!.controllerId = AUSTRIA;
+    const rejected = resolveMonth(drifted, { commands: [propose, accept] });
+    assert.equal(rejected.rejections.at(-1)?.reason, 'invalid-terms');
+    assert.equal(rejected.state.regions.find((entry) => entry.regionId === target.regionId)?.controllerId, AUSTRIA);
+    assert.equal(rejected.ledger.transfers.length, 0);
+  });
+
   it('rejects stale, unknown and mismatched references without partial mutation', () => {
     const state = initState(scenario);
     const invalid = proposeAgreement(state, 'proposal:mismatch') as Extract<DiplomacyCommand, { kind: 'diplomacy.propose' }>;

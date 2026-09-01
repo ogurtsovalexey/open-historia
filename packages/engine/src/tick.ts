@@ -172,7 +172,7 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
 
   const diplomacyCommands = commandsFile.commands.filter((command): command is DiplomacyCommand =>
     command.kind.startsWith('diplomacy.'));
-  const diplomacyPhase = resolveDiplomacyPhase(state, diplomacyCommands, polities);
+  const diplomacyPhase = resolveDiplomacyPhase(state, diplomacyCommands, polities, regions);
   events.push(...diplomacyPhase.events);
   for (const rejection of diplomacyPhase.rejections) {
     rejections.push(rejection);
@@ -193,7 +193,10 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   // ---- 1. Validate commands: any failure rejects the command, changes nothing.
   const accepted: EconomyPhaseCommand[] = [];
   const investedPolities = new Set<PolityId>();
-  const transferredRegions = new Set<RegionId>(militaryCommandPhase.transfers.map((entry) => entry.regionId));
+  const transferredRegions = new Set<RegionId>([
+    ...militaryCommandPhase.transfers.map((entry) => entry.regionId),
+    ...diplomacyPhase.territorialTransfers.map((entry) => entry.regionId),
+  ]);
   /** Controllership as it will stand after the accepted transfers so far. */
   const projectedController = new Map<RegionId, PolityId>(
     regions.map((region) => [region.regionId, region.controllerId])
@@ -309,7 +312,14 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   // ceded this month carries the improvement its previous controller bought.
   // Population, capacity, infrastructure and damage stay with the region;
   // treasury and national stockpiles do not move (§7).
-  const transfers: TransferRecord[] = militaryCommandPhase.transfers.map((entry) => ({ ...entry }));
+  const transfers: TransferRecord[] = [
+    ...militaryCommandPhase.transfers.map((entry) => ({ ...entry })),
+    ...diplomacyPhase.territorialTransfers.map((entry) => ({ ...entry })),
+  ];
+  for (const record of diplomacyPhase.territorialTransfers) {
+    events.push({ type: 'region-transferred', regionId: record.regionId, fromPolityId: record.fromPolityId,
+      toPolityId: record.toPolityId, population: record.population });
+  }
   for (const command of accepted) {
     if (command.kind !== 'territory.transfer-region') continue;
     const region = regionById.get(command.targetRegionId)!;

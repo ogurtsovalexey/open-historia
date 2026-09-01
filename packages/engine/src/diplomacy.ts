@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { gameDateSchema, polityIdSchema } from '@open-historia/domain';
+import { gameDateSchema, polityIdSchema, regionIdSchema } from '@open-historia/domain';
 import { resourceIdSchema } from './scenario.js';
 
 const nonNegInt = z.number().int().nonnegative();
@@ -43,7 +43,17 @@ export const tradeAgreementTermsSchema = z.object({
   if (terms.cadence === 'monthly' && terms.durationMonths < 2) ctx.addIssue({ code: 'custom', message: 'monthly trade duration must be at least two months' });
 });
 
-export const negotiationTermsSchema = z.union([diplomaticAgreementTermsSchema, tradeAgreementTermsSchema]);
+export const territorialSettlementTermsSchema = z.object({
+  kind: z.literal('territorial-settlement'),
+  fromPolityId: polityIdSchema,
+  toPolityId: polityIdSchema,
+  regionIds: z.array(regionIdSchema).min(1).max(12),
+}).strict().superRefine((terms, ctx) => {
+  if (terms.fromPolityId === terms.toPolityId) ctx.addIssue({ code: 'custom', message: 'settlement parties must differ' });
+  if (new Set(terms.regionIds).size !== terms.regionIds.length) ctx.addIssue({ code: 'custom', message: 'settlement regions must be unique' });
+});
+
+export const negotiationTermsSchema = z.union([diplomaticAgreementTermsSchema, tradeAgreementTermsSchema, territorialSettlementTermsSchema]);
 export type NegotiationTerms = z.infer<typeof negotiationTermsSchema>;
 
 export const negotiationProposalSchema = z.object({

@@ -5,6 +5,7 @@ import test from 'node:test';
 import {
   buildFallbackBatch,
   buildDiplomacyBatch,
+  buildDiplomacyBatches,
   buildOpponentBatches,
   buildPolityBrief,
   EMPTY_AGENT_STATE,
@@ -37,7 +38,7 @@ test('strategic diplomacy batch is bounded, deterministic and contains no full m
   assert.equal(JSON.stringify(first).includes('geometry'), false);
   assert.ok(first.briefs.every((brief) => brief.projectRegionCandidates.length <= 3
     && brief.mobilizationRegionCandidates.length <= 3 && brief.frontRegionCandidates.length <= 6
-    && brief.peaceRegionCandidates.length <= 6));
+    && brief.peaceRegionCandidates.length <= 6 && brief.settlementRegionCandidates.length <= 6));
   assert.ok(first.briefs.every((brief) => ((brief.identity?.candidates as string[] | undefined)?.length ?? 0) <= 6));
   assert.ok(first.briefs.every((brief) => brief.campaignGoals.length <= 3 && brief.campaignCrises.length <= 3));
   assert.equal(JSON.stringify(first).includes('minorities'), false);
@@ -49,6 +50,22 @@ test('strategic diplomacy batch is bounded, deterministic and contains no full m
   assert.equal(JSON.stringify(first).includes('character:'), false);
   assert.ok(first.briefs.every((brief) => brief.projectRegionCandidates.length <= 3));
   assert.equal(buildDiplomacyBatch(initial(), 'polity:austria'), null);
+});
+
+test('nine-polity benchmark schedules every opponent in batches of at most six with bounded causal context', () => {
+  const fixture = fileURLToPath(new URL('../../../data-packs/fixtures/europe-1935-benchmark/engine/scenario.json', import.meta.url));
+  const state = initState(parseScenario(JSON.parse(readFileSync(fixture, 'utf8'))));
+  const memory = Array.from({ length: 12 }, (_, index) => `1935-${String(index + 1).padStart(2, '0')}-01 observed fact`);
+  const context = Object.fromEntries(state.polities.map((entry) => [entry.id, {
+    interests: ['preserve security'], threats: ['revisionism'], obligations: ['public treaty'], redLines: ['occupation'],
+    causalAnchors: [{ anchorId: `anchor:${entry.id.slice(7)}`, interest: 'preserve security', applicability: ['state survives'], invalidators: ['government replaced'] }], memory,
+  }]));
+  const batches = buildDiplomacyBatches(state, 'polity:germany', { strategicContextByPolity: context });
+  assert.equal(batches.length, 2);
+  assert.deepEqual(batches.flatMap((entry) => entry.polityIds).sort(), state.polities.filter((entry) => entry.id !== 'polity:germany').map((entry) => entry.id).sort());
+  assert.ok(batches.every((entry) => entry.polityIds.length <= 6 && entry.characterCount <= MAX_BATCH_BRIEF_CHARS));
+  assert.ok(batches.every((entry) => !JSON.stringify(entry).includes('geometry')));
+  assert.ok(batches.flatMap((entry) => entry.briefs).every((entry) => entry.strategicContext?.memory.length === 12));
 });
 
 test('strategic diplomacy validation requires one bound decision per polity', () => {
@@ -218,7 +235,7 @@ const scaleState = (): EconWorldState => {
   return { ...draft, revision: stateChecksum(draft) as typeof base.revision };
 };
 
-test('100 active polities all tick for twelve months and rotate within five using at most two batches', () => {
+test('100 active polities all tick for twelve months and rotate within five using at most four batches', () => {
   let state = scaleState();
   const player = state.polities[0]!.id;
   let agentState: AgentState = structuredClone(EMPTY_AGENT_STATE);

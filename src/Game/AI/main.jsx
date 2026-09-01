@@ -16,6 +16,7 @@ import {
 import { difficultyDirective } from "../../runtime/difficulty.js";
 import { buildCampaignMemoryText } from "../../runtime/campaignMemory.js";
 import { normalizePromptPack } from "./gameplayPrompts.js";
+import { normalizeGeminiUsage } from "./usageMetadata.js";
 import {
     buildFocusedDiplomaticMapContext,
     classifyDiplomaticTurn,
@@ -647,8 +648,9 @@ async function callGemini(systemPrompt, history, {
         const data = await response.json();
         if (tool) {
             const toolInput = extractGeminiToolInput(data, tool);
-            if (toolInput) return { rawText: joinGeminiParts(data?.candidates?.[0]?.content?.parts), toolInput };
-            return { rawText: joinGeminiParts(data?.candidates?.[0]?.content?.parts), toolInput: null };
+            const usage = normalizeGeminiUsage(data?.usageMetadata);
+            if (toolInput) return { rawText: joinGeminiParts(data?.candidates?.[0]?.content?.parts), toolInput, usage };
+            return { rawText: joinGeminiParts(data?.candidates?.[0]?.content?.parts), toolInput: null, usage };
         }
         const text = joinGeminiParts(data?.candidates?.[0]?.content?.parts);
 

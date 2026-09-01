@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
-import { EMPTY_AGENT_STATE, buildDiplomacyBatch } from "@open-historia/agent-runtime";
+import { EMPTY_AGENT_STATE, buildDiplomacyBatches } from "@open-historia/agent-runtime";
 import { initState, parseScenario } from "@open-historia/engine";
 import { resolveStrategicMonth } from "./agentTurnStore.js";
 
@@ -17,7 +17,7 @@ const draftFor = (state) => ({
   agentState: structuredClone(EMPTY_AGENT_STATE),
   lastLedger: null,
   profiles: {},
-  pendingStrategicBatch: buildDiplomacyBatch(state, "polity:austria"),
+  pendingStrategicBatches: buildDiplomacyBatches(state, "polity:austria"),
   strategicCommands: [],
   strategicDecisions: [],
   tasks: [{ taskKey: "material-strategy" }],
@@ -28,14 +28,14 @@ describe("material strategic agent phase", () => {
   it("does not mutate or advance the draft when strategic output fails validation", () => {
     const draft = draftFor(initial());
     const before = structuredClone(draft);
-    assert.throws(() => resolveStrategicMonth(draft, []), /exactly one strategic output/);
+    assert.throws(() => resolveStrategicMonth(draft, []), /one strategic output per batch/);
     assert.deepEqual(draft, before);
     assert.equal(draft.state.turn, 0);
   });
 
   it("accepts a complete no-op strategy batch and proceeds to utility planning", () => {
     const draft = draftFor(initial());
-    const output = { decisions: draft.pendingStrategicBatch.polityIds.map((polityId) => ({
+    const output = { decisions: draft.pendingStrategicBatches[0].polityIds.map((polityId) => ({
       polityId, intent: "hold", rationale: "No material action.", command: null,
     })) };
     resolveStrategicMonth(draft, [output]);

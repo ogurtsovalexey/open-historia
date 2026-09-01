@@ -49,6 +49,7 @@ async function executeAgentTask(task, { signal, definition, budget, profile }) {
     });
     ledger.finishTransport(record.invocationId, 1, started.transportAttempt, {
       latencyMs: Math.max(0, performance.now() - startedAt), terminalStatus: "success",
+      ...(result?.usage ? { usage: result.usage } : {}),
     });
     ledger.finishGeneration(record.invocationId, 1, result?.toolInput ? "accepted" : "parse-failed");
     ledger.closeInvocation(record.invocationId, result?.toolInput
