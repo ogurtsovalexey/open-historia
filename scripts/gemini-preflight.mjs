@@ -133,7 +133,7 @@ const main = async () => {
   if (!/PREFLIGHT_OK/.test(buffered.text)) throw new Error("buffered text checkpoint returned unexpected content");
   const streamed = await client.generate({ name: "sse-streaming", contents: user("Reply with exactly STREAM_OK."), generationConfig: { thinkingConfig: minimal }, stream: true });
   if (!/STREAM_OK/.test(streamed.text)) throw new Error("SSE checkpoint returned unexpected content");
-  const jsonMime = await client.generate({ name: "json-mime", contents: user('{"ok":true}'), generationConfig: { responseMimeType: "application/json", thinkingConfig: minimal } });
+  const jsonMime = await client.generate({ name: "json-mime", contents: user('Return exactly the JSON object {"ok":true} and nothing else.'), generationConfig: { responseMimeType: "application/json", thinkingConfig: minimal } });
   if (JSON.parse(jsonMime.text).ok !== true) throw new Error("JSON MIME checkpoint failed semantic validation");
   const genericTool = { name: "submit_probe", description: "Submit the probe result.", schema: { type: "object", properties: { ok: { type: "boolean" } }, required: ["ok"] } };
   const toolResult = await client.generate({ name: "function-calling", contents: user('Call submit_probe with {"ok":true}.'), generationConfig: { thinkingConfig: minimal }, extra: functionDeclaration(genericTool.name, genericTool.description, genericTool.schema) });
