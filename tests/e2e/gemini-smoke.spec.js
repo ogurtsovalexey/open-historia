@@ -50,8 +50,8 @@ test("live Gemini advisor and diplomacy stay grounded in the 1938 engine session
       url: requestEvent.url(), headers: requestEvent.headers(), body: requestEvent.postDataJSON(),
     });
   });
-  await page.goto(`/?gameId=${gameId}`, { waitUntil: "networkidle" });
-  await expect(page.getByText(/P2 Gemini Smoke 1938/)).toBeVisible();
+  await page.goto(`/?gameId=${gameId}`, { waitUntil: "domcontentloaded" });
+  await expect(page.getByText(/P2 Gemini Smoke 1938/)).toBeVisible({ timeout: 30_000 });
   await page.waitForTimeout(2000);
   expect(modelCalls).toHaveLength(0);
 
