@@ -26,6 +26,7 @@ import { diplomacyStateSchema, tradeStateSchema } from './diplomacy.js';
 import { financeStateSchema, intelligenceStateSchema, projectsStateSchema } from './statecraft.js';
 import { politicsStateSchema } from './politics.js';
 import { militaryStateSchema } from './military.js';
+import { capabilityStateSchema, identityStateSchema } from './society.js';
 
 const nonNegInt = z.number().int().nonnegative();
 const bpSchema = z.number().int().min(0).max(10000);
@@ -95,6 +96,8 @@ export const econWorldStateSchema = z
     intelligence: intelligenceStateSchema.optional(),
     politics: politicsStateSchema.optional(),
     military: militaryStateSchema.optional(),
+    capabilities: capabilityStateSchema.optional(),
+    identity: identityStateSchema.optional(),
     economy: economyParamsSchema,
     /** Sorted by polity id. */
     polities: z.array(econPolityStateSchema).min(2),
@@ -217,6 +220,27 @@ export function initState(scenario: EconScenario): EconWorldState {
           posture: 'hold' as const, targetRegionId: null, familiarityBp: 0 })).sort((a, b) => a.formationId.localeCompare(b.formationId)),
         supplyLinks: [...scenario.military.supplyLinks].sort((a, b) => `${a.regions[0]}|${a.regions[1]}`.localeCompare(`${b.regions[0]}|${b.regions[1]}`)),
         wars: [], fronts: [], occupations: [], peaceOffers: [],
+      },
+    } : {}),
+    ...(scenario.modules?.technology === true && scenario.capabilities ? {
+      capabilities: {
+        catalog: [...scenario.capabilities.catalog].map((entry) => ({ ...entry, displayName: { ...entry.displayName }, prerequisiteIds: [...entry.prerequisiteIds], modifier: { ...entry.modifier } }))
+          .sort((a, b) => a.capabilityId.localeCompare(b.capabilityId)),
+        unlocked: [...scenario.capabilities.starting].map((entry) => ({ ...entry, unlockedMonth: scenario.startMonth, sourceProjectId: null }))
+          .sort((a, b) => `${a.polityId}|${a.capabilityId}`.localeCompare(`${b.polityId}|${b.capabilityId}`)),
+      },
+    } : {}),
+    ...(scenario.modules?.societyAndIdentity === true && scenario.identity ? {
+      identity: {
+        cultures: [...scenario.identity.cultures].map((entry) => ({ ...entry, displayName: { ...entry.displayName } })).sort((a, b) => a.cultureId.localeCompare(b.cultureId)),
+        religions: [...scenario.identity.religions].map((entry) => ({ ...entry, displayName: { ...entry.displayName } })).sort((a, b) => a.religionId.localeCompare(b.religionId)),
+        regions: [...scenario.identity.regions].map((entry) => ({ ...entry,
+          culture: { ...entry.culture, minorities: [...entry.culture.minorities].sort((a, b) => a.identityId.localeCompare(b.identityId)) },
+          religion: { ...entry.religion, minorities: [...entry.religion.minorities].sort((a, b) => a.identityId.localeCompare(b.identityId)) },
+        })).sort((a, b) => a.regionId.localeCompare(b.regionId)),
+        polities: [...scenario.identity.polities].map((entry) => ({ ...entry,
+          acceptedCultureIds: [...entry.acceptedCultureIds].sort(), acceptedReligionIds: [...entry.acceptedReligionIds].sort(),
+        })).sort((a, b) => a.polityId.localeCompare(b.polityId)),
       },
     } : {}),
     polities: [...scenario.polities]

@@ -21,6 +21,7 @@ import {
   commanderIdSchema, formationIdSchema, militaryPostureSchema, peaceOfferIdSchema,
   peaceRegionTransferSchema, reparationSchema, warIdSchema, warReasonSchema,
 } from './military.js';
+import { cultureIdSchema, identityPolicySchema, religionIdSchema } from './society.js';
 
 export const investInRegionCommandSchema = z
   .object({
@@ -203,6 +204,18 @@ export const politicsCommandSchema = z.discriminatedUnion('kind', [
   abdicateCommandSchema, createCharacterCommandSchema,
 ]);
 
+export const setIdentityPolicyCommandSchema = z.object({
+  kind: z.literal('identity.set-policy'), ...statecraftCommandFields,
+  domain: z.enum(['culture', 'religion']), policy: identityPolicySchema,
+}).strict();
+export const setCultureAcceptanceCommandSchema = z.object({ kind: z.literal('identity.set-culture-acceptance'), ...statecraftCommandFields,
+  domain: z.literal('culture'), identityId: cultureIdSchema, accepted: z.boolean() }).strict();
+export const setReligionAcceptanceCommandSchema = z.object({ kind: z.literal('identity.set-religion-acceptance'), ...statecraftCommandFields,
+  domain: z.literal('religion'), identityId: religionIdSchema, accepted: z.boolean() }).strict();
+export type IdentityCommand = z.infer<typeof setIdentityPolicyCommandSchema>
+  | z.infer<typeof setCultureAcceptanceCommandSchema> | z.infer<typeof setReligionAcceptanceCommandSchema>;
+export const identityCommandSchema = z.discriminatedUnion('kind', [setIdentityPolicyCommandSchema, setCultureAcceptanceCommandSchema, setReligionAcceptanceCommandSchema]);
+
 export const declareWarCommandSchema = z.object({
   kind: z.literal('war.declare'), ...statecraftCommandFields,
   warId: warIdSchema, defenderPolityId: polityIdSchema, reason: warReasonSchema,
@@ -275,6 +288,9 @@ export const econCommandSchema = z.discriminatedUnion('kind', [
   issueMilitaryOrderCommandSchema,
   proposePeaceCommandSchema,
   respondPeaceCommandSchema,
+  setIdentityPolicyCommandSchema,
+  setCultureAcceptanceCommandSchema,
+  setReligionAcceptanceCommandSchema,
 ]);
 export type EconCommand = z.infer<typeof econCommandSchema>;
 
@@ -326,6 +342,9 @@ export const REJECTION_REASONS = [
   'not-at-war',
   'disconnected-front',
   'illegal-peace-term',
+  'unknown-identity',
+  'unknown-capability',
+  'missing-prerequisite',
 ] as const;
 export type RejectionReason = (typeof REJECTION_REASONS)[number];
 

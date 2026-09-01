@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { gameDateSchema, polityIdSchema, regionIdSchema } from '@open-historia/domain';
+import { capabilityIdSchema } from './society.js';
 
 const nonNegInt = z.number().int().nonnegative();
 const positiveInt = z.number().int().positive();
@@ -52,6 +53,7 @@ export const projectEffectSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('capacity'), capacity: capacityKindSchema, amount: positiveInt }).strict(),
   z.object({ kind: z.literal('credit-limit'), amount: positiveInt }).strict(),
   z.object({ kind: z.literal('reveal-intelligence') }).strict(),
+  z.object({ kind: z.literal('unlock-capability'), capabilityId: capabilityIdSchema }).strict(),
 ]);
 
 export const projectTemplateSchema = z.object({

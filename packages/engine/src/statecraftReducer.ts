@@ -9,6 +9,7 @@ import {
   type IntelligenceState,
   type ProjectsState,
 } from './statecraft.js';
+import { capabilityCapacityBonus, type CapabilityState } from './society.js';
 
 export interface MutableStatecraftPolity { id: PolityId; treasury: number }
 
@@ -27,6 +28,7 @@ export interface ProjectAllocationRecord {
   capacityUsed: number;
   outcome: 'advanced' | 'completed' | 'capacity-blocked' | 'budget-blocked';
 }
+export interface CapabilityUnlockRecord { polityId: PolityId; capabilityId: string; projectId: string }
 
 export interface FinanceResolutionRecord extends FinanceCommandFlow {
   taxBase: number;
@@ -48,7 +50,8 @@ export type StatecraftEngineEvent =
   | { type: 'project-updated'; polityId: PolityId; projectId: string }
   | { type: 'project-cancelled'; polityId: PolityId; projectId: string }
   | { type: 'project-completed'; polityId: PolityId; projectId: string }
-  | { type: 'intelligence-revealed'; polityId: PolityId; factId: string };
+  | { type: 'intelligence-revealed'; polityId: PolityId; factId: string }
+  | { type: 'capability-unlocked'; polityId: PolityId; capabilityId: string; projectId: string };
 
 const cloneFinance = (state: FinanceState): FinanceState => ({
   polities: state.polities.map((entry) => ({ ...entry, priorities: { ...entry.priorities } })),
@@ -62,6 +65,10 @@ const cloneProjects = (state: ProjectsState): ProjectsState => ({
 const cloneIntelligence = (state: IntelligenceState): IntelligenceState => ({
   truths: state.truths.map((entry) => ({ ...entry, summary: { ...entry.summary } })),
   knownFacts: state.knownFacts.map((entry) => ({ ...entry })),
+});
+const cloneCapabilities = (state: CapabilityState): CapabilityState => ({
+  catalog: state.catalog.map((entry) => ({ ...entry, displayName: { ...entry.displayName }, prerequisiteIds: [...entry.prerequisiteIds], modifier: { ...entry.modifier } })),
+  unlocked: state.unlocked.map((entry) => ({ ...entry })),
 });
 
 const defaultFinance = (state: EconWorldState): FinanceState => ({
@@ -142,6 +149,20 @@ export function applyStatecraftCommands(
       if (projects.projects.filter((entry) => entry.actorPolityId === actor.id && entry.status === 'active').length >= 8) { reject(command, 'command-limit', 'at most eight active projects per polity'); continue; }
       const template = projects.templates.find((entry) => entry.templateId === command.templateId);
       if (!template) { reject(command, 'unknown-template', `no template ${command.templateId}`); continue; }
+      if (template.effect.kind === 'unlock-capability') {
+        const targetCapabilityId = template.effect.capabilityId;
+        if (state.modules?.technology !== true || !state.capabilities) { reject(command, 'module-disabled', 'technology module is not enabled'); continue; }
+        const definition = state.capabilities.catalog.find((entry) => entry.capabilityId === targetCapabilityId);
+        const unlocked = new Set(state.capabilities.unlocked.filter((entry) => entry.polityId === actor.id).map((entry) => entry.capabilityId));
+        if (!definition) { reject(command, 'unknown-capability', `no capability ${targetCapabilityId}`); continue; }
+        if (unlocked.has(definition.capabilityId)) { reject(command, 'invalid-target', `${definition.capabilityId} is already unlocked`); continue; }
+        if (definition.prerequisiteIds.some((entry) => !unlocked.has(entry))) { reject(command, 'missing-prerequisite', `missing prerequisite for ${definition.capabilityId}`); continue; }
+        if (projects.projects.some((entry) => entry.actorPolityId === actor.id && entry.status === 'active'
+          && projects!.templates.find((candidate) => candidate.templateId === entry.templateId)?.effect.kind === 'unlock-capability'
+          && (projects!.templates.find((candidate) => candidate.templateId === entry.templateId)?.effect as { capabilityId?: string }).capabilityId === targetCapabilityId)) {
+          reject(command, 'duplicate-id', `${definition.capabilityId} already has active research`); continue;
+        }
+      }
       let selectedTargetFactId = command.targetFactId;
       if (template.effect.kind === 'infrastructure') {
         const region = regions.find((entry) => entry.regionId === command.targetRegionId);
@@ -201,6 +222,7 @@ export function resolveStatecraftMonth(
   finance: FinanceState | undefined,
   projects: ProjectsState | undefined,
   intelligence: IntelligenceState | undefined,
+  openingCapabilities: CapabilityState | undefined,
   commandFlows: FinanceCommandFlow[],
   polities: MutableStatecraftPolity[],
   regions: EconRegionState[],
@@ -210,14 +232,18 @@ export function resolveStatecraftMonth(
   finance: FinanceState | undefined;
   projects: ProjectsState | undefined;
   intelligence: IntelligenceState | undefined;
+  capabilities: CapabilityState | undefined;
   financeRecords: FinanceResolutionRecord[];
   allocations: ProjectAllocationRecord[];
+  capabilityUnlocks: CapabilityUnlockRecord[];
   events: StatecraftEngineEvent[];
   trustPenalties: Array<{ polityId: PolityId; delta: number }>;
 } {
   const polityById = new Map(polities.map((entry) => [entry.id, entry]));
   const flowById = new Map(commandFlows.map((entry) => [entry.polityId, entry]));
   const allocations: ProjectAllocationRecord[] = [];
+  const capabilityUnlocks: CapabilityUnlockRecord[] = [];
+  const capabilities = openingCapabilities ? cloneCapabilities(openingCapabilities) : undefined;
   const events: StatecraftEngineEvent[] = [];
   const trustPenalties: Array<{ polityId: PolityId; delta: number }> = [];
 
@@ -225,7 +251,11 @@ export function resolveStatecraftMonth(
     for (const polity of polities) {
       const financeRow = finance.polities.find((entry) => entry.polityId === polity.id)!;
       const capacity = projects.capacities.find((entry) => entry.polityId === polity.id)!;
-      const remainingCapacity = { administration: capacity.administration, science: capacity.science, industry: capacity.industry };
+      const remainingCapacity = {
+        administration: capacity.administration + capabilityCapacityBonus(openingCapabilities, polity.id, 'administration'),
+        science: capacity.science + capabilityCapacityBonus(openingCapabilities, polity.id, 'science'),
+        industry: capacity.industry + capabilityCapacityBonus(openingCapabilities, polity.id, 'industry'),
+      };
       const categoryRemaining = Object.fromEntries(Object.entries(financeRow.priorities).map(([key, share]) => [key, Math.floor((polity.treasury * share) / 10000)])) as Record<keyof typeof financeRow.priorities, number>;
       const active = projects.projects.filter((entry) => entry.actorPolityId === polity.id && entry.status === 'active')
         .sort((a, b) => b.priority - a.priority || a.projectId.localeCompare(b.projectId));
@@ -256,11 +286,19 @@ export function resolveStatecraftMonth(
             capacity[template.effect.capacity] += template.effect.amount;
           } else if (template.effect.kind === 'credit-limit') {
             financeRow.creditLimit += template.effect.amount;
-          } else {
+          } else if (template.effect.kind === 'reveal-intelligence') {
             const fact = intelligence?.truths.find((entry) => entry.factId === project.targetFactId);
             if (fact && intelligence && !intelligence.knownFacts.some((entry) => entry.observerPolityId === polity.id && entry.factId === fact.factId)) {
               intelligence.knownFacts.push({ observerPolityId: polity.id, factId: fact.factId, confidence: 'high', observedMonth: state.month, source: 'intelligence', evidenceId: fact.evidenceId, staleAfterMonths: 12 });
               events.push({ type: 'intelligence-revealed', polityId: polity.id, factId: fact.factId });
+            }
+          } else if (template.effect.kind === 'unlock-capability' && capabilities) {
+            const capabilityId = template.effect.capabilityId;
+            if (!capabilities.unlocked.some((entry) => entry.polityId === polity.id && entry.capabilityId === capabilityId)) {
+              capabilities.unlocked.push({ polityId: polity.id, capabilityId,
+                unlockedMonth: state.month, sourceProjectId: project.projectId });
+              capabilityUnlocks.push({ polityId: polity.id, capabilityId, projectId: project.projectId });
+              events.push({ type: 'capability-unlocked', polityId: polity.id, capabilityId, projectId: project.projectId });
             }
           }
           const familiar = projects.familiarity.find((entry) => entry.polityId === polity.id && entry.templateId === template.templateId);
@@ -298,5 +336,6 @@ export function resolveStatecraftMonth(
       financeRecords.push({ ...flow, taxBase: taxBaseByPolity.get(row.polityId) ?? 0, taxEffective: taxEffectiveByPolity.get(row.polityId) ?? 0, interestAccrued: accrued.q, interestPaid, automaticHaircut, defaulted, debtOpening, debtClosing: row.debtPrincipal, creditLimitClosing: row.creditLimit });
     }
   }
-  return { finance, projects, intelligence, financeRecords, allocations, events, trustPenalties };
+  capabilities?.unlocked.sort((a, b) => `${a.polityId}|${a.capabilityId}`.localeCompare(`${b.polityId}|${b.capabilityId}`));
+  return { finance, projects, intelligence, capabilities, financeRecords, allocations, capabilityUnlocks, events, trustPenalties };
 }

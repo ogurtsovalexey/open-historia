@@ -11,6 +11,7 @@ import DiplomacyPane from "./diplomacy.jsx";
 import StatecraftPane from "./statecraft.jsx";
 import PoliticsPane from "./politics.jsx";
 import MilitaryPane from "./military.jsx";
+import SocietyPane from "./society.jsx";
 
 Chart.register(...registerables);
 
@@ -183,6 +184,7 @@ const TabButton = ({ icon, label, active, onClick }) => (
         fontWeight: active ? 700 : 500,
         gap: "0.4rem",
         padding: "0.9rem 0.85rem",
+        flexShrink: 0,
     }}
     >
     <span style={{ fontSize: "1rem" }}>{icon}</span> {label}
@@ -378,12 +380,13 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
             </div>
         )}
         {/* Header: tabs to flip between the advisor chat and national stats. */}
-        <div style={{ alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", display: "flex", padding: "0 0.75rem 0 0.35rem" }}>
+        <div style={{ alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", display: "flex", overflowX: "auto", padding: "0 0.75rem 0 0.35rem" }}>
         <TabButton icon="🏭" label="Economy" active={activeTab === "economy"} onClick={() => setActiveTab("economy")} />
         <TabButton icon="🤝" label="Diplomacy" active={activeTab === "diplomacy"} onClick={() => setActiveTab("diplomacy")} />
         <TabButton icon="🏛" label="Statecraft" active={activeTab === "statecraft"} onClick={() => setActiveTab("statecraft")} />
         <TabButton icon="⚖" label="Politics" active={activeTab === "politics"} onClick={() => setActiveTab("politics")} />
         <TabButton icon="⚔" label="War" active={activeTab === "military"} onClick={() => setActiveTab("military")} />
+        <TabButton icon="🧬" label="Society" active={activeTab === "society"} onClick={() => setActiveTab("society")} />
         <TabButton icon="🧭" label="Advisor" active={activeTab === "advisor"} onClick={() => setActiveTab("advisor")} />
         <TabButton icon="📊" label="Stats" active={activeTab === "stats"} onClick={() => setActiveTab("stats")} />
         <div style={{ flex: 1 }} />
@@ -424,6 +427,10 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
 
         <div style={{ display: activeTab === "military" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
         <MilitaryPane active={isAdvisorOpen && activeTab === "military"} />
+        </div>
+
+        <div style={{ display: activeTab === "society" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
+        <SocietyPane active={isAdvisorOpen && activeTab === "society"} />
         </div>
 
         {/* National stats pane — kept mounted so flipping tabs is instant. */}

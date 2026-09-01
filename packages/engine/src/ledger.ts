@@ -7,9 +7,11 @@ import type { ResourceId } from './scenario.js';
 import type { EconWorldState } from './state.js';
 import { getStock } from './state.js';
 import type { ResourceTransferRecord, TradeExecutionRecord, TreasuryTransferRecord } from './diplomacyReducer.js';
-import type { FinanceResolutionRecord, ProjectAllocationRecord } from './statecraftReducer.js';
+import type { CapabilityUnlockRecord, FinanceResolutionRecord, ProjectAllocationRecord } from './statecraftReducer.js';
 import type { PoliticalCommandRecord, PoliticalResolutionRecord } from './politicsReducer.js';
 import type { CombatRecord, MilitaryCommandRecord, MilitaryTreasuryTransfer } from './militaryReducer.js';
+import type { IdentityCommandRecord, PolityIdentityRecord, RegionIdentityRecord } from './identityReducer.js';
+import { capabilityCapacityBonus, compositionShares } from './society.js';
 
 export interface RegionPopulationRow {
   regionId: RegionId;
@@ -124,6 +126,12 @@ export interface TurnLedger {
   statecraft?: {
     finance: FinanceResolutionRecord[];
     projectAllocations: ProjectAllocationRecord[];
+    capabilityUnlocks?: CapabilityUnlockRecord[];
+  };
+  identity?: {
+    commands: IdentityCommandRecord[];
+    polities: PolityIdentityRecord[];
+    regions: RegionIdentityRecord[];
   };
   politics?: {
     commands: PoliticalCommandRecord[];
@@ -249,7 +257,8 @@ export function checkInvariants(
     for (const capacity of prev.projects?.capacities ?? next.projects?.capacities ?? []) {
       for (const kind of ['administration', 'science', 'industry'] as const) {
         const used = capacityUsed.get(`${capacity.polityId}|${kind}`) ?? 0;
-        if (used > capacity[kind]) fail('project-capacity-conservation', `${capacity.polityId}/${kind}: used ${used} > ${capacity[kind]}`);
+        const available = capacity[kind] + capabilityCapacityBonus(prev.capabilities, capacity.polityId, kind);
+        if (used > available) fail('project-capacity-conservation', `${capacity.polityId}/${kind}: used ${used} > ${available}`);
       }
     }
     checked.push('debt-identity', 'project-budget-conservation', 'project-capacity-conservation');
@@ -371,6 +380,35 @@ export function checkInvariants(
       }
     }
     checked.push('military-manpower-conservation', 'military-equipment-conservation', 'occupation-control-integrity', 'military-treasury-conservation', 'military-supply-bounds');
+  }
+
+  if (next.capabilities) {
+    const catalog = new Map(next.capabilities.catalog.map((entry) => [entry.capabilityId, entry]));
+    const seen = new Set<string>();
+    for (const unlocked of next.capabilities.unlocked) {
+      const key = `${unlocked.polityId}|${unlocked.capabilityId}`;
+      if (seen.has(key)) fail('capability-uniqueness', `${key} is unlocked twice`);
+      seen.add(key);
+      const definition = catalog.get(unlocked.capabilityId);
+      if (!definition) return fail('capability-catalog-integrity', `${unlocked.capabilityId} is not in the catalog`);
+      const polityUnlocked = new Set(next.capabilities.unlocked.filter((entry) => entry.polityId === unlocked.polityId).map((entry) => entry.capabilityId));
+      if (definition.prerequisiteIds.some((entry) => !polityUnlocked.has(entry))) fail('capability-prerequisites', `${key} lacks a prerequisite`);
+    }
+    checked.push('capability-uniqueness', 'capability-catalog-integrity', 'capability-prerequisites');
+  }
+
+  if (next.identity) {
+    const regionIds = new Set(next.regions.map((entry) => entry.regionId));
+    if (next.identity.regions.length !== regionIds.size) fail('identity-region-coverage', 'identity rows do not cover every region exactly once');
+    for (const row of next.identity.regions) {
+      if (!regionIds.has(row.regionId)) fail('identity-region-coverage', `${row.regionId} is not a world region`);
+      for (const [domain, composition] of [['culture', row.culture], ['religion', row.religion]] as const) {
+        const shares = [...compositionShares(composition).values()];
+        if (shares.reduce((sum, entry) => sum + entry, 0) !== 10000) fail('identity-share-conservation', `${row.regionId}/${domain} does not total 10000`);
+        if (shares.some((entry) => entry <= 0) || shares[0] !== Math.max(...shares)) fail('identity-primary-integrity', `${row.regionId}/${domain} has invalid primary`);
+      }
+    }
+    checked.push('identity-region-coverage', 'identity-share-conservation', 'identity-primary-integrity');
   }
 
   if (next.turn !== prev.turn + 1) fail('turn-increment', `${prev.turn} -> ${next.turn}`);

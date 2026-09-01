@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   buildOwnershipOverrides, checkMapLink, initState, parseMapLink, parseScenario,
-  parseTurnCommands, parseWorldState, runTurn,
+  parseTurnCommands, parseWorldState, polityIdentityEffects, runTurn,
 } from "@open-historia/engine";
 import { getGameDetails, getGameDirectory, invalidateLibraryCatalogs } from "./libraryStore.js";
 import {
@@ -172,6 +172,25 @@ const militaryForPlayer = (state, playerId) => {
   };
 };
 
+const societyForPlayer = (state, playerId) => {
+  if (!state.capabilities && !state.identity) return null;
+  const unlocked = (state.capabilities?.unlocked ?? []).filter((entry) => entry.polityId === playerId);
+  const unlockedIds = new Set(unlocked.map((entry) => entry.capabilityId));
+  const controlled = new Set(state.regions.filter((entry) => entry.controllerId === playerId).map((entry) => entry.regionId));
+  return {
+    capabilities: { catalog: state.capabilities?.catalog ?? [], unlocked },
+    identity: state.identity ? {
+      polity: state.identity.polities.find((entry) => entry.polityId === playerId) ?? null,
+      regions: state.identity.regions.filter((entry) => controlled.has(entry.regionId)),
+      cultures: state.identity.cultures,
+      religions: state.identity.religions,
+      aggregate: polityIdentityEffects(state.identity, state.regions, playerId),
+    } : null,
+    researchTemplates: (state.projects?.templates ?? []).filter((entry) => entry.effect.kind === "unlock-capability")
+      .map((entry) => ({ ...entry, unlocked: unlockedIds.has(entry.effect.capabilityId) })),
+  };
+};
+
 const turnForPlayer = (turn, playerId) => {
   if (!turn?.ledger) return turn;
   const involved = (entry) => entry.fromPolityId === playerId || entry.toPolityId === playerId;
@@ -187,6 +206,12 @@ const turnForPlayer = (turn, playerId) => {
       ...(turn.ledger.statecraft ? { statecraft: {
         finance: turn.ledger.statecraft.finance.filter((entry) => entry.polityId === playerId),
         projectAllocations: turn.ledger.statecraft.projectAllocations.filter((entry) => entry.polityId === playerId),
+        capabilityUnlocks: (turn.ledger.statecraft.capabilityUnlocks ?? []).filter((entry) => entry.polityId === playerId),
+      } } : {}),
+      ...(turn.ledger.identity ? { identity: {
+        commands: turn.ledger.identity.commands.filter((entry) => entry.polityId === playerId),
+        polities: turn.ledger.identity.polities.filter((entry) => entry.polityId === playerId),
+        regions: turn.ledger.identity.regions.filter((entry) => entry.polityId === playerId),
       } } : {}),
       ...(turn.ledger.politics ? { politics: {
         commands: turn.ledger.politics.commands.filter((entry) => entry.polityId === playerId),
@@ -226,6 +251,7 @@ const makeSnapshot = (game, fixture, session, actualMonthlyTicks = session.manif
     statecraft: statecraftForPlayer(state, playerId),
     politics: politicsForPlayer(state, playerId),
     military: militaryForPlayer(state, playerId),
+    society: societyForPlayer(state, playerId),
     polities: state.polities,
     regions: state.regions,
     ownershipOverrides: ownership,

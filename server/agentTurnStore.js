@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { exportJsonSchema } from "@open-historia/domain";
-import { parseTurnCommands, runTurn } from "@open-historia/engine";
+import { parseTurnCommands, polityIdentityEffects, runTurn } from "@open-historia/engine";
 import {
   EMPTY_AGENT_STATE,
   agentStateSchema,
@@ -155,6 +155,36 @@ const militaryInterpreterContext = (state, playerPolityId) => {
   };
 };
 
+const societyInterpreterContext = (state, playerPolityId) => {
+  const polity = state.identity?.polities.find((entry) => entry.polityId === playerPolityId);
+  const controlled = new Set(state.regions.filter((entry) => entry.controllerId === playerPolityId).map((entry) => entry.regionId));
+  const rows = (state.identity?.regions ?? []).filter((entry) => controlled.has(entry.regionId));
+  const candidates = [...new Set(rows.flatMap((entry) => [entry.culture.primaryId,
+    ...entry.culture.minorities.map((minority) => minority.identityId), entry.religion.primaryId,
+    ...entry.religion.minorities.map((minority) => minority.identityId)]))].sort().slice(0, 6);
+  const unlockedIds = new Set((state.capabilities?.unlocked ?? []).filter((entry) => entry.polityId === playerPolityId)
+    .map((entry) => entry.capabilityId));
+  const activeTemplates = new Set((state.projects?.projects ?? []).filter((entry) => entry.actorPolityId === playerPolityId && entry.status === "active")
+    .map((entry) => entry.templateId));
+  const researchTemplates = (state.projects?.templates ?? []).filter((entry) => {
+    if (entry.effect.kind !== "unlock-capability" || unlockedIds.has(entry.effect.capabilityId) || activeTemplates.has(entry.templateId)) return false;
+    const definition = state.capabilities?.catalog.find((candidate) => candidate.capabilityId === entry.effect.capabilityId);
+    return definition?.prerequisiteIds.every((candidate) => unlockedIds.has(candidate)) === true;
+  }).sort((left, right) => left.templateId.localeCompare(right.templateId)).slice(0, 6).map((entry) => ({
+    templateId: entry.templateId, totalCost: entry.totalCost, durationMonths: entry.durationMonths,
+    capacity: entry.capacity, effect: entry.effect,
+  }));
+  return {
+    capabilities: (state.capabilities?.catalog ?? []).filter((entry) => unlockedIds.has(entry.capabilityId))
+      .map((entry) => ({ capabilityId: entry.capabilityId, domain: entry.domain, modifier: entry.modifier })),
+    researchTemplates,
+    identity: polity ? { officialCultureId: polity.officialCultureId, acceptedCultureIds: polity.acceptedCultureIds,
+      culturePolicy: polity.culturePolicy, officialReligionId: polity.officialReligionId,
+      acceptedReligionIds: polity.acceptedReligionIds, religionPolicy: polity.religionPolicy,
+      aggregate: polityIdentityEffects(state.identity, state.regions, playerPolityId), candidates } : null,
+  };
+};
+
 const interpreterTasks = (draft) => {
   const chunks = [];
   let current = [];
@@ -173,7 +203,7 @@ const interpreterTasks = (draft) => {
     taskId: "orders.interpret-economy",
     taskVersion: 1,
     taskKey: `interpreter-${index}`,
-    systemPrompt: "Route every player action exactly once. Investment, enabled political and enabled military actions become typed commands. War declarations, mobilization, formation orders and peace may use only the supplied actors, formations, reserves, wars, offers and bounded region candidates; never predict combat or numeric effects. For a new historical or fictional character, propose only a supplied faction, one qualitative aptitude trait, loyalty band and ambition band; the engine owns numeric traits and the player must confirm. Requests to inspect, summarize, brief or report use disposition report with command null. Unavailable mechanics use unsupported. Never invent effects, ids, regions, forces or existing characters.",
+    systemPrompt: "Route every player action exactly once. Investment, enabled statecraft, political, military and identity actions become typed commands. Identity changes may use only supplied policies and identity candidates; capability research uses only supplied project templates. War declarations, mobilization, formation orders and peace may use only the supplied actors, formations, reserves, wars, offers and bounded region candidates; never predict combat or numeric effects. For a new historical or fictional character, propose only a supplied faction, one qualitative aptitude trait, loyalty band and ambition band; the engine owns numeric traits and the player must confirm. Requests to inspect, summarize, brief or report use disposition report with command null. Unavailable mechanics use unsupported. Never invent effects, ids, regions, forces or existing characters.",
     userPrompt: JSON.stringify({
       polityId: draft.playerPolityId,
       month: draft.state.month,
@@ -190,6 +220,7 @@ const interpreterTasks = (draft) => {
         allowedCharacterBands: ["low", "medium", "high"],
       } : null,
       military: militaryInterpreterContext(draft.state, draft.playerPolityId),
+      society: societyInterpreterContext(draft.state, draft.playerPolityId),
       actions,
     }),
     tool: { name: "submit_player_economy_orders", description: "Submit the strict interpretation", schema: toolSchema },
@@ -226,12 +257,13 @@ const makeStrategicTasks = (draft) => {
   draft.pendingStrategicBatch = batch;
   const schema = withoutModelCommandIds(exportJsonSchema(opponentDiplomacyBatchResultSchema));
   draft.tasks = [{
-    taskId: draft.state.modules?.combat ? "opponents.plan-war"
+    taskId: draft.state.modules?.societyAndIdentity || draft.state.modules?.technology ? "opponents.plan-society"
+      : draft.state.modules?.combat ? "opponents.plan-war"
       : draft.state.modules?.politics ? "opponents.plan-politics"
       : draft.state.modules?.finance || draft.state.modules?.projects ? "opponents.plan-statecraft" : "opponents.plan-diplomacy",
     taskVersion: 1,
     taskKey: batch.batchId,
-    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity and at most one material command. Use hold with a null command unless diplomacy, trade, finance, a listed project, active faction crisis or public war state justifies action. War, mobilization, formation orders and peace terms may use only supplied formations, reserves, wars, offers and bounded region candidates. Political responses may name only a listed faction; shared batches may not appoint, create or replace characters. Intelligence may target a polity but must never name a hidden fact id. Commands must use the supplied month and revision. Do not invent actors, resources, routes, templates, regions, forces, effects or outcomes.",
+    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity and at most one material command. Use hold with a null command unless diplomacy, trade, finance, a listed project, aggregate identity pressure, active faction crisis or public war state justifies action. Identity changes may use only supplied policies and at most six supplied candidates; never infer regional composition. War, mobilization, formation orders and peace terms may use only supplied formations, reserves, wars, offers and bounded region candidates. Political responses may name only a listed faction; shared batches may not appoint, create or replace characters. Intelligence may target a polity but must never name a hidden fact id. Commands must use the supplied month and revision. Do not invent actors, resources, routes, templates, regions, forces, capabilities, effects or outcomes.",
     userPrompt: JSON.stringify({ month: batch.month, revision: batch.baseRevision, briefs: batch.briefs }),
     tool: { name: "submit_opponent_strategy_decisions", description: "Submit every requested polity strategic decision", schema },
     context: { fullMapIncluded: false, characterCount: batch.characterCount, polityCount: batch.polityIds.length },
@@ -327,6 +359,7 @@ const validatePlayerInterpretations = (draft, outputs) => {
   if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error("interpreter must return every and only submitted action id");
   const controlled = new Set(draft.state.regions.filter((entry) => entry.controllerId === draft.playerPolityId).map((entry) => entry.regionId));
   const military = militaryInterpreterContext(draft.state, draft.playerPolityId);
+  const society = societyInterpreterContext(draft.state, draft.playerPolityId);
   const commands = actions.flatMap((entry) => entry.command ? [entry.command] : []);
   if (commands.length + draft.playerCommands.length > 8) throw new Error("a player month permits at most eight commands");
   if (commands.filter((command) => command.kind === "economy.invest-region").length
@@ -356,6 +389,10 @@ const validatePlayerInterpretations = (draft, outputs) => {
     if (command.kind === "peace.propose" && (!military?.wars.some((entry) => entry.warId === command.warId && entry.status === "active")
       || command.regionTransfers.some((transfer) => !military.peaceRegionCandidates.some((entry) => entry.regionId === transfer.regionId && entry.actualControllerId === transfer.toPolityId)))) throw new Error("player peace proposal is outside bounded occupied-region candidates");
     if (command.kind === "peace.respond" && !military?.peaceOffers.some((entry) => entry.offerId === command.offerId && entry.recipientPolityId === draft.playerPolityId && entry.status === "pending")) throw new Error("player peace response names an unavailable offer");
+    if (command.kind.startsWith("identity.") && (!society.identity
+      || ("identityId" in command && !society.identity.candidates.includes(command.identityId)))) throw new Error("player identity command names an unavailable identity");
+    if (command.kind === "project.start" && (!society.researchTemplates.some((entry) => entry.templateId === command.templateId)
+      || command.targetFactId || command.targetPolityId || command.targetRegionId)) throw new Error("player research command names an unavailable capability project");
     if (command.expectedRevision !== draft.state.revision || command.effectiveMonth !== draft.state.month) throw new Error("player command is stale or for the wrong month");
   }
   draft.playerCommands.push(...commands);
@@ -389,6 +426,13 @@ const validatePlayerInterpretations = (draft, outputs) => {
         reparation: entry.command.reparation,
       } : entry.command.kind === "peace.respond" ? {
         offerId: entry.command.offerId, response: entry.command.response,
+      } : entry.command.kind === "identity.set-policy" ? {
+        domain: entry.command.domain, policy: entry.command.policy,
+      } : entry.command.kind === "identity.set-culture-acceptance" || entry.command.kind === "identity.set-religion-acceptance" ? {
+        domain: entry.command.domain, identityId: entry.command.identityId, accepted: entry.command.accepted,
+      } : entry.command.kind === "project.start" ? {
+        projectId: entry.command.projectId, templateId: entry.command.templateId,
+        monthlyFunding: entry.command.monthlyFunding, priority: entry.command.priority,
       } : {}),
     } : null,
   }));

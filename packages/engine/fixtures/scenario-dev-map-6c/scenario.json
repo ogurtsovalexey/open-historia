@@ -25,7 +25,9 @@
     "intelligence": true,
     "politics": true,
     "armedForces": true,
-    "combat": true
+    "combat": true,
+    "technology": true,
+    "societyAndIdentity": true
   },
   "economy": {
     "foodNeedPerPersonMilli": 50,
@@ -3245,6 +3247,63 @@
         "effect": {
           "kind": "reveal-intelligence"
         }
+      },
+      {
+        "templateId": "project-template:industrial-standardization",
+        "displayName": {
+          "en": "Industrial standardization",
+          "ru": "Промышленная стандартизация"
+        },
+        "kind": "research",
+        "budgetCategory": "science",
+        "totalCost": 300,
+        "durationMonths": 2,
+        "capacity": {
+          "kind": "science",
+          "amount": 1
+        },
+        "effect": {
+          "kind": "unlock-capability",
+          "capabilityId": "capability:industrial-standardization"
+        }
+      },
+      {
+        "templateId": "project-template:modern-logistics",
+        "displayName": {
+          "en": "Modern logistics",
+          "ru": "Современная логистика"
+        },
+        "kind": "research",
+        "budgetCategory": "science",
+        "totalCost": 400,
+        "durationMonths": 2,
+        "capacity": {
+          "kind": "science",
+          "amount": 1
+        },
+        "effect": {
+          "kind": "unlock-capability",
+          "capabilityId": "capability:modern-logistics"
+        }
+      },
+      {
+        "templateId": "project-template:radio-command",
+        "displayName": {
+          "en": "Radio command",
+          "ru": "Радиокомандование"
+        },
+        "kind": "research",
+        "budgetCategory": "science",
+        "totalCost": 500,
+        "durationMonths": 3,
+        "capacity": {
+          "kind": "science",
+          "amount": 1
+        },
+        "effect": {
+          "kind": "unlock-capability",
+          "capabilityId": "capability:radio-command"
+        }
       }
     ],
     "intelligenceFacts": [
@@ -3351,6 +3410,1023 @@
         "confidence": "high",
         "evidenceId": "evidence:scenario-1938-slovakia-brief",
         "staleAfterMonths": 24
+      }
+    ]
+  },
+  "capabilities": {
+    "catalog": [
+      {
+        "capabilityId": "capability:industrial-standardization",
+        "displayName": {
+          "en": "Industrial standardization",
+          "ru": "Промышленная стандартизация"
+        },
+        "domain": "economy",
+        "prerequisiteIds": [],
+        "modifier": {
+          "kind": "processing-output",
+          "bonusBp": 1000
+        }
+      },
+      {
+        "capabilityId": "capability:modern-logistics",
+        "displayName": {
+          "en": "Modern logistics",
+          "ru": "Современная логистика"
+        },
+        "domain": "military",
+        "prerequisiteIds": [],
+        "modifier": {
+          "kind": "land-supply",
+          "bonusBp": 1500
+        }
+      },
+      {
+        "capabilityId": "capability:radio-command",
+        "displayName": {
+          "en": "Radio command",
+          "ru": "Радиокомандование"
+        },
+        "domain": "administration",
+        "prerequisiteIds": [
+          "capability:modern-logistics"
+        ],
+        "modifier": {
+          "kind": "project-capacity",
+          "capacity": "science",
+          "amount": 1
+        }
+      }
+    ],
+    "starting": []
+  },
+  "identity": {
+    "cultures": [
+      {
+        "cultureId": "culture:austrian",
+        "displayName": {
+          "en": "Austrian",
+          "ru": "Австрийцы"
+        }
+      },
+      {
+        "cultureId": "culture:czech",
+        "displayName": {
+          "en": "Czech",
+          "ru": "Чехи"
+        }
+      },
+      {
+        "cultureId": "culture:french",
+        "displayName": {
+          "en": "French",
+          "ru": "Французы"
+        }
+      },
+      {
+        "cultureId": "culture:german",
+        "displayName": {
+          "en": "German",
+          "ru": "Немцы"
+        }
+      },
+      {
+        "cultureId": "culture:polish",
+        "displayName": {
+          "en": "Polish",
+          "ru": "Поляки"
+        }
+      },
+      {
+        "cultureId": "culture:slovak",
+        "displayName": {
+          "en": "Slovak",
+          "ru": "Словаки"
+        }
+      }
+    ],
+    "religions": [
+      {
+        "religionId": "religion:catholic",
+        "displayName": {
+          "en": "Catholic",
+          "ru": "Католицизм"
+        }
+      },
+      {
+        "religionId": "religion:protestant",
+        "displayName": {
+          "en": "Protestant",
+          "ru": "Протестантизм"
+        }
+      },
+      {
+        "religionId": "religion:orthodox",
+        "displayName": {
+          "en": "Orthodox",
+          "ru": "Православие"
+        }
+      }
+    ],
+    "regions": [
+      {
+        "regionId": "region:gadm:AUT.9_1",
+        "culture": {
+          "primaryId": "culture:austrian",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:AUT.3_1",
+        "culture": {
+          "primaryId": "culture:austrian",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:AUT.4_1",
+        "culture": {
+          "primaryId": "culture:austrian",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:AUT.1_1",
+        "culture": {
+          "primaryId": "culture:austrian",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:AUT.2_1",
+        "culture": {
+          "primaryId": "culture:austrian",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:AUT.5_1",
+        "culture": {
+          "primaryId": "culture:austrian",
+          "minorities": [
+            {
+              "identityId": "culture:german",
+              "shareBp": 2000
+            }
+          ]
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:AUT.7_1",
+        "culture": {
+          "primaryId": "culture:austrian",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:AUT.8_1",
+        "culture": {
+          "primaryId": "culture:austrian",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:AUT.6_1",
+        "culture": {
+          "primaryId": "culture:austrian",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.11_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.12_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.1_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.2_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.9_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.4_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.5_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.6_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.7_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.13_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.3_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.10_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.8_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:CZE.14_1",
+        "culture": {
+          "primaryId": "culture:czech",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.3_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.9_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.2_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.1_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.4_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.15_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.11_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.8_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.5_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.10_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.13_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.14_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.12_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.16_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.7_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:DEU.6_1",
+        "culture": {
+          "primaryId": "culture:german",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:protestant",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:SVK.2_1",
+        "culture": {
+          "primaryId": "culture:slovak",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:SVK.4_1",
+        "culture": {
+          "primaryId": "culture:slovak",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:SVK.7_1",
+        "culture": {
+          "primaryId": "culture:slovak",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:SVK.5_1",
+        "culture": {
+          "primaryId": "culture:slovak",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:SVK.6_1",
+        "culture": {
+          "primaryId": "culture:slovak",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:SVK.8_1",
+        "culture": {
+          "primaryId": "culture:slovak",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:SVK.1_1",
+        "culture": {
+          "primaryId": "culture:slovak",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:SVK.3_1",
+        "culture": {
+          "primaryId": "culture:slovak",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.1_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.10_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.11_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.12_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.13_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.2_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.3_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.4_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.5_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.6_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.7_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.8_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:FRA.9_1",
+        "culture": {
+          "primaryId": "culture:french",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.1_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.10_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.11_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.12_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.13_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.14_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.15_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.16_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.2_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.3_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.4_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.5_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.6_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.7_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.8_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      },
+      {
+        "regionId": "region:gadm:POL.9_1",
+        "culture": {
+          "primaryId": "culture:polish",
+          "minorities": []
+        },
+        "religion": {
+          "primaryId": "religion:catholic",
+          "minorities": []
+        }
+      }
+    ],
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "officialCultureId": "culture:austrian",
+        "acceptedCultureIds": [
+          "culture:german"
+        ],
+        "culturePolicy": "tolerance",
+        "officialReligionId": "religion:catholic",
+        "acceptedReligionIds": [],
+        "religionPolicy": "tolerance"
+      },
+      {
+        "polityId": "polity:czechia",
+        "officialCultureId": "culture:czech",
+        "acceptedCultureIds": [],
+        "culturePolicy": "tolerance",
+        "officialReligionId": "religion:catholic",
+        "acceptedReligionIds": [],
+        "religionPolicy": "tolerance"
+      },
+      {
+        "polityId": "polity:france",
+        "officialCultureId": "culture:french",
+        "acceptedCultureIds": [],
+        "culturePolicy": "tolerance",
+        "officialReligionId": "religion:catholic",
+        "acceptedReligionIds": [],
+        "religionPolicy": "tolerance"
+      },
+      {
+        "polityId": "polity:germany",
+        "officialCultureId": "culture:german",
+        "acceptedCultureIds": [],
+        "culturePolicy": "tolerance",
+        "officialReligionId": "religion:protestant",
+        "acceptedReligionIds": [],
+        "religionPolicy": "tolerance"
+      },
+      {
+        "polityId": "polity:poland",
+        "officialCultureId": "culture:polish",
+        "acceptedCultureIds": [],
+        "culturePolicy": "tolerance",
+        "officialReligionId": "religion:catholic",
+        "acceptedReligionIds": [],
+        "religionPolicy": "tolerance"
+      },
+      {
+        "polityId": "polity:slovakia",
+        "officialCultureId": "culture:slovak",
+        "acceptedCultureIds": [],
+        "culturePolicy": "tolerance",
+        "officialReligionId": "religion:catholic",
+        "acceptedReligionIds": [],
+        "religionPolicy": "tolerance"
       }
     ]
   },

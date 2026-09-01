@@ -14,6 +14,7 @@ import {
 import { authoredStatecraftSchema } from './statecraft.js';
 import { authoredPoliticsSchema } from './politics.js';
 import { authoredMilitarySchema } from './military.js';
+import { authoredCapabilitiesSchema, authoredIdentitySchema } from './society.js';
 
 /** Game resource catalog per regional-resource-economy.md §2. Engine-owned. */
 export const RESOURCE_CATALOG = [
@@ -140,6 +141,8 @@ export const modulesSchema = z
     finance: z.boolean().optional(),
     intelligence: z.boolean().optional(),
     politics: z.boolean().optional(),
+    societyAndIdentity: z.boolean().optional(),
+    technology: z.boolean().optional(),
     projects: z.boolean().optional(),
     budget: z.boolean().optional(),
     trade: z.boolean().optional(),
@@ -149,7 +152,7 @@ export const modulesSchema = z
   .strict();
 export type Modules = z.infer<typeof modulesSchema>;
 
-export const MODULE_NAMES = ['armedForces', 'combat', 'diplomacy', 'finance', 'intelligence', 'politics', 'projects', 'budget', 'trade', 'shortages', 'unrest'] as const;
+export const MODULE_NAMES = ['armedForces', 'combat', 'diplomacy', 'finance', 'intelligence', 'politics', 'projects', 'societyAndIdentity', 'technology', 'budget', 'trade', 'shortages', 'unrest'] as const;
 export type ModuleName = (typeof MODULE_NAMES)[number];
 
 export const authoredRelationSchema = z.object({
@@ -193,6 +196,10 @@ export const econScenarioSchema = z
     politics: authoredPoliticsSchema.optional(),
     /** Authored manpower ceilings, starting forces, commanders and supply links. */
     military: authoredMilitarySchema.optional(),
+    /** Authored non-linear capability catalog and starting unlocks. */
+    capabilities: authoredCapabilitiesSchema.optional(),
+    /** Authored culture/religion groups, regional composition and state policy. */
+    identity: authoredIdentitySchema.optional(),
     economy: economyParamsSchema,
     polities: z.array(scenarioPolitySchema).min(2),
     regions: z.array(scenarioRegionSchema).min(1),
@@ -220,6 +227,89 @@ export const econScenarioSchema = z
     }
     if (scenario.modules?.combat === true && scenario.modules?.armedForces !== true) {
       ctx.addIssue({ code: 'custom', message: 'combat module requires armedForces', path: ['modules', 'combat'] });
+    }
+    if (scenario.modules?.technology === true && (!scenario.capabilities || scenario.modules?.projects !== true)) {
+      ctx.addIssue({ code: 'custom', message: 'technology requires authored capabilities and projects', path: ['capabilities'] });
+    }
+    if (scenario.modules?.societyAndIdentity === true && !scenario.identity) {
+      ctx.addIssue({ code: 'custom', message: 'societyAndIdentity requires authored identity inputs', path: ['identity'] });
+    }
+    if (scenario.capabilities) {
+      const capabilityIds = new Set(scenario.capabilities.catalog.map((entry) => entry.capabilityId));
+      if (capabilityIds.size !== scenario.capabilities.catalog.length) {
+        ctx.addIssue({ code: 'custom', message: 'capability ids must be unique', path: ['capabilities', 'catalog'] });
+      }
+      for (const [index, capability] of scenario.capabilities.catalog.entries()) {
+        if (new Set(capability.prerequisiteIds).size !== capability.prerequisiteIds.length
+          || capability.prerequisiteIds.includes(capability.capabilityId)
+          || capability.prerequisiteIds.some((entry) => !capabilityIds.has(entry))) {
+          ctx.addIssue({ code: 'custom', message: 'capability prerequisites must be unique known non-self ids', path: ['capabilities', 'catalog', index, 'prerequisiteIds'] });
+        }
+      }
+      const visiting = new Set<string>(); const visited = new Set<string>();
+      const cyclic = (id: string): boolean => {
+        if (visiting.has(id)) return true;
+        if (visited.has(id)) return false;
+        visiting.add(id);
+        const row = scenario.capabilities!.catalog.find((entry) => entry.capabilityId === id);
+        const result = row?.prerequisiteIds.some(cyclic) ?? false;
+        visiting.delete(id); visited.add(id); return result;
+      };
+      if ([...capabilityIds].some(cyclic)) ctx.addIssue({ code: 'custom', message: 'capability prerequisites must be acyclic', path: ['capabilities', 'catalog'] });
+      const startingKeys = new Set<string>();
+      const startingByPolity = new Map<string, Set<string>>();
+      for (const [index, unlock] of scenario.capabilities.starting.entries()) {
+        const key = `${unlock.polityId}|${unlock.capabilityId}`;
+        if (!polityIds.has(unlock.polityId) || !capabilityIds.has(unlock.capabilityId) || startingKeys.has(key)) {
+          ctx.addIssue({ code: 'custom', message: 'starting capability must reference unique known polity/capability', path: ['capabilities', 'starting', index] });
+        }
+        startingKeys.add(key);
+        const entries = startingByPolity.get(unlock.polityId) ?? new Set<string>();
+        entries.add(unlock.capabilityId); startingByPolity.set(unlock.polityId, entries);
+      }
+      for (const [polityId, unlocked] of startingByPolity) {
+        for (const capabilityId of unlocked) {
+          const definition = scenario.capabilities.catalog.find((entry) => entry.capabilityId === capabilityId);
+          if (definition?.prerequisiteIds.some((entry) => !unlocked.has(entry))) {
+            ctx.addIssue({ code: 'custom', message: `starting capability ${capabilityId} lacks a prerequisite for ${polityId}`, path: ['capabilities', 'starting'] });
+          }
+        }
+      }
+      for (const [index, template] of (scenario.statecraft?.projectTemplates ?? []).entries()) {
+        if (template.effect.kind === 'unlock-capability' && !capabilityIds.has(template.effect.capabilityId)) {
+          ctx.addIssue({ code: 'custom', message: 'research template references unknown capability', path: ['statecraft', 'projectTemplates', index, 'effect', 'capabilityId'] });
+        }
+      }
+    }
+    if (scenario.identity) {
+      const cultureIds = new Set(scenario.identity.cultures.map((entry) => entry.cultureId));
+      const religionIds = new Set(scenario.identity.religions.map((entry) => entry.religionId));
+      const regionIds = new Set(scenario.regions.map((entry) => entry.regionId));
+      if (cultureIds.size !== scenario.identity.cultures.length || religionIds.size !== scenario.identity.religions.length) {
+        ctx.addIssue({ code: 'custom', message: 'culture and religion ids must be unique', path: ['identity'] });
+      }
+      if (scenario.identity.regions.length !== regionIds.size || new Set(scenario.identity.regions.map((entry) => entry.regionId)).size !== regionIds.size) {
+        ctx.addIssue({ code: 'custom', message: 'identity requires exactly one row per scenario region', path: ['identity', 'regions'] });
+      }
+      if (scenario.identity.polities.length !== polityIds.size || new Set(scenario.identity.polities.map((entry) => entry.polityId)).size !== polityIds.size) {
+        ctx.addIssue({ code: 'custom', message: 'identity requires exactly one row per scenario polity', path: ['identity', 'polities'] });
+      }
+      for (const [index, row] of scenario.identity.regions.entries()) {
+        if (!regionIds.has(row.regionId) || !cultureIds.has(row.culture.primaryId)
+          || row.culture.minorities.some((entry) => !cultureIds.has(entry.identityId))
+          || !religionIds.has(row.religion.primaryId)
+          || row.religion.minorities.some((entry) => !religionIds.has(entry.identityId))) {
+          ctx.addIssue({ code: 'custom', message: 'regional identity row references unknown region/group', path: ['identity', 'regions', index] });
+        }
+      }
+      for (const [index, row] of scenario.identity.polities.entries()) {
+        if (!polityIds.has(row.polityId) || !cultureIds.has(row.officialCultureId) || !religionIds.has(row.officialReligionId)
+          || row.acceptedCultureIds.includes(row.officialCultureId) || row.acceptedReligionIds.includes(row.officialReligionId)
+          || new Set(row.acceptedCultureIds).size !== row.acceptedCultureIds.length || new Set(row.acceptedReligionIds).size !== row.acceptedReligionIds.length
+          || row.acceptedCultureIds.some((entry) => !cultureIds.has(entry)) || row.acceptedReligionIds.some((entry) => !religionIds.has(entry))) {
+          ctx.addIssue({ code: 'custom', message: 'polity identity row requires known unique official/accepted groups', path: ['identity', 'polities', index] });
+        }
+      }
     }
     if (scenario.politics) {
       const factionIds = new Set(scenario.politics.factions.map((entry) => entry.factionId));

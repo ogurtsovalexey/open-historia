@@ -43,6 +43,8 @@ scenario.modules.intelligence = true;
 scenario.modules.politics = true;
 scenario.modules.armedForces = true;
 scenario.modules.combat = true;
+scenario.modules.technology = true;
+scenario.modules.societyAndIdentity = true;
 const polityIds = ["polity:austria", "polity:czechia", "polity:france", "polity:germany", "polity:poland", "polity:slovakia"];
 const relations = [];
 const tradeRoutes = [];
@@ -172,6 +174,18 @@ const projectTemplates = [{
   templateId: "project-template:intelligence-assessment", displayName: { en: "Intelligence assessment", ru: "Разведывательная оценка" },
   kind: "intelligence", budgetCategory: "security", totalCost: 300, durationMonths: 2,
   capacity: { kind: "administration", amount: 1 }, effect: { kind: "reveal-intelligence" },
+}, {
+  templateId: "project-template:industrial-standardization", displayName: { en: "Industrial standardization", ru: "Промышленная стандартизация" },
+  kind: "research", budgetCategory: "science", totalCost: 300, durationMonths: 2,
+  capacity: { kind: "science", amount: 1 }, effect: { kind: "unlock-capability", capabilityId: "capability:industrial-standardization" },
+}, {
+  templateId: "project-template:modern-logistics", displayName: { en: "Modern logistics", ru: "Современная логистика" },
+  kind: "research", budgetCategory: "science", totalCost: 400, durationMonths: 2,
+  capacity: { kind: "science", amount: 1 }, effect: { kind: "unlock-capability", capabilityId: "capability:modern-logistics" },
+}, {
+  templateId: "project-template:radio-command", displayName: { en: "Radio command", ru: "Радиокомандование" },
+  kind: "research", budgetCategory: "science", totalCost: 500, durationMonths: 3,
+  capacity: { kind: "science", amount: 1 }, effect: { kind: "unlock-capability", capabilityId: "capability:radio-command" },
 }];
 const factSummaries = {
   austria: ["Austria's public debt administration has limited emergency headroom.", "Управление государственным долгом Австрии имеет ограниченный резерв для чрезвычайных расходов."],
@@ -198,6 +212,41 @@ const knowledgeSeeds = polityIds.map((polityId) => {
   };
 });
 scenario.statecraft = { finance, capacities, projectTemplates, intelligenceFacts, knowledgeSeeds };
+scenario.capabilities = {
+  catalog: [
+    { capabilityId: "capability:industrial-standardization", displayName: { en: "Industrial standardization", ru: "Промышленная стандартизация" }, domain: "economy", prerequisiteIds: [], modifier: { kind: "processing-output", bonusBp: 1000 } },
+    { capabilityId: "capability:modern-logistics", displayName: { en: "Modern logistics", ru: "Современная логистика" }, domain: "military", prerequisiteIds: [], modifier: { kind: "land-supply", bonusBp: 1500 } },
+    { capabilityId: "capability:radio-command", displayName: { en: "Radio command", ru: "Радиокомандование" }, domain: "administration", prerequisiteIds: ["capability:modern-logistics"], modifier: { kind: "project-capacity", capacity: "science", amount: 1 } },
+  ],
+  starting: [],
+};
+
+const cultureFor = { austria: "austrian", czechia: "czech", france: "french", germany: "german", poland: "polish", slovakia: "slovak" };
+const religionFor = { austria: "catholic", czechia: "catholic", france: "catholic", germany: "protestant", poland: "catholic", slovakia: "catholic" };
+scenario.identity = {
+  cultures: Object.entries({ austrian: ["Austrian", "Австрийцы"], czech: ["Czech", "Чехи"], french: ["French", "Французы"], german: ["German", "Немцы"], polish: ["Polish", "Поляки"], slovak: ["Slovak", "Словаки"] })
+    .map(([slug, names]) => ({ cultureId: `culture:${slug}`, displayName: { en: names[0], ru: names[1] } })),
+  religions: Object.entries({ catholic: ["Catholic", "Католицизм"], protestant: ["Protestant", "Протестантизм"], orthodox: ["Orthodox", "Православие"] })
+    .map(([slug, names]) => ({ religionId: `religion:${slug}`, displayName: { en: names[0], ru: names[1] } })),
+  regions: scenario.regions.map((region) => {
+    const slug = region.controllerId.slice("polity:".length);
+    const isSalzburg = region.regionId === "region:gadm:AUT.5_1";
+    return {
+      regionId: region.regionId,
+      culture: isSalzburg
+        ? { primaryId: "culture:austrian", minorities: [{ identityId: "culture:german", shareBp: 2000 }] }
+        : { primaryId: `culture:${cultureFor[slug]}`, minorities: [] },
+      religion: { primaryId: `religion:${religionFor[slug]}`, minorities: [] },
+    };
+  }),
+  polities: politySlugs.map((slug) => ({
+    polityId: `polity:${slug}`,
+    officialCultureId: `culture:${cultureFor[slug]}`,
+    acceptedCultureIds: slug === "austria" ? ["culture:german"] : [], culturePolicy: "tolerance",
+    officialReligionId: `religion:${religionFor[slug]}`,
+    acceptedReligionIds: [], religionPolicy: "tolerance",
+  })),
+};
 const forceRegion = {
   austria: "region:gadm:AUT.5_1", czechia: "region:gadm:CZE.1_1", france: "region:gadm:FRA.4_1",
   germany: "region:gadm:DEU.2_1", poland: "region:gadm:POL.1_1", slovakia: "region:gadm:SVK.2_1",

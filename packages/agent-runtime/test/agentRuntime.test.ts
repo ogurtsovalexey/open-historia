@@ -38,6 +38,9 @@ test('strategic diplomacy batch is bounded, deterministic and contains no full m
   assert.ok(first.briefs.every((brief) => brief.projectRegionCandidates.length <= 3
     && brief.mobilizationRegionCandidates.length <= 3 && brief.frontRegionCandidates.length <= 6
     && brief.peaceRegionCandidates.length <= 6));
+  assert.ok(first.briefs.every((brief) => ((brief.identity?.candidates as string[] | undefined)?.length ?? 0) <= 6));
+  assert.equal(JSON.stringify(first).includes('minorities'), false);
+  assert.equal(JSON.stringify(first).includes('identity.regions'), false);
   assert.equal(JSON.stringify(first).includes('supplyLinks'), false);
   assert.equal(JSON.stringify(first).includes('truths'), false);
   assert.equal(JSON.stringify(first).includes('liquid-fuel reserves'), false);
@@ -95,6 +98,26 @@ test('strategic diplomacy validation requires one bound decision per polity', ()
       warId: 'war:agent-validation', defenderPolityId: 'polity:austria', reason: 'rivalry' },
   };
   assert.equal(validateDiplomacyBatch(war, batch).decisions[0]?.intent, 'declare-war');
+
+  const identity: { decisions: Array<Record<string, unknown>> } = structuredClone(holds);
+  const identityActor = batch.briefs.find((brief) => brief.identity)!;
+  const identityIndex = batch.polityIds.indexOf(identityActor.polityId);
+  identity.decisions[identityIndex] = {
+    polityId: identityActor.polityId, intent: 'set-identity-policy', rationale: 'Reduce identity pressure.',
+    command: { kind: 'identity.set-policy', commandId: '00000000-0000-4000-8000-000000000005',
+      actorPolityId: identityActor.polityId, expectedRevision: state.revision, effectiveMonth: state.month,
+      domain: 'culture', policy: 'integration' },
+  };
+  assert.equal(validateDiplomacyBatch(identity, batch).decisions[identityIndex]?.intent, 'set-identity-policy');
+
+  const unknownIdentity: { decisions: Array<Record<string, unknown>> } = structuredClone(holds);
+  unknownIdentity.decisions[identityIndex] = {
+    polityId: identityActor.polityId, intent: 'set-identity-acceptance', rationale: 'Invalid candidate.',
+    command: { kind: 'identity.set-culture-acceptance', commandId: '00000000-0000-4000-8000-000000000006',
+      actorPolityId: identityActor.polityId, expectedRevision: state.revision, effectiveMonth: state.month,
+      domain: 'culture', identityId: 'culture:unknown', accepted: true },
+  };
+  assert.throws(() => validateDiplomacyBatch(unknownIdentity, batch), /outside bounded candidates/);
 });
 
 test('bounded briefs and batches never include the full map', () => {

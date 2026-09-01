@@ -9,6 +9,8 @@ export * from './politics.js';
 export * from './politicsReducer.js';
 export * from './military.js';
 export * from './militaryReducer.js';
+export * from './society.js';
+export * from './identityReducer.js';
 export * from './mapLink.js';
 export * from './selectors.js';
 export * from './state.js';

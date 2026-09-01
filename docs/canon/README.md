@@ -26,6 +26,7 @@ escalate, do not silently "fix" either side.
 | 12 | [`12-p3c-statecraft.md`](12-p3c-statecraft.md) | P3c finance, unified projects and evidence-backed intelligence |
 | 13 | [`13-p4-politics-and-characters.md`](13-p4-politics-and-characters.md) | P4 factions, political escalation, rulers, appointments and succession |
 | 14 | [`14-p5-war-and-peace.md`](14-p5-war-and-peace.md) | P5 mobilization, formations, supply, combat, occupation and peace |
+| 15 | [`15-p6-capabilities-and-identity.md`](15-p6-capabilities-and-identity.md) | P6 project-unlocked capabilities and culture/religion identity policy |
 
 Sources of each doc are cited inline. The full archived corpus stays under
 `docs/spec/` and `docs/product/` for provenance; their READMEs carry a

@@ -5,6 +5,8 @@ import { sha256OfString } from './canonical.js';
 import type { EconRegionState, EconWorldState } from './state.js';
 import { addMonth } from './state.js';
 import { actualController, type Formation, type MilitaryState } from './military.js';
+import { polityIdentityEffects } from './identityReducer.js';
+import { capabilityBonusBp, type CapabilityState, type IdentityState } from './society.js';
 
 export interface MutableMilitaryPolity { id: PolityId; treasury: number }
 export interface MilitaryTransferRecord {
@@ -66,6 +68,7 @@ export function applyMilitaryCommands(
   commands: MilitaryCommand[],
   polities: MutableMilitaryPolity[],
   regions: EconRegionState[],
+  identity?: IdentityState,
 ): {
   military: MilitaryState | undefined; transfers: MilitaryTransferRecord[]; treasuryTransfers: MilitaryTreasuryTransfer[];
   relationPenalties: Array<{ polityId: PolityId; deltaTrust: number; deltaOpinion: number; deltaThreat: number }>;
@@ -130,6 +133,10 @@ export function applyMilitaryCommands(
       const commander = command.commanderId ? military.commanders.find((entry) => entry.commanderId === command.commanderId) : null;
       if (command.commanderId && (!commander || commander.polityId !== actor.id)) { reject(command, 'unknown-commander', 'commander is unknown or foreign'); continue; }
       if (command.manpower > militaryPolity.manpowerPool) { reject(command, 'invalid-amount', `manpower ${command.manpower} exceeds pool ${militaryPolity.manpowerPool}`); continue; }
+      const recruitmentBp = polityIdentityEffects(identity, regions, actor.id).recruitmentMultiplierBp;
+      const identityAvailable = Math.max(0, Math.floor((militaryPolity.manpowerCeiling * recruitmentBp) / 10000)
+        - militaryPolity.mobilized - militaryPolity.casualties);
+      if (command.manpower > identityAvailable) { reject(command, 'invalid-amount', `manpower ${command.manpower} exceeds identity-adjusted availability ${identityAvailable}`); continue; }
       if (command.equipment > militaryPolity.equipmentReserve) { reject(command, 'invalid-amount', `equipment ${command.equipment} exceeds reserve ${militaryPolity.equipmentReserve}`); continue; }
       militaryPolity.manpowerPool -= command.manpower; militaryPolity.mobilized += command.manpower;
       militaryPolity.equipmentReserve -= command.equipment;
@@ -305,6 +312,7 @@ export function resolveMilitaryMonth(
   state: EconWorldState,
   military: MilitaryState | undefined,
   regions: EconRegionState[],
+  capabilities?: CapabilityState,
 ): { military: MilitaryState | undefined; combats: CombatRecord[]; events: MilitaryEngineEvent[] } {
   if (!military || state.modules?.combat !== true) return { military, combats: [], events: [] };
   const events: MilitaryEngineEvent[] = [];
@@ -333,7 +341,8 @@ export function resolveMilitaryMonth(
     const defenderManpower = defenders.reduce((sum, entry) => sum + entry.manpower, 0);
     const attackerEquipment = attackers.reduce((sum, entry) => sum + entry.equipment, 0);
     const defenderEquipment = defenders.reduce((sum, entry) => sum + entry.equipment, 0);
-    const attackerSupplyBp = Math.min(10000, Math.floor((link.capacity * 10000) / Math.max(1, attackerManpower)));
+    const effectiveLinkCapacity = Math.floor((link.capacity * (10000 + capabilityBonusBp(capabilities, attackerId, 'land-supply'))) / 10000);
+    const attackerSupplyBp = Math.min(10000, Math.floor((effectiveLinkCapacity * 10000) / Math.max(1, attackerManpower)));
     const target = regionById.get(targetRegionId)!;
     const defenderSupplyBp = actualController(military, targetRegionId, target.controllerId) === defenderId ? 10000 : 6000;
     const frontSlug = (regionId: string) => regionId.slice(regionId.lastIndexOf(':') + 1).toLowerCase().replace(/[^a-z0-9._-]/g, '-');
