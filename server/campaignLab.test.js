@@ -5,7 +5,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { after, before, test } from "node:test";
 import {
-  CODEX_DECISION_RESPONSE_SCHEMA, normalizeCodexDecisionWire,
+  assessCodexDecisionReferences, buildCodexDecisionResponseSchema, CODEX_DECISION_RESPONSE_SCHEMA, normalizeCodexDecisionWire,
 } from "../scripts/lib/campaign-lab-contract.mjs";
 import {
   buildCodexExecArgs, invokeCodexSubscription, parseCodexJsonl, sanitizeCodexEnvironment,
@@ -76,6 +76,25 @@ test("Codex wire is a flat named-field schema and normalizes once to StrategicDe
   assert.throws(() => normalizeCodexDecisionWire(polluted), /empty sentinel/);
 });
 
+test("Codex batch schema requires exact requested coverage and constrains actor ids", () => {
+  const ids = ["polity:austria", "polity:united-kingdom"];
+  const schema = buildCodexDecisionResponseSchema(ids);
+  assert.equal(schema.properties.decisions.minItems, 2);
+  assert.equal(schema.properties.decisions.maxItems, 2);
+  assert.deepEqual(schema.properties.decisions.items.properties.polityId.enum, ids);
+  assert.throws(() => buildCodexDecisionResponseSchema([ids[0], ids[0]]), /unique polity ids/);
+});
+
+test("Codex evaluator separates citations of published indicators from invented numeric effects", () => {
+  const prompt = 'APPLICATION PAYLOAD:{"actorRunwayMonths":40,"availableManpower":12000}';
+  const assessed = assessCodexDecisionReferences({ decisions: [{
+    objectiveSummary: "Preserve reserves.", rationale: "The published runway is 40 months; output will rise by 12%.",
+    intendedOutcome: "", contingency: "Reassess.", futurePlan: [],
+  }] }, prompt);
+  assert.deepEqual(assessed.publishedNumericCitations, ["40 months"]);
+  assert.deepEqual(assessed.authoritativeNumericClaims, ["12%"]);
+});
+
 test("Codex subprocess contract forces ephemeral ChatGPT Luna and sanitizes provider credentials", () => {
   const args = buildCodexExecArgs({ cwd: "/tmp/lab", schemaPath: "/tmp/lab/schema.json", outputPath: "/tmp/lab/out.json" });
   for (const required of ["--ephemeral", "--ignore-user-config", "--ignore-rules", "--skip-git-repo-check", "--json", "read-only", "gpt-5.6-luna",
@@ -108,5 +127,12 @@ test("Luna capability mock mode performs zero Codex turns and is byte-identical"
     assert.equal(fs.readFileSync(path.join(temp, "luna-mock-a", probe, "validation.json"), "utf8"),
       fs.readFileSync(path.join(temp, "luna-mock-b", probe, "validation.json"), "utf8"));
     assert.equal(fs.existsSync(path.join(temp, "luna-mock-a", probe, "events.jsonl")), false);
+    const brief = JSON.parse(fs.readFileSync(path.join(temp, "luna-mock-a", probe, "brief-batch.json"), "utf8"));
+    const schema = JSON.parse(fs.readFileSync(path.join(temp, "luna-mock-a", probe, "output-schema.json"), "utf8"));
+    const prompt = fs.readFileSync(path.join(temp, "luna-mock-a", probe, "prompt.txt"), "utf8");
+    assert.equal(schema.properties.decisions.minItems, brief.polityIds.length);
+    assert.equal(schema.properties.decisions.maxItems, brief.polityIds.length);
+    assert.deepEqual(schema.properties.decisions.items.properties.polityId.enum, brief.polityIds);
+    assert.ok(prompt.includes(`"requiredPolityIds":${JSON.stringify(brief.polityIds)}`));
   }
 });

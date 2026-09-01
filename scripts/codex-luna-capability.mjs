@@ -8,19 +8,17 @@ import { initState, parseScenario, runTurn, stateChecksum } from '../packages/en
 import {
   buildStrategicBatchesV3, expandStrategicAffordancesV3, materializeStrategicBatchV3, strategicDecisionBatchV2Schema,
 } from '../packages/agent-runtime/dist/index.js';
-import { CODEX_DECISION_RESPONSE_SCHEMA, normalizeCodexDecisionWire } from './lib/campaign-lab-contract.mjs';
+import {
+  assessCodexDecisionReferences, buildCodexDecisionResponseSchema, normalizeCodexDecisionWire,
+} from './lib/campaign-lab-contract.mjs';
 import { CODEX_PROMPT_CONTRACT, CODEX_SUBSCRIPTION_MODEL, codexCliVersion, invokeCodexSubscription } from './lib/codex-subscription.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RUNS = process.env.CAMPAIGN_LAB_RUNS_DIR ? path.resolve(process.env.CAMPAIGN_LAB_RUNS_DIR) : path.join(ROOT, 'runs/campaign-lab');
 const SCENARIO = path.join(ROOT, 'packages/data-packs/fixtures/europe-1935-benchmark/engine/scenario.json');
 const EXTERNAL_SUPPLIERS = Object.freeze(['polity:soviet-union', 'polity:united-states']);
-const SYSTEM_TEXT = `You are an autonomous opponent strategist in Open Historia. Return exactly one decision for every polity in the supplied batch using the output schema.
-All listed StrategicBriefV3 affordances are executable at the frozen month and revision. Omitted tools and unlisted option combinations are unavailable. Select only exact listed choices.
-Use supplied polity, region, proposal, faction, formation, project, and war IDs in action fields. Never invent command IDs or new proposal, project, formation, war, effect, fact, or evidence IDs.
-Do not invent effects, numeric outcomes, authoritative consequences, doctrine, hidden intelligence, private character information, or facts. Engine previews are evidence, not values you may alter.
-Future plans describe intentions, not completed outcomes. Non-holds need a material affordance; otherwise use conserve and a typed hold.
-For every action, set EVERY field not named here to "": invest=targetRegionId,scale; reallocate-production=targetRegionId,priority,scale; conserve=none; negotiate-trade/external-import=partner,resource,desiredRunway,budgetAttitude; propose-agreement=partner,agreementType; apply-diplomatic-pressure=partner,targetRegionId(if listed),demand,pressure; respond-proposal=proposalId,response; change-policy=taxStance,budgetPriority; respond-faction=factionId,response; start-project=templateId,scale,targetRegionId/targetPolityId(if listed); mobilize=targetRegionId,scale,commanderId; declare-war=defender,reason; issue-order=formationId,posture,targetRegionId(if listed); negotiate-peace=warId,approach.`;
+const SYSTEM_TEXT = `Return one independent decision per required polity ID. Each listed StrategicBriefV3 choice is executable at the frozen state: use exact listed combinations and public IDs only; omitted tools are unavailable. Invent no IDs, facts, doctrine, hidden/private information, numeric effects or outcomes. Previews are immutable evidence; plans are future intentions. Non-holds need a material choice, else conserve with a typed hold.
+Every unused action field is "". Fields by tool: invest=targetRegionId+scale; reallocate-production=targetRegionId+priority+scale; conserve=none; negotiate-trade/external-import=partner+resource+desiredRunway+budgetAttitude; propose-agreement=partner+agreementType; apply-diplomatic-pressure=partner+optional targetRegionId+demand+pressure; respond-proposal=proposalId+response; change-policy=taxStance+budgetPriority; respond-faction=factionId+response; start-project=templateId+scale+optional targetRegionId/targetPolityId; mobilize=targetRegionId+scale+commanderId; declare-war=defender+reason; issue-order=formationId+posture+optional targetRegionId; negotiate-peace=warId+approach.`;
 const APPLICATION_PREFIX = '\n\nAPPLICATION PAYLOAD:\n';
 const MEASURED_SYSTEM_TEXT = `${SYSTEM_TEXT}${APPLICATION_PREFIX}`;
 
@@ -96,7 +94,7 @@ const buildProbes = () => {
   return [probe1, probe2, probe3, probe4];
 };
 
-const promptFor = (probe) => `${MEASURED_SYSTEM_TEXT}${JSON.stringify({ briefs: probe.batch.briefs })}`;
+const promptFor = (probe) => `${MEASURED_SYSTEM_TEXT}${JSON.stringify({ requiredPolityIds: probe.batch.polityIds, briefs: probe.batch.briefs })}`;
 const mockBatch = (probe) => ({ decisions: probe.batch.briefs.map((brief) => {
   const action = expandStrategicAffordancesV3(brief).find((entry) => entry.tool !== 'conserve');
   return action ? { polityId: brief.polity.id, objective: { domain: 'campaign', summary: 'Use the highest-ranked executable response.', horizon: 'short' },
@@ -107,16 +105,8 @@ const mockBatch = (probe) => ({ decisions: probe.batch.briefs.map((brief) => {
       hold: { reason: 'no-legal-action', detail: 'Only conserve is available.', revisit: { afterMonths: 1, triggers: ['resource-deficit'] } } };
 }) });
 
-const assessReferences = (raw, prompt) => {
-  const text = JSON.stringify(raw);
-  const ids = text.match(/(?:polity|region|proposal|faction|formation|project|war|effect|intel|character):[a-z0-9._:-]+/gi) ?? [];
-  const invented = [...new Set(ids.filter((id) => !prompt.includes(id)))].sort();
-  const narrative = (raw?.decisions ?? []).flatMap((entry) => [entry.objectiveSummary, entry.rationale, entry.intendedOutcome,
-    entry.contingency, ...(entry.futurePlan ?? []).flatMap((plan) => [plan.summary, plan.condition])]).filter(Boolean).join(' ');
-  return { inventedReferences: invented, privateDoctrine: /lebensraum|private german doctrine|player doctrine/i.test(narrative),
-    authoritativeNumericClaims: /\b\d+(?:[.,]\d+)?\s*(?:%|bp|gold|men|equipment|months?)\b/i.test(narrative) };
-};
-
+let activeManifest = null;
+let activeManifestPath = null;
 const main = () => {
   const args = parseArgs(process.argv.slice(2)); const mode = args.mode ?? 'live';
   if (!['live', 'mock'].includes(mode)) throw new Error('mode must be live or mock');
@@ -125,14 +115,15 @@ const main = () => {
   const runId = args.run ?? `luna-gate0-${revision.slice(0, 12)}`; const outputDir = path.join(RUNS, runId);
   if (fs.existsSync(outputDir)) throw new Error(`evaluation output already exists: ${outputDir}`);
   fs.mkdirSync(outputDir, { recursive: true });
-  const schemaText = JSON.stringify(CODEX_DECISION_RESPONSE_SCHEMA);
   const probes = buildProbes();
+  const schemas = Object.fromEntries(probes.map((probe) => [probe.id, buildCodexDecisionResponseSchema(probe.batch.polityIds)]));
   const manifest = { schemaVersion: 'open-historia-luna-capability/1', runId, mode, model: CODEX_SUBSCRIPTION_MODEL,
     authMode: 'chatgpt', reasoning: 'low', verbosity: 'low', fastMode: false, ephemeral: true, codeRevision: revision,
     cliVersion, promptContract: CODEX_PROMPT_CONTRACT, externalSupplierPolityIds: EXTERNAL_SUPPLIERS,
     externalSupplierProfileChecksum: sha256(JSON.stringify(EXTERNAL_SUPPLIERS)),
-    outputSchemaChecksum: sha256(schemaText), completedCodexTurns: 0, status: 'running', probes: [] };
-  atomicJson(path.join(outputDir, 'manifest.json'), manifest);
+    outputSchemaChecksum: sha256(JSON.stringify(schemas)), completedCodexTurns: 0, status: 'running', probes: [] };
+  activeManifest = manifest; activeManifestPath = path.join(outputDir, 'manifest.json');
+  atomicJson(activeManifestPath, manifest);
   for (const [index, probe] of probes.entries()) {
     const prompt = promptFor(probe);
     if (prompt.length >= 40000 || probe.batch.characterCount !== prompt.length) throw new Error(`${probe.id} prompt is ${prompt.length}, batch measured ${probe.batch.characterCount}`);
@@ -140,7 +131,9 @@ const main = () => {
     fs.writeFileSync(path.join(probeDir, 'prompt.txt'), prompt, 'utf8');
     atomicJson(path.join(probeDir, 'brief-batch.json'), probe.batch); atomicJson(path.join(probeDir, 'state.json'), probe.state);
     const beforeChecksum = stateChecksum(probe.state);
-    const invocation = mode === 'mock' ? null : invokeCodexSubscription({ prompt, schema: CODEX_DECISION_RESPONSE_SCHEMA });
+    const schema = schemas[probe.id];
+    atomicJson(path.join(probeDir, 'output-schema.json'), schema);
+    const invocation = mode === 'mock' ? null : invokeCodexSubscription({ prompt, schema });
     if (invocation) {
       fs.writeFileSync(path.join(probeDir, 'events.jsonl'), invocation.stdout, 'utf8');
       fs.writeFileSync(path.join(probeDir, 'response.json'), invocation.responseText ?? '', 'utf8');
@@ -159,7 +152,7 @@ const main = () => {
       : strategicDecisionBatchV2Schema.safeParse(normalized);
     const materialized = strict.success ? materializeStrategicBatchV3(probe.state, strict.data, probe.batch)
       : { commands: [], rejected: [{ actionIndex: -1, reason: strict.error.issues[0]?.message ?? 'schema rejection' }], unsupportedResidual: [] };
-    const afterChecksum = stateChecksum(probe.state); const refs = assessReferences(invocation?.response ?? normalized, prompt);
+    const afterChecksum = stateChecksum(probe.state); const refs = assessCodexDecisionReferences(invocation?.response ?? normalized, prompt);
     const focal = strict.success ? strict.data.decisions.find((entry) => entry.polityId === probe.focalPolityId) : null;
     const result = { probeId: probe.id, promptCharacters: prompt.length, requestedPolityIds: probe.batch.polityIds,
       strictValid: strict.success, normalizedDecision: normalized, materialized, focalPolityId: probe.focalPolityId,
@@ -171,14 +164,22 @@ const main = () => {
       threadIds: invocation?.threadIds ?? [], usage: invocation?.usage ?? { inputTokens: 0, outputTokens: 0, totalTokens: 0 } });
     atomicJson(path.join(outputDir, 'manifest.json'), manifest);
     if (mode === 'live' && (!strict.success || materialized.rejected.length || !result.focalMaterial || refs.inventedReferences.length
-      || refs.privateDoctrine || refs.authoritativeNumericClaims || result.stateMutated)) {
+      || refs.privateDoctrine || refs.authoritativeNumericClaims.length || result.stateMutated)) {
       manifest.status = 'failed'; atomicJson(path.join(outputDir, 'manifest.json'), manifest); process.stdout.write(`${JSON.stringify(manifest, null, 2)}\n`); return;
     }
   }
   const threadIds = [...new Set(manifest.probes.flatMap((entry) => entry.threadIds))];
   manifest.status = mode === 'mock' ? 'mock-pass' : manifest.probes.length === 4 && threadIds.length === 4 ? 'awaiting-primary-review' : 'failed';
   manifest.threadIds = threadIds; atomicJson(path.join(outputDir, 'manifest.json'), manifest);
+  activeManifest = null; activeManifestPath = null;
   process.stdout.write(`${JSON.stringify(manifest, null, 2)}\n`);
 };
 
-try { main(); } catch (error) { process.stderr.write(`${error instanceof Error ? error.stack : String(error)}\n`); process.exitCode = 1; }
+try { main(); } catch (error) {
+  if (activeManifest && activeManifestPath) {
+    activeManifest.status = 'failed';
+    activeManifest.failure = { stage: 'evaluation', detail: error instanceof Error ? error.message : String(error) };
+    atomicJson(activeManifestPath, activeManifest);
+  }
+  process.stderr.write(`${error instanceof Error ? error.stack : String(error)}\n`); process.exitCode = 1;
+}

@@ -177,7 +177,9 @@ test('Strategic V3 policy choices preserve relative policy and batches include c
   const systemText = 'S'.repeat(1200);
   const state = benchmarkInitial();
   const batches = buildStrategicBatchesV3(state, 'polity:germany', { systemText });
-  assert.ok(batches.every((entry) => entry.characterCount === systemText.length + JSON.stringify({ briefs: entry.briefs }).length));
+  assert.ok(batches.every((entry) => entry.characterCount === systemText.length
+    + JSON.stringify({ requiredPolityIds: entry.polityIds, briefs: entry.briefs }).length));
+  assert.ok(batches.every((entry) => entry.polityIds.length === 1 || entry.characterCount < 39500));
   assert.ok(batches.every((entry) => entry.characterCount < 40000));
 });
 

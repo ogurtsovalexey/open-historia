@@ -131,7 +131,7 @@ Object.assign(codexActionProperties, {
   approach: stringEnum('', 'status-quo', 'limited-concessions', 'press-claims'),
 });
 
-export const CODEX_DECISION_RESPONSE_SCHEMA = Object.freeze({
+const CODEX_DECISION_RESPONSE_SCHEMA_BASE = {
   type: 'object', additionalProperties: false, required: ['decisions'], properties: {
     decisions: { type: 'array', maxItems: 6, items: {
       type: 'object', additionalProperties: false,
@@ -152,7 +152,28 @@ export const CODEX_DECISION_RESPONSE_SCHEMA = Object.freeze({
       },
     } },
   },
-});
+};
+
+// The evaluator must bind each output schema to the concrete application
+// batch. Exact length prevents a structurally valid partial response; the
+// materializer still owns the separate exact-and-unique coverage check because
+// JSON Schema cannot express uniqueness by polityId.
+export const buildCodexDecisionResponseSchema = (polityIds) => {
+  if (!Array.isArray(polityIds) || polityIds.length < 1 || polityIds.length > 6
+    || new Set(polityIds).size !== polityIds.length
+    || polityIds.some((polityId) => typeof polityId !== 'string' || !polityId)) {
+    throw new Error('Codex output schema requires one to six unique polity ids');
+  }
+  const schema = structuredClone(CODEX_DECISION_RESPONSE_SCHEMA_BASE);
+  schema.properties.decisions.minItems = polityIds.length;
+  schema.properties.decisions.maxItems = polityIds.length;
+  schema.properties.decisions.items.properties.polityId = { type: 'string', enum: [...polityIds] };
+  return schema;
+};
+
+// Retained for transport unit tests and non-batch callers. Capability and
+// production calls must use buildCodexDecisionResponseSchema(batch.polityIds).
+export const CODEX_DECISION_RESPONSE_SCHEMA = Object.freeze(structuredClone(CODEX_DECISION_RESPONSE_SCHEMA_BASE));
 
 const codexUsedFields = Object.freeze({
   invest: ['targetRegionId', 'scale'], 'reallocate-production': ['targetRegionId', 'priority', 'scale'], conserve: [],
@@ -198,3 +219,38 @@ export const normalizeCodexDecisionWire = (raw) => ({
       revisit: { afterMonths: decision.revisitAfterMonths, triggers: decision.revisitTriggers } },
   })) : raw?.decisions,
 });
+
+const numericClaimPattern = /\b-?\d+(?:[.,]\d+)?\s*(?:%|bp|gold|men|equipment|months?)(?!\w)/gi;
+const unitForPublishedField = (field) => {
+  if (/months?/i.test(field)) return 'months';
+  if (/bp$/i.test(field)) return 'bp';
+  if (/manpower|\bmen\b/i.test(field)) return 'men';
+  if (/equipment/i.test(field)) return 'equipment';
+  if (/treasury|cost|gold/i.test(field)) return 'gold';
+  if (/percent|percentage|pct/i.test(field)) return '%';
+  return null;
+};
+const normalizedClaim = (value, unit) => `${String(value).replace(',', '.')} ${unit.toLowerCase().replace(/^month$/, 'months')}`;
+
+export const assessCodexDecisionReferences = (raw, prompt) => {
+  const text = JSON.stringify(raw ?? null);
+  const ids = text.match(/(?:polity|region|proposal|faction|formation|project|war|effect|intel|character):[a-z0-9._:-]+/gi) ?? [];
+  const inventedReferences = [...new Set(ids.filter((id) => !prompt.includes(id)))].sort();
+  const decisions = Array.isArray(raw?.decisions) ? raw.decisions : [];
+  const narrative = decisions.flatMap((entry) => [entry?.objectiveSummary, entry?.rationale, entry?.intendedOutcome,
+    entry?.contingency, ...(Array.isArray(entry?.futurePlan) ? entry.futurePlan.flatMap((plan) => [plan?.summary, plan?.condition]) : [])])
+    .filter((entry) => typeof entry === 'string').join(' ');
+  const published = new Set();
+  for (const match of prompt.matchAll(/"([^"]+)":(-?\d+(?:\.\d+)?)/g)) {
+    const unit = unitForPublishedField(match[1]);
+    if (unit) published.add(normalizedClaim(match[2], unit));
+  }
+  const claims = [...narrative.matchAll(numericClaimPattern)].map((match) => match[0]);
+  const publishedNumericCitations = claims.filter((claim) => {
+    const parsed = claim.match(/(-?\d+(?:[.,]\d+)?)\s*(%|bp|gold|men|equipment|months?)/i);
+    return parsed ? published.has(normalizedClaim(parsed[1], parsed[2])) : false;
+  });
+  const authoritativeNumericClaims = claims.filter((claim) => !publishedNumericCitations.includes(claim));
+  return { inventedReferences, privateDoctrine: /lebensraum|private german doctrine|player doctrine/i.test(narrative),
+    publishedNumericCitations, authoritativeNumericClaims };
+};

@@ -451,6 +451,7 @@ export function materializeStrategicBatchV2(state: EconWorldState, raw: unknown,
 }
 
 const V3_LIMIT = 40000;
+const V3_BATCH_TARGET = 39500;
 const budgetCategories = ['administration', 'science', 'industry', 'security', 'military'] as const;
 type BudgetCategory = typeof budgetCategories[number];
 type V3Options = {
@@ -963,7 +964,7 @@ export function buildStrategicBatchesV3(state: EconWorldState, playerPolityId: s
   const systemLength = (options.systemText ?? '').length;
   const flush = () => {
     if (!currentIds.length) return;
-    const characterCount = systemLength + JSON.stringify({ briefs: currentBriefs }).length;
+    const characterCount = systemLength + JSON.stringify({ requiredPolityIds: currentIds, briefs: currentBriefs }).length;
     batches.push({ schemaVersion: 'open-historia-strategic-batch/3', promptContract: 'StrategicBriefV3+StrategicDecisionV2',
       batchId: sha256OfString(`${state.revision}|strategic-v3|${currentIds.join('|')}`), month: state.month, baseRevision: state.revision,
       polityIds: currentIds, briefs: currentBriefs, characterCount });
@@ -974,9 +975,10 @@ export function buildStrategicBatchesV3(state: EconWorldState, playerPolityId: s
       maxMaterialToolAffordances: options.maxMaterialToolAffordances ?? (ids.length >= 6 ? 1 : undefined),
       strategicContext: options.strategicContextByPolity?.[polityId] });
     const candidateBriefs = [...currentBriefs, brief];
-    const candidateSize = systemLength + JSON.stringify({ briefs: candidateBriefs }).length;
-    if (currentIds.length && (currentIds.length >= 6 || candidateSize >= V3_LIMIT)) flush();
-    const individualSize = systemLength + JSON.stringify({ briefs: [brief] }).length;
+    const candidateIds = [...currentIds, polityId];
+    const candidateSize = systemLength + JSON.stringify({ requiredPolityIds: candidateIds, briefs: candidateBriefs }).length;
+    if (currentIds.length && (currentIds.length >= 6 || candidateSize >= V3_BATCH_TARGET)) flush();
+    const individualSize = systemLength + JSON.stringify({ requiredPolityIds: [polityId], briefs: [brief] }).length;
     if (individualSize >= V3_LIMIT) throw new Error(`individual strategic V3 brief exceeds ${V3_LIMIT} characters`);
     currentIds.push(polityId); currentBriefs.push(brief);
   }
