@@ -48,6 +48,7 @@
     "build:engine": "cd packages/engine && npm run build",
     "typecheck:engine": "cd packages/engine && npm run typecheck",
     "play:engine": "cd packages/engine && npm run play"
+    ,"campaign-lab": "npm run build:data-packs && npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/campaign-lab.mjs"
   },
   "dependencies": {
     "@noble/ed25519": "^2.3.0",
