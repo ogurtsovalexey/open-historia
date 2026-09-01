@@ -14,7 +14,8 @@ test("Campaign Lab sends the bounded StrategicDecisionV2 schema without raw comm
   assert.ok(CAMPAIGN_DECISION_TOOLS.includes("conserve"));
   assert.ok(CAMPAIGN_DECISION_TOOLS.includes("declare-war"));
   const serialized = JSON.stringify(CAMPAIGN_DECISION_RESPONSE_SCHEMA);
-  for (const tool of CAMPAIGN_DECISION_TOOLS) assert.ok(serialized.includes(tool));
+  assert.equal(CAMPAIGN_DECISION_TOOLS.length, 15);
+  assert.equal(CAMPAIGN_DECISION_RESPONSE_SCHEMA.properties.decisions.items.properties.actions.items.properties.tool.type, "string");
   assert.equal(serialized.includes('"command"'), false);
   assert.ok(serialized.length < 30_000);
 });

@@ -11,21 +11,18 @@ export const CAMPAIGN_DECISION_TOOLS = Object.freeze([
 // The wire contract is therefore a flat superset; the strict per-tool Zod
 // union and semantic materializer still validate every returned decision.
 const wireActionSchema = z.object({
-  tool: z.enum(CAMPAIGN_DECISION_TOOLS),
+  tool: z.string(),
   target: z.string(), counterpart: z.string(), subject: z.string(), choice: z.string(), intensity: z.string(),
 }).strict();
 const wireDecisionSchema = z.object({
-  polityId: z.string(), objectiveDomain: z.enum(['economy', 'diplomacy', 'politics', 'military', 'statecraft', 'campaign']),
-  objectiveSummary: z.string(), horizon: z.enum(['short', 'medium', 'long']),
-  actions: z.array(wireActionSchema).max(3), futurePlan: z.array(z.object({ summary: z.string(), condition: z.string() }).strict()).max(8),
+  polityId: z.string(), objectiveDomain: z.string(), objectiveSummary: z.string(), horizon: z.string(),
+  actions: z.array(wireActionSchema), futurePlan: z.array(z.object({ summary: z.string(), condition: z.string() }).strict()),
   contingency: z.string(), rationale: z.string(), intendedOutcome: z.string(),
-  holdReason: z.enum(['none', 'no-legal-action', 'waiting-response', 'insufficient-resources', 'plan-sequencing', 'risk-too-high']),
-  holdDetail: z.string(), revisitAfterMonths: z.number().int().min(1).max(12),
-  revisitTriggers: z.array(z.enum(['resource-deficit', 'diplomatic-response', 'war', 'occupation', 'peace', 'crisis', 'government-change', 'default'])).min(1).max(8),
+  holdReason: z.string(), holdDetail: z.string(), revisitAfterMonths: z.number().int(), revisitTriggers: z.array(z.string()),
 }).strict();
 
 export const CAMPAIGN_DECISION_RESPONSE_SCHEMA = Object.freeze(
-  fitGeminiFunctionSchema(z.toJSONSchema(z.object({ decisions: z.array(wireDecisionSchema).max(6) }).strict())),
+  fitGeminiFunctionSchema(z.toJSONSchema(z.object({ decisions: z.array(wireDecisionSchema) }).strict())),
 );
 
 export const encodeCampaignActionWire = (action) => {
