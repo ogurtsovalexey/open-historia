@@ -11,7 +11,7 @@ export const CAMPAIGN_DECISION_TOOLS = Object.freeze([
 // The wire contract is therefore a flat superset; the strict per-tool Zod
 // union and semantic materializer still validate every returned decision.
 const wireActionSchema = z.object({
-  tool: z.string(),
+  tool: z.enum(CAMPAIGN_DECISION_TOOLS),
   target: z.string(), counterpart: z.string(), subject: z.string(), choice: z.string(), intensity: z.string(),
 }).strict();
 const wireDecisionSchema = z.object({
