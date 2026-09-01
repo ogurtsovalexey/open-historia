@@ -193,6 +193,9 @@ const main = async () => {
       if (!validation.valid) throw new Error(`${entry.taskKey}: ${validation.error}`);
     }
     for (const [name, schema] of Object.entries(engineSchemas)) {
+      // opponentStrategy already ran above through its compact provider wire
+      // schema and was then parsed by the full StrategicDecisionV2 contract.
+      if (name === "opponentStrategy") continue;
       const jsonSchema = z.toJSONSchema(schema); const example = exampleFromSchema(jsonSchema);
       const toolName = `submit_${name.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)}`;
       const response = await client.generate({ name: `engine-schema:${name}`, contents: user(`Call ${toolName} with exactly ${JSON.stringify(example)}`),
