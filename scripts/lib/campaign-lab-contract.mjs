@@ -12,17 +12,8 @@ export const CAMPAIGN_DECISION_TOOLS = Object.freeze([
 // union and semantic materializer still validate every returned decision.
 const wireActionSchema = z.object({
   tool: z.enum(CAMPAIGN_DECISION_TOOLS),
-  targetRegionId: z.string().optional(), scale: z.enum(['small', 'medium', 'large']).optional(),
-  priority: z.enum(['food', 'raw-materials', 'industry']).optional(), partner: z.string().optional(), resource: z.string().optional(),
-  desiredRunway: z.enum(['short', 'medium', 'long']).optional(), budgetAttitude: z.enum(['cautious', 'balanced', 'urgent']).optional(),
-  agreementType: z.enum(['non-aggression', 'defensive-alliance', 'guarantee', 'military-access']).optional(),
-  demand: z.enum(['territorial-concession', 'policy-change', 'military-access']).optional(), pressure: z.enum(['small', 'medium', 'large']).optional(),
-  proposalId: z.string().optional(), response: z.enum(['accept', 'reject', 'concede', 'repress', 'refuse']).optional(),
-  taxStance: z.enum(['relieve', 'steady', 'raise']).optional(), budgetPriority: z.enum(['administration', 'science', 'industry', 'security', 'military']).optional(),
-  factionId: z.string().optional(), templateId: z.string().optional(), targetPolityId: z.string().optional(), commanderId: z.string().optional(),
-  defender: z.string().optional(), reason: z.enum(['claim', 'defense', 'guarantee', 'rivalry', 'none']).optional(),
-  formationId: z.string().optional(), posture: z.enum(['hold', 'defend', 'advance', 'withdraw']).optional(), warId: z.string().optional(),
-  approach: z.enum(['status-quo', 'limited-concessions', 'press-claims']).optional(),
+  target: z.string().optional(), counterpart: z.string().optional(), subject: z.string().optional(),
+  choice: z.string().optional(), intensity: z.string().optional(),
 }).strict();
 const wireHoldSchema = z.object({
   reason: z.enum(['no-legal-action', 'waiting-response', 'insufficient-resources', 'plan-sequencing', 'risk-too-high']), detail: z.string(),
@@ -38,12 +29,47 @@ export const CAMPAIGN_DECISION_RESPONSE_SCHEMA = Object.freeze(
   fitGeminiFunctionSchema(z.toJSONSchema(z.object({ decisions: z.array(wireDecisionSchema).max(6) }).strict())),
 );
 
+export const encodeCampaignActionWire = (action) => {
+  const tool = action?.tool;
+  if (tool === 'invest') return { tool, target: action.targetRegionId, intensity: action.scale };
+  if (tool === 'reallocate-production') return { tool, target: action.targetRegionId, choice: action.priority, intensity: action.scale };
+  if (tool === 'negotiate-trade' || tool === 'external-import') return { tool, counterpart: action.partner, subject: action.resource, choice: action.desiredRunway, intensity: action.budgetAttitude };
+  if (tool === 'propose-agreement') return { tool, counterpart: action.partner, choice: action.agreementType };
+  if (tool === 'apply-diplomatic-pressure') return { tool, counterpart: action.partner, target: action.targetRegionId, choice: action.demand, intensity: action.pressure };
+  if (tool === 'respond-proposal') return { tool, target: action.proposalId, choice: action.response };
+  if (tool === 'change-policy') return { tool, choice: action.taxStance, subject: action.budgetPriority };
+  if (tool === 'respond-faction') return { tool, target: action.factionId, choice: action.response };
+  if (tool === 'start-project') return { tool, target: action.templateId, subject: action.targetRegionId, counterpart: action.targetPolityId, intensity: action.scale };
+  if (tool === 'mobilize') return { tool, target: action.locationRegionId, subject: action.commanderId, intensity: action.scale };
+  if (tool === 'declare-war') return { tool, counterpart: action.defender, choice: action.reason };
+  if (tool === 'issue-order') return { tool, target: action.formationId, subject: action.targetRegionId ?? undefined, choice: action.posture };
+  if (tool === 'negotiate-peace') return { tool, target: action.warId, choice: action.approach };
+  return { tool };
+};
+
+const decodeCampaignActionWire = (action) => {
+  const tool = action?.tool;
+  if (tool === 'invest') return { tool, targetRegionId: action.target, scale: action.intensity };
+  if (tool === 'reallocate-production') return { tool, targetRegionId: action.target, priority: action.choice, scale: action.intensity };
+  if (tool === 'negotiate-trade' || tool === 'external-import') return { tool, partner: action.counterpart, resource: action.subject, desiredRunway: action.choice, budgetAttitude: action.intensity };
+  if (tool === 'propose-agreement') return { tool, partner: action.counterpart, agreementType: action.choice };
+  if (tool === 'apply-diplomatic-pressure') return { tool, partner: action.counterpart, ...(action.target ? { targetRegionId: action.target } : {}), demand: action.choice, pressure: action.intensity };
+  if (tool === 'respond-proposal') return { tool, proposalId: action.target, response: action.choice };
+  if (tool === 'change-policy') return { tool, taxStance: action.choice, budgetPriority: action.subject };
+  if (tool === 'respond-faction') return { tool, factionId: action.target, response: action.choice };
+  if (tool === 'start-project') return { tool, templateId: action.target, ...(action.subject ? { targetRegionId: action.subject } : {}), ...(action.counterpart ? { targetPolityId: action.counterpart } : {}), scale: action.intensity };
+  if (tool === 'mobilize') return { tool, locationRegionId: action.target, ...(action.subject ? { commanderId: action.subject } : {}), scale: action.intensity };
+  if (tool === 'declare-war') return { tool, defender: action.counterpart, reason: action.choice };
+  if (tool === 'issue-order') return { tool, formationId: action.target, posture: action.choice, targetRegionId: action.subject ?? null };
+  if (tool === 'negotiate-peace') return { tool, warId: action.target, approach: action.choice };
+  return { tool };
+};
+
 export const normalizeCampaignDecisionWire = (raw) => ({
   ...raw,
   decisions: Array.isArray(raw?.decisions) ? raw.decisions.map((decision) => ({
     ...decision,
     hold: decision?.hold ?? null,
-    actions: Array.isArray(decision?.actions) ? decision.actions.map((action) => action?.tool === 'issue-order' && action.targetRegionId === undefined
-      ? { ...action, targetRegionId: null } : action) : decision?.actions,
+    actions: Array.isArray(decision?.actions) ? decision.actions.map(decodeCampaignActionWire) : decision?.actions,
   })) : raw?.decisions,
 });

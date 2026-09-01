@@ -11,7 +11,7 @@ import {
 import {
   opponentBatchResultSchema, playerOrderInterpretationSchema, playerReportResultSchema, strategicDecisionBatchV2Schema,
 } from "../packages/agent-runtime/dist/index.js";
-import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, normalizeCampaignDecisionWire } from "./lib/campaign-lab-contract.mjs";
+import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, encodeCampaignActionWire, normalizeCampaignDecisionWire } from "./lib/campaign-lab-contract.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const DEFAULT_MODEL = "gemini-3.5-flash-lite";
@@ -171,7 +171,7 @@ const main = async () => {
     ];
     for (const [family, action] of familyActions) {
       const expected = { decisions: [{ polityId: "polity:probe", objective: { domain: family === "trade" ? "economy" : family, summary: `Exercise ${family} tools.`, horizon: "short" },
-        actions: [action], futurePlan: [], contingency: "Use another supported tool.", rationale: "Non-hold preflight probe." }] };
+        actions: [encodeCampaignActionWire(action)], futurePlan: [], contingency: "Use another supported tool.", rationale: "Non-hold preflight probe." }] };
       const probe = await client.generate({ name: `strategic-family:${family}`, contents: user(`Return exactly this non-hold StrategicDecisionV2 batch: ${JSON.stringify(expected)}`),
         generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
       const parsed = strategicDecisionBatchV2Schema.parse(normalizeCampaignDecisionWire(JSON.parse(probe.text)));

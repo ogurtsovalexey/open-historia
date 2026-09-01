@@ -8,7 +8,7 @@ import {
   pacificQuotaDay,
   reduceChronicleAlerts,
 } from "../scripts/lib/campaign-lab-policy.mjs";
-import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS } from "../scripts/lib/campaign-lab-contract.mjs";
+import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS, encodeCampaignActionWire, normalizeCampaignDecisionWire } from "../scripts/lib/campaign-lab-contract.mjs";
 
 test("Campaign Lab sends the bounded StrategicDecisionV2 schema without raw commands", () => {
   assert.ok(CAMPAIGN_DECISION_TOOLS.includes("conserve"));
@@ -17,6 +17,13 @@ test("Campaign Lab sends the bounded StrategicDecisionV2 schema without raw comm
   for (const tool of CAMPAIGN_DECISION_TOOLS) assert.ok(serialized.includes(tool));
   assert.equal(serialized.includes('"command"'), false);
   assert.ok(serialized.length < 30_000);
+});
+
+test("compact Gemini actions round-trip to named StrategicDecisionV2 arguments", () => {
+  const action = { tool: "negotiate-trade", partner: "polity:soviet-union", resource: "iron", desiredRunway: "medium", budgetAttitude: "urgent" };
+  const normalized = normalizeCampaignDecisionWire({ decisions: [{ actions: [encodeCampaignActionWire(action)] }] });
+  assert.deepEqual(normalized.decisions[0].actions[0], action);
+  assert.equal(normalized.decisions[0].hold, null);
 });
 
 test("autonomy-v2 pilot is deliberately limited to the three German doctrines", () => {
