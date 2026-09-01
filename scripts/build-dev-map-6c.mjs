@@ -41,6 +41,8 @@ scenario.modules.diplomacy = true;
 scenario.modules.finance = true;
 scenario.modules.intelligence = true;
 scenario.modules.politics = true;
+scenario.modules.armedForces = true;
+scenario.modules.combat = true;
 const polityIds = ["polity:austria", "polity:czechia", "polity:france", "polity:germany", "polity:poland", "polity:slovakia"];
 const relations = [];
 const tradeRoutes = [];
@@ -196,6 +198,39 @@ const knowledgeSeeds = polityIds.map((polityId) => {
   };
 });
 scenario.statecraft = { finance, capacities, projectTemplates, intelligenceFacts, knowledgeSeeds };
+const forceRegion = {
+  austria: "region:gadm:AUT.5_1", czechia: "region:gadm:CZE.1_1", france: "region:gadm:FRA.4_1",
+  germany: "region:gadm:DEU.2_1", poland: "region:gadm:POL.1_1", slovakia: "region:gadm:SVK.2_1",
+};
+const militaryPolities = politySlugs.map((slug) => ({ polityId: `polity:${slug}`, maxMobilizationBp: 800, equipmentReserve: 24000 }));
+const commanders = politySlugs.map((slug, index) => ({
+  commanderId: `commander:${slug}-chief`, polityId: `polity:${slug}`,
+  displayName: { en: `${polityNames[slug].en} Field Commander`, ru: `${polityNames[slug].ru}: полевой командующий` },
+  skill: slug === "austria" ? 4 : slug === "germany" ? 2 : 2 + (index % 3),
+  traits: slug === "austria" ? ["offensive", "logistician"] : slug === "germany" ? ["defensive", "organizer"] : index % 2 === 0 ? ["defensive", "logistician"] : ["offensive", "organizer"],
+}));
+const formations = politySlugs.map((slug) => ({
+  formationId: `formation:${slug}-first`, polityId: `polity:${slug}`,
+  displayName: { en: `${polityNames[slug].en} First Army`, ru: `${polityNames[slug].ru}: первая армия` },
+  manpower: 6000, equipment: 6000, homeRegionId: forceRegion[slug], locationRegionId: forceRegion[slug],
+  commanderId: `commander:${slug}-chief`, moraleBp: 7600,
+}));
+const supplyLinks = [];
+for (const slug of politySlugs) {
+  const ids = scenario.regions.filter((region) => region.controllerId === `polity:${slug}`).map((region) => region.regionId).sort();
+  for (let index = 1; index < ids.length; index += 1) supplyLinks.push({ regions: [ids[index - 1], ids[index]], capacity: 12000 });
+}
+const crossLinks = [
+  ["region:gadm:AUT.5_1", "region:gadm:DEU.2_1"],
+  ["region:gadm:AUT.3_1", "region:gadm:CZE.1_1"],
+  ["region:gadm:CZE.1_1", "region:gadm:DEU.13_1"],
+  ["region:gadm:CZE.10_1", "region:gadm:POL.1_1"],
+  ["region:gadm:FRA.4_1", "region:gadm:DEU.1_1"],
+  ["region:gadm:POL.12_1", "region:gadm:SVK.2_1"],
+];
+for (const pair of crossLinks) supplyLinks.push({ regions: [...pair].sort(), capacity: 12000 });
+scenario.military = { combatSeed: 193801, polities: militaryPolities, commanders, formations,
+  supplyLinks: supplyLinks.sort((a, b) => `${a.regions[0]}|${a.regions[1]}`.localeCompare(`${b.regions[0]}|${b.regions[1]}`)) };
 writeJson(path.join(fixtureDir, "scenario.json"), scenario);
 
 const baseLink = readJson(path.join(baseFixtureDir, "map-link.json"));
@@ -219,7 +254,7 @@ Object.assign(meta, {
   subtitle: "Alternative 1938 playtest — 6 independent polities, 76 regions",
   heroTitle: "European Crisis, 1938",
   heroSubtitle: "Austria, Czechia, France, Germany, Poland and Slovakia enter an open regional crisis.",
-  description: "P3b development scenario for deterministic economy, diplomacy and trade. Economic values are synthetic test balance; no historical outcome is predetermined.",
+  description: "Playable development scenario for deterministic economy, diplomacy, statecraft, politics and aggregate war. Economic and military values are synthetic test balance; no historical outcome is predetermined.",
   engineScenario: "scenario-dev-map-6c",
   startView: { longitude: 11.5, latitude: 49.5, zoom: 4.2 },
   playCount: 0,
@@ -240,7 +275,7 @@ world.polityOverrides.Poland = {
   name: "Poland", aliases: ["Republic of Poland", "Польша", "Польская Республика"], color: [220, 120, 165],
   note: "EN: Poland protects sovereignty between stronger neighbours and seeks credible guarantees. RU: Польша защищает суверенитет между более сильными соседями и ищет надёжные гарантии.",
 };
-world.simulationRules = "Alternate history, 1 January 1938. Austria, Czechia, France, Germany, Poland and Slovakia are independent sovereign states. Slovakia became independent in 1937. There are no active or predetermined wars, annexations, occupations or territorial transfers. The deterministic engine owns every authoritative number and state transition. All authored economic values are synthetic development-test balance. Runtime diplomacy and trade require validated typed commands; AI may propose strategy but never invent outcomes.";
+world.simulationRules = "Alternate history, 1 January 1938. Austria, Czechia, France, Germany, Poland and Slovakia are independent sovereign states. Slovakia became independent in 1937. There are no active or predetermined wars, annexations, occupations or territorial transfers. The deterministic engine owns every authoritative number and state transition. All authored economic and military values are synthetic development-test balance. Runtime diplomacy, politics, mobilization and war require validated typed commands; AI may propose strategy but never invent outcomes.";
 world.startingTimelineText = "January 1938. Six European states enter an open alternate-history crisis. Germany seeks regional dominance; Austria, Czechia, France, Poland and Slovakia pursue their own security and economic interests. Every state begins independent and at peace; no historical annexation or war is scripted.";
 world.ownerCodes = ["Austria", "Czechia", "France", "Germany", "Poland", "Slovakia"];
 writeJson(path.join(serverDir, "world.json"), world);

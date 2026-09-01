@@ -7,6 +7,8 @@ export * from './statecraft.js';
 export * from './statecraftReducer.js';
 export * from './politics.js';
 export * from './politicsReducer.js';
+export * from './military.js';
+export * from './militaryReducer.js';
 export * from './mapLink.js';
 export * from './selectors.js';
 export * from './state.js';

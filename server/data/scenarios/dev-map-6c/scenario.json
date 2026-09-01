@@ -5,7 +5,7 @@
   "eyebrow": "Development/Test",
   "heroTitle": "European Crisis, 1938",
   "heroSubtitle": "Austria, Czechia, France, Germany, Poland and Slovakia enter an open regional crisis.",
-  "description": "P3b development scenario for deterministic economy, diplomacy and trade. Economic values are synthetic test balance; no historical outcome is predetermined.",
+  "description": "Playable development scenario for deterministic economy, diplomacy, statecraft, politics and aggregate war. Economic and military values are synthetic test balance; no historical outcome is predetermined.",
   "accentColor": "#6ea8fe",
   "countryNameOverrides": {},
   "engineDriven": true,

@@ -168,7 +168,7 @@
   "mapCredit": "",
   "difficulty": "standard",
   "language": "English",
-  "simulationRules": "Alternate history, 1 January 1938. Austria, Czechia, France, Germany, Poland and Slovakia are independent sovereign states. Slovakia became independent in 1937. There are no active or predetermined wars, annexations, occupations or territorial transfers. The deterministic engine owns every authoritative number and state transition. All authored economic values are synthetic development-test balance. Runtime diplomacy and trade require validated typed commands; AI may propose strategy but never invent outcomes.",
+  "simulationRules": "Alternate history, 1 January 1938. Austria, Czechia, France, Germany, Poland and Slovakia are independent sovereign states. Slovakia became independent in 1937. There are no active or predetermined wars, annexations, occupations or territorial transfers. The deterministic engine owns every authoritative number and state transition. All authored economic and military values are synthetic development-test balance. Runtime diplomacy, politics, mobilization and war require validated typed commands; AI may propose strategy but never invent outcomes.",
   "startingTimelineText": "January 1938. Six European states enter an open alternate-history crisis. Germany seeks regional dominance; Austria, Czechia, France, Poland and Slovakia pursue their own security and economic interests. Every state begins independent and at peace; no historical annexation or war is scripted.",
   "ownerCodes": [
     "Austria",

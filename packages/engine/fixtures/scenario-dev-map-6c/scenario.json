@@ -23,7 +23,9 @@
     "diplomacy": true,
     "finance": true,
     "intelligence": true,
-    "politics": true
+    "politics": true,
+    "armedForces": true,
+    "combat": true
   },
   "economy": {
     "foodNeedPerPersonMilli": 50,
@@ -3349,6 +3351,741 @@
         "confidence": "high",
         "evidenceId": "evidence:scenario-1938-slovakia-brief",
         "staleAfterMonths": 24
+      }
+    ]
+  },
+  "military": {
+    "combatSeed": 193801,
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "maxMobilizationBp": 800,
+        "equipmentReserve": 24000
+      },
+      {
+        "polityId": "polity:czechia",
+        "maxMobilizationBp": 800,
+        "equipmentReserve": 24000
+      },
+      {
+        "polityId": "polity:france",
+        "maxMobilizationBp": 800,
+        "equipmentReserve": 24000
+      },
+      {
+        "polityId": "polity:germany",
+        "maxMobilizationBp": 800,
+        "equipmentReserve": 24000
+      },
+      {
+        "polityId": "polity:poland",
+        "maxMobilizationBp": 800,
+        "equipmentReserve": 24000
+      },
+      {
+        "polityId": "polity:slovakia",
+        "maxMobilizationBp": 800,
+        "equipmentReserve": 24000
+      }
+    ],
+    "commanders": [
+      {
+        "commanderId": "commander:austria-chief",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Austria Field Commander",
+          "ru": "Австрия: полевой командующий"
+        },
+        "skill": 4,
+        "traits": [
+          "offensive",
+          "logistician"
+        ]
+      },
+      {
+        "commanderId": "commander:czechia-chief",
+        "polityId": "polity:czechia",
+        "displayName": {
+          "en": "Czechia Field Commander",
+          "ru": "Чехия: полевой командующий"
+        },
+        "skill": 3,
+        "traits": [
+          "offensive",
+          "organizer"
+        ]
+      },
+      {
+        "commanderId": "commander:france-chief",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "France Field Commander",
+          "ru": "Франция: полевой командующий"
+        },
+        "skill": 4,
+        "traits": [
+          "defensive",
+          "logistician"
+        ]
+      },
+      {
+        "commanderId": "commander:germany-chief",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Germany Field Commander",
+          "ru": "Германия: полевой командующий"
+        },
+        "skill": 2,
+        "traits": [
+          "defensive",
+          "organizer"
+        ]
+      },
+      {
+        "commanderId": "commander:poland-chief",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Poland Field Commander",
+          "ru": "Польша: полевой командующий"
+        },
+        "skill": 3,
+        "traits": [
+          "defensive",
+          "logistician"
+        ]
+      },
+      {
+        "commanderId": "commander:slovakia-chief",
+        "polityId": "polity:slovakia",
+        "displayName": {
+          "en": "Slovakia Field Commander",
+          "ru": "Словакия: полевой командующий"
+        },
+        "skill": 4,
+        "traits": [
+          "offensive",
+          "organizer"
+        ]
+      }
+    ],
+    "formations": [
+      {
+        "formationId": "formation:austria-first",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Austria First Army",
+          "ru": "Австрия: первая армия"
+        },
+        "manpower": 6000,
+        "equipment": 6000,
+        "homeRegionId": "region:gadm:AUT.5_1",
+        "locationRegionId": "region:gadm:AUT.5_1",
+        "commanderId": "commander:austria-chief",
+        "moraleBp": 7600
+      },
+      {
+        "formationId": "formation:czechia-first",
+        "polityId": "polity:czechia",
+        "displayName": {
+          "en": "Czechia First Army",
+          "ru": "Чехия: первая армия"
+        },
+        "manpower": 6000,
+        "equipment": 6000,
+        "homeRegionId": "region:gadm:CZE.1_1",
+        "locationRegionId": "region:gadm:CZE.1_1",
+        "commanderId": "commander:czechia-chief",
+        "moraleBp": 7600
+      },
+      {
+        "formationId": "formation:france-first",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "France First Army",
+          "ru": "Франция: первая армия"
+        },
+        "manpower": 6000,
+        "equipment": 6000,
+        "homeRegionId": "region:gadm:FRA.4_1",
+        "locationRegionId": "region:gadm:FRA.4_1",
+        "commanderId": "commander:france-chief",
+        "moraleBp": 7600
+      },
+      {
+        "formationId": "formation:germany-first",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Germany First Army",
+          "ru": "Германия: первая армия"
+        },
+        "manpower": 6000,
+        "equipment": 6000,
+        "homeRegionId": "region:gadm:DEU.2_1",
+        "locationRegionId": "region:gadm:DEU.2_1",
+        "commanderId": "commander:germany-chief",
+        "moraleBp": 7600
+      },
+      {
+        "formationId": "formation:poland-first",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Poland First Army",
+          "ru": "Польша: первая армия"
+        },
+        "manpower": 6000,
+        "equipment": 6000,
+        "homeRegionId": "region:gadm:POL.1_1",
+        "locationRegionId": "region:gadm:POL.1_1",
+        "commanderId": "commander:poland-chief",
+        "moraleBp": 7600
+      },
+      {
+        "formationId": "formation:slovakia-first",
+        "polityId": "polity:slovakia",
+        "displayName": {
+          "en": "Slovakia First Army",
+          "ru": "Словакия: первая армия"
+        },
+        "manpower": 6000,
+        "equipment": 6000,
+        "homeRegionId": "region:gadm:SVK.2_1",
+        "locationRegionId": "region:gadm:SVK.2_1",
+        "commanderId": "commander:slovakia-chief",
+        "moraleBp": 7600
+      }
+    ],
+    "supplyLinks": [
+      {
+        "regions": [
+          "region:gadm:AUT.1_1",
+          "region:gadm:AUT.2_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:AUT.2_1",
+          "region:gadm:AUT.3_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:AUT.3_1",
+          "region:gadm:AUT.4_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:AUT.3_1",
+          "region:gadm:CZE.1_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:AUT.4_1",
+          "region:gadm:AUT.5_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:AUT.5_1",
+          "region:gadm:AUT.6_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:AUT.5_1",
+          "region:gadm:DEU.2_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:AUT.6_1",
+          "region:gadm:AUT.7_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:AUT.7_1",
+          "region:gadm:AUT.8_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:AUT.8_1",
+          "region:gadm:AUT.9_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.1_1",
+          "region:gadm:CZE.2_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.1_1",
+          "region:gadm:DEU.13_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.10_1",
+          "region:gadm:CZE.11_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.10_1",
+          "region:gadm:POL.1_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.11_1",
+          "region:gadm:CZE.12_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.12_1",
+          "region:gadm:CZE.13_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.13_1",
+          "region:gadm:CZE.14_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.14_1",
+          "region:gadm:CZE.1_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.2_1",
+          "region:gadm:CZE.3_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.3_1",
+          "region:gadm:CZE.4_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.4_1",
+          "region:gadm:CZE.5_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.5_1",
+          "region:gadm:CZE.6_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.6_1",
+          "region:gadm:CZE.7_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.7_1",
+          "region:gadm:CZE.8_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:CZE.8_1",
+          "region:gadm:CZE.9_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.1_1",
+          "region:gadm:DEU.2_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.1_1",
+          "region:gadm:FRA.4_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.10_1",
+          "region:gadm:DEU.11_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.11_1",
+          "region:gadm:DEU.12_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.12_1",
+          "region:gadm:DEU.13_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.13_1",
+          "region:gadm:DEU.14_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.14_1",
+          "region:gadm:DEU.15_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.15_1",
+          "region:gadm:DEU.16_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.16_1",
+          "region:gadm:DEU.1_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.2_1",
+          "region:gadm:DEU.3_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.3_1",
+          "region:gadm:DEU.4_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.4_1",
+          "region:gadm:DEU.5_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.5_1",
+          "region:gadm:DEU.6_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.6_1",
+          "region:gadm:DEU.7_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.7_1",
+          "region:gadm:DEU.8_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:DEU.8_1",
+          "region:gadm:DEU.9_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.1_1",
+          "region:gadm:FRA.2_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.10_1",
+          "region:gadm:FRA.11_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.11_1",
+          "region:gadm:FRA.12_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.12_1",
+          "region:gadm:FRA.13_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.13_1",
+          "region:gadm:FRA.1_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.2_1",
+          "region:gadm:FRA.3_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.3_1",
+          "region:gadm:FRA.4_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.4_1",
+          "region:gadm:FRA.5_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.5_1",
+          "region:gadm:FRA.6_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.6_1",
+          "region:gadm:FRA.7_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.7_1",
+          "region:gadm:FRA.8_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:FRA.8_1",
+          "region:gadm:FRA.9_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.1_1",
+          "region:gadm:POL.2_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.10_1",
+          "region:gadm:POL.11_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.11_1",
+          "region:gadm:POL.12_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.12_1",
+          "region:gadm:POL.13_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.12_1",
+          "region:gadm:SVK.2_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.13_1",
+          "region:gadm:POL.14_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.14_1",
+          "region:gadm:POL.15_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.15_1",
+          "region:gadm:POL.16_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.16_1",
+          "region:gadm:POL.1_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.2_1",
+          "region:gadm:POL.3_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.3_1",
+          "region:gadm:POL.4_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.4_1",
+          "region:gadm:POL.5_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.5_1",
+          "region:gadm:POL.6_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.6_1",
+          "region:gadm:POL.7_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.7_1",
+          "region:gadm:POL.8_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:POL.8_1",
+          "region:gadm:POL.9_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:SVK.1_1",
+          "region:gadm:SVK.2_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:SVK.2_1",
+          "region:gadm:SVK.3_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:SVK.3_1",
+          "region:gadm:SVK.4_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:SVK.4_1",
+          "region:gadm:SVK.5_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:SVK.5_1",
+          "region:gadm:SVK.6_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:SVK.6_1",
+          "region:gadm:SVK.7_1"
+        ],
+        "capacity": 12000
+      },
+      {
+        "regions": [
+          "region:gadm:SVK.7_1",
+          "region:gadm:SVK.8_1"
+        ],
+        "capacity": 12000
       }
     ]
   }

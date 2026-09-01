@@ -13,6 +13,7 @@ import {
 } from '@open-historia/domain';
 import { authoredStatecraftSchema } from './statecraft.js';
 import { authoredPoliticsSchema } from './politics.js';
+import { authoredMilitarySchema } from './military.js';
 
 /** Game resource catalog per regional-resource-economy.md §2. Engine-owned. */
 export const RESOURCE_CATALOG = [
@@ -134,6 +135,8 @@ export type EconomyParams = z.infer<typeof economyParamsSchema>;
 export const modulesSchema = z
   .object({
     diplomacy: z.boolean().optional(),
+    armedForces: z.boolean().optional(),
+    combat: z.boolean().optional(),
     finance: z.boolean().optional(),
     intelligence: z.boolean().optional(),
     politics: z.boolean().optional(),
@@ -146,7 +149,7 @@ export const modulesSchema = z
   .strict();
 export type Modules = z.infer<typeof modulesSchema>;
 
-export const MODULE_NAMES = ['diplomacy', 'finance', 'intelligence', 'politics', 'projects', 'budget', 'trade', 'shortages', 'unrest'] as const;
+export const MODULE_NAMES = ['armedForces', 'combat', 'diplomacy', 'finance', 'intelligence', 'politics', 'projects', 'budget', 'trade', 'shortages', 'unrest'] as const;
 export type ModuleName = (typeof MODULE_NAMES)[number];
 
 export const authoredRelationSchema = z.object({
@@ -188,6 +191,8 @@ export const econScenarioSchema = z
     statecraft: authoredStatecraftSchema.optional(),
     /** Authored factions, offices and succession state. */
     politics: authoredPoliticsSchema.optional(),
+    /** Authored manpower ceilings, starting forces, commanders and supply links. */
+    military: authoredMilitarySchema.optional(),
     economy: economyParamsSchema,
     polities: z.array(scenarioPolitySchema).min(2),
     regions: z.array(scenarioRegionSchema).min(1),
@@ -209,6 +214,12 @@ export const econScenarioSchema = z
     }
     if (scenario.modules?.politics === true && !scenario.politics) {
       ctx.addIssue({ code: 'custom', message: 'politics module requires authored political inputs', path: ['politics'] });
+    }
+    if ((scenario.modules?.armedForces === true || scenario.modules?.combat === true) && !scenario.military) {
+      ctx.addIssue({ code: 'custom', message: 'armedForces/combat modules require authored military inputs', path: ['military'] });
+    }
+    if (scenario.modules?.combat === true && scenario.modules?.armedForces !== true) {
+      ctx.addIssue({ code: 'custom', message: 'combat module requires armedForces', path: ['modules', 'combat'] });
     }
     if (scenario.politics) {
       const factionIds = new Set(scenario.politics.factions.map((entry) => entry.factionId));
@@ -257,6 +268,47 @@ export const econScenarioSchema = z
           || (polity.heirCharacterId && (!heir || heir.polityId !== polity.polityId || heir.office !== 'heir'))) {
           ctx.addIssue({ code: 'custom', message: 'political ruler/heir must match their polity and offices', path: ['politics', 'polities', index] });
         }
+      }
+    }
+    if (scenario.military) {
+      const regionIds = new Set(scenario.regions.map((entry) => entry.regionId));
+      const militaryPolityIds = new Set(scenario.military.polities.map((entry) => entry.polityId));
+      const commanderIds = new Set(scenario.military.commanders.map((entry) => entry.commanderId));
+      const formationIds = new Set(scenario.military.formations.map((entry) => entry.formationId));
+      if (scenario.modules?.armedForces === true && (militaryPolityIds.size !== polityIds.size || scenario.military.polities.length !== polityIds.size)) {
+        ctx.addIssue({ code: 'custom', message: 'armedForces requires exactly one military row per polity', path: ['military', 'polities'] });
+      }
+      if (commanderIds.size !== scenario.military.commanders.length || formationIds.size !== scenario.military.formations.length) {
+        ctx.addIssue({ code: 'custom', message: 'commander and formation ids must be unique', path: ['military'] });
+      }
+      for (const [index, row] of scenario.military.polities.entries()) {
+        if (!polityIds.has(row.polityId)) ctx.addIssue({ code: 'custom', message: 'military row references unknown polity', path: ['military', 'polities', index] });
+        const population = scenario.regions.filter((entry) => entry.controllerId === row.polityId).reduce((sum, entry) => sum + entry.population, 0);
+        const ceiling = Math.floor((population * row.maxMobilizationBp) / 10000);
+        const starting = scenario.military.formations.filter((entry) => entry.polityId === row.polityId).reduce((sum, entry) => sum + entry.manpower, 0);
+        if (starting > ceiling) ctx.addIssue({ code: 'custom', message: `starting manpower ${starting} exceeds ceiling ${ceiling}`, path: ['military', 'formations'] });
+      }
+      for (const [index, commander] of scenario.military.commanders.entries()) {
+        if (!polityIds.has(commander.polityId)) ctx.addIssue({ code: 'custom', message: 'commander references unknown polity', path: ['military', 'commanders', index] });
+      }
+      for (const [index, formation] of scenario.military.formations.entries()) {
+        const home = scenario.regions.find((entry) => entry.regionId === formation.homeRegionId);
+        const location = scenario.regions.find((entry) => entry.regionId === formation.locationRegionId);
+        const commander = formation.commanderId ? scenario.military.commanders.find((entry) => entry.commanderId === formation.commanderId) : null;
+        if (!polityIds.has(formation.polityId) || !home || !location || home.controllerId !== formation.polityId
+          || location.controllerId !== formation.polityId || formation.manpower <= 0 || formation.equipment <= 0
+          || (formation.commanderId && (!commander || commander.polityId !== formation.polityId))) {
+          ctx.addIssue({ code: 'custom', message: 'starting formation must have positive conserved forces in controlled regions and a matching commander', path: ['military', 'formations', index] });
+        }
+      }
+      const links = new Set<string>();
+      for (const [index, link] of scenario.military.supplyLinks.entries()) {
+        const [left, right] = link.regions;
+        const key = `${left}|${right}`;
+        if (left >= right || !regionIds.has(left) || !regionIds.has(right) || links.has(key)) {
+          ctx.addIssue({ code: 'custom', message: 'supply links require two known sorted unique regions', path: ['military', 'supplyLinks', index] });
+        }
+        links.add(key);
       }
     }
     if (scenario.statecraft) {

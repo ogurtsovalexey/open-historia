@@ -9,6 +9,7 @@ import { getStock } from './state.js';
 import type { ResourceTransferRecord, TradeExecutionRecord, TreasuryTransferRecord } from './diplomacyReducer.js';
 import type { FinanceResolutionRecord, ProjectAllocationRecord } from './statecraftReducer.js';
 import type { PoliticalCommandRecord, PoliticalResolutionRecord } from './politicsReducer.js';
+import type { CombatRecord, MilitaryCommandRecord, MilitaryTreasuryTransfer } from './militaryReducer.js';
 
 export interface RegionPopulationRow {
   regionId: RegionId;
@@ -92,6 +93,7 @@ export interface PolityLedger {
   finance?: FinanceResolutionRecord;
   projectSpend?: number;
   politicalSpend?: number;
+  treasuryMilitaryNet?: number;
   stockMovements: StockMovement[];
 }
 
@@ -126,6 +128,11 @@ export interface TurnLedger {
   politics?: {
     commands: PoliticalCommandRecord[];
     factionChanges: PoliticalResolutionRecord[];
+  };
+  military?: {
+    commands: MilitaryCommandRecord[];
+    combats: CombatRecord[];
+    treasuryTransfers: MilitaryTreasuryTransfer[];
   };
 }
 
@@ -213,6 +220,7 @@ export function checkInvariants(
     // treasury' = treasury + tax revenue - accepted spending.
     const spend = polityLedger.investment?.spend ?? 0;
     const expectedTreasury = polityLedger.treasuryOpening + (polityLedger.treasuryTradeNet ?? 0)
+      + (polityLedger.treasuryMilitaryNet ?? 0)
       + (polityLedger.finance?.bondsIssued ?? 0) + polityLedger.taxTotal - spend
       - (polityLedger.projectSpend ?? 0) - (polityLedger.finance?.interestPaid ?? 0);
     const expectedAfterPolitics = expectedTreasury - (polityLedger.politicalSpend ?? 0);
@@ -328,6 +336,41 @@ export function checkInvariants(
       }
     }
     checked.push('political-office-uniqueness', 'political-succession-integrity');
+  }
+
+  if (next.military) {
+    for (const polity of next.military.polities) {
+      const fielded = next.military.formations.filter((entry) => entry.polityId === polity.polityId
+        && (entry.status === 'active' || entry.status === 'mobilizing'));
+      const manpower = fielded.reduce((sum, entry) => sum + entry.manpower, 0);
+      const equipment = fielded.reduce((sum, entry) => sum + entry.equipment, 0);
+      if (polity.manpowerPool + manpower + polity.casualties !== polity.manpowerCeiling || polity.mobilized !== manpower) {
+        fail('military-manpower-conservation', `${polity.polityId}: pool ${polity.manpowerPool} + fielded ${manpower} + casualties ${polity.casualties} != ceiling ${polity.manpowerCeiling}`);
+      }
+      if (polity.equipmentReserve + equipment + polity.equipmentLost !== polity.equipmentTotal) {
+        fail('military-equipment-conservation', `${polity.polityId}: reserve ${polity.equipmentReserve} + fielded ${equipment} + lost ${polity.equipmentLost} != total ${polity.equipmentTotal}`);
+      }
+    }
+    for (const occupation of next.military.occupations) {
+      const region = next.regions.find((entry) => entry.regionId === occupation.regionId);
+      if (!region || region.controllerId !== occupation.legalControllerId || occupation.actualControllerId === occupation.legalControllerId) {
+        fail('occupation-control-integrity', `${occupation.regionId}: invalid legal/actual control`);
+      }
+    }
+    if (ledger.military) {
+      const net = new Map<string, number>();
+      for (const transfer of ledger.military.treasuryTransfers) {
+        net.set(transfer.fromPolityId, (net.get(transfer.fromPolityId) ?? 0) - transfer.amount);
+        net.set(transfer.toPolityId, (net.get(transfer.toPolityId) ?? 0) + transfer.amount);
+      }
+      if ([...net.values()].reduce((sum, entry) => sum + entry, 0) !== 0) fail('military-treasury-conservation', 'reparation net is not zero');
+      for (const combat of ledger.military.combats) {
+        if (combat.attackerSupplyBp < 0 || combat.attackerSupplyBp > 10000 || combat.defenderSupplyBp < 0 || combat.defenderSupplyBp > 10000) {
+          fail('military-supply-bounds', `${combat.frontId}: invalid supply`);
+        }
+      }
+    }
+    checked.push('military-manpower-conservation', 'military-equipment-conservation', 'occupation-control-integrity', 'military-treasury-conservation', 'military-supply-bounds');
   }
 
   if (next.turn !== prev.turn + 1) fail('turn-increment', `${prev.turn} -> ${next.turn}`);

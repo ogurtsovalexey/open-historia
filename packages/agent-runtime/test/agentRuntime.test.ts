@@ -35,7 +35,10 @@ test('strategic diplomacy batch is bounded, deterministic and contains no full m
   assert.equal(first.polityIds.length, 5);
   assert.ok(first.characterCount <= MAX_BATCH_BRIEF_CHARS);
   assert.equal(JSON.stringify(first).includes('geometry'), false);
-  assert.ok((JSON.stringify(first).match(/regionId/g) ?? []).length <= 15);
+  assert.ok(first.briefs.every((brief) => brief.projectRegionCandidates.length <= 3
+    && brief.mobilizationRegionCandidates.length <= 3 && brief.frontRegionCandidates.length <= 6
+    && brief.peaceRegionCandidates.length <= 6));
+  assert.equal(JSON.stringify(first).includes('supplyLinks'), false);
   assert.equal(JSON.stringify(first).includes('truths'), false);
   assert.equal(JSON.stringify(first).includes('liquid-fuel reserves'), false);
   assert.equal(JSON.stringify(first).includes('character:'), false);
@@ -83,6 +86,15 @@ test('strategic diplomacy validation requires one bound decision per polity', ()
       expectedRevision: state.revision, effectiveMonth: state.month, factionId: faction.factionId, response: 'repress' },
   };
   assert.equal(validateDiplomacyBatch(politics, batch).decisions[index]?.intent, 'repress');
+
+  const war: { decisions: Array<Record<string, unknown>> } = structuredClone(holds);
+  war.decisions[0] = {
+    polityId: batch.polityIds[0]!, intent: 'declare-war', rationale: 'Escalate a public rivalry.',
+    command: { kind: 'war.declare', commandId: '00000000-0000-4000-8000-000000000004',
+      actorPolityId: batch.polityIds[0]!, expectedRevision: state.revision, effectiveMonth: state.month,
+      warId: 'war:agent-validation', defenderPolityId: 'polity:austria', reason: 'rivalry' },
+  };
+  assert.equal(validateDiplomacyBatch(war, batch).decisions[0]?.intent, 'declare-war');
 });
 
 test('bounded briefs and batches never include the full map', () => {

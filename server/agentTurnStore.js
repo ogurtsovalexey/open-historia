@@ -114,6 +114,47 @@ const publicDraft = (draft) => ({
   })) : null,
 });
 
+const militaryInterpreterContext = (state, playerPolityId) => {
+  if (!state.military) return null;
+  const actualController = (region) => state.military.occupations.filter((entry) => entry.regionId === region.regionId)
+    .sort((left, right) => right.occupiedMonth.localeCompare(left.occupiedMonth) || right.warId.localeCompare(left.warId))[0]?.actualControllerId ?? region.controllerId;
+  const wars = state.military.wars.filter((war) => war.attackers.includes(playerPolityId) || war.defenders.includes(playerPolityId));
+  const formations = state.military.formations.filter((entry) => entry.polityId === playerPolityId);
+  const formationLocations = new Set(formations.map((entry) => entry.locationRegionId));
+  const unavailableDefenders = new Set([
+    ...wars.filter((war) => war.status === "active").flatMap((war) => [...war.attackers, ...war.defenders]),
+    ...(state.diplomacy?.agreements ?? []).filter((entry) => entry.terms.kind === "agreement"
+      && ["non-aggression", "defensive-alliance"].includes(entry.terms.agreementType)
+      && [entry.terms.fromPolityId, entry.terms.toPolityId].includes(playerPolityId))
+      .flatMap((entry) => [entry.terms.fromPolityId, entry.terms.toPolityId]),
+  ]);
+  const frontRegionCandidates = formations.filter((entry) => entry.status === "active"
+    || (entry.status === "mobilizing" && entry.readyMonth && entry.readyMonth <= state.month)).flatMap((formation) =>
+    state.military.supplyLinks.filter((link) => link.regions.includes(formation.locationRegionId)).map((link) => {
+      const regionId = link.regions.find((entry) => entry !== formation.locationRegionId);
+      const region = state.regions.find((entry) => entry.regionId === regionId);
+      return region ? { formationId: formation.formationId, regionId, legalControllerId: region.controllerId, actualControllerId: actualController(region) } : null;
+    }).filter(Boolean)).filter((candidate) => wars.some((war) => war.status === "active"
+      && ((war.attackers.includes(playerPolityId) && war.defenders.includes(candidate.actualControllerId))
+        || (war.defenders.includes(playerPolityId) && war.attackers.includes(candidate.actualControllerId)))))
+    .sort((left, right) => `${left.formationId}|${left.regionId}`.localeCompare(`${right.formationId}|${right.regionId}`)).slice(0, 6);
+  return {
+    polity: state.military.polities.find((entry) => entry.polityId === playerPolityId) ?? null,
+    formations,
+    commanders: state.military.commanders.filter((entry) => entry.polityId === playerPolityId),
+    wars,
+    peaceOffers: state.military.peaceOffers.filter((entry) => entry.proposerPolityId === playerPolityId || entry.recipientPolityId === playerPolityId),
+    defenderCandidates: state.polities.filter((entry) => entry.id !== playerPolityId && !unavailableDefenders.has(entry.id))
+      .map((entry) => ({ polityId: entry.id, name: entry.displayName.en })),
+    mobilizationRegionCandidates: state.regions.filter((entry) => entry.controllerId === playerPolityId && actualController(entry) === playerPolityId)
+      .sort((left, right) => Number(formationLocations.has(right.regionId)) - Number(formationLocations.has(left.regionId))
+        || left.regionId.localeCompare(right.regionId)).slice(0, 3).map((entry) => ({ regionId: entry.regionId, name: entry.displayName.en })),
+    frontRegionCandidates,
+    peaceRegionCandidates: state.military.occupations.filter((entry) => wars.some((war) => war.warId === entry.warId && war.status === "active"))
+      .sort((left, right) => left.regionId.localeCompare(right.regionId)).slice(0, 6),
+  };
+};
+
 const interpreterTasks = (draft) => {
   const chunks = [];
   let current = [];
@@ -132,7 +173,7 @@ const interpreterTasks = (draft) => {
     taskId: "orders.interpret-economy",
     taskVersion: 1,
     taskKey: `interpreter-${index}`,
-    systemPrompt: "Route every player action exactly once. Investment orders and enabled political actions become typed commands. For a new historical or fictional character, propose only a supplied faction, one qualitative aptitude trait, loyalty band and ambition band; the engine owns numeric traits and the player must confirm. Requests to inspect, summarize, brief or report use disposition report with command null. Unsupported war, transfers and unavailable mechanics use unsupported. Never invent effects, faction ids or existing characters.",
+    systemPrompt: "Route every player action exactly once. Investment, enabled political and enabled military actions become typed commands. War declarations, mobilization, formation orders and peace may use only the supplied actors, formations, reserves, wars, offers and bounded region candidates; never predict combat or numeric effects. For a new historical or fictional character, propose only a supplied faction, one qualitative aptitude trait, loyalty band and ambition band; the engine owns numeric traits and the player must confirm. Requests to inspect, summarize, brief or report use disposition report with command null. Unavailable mechanics use unsupported. Never invent effects, ids, regions, forces or existing characters.",
     userPrompt: JSON.stringify({
       polityId: draft.playerPolityId,
       month: draft.state.month,
@@ -148,6 +189,7 @@ const interpreterTasks = (draft) => {
         allowedCharacterOrigins: ["historical-runtime", "fictional-runtime"],
         allowedCharacterBands: ["low", "medium", "high"],
       } : null,
+      military: militaryInterpreterContext(draft.state, draft.playerPolityId),
       actions,
     }),
     tool: { name: "submit_player_economy_orders", description: "Submit the strict interpretation", schema: toolSchema },
@@ -184,11 +226,12 @@ const makeStrategicTasks = (draft) => {
   draft.pendingStrategicBatch = batch;
   const schema = withoutModelCommandIds(exportJsonSchema(opponentDiplomacyBatchResultSchema));
   draft.tasks = [{
-    taskId: draft.state.modules?.politics ? "opponents.plan-politics"
+    taskId: draft.state.modules?.combat ? "opponents.plan-war"
+      : draft.state.modules?.politics ? "opponents.plan-politics"
       : draft.state.modules?.finance || draft.state.modules?.projects ? "opponents.plan-statecraft" : "opponents.plan-diplomacy",
     taskVersion: 1,
     taskKey: batch.batchId,
-    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity and at most one material command. Use hold with a null command unless diplomacy, trade, finance, a listed project or an active faction crisis justifies action. Political responses may name only a listed faction; shared batches may not appoint, create or replace characters. Intelligence may target a polity but must never name a hidden fact id. Commands must use the supplied month and revision. Do not invent actors, resources, routes, templates, regions or effects.",
+    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity and at most one material command. Use hold with a null command unless diplomacy, trade, finance, a listed project, active faction crisis or public war state justifies action. War, mobilization, formation orders and peace terms may use only supplied formations, reserves, wars, offers and bounded region candidates. Political responses may name only a listed faction; shared batches may not appoint, create or replace characters. Intelligence may target a polity but must never name a hidden fact id. Commands must use the supplied month and revision. Do not invent actors, resources, routes, templates, regions, forces, effects or outcomes.",
     userPrompt: JSON.stringify({ month: batch.month, revision: batch.baseRevision, briefs: batch.briefs }),
     tool: { name: "submit_opponent_strategy_decisions", description: "Submit every requested polity strategic decision", schema },
     context: { fullMapIncluded: false, characterCount: batch.characterCount, polityCount: batch.polityIds.length },
@@ -283,6 +326,7 @@ const validatePlayerInterpretations = (draft, outputs) => {
   const actual = actions.map((entry) => entry.actionId).sort();
   if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error("interpreter must return every and only submitted action id");
   const controlled = new Set(draft.state.regions.filter((entry) => entry.controllerId === draft.playerPolityId).map((entry) => entry.regionId));
+  const military = militaryInterpreterContext(draft.state, draft.playerPolityId);
   const commands = actions.flatMap((entry) => entry.command ? [entry.command] : []);
   if (commands.length + draft.playerCommands.length > 8) throw new Error("a player month permits at most eight commands");
   if (commands.filter((command) => command.kind === "economy.invest-region").length
@@ -295,6 +339,23 @@ const validatePlayerInterpretations = (draft, outputs) => {
     if (command.kind === "politics.respond" && !draft.state.politics?.factions.some((entry) => entry.polityId === draft.playerPolityId && entry.factionId === command.factionId)) throw new Error("player political response names an unknown faction");
     if (command.kind === "politics.appoint" && !draft.state.politics?.characters.some((entry) => entry.polityId === draft.playerPolityId && entry.characterId === command.characterId)) throw new Error("player appointment names an unknown character");
     if (command.kind === "character.create" && !draft.state.politics?.factions.some((entry) => entry.polityId === draft.playerPolityId && entry.factionId === command.factionId)) throw new Error("player-created character names an unknown faction");
+    if (command.kind === "war.declare" && (!military?.defenderCandidates.some((entry) => entry.polityId === command.defenderPolityId)
+      || military.wars.some((war) => war.status === "active" && (war.attackers.includes(command.defenderPolityId) || war.defenders.includes(command.defenderPolityId))
+        && (war.attackers.includes(draft.playerPolityId) || war.defenders.includes(draft.playerPolityId))))) throw new Error("player war declaration names an unavailable defender");
+    if (command.kind === "military.mobilize" && (!military?.mobilizationRegionCandidates.some((entry) => entry.regionId === command.locationRegionId)
+      || (command.commanderId !== null && !military.commanders.some((entry) => entry.commanderId === command.commanderId))
+      || military.formations.some((entry) => entry.formationId === command.formationId)
+      || command.manpower > (military.polity?.manpowerPool ?? 0) || command.equipment > (military.polity?.equipmentReserve ?? 0))) throw new Error("player mobilization exceeds supplied reserves or names unavailable entities");
+    if (command.kind === "military.order" && (!military?.formations.some((entry) => entry.formationId === command.formationId)
+      || (command.posture === "advance" && !military.frontRegionCandidates.some((entry) => entry.formationId === command.formationId && entry.regionId === command.targetRegionId))
+      || (command.posture !== "advance" && command.targetRegionId !== null))) throw new Error("player military order is outside bounded front candidates");
+    if (command.kind === "military.demobilize" && !military?.formations.some((entry) => entry.formationId === command.formationId)) throw new Error("player demobilization names an unknown formation");
+    if (command.kind === "military.split" && !military?.formations.some((entry) => entry.formationId === command.sourceFormationId)) throw new Error("player split names an unknown formation");
+    if (command.kind === "military.merge" && (!military?.formations.some((entry) => entry.formationId === command.primaryFormationId)
+      || !military.formations.some((entry) => entry.formationId === command.secondaryFormationId))) throw new Error("player merge names an unknown formation");
+    if (command.kind === "peace.propose" && (!military?.wars.some((entry) => entry.warId === command.warId && entry.status === "active")
+      || command.regionTransfers.some((transfer) => !military.peaceRegionCandidates.some((entry) => entry.regionId === transfer.regionId && entry.actualControllerId === transfer.toPolityId)))) throw new Error("player peace proposal is outside bounded occupied-region candidates");
+    if (command.kind === "peace.respond" && !military?.peaceOffers.some((entry) => entry.offerId === command.offerId && entry.recipientPolityId === draft.playerPolityId && entry.status === "pending")) throw new Error("player peace response names an unavailable offer");
     if (command.expectedRevision !== draft.state.revision || command.effectiveMonth !== draft.state.month) throw new Error("player command is stale or for the wrong month");
   }
   draft.playerCommands.push(...commands);
@@ -317,6 +378,17 @@ const validatePlayerInterpretations = (draft, outputs) => {
         factionId: entry.command.factionId, response: entry.command.response,
       } : entry.command.kind === "politics.appoint" ? {
         characterId: entry.command.characterId, office: entry.command.office,
+      } : entry.command.kind === "war.declare" ? {
+        defenderPolityId: entry.command.defenderPolityId, reason: entry.command.reason,
+      } : entry.command.kind === "military.mobilize" ? {
+        formationId: entry.command.formationId, manpower: entry.command.manpower, equipment: entry.command.equipment,
+      } : entry.command.kind === "military.order" ? {
+        formationId: entry.command.formationId, posture: entry.command.posture, targetRegionId: entry.command.targetRegionId,
+      } : entry.command.kind === "peace.propose" ? {
+        warId: entry.command.warId, recipientPolityId: entry.command.recipientPolityId, regionTransfers: entry.command.regionTransfers,
+        reparation: entry.command.reparation,
+      } : entry.command.kind === "peace.respond" ? {
+        offerId: entry.command.offerId, response: entry.command.response,
       } : {}),
     } : null,
   }));

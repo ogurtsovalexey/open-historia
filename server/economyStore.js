@@ -132,6 +132,46 @@ const politicsForPlayer = (state, playerId) => {
   };
 };
 
+const militaryForPlayer = (state, playerId) => {
+  if (!state.military) return null;
+  const wars = state.military.wars.filter((war) => war.attackers.includes(playerId) || war.defenders.includes(playerId));
+  const warIds = new Set(wars.map((war) => war.warId));
+  const actual = (region) => state.military.occupations.filter((entry) => entry.regionId === region.regionId)
+    .sort((left, right) => right.occupiedMonth.localeCompare(left.occupiedMonth) || right.warId.localeCompare(left.warId))[0]?.actualControllerId ?? region.controllerId;
+  const formations = state.military.formations.filter((entry) => entry.polityId === playerId);
+  const unavailableDefenders = new Set([
+    ...wars.filter((war) => war.status === "active").flatMap((war) => [...war.attackers, ...war.defenders]),
+    ...(state.diplomacy?.agreements ?? []).filter((entry) => entry.terms.kind === "agreement"
+      && ["non-aggression", "defensive-alliance"].includes(entry.terms.agreementType)
+      && [entry.terms.fromPolityId, entry.terms.toPolityId].includes(playerId))
+      .flatMap((entry) => [entry.terms.fromPolityId, entry.terms.toPolityId]),
+  ]);
+  const orderCandidates = formations.filter((entry) => entry.status === "active"
+    || (entry.status === "mobilizing" && entry.readyMonth && entry.readyMonth <= state.month)).flatMap((formation) =>
+    state.military.supplyLinks.filter((link) => link.regions.includes(formation.locationRegionId)).map((link) => {
+      const regionId = link.regions.find((entry) => entry !== formation.locationRegionId);
+      const region = state.regions.find((entry) => entry.regionId === regionId);
+      return region ? { formationId: formation.formationId, regionId, name: region.displayName.en, legalControllerId: region.controllerId, actualControllerId: actual(region) } : null;
+    }).filter(Boolean)).filter((candidate) => wars.some((war) => war.status === "active"
+      && ((war.attackers.includes(playerId) && war.defenders.includes(candidate.actualControllerId))
+        || (war.defenders.includes(playerId) && war.attackers.includes(candidate.actualControllerId)))))
+    .sort((left, right) => `${left.formationId}|${left.regionId}`.localeCompare(`${right.formationId}|${right.regionId}`));
+  return {
+    polity: state.military.polities.find((entry) => entry.polityId === playerId) ?? null,
+    formations,
+    commanders: state.military.commanders.filter((entry) => entry.polityId === playerId),
+    wars,
+    fronts: state.military.fronts.filter((entry) => warIds.has(entry.warId)),
+    occupations: state.military.occupations.filter((entry) => warIds.has(entry.warId)),
+    peaceOffers: state.military.peaceOffers.filter((entry) => entry.proposerPolityId === playerId || entry.recipientPolityId === playerId),
+    warDeclarationCandidates: state.polities.filter((entry) => entry.id !== playerId && !unavailableDefenders.has(entry.id))
+      .map((entry) => ({ polityId: entry.id, name: entry.displayName.en })),
+    mobilizationRegions: state.regions.filter((entry) => entry.controllerId === playerId && actual(entry) === playerId)
+      .map((entry) => ({ regionId: entry.regionId, name: entry.displayName.en })),
+    orderCandidates,
+  };
+};
+
 const turnForPlayer = (turn, playerId) => {
   if (!turn?.ledger) return turn;
   const involved = (entry) => entry.fromPolityId === playerId || entry.toPolityId === playerId;
@@ -151,6 +191,11 @@ const turnForPlayer = (turn, playerId) => {
       ...(turn.ledger.politics ? { politics: {
         commands: turn.ledger.politics.commands.filter((entry) => entry.polityId === playerId),
         factionChanges: turn.ledger.politics.factionChanges.filter((entry) => entry.polityId === playerId),
+      } } : {}),
+      ...(turn.ledger.military ? { military: {
+        commands: turn.ledger.military.commands.filter((entry) => entry.polityId === playerId),
+        combats: turn.ledger.military.combats.filter((entry) => entry.attackerPolityId === playerId || entry.defenderPolityId === playerId),
+        treasuryTransfers: turn.ledger.military.treasuryTransfers.filter(involved),
       } } : {}),
     },
   };
@@ -180,6 +225,7 @@ const makeSnapshot = (game, fixture, session, actualMonthlyTicks = session.manif
     trade: tradeForPlayer(state, playerId),
     statecraft: statecraftForPlayer(state, playerId),
     politics: politicsForPlayer(state, playerId),
+    military: militaryForPlayer(state, playerId),
     polities: state.polities,
     regions: state.regions,
     ownershipOverrides: ownership,

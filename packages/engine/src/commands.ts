@@ -17,6 +17,10 @@ import {
 import { agreementIdSchema, negotiationTermsSchema, proposalIdSchema } from './diplomacy.js';
 import { budgetPrioritiesSchema, intelligenceFactIdSchema, projectIdSchema, projectTemplateIdSchema } from './statecraft.js';
 import { characterIdSchema, characterTraitSchema, factionIdSchema, qualitativeBandSchema } from './politics.js';
+import {
+  commanderIdSchema, formationIdSchema, militaryPostureSchema, peaceOfferIdSchema,
+  peaceRegionTransferSchema, reparationSchema, warIdSchema, warReasonSchema,
+} from './military.js';
 
 export const investInRegionCommandSchema = z
   .object({
@@ -199,6 +203,53 @@ export const politicsCommandSchema = z.discriminatedUnion('kind', [
   abdicateCommandSchema, createCharacterCommandSchema,
 ]);
 
+export const declareWarCommandSchema = z.object({
+  kind: z.literal('war.declare'), ...statecraftCommandFields,
+  warId: warIdSchema, defenderPolityId: polityIdSchema, reason: warReasonSchema,
+}).strict();
+export const mobilizeCommandSchema = z.object({
+  kind: z.literal('military.mobilize'), ...statecraftCommandFields,
+  formationId: formationIdSchema, locationRegionId: regionIdSchema,
+  manpower: z.number().int().positive(), equipment: z.number().int().positive(),
+  commanderId: commanderIdSchema.nullable(),
+}).strict();
+export const demobilizeCommandSchema = z.object({
+  kind: z.literal('military.demobilize'), ...statecraftCommandFields, formationId: formationIdSchema,
+}).strict();
+export const splitFormationCommandSchema = z.object({
+  kind: z.literal('military.split'), ...statecraftCommandFields,
+  sourceFormationId: formationIdSchema, newFormationId: formationIdSchema,
+  manpower: z.number().int().positive(), equipment: z.number().int().positive(),
+}).strict();
+export const mergeFormationCommandSchema = z.object({
+  kind: z.literal('military.merge'), ...statecraftCommandFields,
+  primaryFormationId: formationIdSchema, secondaryFormationId: formationIdSchema,
+}).strict();
+export const issueMilitaryOrderCommandSchema = z.object({
+  kind: z.literal('military.order'), ...statecraftCommandFields,
+  formationId: formationIdSchema, posture: militaryPostureSchema, targetRegionId: regionIdSchema.nullable(),
+}).strict();
+export const proposePeaceCommandSchema = z.object({
+  kind: z.literal('peace.propose'), ...statecraftCommandFields,
+  offerId: peaceOfferIdSchema, warId: warIdSchema, recipientPolityId: polityIdSchema,
+  regionTransfers: z.array(peaceRegionTransferSchema).max(12), reparation: reparationSchema.nullable(),
+}).strict();
+export const respondPeaceCommandSchema = z.object({
+  kind: z.literal('peace.respond'), ...statecraftCommandFields,
+  offerId: peaceOfferIdSchema, response: z.enum(['accept', 'reject']),
+}).strict();
+
+export type MilitaryCommand = z.infer<typeof declareWarCommandSchema>
+  | z.infer<typeof mobilizeCommandSchema> | z.infer<typeof demobilizeCommandSchema>
+  | z.infer<typeof splitFormationCommandSchema> | z.infer<typeof mergeFormationCommandSchema>
+  | z.infer<typeof issueMilitaryOrderCommandSchema> | z.infer<typeof proposePeaceCommandSchema>
+  | z.infer<typeof respondPeaceCommandSchema>;
+export const militaryCommandSchema = z.discriminatedUnion('kind', [
+  declareWarCommandSchema, mobilizeCommandSchema, demobilizeCommandSchema,
+  splitFormationCommandSchema, mergeFormationCommandSchema, issueMilitaryOrderCommandSchema,
+  proposePeaceCommandSchema, respondPeaceCommandSchema,
+]);
+
 export const econCommandSchema = z.discriminatedUnion('kind', [
   investInRegionCommandSchema,
   transferRegionCommandSchema,
@@ -216,6 +267,14 @@ export const econCommandSchema = z.discriminatedUnion('kind', [
   appointCharacterCommandSchema,
   abdicateCommandSchema,
   createCharacterCommandSchema,
+  declareWarCommandSchema,
+  mobilizeCommandSchema,
+  demobilizeCommandSchema,
+  splitFormationCommandSchema,
+  mergeFormationCommandSchema,
+  issueMilitaryOrderCommandSchema,
+  proposePeaceCommandSchema,
+  respondPeaceCommandSchema,
 ]);
 export type EconCommand = z.infer<typeof econCommandSchema>;
 
@@ -260,6 +319,13 @@ export const REJECTION_REASONS = [
   'inactive-crisis',
   'no-successor',
   'office-conflict',
+  'unknown-war',
+  'unknown-formation',
+  'unknown-commander',
+  'unknown-peace-offer',
+  'not-at-war',
+  'disconnected-front',
+  'illegal-peace-term',
 ] as const;
 export type RejectionReason = (typeof REJECTION_REASONS)[number];
 

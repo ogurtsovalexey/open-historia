@@ -25,6 +25,7 @@ escalate, do not silently "fix" either side.
 | 11 | [`11-p3b-diplomacy-and-trade.md`](11-p3b-diplomacy-and-trade.md) | P3b six-polity world, two-tier AI routing, diplomacy and bilateral trade |
 | 12 | [`12-p3c-statecraft.md`](12-p3c-statecraft.md) | P3c finance, unified projects and evidence-backed intelligence |
 | 13 | [`13-p4-politics-and-characters.md`](13-p4-politics-and-characters.md) | P4 factions, political escalation, rulers, appointments and succession |
+| 14 | [`14-p5-war-and-peace.md`](14-p5-war-and-peace.md) | P5 mobilization, formations, supply, combat, occupation and peace |
 
 Sources of each doc are cited inline. The full archived corpus stays under
 `docs/spec/` and `docs/product/` for provenance; their READMEs carry a

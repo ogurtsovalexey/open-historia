@@ -5,6 +5,7 @@ import {
   diplomacyCommandSchema,
   statecraftCommandSchema,
   politicsCommandSchema,
+  militaryCommandSchema,
   potentialOutput,
   runTurn,
   sha256OfString,
@@ -15,6 +16,7 @@ import {
 import type { DiplomacyCommand } from '@open-historia/engine';
 import type { StatecraftCommand } from '@open-historia/engine';
 import type { PoliticsCommand } from '@open-historia/engine';
+import type { MilitaryCommand } from '@open-historia/engine';
 
 export const MAX_POLITIES_PER_BATCH = 12;
 export const MAX_BATCHES_PER_MONTH = 2;
@@ -42,9 +44,9 @@ export type OpponentBatchResult = z.infer<typeof opponentBatchResultSchema>;
 
 export const opponentDiplomacyDecisionSchema = z.object({
   polityId: polityIdSchema,
-  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'set-policy', 'issue-bonds', 'restructure', 'start-project', 'update-project', 'cancel-project', 'concede', 'repress', 'refuse', 'hold']),
+  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'set-policy', 'issue-bonds', 'restructure', 'start-project', 'update-project', 'cancel-project', 'concede', 'repress', 'refuse', 'declare-war', 'mobilize', 'demobilize', 'order', 'split', 'merge', 'propose-peace', 'accept-peace', 'reject-peace', 'hold']),
   rationale: z.string().max(320),
-  command: z.union([diplomacyCommandSchema, statecraftCommandSchema, politicsCommandSchema]).nullable(),
+  command: z.union([diplomacyCommandSchema, statecraftCommandSchema, politicsCommandSchema, militaryCommandSchema]).nullable(),
 }).strict().superRefine((decision, ctx) => {
   const expectedKind = decision.intent === 'propose' ? 'diplomacy.propose'
     : decision.intent === 'counter' ? 'diplomacy.counter'
@@ -57,6 +59,14 @@ export const opponentDiplomacyDecisionSchema = z.object({
                   : decision.intent === 'update-project' ? 'project.update'
                     : decision.intent === 'cancel-project' ? 'project.cancel'
                       : decision.intent === 'concede' || decision.intent === 'repress' || decision.intent === 'refuse' ? 'politics.respond'
+                        : decision.intent === 'declare-war' ? 'war.declare'
+                          : decision.intent === 'mobilize' ? 'military.mobilize'
+                            : decision.intent === 'demobilize' ? 'military.demobilize'
+                              : decision.intent === 'order' ? 'military.order'
+                                : decision.intent === 'split' ? 'military.split'
+                                  : decision.intent === 'merge' ? 'military.merge'
+                                    : decision.intent === 'propose-peace' ? 'peace.propose'
+                                      : decision.intent === 'accept-peace' || decision.intent === 'reject-peace' ? 'peace.respond'
                       : null;
   if ((decision.command?.kind ?? null) !== expectedKind) {
     ctx.addIssue({ code: 'custom', path: ['command'], message: 'intent and diplomacy command must match' });
@@ -92,6 +102,14 @@ export interface DiplomacyPolityBrief {
   intelligenceTargetPolityIds: string[];
   politics: Record<string, unknown> | null;
   factions: Array<Record<string, unknown>>;
+  military: Record<string, unknown> | null;
+  formations: Array<Record<string, unknown>>;
+  commanders: Array<Record<string, unknown>>;
+  wars: Array<Record<string, unknown>>;
+  peaceOffers: Array<Record<string, unknown>>;
+  mobilizationRegionCandidates: Array<{ regionId: string; name: string }>;
+  frontRegionCandidates: Array<{ formationId: string; regionId: string; legalControllerId: string; actualControllerId: string }>;
+  peaceRegionCandidates: Array<{ regionId: string; legalControllerId: string; actualControllerId: string }>;
 }
 
 export interface DiplomacyBatch {
@@ -109,6 +127,8 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
     .map((entry) => entry.id).sort().slice(0, MAX_STRATEGIC_POLITIES);
   const briefs = polityIds.map((polityId): DiplomacyPolityBrief => {
     const polity = state.polities.find((entry) => entry.id === polityId)!;
+    const militaryLocations = new Set((state.military?.formations ?? []).filter((entry) => entry.polityId === polityId)
+      .map((entry) => entry.locationRegionId));
     const relations = state.diplomacy!.relations.filter((entry) => entry.polities.includes(polityId)).map((entry) => ({
       polityId: entry.polities.find((id) => id !== polityId)!, opinion: entry.opinion, trust: entry.trust, threat: entry.threat,
     })).sort((left, right) => left.polityId.localeCompare(right.polityId));
@@ -146,6 +166,39 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
         idealTaxBurdenBp: entry.idealTaxBurdenBp, preferredBudgetCategory: entry.preferredBudgetCategory,
         foreignPolicy: entry.foreignPolicy, ideology: entry.ideology, traditionalismBp: entry.traditionalismBp, escalation: entry.escalation,
       })),
+      military: state.military?.polities.find((entry) => entry.polityId === polityId) ?? null,
+      formations: (state.military?.formations ?? []).filter((entry) => entry.polityId === polityId).map((entry) => ({
+        formationId: entry.formationId, manpower: entry.manpower, equipment: entry.equipment,
+        locationRegionId: entry.locationRegionId, commanderId: entry.commanderId, status: entry.status,
+        readyMonth: entry.readyMonth, posture: entry.posture, moraleBp: entry.moraleBp, familiarityBp: entry.familiarityBp,
+      })),
+      commanders: (state.military?.commanders ?? []).filter((entry) => entry.polityId === polityId).map((entry) => ({
+        commanderId: entry.commanderId, skill: entry.skill, traits: entry.traits, experience: entry.experience,
+      })),
+      wars: (state.military?.wars ?? []).filter((entry) => entry.attackers.includes(polityId as never) || entry.defenders.includes(polityId as never)),
+      peaceOffers: (state.military?.peaceOffers ?? []).filter((entry) => entry.proposerPolityId === polityId || entry.recipientPolityId === polityId),
+      mobilizationRegionCandidates: state.regions.filter((entry) => entry.controllerId === polityId
+        && !(state.military?.occupations ?? []).some((occupation) => occupation.regionId === entry.regionId && occupation.actualControllerId !== polityId))
+        .sort((a, b) => Number(militaryLocations.has(b.regionId)) - Number(militaryLocations.has(a.regionId))
+          || a.regionId.localeCompare(b.regionId)).slice(0, 3).map((entry) => ({ regionId: entry.regionId, name: entry.displayName.en })),
+      frontRegionCandidates: (state.military?.formations ?? []).filter((entry) => entry.polityId === polityId && (entry.status === 'active'
+        || (entry.status === 'mobilizing' && entry.readyMonth !== null && entry.readyMonth <= state.month)))
+        .flatMap((formation) => (state.military?.supplyLinks ?? []).filter((link) => link.regions.includes(formation.locationRegionId))
+          .map((link) => link.regions.find((regionId) => regionId !== formation.locationRegionId)!)
+          .map((regionId) => { const region = state.regions.find((entry) => entry.regionId === regionId)!;
+            const occupation = state.military?.occupations.filter((entry) => entry.regionId === regionId)
+              .sort((a, b) => b.occupiedMonth.localeCompare(a.occupiedMonth) || b.warId.localeCompare(a.warId))[0];
+            return { formationId: formation.formationId, regionId, legalControllerId: region.controllerId,
+              actualControllerId: occupation?.actualControllerId ?? region.controllerId }; })
+          .filter((candidate) => (state.military?.wars ?? []).some((war) => war.status === 'active'
+            && ((war.attackers.includes(polityId as never) && war.defenders.includes(candidate.actualControllerId as never))
+              || (war.defenders.includes(polityId as never) && war.attackers.includes(candidate.actualControllerId as never))))))
+        .sort((a, b) => `${a.formationId}|${a.regionId}`.localeCompare(`${b.formationId}|${b.regionId}`)).slice(0, 6),
+      peaceRegionCandidates: (state.military?.occupations ?? []).filter((entry) => {
+        const war = state.military?.wars.find((candidate) => candidate.warId === entry.warId && candidate.status === 'active');
+        return war && (war.attackers.includes(polityId as never) || war.defenders.includes(polityId as never));
+      }).map((entry) => ({ regionId: entry.regionId, legalControllerId: entry.legalControllerId, actualControllerId: entry.actualControllerId }))
+        .sort((a, b) => a.regionId.localeCompare(b.regionId)).slice(0, 6),
     };
   });
   const characterCount = briefs.reduce((sum, brief) => sum + JSON.stringify(brief).length, 0);
@@ -163,7 +216,7 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
   if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error('strategic batch must decide every and only requested polity');
   const known = new Set(batch.briefs.map((entry) => entry.polityId));
   for (const decision of parsed.decisions) {
-    const command = decision.command as DiplomacyCommand | StatecraftCommand | PoliticsCommand | null;
+    const command = decision.command as DiplomacyCommand | StatecraftCommand | PoliticsCommand | MilitaryCommand | null;
     if (!command) continue;
     if (command.actorPolityId !== decision.polityId) throw new Error('diplomacy command actor mismatch');
     if (command.expectedRevision !== batch.baseRevision || command.effectiveMonth !== batch.month) throw new Error('diplomacy command is stale or for the wrong month');
@@ -189,6 +242,38 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
     if (command.kind === 'politics.appoint' || command.kind === 'politics.abdicate' || command.kind === 'character.create') {
       throw new Error('shared strategic batch may not manipulate private character choices');
     }
+    if (command.kind === 'war.declare') {
+      if (!brief.relations.some((entry) => entry.polityId === command.defenderPolityId)) throw new Error('war declaration names an unknown defender');
+      if (brief.wars.some((war) => war.status === 'active' && ((war.attackers as string[]).includes(command.defenderPolityId)
+        || (war.defenders as string[]).includes(command.defenderPolityId)))) throw new Error('war declaration names an existing belligerent');
+      if (brief.agreements.some((entry) => {
+        const terms = entry.terms as { kind?: string; agreementType?: string; fromPolityId?: string; toPolityId?: string } | undefined;
+        return terms?.kind === 'agreement' && ['non-aggression', 'defensive-alliance'].includes(terms.agreementType ?? '')
+          && [terms.fromPolityId, terms.toPolityId].includes(command.defenderPolityId);
+      })) throw new Error('war declaration violates an active protected agreement');
+    }
+    if (command.kind === 'military.mobilize') {
+      if (!brief.mobilizationRegionCandidates.some((entry) => entry.regionId === command.locationRegionId)) throw new Error('mobilization names a region outside bounded candidates');
+      if (command.commanderId && !brief.commanders.some((entry) => entry.commanderId === command.commanderId)) throw new Error('mobilization names an unknown commander');
+      const row = brief.military as { manpowerPool?: number; equipmentReserve?: number } | null;
+      if (command.manpower > (row?.manpowerPool ?? 0) || command.equipment > (row?.equipmentReserve ?? 0)) throw new Error('mobilization exceeds supplied reserves');
+    }
+    if (command.kind === 'military.order') {
+      if (!brief.formations.some((entry) => entry.formationId === command.formationId)) throw new Error('order names another polity formation');
+      if (command.posture === 'advance' && !brief.frontRegionCandidates.some((entry) => entry.formationId === command.formationId && entry.regionId === command.targetRegionId)) throw new Error('order target is outside bounded front candidates');
+    }
+    if (command.kind === 'military.demobilize' && !brief.formations.some((entry) => entry.formationId === command.formationId)) throw new Error('demobilization names another polity formation');
+    if (command.kind === 'military.split' && !brief.formations.some((entry) => entry.formationId === command.sourceFormationId)) throw new Error('split names another polity formation');
+    if (command.kind === 'military.merge' && (!brief.formations.some((entry) => entry.formationId === command.primaryFormationId)
+      || !brief.formations.some((entry) => entry.formationId === command.secondaryFormationId))) throw new Error('merge names another polity formation');
+    if (command.kind === 'peace.propose') {
+      if (!brief.wars.some((entry) => entry.warId === command.warId)) throw new Error('peace proposal names an unknown war');
+      if (command.regionTransfers.some((transfer) => !brief.peaceRegionCandidates.some((entry) => entry.regionId === transfer.regionId && entry.actualControllerId === transfer.toPolityId))) throw new Error('peace proposal region is outside bounded candidates');
+    }
+    if (command.kind === 'peace.respond') {
+      if (!brief.peaceOffers.some((entry) => entry.offerId === command.offerId && entry.recipientPolityId === decision.polityId)) throw new Error('peace response names an unavailable offer');
+      if ((command.response === 'accept') !== (decision.intent === 'accept-peace')) throw new Error('peace response and intent must match');
+    }
   }
   return parsed;
 }
@@ -196,7 +281,7 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
 export const interpretedActionSchema = z.object({
   actionId: z.string().min(1).max(200),
   summary: z.string().min(1).max(240),
-  command: z.union([investInRegionCommandSchema, politicsCommandSchema]).nullable(),
+  command: z.union([investInRegionCommandSchema, politicsCommandSchema, militaryCommandSchema]).nullable(),
   disposition: z.enum(['command', 'report', 'unsupported', 'ambiguous']),
 }).strict().refine(
   (value) => (value.disposition === 'command') === (value.command !== null),

@@ -25,6 +25,7 @@ import { stateChecksum } from './canonical.js';
 import { diplomacyStateSchema, tradeStateSchema } from './diplomacy.js';
 import { financeStateSchema, intelligenceStateSchema, projectsStateSchema } from './statecraft.js';
 import { politicsStateSchema } from './politics.js';
+import { militaryStateSchema } from './military.js';
 
 const nonNegInt = z.number().int().nonnegative();
 const bpSchema = z.number().int().min(0).max(10000);
@@ -93,6 +94,7 @@ export const econWorldStateSchema = z
     projects: projectsStateSchema.optional(),
     intelligence: intelligenceStateSchema.optional(),
     politics: politicsStateSchema.optional(),
+    military: militaryStateSchema.optional(),
     economy: economyParamsSchema,
     /** Sorted by polity id. */
     polities: z.array(econPolityStateSchema).min(2),
@@ -195,6 +197,26 @@ export function initState(scenario: EconScenario): EconWorldState {
           ...entry, lastResponseMonth: null,
         })).sort((a, b) => a.factionId.localeCompare(b.factionId)),
         characters: [...scenario.politics.characters].sort((a, b) => a.characterId.localeCompare(b.characterId)),
+      },
+    } : {}),
+    ...(scenario.modules?.armedForces === true && scenario.military ? {
+      military: {
+        combatSeed: scenario.military.combatSeed,
+        polities: [...scenario.military.polities].map((entry) => {
+          const population = scenario.regions.filter((region) => region.controllerId === entry.polityId).reduce((sum, region) => sum + region.population, 0);
+          const manpowerCeiling = Math.floor((population * entry.maxMobilizationBp) / 10000);
+          const formations = scenario.military!.formations.filter((formation) => formation.polityId === entry.polityId);
+          const mobilized = formations.reduce((sum, formation) => sum + formation.manpower, 0);
+          const formationEquipment = formations.reduce((sum, formation) => sum + formation.equipment, 0);
+          return { polityId: entry.polityId, maxMobilizationBp: entry.maxMobilizationBp, manpowerCeiling,
+            manpowerPool: manpowerCeiling - mobilized, mobilized, casualties: 0,
+            equipmentTotal: entry.equipmentReserve + formationEquipment, equipmentReserve: entry.equipmentReserve, equipmentLost: 0 };
+        }).sort((a, b) => a.polityId.localeCompare(b.polityId)),
+        commanders: [...scenario.military.commanders].map((entry) => ({ ...entry, experience: 0 })).sort((a, b) => a.commanderId.localeCompare(b.commanderId)),
+        formations: [...scenario.military.formations].map((entry) => ({ ...entry, status: 'active' as const, readyMonth: null,
+          posture: 'hold' as const, targetRegionId: null, familiarityBp: 0 })).sort((a, b) => a.formationId.localeCompare(b.formationId)),
+        supplyLinks: [...scenario.military.supplyLinks].sort((a, b) => `${a.regions[0]}|${a.regions[1]}`.localeCompare(`${b.regions[0]}|${b.regions[1]}`)),
+        wars: [], fronts: [], occupations: [], peaceOffers: [],
       },
     } : {}),
     polities: [...scenario.polities]
