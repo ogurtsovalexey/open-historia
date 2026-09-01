@@ -15,10 +15,14 @@ const wireActionSchema = z.object({
   target: z.string(), counterpart: z.string(), subject: z.string(), choice: z.string(), intensity: z.string(),
 }).strict();
 const wireDecisionSchema = z.object({
-  polityId: z.string(), objectiveDomain: z.string(), objectiveSummary: z.string(), horizon: z.string(),
+  polityId: z.string(), objectiveDomain: z.enum(['economy', 'diplomacy', 'politics', 'military', 'statecraft', 'campaign']),
+  objectiveSummary: z.string(), horizon: z.enum(['short', 'medium', 'long']),
   actions: z.array(wireActionSchema), futurePlan: z.array(z.object({ summary: z.string(), condition: z.string() }).strict()),
   contingency: z.string(), rationale: z.string(), intendedOutcome: z.string(),
-  holdReason: z.string(), holdDetail: z.string(), revisitAfterMonths: z.number().int(), revisitTriggers: z.array(z.string()),
+  holdReason: z.enum(['none', 'no-legal-action', 'waiting-response', 'insufficient-resources', 'plan-sequencing', 'risk-too-high']),
+  holdDetail: z.string(), revisitAfterMonths: z.number().int(), revisitTriggers: z.array(z.enum([
+    'resource-deficit', 'diplomatic-response', 'war', 'occupation', 'peace', 'crisis', 'government-change', 'default',
+  ])),
 }).strict();
 
 export const CAMPAIGN_DECISION_RESPONSE_SCHEMA = Object.freeze(

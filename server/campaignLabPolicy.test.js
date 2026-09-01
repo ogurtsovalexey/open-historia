@@ -16,6 +16,9 @@ test("Campaign Lab sends the bounded StrategicDecisionV2 schema without raw comm
   const serialized = JSON.stringify(CAMPAIGN_DECISION_RESPONSE_SCHEMA);
   assert.equal(CAMPAIGN_DECISION_TOOLS.length, 15);
   assert.deepEqual(CAMPAIGN_DECISION_RESPONSE_SCHEMA.properties.decisions.items.properties.actions.items.properties.tool.enum, CAMPAIGN_DECISION_TOOLS);
+  assert.deepEqual(CAMPAIGN_DECISION_RESPONSE_SCHEMA.properties.decisions.items.properties.horizon.enum, ["short", "medium", "long"]);
+  assert.ok(CAMPAIGN_DECISION_RESPONSE_SCHEMA.properties.decisions.items.properties.holdReason.enum.includes("none"));
+  assert.ok(CAMPAIGN_DECISION_RESPONSE_SCHEMA.properties.decisions.items.properties.revisitTriggers.items.enum.includes("diplomatic-response"));
   assert.equal(serialized.includes('"command"'), false);
   assert.ok(serialized.length < 30_000);
 });
