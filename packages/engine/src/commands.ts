@@ -22,6 +22,7 @@ import {
   peaceRegionTransferSchema, reparationSchema, warIdSchema, warReasonSchema,
 } from './military.js';
 import { cultureIdSchema, identityPolicySchema, religionIdSchema } from './society.js';
+import { campaignGoalIdSchema, crisisIdSchema, crisisPositionSchema, legacyAssessmentIdSchema } from './campaign.js';
 
 export const investInRegionCommandSchema = z
   .object({
@@ -216,6 +217,21 @@ export type IdentityCommand = z.infer<typeof setIdentityPolicyCommandSchema>
   | z.infer<typeof setCultureAcceptanceCommandSchema> | z.infer<typeof setReligionAcceptanceCommandSchema>;
 export const identityCommandSchema = z.discriminatedUnion('kind', [setIdentityPolicyCommandSchema, setCultureAcceptanceCommandSchema, setReligionAcceptanceCommandSchema]);
 
+export const adoptCampaignGoalCommandSchema = z.object({
+  kind: z.literal('campaign.adopt-goal'), ...statecraftCommandFields, goalId: campaignGoalIdSchema,
+}).strict();
+export const setCrisisPositionCommandSchema = z.object({
+  kind: z.literal('crisis.set-position'), ...statecraftCommandFields, crisisId: crisisIdSchema, position: crisisPositionSchema,
+}).strict();
+export const assessLegacyCommandSchema = z.object({
+  kind: z.literal('campaign.assess-legacy'), ...statecraftCommandFields, assessmentId: legacyAssessmentIdSchema,
+}).strict();
+export type CampaignCommand = z.infer<typeof adoptCampaignGoalCommandSchema>
+  | z.infer<typeof setCrisisPositionCommandSchema> | z.infer<typeof assessLegacyCommandSchema>;
+export const campaignCommandSchema = z.discriminatedUnion('kind', [
+  adoptCampaignGoalCommandSchema, setCrisisPositionCommandSchema, assessLegacyCommandSchema,
+]);
+
 export const declareWarCommandSchema = z.object({
   kind: z.literal('war.declare'), ...statecraftCommandFields,
   warId: warIdSchema, defenderPolityId: polityIdSchema, reason: warReasonSchema,
@@ -291,6 +307,9 @@ export const econCommandSchema = z.discriminatedUnion('kind', [
   setIdentityPolicyCommandSchema,
   setCultureAcceptanceCommandSchema,
   setReligionAcceptanceCommandSchema,
+  adoptCampaignGoalCommandSchema,
+  setCrisisPositionCommandSchema,
+  assessLegacyCommandSchema,
 ]);
 export type EconCommand = z.infer<typeof econCommandSchema>;
 
@@ -345,6 +364,8 @@ export const REJECTION_REASONS = [
   'unknown-identity',
   'unknown-capability',
   'missing-prerequisite',
+  'unknown-goal',
+  'unknown-crisis',
 ] as const;
 export type RejectionReason = (typeof REJECTION_REASONS)[number];
 

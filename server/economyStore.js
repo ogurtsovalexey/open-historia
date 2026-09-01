@@ -191,7 +191,16 @@ const societyForPlayer = (state, playerId) => {
   };
 };
 
-const turnForPlayer = (turn, playerId) => {
+const campaignForPlayer = (state, playerId) => state.campaign ? ({
+  softHorizonMonth: state.campaign.softHorizonMonth,
+  horizonReached: state.month >= state.campaign.softHorizonMonth,
+  goals: state.campaign.goals.filter((entry) => entry.polityId === playerId),
+  crises: state.campaign.crises.filter((entry) => entry.participants.includes(playerId)),
+  assessments: state.campaign.assessments.filter((entry) => entry.polityId === playerId),
+  allowedPositions: ["compromise", "status-quo", "press", "escalate"],
+}) : null;
+
+const turnForPlayer = (turn, playerId, state) => {
   if (!turn?.ledger) return turn;
   const involved = (entry) => entry.fromPolityId === playerId || entry.toPolityId === playerId;
   return {
@@ -221,6 +230,12 @@ const turnForPlayer = (turn, playerId) => {
         commands: turn.ledger.military.commands.filter((entry) => entry.polityId === playerId),
         combats: turn.ledger.military.combats.filter((entry) => entry.attackerPolityId === playerId || entry.defenderPolityId === playerId),
         treasuryTransfers: turn.ledger.military.treasuryTransfers.filter(involved),
+      } } : {}),
+      ...(turn.ledger.campaign ? { campaign: {
+        commands: turn.ledger.campaign.commands.filter((entry) => entry.polityId === playerId),
+        goals: turn.ledger.campaign.goals.filter((entry) => entry.polityId === playerId),
+        crises: turn.ledger.campaign.crises.filter((entry) => state.campaign?.crises.find((crisis) => crisis.crisisId === entry.crisisId)?.participants.includes(playerId)),
+        legacy: turn.ledger.campaign.legacy.filter((entry) => entry.polityId === playerId),
       } } : {}),
     },
   };
@@ -252,11 +267,12 @@ const makeSnapshot = (game, fixture, session, actualMonthlyTicks = session.manif
     politics: politicsForPlayer(state, playerId),
     military: militaryForPlayer(state, playerId),
     society: societyForPlayer(state, playerId),
+    campaign: campaignForPlayer(state, playerId),
     polities: state.polities,
     regions: state.regions,
     ownershipOverrides: ownership,
     mapLink: fixture.link ? { dataset: fixture.link.dataset, polityOwnerNames: fixture.link.polityOwnerNames, regions: fixture.link.regions } : null,
-    lastTurn: turnForPlayer(lastTurn, playerId),
+    lastTurn: turnForPlayer(lastTurn, playerId, state),
     agentState: session.agentState ?? null,
     agentTurn: session.agentTurn ?? null,
   };

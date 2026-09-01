@@ -27,6 +27,7 @@ import { financeStateSchema, intelligenceStateSchema, projectsStateSchema } from
 import { politicsStateSchema } from './politics.js';
 import { militaryStateSchema } from './military.js';
 import { capabilityStateSchema, identityStateSchema } from './society.js';
+import { campaignStateSchema } from './campaign.js';
 
 const nonNegInt = z.number().int().nonnegative();
 const bpSchema = z.number().int().min(0).max(10000);
@@ -98,6 +99,7 @@ export const econWorldStateSchema = z
     military: militaryStateSchema.optional(),
     capabilities: capabilityStateSchema.optional(),
     identity: identityStateSchema.optional(),
+    campaign: campaignStateSchema.optional(),
     economy: economyParamsSchema,
     /** Sorted by polity id. */
     polities: z.array(econPolityStateSchema).min(2),
@@ -241,6 +243,22 @@ export function initState(scenario: EconScenario): EconWorldState {
         polities: [...scenario.identity.polities].map((entry) => ({ ...entry,
           acceptedCultureIds: [...entry.acceptedCultureIds].sort(), acceptedReligionIds: [...entry.acceptedReligionIds].sort(),
         })).sort((a, b) => a.polityId.localeCompare(b.polityId)),
+      },
+    } : {}),
+    ...(scenario.modules?.campaign === true && scenario.campaign ? {
+      campaign: {
+        softHorizonMonth: scenario.campaign.softHorizonMonth,
+        goals: [...scenario.campaign.goals].map((entry) => ({ ...entry, displayName: { ...entry.displayName },
+          status: entry.initiallyActive ? 'active' as const : 'candidate' as const, progressBp: 0,
+          adoptedMonth: entry.initiallyActive ? scenario.startMonth : null, achievedMonth: null,
+        })).sort((a, b) => a.goalId.localeCompare(b.goalId)),
+        crisisTemplates: [...scenario.campaign.crisisTemplates].map((entry) => ({ ...entry, displayName: { ...entry.displayName }, participants: [...entry.participants].sort() }))
+          .sort((a, b) => a.templateId.localeCompare(b.templateId)),
+        crises: [],
+        legacyBaselines: [...scenario.campaign.legacyBaselines].map((entry) => ({ ...entry, scores: { ...entry.scores } })).sort((a, b) => a.polityId.localeCompare(b.polityId)),
+        startingRegionCounts: scenario.polities.map((polity) => ({ polityId: polity.id, count: scenario.regions.filter((region) => region.controllerId === polity.id).length }))
+          .sort((a, b) => a.polityId.localeCompare(b.polityId)),
+        assessments: [],
       },
     } : {}),
     polities: [...scenario.polities]

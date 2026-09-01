@@ -45,6 +45,7 @@ scenario.modules.armedForces = true;
 scenario.modules.combat = true;
 scenario.modules.technology = true;
 scenario.modules.societyAndIdentity = true;
+scenario.modules.campaign = true;
 const polityIds = ["polity:austria", "polity:czechia", "polity:france", "polity:germany", "polity:poland", "polity:slovakia"];
 const relations = [];
 const tradeRoutes = [];
@@ -280,6 +281,28 @@ const crossLinks = [
 for (const pair of crossLinks) supplyLinks.push({ regions: [...pair].sort(), capacity: 12000 });
 scenario.military = { combatSeed: 193801, polities: militaryPolities, commanders, formations,
   supplyLinks: supplyLinks.sort((a, b) => `${a.regions[0]}|${a.regions[1]}`.localeCompare(`${b.regions[0]}|${b.regions[1]}`)) };
+scenario.campaign = {
+  softHorizonMonth: "1939-01-01",
+  goals: [
+    { goalId: "goal:austria-france-alliance", polityId: "polity:austria", displayName: { en: "Secure a French alliance", ru: "Заключить союз с Францией" }, initiallyActive: true, kind: "secure-alliance", targetPolityId: "polity:france" },
+    { goalId: "goal:austria-industry", polityId: "polity:austria", displayName: { en: "Standardize Austrian industry", ru: "Стандартизировать промышленность Австрии" }, initiallyActive: false, kind: "unlock-capability", capabilityId: "capability:industrial-standardization" },
+    { goalId: "goal:czechia-stability", polityId: "polity:czechia", displayName: { en: "Preserve stable government", ru: "Сохранить устойчивое правительство" }, initiallyActive: true, kind: "stabilize-government", thresholdBp: 6000 },
+    { goalId: "goal:france-poland-alliance", polityId: "polity:france", displayName: { en: "Secure Poland's defense", ru: "Обеспечить оборону Польши" }, initiallyActive: true, kind: "secure-alliance", targetPolityId: "polity:poland" },
+    { goalId: "goal:germany-logistics", polityId: "polity:germany", displayName: { en: "Modernize continental logistics", ru: "Модернизировать континентальную логистику" }, initiallyActive: false, kind: "unlock-capability", capabilityId: "capability:modern-logistics" },
+    { goalId: "goal:poland-stability", polityId: "polity:poland", displayName: { en: "Stabilize the republic", ru: "Стабилизировать республику" }, initiallyActive: true, kind: "stabilize-government", thresholdBp: 6500 },
+    { goalId: "goal:slovakia-stability", polityId: "polity:slovakia", displayName: { en: "Consolidate the new administration", ru: "Укрепить новую администрацию" }, initiallyActive: true, kind: "stabilize-government", thresholdBp: 6500 },
+  ],
+  crisisTemplates: [
+    { templateId: "crisis-template:german-political-strain", displayName: { en: "German political confrontation", ru: "Политическое противостояние в Германии" }, kind: "political-escalation", subjectPolityId: "polity:germany", thresholdStage: "protest", participants: ["polity:germany", "polity:austria", "polity:france"] },
+    { templateId: "crisis-template:austrian-identity-strain", displayName: { en: "Austrian identity dispute", ru: "Спор об идентичности в Австрии" }, kind: "identity-pressure", subjectPolityId: "polity:austria", thresholdBp: 100, participants: ["polity:austria", "polity:germany"] },
+    { templateId: "crisis-template:german-war", displayName: { en: "Continental war crisis", ru: "Кризис континентальной войны" }, kind: "war-escalation", subjectPolityId: "polity:germany", participants: ["polity:germany", "polity:austria", "polity:france", "polity:poland"] },
+  ],
+  legacyBaselines: scenario.polities.map((polity) => ({
+    polityId: polity.id,
+    treasuryReference: polity.treasury,
+    scores: { prosperity: 10000, security: 10000, stability: 6000, diplomacy: 4500, capability: 0, pluralism: 10000 },
+  })),
+};
 writeJson(path.join(fixtureDir, "scenario.json"), scenario);
 
 const baseLink = readJson(path.join(baseFixtureDir, "map-link.json"));

@@ -234,11 +234,35 @@ const TASK_DEFINITIONS = [
     mayMutateState: true
   },
   {
+    taskId: 'opponents.plan-campaign',
+    version: 1,
+    kind: 'structured',
+    authority: 'proposal',
+    contextPolicyId: 'opponent-public-campaign-batch',
+    budgetPolicyId: 'large-generation',
+    outputContractId: 'opponent-public-strategy-batch-schema',
+    allowedVariants: [],
+    fallbackPolicy: 'surface-error',
+    mayMutateState: true
+  },
+  {
     taskId: 'reports.explain-economy',
     version: 1,
     kind: 'structured',
     authority: 'explanation',
     contextPolicyId: 'player-economy-report',
+    budgetPolicyId: 'medium-generation',
+    outputContractId: 'player-economy-report-schema',
+    allowedVariants: [],
+    fallbackPolicy: 'deterministic',
+    mayMutateState: false
+  },
+  {
+    taskId: 'reports.explain-campaign',
+    version: 1,
+    kind: 'structured',
+    authority: 'explanation',
+    contextPolicyId: 'player-campaign-report',
     budgetPolicyId: 'medium-generation',
     outputContractId: 'player-economy-report-schema',
     allowedVariants: [],
@@ -437,6 +461,7 @@ const STRATEGIC_TASKS = new Set([
   'opponents.plan-politics',
   'opponents.plan-war',
   'opponents.plan-society',
+  'opponents.plan-campaign',
   'chat.diplomacy.plan',
   'chat.diplomacy.reply'
 ]);

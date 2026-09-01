@@ -10,7 +10,7 @@ const completePreparedMonth = async (request, gameId, draft, decide) => {
     turnToken: draft.turnToken, action: 'confirm-player',
   } })).json();
   expect(draft.phase).toBe('plan-strategy');
-  expect(draft.tasks[0].taskId).toBe('opponents.plan-society');
+  expect(draft.tasks[0].taskId).toBe('opponents.plan-campaign');
   const prompt = JSON.parse(draft.tasks[0].userPrompt);
   const promptText = JSON.stringify(prompt);
   expect(promptText).not.toContain('FeatureCollection');

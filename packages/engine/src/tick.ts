@@ -5,7 +5,7 @@
  * uses no randomness, no wall clock, no I/O.
  */
 import type { PolityId, RegionId, WorldRevisionId } from '@open-historia/domain';
-import type { CommandRejection, DiplomacyCommand, EconCommand, IdentityCommand, MilitaryCommand, PoliticsCommand, StatecraftCommand, TurnCommandsFile } from './commands.js';
+import type { CampaignCommand, CommandRejection, DiplomacyCommand, EconCommand, IdentityCommand, MilitaryCommand, PoliticsCommand, StatecraftCommand, TurnCommandsFile } from './commands.js';
 import {
   ANNUAL_BP_MONTHLY_DIVISOR,
   BP_SCALE,
@@ -44,6 +44,8 @@ import type { MilitaryEngineEvent } from './militaryReducer.js';
 import { applyIdentityCommands, applyIdentityUnrest, polityIdentityEffects, regionIdentityEffects, resolveIdentityMonth } from './identityReducer.js';
 import type { IdentityEngineEvent } from './identityReducer.js';
 import { capabilityBonusBp } from './society.js';
+import { applyCampaignCommands, resolveCampaignMonth } from './campaignReducer.js';
+import type { CampaignEngineEvent } from './campaignReducer.js';
 
 export type EngineEvent =
   DiplomacyEngineEvent
@@ -51,6 +53,7 @@ export type EngineEvent =
   | PoliticsEngineEvent
   | MilitaryEngineEvent
   | IdentityEngineEvent
+  | CampaignEngineEvent
   | { type: 'command-rejected'; commandId: string; reason: CommandRejection['reason']; detail: string }
   | { type: 'region-transferred'; regionId: RegionId; fromPolityId: PolityId; toPolityId: PolityId; population: number }
   | { type: 'investment-applied'; polityId: PolityId; regionId: RegionId; spend: number; infrastructureGainBp: number; infrastructureBp: number }
@@ -77,7 +80,7 @@ interface MutablePolity {
   stock: Map<ResourceId, number>;
 }
 
-type EconomyPhaseCommand = Exclude<EconCommand, DiplomacyCommand | StatecraftCommand | PoliticsCommand | MilitaryCommand | IdentityCommand>;
+type EconomyPhaseCommand = Exclude<EconCommand, DiplomacyCommand | StatecraftCommand | PoliticsCommand | MilitaryCommand | IdentityCommand | CampaignCommand>;
 
 /**
  * Capacity-side output before material inputs (rre §5).
@@ -127,6 +130,15 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   const identityCommandPhase = applyIdentityCommands(state, identityCommands, regions);
   events.push(...identityCommandPhase.events);
   for (const rejection of identityCommandPhase.rejections) {
+    rejections.push(rejection);
+    events.push({ type: 'command-rejected', commandId: rejection.command.commandId, reason: rejection.reason, detail: rejection.detail });
+  }
+
+  const campaignCommands = commandsFile.commands.filter((command): command is CampaignCommand =>
+    command.kind.startsWith('campaign.') || command.kind.startsWith('crisis.'));
+  const campaignCommandPhase = applyCampaignCommands(state, campaignCommands);
+  events.push(...campaignCommandPhase.events);
+  for (const rejection of campaignCommandPhase.rejections) {
     rejections.push(rejection);
     events.push({ type: 'command-rejected', commandId: rejection.command.commandId, reason: rejection.reason, detail: rejection.detail });
   }
@@ -555,6 +567,24 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   const identityPhase = resolveIdentityMonth(identityCommandPhase.identity, regions);
   events.push(...identityPhase.events);
 
+  const resolvedPolities = polities.map((polity) => ({
+    id: polity.id, displayName: polity.displayName, treasury: polity.treasury,
+    stockpile: [...state.activeResources].sort().map((resource) => ({ resource, amount: polity.stock.get(resource) ?? 0 })),
+  }));
+  const campaignInput: EconWorldState = {
+    ...state,
+    ...(diplomacyPhase.diplomacy ? { diplomacy: diplomacyPhase.diplomacy } : {}),
+    ...(statecraftPhase.finance ? { finance: statecraftPhase.finance } : {}),
+    ...(statecraftPhase.capabilities ? { capabilities: statecraftPhase.capabilities } : {}),
+    ...(identityPhase.identity ? { identity: identityPhase.identity } : {}),
+    ...(politicsPhase.politics ? { politics: politicsPhase.politics } : {}),
+    ...(militaryPhase.military ? { military: militaryPhase.military } : {}),
+    polities: resolvedPolities,
+    regions,
+  };
+  const campaignPhase = resolveCampaignMonth(campaignInput, campaignCommandPhase.campaign, campaignCommandPhase.assessments);
+  events.push(...campaignPhase.events);
+
   // ---- 10. Assemble next state, ledger; verify identities; commit revision.
   const nextBase = {
     ...state,
@@ -567,16 +597,10 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
     ...(identityPhase.identity ? { identity: identityPhase.identity } : {}),
     ...(politicsPhase.politics ? { politics: politicsPhase.politics } : {}),
     ...(militaryPhase.military ? { military: militaryPhase.military } : {}),
+    ...(campaignPhase.campaign ? { campaign: campaignPhase.campaign } : {}),
     month: addMonth(state.month),
     turn: state.turn + 1,
-    polities: polities.map((polity) => ({
-      id: polity.id,
-      displayName: polity.displayName,
-      treasury: polity.treasury,
-      stockpile: [...state.activeResources]
-        .sort()
-        .map((resource) => ({ resource, amount: polity.stock.get(resource) ?? 0 })),
-    })),
+    polities: resolvedPolities,
     regions: regions.map((region) => ({ ...region })),
   };
   const nextState: EconWorldState = {
@@ -683,6 +707,9 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
     ...(militaryPhase.military ? {
       military: { commands: militaryCommandPhase.commandRecords, combats: militaryPhase.combats,
         treasuryTransfers: militaryCommandPhase.treasuryTransfers },
+    } : {}),
+    ...(campaignPhase.campaign ? {
+      campaign: { commands: campaignCommandPhase.commandRecords, goals: campaignPhase.goals, crises: campaignPhase.crises, legacy: campaignPhase.legacy },
     } : {}),
   };
 

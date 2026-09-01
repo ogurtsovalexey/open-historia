@@ -12,7 +12,7 @@ const finishMonth = async (request, gameId, draft, decide) => {
   expect(confirmed.ok(), await confirmed.text()).toBeTruthy();
   draft = await confirmed.json();
   expect(draft.phase).toBe('plan-strategy');
-  expect(draft.tasks[0].taskId).toBe('opponents.plan-society');
+  expect(draft.tasks[0].taskId).toBe('opponents.plan-campaign');
   const prompt = JSON.parse(draft.tasks[0].userPrompt);
   const promptText = JSON.stringify(prompt);
   expect(promptText).not.toContain('FeatureCollection');

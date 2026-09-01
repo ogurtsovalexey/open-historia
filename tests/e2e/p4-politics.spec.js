@@ -9,7 +9,7 @@ const finishMonth = async (request, gameId, draft) => {
   draft = await (await request.post(`/api/games/${gameId}/agent-turn/step`, { data: {
     turnToken: draft.turnToken, action: 'confirm-player',
   } })).json();
-  expect(draft.tasks[0].taskId).toBe('opponents.plan-society');
+  expect(draft.tasks[0].taskId).toBe('opponents.plan-campaign');
   const prompt = JSON.parse(draft.tasks[0].userPrompt);
   const text = JSON.stringify(prompt);
   expect(text).not.toContain('FeatureCollection');

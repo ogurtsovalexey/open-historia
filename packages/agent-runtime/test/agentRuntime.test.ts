@@ -39,8 +39,10 @@ test('strategic diplomacy batch is bounded, deterministic and contains no full m
     && brief.mobilizationRegionCandidates.length <= 3 && brief.frontRegionCandidates.length <= 6
     && brief.peaceRegionCandidates.length <= 6));
   assert.ok(first.briefs.every((brief) => ((brief.identity?.candidates as string[] | undefined)?.length ?? 0) <= 6));
+  assert.ok(first.briefs.every((brief) => brief.campaignGoals.length <= 3 && brief.campaignCrises.length <= 3));
   assert.equal(JSON.stringify(first).includes('minorities'), false);
   assert.equal(JSON.stringify(first).includes('identity.regions'), false);
+  assert.equal(JSON.stringify(first).includes('startingRegionCounts'), false);
   assert.equal(JSON.stringify(first).includes('supplyLinks'), false);
   assert.equal(JSON.stringify(first).includes('truths'), false);
   assert.equal(JSON.stringify(first).includes('liquid-fuel reserves'), false);
@@ -118,6 +120,27 @@ test('strategic diplomacy validation requires one bound decision per polity', ()
       domain: 'culture', identityId: 'culture:unknown', accepted: true },
   };
   assert.throws(() => validateDiplomacyBatch(unknownIdentity, batch), /outside bounded candidates/);
+
+  const campaign: { decisions: Array<Record<string, unknown>> } = structuredClone(holds);
+  const campaignActor = batch.briefs.find((brief) => brief.campaignGoals.some((entry) => entry.status === 'candidate'))!;
+  const campaignIndex = batch.polityIds.indexOf(campaignActor.polityId);
+  const goal = campaignActor.campaignGoals.find((entry) => entry.status === 'candidate')!;
+  campaign.decisions[campaignIndex] = {
+    polityId: campaignActor.polityId, intent: 'adopt-goal', rationale: 'Adopt an engine-advertised direction.',
+    command: { kind: 'campaign.adopt-goal', commandId: '00000000-0000-4000-8000-000000000007', actorPolityId: campaignActor.polityId,
+      expectedRevision: state.revision, effectiveMonth: state.month, goalId: goal.goalId },
+  };
+  assert.equal(validateDiplomacyBatch(campaign, batch).decisions[campaignIndex]?.intent, 'adopt-goal');
+
+  const crisisState = runTurn(state, { commands: [] }).result.state;
+  const crisisBatch = buildDiplomacyBatch(crisisState, 'polity:austria')!;
+  const crisisActor = crisisBatch.briefs.find((brief) => brief.campaignCrises.length)!;
+  const crisisHolds: { decisions: Array<Record<string, unknown>> } = { decisions: crisisBatch.polityIds.map((polityId) => ({ polityId, intent: 'hold', rationale: 'Hold.', command: null })) };
+  const crisisIndex = crisisBatch.polityIds.indexOf(crisisActor.polityId);
+  crisisHolds.decisions[crisisIndex] = { polityId: crisisActor.polityId, intent: 'set-crisis-position', rationale: 'Seek compromise.',
+    command: { kind: 'crisis.set-position', commandId: '00000000-0000-4000-8000-000000000008', actorPolityId: crisisActor.polityId,
+      expectedRevision: crisisState.revision, effectiveMonth: crisisState.month, crisisId: crisisActor.campaignCrises[0]!.crisisId, position: 'compromise' } };
+  assert.equal(validateDiplomacyBatch(crisisHolds, crisisBatch).decisions[crisisIndex]?.intent, 'set-crisis-position');
 });
 
 test('bounded briefs and batches never include the full map', () => {

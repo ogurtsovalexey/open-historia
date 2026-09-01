@@ -12,6 +12,7 @@ import StatecraftPane from "./statecraft.jsx";
 import PoliticsPane from "./politics.jsx";
 import MilitaryPane from "./military.jsx";
 import SocietyPane from "./society.jsx";
+import CampaignPane from "./campaign.jsx";
 
 Chart.register(...registerables);
 
@@ -387,6 +388,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
         <TabButton icon="⚖" label="Politics" active={activeTab === "politics"} onClick={() => setActiveTab("politics")} />
         <TabButton icon="⚔" label="War" active={activeTab === "military"} onClick={() => setActiveTab("military")} />
         <TabButton icon="🧬" label="Society" active={activeTab === "society"} onClick={() => setActiveTab("society")} />
+        <TabButton icon="🏁" label="Campaign" active={activeTab === "campaign"} onClick={() => setActiveTab("campaign")} />
         <TabButton icon="🧭" label="Advisor" active={activeTab === "advisor"} onClick={() => setActiveTab("advisor")} />
         <TabButton icon="📊" label="Stats" active={activeTab === "stats"} onClick={() => setActiveTab("stats")} />
         <div style={{ flex: 1 }} />
@@ -431,6 +433,10 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
 
         <div style={{ display: activeTab === "society" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
         <SocietyPane active={isAdvisorOpen && activeTab === "society"} />
+        </div>
+
+        <div style={{ display: activeTab === "campaign" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
+        <CampaignPane active={isAdvisorOpen && activeTab === "campaign"} />
         </div>
 
         {/* National stats pane — kept mounted so flipping tabs is instant. */}

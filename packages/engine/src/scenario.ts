@@ -15,6 +15,7 @@ import { authoredStatecraftSchema } from './statecraft.js';
 import { authoredPoliticsSchema } from './politics.js';
 import { authoredMilitarySchema } from './military.js';
 import { authoredCapabilitiesSchema, authoredIdentitySchema } from './society.js';
+import { authoredCampaignSchema } from './campaign.js';
 
 /** Game resource catalog per regional-resource-economy.md §2. Engine-owned. */
 export const RESOURCE_CATALOG = [
@@ -148,11 +149,12 @@ export const modulesSchema = z
     trade: z.boolean().optional(),
     shortages: z.boolean().optional(),
     unrest: z.boolean().optional(),
+    campaign: z.boolean().optional(),
   })
   .strict();
 export type Modules = z.infer<typeof modulesSchema>;
 
-export const MODULE_NAMES = ['armedForces', 'combat', 'diplomacy', 'finance', 'intelligence', 'politics', 'projects', 'societyAndIdentity', 'technology', 'budget', 'trade', 'shortages', 'unrest'] as const;
+export const MODULE_NAMES = ['armedForces', 'campaign', 'combat', 'diplomacy', 'finance', 'intelligence', 'politics', 'projects', 'societyAndIdentity', 'technology', 'budget', 'trade', 'shortages', 'unrest'] as const;
 export type ModuleName = (typeof MODULE_NAMES)[number];
 
 export const authoredRelationSchema = z.object({
@@ -200,6 +202,8 @@ export const econScenarioSchema = z
     capabilities: authoredCapabilitiesSchema.optional(),
     /** Authored culture/religion groups, regional composition and state policy. */
     identity: authoredIdentitySchema.optional(),
+    /** Authored directions, deterministic crisis conditions and historical baselines. */
+    campaign: authoredCampaignSchema.optional(),
     economy: economyParamsSchema,
     polities: z.array(scenarioPolitySchema).min(2),
     regions: z.array(scenarioRegionSchema).min(1),
@@ -233,6 +237,47 @@ export const econScenarioSchema = z
     }
     if (scenario.modules?.societyAndIdentity === true && !scenario.identity) {
       ctx.addIssue({ code: 'custom', message: 'societyAndIdentity requires authored identity inputs', path: ['identity'] });
+    }
+    if (scenario.modules?.campaign === true && !scenario.campaign) {
+      ctx.addIssue({ code: 'custom', message: 'campaign module requires authored campaign inputs', path: ['campaign'] });
+    }
+    if (scenario.campaign) {
+      const goalIds = new Set(scenario.campaign.goals.map((entry) => entry.goalId));
+      const templateIds = new Set(scenario.campaign.crisisTemplates.map((entry) => entry.templateId));
+      if (goalIds.size !== scenario.campaign.goals.length) ctx.addIssue({ code: 'custom', message: 'campaign goal ids must be unique', path: ['campaign', 'goals'] });
+      if ([...polityIds].some((polityId) => scenario.campaign!.goals.filter((entry) => entry.polityId === polityId).length > 3)) {
+        ctx.addIssue({ code: 'custom', message: 'campaign permits at most three directions per polity', path: ['campaign', 'goals'] });
+      }
+      if (templateIds.size !== scenario.campaign.crisisTemplates.length) ctx.addIssue({ code: 'custom', message: 'crisis template ids must be unique', path: ['campaign', 'crisisTemplates'] });
+      const regionIds = new Set(scenario.regions.map((entry) => entry.regionId));
+      const capabilityIds = new Set(scenario.capabilities?.catalog.map((entry) => entry.capabilityId) ?? []);
+      if (scenario.campaign.softHorizonMonth < scenario.startMonth) {
+        ctx.addIssue({ code: 'custom', message: 'campaign soft horizon cannot precede scenario start', path: ['campaign', 'softHorizonMonth'] });
+      }
+      for (const [index, goal] of scenario.campaign.goals.entries()) {
+        if (!polityIds.has(goal.polityId)
+          || (goal.kind === 'secure-alliance' && (!polityIds.has(goal.targetPolityId) || goal.targetPolityId === goal.polityId || scenario.modules?.diplomacy !== true))
+          || (goal.kind === 'control-region' && !regionIds.has(goal.regionId))
+          || (goal.kind === 'unlock-capability' && (!capabilityIds.has(goal.capabilityId) || scenario.modules?.technology !== true))
+          || (goal.kind === 'stabilize-government' && scenario.modules?.politics !== true)) {
+          ctx.addIssue({ code: 'custom', message: 'campaign goal references unknown id or disabled module', path: ['campaign', 'goals', index] });
+        }
+      }
+      for (const [index, template] of scenario.campaign.crisisTemplates.entries()) {
+        if (!polityIds.has(template.subjectPolityId) || template.participants.some((entry) => !polityIds.has(entry))
+          || new Set(template.participants).size !== template.participants.length || !template.participants.includes(template.subjectPolityId)
+          || (template.kind === 'identity-pressure' && scenario.modules?.societyAndIdentity !== true)
+          || (template.kind === 'debt-distress' && scenario.modules?.finance !== true)
+          || (template.kind === 'war-escalation' && scenario.modules?.armedForces !== true)
+          || (template.kind === 'political-escalation' && scenario.modules?.politics !== true)) {
+          ctx.addIssue({ code: 'custom', message: 'crisis template references unique known polities', path: ['campaign', 'crisisTemplates', index] });
+        }
+      }
+      if (scenario.campaign.legacyBaselines.length !== polityIds.size
+        || new Set(scenario.campaign.legacyBaselines.map((entry) => entry.polityId)).size !== polityIds.size
+        || scenario.campaign.legacyBaselines.some((entry) => !polityIds.has(entry.polityId))) {
+        ctx.addIssue({ code: 'custom', message: 'campaign requires exactly one legacy baseline per polity', path: ['campaign', 'legacyBaselines'] });
+      }
     }
     if (scenario.capabilities) {
       const capabilityIds = new Set(scenario.capabilities.catalog.map((entry) => entry.capabilityId));

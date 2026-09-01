@@ -8,6 +8,7 @@ import {
   politicsCommandSchema,
   militaryCommandSchema,
   identityCommandSchema,
+  campaignCommandSchema,
   polityIdentityEffects,
   potentialOutput,
   runTurn,
@@ -21,12 +22,13 @@ import type { StatecraftCommand } from '@open-historia/engine';
 import type { PoliticsCommand } from '@open-historia/engine';
 import type { MilitaryCommand } from '@open-historia/engine';
 import type { IdentityCommand } from '@open-historia/engine';
+import type { CampaignCommand } from '@open-historia/engine';
 
 export const MAX_POLITIES_PER_BATCH = 12;
 export const MAX_BATCHES_PER_MONTH = 2;
 export const MAX_POLITIES_PER_MONTH = MAX_POLITIES_PER_BATCH * MAX_BATCHES_PER_MONTH;
 export const MAX_POLITY_BRIEF_CHARS = 1600;
-export const MAX_BATCH_BRIEF_CHARS = 24000;
+export const MAX_BATCH_BRIEF_CHARS = 26000;
 export const MAX_STRATEGIC_POLITIES = 6;
 
 export const strategyIntentSchema = z.enum([
@@ -48,9 +50,9 @@ export type OpponentBatchResult = z.infer<typeof opponentBatchResultSchema>;
 
 export const opponentDiplomacyDecisionSchema = z.object({
   polityId: polityIdSchema,
-  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'set-policy', 'issue-bonds', 'restructure', 'start-project', 'update-project', 'cancel-project', 'concede', 'repress', 'refuse', 'declare-war', 'mobilize', 'demobilize', 'order', 'split', 'merge', 'propose-peace', 'accept-peace', 'reject-peace', 'set-identity-policy', 'set-identity-acceptance', 'hold']),
+  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'set-policy', 'issue-bonds', 'restructure', 'start-project', 'update-project', 'cancel-project', 'concede', 'repress', 'refuse', 'declare-war', 'mobilize', 'demobilize', 'order', 'split', 'merge', 'propose-peace', 'accept-peace', 'reject-peace', 'set-identity-policy', 'set-identity-acceptance', 'adopt-goal', 'set-crisis-position', 'hold']),
   rationale: z.string().max(320),
-  command: z.union([diplomacyCommandSchema, statecraftCommandSchema, politicsCommandSchema, militaryCommandSchema, identityCommandSchema]).nullable(),
+  command: z.union([diplomacyCommandSchema, statecraftCommandSchema, politicsCommandSchema, militaryCommandSchema, identityCommandSchema, campaignCommandSchema]).nullable(),
 }).strict().superRefine((decision, ctx) => {
   const expectedKind = decision.intent === 'propose' ? 'diplomacy.propose'
     : decision.intent === 'counter' ? 'diplomacy.counter'
@@ -74,6 +76,8 @@ export const opponentDiplomacyDecisionSchema = z.object({
                                         : decision.intent === 'set-identity-policy' ? 'identity.set-policy'
                                           : decision.intent === 'set-identity-acceptance'
                                             ? decision.command?.kind === 'identity.set-religion-acceptance' ? 'identity.set-religion-acceptance' : 'identity.set-culture-acceptance'
+                                            : decision.intent === 'adopt-goal' ? 'campaign.adopt-goal'
+                                              : decision.intent === 'set-crisis-position' ? 'crisis.set-position'
                       : null;
   if ((decision.command?.kind ?? null) !== expectedKind) {
     ctx.addIssue({ code: 'custom', path: ['command'], message: 'intent and diplomacy command must match' });
@@ -119,6 +123,9 @@ export interface DiplomacyPolityBrief {
   peaceRegionCandidates: Array<{ regionId: string; legalControllerId: string; actualControllerId: string }>;
   capabilities: Array<Record<string, unknown>>;
   identity: Record<string, unknown> | null;
+  campaignGoals: Array<Record<string, unknown>>;
+  campaignCrises: Array<Record<string, unknown>>;
+  latestLegacy: Record<string, unknown> | null;
 }
 
 export interface DiplomacyBatch {
@@ -245,6 +252,22 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
         aggregate: polityIdentityEffects(state.identity, state.regions, polityId),
         candidates: presentIdentityIds,
       } : null,
+      campaignGoals: (state.campaign?.goals ?? []).filter((entry) => entry.polityId === polityId)
+        .sort((a, b) => Number(b.status === 'active') - Number(a.status === 'active') || a.goalId.localeCompare(b.goalId)).slice(0, 3).map((entry) => ({
+          goalId: entry.goalId, kind: entry.kind, status: entry.status, progressBp: entry.progressBp, displayName: entry.displayName,
+          ...(entry.kind === 'secure-alliance' ? { targetPolityId: entry.targetPolityId }
+            : entry.kind === 'unlock-capability' ? { capabilityId: entry.capabilityId }
+              : entry.kind === 'control-region' ? { regionId: entry.regionId }
+                : { thresholdBp: entry.thresholdBp }),
+        })),
+      campaignCrises: (state.campaign?.crises ?? []).filter((entry) => entry.participants.includes(polityId as never) && entry.status !== 'resolved')
+        .sort((a, b) => a.crisisId.localeCompare(b.crisisId)).slice(0, 3).map((entry) => ({
+          crisisId: entry.crisisId, kind: entry.kind, status: entry.status, subjectPolityId: entry.subjectPolityId,
+          evidenceValue: entry.evidenceValue, evidenceThreshold: entry.evidenceThreshold, participants: entry.participants, positions: entry.positions,
+          allowedPositions: ['compromise', 'status-quo', 'press', 'escalate'],
+        })),
+      latestLegacy: (state.campaign?.assessments ?? []).filter((entry) => entry.polityId === polityId)
+        .sort((a, b) => b.month.localeCompare(a.month) || b.assessmentId.localeCompare(a.assessmentId))[0] ?? null,
     };
   });
   const characterCount = briefs.reduce((sum, brief) => sum + JSON.stringify(brief).length, 0);
@@ -262,7 +285,7 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
   if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error('strategic batch must decide every and only requested polity');
   const known = new Set(batch.briefs.map((entry) => entry.polityId));
   for (const decision of parsed.decisions) {
-    const command = decision.command as DiplomacyCommand | StatecraftCommand | PoliticsCommand | MilitaryCommand | IdentityCommand | null;
+    const command = decision.command as DiplomacyCommand | StatecraftCommand | PoliticsCommand | MilitaryCommand | IdentityCommand | CampaignCommand | null;
     if (!command) continue;
     if (command.actorPolityId !== decision.polityId) throw new Error('diplomacy command actor mismatch');
     if (command.expectedRevision !== batch.baseRevision || command.effectiveMonth !== batch.month) throw new Error('diplomacy command is stale or for the wrong month');
@@ -325,6 +348,13 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
       const identity = brief.identity as { candidates?: string[] };
       if ('identityId' in command && !identity.candidates?.includes(command.identityId)) throw new Error('identity command names an identity outside bounded candidates');
     }
+    if (command.kind === 'campaign.adopt-goal' && !brief.campaignGoals.some((entry) => entry.goalId === command.goalId && entry.status === 'candidate')) {
+      throw new Error('campaign command names a goal outside bounded candidates');
+    }
+    if (command.kind === 'crisis.set-position' && !brief.campaignCrises.some((entry) => entry.crisisId === command.crisisId)) {
+      throw new Error('crisis command names a crisis outside bounded participants');
+    }
+    if (command.kind === 'campaign.assess-legacy') throw new Error('shared strategic batch may not create player legacy reports');
   }
   return parsed;
 }
@@ -332,7 +362,7 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
 export const interpretedActionSchema = z.object({
   actionId: z.string().min(1).max(200),
   summary: z.string().min(1).max(240),
-  command: z.union([investInRegionCommandSchema, startProjectCommandSchema, politicsCommandSchema, militaryCommandSchema, identityCommandSchema]).nullable(),
+  command: z.union([investInRegionCommandSchema, startProjectCommandSchema, politicsCommandSchema, militaryCommandSchema, identityCommandSchema, campaignCommandSchema]).nullable(),
   disposition: z.enum(['command', 'report', 'unsupported', 'ambiguous']),
 }).strict().refine(
   (value) => (value.disposition === 'command') === (value.command !== null),

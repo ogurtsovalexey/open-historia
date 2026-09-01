@@ -66,7 +66,7 @@ Adopted from the archived domain spec: a scenario manifest **enables modules**
 — `territorialControl` (required), `economy`, `publicFinance`,
 `productionAndTrade`, `resourcesAndLogistics`, `demographics`, `diplomacy`,
 `internalPolitics`, `societyAndIdentity`, `armedForces`, `combat`, `projects`,
-`technology`.
+`technology`, `campaign`.
 
 A disabled module is absent from state, UI, **AI context and tool schemas**.
 This is the mechanism that makes staged growth safe and keeps token spend
@@ -98,12 +98,12 @@ opponent → deterministic consequences) comes second.
 | **P1 — Headless bench** | UI-free playtest surface for fast checks: region table, national totals, "why changed" from the ledger, resource flows, investment order, advance one/twelve months, reset, turn report. Zero model calls (`npm run play:engine`). A test bench, not the product. | **Done** |
 | **P2 — The engine inside the game** | The Central Europe scenario (4 polities, 47 real regions) visible on the map; clicking a region selects it; the `Economy` drawer tab shows region + controller numbers and "why changed" from the ledger; advancing time runs the engine, not a model. Date, round, ownership and economy publish as one game-scoped session revision. Zero model calls. | **Done** |
 | **P3a — Economic agent loop** | Free-text economy orders → typed commands; bounded opponent briefs, scheduling, difficulty and atomic agent turns | **Done** (canon 09) |
-| **P3b — Playable diplomacy and trade** | Six-polity Central Europe (add metropolitan France and Poland), two-tier AI orchestration, relations, proposals/counters, four agreement types, calls to arms and bilateral resource/treasury contracts | **Next — unlock interaction** |
-| **P3c — Statecraft tools** | Tax burden, budget priorities, debt/default; unified projects for construction/reform/research/mobilization/intelligence; evidence-backed country knowledge | |
-| **P4 — Politics and characters** | Scenario-defined factions, legitimacy/stability/unrest, escalation to coups/rebellions; rulers, heirs, appointments, succession and significant personal relations | |
-| **P5 — War and peace** | Formations and commanders, mobilization, connected supply, fronts, deterministic aggregate combat, occupation and validated free-form peace bargaining | |
-| **P6 — Capabilities and identity** | Non-linear capabilities; culture/religion mismatch, accepted identities and slow causal policy-driven change | |
-| **P7 — Campaign and balance** | Adaptive goals, generated crises, soft horizon and multidimensional legacy; tune the complete diplomacy → economy → politics → war loop for replayable campaigns | |
+| **P3b — Playable diplomacy and trade** | Six-polity Central Europe (add metropolitan France and Poland), two-tier AI orchestration, relations, proposals/counters, four agreement types, calls to arms and bilateral resource/treasury contracts | **Done** (canon 11) |
+| **P3c — Statecraft tools** | Tax burden, budget priorities, debt/default; unified projects for construction/reform/research/mobilization/intelligence; evidence-backed country knowledge | **Done** (canon 12) |
+| **P4 — Politics and characters** | Scenario-defined factions, legitimacy/stability/unrest, escalation to coups/rebellions; rulers, heirs, appointments, succession and significant personal relations | **Done** (canon 13) |
+| **P5 — War and peace** | Formations and commanders, mobilization, connected supply, fronts, deterministic aggregate combat, occupation and validated free-form peace bargaining | **Done** (canon 14) |
+| **P6 — Capabilities and identity** | Non-linear capabilities; culture/religion mismatch, accepted identities and slow causal policy-driven change | **Done** (canon 15) |
+| **P7 — Campaign and balance** | Adaptive goals, generated crises, soft horizon and multidimensional legacy; tune the complete diplomacy → economy → politics → war loop for replayable campaigns | **Done** (canon 16) |
 | **P8 — World and deeper markets** | Grow toward the bounded target only after the loop is fun; full markets/prices, optional simple migration and other proven depth | |
 | **P9 — Optional** | One curated historical scenario; anything else | Optional |
 

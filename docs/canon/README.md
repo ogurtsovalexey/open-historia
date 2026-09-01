@@ -27,6 +27,7 @@ escalate, do not silently "fix" either side.
 | 13 | [`13-p4-politics-and-characters.md`](13-p4-politics-and-characters.md) | P4 factions, political escalation, rulers, appointments and succession |
 | 14 | [`14-p5-war-and-peace.md`](14-p5-war-and-peace.md) | P5 mobilization, formations, supply, combat, occupation and peace |
 | 15 | [`15-p6-capabilities-and-identity.md`](15-p6-capabilities-and-identity.md) | P6 project-unlocked capabilities and culture/religion identity policy |
+| 16 | [`16-p7-campaign-crises-and-legacy.md`](16-p7-campaign-crises-and-legacy.md) | P7 durable goals, deterministic crises, soft horizon and legacy reports |
 
 Sources of each doc are cited inline. The full archived corpus stays under
 `docs/spec/` and `docs/product/` for provenance; their READMEs carry a

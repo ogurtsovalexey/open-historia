@@ -12,6 +12,7 @@ import type { PoliticalCommandRecord, PoliticalResolutionRecord } from './politi
 import type { CombatRecord, MilitaryCommandRecord, MilitaryTreasuryTransfer } from './militaryReducer.js';
 import type { IdentityCommandRecord, PolityIdentityRecord, RegionIdentityRecord } from './identityReducer.js';
 import { capabilityCapacityBonus, compositionShares } from './society.js';
+import type { CampaignCommandRecord, CrisisRecord, GoalProgressRecord, LegacyRecord } from './campaignReducer.js';
 
 export interface RegionPopulationRow {
   regionId: RegionId;
@@ -141,6 +142,12 @@ export interface TurnLedger {
     commands: MilitaryCommandRecord[];
     combats: CombatRecord[];
     treasuryTransfers: MilitaryTreasuryTransfer[];
+  };
+  campaign?: {
+    commands: CampaignCommandRecord[];
+    goals: GoalProgressRecord[];
+    crises: CrisisRecord[];
+    legacy: LegacyRecord[];
   };
 }
 
