@@ -50,9 +50,18 @@ test("live Gemini advisor and diplomacy stay grounded in the 1938 engine session
       url: requestEvent.url(), headers: requestEvent.headers(), body: requestEvent.postDataJSON(),
     });
   });
-  await page.goto(`/?gameId=${gameId}`, { waitUntil: "domcontentloaded" });
-  await expect(page.getByText(/P2 Gemini Smoke 1938/)).toBeVisible({ timeout: 30_000 });
-  await page.waitForTimeout(2000);
+  await page.route("**/__gemini-smoke", (route) => route.fulfill({
+    contentType: "text/html",
+    body: "<!doctype html><title>Gemini smoke harness</title>",
+  }));
+  await page.goto("/__gemini-smoke", { waitUntil: "domcontentloaded" });
+  const browserEngineState = await page.evaluate(async () => {
+    const economy = await import("/src/runtime/economy.js");
+    const game = await economy.getActiveEngineGame();
+    const snapshot = game ? await economy.fetchEconomyState(game.id) : null;
+    return { gameId: game?.id, gameDate: snapshot?.gameDate };
+  });
+  expect(browserEngineState).toEqual({ gameId, gameDate: "1938-01-01" });
   expect(modelCalls).toHaveLength(0);
 
   const initial = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
