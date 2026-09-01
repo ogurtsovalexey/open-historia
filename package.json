@@ -49,7 +49,8 @@
     "typecheck:engine": "cd packages/engine && npm run typecheck",
     "play:engine": "cd packages/engine && npm run play"
     ,"campaign-lab": "npm run build:data-packs && npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/campaign-lab.mjs",
-    "gemini:preflight": "npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/gemini-preflight.mjs"
+    "gemini:preflight": "npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/gemini-preflight.mjs",
+    "codex:luna:capability": "npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/codex-luna-capability.mjs"
   },
   "dependencies": {
     "@noble/ed25519": "^2.3.0",

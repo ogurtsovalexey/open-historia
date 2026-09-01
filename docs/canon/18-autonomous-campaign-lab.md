@@ -1,8 +1,60 @@
 # 18 — Autonomous Campaign Lab
 
-Status: accepted implementation contract, 2026-09-01.
+Status: accepted implementation contract; Codex-local renewal accepted 2026-09-02.
 
-## Preconditions and authority
+## 2026-09-02 Codex-local renewal
+
+Principles 1–4 remain binding. The failed 2026-09-01 evidence is immutable
+diagnostic material: its retry budget does not count against the renewed gate
+because it exposed a defective V2 brief boundary and an unsupported Codex
+output-schema shape. New runs freeze
+`StrategicBriefV3+StrategicDecisionV2`; V2 runs never resume under V3.
+
+The only new matrix namespace is `free10-autonomy-v2-codex-luna`, containing
+Germany historical, alternative and free. It freezes the external-supplier
+profile separately from the matrix version, plus provider kind, ChatGPT auth,
+`gpt-5.6-luna`, low reasoning/verbosity, Codex CLI version, code revision,
+prompt/brief contract and preflight checksum. Status and resume reject drift.
+Gemini is an explicitly selected, non-resumable legacy diagnostic provider and
+is never a fallback.
+
+The isolated capability evaluator writes only beneath `runs/campaign-lab/`,
+uses real V3 briefs and dynamic engine states, and cannot mutate campaign
+state. Every call is a fresh `codex exec --ephemeral` in a temporary
+non-repository cwd, with ChatGPT login forced, read-only sandbox, user rules,
+plugins and MCP disabled, and provider credentials removed from the child
+environment. It retains JSONL, exact prompts and responses, normalized strict
+V2 decisions, validation/materialization results, thread ids, CLI version,
+revision and checksums. A transport retry is allowed only if no Codex turn
+completed; there is no schema-correction generation or substitute model.
+
+Renewed Gate 0 is four sequential independent Luna sessions: the initial six-
+opponent 1935 state, UK iron exhaustion with domestic/ordinary/external supply
+choices, a real territorial proposal to Czechoslovakia, and an engine-created
+German war for Poland. Passing requires 4/4 structured outputs, exact actor
+coverage, relevant material focal choices, at least 90% unsalvaged decision
+materialization, no invented/private/authoritative content, exact affordance
+matching, prompt sizes below 40,000 characters, no validation mutation, four
+distinct thread ids, and at least 4/5 relevance/coherence for every focal
+strategy. Only transport formatting or clearly correctable prompt wording may
+receive one revision and failed-probe repeats, with at most four additional
+completed Luna turns; other failure stops the work.
+
+Production `codex-subscription` remains gated on that pass and is a local Lab
+facility, never a shipped-game backend. After integration it receives exactly
+two live preflight calls: one real opponent batch and one aggregate of fifteen
+real tool-family micro-briefs. Subscription/rate-limit failures atomically
+pause at the same revision/checkpoint; invalid individual decisions become
+typed holds. The three German campaign lines start only after both calls and
+all deterministic gates pass, run sequentially with the existing 60-turn line
+and 180-turn matrix limits, and stop before any Poland, France or UK line.
+
+## Legacy 2026-09-01 Gemini diagnostic contract
+
+The remaining sections describe the frozen legacy provider unless the Codex
+renewal above explicitly overrides them.
+
+### Preconditions and authority
 
 - Canon 00–17 remains binding. The lab is an opt-in orchestration layer and
   never becomes a second simulation engine.
@@ -14,7 +66,7 @@ Status: accepted implementation contract, 2026-09-01.
 - A live run reads `GEMINI_API_KEY` from its process environment. Keys, raw
   prompts, provider responses and browser traces are never committed.
 
-## CLI and run contract
+### CLI and run contract
 
 The root command `campaign-lab` exposes `start`, `status`, `decide`, `resume`
 and `report`. A run manifest pins scenario checksum, engine revision, model,
@@ -48,7 +100,7 @@ alert start, material worsening/change and resolution. Extra decisions are
 triggered only by material diplomacy, war/call, occupation/peace, government,
 default or crisis transitions, plus the first active food shortfall.
 
-## Chronicle and telemetry
+### Chronicle and telemetry
 
 Every material event appends one JSONL record and one Markdown entry containing
 month, opening/closing revision, participants, event kind, related decisions,
@@ -62,7 +114,7 @@ terminal status, parse/schema result and accepted/rejected command counts.
 Raw material lives under gitignored `runs/campaign-lab/`. Only a redacted,
 aggregate dataset and the cross-run report may be committed.
 
-## Acceptance
+### Acceptance
 
 - Mocked runs replay byte-identically and produce non-empty chronicles/cards.
 - Prompt gates prove the character/memory limits and absence of geometry.

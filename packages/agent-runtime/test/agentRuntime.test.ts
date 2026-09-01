@@ -22,6 +22,11 @@ import {
   materializeStrategicDecisionV2,
   materializeStrategicBatchV2,
   strategicDecisionV2Schema,
+  buildStrategicBriefV3,
+  buildStrategicBatchesV3,
+  expandStrategicAffordancesV3,
+  materializeStrategicDecisionV3,
+  materializeStrategicBatchV3,
   type AgentState,
 } from '../src/index.js';
 import { initState, parseScenario, runTurn, stateChecksum, type EconWorldState } from '@open-historia/engine';
@@ -114,6 +119,160 @@ test('Strategic V2 batches are bounded and materialize all actors against one re
   assert.deepEqual(materialized, { commands: [], unsupportedResidual: [], rejected: [] });
   const advanced = runTurn(state, { commands: [] }).result.state;
   assert.match(materializeStrategicBatchV2(advanced, { decisions: batch.polityIds.map(holdV2) }, batch).rejected[0]?.reason ?? '', /stale-revision/);
+});
+
+test('StrategicBriefV3 publishes only individually executable coupled affordances', () => {
+  const state = benchmarkInitial();
+  const brief = buildStrategicBriefV3(state, 'polity:germany', {
+    externalSupplierPolityIds: ['polity:soviet-union', 'polity:united-states'],
+    strategicContext: { interests: ['secure inputs'], threats: ['iron exhaustion'], obligations: ['honour agreements'], redLines: ['no invented facts'],
+      causalAnchors: [{ anchorId: 'anchor:iron', interest: 'secure inputs', applicability: ['iron deficit'], invalidators: ['iron surplus'] }], memory: ['Imports were reviewed.'] },
+  });
+  assert.equal(brief.schemaVersion, 'open-historia-strategic-brief/3');
+  assert.equal(brief.decisionSchemaVersion, 'open-historia-strategic-decision/2');
+  assert.deepEqual(brief.context.interests, ['secure inputs']);
+  assert.ok(brief.affordances.some((entry) => entry.tool === 'conserve'));
+  assert.equal(JSON.stringify(brief).includes('allowed'), false);
+  assert.equal(JSON.stringify(brief).includes('geometry'), false);
+  assert.equal(JSON.stringify(brief).includes('character:'), false);
+  const actions = expandStrategicAffordancesV3(brief);
+  assert.ok(actions.length > 1);
+  for (const action of actions) {
+    if (action.tool === 'conserve') continue;
+    const decision = { ...holdV2('polity:germany'), actions: [action], hold: null };
+    const result = materializeStrategicDecisionV3(state, decision, brief);
+    assert.equal(result.rejected.length, 0, `${action.tool}: ${JSON.stringify(result.rejected)}`);
+    assert.ok(result.commands.length > 0, action.tool);
+    assert.equal(runTurn(state, { commands: result.commands }).result.rejections.length, 0, action.tool);
+  }
+  assert.deepEqual(state, benchmarkInitial(), 'affordance enumeration and validation must not mutate state');
+});
+
+test('StrategicBriefV3 removes empty and mismatched options and enforces frozen choices', () => {
+  const state = benchmarkInitial();
+  const brief = buildStrategicBriefV3(state, 'polity:germany', { externalSupplierPolityIds: ['polity:soviet-union'] });
+  const realloc = brief.affordances.find((entry) => entry.tool === 'reallocate-production');
+  if (realloc?.tool === 'reallocate-production') {
+    for (const region of realloc.regions) for (const priority of region.priorities) for (const choice of priority.scales) {
+      assert.equal(choice.action.targetRegionId, region.region.id);
+      assert.equal(choice.action.priority, priority.priority);
+    }
+  }
+  assert.ok(brief.affordances.every((entry) => expandStrategicAffordancesV3({ ...brief, affordances: [entry] }).length > 0));
+  const invented = { ...holdV2('polity:germany'), actions: [{ tool: 'invest' as const, targetRegionId: 'region:invented:XX', scale: 'small' as const }], hold: null };
+  const rejected = materializeStrategicDecisionV3(state, invented, brief);
+  assert.equal(rejected.commands.length, 0);
+  assert.match(rejected.rejected[0]?.reason ?? '', /frozen V3 affordance/);
+});
+
+test('Strategic V3 policy choices preserve relative policy and batches include complete prompt size', () => {
+  const policyState = diplomacyInitial();
+  const brief = buildStrategicBriefV3(policyState, 'polity:austria');
+  const policy = brief.affordances.find((entry) => entry.tool === 'change-policy');
+  assert.ok(policy?.tool === 'change-policy');
+  if (policy?.tool !== 'change-policy') return;
+  const steady = policy.choices.find((entry) => entry.action.taxStance === 'steady')!;
+  assert.ok(steady.preview.deltas.some((entry) => entry.path.endsWith('taxBurdenBp') && entry.before === entry.after));
+  assert.ok(policy.choices.every((entry) => Object.values((entry.preview.deltas.find((delta) => delta.path.endsWith('priorities'))?.after ?? {}) as Record<string, number>).reduce((sum, value) => sum + value, 0) === 10000));
+  const systemText = 'S'.repeat(1200);
+  const state = benchmarkInitial();
+  const batches = buildStrategicBatchesV3(state, 'polity:germany', { systemText });
+  assert.ok(batches.every((entry) => entry.characterCount === systemText.length + JSON.stringify({ briefs: entry.briefs }).length));
+  assert.ok(batches.every((entry) => entry.characterCount < 40000));
+});
+
+test('Strategic V3 batch rejects duplicate tools, exclusive targets, and reciprocal wars', () => {
+  const state = benchmarkInitial();
+  const batches = buildStrategicBatchesV3(state, 'polity:germany');
+  const batch = batches[0]!;
+  const decisions = batch.polityIds.map(holdV2);
+  const actorBrief = batch.briefs[0]!;
+  const action = expandStrategicAffordancesV3(actorBrief).find((entry) => entry.tool !== 'conserve');
+  if (action) decisions[0] = { ...holdV2(batch.polityIds[0]!), actions: [action, action], hold: null } as never;
+  assert.match(materializeStrategicBatchV3(state, { decisions }, batch).rejected[0]?.reason ?? '', /one action per tool|exclusive target/);
+});
+
+test('Strategic V3 diplomacy, proposal, faction, and project options carry public context and legal targets', () => {
+  let state = diplomacyInitial();
+  const base = (actorPolityId: string, suffix: string) => ({ commandId: `94000000-0000-4000-8000-${suffix.padStart(12, '0')}`,
+    actorPolityId, expectedRevision: state.revision, effectiveMonth: state.month });
+  const germanRegion = state.regions.find((entry) => entry.controllerId === 'polity:germany')!;
+  state = runTurn(state, { commands: [{ kind: 'diplomacy.propose', ...base('polity:germany', '1'), proposalId: 'proposal:v3-terms',
+    recipientPolityId: 'polity:austria', terms: { kind: 'territorial-settlement', fromPolityId: 'polity:germany',
+      toPolityId: 'polity:austria', regionIds: [germanRegion.regionId] } }] as never }).result.state;
+  const brief = buildStrategicBriefV3(state, 'polity:austria');
+  const proposals = brief.affordances.find((entry) => entry.tool === 'respond-proposal');
+  assert.ok(proposals?.tool === 'respond-proposal');
+  if (proposals?.tool === 'respond-proposal') {
+    assert.deepEqual(proposals.proposals[0]?.terms, { kind: 'territorial-settlement', fromPolityId: 'polity:germany',
+      toPolityId: 'polity:austria', regionIds: [germanRegion.regionId] });
+    assert.ok(proposals.proposals[0]?.choices.every((entry) => ['accept', 'reject'].includes(entry.action.response)));
+  }
+  const pressure = brief.affordances.find((entry) => entry.tool === 'apply-diplomatic-pressure');
+  if (pressure?.tool === 'apply-diplomatic-pressure') for (const partner of pressure.partners) for (const choice of partner.choices) {
+    if (choice.action.demand === 'territorial-concession') assert.equal(state.regions.find((entry) => entry.regionId === choice.action.targetRegionId)?.controllerId, partner.partner.id);
+    assert.notEqual(choice.action.demand, 'policy-change');
+  }
+  const factions = brief.affordances.find((entry) => entry.tool === 'respond-faction');
+  if (factions?.tool === 'respond-faction') assert.ok(factions.factions.every((entry) => entry.escalation !== 'calm' && entry.faction.name.length > 0));
+  const projects = brief.affordances.find((entry) => entry.tool === 'start-project');
+  if (projects?.tool === 'start-project') for (const project of projects.projects) {
+    assert.ok(project.template.name.length > 0 && project.cost > 0 && project.durationMonths > 0);
+    assert.ok(project.choices.every((choice) => project.targetMode === 'owned-region' ? Boolean(choice.action.targetRegionId) && !choice.action.targetPolityId
+      : project.targetMode === 'foreign-polity' ? Boolean(choice.action.targetPolityId) && !choice.action.targetRegionId
+        : !choice.action.targetPolityId && !choice.action.targetRegionId));
+  }
+});
+
+test('Strategic V3 zero treasury and current control remove unaffordable or invalid options', () => {
+  const state = diplomacyInitial();
+  const clone = structuredClone(state);
+  clone.polities.find((entry) => entry.id === 'polity:austria')!.treasury = 0;
+  clone.revision = stateChecksum(clone) as EconWorldState['revision'];
+  const brief = buildStrategicBriefV3(clone, 'polity:austria');
+  assert.equal(brief.affordances.some((entry) => ['invest', 'negotiate-trade', 'external-import'].includes(entry.tool)), false);
+  const factions = brief.affordances.find((entry) => entry.tool === 'respond-faction');
+  if (factions?.tool === 'respond-faction') assert.ok(factions.factions.every((entry) => entry.choices.every((choice) => choice.action.response !== 'concede')));
+  const mobilize = brief.affordances.find((entry) => entry.tool === 'mobilize');
+  if (mobilize?.tool === 'mobilize') assert.ok(mobilize.regions.every((entry) => entry.choices.every((choice) => {
+    const command = materializeStrategicDecisionV3(clone, { ...holdV2('polity:austria'), actions: [choice.action], hold: null }, brief).commands[0];
+    return command?.kind === 'military.mobilize' && command.manpower > 0 && command.equipment > 0;
+  })));
+});
+
+test('Strategic V3 war protections, active formation orders, and leader-only peace are enforced', () => {
+  let state = diplomacyInitial();
+  const base = (actorPolityId: string, suffix: string) => ({ commandId: `95000000-0000-4000-8000-${suffix.padStart(12, '0')}`,
+    actorPolityId, expectedRevision: state.revision, effectiveMonth: state.month });
+  state = runTurn(state, { commands: [{ kind: 'war.declare', ...base('polity:germany', '1'), warId: 'war:v3-order',
+    defenderPolityId: 'polity:austria', reason: 'rivalry' }] as never }).result.state;
+  const german = buildStrategicBriefV3(state, 'polity:germany');
+  const declarations = german.affordances.find((entry) => entry.tool === 'declare-war');
+  if (declarations?.tool === 'declare-war') assert.equal(declarations.defenders.some((entry) => entry.defender.id === 'polity:austria'), false);
+  const orders = german.affordances.find((entry) => entry.tool === 'issue-order');
+  if (orders?.tool === 'issue-order') assert.ok(orders.formations.every((entry) => entry.status === 'active'
+    && entry.choices.every((choice) => choice.action.posture === 'advance' ? choice.action.targetRegionId !== null : choice.action.targetRegionId === null)));
+  const peace = german.affordances.find((entry) => entry.tool === 'negotiate-peace');
+  assert.ok(peace?.tool === 'negotiate-peace' && peace.wars.some((entry) => entry.war.id === 'war:v3-order'));
+  const nonLeader = buildStrategicBriefV3(state, 'polity:france').affordances.find((entry) => entry.tool === 'negotiate-peace');
+  assert.equal(nonLeader, undefined);
+});
+
+test('Strategic V3 briefs, previews, commands, and batches are byte-deterministic and doctrine-free', () => {
+  const state = diplomacyInitial();
+  const options = { externalSupplierPolityIds: ['polity:france'], strategicContext: { interests: ['security'], threats: ['war'],
+    obligations: ['treaty'], redLines: ['no surrender'], causalAnchors: [{ anchorId: 'anchor:test', interest: 'security', applicability: ['war'], invalidators: ['peace'] }],
+    memory: ['Public consequence only.'] } };
+  const first = buildStrategicBriefV3(state, 'polity:austria', options);
+  const second = buildStrategicBriefV3(state, 'polity:austria', options);
+  assert.equal(JSON.stringify(first), JSON.stringify(second));
+  assert.equal(JSON.stringify(first).includes('Lebensraum'), false);
+  assert.equal(JSON.stringify(first).includes('character:'), false);
+  const action = expandStrategicAffordancesV3(first).find((entry) => entry.tool !== 'conserve')!;
+  assert.equal(JSON.stringify(materializeStrategicDecisionV3(state, { ...holdV2('polity:austria'), actions: [action], hold: null }, first)),
+    JSON.stringify(materializeStrategicDecisionV3(state, { ...holdV2('polity:austria'), actions: [action], hold: null }, second)));
+  assert.equal(JSON.stringify(buildStrategicBatchesV3(state, 'polity:germany', { systemText: 'system' })),
+    JSON.stringify(buildStrategicBatchesV3(state, 'polity:germany', { systemText: 'system' })));
 });
 
 test('strategic diplomacy batch is bounded, deterministic and contains no full map', () => {

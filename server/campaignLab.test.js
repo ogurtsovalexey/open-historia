@@ -4,9 +4,16 @@ import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { after, before, test } from "node:test";
+import {
+  CODEX_DECISION_RESPONSE_SCHEMA, normalizeCodexDecisionWire,
+} from "../scripts/lib/campaign-lab-contract.mjs";
+import {
+  buildCodexExecArgs, invokeCodexSubscription, parseCodexJsonl, sanitizeCodexEnvironment,
+} from "../scripts/lib/codex-subscription.mjs";
 
 let temp;
 const script = path.resolve("scripts/campaign-lab.mjs");
+const evaluatorScript = path.resolve("scripts/codex-luna-capability.mjs");
 const run = (...args) => JSON.parse(execFileSync(process.execPath, [script, ...args], {
   cwd: path.resolve("."), encoding: "utf8", env: { ...process.env, CAMPAIGN_LAB_RUNS_DIR: temp },
 }));
@@ -50,4 +57,56 @@ test("free10 creates only the requested ten player cells and freezes one matrix 
   assert.equal(freeze.cells.length, 10);
   assert.equal(freeze.thinkingLevel, "off");
   assert.equal(ids.some((id) => /austria|czechoslovakia|italy/.test(id)), false);
+});
+
+const emptyCodexAction = (tool) => ({ tool, targetRegionId: "", partner: "", resource: "", desiredRunway: "", budgetAttitude: "",
+  agreementType: "", demand: "", pressure: "", proposalId: "", response: "", taxStance: "", budgetPriority: "", priority: "",
+  factionId: "", templateId: "", scale: "", targetPolityId: "", commanderId: "", defender: "", reason: "", formationId: "",
+  posture: "", warId: "", approach: "" });
+
+test("Codex wire is a flat named-field schema and normalizes once to StrategicDecisionV2", () => {
+  assert.equal(JSON.stringify(CODEX_DECISION_RESPONSE_SCHEMA).includes("oneOf"), false);
+  assert.ok(CODEX_DECISION_RESPONSE_SCHEMA.properties.decisions.items.properties.actions.items.properties.targetRegionId);
+  const raw = { decisions: [{ polityId: "polity:austria", objectiveDomain: "economy", objectiveSummary: "Preserve reserves.", horizon: "short",
+    actions: [{ ...emptyCodexAction("invest"), targetRegionId: "region:test:AT", scale: "small" }], futurePlan: [],
+    contingency: "Conserve.", rationale: "The listed investment is executable.", intendedOutcome: "", holdReason: "none", holdDetail: "",
+    revisitAfterMonths: 1, revisitTriggers: ["resource-deficit"] }] };
+  assert.deepEqual(normalizeCodexDecisionWire(raw).decisions[0].actions[0], { tool: "invest", targetRegionId: "region:test:AT", scale: "small" });
+  const polluted = structuredClone(raw); polluted.decisions[0].actions[0].partner = "polity:invented";
+  assert.throws(() => normalizeCodexDecisionWire(polluted), /empty sentinel/);
+});
+
+test("Codex subprocess contract forces ephemeral ChatGPT Luna and sanitizes provider credentials", () => {
+  const args = buildCodexExecArgs({ cwd: "/tmp/lab", schemaPath: "/tmp/lab/schema.json", outputPath: "/tmp/lab/out.json" });
+  for (const required of ["--ephemeral", "--ignore-user-config", "--ignore-rules", "--skip-git-repo-check", "--json", "read-only", "gpt-5.6-luna",
+    'forced_login_method="chatgpt"', 'model_reasoning_effort="low"', 'model_verbosity="low"', "features.fast_mode=false", "features.plugins=false", "mcp_servers={}"]) {
+    assert.ok(args.includes(required), required);
+  }
+  const env = sanitizeCodexEnvironment({ PATH: "/bin", HOME: "/home/test", CODEX_HOME: "/auth", OPENAI_API_KEY: "secret", GEMINI_API_KEY: "secret", ANTHROPIC_AUTH_TOKEN: "secret" });
+  assert.deepEqual(env, { PATH: "/bin", HOME: "/home/test", CODEX_HOME: "/auth" });
+});
+
+test("Codex JSONL parsing and retry stop after a completed turn", () => {
+  const parsed = parseCodexJsonl('{"type":"thread.started","thread_id":"thread-1"}\n{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":4,"total_tokens":14}}\n');
+  assert.deepEqual(parsed.threadIds, ["thread-1"]); assert.equal(parsed.completed, true); assert.equal(parsed.usage.totalTokens, 14);
+  let calls = 0;
+  const result = invokeCodexSubscription({ prompt: "probe", schema: CODEX_DECISION_RESPONSE_SCHEMA, exec: (_command, args) => {
+    calls += 1;
+    const error = new Error("schema failure"); error.stdout = '{"type":"turn.completed","thread_id":"thread-done"}\n'; error.stderr = "invalid output";
+    throw error;
+  } });
+  assert.equal(calls, 1); assert.equal(result.completed, true);
+});
+
+test("Luna capability mock mode performs zero Codex turns and is byte-identical", () => {
+  const runEvaluator = (id) => JSON.parse(execFileSync(process.execPath, [evaluatorScript, "--mode", "mock", "--run", id], {
+    cwd: path.resolve("."), encoding: "utf8", env: { ...process.env, CAMPAIGN_LAB_RUNS_DIR: temp },
+  }));
+  const first = runEvaluator("luna-mock-a"); const second = runEvaluator("luna-mock-b");
+  assert.equal(first.completedCodexTurns, 0); assert.equal(second.completedCodexTurns, 0);
+  for (const probe of ["1-initial-six-opponents", "2-uk-iron-exhaustion", "3-czechoslovakia-territorial-proposal", "4-poland-active-german-war"]) {
+    assert.equal(fs.readFileSync(path.join(temp, "luna-mock-a", probe, "validation.json"), "utf8"),
+      fs.readFileSync(path.join(temp, "luna-mock-b", probe, "validation.json"), "utf8"));
+    assert.equal(fs.existsSync(path.join(temp, "luna-mock-a", probe, "events.jsonl")), false);
+  }
 });

@@ -110,3 +110,91 @@ export const salvageCampaignDecisionBatch = (raw, polityIds, { acceptDecision, f
   });
   return { batch: { decisions }, replacedPolityIds };
 };
+
+// Codex output-schema accepts this flat named-field object. Every action field
+// is required; fields unused by the selected tool MUST be the empty string.
+const codexActionFields = Object.freeze([
+  'targetRegionId', 'partner', 'resource', 'desiredRunway', 'budgetAttitude', 'agreementType', 'demand', 'pressure',
+  'proposalId', 'response', 'taxStance', 'budgetPriority', 'priority', 'factionId', 'templateId', 'scale', 'targetPolityId',
+  'commanderId', 'defender', 'reason', 'formationId', 'posture', 'warId', 'approach',
+]);
+const stringEnum = (...values) => ({ type: 'string', enum: values });
+const codexActionProperties = Object.fromEntries(codexActionFields.map((field) => [field, { type: 'string' }]));
+Object.assign(codexActionProperties, {
+  desiredRunway: stringEnum('', 'short', 'medium', 'long'), budgetAttitude: stringEnum('', 'cautious', 'balanced', 'urgent'),
+  agreementType: stringEnum('', 'non-aggression', 'defensive-alliance', 'guarantee', 'military-access'),
+  demand: stringEnum('', 'territorial-concession', 'policy-change', 'military-access'), pressure: stringEnum('', 'small', 'medium', 'large'),
+  response: stringEnum('', 'accept', 'reject', 'concede', 'repress', 'refuse'), taxStance: stringEnum('', 'relieve', 'steady', 'raise'),
+  budgetPriority: stringEnum('', 'administration', 'science', 'industry', 'security', 'military'), scale: stringEnum('', 'small', 'medium', 'large'),
+  priority: stringEnum('', 'food', 'raw-materials', 'industry'),
+  reason: stringEnum('', 'claim', 'defense', 'guarantee', 'rivalry', 'none'), posture: stringEnum('', 'hold', 'defend', 'advance', 'withdraw'),
+  approach: stringEnum('', 'status-quo', 'limited-concessions', 'press-claims'),
+});
+
+export const CODEX_DECISION_RESPONSE_SCHEMA = Object.freeze({
+  type: 'object', additionalProperties: false, required: ['decisions'], properties: {
+    decisions: { type: 'array', maxItems: 6, items: {
+      type: 'object', additionalProperties: false,
+      required: ['polityId', 'objectiveDomain', 'objectiveSummary', 'horizon', 'actions', 'futurePlan', 'contingency', 'rationale',
+        'intendedOutcome', 'holdReason', 'holdDetail', 'revisitAfterMonths', 'revisitTriggers'],
+      properties: {
+        polityId: { type: 'string' }, objectiveDomain: stringEnum('economy', 'diplomacy', 'politics', 'military', 'statecraft', 'campaign'),
+        objectiveSummary: { type: 'string' }, horizon: stringEnum('short', 'medium', 'long'),
+        actions: { type: 'array', maxItems: 3, items: { type: 'object', additionalProperties: false,
+          required: ['tool', ...codexActionFields], properties: { tool: stringEnum(...CAMPAIGN_DECISION_TOOLS), ...codexActionProperties } } },
+        futurePlan: { type: 'array', maxItems: 8, items: { type: 'object', additionalProperties: false,
+          required: ['summary', 'condition'], properties: { summary: { type: 'string' }, condition: { type: 'string' } } } },
+        contingency: { type: 'string' }, rationale: { type: 'string' }, intendedOutcome: { type: 'string' },
+        holdReason: stringEnum('none', 'no-legal-action', 'waiting-response', 'insufficient-resources', 'plan-sequencing', 'risk-too-high'),
+        holdDetail: { type: 'string' }, revisitAfterMonths: { type: 'integer', minimum: 1, maximum: 12 },
+        revisitTriggers: { type: 'array', minItems: 1, maxItems: 8, items: stringEnum(
+          'resource-deficit', 'diplomatic-response', 'war', 'occupation', 'peace', 'crisis', 'government-change', 'default') },
+      },
+    } },
+  },
+});
+
+const codexUsedFields = Object.freeze({
+  invest: ['targetRegionId', 'scale'], 'reallocate-production': ['targetRegionId', 'priority', 'scale'], conserve: [],
+  'negotiate-trade': ['partner', 'resource', 'desiredRunway', 'budgetAttitude'], 'external-import': ['partner', 'resource', 'desiredRunway', 'budgetAttitude'],
+  'propose-agreement': ['partner', 'agreementType'], 'apply-diplomatic-pressure': ['partner', 'targetRegionId', 'demand', 'pressure'],
+  'respond-proposal': ['proposalId', 'response'], 'change-policy': ['taxStance', 'budgetPriority'], 'respond-faction': ['factionId', 'response'],
+  'start-project': ['templateId', 'scale', 'targetRegionId', 'targetPolityId'], mobilize: ['targetRegionId', 'scale', 'commanderId'],
+  'declare-war': ['defender', 'reason'], 'issue-order': ['formationId', 'posture', 'targetRegionId'], 'negotiate-peace': ['warId', 'approach'],
+});
+
+const decodeCodexActionWire = (action) => {
+  const used = new Set(codexUsedFields[action?.tool] ?? []);
+  for (const field of codexActionFields) if (!used.has(field) && action?.[field] !== '') throw new Error(`Codex wire field ${field} must use the empty sentinel for ${action?.tool}`);
+  const tool = action?.tool;
+  if (tool === 'invest') return { tool, targetRegionId: action.targetRegionId, scale: action.scale };
+  if (tool === 'reallocate-production') return { tool, targetRegionId: action.targetRegionId, priority: action.priority, scale: action.scale };
+  if (tool === 'conserve') return { tool };
+  if (tool === 'negotiate-trade' || tool === 'external-import') return { tool, partner: action.partner, resource: action.resource,
+    desiredRunway: action.desiredRunway, budgetAttitude: action.budgetAttitude };
+  if (tool === 'propose-agreement') return { tool, partner: action.partner, agreementType: action.agreementType };
+  if (tool === 'apply-diplomatic-pressure') return { tool, partner: action.partner, demand: action.demand, pressure: action.pressure,
+    ...(action.targetRegionId ? { targetRegionId: action.targetRegionId } : {}) };
+  if (tool === 'respond-proposal') return { tool, proposalId: action.proposalId, response: action.response };
+  if (tool === 'change-policy') return { tool, taxStance: action.taxStance, budgetPriority: action.budgetPriority };
+  if (tool === 'respond-faction') return { tool, factionId: action.factionId, response: action.response };
+  if (tool === 'start-project') return { tool, templateId: action.templateId, scale: action.scale,
+    ...(action.targetRegionId ? { targetRegionId: action.targetRegionId } : {}), ...(action.targetPolityId ? { targetPolityId: action.targetPolityId } : {}) };
+  if (tool === 'mobilize') return { tool, locationRegionId: action.targetRegionId, scale: action.scale,
+    commanderId: action.commanderId || null };
+  if (tool === 'declare-war') return { tool, defender: action.defender, reason: action.reason };
+  if (tool === 'issue-order') return { tool, formationId: action.formationId, posture: action.posture, targetRegionId: action.targetRegionId || null };
+  if (tool === 'negotiate-peace') return { tool, warId: action.warId, approach: action.approach };
+  return { tool };
+};
+
+export const normalizeCodexDecisionWire = (raw) => ({
+  decisions: Array.isArray(raw?.decisions) ? raw.decisions.map((decision) => ({
+    polityId: decision.polityId, objective: { domain: decision.objectiveDomain, summary: decision.objectiveSummary, horizon: decision.horizon },
+    actions: Array.isArray(decision.actions) ? decision.actions.map(decodeCodexActionWire) : decision.actions,
+    futurePlan: decision.futurePlan, contingency: decision.contingency, rationale: decision.rationale,
+    ...(decision.intendedOutcome ? { intendedOutcome: decision.intendedOutcome } : {}),
+    hold: decision.holdReason === 'none' ? null : { reason: decision.holdReason, detail: decision.holdDetail,
+      revisit: { afterMonths: decision.revisitAfterMonths, triggers: decision.revisitTriggers } },
+  })) : raw?.decisions,
+});
