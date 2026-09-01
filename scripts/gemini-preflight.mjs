@@ -11,6 +11,7 @@ import {
 import {
   opponentBatchResultSchema, opponentDiplomacyBatchResultSchema, playerOrderInterpretationSchema, playerReportResultSchema,
 } from "../packages/agent-runtime/dist/index.js";
+import { CAMPAIGN_DECISION_RESPONSE_SCHEMA } from "./lib/campaign-lab-contract.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const DEFAULT_MODEL = "gemini-3.5-flash-lite";
@@ -149,6 +150,13 @@ const main = async () => {
     { role: "user", parts: [{ text: 'Correction: return only {"corrected":true}.' }] },
     ], generationConfig: { responseMimeType: "application/json", thinkingConfig: minimal } });
     if (JSON.parse(corrected.text).corrected !== true) throw new Error("correction checkpoint failed semantic validation");
+    const campaignIds = ["polity:austria", "polity:france"];
+    const campaignExpected = { decisions: campaignIds.map((polityId) => ({ polityId, intent: "hold", rationale: "Bounded probe hold.", command: null })) };
+    const campaignJson = await client.generate({ name: "campaign-lab-json-schema",
+      contents: user(`Return exactly this decision batch: ${JSON.stringify(campaignExpected)}`),
+      generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
+    const campaignParsed = opponentDiplomacyBatchResultSchema.parse(JSON.parse(campaignJson.text));
+    if (campaignParsed.decisions.map((decision) => decision.polityId).join("|") !== campaignIds.join("|")) throw new Error("Campaign Lab JSON schema checkpoint changed polity IDs");
   }
   for (const level of suite === "primary" ? ["minimal", "low", "medium"] : ["low", "medium"]) {
     const reasoned = await client.generate({ name: `reasoning-${level}`,

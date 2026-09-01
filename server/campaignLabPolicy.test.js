@@ -7,6 +7,19 @@ import {
   pacificQuotaDay,
   reduceChronicleAlerts,
 } from "../scripts/lib/campaign-lab-policy.mjs";
+import { CAMPAIGN_DECISION_INTENTS, CAMPAIGN_DECISION_RESPONSE_SCHEMA } from "../scripts/lib/campaign-lab-contract.mjs";
+
+test("Campaign Lab sends the exact bounded decision enum as a Gemini response schema", () => {
+  assert.ok(CAMPAIGN_DECISION_INTENTS.includes("hold"));
+  assert.ok(CAMPAIGN_DECISION_INTENTS.includes("declare-war"));
+  assert.deepEqual(
+    CAMPAIGN_DECISION_RESPONSE_SCHEMA.properties.decisions.items.properties.intent.enum,
+    CAMPAIGN_DECISION_INTENTS,
+  );
+  assert.ok(CAMPAIGN_DECISION_RESPONSE_SCHEMA.properties.decisions.items.properties.command.anyOf
+    .some((entry) => entry.type === "null"));
+  assert.ok(JSON.stringify(CAMPAIGN_DECISION_RESPONSE_SCHEMA).length < 30_000);
+});
 
 test("free10 matrix contains the requested ten campaign cells", () => {
   assert.equal(FREE10_CELLS.length, 10);

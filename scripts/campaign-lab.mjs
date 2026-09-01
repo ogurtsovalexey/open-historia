@@ -14,6 +14,7 @@ import {
   CAMPAIGN_MAX_CALLS, FREE10_CELLS, MAX_OUTPUT_TOKENS, PACIFIC_DAILY_CALL_LIMIT, PACING_RPM, PACING_TPM,
   decisionTriggerReasons, isRetryableGeminiFailure, pacificQuotaDay, reduceChronicleAlerts,
 } from "./lib/campaign-lab-policy.mjs";
+import { CAMPAIGN_DECISION_INTENTS, CAMPAIGN_DECISION_RESPONSE_SCHEMA } from "./lib/campaign-lab-contract.mjs";
 import { getGeminiHeaders, getGeminiThinkingConfig, getGeminiUrl } from "../src/Game/AI/geminiProtocol.js";
 import { GAMEPLAY_TOOLS } from "../src/Game/AI/gameplaySchemas.js";
 
@@ -142,7 +143,7 @@ const createOne = ({ id, playerPolityId, strategy, mode, model, preflight = null
     model: mode === "live" ? model : "deterministic-mock", reasoningMode: mode === "live" ? "minimal" : "off",
     maxOutputTokens: MAX_OUTPUT_TOKENS, maxCalls: CAMPAIGN_MAX_CALLS, transportRetries: 2, schemaCorrections: 1,
     pacing: { rpm: PACING_RPM, tpm: PACING_TPM, dailyCalls: PACIFIC_DAILY_CALL_LIMIT, timezone: "America/Los_Angeles" },
-    preflight, promptVersions: { campaignLabDecision: "campaign-lab-strategy/2", geminiWire: "gemini-wire/2" },
+    preflight, promptVersions: { campaignLabDecision: "campaign-lab-strategy/3", geminiWire: "gemini-wire/2" },
     startMonth: state.month, horizonMonth: loaded.authoring.horizonDate,
     status: mode === "live" ? "awaiting-player-decision" : "ready", calls: 0,
     createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), checkpoint: { month: state.month, reasons: ["campaign-start"] },
@@ -177,13 +178,13 @@ const strategicContexts = (authoring, memory) => Object.fromEntries(authoring.na
 
 const geminiDecision = async ({ id, manifest, batch, correction = null }) => {
   if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is required for live mode and is never stored");
-  const system = "Play each requested polity independently. Return strict JSON {decisions:[{polityId,intent,rationale,command}]}. Use hold and null command unless a supplied bounded action is justified. Never invent numeric outcomes, ids, regions or geometry. Commands use the supplied month and revision.";
+  const system = `Play each requested polity independently. Return strict JSON {decisions:[{polityId,intent,rationale,command}]}. intent must be exactly one of: ${CAMPAIGN_DECISION_INTENTS.join(", ")}. Use hold and null command unless a supplied bounded action is justified. Never invent numeric outcomes, ids, regions or geometry. Commands use the supplied month and revision.`;
   const payload = { month: batch.month, revision: batch.baseRevision, briefs: batch.briefs, ...(correction ? { correction } : {}) };
   const serialized = JSON.stringify(payload);
   if (serialized.length > MAX_CONTEXT_CHARS || /coordinates|geometry|FeatureCollection/.test(serialized)) throw new Error("AI context gate failed");
   const request = {
     system_instruction: { parts: [{ text: system }] }, contents: [{ role: "user", parts: [{ text: serialized }] }],
-    generationConfig: { responseMimeType: "application/json", maxOutputTokens: MAX_OUTPUT_TOKENS,
+    generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, maxOutputTokens: MAX_OUTPUT_TOKENS,
       thinkingConfig: getGeminiThinkingConfig(manifest.model, { reasoningMode: "minimal" }) },
   };
   let lastError;
@@ -521,7 +522,7 @@ const startMatrix = ({ matrixName, mode, model, preflight }) => {
     schemaVersion: "open-historia-campaign-lab-matrix/1", matrix: matrixName, scenarioId: loaded.projection.scenario.scenarioId,
     scenarioChecksum: loaded.projection.checksum, codeRevision: gitRevision(), model: mode === "live" ? model : "deterministic-mock",
     thinkingLevel: mode === "live" ? "minimal" : "off", maxOutputTokens: MAX_OUTPUT_TOKENS,
-    preflight, promptVersions: { campaignLabDecision: "campaign-lab-strategy/2", geminiWire: "gemini-wire/2" },
+    preflight, promptVersions: { campaignLabDecision: "campaign-lab-strategy/3", geminiWire: "gemini-wire/2" },
     pacing: { rpm: PACING_RPM, tpm: PACING_TPM, dailyCalls: PACIFIC_DAILY_CALL_LIMIT, timezone: "America/Los_Angeles" },
     cells: ids, createdAt: new Date().toISOString(),
   };
