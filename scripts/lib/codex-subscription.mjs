@@ -41,9 +41,10 @@ export const parseCodexJsonl = (stdout) => {
     inputTokens: total.inputTokens + (row.input_tokens ?? row.inputTokens ?? 0),
     cachedInputTokens: total.cachedInputTokens + (row.cached_input_tokens ?? row.cachedInputTokens ?? 0),
     outputTokens: total.outputTokens + (row.output_tokens ?? row.outputTokens ?? 0),
-    reasoningTokens: total.reasoningTokens + (row.reasoning_tokens ?? row.reasoningTokens ?? 0),
+    reasoningTokens: total.reasoningTokens + (row.reasoning_output_tokens ?? row.reasoning_tokens ?? row.reasoningTokens ?? 0),
     totalTokens: total.totalTokens + (row.total_tokens ?? row.totalTokens ?? 0),
   }), { inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, reasoningTokens: 0, totalTokens: 0 });
+  if (usage.totalTokens === 0) usage.totalTokens = usage.inputTokens + usage.outputTokens;
   return { events, threadIds, completed, usage };
 };
 

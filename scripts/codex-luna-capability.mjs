@@ -19,7 +19,8 @@ const SYSTEM_TEXT = `You are an autonomous opponent strategist in Open Historia.
 All listed StrategicBriefV3 affordances are executable at the frozen month and revision. Omitted tools and unlisted option combinations are unavailable. Select only exact listed choices.
 Use supplied polity, region, proposal, faction, formation, project, and war IDs in action fields. Never invent command IDs or new proposal, project, formation, war, effect, fact, or evidence IDs.
 Do not invent effects, numeric outcomes, authoritative consequences, doctrine, hidden intelligence, private character information, or facts. Engine previews are evidence, not values you may alter.
-Future plans and contingencies describe intentions and conditions, never completed outcomes. A non-hold decision must choose at least one relevant material affordance. Use conserve with a typed hold only when no material action is justified.`;
+Future plans describe intentions, not completed outcomes. Non-holds need a material affordance; otherwise use conserve and a typed hold.
+For every action, set EVERY field not named here to "": invest=targetRegionId,scale; reallocate-production=targetRegionId,priority,scale; conserve=none; negotiate-trade/external-import=partner,resource,desiredRunway,budgetAttitude; propose-agreement=partner,agreementType; apply-diplomatic-pressure=partner,targetRegionId(if listed),demand,pressure; respond-proposal=proposalId,response; change-policy=taxStance,budgetPriority; respond-faction=factionId,response; start-project=templateId,scale,targetRegionId/targetPolityId(if listed); mobilize=targetRegionId,scale,commanderId; declare-war=defender,reason; issue-order=formationId,posture,targetRegionId(if listed); negotiate-peace=warId,approach.`;
 const APPLICATION_PREFIX = '\n\nAPPLICATION PAYLOAD:\n';
 const MEASURED_SYSTEM_TEXT = `${SYSTEM_TEXT}${APPLICATION_PREFIX}`;
 
@@ -151,8 +152,11 @@ const main = () => {
         atomicJson(path.join(outputDir, 'manifest.json'), manifest); process.stdout.write(`${JSON.stringify(manifest, null, 2)}\n`); return;
       }
     }
-    const normalized = mode === 'mock' ? mockBatch(probe) : normalizeCodexDecisionWire(invocation.response);
-    const strict = strategicDecisionBatchV2Schema.safeParse(normalized);
+    let normalized; let normalizationError = null;
+    try { normalized = mode === 'mock' ? mockBatch(probe) : normalizeCodexDecisionWire(invocation.response); }
+    catch (error) { normalizationError = error instanceof Error ? error.message : String(error); normalized = { decisions: [] }; }
+    const strict = normalizationError ? { success: false, error: { issues: [{ message: normalizationError }] } }
+      : strategicDecisionBatchV2Schema.safeParse(normalized);
     const materialized = strict.success ? materializeStrategicBatchV3(probe.state, strict.data, probe.batch)
       : { commands: [], rejected: [{ actionIndex: -1, reason: strict.error.issues[0]?.message ?? 'schema rejection' }], unsupportedResidual: [] };
     const afterChecksum = stateChecksum(probe.state); const refs = assessReferences(invocation?.response ?? normalized, prompt);
