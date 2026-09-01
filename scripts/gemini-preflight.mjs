@@ -11,7 +11,7 @@ import {
 import {
   opponentBatchResultSchema, playerOrderInterpretationSchema, playerReportResultSchema, strategicDecisionBatchV2Schema,
 } from "../packages/agent-runtime/dist/index.js";
-import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, encodeCampaignActionWire, normalizeCampaignDecisionWire } from "./lib/campaign-lab-contract.mjs";
+import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, encodeCampaignDecisionWire, normalizeCampaignDecisionWire } from "./lib/campaign-lab-contract.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const DEFAULT_MODEL = "gemini-3.5-flash-lite";
@@ -151,7 +151,7 @@ const main = async () => {
     ], generationConfig: { responseMimeType: "application/json", thinkingConfig: minimal } });
     if (JSON.parse(corrected.text).corrected !== true) throw new Error("correction checkpoint failed semantic validation");
     const campaignIds = ["polity:austria", "polity:france"];
-    const campaignExpected = { decisions: campaignIds.map((polityId) => ({ polityId,
+    const campaignExpected = { decisions: campaignIds.map((polityId) => encodeCampaignDecisionWire({ polityId,
       objective: { domain: "campaign", summary: "Preserve flexibility.", horizon: "short" }, actions: [{ tool: "conserve" }],
       futurePlan: [], contingency: "Reassess after new evidence.", rationale: "Bounded typed hold.",
       hold: { reason: "plan-sequencing", detail: "Wait for a material trigger.", revisit: { afterMonths: 1, triggers: ["resource-deficit"] } },
@@ -170,8 +170,8 @@ const main = async () => {
       ["military", { tool: "mobilize", locationRegionId: "region:probe:DE", scale: "small" }],
     ];
     for (const [family, action] of familyActions) {
-      const expected = { decisions: [{ polityId: "polity:probe", objective: { domain: family === "trade" ? "economy" : family, summary: `Exercise ${family} tools.`, horizon: "short" },
-        actions: [encodeCampaignActionWire(action)], futurePlan: [], contingency: "Use another supported tool.", rationale: "Non-hold preflight probe." }] };
+      const expected = { decisions: [encodeCampaignDecisionWire({ polityId: "polity:probe", objective: { domain: family === "trade" ? "economy" : family, summary: `Exercise ${family} tools.`, horizon: "short" },
+        actions: [action], futurePlan: [], contingency: "Use another supported tool.", rationale: "Non-hold preflight probe.", hold: null })] };
       const probe = await client.generate({ name: `strategic-family:${family}`, contents: user(`Return exactly this non-hold StrategicDecisionV2 batch: ${JSON.stringify(expected)}`),
         generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
       const parsed = strategicDecisionBatchV2Schema.parse(normalizeCampaignDecisionWire(JSON.parse(probe.text)));

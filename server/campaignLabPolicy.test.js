@@ -8,7 +8,7 @@ import {
   pacificQuotaDay,
   reduceChronicleAlerts,
 } from "../scripts/lib/campaign-lab-policy.mjs";
-import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS, encodeCampaignActionWire, normalizeCampaignDecisionWire } from "../scripts/lib/campaign-lab-contract.mjs";
+import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS, encodeCampaignDecisionWire, normalizeCampaignDecisionWire } from "../scripts/lib/campaign-lab-contract.mjs";
 
 test("Campaign Lab sends the bounded StrategicDecisionV2 schema without raw commands", () => {
   assert.ok(CAMPAIGN_DECISION_TOOLS.includes("conserve"));
@@ -21,7 +21,8 @@ test("Campaign Lab sends the bounded StrategicDecisionV2 schema without raw comm
 
 test("compact Gemini actions round-trip to named StrategicDecisionV2 arguments", () => {
   const action = { tool: "negotiate-trade", partner: "polity:soviet-union", resource: "iron", desiredRunway: "medium", budgetAttitude: "urgent" };
-  const normalized = normalizeCampaignDecisionWire({ decisions: [{ actions: [encodeCampaignActionWire(action)] }] });
+  const normalized = normalizeCampaignDecisionWire({ decisions: [encodeCampaignDecisionWire({ polityId: "polity:test", objective: { domain: "economy", summary: "Trade.", horizon: "short" },
+    actions: [action], futurePlan: [], contingency: "Wait.", rationale: "Need iron.", hold: null })] });
   assert.deepEqual(normalized.decisions[0].actions[0], action);
   assert.equal(normalized.decisions[0].hold, null);
 });

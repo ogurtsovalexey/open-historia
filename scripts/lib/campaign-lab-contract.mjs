@@ -12,17 +12,16 @@ export const CAMPAIGN_DECISION_TOOLS = Object.freeze([
 // union and semantic materializer still validate every returned decision.
 const wireActionSchema = z.object({
   tool: z.enum(CAMPAIGN_DECISION_TOOLS),
-  target: z.string().optional(), counterpart: z.string().optional(), subject: z.string().optional(),
-  choice: z.string().optional(), intensity: z.string().optional(),
-}).strict();
-const wireHoldSchema = z.object({
-  reason: z.enum(['no-legal-action', 'waiting-response', 'insufficient-resources', 'plan-sequencing', 'risk-too-high']), detail: z.string(),
-  revisit: z.object({ afterMonths: z.number().int().min(1).max(12), triggers: z.array(z.enum(['resource-deficit', 'diplomatic-response', 'war', 'occupation', 'peace', 'crisis', 'government-change', 'default'])).min(1).max(8) }).strict(),
+  target: z.string(), counterpart: z.string(), subject: z.string(), choice: z.string(), intensity: z.string(),
 }).strict();
 const wireDecisionSchema = z.object({
-  polityId: z.string(), objective: z.object({ domain: z.enum(['economy', 'diplomacy', 'politics', 'military', 'statecraft', 'campaign']), summary: z.string(), horizon: z.enum(['short', 'medium', 'long']) }).strict(),
+  polityId: z.string(), objectiveDomain: z.enum(['economy', 'diplomacy', 'politics', 'military', 'statecraft', 'campaign']),
+  objectiveSummary: z.string(), horizon: z.enum(['short', 'medium', 'long']),
   actions: z.array(wireActionSchema).max(3), futurePlan: z.array(z.object({ summary: z.string(), condition: z.string() }).strict()).max(8),
-  contingency: z.string(), rationale: z.string(), intendedOutcome: z.string().optional(), hold: wireHoldSchema.optional(),
+  contingency: z.string(), rationale: z.string(), intendedOutcome: z.string(),
+  holdReason: z.enum(['none', 'no-legal-action', 'waiting-response', 'insufficient-resources', 'plan-sequencing', 'risk-too-high']),
+  holdDetail: z.string(), revisitAfterMonths: z.number().int().min(1).max(12),
+  revisitTriggers: z.array(z.enum(['resource-deficit', 'diplomatic-response', 'war', 'occupation', 'peace', 'crisis', 'government-change', 'default'])).min(1).max(8),
 }).strict();
 
 export const CAMPAIGN_DECISION_RESPONSE_SCHEMA = Object.freeze(
@@ -30,22 +29,31 @@ export const CAMPAIGN_DECISION_RESPONSE_SCHEMA = Object.freeze(
 );
 
 export const encodeCampaignActionWire = (action) => {
+  const wire = (tool, values = {}) => ({ tool, target: '', counterpart: '', subject: '', choice: '', intensity: '', ...values });
   const tool = action?.tool;
-  if (tool === 'invest') return { tool, target: action.targetRegionId, intensity: action.scale };
-  if (tool === 'reallocate-production') return { tool, target: action.targetRegionId, choice: action.priority, intensity: action.scale };
-  if (tool === 'negotiate-trade' || tool === 'external-import') return { tool, counterpart: action.partner, subject: action.resource, choice: action.desiredRunway, intensity: action.budgetAttitude };
-  if (tool === 'propose-agreement') return { tool, counterpart: action.partner, choice: action.agreementType };
-  if (tool === 'apply-diplomatic-pressure') return { tool, counterpart: action.partner, target: action.targetRegionId, choice: action.demand, intensity: action.pressure };
-  if (tool === 'respond-proposal') return { tool, target: action.proposalId, choice: action.response };
-  if (tool === 'change-policy') return { tool, choice: action.taxStance, subject: action.budgetPriority };
-  if (tool === 'respond-faction') return { tool, target: action.factionId, choice: action.response };
-  if (tool === 'start-project') return { tool, target: action.templateId, subject: action.targetRegionId, counterpart: action.targetPolityId, intensity: action.scale };
-  if (tool === 'mobilize') return { tool, target: action.locationRegionId, subject: action.commanderId, intensity: action.scale };
-  if (tool === 'declare-war') return { tool, counterpart: action.defender, choice: action.reason };
-  if (tool === 'issue-order') return { tool, target: action.formationId, subject: action.targetRegionId ?? undefined, choice: action.posture };
-  if (tool === 'negotiate-peace') return { tool, target: action.warId, choice: action.approach };
-  return { tool };
+  if (tool === 'invest') return wire(tool, { target: action.targetRegionId, intensity: action.scale });
+  if (tool === 'reallocate-production') return wire(tool, { target: action.targetRegionId, choice: action.priority, intensity: action.scale });
+  if (tool === 'negotiate-trade' || tool === 'external-import') return wire(tool, { counterpart: action.partner, subject: action.resource, choice: action.desiredRunway, intensity: action.budgetAttitude });
+  if (tool === 'propose-agreement') return wire(tool, { counterpart: action.partner, choice: action.agreementType });
+  if (tool === 'apply-diplomatic-pressure') return wire(tool, { counterpart: action.partner, target: action.targetRegionId ?? '', choice: action.demand, intensity: action.pressure });
+  if (tool === 'respond-proposal') return wire(tool, { target: action.proposalId, choice: action.response });
+  if (tool === 'change-policy') return wire(tool, { choice: action.taxStance, subject: action.budgetPriority });
+  if (tool === 'respond-faction') return wire(tool, { target: action.factionId, choice: action.response });
+  if (tool === 'start-project') return wire(tool, { target: action.templateId, subject: action.targetRegionId ?? '', counterpart: action.targetPolityId ?? '', intensity: action.scale });
+  if (tool === 'mobilize') return wire(tool, { target: action.locationRegionId, subject: action.commanderId ?? '', intensity: action.scale });
+  if (tool === 'declare-war') return wire(tool, { counterpart: action.defender, choice: action.reason });
+  if (tool === 'issue-order') return wire(tool, { target: action.formationId, subject: action.targetRegionId ?? '', choice: action.posture });
+  if (tool === 'negotiate-peace') return wire(tool, { target: action.warId, choice: action.approach });
+  return wire(tool);
 };
+
+export const encodeCampaignDecisionWire = (decision) => ({
+  polityId: decision.polityId, objectiveDomain: decision.objective.domain, objectiveSummary: decision.objective.summary, horizon: decision.objective.horizon,
+  actions: decision.actions.map(encodeCampaignActionWire), futurePlan: decision.futurePlan, contingency: decision.contingency,
+  rationale: decision.rationale, intendedOutcome: decision.intendedOutcome ?? '', holdReason: decision.hold?.reason ?? 'none',
+  holdDetail: decision.hold?.detail ?? '', revisitAfterMonths: decision.hold?.revisit.afterMonths ?? 1,
+  revisitTriggers: decision.hold?.revisit.triggers ?? ['resource-deficit'],
+});
 
 const decodeCampaignActionWire = (action) => {
   const tool = action?.tool;
@@ -68,8 +76,12 @@ const decodeCampaignActionWire = (action) => {
 export const normalizeCampaignDecisionWire = (raw) => ({
   ...raw,
   decisions: Array.isArray(raw?.decisions) ? raw.decisions.map((decision) => ({
-    ...decision,
-    hold: decision?.hold ?? null,
+    polityId: decision.polityId,
+    objective: { domain: decision.objectiveDomain, summary: decision.objectiveSummary, horizon: decision.horizon },
     actions: Array.isArray(decision?.actions) ? decision.actions.map(decodeCampaignActionWire) : decision?.actions,
+    futurePlan: decision.futurePlan, contingency: decision.contingency, rationale: decision.rationale,
+    ...(decision.intendedOutcome ? { intendedOutcome: decision.intendedOutcome } : {}),
+    hold: decision.holdReason === 'none' ? null : { reason: decision.holdReason, detail: decision.holdDetail,
+      revisit: { afterMonths: decision.revisitAfterMonths, triggers: decision.revisitTriggers } },
   })) : raw?.decisions,
 });
