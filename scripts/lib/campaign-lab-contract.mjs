@@ -56,7 +56,19 @@ const decodeCampaignActionWire = (action) => {
   const tool = action?.tool;
   if (tool === 'invest') return { tool, targetRegionId: action.target, scale: action.intensity };
   if (tool === 'reallocate-production') return { tool, targetRegionId: action.target, priority: action.choice, scale: action.intensity };
-  if (tool === 'negotiate-trade' || tool === 'external-import') return { tool, partner: action.counterpart, resource: action.subject, desiredRunway: action.choice, budgetAttitude: action.intensity };
+  if (tool === 'negotiate-trade' || tool === 'external-import') {
+    // The compact wire has deliberately generic slots. Gemini occasionally
+    // puts the two trade qualifiers in their semantically matching but
+    // opposite slots (for example choice=balanced, intensity=medium). The
+    // domains are disjoint, so this swap is deterministic and cannot hide an
+    // unknown value; the strict StrategicDecisionV2 parser still rejects it.
+    const runwayValues = new Set(['short', 'medium', 'long']);
+    const budgetValues = new Set(['cautious', 'balanced', 'urgent']);
+    const swapped = budgetValues.has(action.choice) && runwayValues.has(action.intensity);
+    return { tool, partner: action.counterpart, resource: action.subject,
+      desiredRunway: swapped ? action.intensity : action.choice,
+      budgetAttitude: swapped ? action.choice : action.intensity };
+  }
   if (tool === 'propose-agreement') return { tool, partner: action.counterpart, agreementType: action.choice };
   if (tool === 'apply-diplomatic-pressure') return { tool, partner: action.counterpart, ...(action.target ? { targetRegionId: action.target } : {}), demand: action.choice, pressure: action.intensity };
   if (tool === 'respond-proposal') return { tool, proposalId: action.target, response: action.choice };

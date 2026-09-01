@@ -28,6 +28,18 @@ test("compact Gemini actions round-trip to named StrategicDecisionV2 arguments",
   assert.equal(normalized.decisions[0].hold, null);
 });
 
+test("compact Gemini trade actions normalize an unambiguous qualifier swap", () => {
+  const normalized = normalizeCampaignDecisionWire({ decisions: [{
+    polityId: "polity:test", objectiveDomain: "economy", objectiveSummary: "Trade.", horizon: "short",
+    actions: [{ tool: "negotiate-trade", target: "", counterpart: "polity:partner", subject: "iron", choice: "balanced", intensity: "medium" }],
+    futurePlan: [], contingency: "Wait.", rationale: "Need iron.", intendedOutcome: "", holdReason: "none",
+    holdDetail: "", revisitAfterMonths: 1, revisitTriggers: ["resource-deficit"],
+  }] });
+  assert.deepEqual(normalized.decisions[0].actions[0], {
+    tool: "negotiate-trade", partner: "polity:partner", resource: "iron", desiredRunway: "medium", budgetAttitude: "balanced",
+  });
+});
+
 test("autonomy-v2 pilot is deliberately limited to the three German doctrines", () => {
   assert.deepEqual(AUTONOMY_V2_CELLS, [
     { player: "germany", strategy: "historical" }, { player: "germany", strategy: "alternative" }, { player: "germany", strategy: "free" },
