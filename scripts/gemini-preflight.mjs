@@ -11,7 +11,7 @@ import {
 import {
   opponentBatchResultSchema, playerOrderInterpretationSchema, playerReportResultSchema, strategicDecisionBatchV2Schema,
 } from "../packages/agent-runtime/dist/index.js";
-import { CAMPAIGN_DECISION_RESPONSE_SCHEMA } from "./lib/campaign-lab-contract.mjs";
+import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, normalizeCampaignDecisionWire } from "./lib/campaign-lab-contract.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const DEFAULT_MODEL = "gemini-3.5-flash-lite";
@@ -159,7 +159,7 @@ const main = async () => {
     const campaignJson = await client.generate({ name: "campaign-lab-json-schema",
       contents: user(`Return exactly this decision batch: ${JSON.stringify(campaignExpected)}`),
       generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
-    const campaignParsed = strategicDecisionBatchV2Schema.parse(JSON.parse(campaignJson.text));
+    const campaignParsed = strategicDecisionBatchV2Schema.parse(normalizeCampaignDecisionWire(JSON.parse(campaignJson.text)));
     if (campaignParsed.decisions.map((decision) => decision.polityId).join("|") !== campaignIds.join("|")) throw new Error("Campaign Lab JSON schema checkpoint changed polity IDs");
     const familyActions = [
       ["economy", { tool: "reallocate-production", targetRegionId: "region:probe:DE", priority: "raw-materials", scale: "medium" }],
@@ -167,14 +167,14 @@ const main = async () => {
       ["diplomacy", { tool: "propose-agreement", partner: "polity:partner", agreementType: "non-aggression" }],
       ["statecraft", { tool: "start-project", templateId: "project-template:probe", scale: "medium", targetRegionId: "region:probe:DE" }],
       ["politics", { tool: "respond-faction", factionId: "faction:probe", response: "concede" }],
-      ["military", { tool: "mobilize", locationRegionId: "region:probe:DE", scale: "small", commanderId: null }],
+      ["military", { tool: "mobilize", locationRegionId: "region:probe:DE", scale: "small" }],
     ];
     for (const [family, action] of familyActions) {
       const expected = { decisions: [{ polityId: "polity:probe", objective: { domain: family === "trade" ? "economy" : family, summary: `Exercise ${family} tools.`, horizon: "short" },
-        actions: [action], futurePlan: [], contingency: "Use another supported tool.", rationale: "Non-hold preflight probe.", hold: null }] };
+        actions: [action], futurePlan: [], contingency: "Use another supported tool.", rationale: "Non-hold preflight probe." }] };
       const probe = await client.generate({ name: `strategic-family:${family}`, contents: user(`Return exactly this non-hold StrategicDecisionV2 batch: ${JSON.stringify(expected)}`),
         generationConfig: { responseMimeType: "application/json", responseJsonSchema: CAMPAIGN_DECISION_RESPONSE_SCHEMA, thinkingConfig: minimal } });
-      const parsed = strategicDecisionBatchV2Schema.parse(JSON.parse(probe.text));
+      const parsed = strategicDecisionBatchV2Schema.parse(normalizeCampaignDecisionWire(JSON.parse(probe.text)));
       if (parsed.decisions[0]?.actions[0]?.tool !== action.tool) throw new Error(`${family} strategic family probe returned hold or the wrong tool`);
     }
   }

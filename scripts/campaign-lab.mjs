@@ -15,7 +15,7 @@ import {
   AUTONOMY_V2_CELLS, CAMPAIGN_MAX_CALLS, FREE10_CELLS, MAX_OUTPUT_TOKENS, PACIFIC_DAILY_CALL_LIMIT, PACING_RPM, PACING_TPM,
   decisionTriggerReasons, isRetryableGeminiFailure, pacificQuotaDay, reduceChronicleAlerts,
 } from "./lib/campaign-lab-policy.mjs";
-import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS } from "./lib/campaign-lab-contract.mjs";
+import { CAMPAIGN_DECISION_RESPONSE_SCHEMA, CAMPAIGN_DECISION_TOOLS, normalizeCampaignDecisionWire } from "./lib/campaign-lab-contract.mjs";
 import { getGeminiHeaders, getGeminiThinkingConfig, getGeminiUrl } from "../src/Game/AI/geminiProtocol.js";
 import { GAMEPLAY_TOOLS } from "../src/Game/AI/gameplaySchemas.js";
 
@@ -265,7 +265,7 @@ const opponentCommands = async ({ id, manifest, state, authoring, memory }) => {
           throw error;
         }
         try {
-          parsed = JSON.parse(text);
+          parsed = normalizeCampaignDecisionWire(JSON.parse(text));
           const materialized = materializeStrategicBatchV2(state, parsed, batch);
           if (materialized.rejected.length) throw new Error(materialized.rejected.map((entry) => entry.reason).join("; "));
           appendJsonl(fileOf(id, "telemetry.jsonl"), { month: batch.month, batchId: batch.batchId, generation,
