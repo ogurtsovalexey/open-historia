@@ -18,7 +18,7 @@ import { agreementIdSchema, negotiationTermsSchema, proposalIdSchema } from './d
 import { budgetPrioritiesSchema, intelligenceFactIdSchema, projectIdSchema, projectTemplateIdSchema } from './statecraft.js';
 import { characterIdSchema, characterTraitSchema, factionIdSchema, qualitativeBandSchema } from './politics.js';
 import {
-  commanderIdSchema, formationIdSchema, militaryPostureSchema, peaceOfferIdSchema,
+  callToArmsIdSchema, commanderIdSchema, formationIdSchema, militaryPostureSchema, peaceOfferIdSchema,
   peaceRegionTransferSchema, reparationSchema, warIdSchema, warReasonSchema,
 } from './military.js';
 import { cultureIdSchema, identityPolicySchema, religionIdSchema } from './society.js';
@@ -267,16 +267,20 @@ export const respondPeaceCommandSchema = z.object({
   kind: z.literal('peace.respond'), ...statecraftCommandFields,
   offerId: peaceOfferIdSchema, response: z.enum(['accept', 'reject']),
 }).strict();
+export const respondCallToArmsCommandSchema = z.object({
+  kind: z.literal('war.respond-call'), ...statecraftCommandFields,
+  callId: callToArmsIdSchema, response: z.enum(['accept', 'refuse']),
+}).strict();
 
 export type MilitaryCommand = z.infer<typeof declareWarCommandSchema>
   | z.infer<typeof mobilizeCommandSchema> | z.infer<typeof demobilizeCommandSchema>
   | z.infer<typeof splitFormationCommandSchema> | z.infer<typeof mergeFormationCommandSchema>
   | z.infer<typeof issueMilitaryOrderCommandSchema> | z.infer<typeof proposePeaceCommandSchema>
-  | z.infer<typeof respondPeaceCommandSchema>;
+  | z.infer<typeof respondPeaceCommandSchema> | z.infer<typeof respondCallToArmsCommandSchema>;
 export const militaryCommandSchema = z.discriminatedUnion('kind', [
   declareWarCommandSchema, mobilizeCommandSchema, demobilizeCommandSchema,
   splitFormationCommandSchema, mergeFormationCommandSchema, issueMilitaryOrderCommandSchema,
-  proposePeaceCommandSchema, respondPeaceCommandSchema,
+  proposePeaceCommandSchema, respondPeaceCommandSchema, respondCallToArmsCommandSchema,
 ]);
 
 export const econCommandSchema = z.discriminatedUnion('kind', [
@@ -304,6 +308,7 @@ export const econCommandSchema = z.discriminatedUnion('kind', [
   issueMilitaryOrderCommandSchema,
   proposePeaceCommandSchema,
   respondPeaceCommandSchema,
+  respondCallToArmsCommandSchema,
   setIdentityPolicyCommandSchema,
   setCultureAcceptanceCommandSchema,
   setReligionAcceptanceCommandSchema,

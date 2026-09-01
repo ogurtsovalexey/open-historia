@@ -166,6 +166,19 @@ crisis → mobilization → war → occupation → peace → political consequen
 legacy, while still allowing a materially different replay from the same
 starting scenario under different commands.
 
+### 8. P8 — depth justified by the playable-loop gate
+
+Gate C found one concrete strategic gap after P7: defensive alliances and
+guarantees existed as agreements but did not affect a war. Canon 17 closes it
+with deterministic calls to arms, explicit accept/refuse responses, defender
+joining, scoped trust damage and expiry at peace. The same typed command is
+available to the player and bounded strategic AI; player use is confirmed.
+
+**Playable outcome:** attacking a protected polity now creates an executable
+choice for its ally or guarantor, so diplomacy changes the military balance.
+Further P8 depth remains evidence-gated; markets, currencies, migration and
+other deferred systems are not added merely to increase feature count.
+
 ## Acceptance criteria
 
 - Each slice ships as a vertical engine + persistence + bounded AI contract +

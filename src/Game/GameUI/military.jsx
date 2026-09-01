@@ -117,6 +117,14 @@ const MilitaryPane = ({ active }) => {
     </div>
 
     <div style={{ color: dim, margin: '12px 0 5px' }}>Wars and occupation</div>
+    {(military.callsToArms ?? []).filter((entry) => entry.status === 'pending').map((call) => <div key={call.callId} data-testid="call-to-arms" style={card}>
+      <strong>Call to arms from {nameFor(snapshot, call.beneficiaryPolityId)}</strong>
+      <div style={{ color: dim, margin: '4px 0' }}>Defensive war {call.warId} · obligation {call.sourceAgreementIds.join(', ')}</div>
+      {call.calledPolityId === playerId && <div style={{ display: 'flex', gap: 5 }}>
+        <button data-testid="accept-call" style={button} onClick={() => queue({ kind: 'war.respond-call', ...base(), callId: call.callId, response: 'accept' }, 'Call to arms acceptance queued for confirmation.')}>Join defenders</button>
+        <button data-testid="refuse-call" style={button} onClick={() => queue({ kind: 'war.respond-call', ...base(), callId: call.callId, response: 'refuse' }, 'Call to arms refusal queued for confirmation.')}>Refuse</button>
+      </div>}
+    </div>)}
     {activeWars.length === 0 && <div style={{ color: dim, marginBottom: 8 }}>No active war.</div>}
     {activeWars.map((war) => {
       const occupations = military.occupations.filter((entry) => entry.warId === war.warId);

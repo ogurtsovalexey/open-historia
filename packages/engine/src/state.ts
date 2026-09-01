@@ -221,7 +221,7 @@ export function initState(scenario: EconScenario): EconWorldState {
         formations: [...scenario.military.formations].map((entry) => ({ ...entry, status: 'active' as const, readyMonth: null,
           posture: 'hold' as const, targetRegionId: null, familiarityBp: 0 })).sort((a, b) => a.formationId.localeCompare(b.formationId)),
         supplyLinks: [...scenario.military.supplyLinks].sort((a, b) => `${a.regions[0]}|${a.regions[1]}`.localeCompare(`${b.regions[0]}|${b.regions[1]}`)),
-        wars: [], fronts: [], occupations: [], peaceOffers: [],
+        wars: [], fronts: [], occupations: [], peaceOffers: [], callsToArms: [],
       },
     } : {}),
     ...(scenario.modules?.technology === true && scenario.capabilities ? {

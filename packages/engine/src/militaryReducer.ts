@@ -41,7 +41,9 @@ export type MilitaryEngineEvent =
   | { type: 'combat-resolved'; frontId: string; warId: string; outcome: CombatRecord['outcome'] }
   | { type: 'region-occupied'; warId: string; regionId: RegionId; actualControllerId: PolityId }
   | { type: 'peace-offered'; offerId: string; warId: string; proposerPolityId: PolityId; recipientPolityId: PolityId }
-  | { type: 'peace-resolved'; offerId: string; warId: string; accepted: boolean };
+  | { type: 'peace-resolved'; offerId: string; warId: string; accepted: boolean }
+  | { type: 'call-to-arms-issued'; callId: string; warId: string; calledPolityId: PolityId; beneficiaryPolityId: PolityId }
+  | { type: 'call-to-arms-resolved'; callId: string; warId: string; response: 'accept' | 'refuse' | 'expired' };
 
 const cloneMilitary = (state: MilitaryState): MilitaryState => ({
   combatSeed: state.combatSeed,
@@ -53,6 +55,7 @@ const cloneMilitary = (state: MilitaryState): MilitaryState => ({
   fronts: state.fronts.map((entry) => ({ ...entry })),
   occupations: state.occupations.map((entry) => ({ ...entry })),
   peaceOffers: state.peaceOffers.map((entry) => ({ ...entry, regionTransfers: entry.regionTransfers.map((transfer) => ({ ...transfer })), reparation: entry.reparation ? { ...entry.reparation } : null })),
+  callsToArms: (state.callsToArms ?? []).map((entry) => ({ ...entry, sourceAgreementIds: [...entry.sourceAgreementIds] })),
 });
 
 const opposing = (war: MilitaryState['wars'][number], left: string, right: string): boolean =>
@@ -71,7 +74,7 @@ export function applyMilitaryCommands(
   identity?: IdentityState,
 ): {
   military: MilitaryState | undefined; transfers: MilitaryTransferRecord[]; treasuryTransfers: MilitaryTreasuryTransfer[];
-  relationPenalties: Array<{ polityId: PolityId; deltaTrust: number; deltaOpinion: number; deltaThreat: number }>;
+  relationPenalties: Array<{ polityId: PolityId; counterpartyPolityId?: PolityId; deltaTrust: number; deltaOpinion: number; deltaThreat: number }>;
   politicsPenalties: Array<{ polityId: PolityId; legitimacy: number; stability: number; unrest: number }>;
   commandRecords: MilitaryCommandRecord[]; events: MilitaryEngineEvent[]; rejections: CommandRejection[];
 } {
@@ -80,7 +83,7 @@ export function applyMilitaryCommands(
   const regionById = new Map(regions.map((entry) => [entry.regionId, entry]));
   const transfers: MilitaryTransferRecord[] = [];
   const treasuryTransfers: MilitaryTreasuryTransfer[] = [];
-  const relationPenalties: Array<{ polityId: PolityId; deltaTrust: number; deltaOpinion: number; deltaThreat: number }> = [];
+  const relationPenalties: Array<{ polityId: PolityId; counterpartyPolityId?: PolityId; deltaTrust: number; deltaOpinion: number; deltaThreat: number }> = [];
   const politicsPenalties: Array<{ polityId: PolityId; legitimacy: number; stability: number; unrest: number }> = [];
   const commandRecords: MilitaryCommandRecord[] = [];
   const events: MilitaryEngineEvent[] = [];
@@ -117,12 +120,49 @@ export function applyMilitaryCommands(
       if (protectedAgreement) { reject(command, 'invalid-target', `active protected agreement ${protectedAgreement.agreementId} forbids this declaration`); continue; }
       military.wars.push({ warId: command.warId, attackers: [actor.id], defenders: [defender.id], reason: command.reason,
         declaredByPolityId: actor.id, startedMonth: state.month, endedMonth: null, status: 'active' });
+      const obligations = new Map<PolityId, string[]>();
+      for (const agreement of state.diplomacy?.agreements ?? []) {
+        if (agreement.terms.kind !== 'agreement') continue;
+        let called: PolityId | null = null;
+        if (agreement.terms.agreementType === 'defensive-alliance') {
+          if (agreement.terms.fromPolityId === defender.id) called = agreement.terms.toPolityId;
+          if (agreement.terms.toPolityId === defender.id) called = agreement.terms.fromPolityId;
+        } else if (agreement.terms.agreementType === 'guarantee' && agreement.terms.toPolityId === defender.id) {
+          called = agreement.terms.fromPolityId;
+        }
+        if (!called || called === actor.id || called === defender.id) continue;
+        const sources = obligations.get(called) ?? []; sources.push(agreement.agreementId); obligations.set(called, sources);
+      }
+      for (const called of [...obligations.keys()].sort()) {
+        const slug = (value: string) => value.slice(value.indexOf(':') + 1).toLowerCase().replace(/[^a-z0-9._-]/g, '-');
+        const digest = sha256OfString(`${command.warId}|${called}`).slice('sha256:'.length, 'sha256:'.length + 16);
+        const callId = `call:${slug(command.warId).slice(0, 80)}-${digest}`;
+        military.callsToArms!.push({ callId, warId: command.warId, beneficiaryPolityId: defender.id, calledPolityId: called,
+          sourceAgreementIds: [...new Set(obligations.get(called)!)].sort(), status: 'pending', createdMonth: state.month, resolvedMonth: null });
+        events.push({ type: 'call-to-arms-issued', callId, warId: command.warId, calledPolityId: called, beneficiaryPolityId: defender.id });
+      }
       if (command.reason === 'none') {
         relationPenalties.push({ polityId: actor.id, deltaTrust: -1500, deltaOpinion: -1200, deltaThreat: 1800 });
         politicsPenalties.push({ polityId: actor.id, legitimacy: -800, stability: -500, unrest: 700 });
       }
       record(command);
       events.push({ type: 'war-declared', warId: command.warId, attackerPolityId: actor.id, defenderPolityId: defender.id, reason: command.reason });
+      continue;
+    }
+
+    if (command.kind === 'war.respond-call') {
+      const call = military.callsToArms!.find((entry) => entry.callId === command.callId && entry.status === 'pending');
+      if (!call) { reject(command, 'invalid-target', `no pending call ${command.callId}`); continue; }
+      if (call.calledPolityId !== actor.id) { reject(command, 'unauthorized', 'only the called polity may respond'); continue; }
+      const war = military.wars.find((entry) => entry.warId === call.warId && entry.status === 'active');
+      if (!war) { reject(command, 'unknown-war', `war ${call.warId} is not active`); continue; }
+      if (command.response === 'accept' && war.attackers.includes(actor.id)) { reject(command, 'invalid-target', 'an attacker cannot join the defenders'); continue; }
+      if (command.response === 'accept' && !war.defenders.includes(actor.id)) war.defenders.push(actor.id);
+      call.status = command.response === 'accept' ? 'accepted' : 'refused'; call.resolvedMonth = state.month;
+      if (command.response === 'refuse') relationPenalties.push({ polityId: actor.id, counterpartyPolityId: call.beneficiaryPolityId,
+        deltaTrust: -1000, deltaOpinion: -500, deltaThreat: 0 });
+      war.defenders.sort(); record(command);
+      events.push({ type: 'call-to-arms-resolved', callId: call.callId, warId: war.warId, response: command.response });
       continue;
     }
 
@@ -207,6 +247,10 @@ export function applyMilitaryCommands(
           treasuryTransfers.push({ offerId: offer.offerId, fromPolityId: payer.id, toPolityId: receiver.id, amount: offer.reparation.amount });
         }
         war.status = 'ended'; war.endedMonth = state.month;
+        for (const call of military.callsToArms!.filter((entry) => entry.warId === war.warId && entry.status === 'pending')) {
+          call.status = 'expired'; call.resolvedMonth = state.month;
+          events.push({ type: 'call-to-arms-resolved', callId: call.callId, warId: war.warId, response: 'expired' });
+        }
         military.occupations = military.occupations.filter((entry) => entry.warId !== war.warId);
         military.fronts = military.fronts.filter((entry) => entry.warId !== war.warId);
         for (const formation of military.formations.filter((entry) => partyTo(war, entry.polityId))) {
@@ -279,6 +323,7 @@ export function applyMilitaryCommands(
   military?.wars.sort((a, b) => a.warId.localeCompare(b.warId));
   military?.formations.sort((a, b) => a.formationId.localeCompare(b.formationId));
   military?.peaceOffers.sort((a, b) => a.offerId.localeCompare(b.offerId));
+  military?.callsToArms?.sort((a, b) => a.callId.localeCompare(b.callId));
   return { military, transfers, treasuryTransfers, relationPenalties, politicsPenalties, commandRecords, events, rejections };
 }
 

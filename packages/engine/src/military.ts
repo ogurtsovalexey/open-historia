@@ -11,6 +11,7 @@ export const commanderIdSchema = z.string().regex(/^commander:[a-z0-9][a-z0-9._-
 export const warIdSchema = z.string().regex(/^war:[a-z0-9][a-z0-9._-]{0,99}$/);
 export const frontIdSchema = z.string().regex(/^front:[a-z0-9][a-z0-9._-]{0,99}$/);
 export const peaceOfferIdSchema = z.string().regex(/^peace:[a-z0-9][a-z0-9._-]{0,99}$/);
+export const callToArmsIdSchema = z.string().regex(/^call:[a-z0-9][a-z0-9._-]{0,119}$/);
 export const warReasonSchema = z.enum(['claim', 'defense', 'guarantee', 'rivalry', 'none']);
 export const militaryPostureSchema = z.enum(['hold', 'defend', 'advance', 'withdraw']);
 
@@ -108,6 +109,17 @@ export const warSchema = z.object({
   status: z.enum(['active', 'ended']),
 }).strict();
 
+export const callToArmsSchema = z.object({
+  callId: callToArmsIdSchema,
+  warId: warIdSchema,
+  beneficiaryPolityId: polityIdSchema,
+  calledPolityId: polityIdSchema,
+  sourceAgreementIds: z.array(z.string().regex(/^agreement:[a-z0-9][a-z0-9._-]{0,99}$/)).min(1),
+  status: z.enum(['pending', 'accepted', 'refused', 'expired']),
+  createdMonth: gameDateSchema,
+  resolvedMonth: gameDateSchema.nullable(),
+}).strict();
+
 export const militaryStateSchema = z.object({
   combatSeed: z.number().int().nonnegative(),
   polities: z.array(militaryPolitySchema),
@@ -118,6 +130,7 @@ export const militaryStateSchema = z.object({
   fronts: z.array(frontSchema),
   occupations: z.array(occupationSchema),
   peaceOffers: z.array(peaceOfferSchema),
+  callsToArms: z.array(callToArmsSchema).optional(),
 }).strict();
 export type MilitaryState = z.infer<typeof militaryStateSchema>;
 

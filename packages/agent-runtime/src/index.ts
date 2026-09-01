@@ -50,7 +50,7 @@ export type OpponentBatchResult = z.infer<typeof opponentBatchResultSchema>;
 
 export const opponentDiplomacyDecisionSchema = z.object({
   polityId: polityIdSchema,
-  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'set-policy', 'issue-bonds', 'restructure', 'start-project', 'update-project', 'cancel-project', 'concede', 'repress', 'refuse', 'declare-war', 'mobilize', 'demobilize', 'order', 'split', 'merge', 'propose-peace', 'accept-peace', 'reject-peace', 'set-identity-policy', 'set-identity-acceptance', 'adopt-goal', 'set-crisis-position', 'hold']),
+  intent: z.enum(['propose', 'counter', 'accept', 'reject', 'terminate', 'set-policy', 'issue-bonds', 'restructure', 'start-project', 'update-project', 'cancel-project', 'concede', 'repress', 'refuse', 'declare-war', 'accept-call', 'refuse-call', 'mobilize', 'demobilize', 'order', 'split', 'merge', 'propose-peace', 'accept-peace', 'reject-peace', 'set-identity-policy', 'set-identity-acceptance', 'adopt-goal', 'set-crisis-position', 'hold']),
   rationale: z.string().max(320),
   command: z.union([diplomacyCommandSchema, statecraftCommandSchema, politicsCommandSchema, militaryCommandSchema, identityCommandSchema, campaignCommandSchema]).nullable(),
 }).strict().superRefine((decision, ctx) => {
@@ -66,6 +66,7 @@ export const opponentDiplomacyDecisionSchema = z.object({
                     : decision.intent === 'cancel-project' ? 'project.cancel'
                       : decision.intent === 'concede' || decision.intent === 'repress' || decision.intent === 'refuse' ? 'politics.respond'
                         : decision.intent === 'declare-war' ? 'war.declare'
+                          : decision.intent === 'accept-call' || decision.intent === 'refuse-call' ? 'war.respond-call'
                           : decision.intent === 'mobilize' ? 'military.mobilize'
                             : decision.intent === 'demobilize' ? 'military.demobilize'
                               : decision.intent === 'order' ? 'military.order'
@@ -118,6 +119,7 @@ export interface DiplomacyPolityBrief {
   commanders: Array<Record<string, unknown>>;
   wars: Array<Record<string, unknown>>;
   peaceOffers: Array<Record<string, unknown>>;
+  callsToArms?: Array<Record<string, unknown>>;
   mobilizationRegionCandidates: Array<{ regionId: string; name: string }>;
   frontRegionCandidates: Array<{ formationId: string; regionId: string; legalControllerId: string; actualControllerId: string }>;
   peaceRegionCandidates: Array<{ regionId: string; legalControllerId: string; actualControllerId: string }>;
@@ -155,6 +157,8 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
       entry.terms.fromPolityId === polityId || entry.terms.toPolityId === polityId)
       .sort((a, b) => b.acceptedMonth.localeCompare(a.acceptedMonth) || a.agreementId.localeCompare(b.agreementId)).slice(0, 6)
       .map((entry) => ({ agreementId: entry.agreementId, terms: entry.terms }));
+    const callsToArms = (state.military?.callsToArms ?? []).filter((entry) => entry.calledPolityId === polityId)
+      .sort((a, b) => Number(b.status === 'pending') - Number(a.status === 'pending') || b.createdMonth.localeCompare(a.createdMonth) || a.callId.localeCompare(b.callId)).slice(0, 6);
     const identityPolity = state.identity?.polities.find((entry) => entry.polityId === polityId);
     const controlledIdentityRows = (state.identity?.regions ?? []).filter((entry) =>
       state.regions.some((region) => region.regionId === entry.regionId && region.controllerId === polityId));
@@ -221,6 +225,7 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
         .sort((a, b) => Number(b.status === 'active') - Number(a.status === 'active') || b.startedMonth.localeCompare(a.startedMonth) || a.warId.localeCompare(b.warId)).slice(0, 6),
       peaceOffers: (state.military?.peaceOffers ?? []).filter((entry) => entry.proposerPolityId === polityId || entry.recipientPolityId === polityId)
         .sort((a, b) => Number(b.status === 'pending') - Number(a.status === 'pending') || b.createdMonth.localeCompare(a.createdMonth) || a.offerId.localeCompare(b.offerId)).slice(0, 6),
+      ...(callsToArms.length ? { callsToArms } : {}),
       mobilizationRegionCandidates: state.regions.filter((entry) => entry.controllerId === polityId
         && !(state.military?.occupations ?? []).some((occupation) => occupation.regionId === entry.regionId && occupation.actualControllerId !== polityId))
         .sort((a, b) => Number(militaryLocations.has(b.regionId)) - Number(militaryLocations.has(a.regionId))
@@ -254,7 +259,7 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
       } : null,
       campaignGoals: (state.campaign?.goals ?? []).filter((entry) => entry.polityId === polityId)
         .sort((a, b) => Number(b.status === 'active') - Number(a.status === 'active') || a.goalId.localeCompare(b.goalId)).slice(0, 3).map((entry) => ({
-          goalId: entry.goalId, kind: entry.kind, status: entry.status, progressBp: entry.progressBp, displayName: entry.displayName,
+          goalId: entry.goalId, kind: entry.kind, status: entry.status, progressBp: entry.progressBp, name: entry.displayName.en,
           ...(entry.kind === 'secure-alliance' ? { targetPolityId: entry.targetPolityId }
             : entry.kind === 'unlock-capability' ? { capabilityId: entry.capabilityId }
               : entry.kind === 'control-region' ? { regionId: entry.regionId }
@@ -342,6 +347,10 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
     if (command.kind === 'peace.respond') {
       if (!brief.peaceOffers.some((entry) => entry.offerId === command.offerId && entry.recipientPolityId === decision.polityId)) throw new Error('peace response names an unavailable offer');
       if ((command.response === 'accept') !== (decision.intent === 'accept-peace')) throw new Error('peace response and intent must match');
+    }
+    if (command.kind === 'war.respond-call') {
+      if (!(brief.callsToArms ?? []).some((entry) => entry.callId === command.callId && entry.status === 'pending')) throw new Error('call response names an unavailable call');
+      if ((command.response === 'accept') !== (decision.intent === 'accept-call')) throw new Error('call response and intent must match');
     }
     if (command.kind.startsWith('identity.')) {
       if (!brief.identity) throw new Error('identity command is unavailable');

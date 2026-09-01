@@ -144,6 +144,7 @@ const militaryInterpreterContext = (state, playerPolityId) => {
     commanders: state.military.commanders.filter((entry) => entry.polityId === playerPolityId),
     wars,
     peaceOffers: state.military.peaceOffers.filter((entry) => entry.proposerPolityId === playerPolityId || entry.recipientPolityId === playerPolityId),
+    callsToArms: (state.military.callsToArms ?? []).filter((entry) => entry.calledPolityId === playerPolityId),
     defenderCandidates: state.polities.filter((entry) => entry.id !== playerPolityId && !unavailableDefenders.has(entry.id))
       .map((entry) => ({ polityId: entry.id, name: entry.displayName.en })),
     mobilizationRegionCandidates: state.regions.filter((entry) => entry.controllerId === playerPolityId && actualController(entry) === playerPolityId)
@@ -221,7 +222,7 @@ const interpreterTasks = (draft) => {
     taskId: "orders.interpret-economy",
     taskVersion: 1,
     taskKey: `interpreter-${index}`,
-    systemPrompt: "Route every player action exactly once. Investment, enabled statecraft, political, military, identity and campaign actions become typed commands. Campaign actions may adopt only a supplied candidate goal, position the actor in a supplied crisis, or request a legacy assessment; goals are directions and never victory conditions. Identity changes may use only supplied policies and identity candidates; capability research uses only supplied project templates. War declarations, mobilization, formation orders and peace may use only the supplied actors, formations, reserves, wars, offers and bounded region candidates; never predict combat or numeric effects. For a new historical or fictional character, propose only a supplied faction, one qualitative aptitude trait, loyalty band and ambition band; the engine owns numeric traits and the player must confirm. Requests to inspect, summarize or brief use disposition report with command null. Unavailable mechanics use unsupported. Never invent effects, ids, regions, forces or existing characters.",
+    systemPrompt: "Route every player action exactly once. Investment, enabled statecraft, political, military, identity and campaign actions become typed commands. Campaign actions may adopt only a supplied candidate goal, position the actor in a supplied crisis, or request a legacy assessment; goals are directions and never victory conditions. Identity changes may use only supplied policies and identity candidates; capability research uses only supplied project templates. War declarations, calls to arms, mobilization, formation orders and peace may use only the supplied actors, calls, formations, reserves, wars, offers and bounded region candidates; only the addressed polity may answer a call, and the engine owns its effects. For a new historical or fictional character, propose only a supplied faction, one qualitative aptitude trait, loyalty band and ambition band; the engine owns numeric traits and the player must confirm. Requests to inspect, summarize or brief use disposition report with command null. Unavailable mechanics use unsupported. Never invent effects, ids, regions, forces or existing characters.",
     userPrompt: JSON.stringify({
       polityId: draft.playerPolityId,
       month: draft.state.month,
@@ -283,7 +284,7 @@ const makeStrategicTasks = (draft) => {
       : draft.state.modules?.finance || draft.state.modules?.projects ? "opponents.plan-statecraft" : "opponents.plan-diplomacy",
     taskVersion: 1,
     taskKey: batch.batchId,
-    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity and at most one material command. Use hold with a null command unless diplomacy, trade, finance, a listed project, durable goal, public crisis, aggregate identity pressure, active faction crisis or public war state justifies action. Adopt only a listed candidate goal and set a position only in a listed participating crisis; do not invent victory conditions or numeric outcomes. Identity changes may use only supplied policies and at most six supplied candidates; never infer regional composition. War, mobilization, formation orders and peace terms may use only supplied formations, reserves, wars, offers and bounded region candidates. Political responses may name only a listed faction; shared batches may not appoint, create or replace characters. Intelligence may target a polity but must never name a hidden fact id. Commands must use the supplied month and revision. Do not invent actors, resources, routes, templates, regions, forces, capabilities, effects or outcomes.",
+    systemPrompt: "Act independently for every requested polity. Return exactly one decision per polity and at most one material command. Use hold with a null command unless diplomacy, trade, finance, a listed project, durable goal, public crisis, aggregate identity pressure, active faction crisis or public war state justifies action. Adopt only a listed candidate goal and set a position only in a listed participating crisis; do not invent victory conditions or numeric outcomes. Identity changes may use only supplied policies and at most six supplied candidates; never infer regional composition. War, calls to arms, mobilization, formation orders and peace terms may use only supplied calls, formations, reserves, wars, offers and bounded region candidates. A call may be accepted or refused only by its addressed polity. Political responses may name only a listed faction; shared batches may not appoint, create or replace characters. Intelligence may target a polity but must never name a hidden fact id. Commands must use the supplied month and revision. Do not invent actors, resources, routes, templates, regions, forces, capabilities, effects or outcomes.",
     userPrompt: JSON.stringify({ month: batch.month, revision: batch.baseRevision, briefs: batch.briefs }),
     tool: { name: "submit_opponent_strategy_decisions", description: "Submit every requested polity strategic decision", schema },
     context: { fullMapIncluded: false, characterCount: batch.characterCount, polityCount: batch.polityIds.length },
@@ -423,6 +424,7 @@ const validatePlayerInterpretations = (draft, outputs) => {
     if (command.kind === "peace.propose" && (!military?.wars.some((entry) => entry.warId === command.warId && entry.status === "active")
       || command.regionTransfers.some((transfer) => !military.peaceRegionCandidates.some((entry) => entry.regionId === transfer.regionId && entry.actualControllerId === transfer.toPolityId)))) throw new Error("player peace proposal is outside bounded occupied-region candidates");
     if (command.kind === "peace.respond" && !military?.peaceOffers.some((entry) => entry.offerId === command.offerId && entry.recipientPolityId === draft.playerPolityId && entry.status === "pending")) throw new Error("player peace response names an unavailable offer");
+    if (command.kind === "war.respond-call" && !military?.callsToArms.some((entry) => entry.callId === command.callId && entry.calledPolityId === draft.playerPolityId && entry.status === "pending")) throw new Error("player call response names an unavailable call");
     if (command.kind.startsWith("identity.") && (!society.identity
       || ("identityId" in command && !society.identity.candidates.includes(command.identityId)))) throw new Error("player identity command names an unavailable identity");
     if (command.kind === "project.start" && (!society.researchTemplates.some((entry) => entry.templateId === command.templateId)
@@ -463,6 +465,8 @@ const validatePlayerInterpretations = (draft, outputs) => {
         reparation: entry.command.reparation,
       } : entry.command.kind === "peace.respond" ? {
         offerId: entry.command.offerId, response: entry.command.response,
+      } : entry.command.kind === "war.respond-call" ? {
+        callId: entry.command.callId, response: entry.command.response,
       } : entry.command.kind === "identity.set-policy" ? {
         domain: entry.command.domain, policy: entry.command.policy,
       } : entry.command.kind === "identity.set-culture-acceptance" || entry.command.kind === "identity.set-religion-acceptance" ? {
@@ -616,13 +620,15 @@ export const prepareAgentTurn = (gameId, { targetDate, expectedSessionRevision, 
           : command.kind === "diplomacy.counter" ? `Counter proposal ${command.proposalId}`
             : command.kind === "diplomacy.respond" ? `${command.response} proposal ${command.proposalId}`
               : command.kind === "diplomacy.terminate-agreement" ? `Terminate ${command.agreementId}`
+                : command.kind === "war.respond-call" ? `${command.response} call ${command.callId}`
                 : command.kind,
       disposition: "command",
       command: command.kind === "economy.invest-region" ? {
         kind: command.kind,
         region: session.state.regions.find((region) => region.regionId === command.targetRegionId)?.displayName ?? command.targetRegionId,
         spend: command.spend,
-      } : { kind: command.kind },
+      } : command.kind === "war.respond-call" ? { kind: command.kind, callId: command.callId, response: command.response }
+        : { kind: command.kind },
     })),
   };
   if (normalized.length) draft.tasks = interpreterTasks(draft);

@@ -164,6 +164,7 @@ const militaryForPlayer = (state, playerId) => {
     fronts: state.military.fronts.filter((entry) => warIds.has(entry.warId)),
     occupations: state.military.occupations.filter((entry) => warIds.has(entry.warId)),
     peaceOffers: state.military.peaceOffers.filter((entry) => entry.proposerPolityId === playerId || entry.recipientPolityId === playerId),
+    callsToArms: (state.military.callsToArms ?? []).filter((entry) => entry.calledPolityId === playerId || entry.beneficiaryPolityId === playerId),
     warDeclarationCandidates: state.polities.filter((entry) => entry.id !== playerId && !unavailableDefenders.has(entry.id))
       .map((entry) => ({ polityId: entry.id, name: entry.displayName.en })),
     mobilizationRegions: state.regions.filter((entry) => entry.controllerId === playerId && actual(entry) === playerId)

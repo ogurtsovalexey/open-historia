@@ -180,7 +180,8 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   }
   for (const penalty of militaryCommandPhase.relationPenalties) {
     for (const relation of diplomacyPhase.diplomacy?.relations ?? []) {
-      if (relation.polities.includes(penalty.polityId)) {
+      if (relation.polities.includes(penalty.polityId)
+        && (!penalty.counterpartyPolityId || relation.polities.includes(penalty.counterpartyPolityId))) {
         relation.trust = clampBp(relation.trust + penalty.deltaTrust);
         relation.opinion = Math.max(-10000, Math.min(10000, relation.opinion + penalty.deltaOpinion));
         relation.threat = clampBp(relation.threat + penalty.deltaThreat);

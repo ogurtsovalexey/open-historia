@@ -143,6 +143,30 @@ test('strategic diplomacy validation requires one bound decision per polity', ()
   assert.equal(validateDiplomacyBatch(crisisHolds, crisisBatch).decisions[crisisIndex]?.intent, 'set-crisis-position');
 });
 
+test('strategic AI sees and may answer only its addressed call to arms', () => {
+  let state = diplomacyInitial();
+  const command = (actorPolityId: string, suffix: number) => ({ commandId: `82000000-0000-4000-8000-${String(suffix).padStart(12, '0')}`,
+    actorPolityId, expectedRevision: state.revision, effectiveMonth: state.month });
+  state = runTurn(state, { commands: [{ kind: 'diplomacy.propose', ...command('polity:austria', 1), proposalId: 'proposal:p8-agent-alliance',
+    recipientPolityId: 'polity:france', terms: { kind: 'agreement', agreementType: 'defensive-alliance', fromPolityId: 'polity:austria', toPolityId: 'polity:france' } }] as never }).result.state;
+  state = runTurn(state, { commands: [{ kind: 'diplomacy.respond', ...command('polity:france', 2), proposalId: 'proposal:p8-agent-alliance', response: 'accept' }] as never }).result.state;
+  state = runTurn(state, { commands: [{ kind: 'war.declare', ...command('polity:germany', 3), warId: 'war:p8-agent-call', defenderPolityId: 'polity:austria', reason: 'rivalry' }] as never }).result.state;
+  const batch = buildDiplomacyBatch(state, 'polity:austria')!;
+  const france = batch.briefs.find((entry) => entry.polityId === 'polity:france')!;
+  assert.equal(france.callsToArms?.length, 1);
+  assert.ok(batch.briefs.filter((entry) => entry.polityId !== 'polity:france').every((entry) => entry.callsToArms === undefined));
+  const decisions = batch.polityIds.map((polityId) => polityId === 'polity:france' ? ({ polityId, intent: 'accept-call' as const,
+    rationale: 'Honor the supplied defensive obligation.', command: { kind: 'war.respond-call' as const,
+      commandId: '82000000-0000-4000-8000-000000000004', actorPolityId: polityId, expectedRevision: state.revision,
+      effectiveMonth: state.month, callId: france.callsToArms![0]!.callId as string, response: 'accept' as const } })
+    : ({ polityId, intent: 'hold' as const, rationale: 'No material action.', command: null }));
+  assert.equal(validateDiplomacyBatch({ decisions }, batch).decisions.find((entry) => entry.polityId === 'polity:france')?.intent, 'accept-call');
+  const wrong: { decisions: Array<Record<string, unknown>> } = structuredClone({ decisions });
+  const franceDecision = wrong.decisions.find((entry) => entry.polityId === 'polity:france')!;
+  franceDecision.intent = 'refuse-call';
+  assert.throws(() => validateDiplomacyBatch(wrong, batch), /response and intent must match/);
+});
+
 test('bounded briefs and batches never include the full map', () => {
   const state = initial();
   const selected = selectOpponentPolities(state, 'polity:austria', EMPTY_AGENT_STATE);
