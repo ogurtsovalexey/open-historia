@@ -104,6 +104,7 @@ export const warSchema = z.object({
   defenders: z.array(polityIdSchema).min(1).max(12),
   reason: warReasonSchema,
   declaredByPolityId: polityIdSchema,
+  primaryDefenderPolityId: polityIdSchema.optional(),
   startedMonth: gameDateSchema,
   endedMonth: gameDateSchema.nullable(),
   status: z.enum(['active', 'ended']),

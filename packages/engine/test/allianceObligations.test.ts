@@ -46,6 +46,11 @@ describe('P8 executable alliance obligations (canon 17)', () => {
       callId: call.callId, response: 'accept' }]);
     assert.deepEqual(accepted.state.military!.wars[0]!.defenders, ['polity:austria', 'polity:france']);
     assert.equal(accepted.state.military!.callsToArms![0]!.status, 'accepted');
+    const allyPeace = tick(accepted.state, [{ kind: 'peace.propose', ...common(accepted.state, 'polity:france', 5),
+      offerId: 'peace:p8-ally-cannot-end-war', warId: 'war:p8-alliance', recipientPolityId: 'polity:germany',
+      regionTransfers: [], reparation: null }]);
+    assert.equal(allyPeace.rejections[0]?.reason, 'unauthorized');
+    assert.equal(allyPeace.state.military!.wars[0]!.status, 'active');
     assert.deepEqual(tick(declared.state, [{ kind: 'war.respond-call', ...common(declared.state, 'polity:france', 4),
       callId: call.callId, response: 'accept' }]), accepted);
   });

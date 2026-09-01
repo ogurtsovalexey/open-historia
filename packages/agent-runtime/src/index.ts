@@ -341,7 +341,10 @@ export function validateDiplomacyBatch(raw: unknown, batch: DiplomacyBatch): Opp
     if (command.kind === 'military.merge' && (!brief.formations.some((entry) => entry.formationId === command.primaryFormationId)
       || !brief.formations.some((entry) => entry.formationId === command.secondaryFormationId))) throw new Error('merge names another polity formation');
     if (command.kind === 'peace.propose') {
-      if (!brief.wars.some((entry) => entry.warId === command.warId)) throw new Error('peace proposal names an unknown war');
+      const war = brief.wars.find((entry) => entry.warId === command.warId);
+      if (!war) throw new Error('peace proposal names an unknown war');
+      const leaders = [war.declaredByPolityId, war.primaryDefenderPolityId ?? (war.defenders as string[])[0]];
+      if (!leaders.includes(decision.polityId) || !leaders.includes(command.recipientPolityId)) throw new Error('peace proposal must name opposing war leaders');
       if (command.regionTransfers.some((transfer) => !brief.peaceRegionCandidates.some((entry) => entry.regionId === transfer.regionId && entry.actualControllerId === transfer.toPolityId))) throw new Error('peace proposal region is outside bounded candidates');
     }
     if (command.kind === 'peace.respond') {

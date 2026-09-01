@@ -63,6 +63,8 @@ const opposing = (war: MilitaryState['wars'][number], left: string, right: strin
   || (war.defenders.includes(left as PolityId) && war.attackers.includes(right as PolityId));
 const partyTo = (war: MilitaryState['wars'][number], polityId: string): boolean =>
   war.attackers.includes(polityId as PolityId) || war.defenders.includes(polityId as PolityId);
+const warLeaders = (war: MilitaryState['wars'][number]): [PolityId, PolityId] =>
+  [war.declaredByPolityId, war.primaryDefenderPolityId ?? war.defenders[0]!];
 const linkFor = (military: MilitaryState, left: string, right: string) => military.supplyLinks.find((entry) =>
   (entry.regions[0] === left && entry.regions[1] === right) || (entry.regions[0] === right && entry.regions[1] === left));
 
@@ -119,7 +121,7 @@ export function applyMilitaryCommands(
         && [entry.terms.fromPolityId, entry.terms.toPolityId].includes(defender.id));
       if (protectedAgreement) { reject(command, 'invalid-target', `active protected agreement ${protectedAgreement.agreementId} forbids this declaration`); continue; }
       military.wars.push({ warId: command.warId, attackers: [actor.id], defenders: [defender.id], reason: command.reason,
-        declaredByPolityId: actor.id, startedMonth: state.month, endedMonth: null, status: 'active' });
+        declaredByPolityId: actor.id, primaryDefenderPolityId: defender.id, startedMonth: state.month, endedMonth: null, status: 'active' });
       const obligations = new Map<PolityId, string[]>();
       for (const agreement of state.diplomacy?.agreements ?? []) {
         if (agreement.terms.kind !== 'agreement') continue;
@@ -195,6 +197,8 @@ export function applyMilitaryCommands(
       const war = military.wars.find((entry) => entry.warId === command.warId && entry.status === 'active');
       if (!war) { reject(command, 'unknown-war', `no active war ${command.warId}`); continue; }
       if (!partyTo(war, actor.id) || !partyTo(war, command.recipientPolityId) || !opposing(war, actor.id, command.recipientPolityId)) { reject(command, 'unauthorized', 'peace parties must oppose each other in the war'); continue; }
+      const leaders = warLeaders(war);
+      if (!leaders.includes(actor.id) || !leaders.includes(command.recipientPolityId)) { reject(command, 'unauthorized', 'only opposing war leaders may settle the whole coalition war'); continue; }
       if (military.peaceOffers.some((entry) => entry.offerId === command.offerId)) { reject(command, 'duplicate-id', `peace offer ${command.offerId} exists`); continue; }
       const uniqueRegions = new Set(command.regionTransfers.map((entry) => entry.regionId));
       const invalidTransfer = uniqueRegions.size !== command.regionTransfers.length || command.regionTransfers.some((transfer) => {

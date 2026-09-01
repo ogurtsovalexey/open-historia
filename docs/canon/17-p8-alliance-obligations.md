@@ -23,6 +23,9 @@ currencies or migration without playtest evidence.
 - Pending calls expire when the war ends. A polity already fighting on the
   opposite side cannot accept. IDs, sides and participant arrays are validated,
   deduplicated and stably sorted.
+- Joining a coalition does not grant authority to end the whole war. Only the
+  original opposing war leaders may conclude the current all-parties peace;
+  separate peaces remain deferred rather than being simulated implicitly.
 - Player responses are material commands and require confirmation. Strategic
   AI sees only calls addressed to its actor plus the already bounded public war
   brief. No model chooses numeric penalties or edits belligerent arrays.

@@ -421,8 +421,12 @@ const validatePlayerInterpretations = (draft, outputs) => {
     if (command.kind === "military.split" && !military?.formations.some((entry) => entry.formationId === command.sourceFormationId)) throw new Error("player split names an unknown formation");
     if (command.kind === "military.merge" && (!military?.formations.some((entry) => entry.formationId === command.primaryFormationId)
       || !military.formations.some((entry) => entry.formationId === command.secondaryFormationId))) throw new Error("player merge names an unknown formation");
-    if (command.kind === "peace.propose" && (!military?.wars.some((entry) => entry.warId === command.warId && entry.status === "active")
-      || command.regionTransfers.some((transfer) => !military.peaceRegionCandidates.some((entry) => entry.regionId === transfer.regionId && entry.actualControllerId === transfer.toPolityId)))) throw new Error("player peace proposal is outside bounded occupied-region candidates");
+    if (command.kind === "peace.propose") {
+      const war = military?.wars.find((entry) => entry.warId === command.warId && entry.status === "active");
+      const leaders = war ? [war.declaredByPolityId, war.primaryDefenderPolityId ?? war.defenders[0]] : [];
+      if (!war || !leaders.includes(draft.playerPolityId) || !leaders.includes(command.recipientPolityId)
+        || command.regionTransfers.some((transfer) => !military.peaceRegionCandidates.some((entry) => entry.regionId === transfer.regionId && entry.actualControllerId === transfer.toPolityId))) throw new Error("player peace proposal is outside bounded leader or occupied-region candidates");
+    }
     if (command.kind === "peace.respond" && !military?.peaceOffers.some((entry) => entry.offerId === command.offerId && entry.recipientPolityId === draft.playerPolityId && entry.status === "pending")) throw new Error("player peace response names an unavailable offer");
     if (command.kind === "war.respond-call" && !military?.callsToArms.some((entry) => entry.callId === command.callId && entry.calledPolityId === draft.playerPolityId && entry.status === "pending")) throw new Error("player call response names an unavailable call");
     if (command.kind.startsWith("identity.") && (!society.identity
