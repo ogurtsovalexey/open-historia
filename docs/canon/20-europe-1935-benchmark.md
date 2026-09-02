@@ -23,6 +23,11 @@ pass, no new benchmark model call is allowed.
   element's `license=*` says otherwise; share-alike content requires a separate
   owner decision. Land adjacency derives from geometry; straits, sea routes
   and external links are authored.
+- The Poland source checkpoint uses the 16 dated OHM voivodeship relations.
+  Their union is the authoritative internal boundary and topology control; the
+  separate country relation remains a measured cross-check and never repairs
+  source linework. Every selected relation is checked for date and per-object
+  license before adjacency is derived.
 - National population/capacity controls and the first aggregate month are
   preserved. Regional specialization follows sources; every estimate declares
   confidence, method and TODO.

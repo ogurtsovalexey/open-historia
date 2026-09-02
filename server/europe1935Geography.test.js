@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   SNAPSHOT_DATE,
+  OHM_POLAND_1935,
   auditTopology,
   auditRelationGeometry,
   buildCheckpoint,
@@ -14,6 +15,7 @@ import {
   overlapRatio,
   normalizeFranceDepartments,
   normalizeFranceMilitaryRegions,
+  normalizePolandRegions,
   stitchRings,
 } from '../scripts/europe-1935-geography.mjs';
 
@@ -58,6 +60,26 @@ test('TRF-GIS France military layer fits the 10–25 game-region gate', () => {
   assert.equal(normalized.features.length, 18);
   assert.equal(normalized.features[0].properties.source.license, 'CC BY 4.0');
   assert.throws(() => normalizeFranceMilitaryRegions({ ...raw, features: raw.features.slice(1) }), /expected 18/);
+});
+
+test('OHM Poland 1935 normalization requires the exact dated and licensed voivodeship set', () => {
+  const polygon = (offset) => ({ type: 'Polygon', coordinates: [[
+    [offset, 0], [offset + 1, 0], [offset + 1, 1], [offset, 1], [offset, 0],
+  ]] });
+  const features = OHM_POLAND_1935.regionRelationIds.map((relationId, index) => ({
+    type: 'Feature', geometry: polygon(index), properties: {
+      relationId, nativeName: `Województwo ${index + 1}`, startDate: '1930', endDate: '1939',
+      license: { class: 'ohm-default-cc0', value: 'CC0 (OHM default)', allowed: true },
+    },
+  }));
+  const normalized = normalizePolandRegions(features);
+  assert.equal(normalized.features.length, 16);
+  assert.equal(normalized.features[0].properties.nativeId, `ohm-relation-${OHM_POLAND_1935.regionRelationIds[0]}`);
+  assert.equal(normalized.features[0].properties.source.copyright, 'https://www.openhistoricalmap.org/copyright');
+  assert.throws(() => normalizePolandRegions(features.slice(1)), /lacks voivodeship relation/);
+  const blocked = structuredClone(features);
+  blocked[0].properties.license = { class: 'share-alike', value: 'CC BY-SA 4.0', allowed: false };
+  assert.throws(() => normalizePolandRegions(blocked), /blocked license/);
 });
 
 test('Europe 1935 geography closes relation ways into deterministic polygons', () => {

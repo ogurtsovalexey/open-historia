@@ -42,6 +42,15 @@ export const TRF_GIS_FRANCE_MILITARY_1935 = Object.freeze({
   license: 'CC BY 4.0',
   expectedSha256: 'sha256:26dfb0a8bc6fd9cabcb175e7ced71b12ec76a4d5fc80bfde7c678a3a79078573',
 });
+export const OHM_POLAND_1935 = Object.freeze({
+  boundaryRelationId: 2692205,
+  regionRelationIds: Object.freeze([
+    2696109, 2698169, 2698170, 2741463, 2741466, 2741468, 2741469, 2741470,
+    2741471, 2741475, 2741476, 2741477, 2927190, 2927191, 2929589, 2930186,
+  ]),
+  normalizedSourceChecksum: 'sha256:9ebf6e3f1c6cca66bdca58b110f78d3c2115c0c3c398820c3bea29da37078cfe',
+  copyright: 'https://www.openhistoricalmap.org/copyright',
+});
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_OUTPUT = path.join(ROOT, 'runs', 'campaign-lab', 'europe-1935-geography-checkpoint');
 
@@ -515,6 +524,39 @@ export function normalizeFranceMilitaryRegions(featureCollection) {
   };
 }
 
+export function normalizePolandRegions(features) {
+  const byRelation = new Map(features.map((feature) => [feature.properties?.relationId, feature]));
+  const expected = new Set(OHM_POLAND_1935.regionRelationIds);
+  const unexpected = [...byRelation.keys()].filter((relationId) => relationId !== OHM_POLAND_1935.boundaryRelationId
+    && !expected.has(relationId));
+  if (unexpected.length) throw new Error(`OHM Poland 1935 has unexpected relations: ${unexpected.sort((a, b) => a - b).join(', ')}`);
+  const normalized = OHM_POLAND_1935.regionRelationIds.map((relationId) => {
+    const feature = byRelation.get(relationId);
+    if (!feature) throw new Error(`OHM Poland 1935 lacks voivodeship relation ${relationId}`);
+    if (!feature.properties?.nativeName) throw new Error(`OHM Poland 1935 relation ${relationId} lacks a native name`);
+    if (feature.properties.startDate > SNAPSHOT_DATE
+      || (feature.properties.endDate && feature.properties.endDate <= SNAPSHOT_DATE)) {
+      throw new Error(`OHM Poland 1935 relation ${relationId} is not effective at ${SNAPSHOT_DATE}`);
+    }
+    if (!feature.properties.license?.allowed) {
+      throw new Error(`OHM Poland 1935 relation ${relationId} has blocked license ${feature.properties.license?.value ?? 'unknown'}`);
+    }
+    return {
+      type: 'Feature', geometry: feature.geometry, properties: {
+        nativeId: `ohm-relation-${relationId}`,
+        nativeName: feature.properties.nativeName,
+        polityId: 'polity:poland', effectiveAt: SNAPSHOT_DATE,
+        source: {
+          provider: 'OpenHistoricalMap', relationId,
+          startDate: feature.properties.startDate, endDate: feature.properties.endDate,
+          license: feature.properties.license, copyright: OHM_POLAND_1935.copyright,
+        },
+      },
+    };
+  });
+  return { type: 'FeatureCollection', features: normalized };
+}
+
 export async function fetchPinnedSource(source, fetchImpl = fetch) {
   const response = await fetchImpl(source.downloadUrl, { signal: AbortSignal.timeout(120_000) });
   if (!response.ok) throw new Error(`${source.filename} download failed: ${response.status} ${await response.text()}`);
@@ -697,10 +739,78 @@ export async function runFranceCoverage(outputDirectory = DEFAULT_OUTPUT, option
   return checkpoint;
 }
 
+export async function runPolandCoverage(outputDirectory = DEFAULT_OUTPUT, options = {}) {
+  const relationIds = [OHM_POLAND_1935.boundaryRelationId, ...OHM_POLAND_1935.regionRelationIds];
+  const query = relationGeometryQuery(relationIds);
+  const rawPath = path.join(outputDirectory, 'poland-ohm-1935.raw.json');
+  const fetched = options.cached ? readCachedResult(outputDirectory, path.basename(rawPath), query)
+    : await fetchRelationGeometry(relationIds);
+  const sourceFeatures = normalizeRelationGeometry(fetched.raw, relationIds);
+  const normalizedSourceChecksum = sha256(canonical(sourceFeatures));
+  if (normalizedSourceChecksum !== OHM_POLAND_1935.normalizedSourceChecksum) {
+    throw new Error(`OHM Poland 1935 normalized checksum mismatch: expected ${OHM_POLAND_1935.normalizedSourceChecksum}, received ${normalizedSourceChecksum}`);
+  }
+  const countryBoundary = sourceFeatures.find((feature) => feature.properties.relationId === OHM_POLAND_1935.boundaryRelationId);
+  if (!countryBoundary) throw new Error('OHM Poland 1935 lacks its independent country boundary');
+  const regions = normalizePolandRegions(sourceFeatures);
+  const regionUnion = polygonClipping.union(...regions.features.map((feature) => asMultiPolygonCoordinates(feature.geometry)));
+  const regionBoundary = { type: 'Feature', properties: { method: 'union-of-voivodeships' },
+    geometry: { type: 'MultiPolygon', coordinates: regionUnion } };
+  const regionTopology = auditTopology(regionBoundary, regions.features);
+  const boundaryCrossCheck = auditTopology(countryBoundary, regions.features);
+  const adjacency = deriveLandAdjacency(regions);
+  const isolatedRegionIds = adjacency.regions.filter((entry) => entry.adjacentRegionIds.length === 0)
+    .map((entry) => entry.regionId);
+  const ready = regionTopology.status === 'topology-clean'
+    && regions.features.length >= 10 && regions.features.length <= 25
+    && isolatedRegionIds.length === 0 && adjacency.nonManifoldSegments.length === 0;
+  const regionsWithAdjacency = { ...regions, features: regions.features.map((feature) => ({
+    ...feature,
+    properties: { ...feature.properties, adjacentNativeIds: adjacency.regions
+      .find((entry) => entry.regionId === feature.properties.nativeId).adjacentRegionIds },
+  })) };
+  const checkpoint = {
+    schemaVersion: 'open-historia-geography-ohm-source/1',
+    scenarioId: 'scenario:europe-1935-benchmark', snapshotDate: SNAPSHOT_DATE, polityId: 'polity:poland',
+    source: {
+      provider: 'OpenHistoricalMap', endpoint: OHM_ENDPOINT, copyright: OHM_POLAND_1935.copyright,
+      query, responseChecksum: sha256(fetched.bytes), normalizedSourceChecksum,
+      boundaryRelationId: OHM_POLAND_1935.boundaryRelationId,
+      regionRelationIds: OHM_POLAND_1935.regionRelationIds,
+    },
+    gate: {
+      status: ready ? 'source-topology-ready' : 'topology-review-required',
+      candidateCount: regions.features.length,
+      note: 'The voivodeship union is authoritative for internal topology. The independently authored OHM country relation is retained only as a measured cross-check and is never used to repair the source polygons.',
+    },
+    topology: {
+      regionUnion: regionTopology,
+      independentBoundaryCrossCheck: boundaryCrossCheck,
+      adjacency: {
+        method: adjacency.method, edgeCount: adjacency.edges.length, isolatedRegionIds,
+        nonManifoldSegmentCount: adjacency.nonManifoldSegments.length,
+        checksum: sha256(canonical(adjacency)),
+      },
+    },
+  };
+  fs.mkdirSync(outputDirectory, { recursive: true });
+  fs.writeFileSync(rawPath, fetched.bytes);
+  fs.writeFileSync(path.join(outputDirectory, 'poland-regions-1935.geojson'), `${JSON.stringify(regionsWithAdjacency)}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'poland-land-adjacency.json'), `${JSON.stringify(adjacency, null, 2)}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'poland-source-overlay.svg'), buildRegionalOverlay(
+    regions, 'Polska 1935 — województwa source layer', POLITY_COLORS['polity:poland'],
+  ));
+  fs.writeFileSync(path.join(outputDirectory, 'poland-source-manifest.json'), `${JSON.stringify({
+    ...checkpoint, regionGeojsonChecksum: sha256(canonical(regionsWithAdjacency)),
+  }, null, 2)}\n`);
+  return checkpoint;
+}
+
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   const outputFlag = process.argv.indexOf('--output');
   const output = outputFlag >= 0 && process.argv[outputFlag + 1] ? path.resolve(process.argv[outputFlag + 1]) : DEFAULT_OUTPUT;
   const operation = process.argv.includes('--france') ? runFranceCoverage
+    : process.argv.includes('--poland') ? runPolandCoverage
     : process.argv.includes('--boundaries') ? runBoundaryCoverage : runInventory;
   operation(output, { cached: process.argv.includes('--cached') }).then((checkpoint) => process.stdout.write(`${JSON.stringify(checkpoint.counts
     ? { output, counts: checkpoint.counts, blockedRelations: checkpoint.blockedRelations.length }
