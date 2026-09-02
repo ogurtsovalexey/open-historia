@@ -37,6 +37,10 @@ cannot resume or validate a V4 run.
   never silently truncated. Schema/normalization/semantic failures terminalize
   the attempt; provider failure or staleness produces a visible hold and keeps
   its trigger pending.
+- One production serializer emits the ordered task, checkpoint, goals/red
+  lines, leadership, public/own evidence, durable plan, frozen choices,
+  candidate audit and output sections. Provider calls and prompt-lab snapshots
+  must use that serializer; copied prompt strings are not a valid test fixture.
 - Scheduled decisions are quarterly. Material war, proposal, crisis,
   government, occupation/peace and default checkpoints are immediate. At most
   four country sessions run concurrently and accepted packages commit in

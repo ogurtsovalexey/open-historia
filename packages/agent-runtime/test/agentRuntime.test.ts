@@ -28,6 +28,7 @@ import {
   materializeStrategicDecisionV3,
   materializeStrategicBatchV3,
   buildStrategicBriefV4,
+  renderStrategicPromptV4,
   materializeStrategicDecisionV4,
   dispatchStrategicSessions,
   stableStrategicCommitOrder,
@@ -375,6 +376,12 @@ test('StrategicBriefV4 is a single-actor bounded ID catalog with politics and co
   assert.ok(first.choices.every((entry) => entry.choiceId.startsWith('choice:')));
   assert.equal(new Set(first.choices.map((entry) => entry.choiceId)).size, first.choices.length);
   assert.equal(JSON.stringify(first).includes('geometry'), false);
+  const prompt = renderStrategicPromptV4(first, options.systemText);
+  assert.equal(first.inputTokenCount, options.countTokens(prompt));
+  assert.match(prompt, /^Compact production prompt\.\n\[TASK\]/);
+  assert.match(prompt, /\[CHECKPOINT\][\s\S]*\[GOALS_AND_RED_LINES\][\s\S]*\[FROZEN_CHOICES\][\s\S]*\[OUTPUT\]/);
+  assert.equal(prompt.includes('inputTokenCount'), false);
+  assert.equal(prompt.includes('geometry'), false);
 });
 
 test('StrategicBriefV4 derives authority from canonical politics and observes a same-revision transfer', () => {

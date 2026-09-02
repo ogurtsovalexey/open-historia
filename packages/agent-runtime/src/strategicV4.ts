@@ -219,6 +219,36 @@ export interface StrategicBriefV4Options {
   countTokens?: (text: string) => number;
 }
 
+type StrategicPromptSourceV4 = Omit<StrategicBriefV4, 'inputTokenCount' | 'tokenCountMethod'>;
+
+/** The sole production serializer for provider calls and prompt-lab snapshots. */
+export function renderStrategicPromptV4(brief: StrategicPromptSourceV4 | StrategicBriefV4, systemText = ''): string {
+  const lines = [
+    systemText.trim(),
+    '[TASK]',
+    brief.role,
+    `Success: ${brief.successCriterion}`,
+    `Decision hierarchy: ${brief.decisionHierarchy.join(' > ')}`,
+    '[CHECKPOINT]',
+    JSON.stringify({ actor: brief.actor, month: brief.month, revision: brief.revision, invocation: brief.invocation, triggers: brief.triggers }),
+    '[GOALS_AND_RED_LINES]',
+    JSON.stringify({ goals: brief.goals, redLines: brief.redLines }),
+    '[CURRENT_LEADERSHIP]',
+    JSON.stringify(brief.political),
+    '[PUBLIC_STATE_AND_OWN_EVIDENCE]',
+    JSON.stringify({ publicData: brief.publicData, ownIntelligence: brief.ownIntelligence }),
+    '[DURABLE_PLAN_AND_CHANGES]',
+    JSON.stringify({ durablePlan: brief.durablePlan, changesSinceLastDecision: brief.changesSinceLastDecision }),
+    '[FROZEN_CHOICES]',
+    JSON.stringify(brief.choices),
+    '[CANDIDATE_AUDIT]',
+    JSON.stringify(brief.candidateAudit),
+    '[OUTPUT]',
+    'Return exactly one StrategicDecisionV3 JSON object for this actor and revision. Select only published choiceId values; map every mandatory trigger exactly once to compatible selected choiceIds. Use evidence IDs from this prompt, state qualitative expected consequences only, and invent no IDs, hidden facts, numeric effects, or completed outcomes. Return no prose or markdown.',
+  ];
+  return `${lines.filter((line, index) => index > 0 || line.length > 0).join('\n')}\n`;
+}
+
 /** Builds one private session payload for exactly one polity. */
 export function buildStrategicBriefV4(state: EconWorldState, polityId: string, options: StrategicBriefV4Options): StrategicBriefV4 {
   const triggers = strategicTriggerV4Schema.array().parse(options.triggers ?? []);
@@ -320,7 +350,7 @@ export function buildStrategicBriefV4(state: EconWorldState, polityId: string, o
     ownIntelligence: (options.ownIntelligence ?? []).slice(0, 12), durablePlan: options.durablePlan ?? null,
     changesSinceLastDecision: (options.changesSinceLastDecision ?? []).slice(0, 12), choices, candidateAudit,
   };
-  const promptText = `${options.systemText ?? ''}\n${JSON.stringify(draft)}`;
+  const promptText = renderStrategicPromptV4(draft, options.systemText);
   const inputTokenCount = options.countTokens ? options.countTokens(promptText) : Buffer.byteLength(promptText, 'utf8');
   if (!Number.isSafeInteger(inputTokenCount) || inputTokenCount < 0) throw new Error('strategic V4 token counter returned an invalid value');
   if (inputTokenCount > STRATEGIC_INPUT_TOKEN_LIMIT) throw new Error(`strategic V4 input exceeds ${STRATEGIC_INPUT_TOKEN_LIMIT} tokens (${inputTokenCount})`);
