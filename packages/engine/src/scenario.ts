@@ -116,6 +116,9 @@ export const scenarioPolitySchema = z
   .object({
     id: polityIdSchema,
     displayName: displayNameSchema,
+    /** Inert polities participate in engine state and may be targeted, but are
+     * never eligible for player/opponent strategic decision scheduling. */
+    decisionMode: z.enum(['active', 'inert']).optional(),
     treasury: nonNegInt,
     stockpile: z
       .array(z.object({ resource: resourceIdSchema, amount: nonNegInt }).strict()),

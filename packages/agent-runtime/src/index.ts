@@ -17,6 +17,7 @@ import {
   type InvestInRegionCommand,
   type PolityLedger,
   activitiesOf,
+  isStrategicActor,
 } from '@open-historia/engine';
 import type { DiplomacyCommand } from '@open-historia/engine';
 import type { StatecraftCommand } from '@open-historia/engine';
@@ -163,7 +164,7 @@ export interface DiplomacyBriefOptions {
 
 export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: string, requestedPolityIds?: string[], options: DiplomacyBriefOptions = {}): DiplomacyBatch | null {
   if (state.modules?.diplomacy !== true || !state.diplomacy) return null;
-  const available = state.polities.filter((entry) => entry.id !== playerPolityId).map((entry) => entry.id).sort();
+  const available = state.polities.filter((entry) => entry.id !== playerPolityId && isStrategicActor(entry)).map((entry) => entry.id).sort();
   const allowed = new Set<string>(available);
   const polityIds = (requestedPolityIds ?? available).filter((entry) => allowed.has(entry)).slice(0, MAX_STRATEGIC_POLITIES)
     .map((entry) => entry as EconWorldState['polities'][number]['id']);
@@ -318,7 +319,7 @@ export function buildDiplomacyBatch(state: EconWorldState, playerPolityId: strin
 /** Stable strategic batches. Unlike the legacy singular helper, this never drops an opponent. */
 export function buildDiplomacyBatches(state: EconWorldState, playerPolityId: string, options: DiplomacyBriefOptions = {}): DiplomacyBatch[] {
   if (state.modules?.diplomacy !== true || !state.diplomacy) return [];
-  const polityIds = state.polities.filter((entry) => entry.id !== playerPolityId).map((entry) => entry.id).sort();
+  const polityIds = state.polities.filter((entry) => entry.id !== playerPolityId && isStrategicActor(entry)).map((entry) => entry.id).sort();
   const batches: DiplomacyBatch[] = [];
   for (let index = 0; index < polityIds.length; index += MAX_STRATEGIC_POLITIES) {
     const batch = buildDiplomacyBatch(state, playerPolityId, polityIds.slice(index, index + MAX_STRATEGIC_POLITIES), options);
@@ -602,7 +603,7 @@ export function selectOpponentPolities(
 ): string[] {
   const previous = new Map(agentState.polities.map((entry) => [entry.polityId, entry]));
   const scored = state.polities
-    .filter((polity) => polity.id !== playerPolityId)
+    .filter((polity) => polity.id !== playerPolityId && isStrategicActor(polity))
     .map((polity) => {
       const old = previous.get(polity.id);
       const fingerprint = triggerFingerprintFor(ledgerFor(lastLedger, polity.id), polity.treasury);
@@ -661,7 +662,8 @@ export function buildOpponentBatches(
   polityIds: string[],
   build: (polityId: string) => PolityDecisionBrief,
 ): AgentBatch[] {
-  const selected = polityIds.slice(0, MAX_POLITIES_PER_MONTH);
+  const eligible = new Set<string>(state.polities.filter(isStrategicActor).map((entry) => entry.id));
+  const selected = polityIds.filter((polityId) => eligible.has(polityId)).slice(0, MAX_POLITIES_PER_MONTH);
   const batches: AgentBatch[] = [];
   for (let index = 0; index < selected.length; index += MAX_POLITIES_PER_BATCH) {
     const ids = selected.slice(index, index + MAX_POLITIES_PER_BATCH);

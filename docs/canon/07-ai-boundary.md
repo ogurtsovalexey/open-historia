@@ -60,6 +60,10 @@ later option, not a substitute for a complete pack.
 - Token hygiene (Track A): UI locales narrowed to EN+RU static packs; prompts
   must not carry the map or unbounded context (`docs/principles.md` §3);
   context size is a QA check.
+- A polity authored with engine `decisionMode: inert` remains a legal world
+  entity and target but is excluded by every opponent decision scheduler.
+  Absence of the optional field preserves legacy active behaviour. This is the
+  required boundary for non-player entities such as 1935 Saar and Danzig.
 
 ## Deferred
 

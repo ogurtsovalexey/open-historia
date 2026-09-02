@@ -69,6 +69,7 @@ export const econPolityStateSchema = z
   .object({
     id: polityIdSchema,
     displayName: displayNameSchema,
+    decisionMode: z.enum(['active', 'inert']).optional(),
     treasury: nonNegInt,
     /** National Stockpile, sorted by resource id, one entry per active resource. */
     stockpile: z.array(stockEntrySchema),
@@ -283,6 +284,7 @@ export function initState(scenario: EconScenario): EconWorldState {
       .map((polity) => ({
         id: polity.id,
         displayName: polity.displayName,
+        ...(polity.decisionMode ? { decisionMode: polity.decisionMode } : {}),
         treasury: polity.treasury,
         stockpile: sortedStockpile(polity.stockpile, scenario.activeResources),
       })),
@@ -300,6 +302,10 @@ export function initState(scenario: EconScenario): EconWorldState {
 
 export function getPolity(state: EconWorldState, id: PolityId): EconPolityState | undefined {
   return state.polities.find((polity) => polity.id === id);
+}
+
+export function isStrategicActor(polity: Pick<EconPolityState, 'decisionMode'>): boolean {
+  return polity.decisionMode !== 'inert';
 }
 
 export function getRegion(state: EconWorldState, id: RegionId): EconRegionState | undefined {

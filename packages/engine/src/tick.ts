@@ -77,6 +77,7 @@ export interface TurnResult {
 interface MutablePolity {
   id: PolityId;
   displayName: { en: string; ru: string };
+  decisionMode?: 'active' | 'inert';
   treasury: number;
   stock: Map<ResourceId, number>;
 }
@@ -108,6 +109,7 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
   const polities: MutablePolity[] = state.polities.map((polity) => ({
     id: polity.id,
     displayName: polity.displayName,
+    ...(polity.decisionMode ? { decisionMode: polity.decisionMode } : {}),
     treasury: polity.treasury,
     stock: new Map(polity.stockpile.map((entry) => [entry.resource, entry.amount])),
   }));
@@ -602,6 +604,7 @@ export function resolveMonth(state: EconWorldState, commandsFile: TurnCommandsFi
 
   const resolvedPolities = polities.map((polity) => ({
     id: polity.id, displayName: polity.displayName, treasury: polity.treasury,
+    ...(polity.decisionMode ? { decisionMode: polity.decisionMode } : {}),
     stockpile: [...state.activeResources].sort().map((resource) => ({ resource, amount: polity.stock.get(resource) ?? 0 })),
   }));
   const campaignInput: EconWorldState = {

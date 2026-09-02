@@ -47,6 +47,11 @@ const fallbackGolden = fileURLToPath(new URL('../../test/golden/p3a-fallback-cha
 const initial = () => initState(parseScenario(JSON.parse(readFileSync(fixture, 'utf8'))));
 const diplomacyFixture = fileURLToPath(new URL('../../../engine/fixtures/scenario-dev-map-6c/scenario.json', import.meta.url));
 const diplomacyInitial = () => initState(parseScenario(JSON.parse(readFileSync(diplomacyFixture, 'utf8'))));
+const inertDiplomacyInitial = () => {
+  const raw = JSON.parse(readFileSync(diplomacyFixture, 'utf8'));
+  raw.polities.find((entry: { id: string }) => entry.id === 'polity:austria').decisionMode = 'inert';
+  return initState(parseScenario(raw));
+};
 const benchmarkFixture = fileURLToPath(new URL('../../../data-packs/fixtures/europe-1935-benchmark/engine/scenario.json', import.meta.url));
 const benchmarkInitial = () => initState(parseScenario(JSON.parse(readFileSync(benchmarkFixture, 'utf8'))));
 const canonicalPoliticalInitial = () => {
@@ -166,6 +171,18 @@ test('Strategic V2 batches are bounded and materialize all actors against one re
   assert.deepEqual(materialized, { commands: [], unsupportedResidual: [], rejected: [] });
   const advanced = runTurn(state, { commands: [] }).result.state;
   assert.match(materializeStrategicBatchV2(advanced, { decisions: batch.polityIds.map(holdV2) }, batch).rejected[0]?.reason ?? '', /stale-revision/);
+});
+
+test('inert engine polities remain legal world entities but receive no opponent decision turn', () => {
+  const state = inertDiplomacyInitial();
+  const player = 'polity:germany';
+  assert.equal(state.polities.some((entry) => entry.id === 'polity:austria' && entry.decisionMode === 'inert'), true);
+  assert.equal(selectOpponentPolities(state, player, EMPTY_AGENT_STATE).includes('polity:austria'), false);
+  assert.equal(buildDiplomacyBatches(state, player).flatMap((batch) => batch.polityIds).includes('polity:austria'), false);
+  assert.equal(buildStrategicBatchesV2(state, player).flatMap((batch) => batch.polityIds).includes('polity:austria'), false);
+  assert.equal(buildStrategicBatchesV3(state, player).flatMap((batch) => batch.polityIds).includes('polity:austria'), false);
+  assert.equal(buildOpponentBatches(state, ['polity:austria', 'polity:italy'], (id) => buildPolityBrief(state, id))
+    .flatMap((batch) => batch.polityIds).includes('polity:austria'), false);
 });
 
 test('StrategicBriefV3 publishes only individually executable coupled affordances', () => {

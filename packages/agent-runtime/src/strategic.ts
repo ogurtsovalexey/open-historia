@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   econCommandSchema,
   actualController,
+  isStrategicActor,
   polityIdentityEffects,
   relationKey,
   runTurn,
@@ -413,7 +414,7 @@ export function buildStrategicBatchesV2(state: EconWorldState, playerPolityId: s
   strategicContextByPolity?: Record<string, { threats?: string[]; obligations?: string[]; memory?: string[] }>;
   requestedPolityIds?: string[];
 } = {}): StrategicBatchV2[] {
-  const allowed = new Set<string>(state.polities.filter((entry) => entry.id !== playerPolityId).map((entry) => entry.id));
+  const allowed = new Set<string>(state.polities.filter((entry) => entry.id !== playerPolityId && isStrategicActor(entry)).map((entry) => entry.id));
   const polityIds = (options.requestedPolityIds ?? [...allowed]).filter((entry) => allowed.has(entry)).sort();
   const batches: StrategicBatchV2[] = [];
   for (let index = 0; index < polityIds.length; index += 6) {
@@ -960,7 +961,7 @@ export function buildStrategicBatchesV3(state: EconWorldState, playerPolityId: s
   requestedPolityIds?: string[];
   systemText?: string;
 } = {}): StrategicBatchV3[] {
-  const allowed = new Set<string>(state.polities.filter((entry) => entry.id !== playerPolityId).map((entry) => entry.id));
+  const allowed = new Set<string>(state.polities.filter((entry) => entry.id !== playerPolityId && isStrategicActor(entry)).map((entry) => entry.id));
   const ids = (options.requestedPolityIds ?? [...allowed]).filter((entry) => allowed.has(entry)).sort();
   const batches: StrategicBatchV3[] = [];
   let currentIds: string[] = [];

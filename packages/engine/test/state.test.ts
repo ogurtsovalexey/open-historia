@@ -1,8 +1,11 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { addMonth, initState, parseWorldState } from '../src/state.js';
+import { addMonth, initState, isStrategicActor, parseWorldState } from '../src/state.js';
 import { canonicalState, stateChecksum } from '../src/canonical.js';
-import { loadScenario } from './helpers.js';
+import { loadScenario, loadScenarioRaw } from './helpers.js';
+import { parseScenario } from '../src/scenario.js';
+import { resolveMonth } from '../src/tick.js';
+import { EMPTY_TURN_COMMANDS } from '../src/commands.js';
 
 describe('world state', () => {
   it('initState is deterministic: two builds produce identical canonical text', () => {
@@ -44,5 +47,16 @@ describe('world state', () => {
     assert.strictEqual(addMonth('1900-12-01'), '1901-01-01');
     assert.strictEqual(addMonth('1900-01-31'), '1900-02-28'); // 1900 is not a leap year
     assert.strictEqual(addMonth('2000-01-31'), '2000-02-29'); // 2000 is
+  });
+
+  it('preserves an authored inert decision mode across monthly resolution', () => {
+    const raw = structuredClone(loadScenarioRaw()) as { polities: Array<{ decisionMode?: string }> };
+    raw.polities[0].decisionMode = 'inert';
+    const initial = initState(parseScenario(raw));
+    assert.strictEqual(isStrategicActor(initial.polities[0]), false);
+    const next = resolveMonth(initial, EMPTY_TURN_COMMANDS).state;
+    assert.strictEqual(next.polities[0].decisionMode, 'inert');
+    assert.strictEqual(isStrategicActor(next.polities[0]), false);
+    assert.strictEqual(isStrategicActor(next.polities[1]), true);
   });
 });
