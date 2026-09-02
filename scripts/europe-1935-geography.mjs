@@ -3,10 +3,28 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import area from '@turf/area';
+import simplify from '@turf/simplify';
+import { geoIdentity, geoPath } from 'd3-geo';
+import polygonClipping from 'polygon-clipping';
 
 export const SNAPSHOT_DATE = '1935-01-01';
 export const OHM_ENDPOINT = 'https://overpass-api.openhistoricalmap.org/api/interpreter';
 export const EUROPE_BBOX = '35,-12,72,32';
+export const SUPPORTED_BOUNDARIES = Object.freeze([
+  { polityId: 'polity:austria', relationId: 2858751, candidateAdminLevels: ['4'], overlayAdminLevels: ['4'], candidateBbox: [9.4, 46.2, 17.2, 49.2] },
+  { polityId: 'polity:czechoslovakia', relationId: 2692233, candidateAdminLevels: ['4', '5'], overlayAdminLevels: ['5'], candidateBbox: [12, 47.5, 27, 51.2] },
+  { polityId: 'polity:france', relationId: 2696299, candidateAdminLevels: ['4', '5'], overlayAdminLevels: ['4', '5'], candidateBbox: [-5.5, 41, 10, 51.5] },
+  { polityId: 'polity:germany', relationId: 2696515, candidateAdminLevels: ['4'], overlayAdminLevels: ['4'], candidateBbox: [5.8, 47.2, 23, 55.5] },
+  { polityId: 'polity:italy', relationId: 2851104, candidateAdminLevels: ['4'], overlayAdminLevels: ['4'], candidateBbox: [6.5, 35, 19, 47.2] },
+  { polityId: 'polity:poland', relationId: 2692205, candidateAdminLevels: ['4'], overlayAdminLevels: ['4'], candidateBbox: [13.5, 47.8, 28.5, 56] },
+  { polityId: 'polity:united-kingdom', relationId: 2693292, candidateAdminLevels: ['4', '5'], overlayAdminLevels: ['5'], candidateBbox: [-8.8, 49.5, 2.2, 61] },
+]);
+const POLITY_COLORS = Object.freeze({
+  'polity:austria': '#d94848', 'polity:czechoslovakia': '#4f78c4', 'polity:france': '#4169a8',
+  'polity:germany': '#555555', 'polity:italy': '#4f9960', 'polity:poland': '#d8d8d8',
+  'polity:united-kingdom': '#b44747',
+});
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_OUTPUT = path.join(ROOT, 'runs', 'campaign-lab', 'europe-1935-geography-checkpoint');
 
@@ -54,8 +72,244 @@ export function normalizeInventory(raw) {
     || left.nativeName.localeCompare(right.nativeName) || left.relationId - right.relationId);
 }
 
+const inventoryQuery = () => `[out:json][timeout:120];relation["boundary"="administrative"]["admin_level"~"^(2|3|4|5|6)$"]["start_date"](${EUROPE_BBOX})(if:t["start_date"] <= "${SNAPSHOT_DATE}" && (!is_tag("end_date") || t["end_date"] > "${SNAPSHOT_DATE}"));out tags center;`;
+const relationGeometryQuery = (relationIds) => `[out:json][timeout:180];relation(id:${[...new Set(relationIds)]
+  .sort((left, right) => left - right).join(',')});out body;way(r);out geom;`;
+
+const coordinateKey = ([longitude, latitude]) => `${longitude.toFixed(7)},${latitude.toFixed(7)}`;
+const sameCoordinate = (left, right) => coordinateKey(left) === coordinateKey(right);
+
+export function stitchRings(segments, label = 'relation') {
+  const unused = segments.map((segment) => ({
+    id: segment.id,
+    coordinates: segment.coordinates.map((coordinate) => [...coordinate]),
+  })).sort((left, right) => left.id - right.id);
+  const rings = [];
+  while (unused.length) {
+    const seed = unused.shift();
+    const ring = seed.coordinates;
+    while (!sameCoordinate(ring[0], ring.at(-1))) {
+      const endpoint = ring.at(-1);
+      const matchIndex = unused.findIndex((segment) => sameCoordinate(segment.coordinates[0], endpoint)
+        || sameCoordinate(segment.coordinates.at(-1), endpoint));
+      if (matchIndex < 0) throw new Error(`${label}: open boundary at ${coordinateKey(endpoint)}`);
+      const [match] = unused.splice(matchIndex, 1);
+      const oriented = sameCoordinate(match.coordinates[0], endpoint) ? match.coordinates : match.coordinates.toReversed();
+      ring.push(...oriented.slice(1));
+    }
+    if (ring.length < 4) throw new Error(`${label}: ring has fewer than four coordinates`);
+    rings.push(ring);
+  }
+  return rings;
+}
+
+const pointInRing = ([x, y], ring) => {
+  let inside = false;
+  for (let current = 0, previous = ring.length - 1; current < ring.length; previous = current++) {
+    const [xi, yi] = ring[current];
+    const [xj, yj] = ring[previous];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+};
+
+export function relationToFeature(relation, waysById) {
+  const members = (relation.members ?? []).filter((member) => member.type === 'way'
+    && (member.role === 'outer' || member.role === 'inner'));
+  const missing = members.filter((member) => !waysById.has(member.ref));
+  if (missing.length) throw new Error(`relation ${relation.id}: ${missing.length} member ways lack geometry`);
+  const segmentsFor = (role) => members.filter((member) => member.role === role).map((member) => ({
+    id: member.ref,
+    coordinates: waysById.get(member.ref).geometry.map(({ lon, lat }) => [lon, lat]),
+  }));
+  const outerRings = stitchRings(segmentsFor('outer'), `relation ${relation.id} outer`);
+  if (!outerRings.length) throw new Error(`relation ${relation.id}: no outer rings`);
+  const polygons = outerRings.map((ring) => [ring]);
+  for (const inner of stitchRings(segmentsFor('inner'), `relation ${relation.id} inner`)) {
+    const outerIndex = outerRings.findIndex((outer) => pointInRing(inner[0], outer));
+    if (outerIndex < 0) throw new Error(`relation ${relation.id}: inner ring has no containing outer ring`);
+    polygons[outerIndex].push(inner);
+  }
+  return {
+    type: 'Feature',
+    geometry: polygons.length === 1
+      ? { type: 'Polygon', coordinates: polygons[0] }
+      : { type: 'MultiPolygon', coordinates: polygons },
+    properties: {
+      relationId: relation.id,
+      nativeName: relation.tags?.['name:local'] || relation.tags?.name || '',
+      startDate: relation.tags?.start_date || null,
+      endDate: relation.tags?.end_date || null,
+      license: classifyLicense(relation.tags),
+    },
+  };
+}
+
+export function normalizeRelationGeometry(raw, expectedRelationIds) {
+  const relations = new Map(raw.elements.filter((element) => element.type === 'relation')
+    .map((relation) => [relation.id, relation]));
+  const ways = new Map(raw.elements.filter((element) => element.type === 'way')
+    .map((way) => [way.id, way]));
+  const { features, issues } = auditRelationGeometry(expectedRelationIds, relations, ways);
+  if (issues.length) throw new Error(issues[0].error);
+  return features;
+}
+
+export function filterFeaturePolygonsToBbox(feature, bbox) {
+  const [west, south, east, north] = bbox;
+  const polygons = feature.geometry.type === 'Polygon' ? [feature.geometry.coordinates] : feature.geometry.coordinates;
+  const retained = polygons.filter(([outer]) => {
+    const bounds = outer.reduce((result, [longitude, latitude]) => ({
+      west: Math.min(result.west, longitude), south: Math.min(result.south, latitude),
+      east: Math.max(result.east, longitude), north: Math.max(result.north, latitude),
+    }), { west: Infinity, south: Infinity, east: -Infinity, north: -Infinity });
+    return bounds.east >= west && bounds.west <= east && bounds.north >= south && bounds.south <= north;
+  });
+  if (!retained.length) throw new Error(`relation ${feature.properties.relationId}: no polygons in scenario scope`);
+  return {
+    ...feature,
+    geometry: retained.length === 1
+      ? { type: 'Polygon', coordinates: retained[0] }
+      : { type: 'MultiPolygon', coordinates: retained },
+    properties: { ...feature.properties, scenarioScopeBbox: bbox, excludedOuterRings: polygons.length - retained.length },
+  };
+}
+
+export function auditRelationGeometry(expectedRelationIds, relationsOrRaw, waysOverride) {
+  const relations = relationsOrRaw instanceof Map ? relationsOrRaw : new Map(relationsOrRaw.elements
+    .filter((element) => element.type === 'relation').map((relation) => [relation.id, relation]));
+  const ways = waysOverride ?? new Map(relationsOrRaw.elements.filter((element) => element.type === 'way')
+    .map((way) => [way.id, way]));
+  const features = [];
+  const issues = [];
+  for (const relationId of expectedRelationIds) {
+    try {
+      const relation = relations.get(relationId);
+      if (!relation) throw new Error(`OHM response lacks relation ${relationId}`);
+      if (!isEffectiveAt(relation.tags)) throw new Error(`relation ${relationId} is not effective at ${SNAPSHOT_DATE}`);
+      const license = classifyLicense(relation.tags);
+      if (!license.allowed) throw new Error(`relation ${relationId} has blocked license ${license.value}`);
+      features.push(relationToFeature(relation, ways));
+    } catch (error) {
+      issues.push({ relationId, error: error instanceof Error ? error.message : String(error) });
+    }
+  }
+  return { features, issues };
+}
+
+export async function fetchRelationGeometry(relationIds, fetchImpl = fetch) {
+  const query = relationGeometryQuery(relationIds);
+  const response = await fetchImpl(OHM_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ data: query }), signal: AbortSignal.timeout(210_000) });
+  if (!response.ok) throw new Error(`OHM geometry failed: ${response.status} ${await response.text()}`);
+  const bytes = Buffer.from(await response.arrayBuffer());
+  return { query, bytes, raw: JSON.parse(bytes.toString('utf8')) };
+}
+
+const asMultiPolygonCoordinates = (geometry) => geometry.type === 'Polygon'
+  ? [geometry.coordinates]
+  : geometry.coordinates;
+
+export function overlapRatio(candidateGeometry, boundaryGeometry) {
+  const candidateFeature = { type: 'Feature', properties: {}, geometry: candidateGeometry };
+  const candidateArea = area(candidateFeature);
+  if (!Number.isFinite(candidateArea) || candidateArea <= 0) throw new Error('Candidate geometry has no positive area');
+  const clipped = polygonClipping.intersection(
+    asMultiPolygonCoordinates(candidateGeometry),
+    asMultiPolygonCoordinates(boundaryGeometry),
+  );
+  if (!clipped.length) return 0;
+  const intersectionArea = area({
+    type: 'Feature', properties: {}, geometry: { type: 'MultiPolygon', coordinates: clipped },
+  });
+  return Math.max(0, Math.min(1, intersectionArea / candidateArea));
+}
+
+const pointInBbox = ([longitude, latitude], [west, south, east, north]) => longitude >= west
+  && longitude <= east && latitude >= south && latitude <= north;
+
+export function buildCoverageMatrix(inventory, boundaryFeatures) {
+  const boundariesByRelation = new Map(boundaryFeatures.map((feature) => [feature.properties.relationId, feature]));
+  return SUPPORTED_BOUNDARIES.map((definition) => {
+    const boundary = boundariesByRelation.get(definition.relationId);
+    if (!boundary) throw new Error(`Missing boundary feature ${definition.relationId}`);
+    const candidates = inventory.filter((entry) => entry.effective && entry.license.allowed && entry.center
+      && entry.relationId !== definition.relationId
+      && definition.candidateAdminLevels.includes(entry.adminLevel)
+      && pointInBbox(entry.center, definition.candidateBbox));
+    return {
+      polityId: definition.polityId,
+      boundaryRelationId: definition.relationId,
+      candidateAdminLevels: definition.candidateAdminLevels,
+      candidateCount: candidates.length,
+      status: 'geometry-membership-pending',
+      candidates: candidates.map(({ relationId, nativeName, adminLevel, startDate, endDate, license, source, center }) => ({
+        relationId, nativeName, adminLevel, startDate, endDate, license, source, center,
+      })),
+    };
+  });
+}
+
+export function refineCoverageMatrix(coverage, boundaryFeatures, candidateFeatures, geometryIssues = []) {
+  const boundariesByRelation = new Map(boundaryFeatures.map((feature) => [feature.properties.relationId, feature]));
+  const candidatesByRelation = new Map(candidateFeatures.map((feature) => [feature.properties.relationId, feature]));
+  const issuesByRelation = new Map(geometryIssues.map((issue) => [issue.relationId, issue]));
+  return coverage.map((entry) => {
+    const boundary = boundariesByRelation.get(entry.boundaryRelationId);
+    const accepted = [];
+    const conflicts = [];
+    const excluded = [];
+    const invalid = [];
+    for (const candidate of entry.candidates) {
+      const feature = candidatesByRelation.get(candidate.relationId);
+      if (!feature) {
+        invalid.push({ ...candidate, error: issuesByRelation.get(candidate.relationId)?.error ?? 'candidate geometry missing' });
+        continue;
+      }
+      const ratio = overlapRatio(feature.geometry, boundary.geometry);
+      const result = { ...candidate, overlapRatio: Number(ratio.toFixed(6)) };
+      if (ratio >= 0.98) accepted.push(result);
+      else if (ratio > 0.02) conflicts.push(result);
+      else excluded.push(result);
+    }
+    const count = accepted.length;
+    return {
+      ...entry,
+      candidateCount: count,
+      status: count < 10 ? 'source-gap' : count > 25 ? 'candidate-aggregation-required' : 'candidate-selection-ready',
+      candidates: accepted,
+      boundaryConflicts: conflicts,
+      bboxExclusions: excluded,
+      geometryExclusions: invalid,
+    };
+  });
+}
+
+const xmlEscape = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+
+export function buildCandidateOverlay(boundaryFeatures, candidateFeatures, coverage) {
+  const definitionByPolity = new Map(SUPPORTED_BOUNDARIES.map((definition) => [definition.polityId, definition]));
+  const ownerByRelation = new Map(coverage.flatMap((entry) => entry.candidates
+    .filter((candidate) => definitionByPolity.get(entry.polityId).overlayAdminLevels.includes(candidate.adminLevel))
+    .map((candidate) => [candidate.relationId, entry.polityId])));
+  const visibleRegions = candidateFeatures.filter((feature) => ownerByRelation.has(feature.properties.relationId))
+    .map((feature) => simplify({ ...feature, properties: {
+      ...feature.properties, polityId: ownerByRelation.get(feature.properties.relationId),
+    } }, { tolerance: 0.02, highQuality: false, mutate: false }));
+  const visibleBoundaries = boundaryFeatures.map((feature) => simplify(feature,
+    { tolerance: 0.02, highQuality: false, mutate: false }));
+  const collection = { type: 'FeatureCollection', features: visibleBoundaries };
+  const projection = geoIdentity().reflectY(true).fitExtent([[24, 70], [1176, 790]], collection);
+  const renderPath = geoPath(projection);
+  const regionPaths = visibleRegions.map((feature) => `<path d="${renderPath(feature)}" fill="${POLITY_COLORS[feature.properties.polityId]}" fill-opacity="0.34" stroke="#20242a" stroke-width="0.45"><title>${xmlEscape(`${feature.properties.polityId}: ${feature.properties.nativeName}`)}</title></path>`).join('');
+  const boundaryPaths = visibleBoundaries.map((feature) => `<path d="${renderPath(feature)}" fill="none" stroke="#090b0e" stroke-width="1.4"/>`).join('');
+  const legend = coverage.map((entry, index) => `<g transform="translate(${24 + (index % 4) * 290} ${826 + Math.floor(index / 4) * 28})"><rect width="14" height="14" fill="${POLITY_COLORS[entry.polityId]}"/><text x="21" y="12">${xmlEscape(`${entry.polityId.replace('polity:', '')}: ${entry.candidateCount} · ${entry.status.replace('candidate-', '')}`)}</text></g>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc"><title id="title">Europe 1935 candidate source overlay</title><desc id="desc">Diagnostic source coverage. Not an owner approval overlay.</desc><rect width="1200" height="900" fill="#f5f0e6"/><text x="24" y="30" font-family="system-ui" font-size="22" font-weight="700">Europe 1935 — candidate source coverage</text><text x="24" y="53" font-family="system-ui" font-size="13">Diagnostic only · overlaps/gaps unresolved · NOT FOR OWNER APPROVAL</text><g>${regionPaths}${boundaryPaths}</g><g font-family="system-ui" font-size="11">${legend}</g></svg>\n`;
+}
+
 export async function fetchInventory(fetchImpl = fetch) {
-  const query = `[out:json][timeout:120];relation["boundary"="administrative"]["admin_level"~"^(2|3|4|5|6)$"]["start_date"](${EUROPE_BBOX})(if:t["start_date"] <= "${SNAPSHOT_DATE}" && (!is_tag("end_date") || t["end_date"] > "${SNAPSHOT_DATE}"));out tags center;`;
+  const query = inventoryQuery();
   const response = await fetchImpl(OHM_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ data: query }), signal: AbortSignal.timeout(150_000) });
   if (!response.ok) throw new Error(`OHM inventory failed: ${response.status} ${await response.text()}`);
@@ -90,10 +344,80 @@ export async function runInventory(outputDirectory = DEFAULT_OUTPUT) {
   return checkpoint;
 }
 
+const readCachedResult = (outputDirectory, filename, query) => {
+  const bytes = fs.readFileSync(path.join(outputDirectory, filename));
+  return { query, bytes, raw: JSON.parse(bytes.toString('utf8')) };
+};
+
+export async function runBoundaryCoverage(outputDirectory = DEFAULT_OUTPUT, options = {}) {
+  const inventoryResult = options.cached
+    ? readCachedResult(outputDirectory, 'ohm-inventory.raw.json', inventoryQuery())
+    : await fetchInventory();
+  const inventoryCheckpoint = buildCheckpoint(inventoryResult.raw, inventoryResult.query, sha256(inventoryResult.bytes));
+  const relationIds = SUPPORTED_BOUNDARIES.map(({ relationId }) => relationId);
+  const boundaryResult = options.cached
+    ? readCachedResult(outputDirectory, 'ohm-boundaries.raw.json', relationGeometryQuery(relationIds))
+    : await fetchRelationGeometry(relationIds);
+  const boundaryFeatures = normalizeRelationGeometry(boundaryResult.raw, relationIds).map((feature) => {
+    const definition = SUPPORTED_BOUNDARIES.find(({ relationId }) => relationId === feature.properties.relationId);
+    return filterFeaturePolygonsToBbox(feature, definition.candidateBbox);
+  });
+  const preliminaryCoverage = buildCoverageMatrix(inventoryCheckpoint.inventory, boundaryFeatures);
+  const candidateIds = preliminaryCoverage.flatMap(({ candidates }) => candidates.map(({ relationId }) => relationId));
+  const candidateResult = options.cached
+    ? readCachedResult(outputDirectory, 'ohm-candidates.raw.json', relationGeometryQuery(candidateIds))
+    : await fetchRelationGeometry(candidateIds);
+  const candidateAudit = auditRelationGeometry([...new Set(candidateIds)].sort((left, right) => left - right), candidateResult.raw);
+  const candidateFeatures = candidateAudit.features;
+  const coverage = refineCoverageMatrix(preliminaryCoverage, boundaryFeatures, candidateFeatures, candidateAudit.issues);
+  const checkpoint = {
+    schemaVersion: 'open-historia-geography-coverage/1',
+    scenarioId: 'scenario:europe-1935-benchmark',
+    snapshotDate: SNAPSHOT_DATE,
+    sources: [
+      { kind: 'inventory', query: inventoryResult.query, checksum: sha256(inventoryResult.bytes) },
+      { kind: 'boundary-geometry', query: boundaryResult.query, checksum: sha256(boundaryResult.bytes) },
+      { kind: 'candidate-geometry', query: candidateResult.query, checksum: sha256(candidateResult.bytes) },
+    ],
+    gate: {
+      status: coverage.every((entry) => entry.status !== 'source-gap') ? 'candidate-coverage-ready' : 'blocked-by-source-gaps',
+      note: 'Candidate centroids are diagnostic only; selected region polygons, topology and owner approval remain required.',
+    },
+    coverage,
+  };
+  fs.mkdirSync(outputDirectory, { recursive: true });
+  fs.writeFileSync(path.join(outputDirectory, 'ohm-inventory.raw.json'), inventoryResult.bytes);
+  fs.writeFileSync(path.join(outputDirectory, 'ohm-boundaries.raw.json'), boundaryResult.bytes);
+  fs.writeFileSync(path.join(outputDirectory, 'ohm-candidates.raw.json'), candidateResult.bytes);
+  fs.writeFileSync(path.join(outputDirectory, 'country-boundaries.geojson'), `${JSON.stringify({
+    type: 'FeatureCollection', features: boundaryFeatures,
+  })}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'coverage-matrix.json'), `${JSON.stringify(checkpoint, null, 2)}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'candidate-regions.geojson'), `${JSON.stringify({
+    type: 'FeatureCollection', features: candidateFeatures.filter((feature) => coverage.some((entry) => entry.candidates
+      .some((candidate) => candidate.relationId === feature.properties.relationId))),
+  })}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'candidate-source-overlay.svg'), buildCandidateOverlay(
+    boundaryFeatures, candidateFeatures, coverage,
+  ));
+  fs.writeFileSync(path.join(outputDirectory, 'coverage-manifest.json'), `${JSON.stringify({
+    schemaVersion: checkpoint.schemaVersion,
+    scenarioId: checkpoint.scenarioId,
+    snapshotDate: checkpoint.snapshotDate,
+    status: checkpoint.gate.status,
+    checkpointChecksum: sha256(canonical(checkpoint)),
+    sourceChecksums: checkpoint.sources.map(({ checksum }) => checksum),
+  }, null, 2)}\n`);
+  return checkpoint;
+}
+
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   const outputFlag = process.argv.indexOf('--output');
   const output = outputFlag >= 0 && process.argv[outputFlag + 1] ? path.resolve(process.argv[outputFlag + 1]) : DEFAULT_OUTPUT;
-  runInventory(output).then((checkpoint) => process.stdout.write(`${JSON.stringify({ output,
-    counts: checkpoint.counts, blockedRelations: checkpoint.blockedRelations.length }, null, 2)}\n`))
+  const operation = process.argv.includes('--boundaries') ? runBoundaryCoverage : runInventory;
+  operation(output, { cached: process.argv.includes('--cached') }).then((checkpoint) => process.stdout.write(`${JSON.stringify(checkpoint.counts
+    ? { output, counts: checkpoint.counts, blockedRelations: checkpoint.blockedRelations.length }
+    : { output, status: checkpoint.gate.status, coverage: Object.fromEntries(checkpoint.coverage
+      .map(({ polityId, candidateCount }) => [polityId, candidateCount])) }, null, 2)}\n`))
     .catch((error) => { process.stderr.write(`${error instanceof Error ? error.stack : String(error)}\n`); process.exitCode = 1; });
 }
