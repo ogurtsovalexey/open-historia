@@ -34,7 +34,9 @@ pass, no new benchmark model call is allowed.
 The geography gate checks dates/licenses, topology, ownership, adjacency and
 the approved overlay. The starting-state gate checks national totals,
 first-month reproduction, cross-module consistency and provenance for every
-value.
+value. Historical-module provenance is row-level and binds a source-derived or
+explicit authored-estimate claim to one engine JSON Pointer and the checksum of
+its complete value; stale, duplicate and unknown-path claims fail closed.
 
 ## Scope
 

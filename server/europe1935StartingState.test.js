@@ -2,9 +2,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
+import { startingStateValueChecksum } from '@open-historia/engine';
 import { fileURLToPath } from 'node:url';
 import {
   AUTHORED_COMMITMENT_EXPECTATIONS,
+  STARTING_STATE_PROVENANCE_COLLECTIONS,
+  auditStartingStateProvenance,
   buildFirstMonthBaseline,
   buildStartingStateAudit,
   calculateCheckpoint,
@@ -52,6 +55,12 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   assert.equal(audit.issues.filter((entry) => entry.code === 'goal-conflicts-with-existing-commitment').length, 2);
   assert.equal(audit.issues.filter((entry) => entry.code === 'executable-agreement-missing').length,
     AUTHORED_COMMITMENT_EXPECTATIONS.length);
+  assert(STARTING_STATE_PROVENANCE_COLLECTIONS.includes('/politics/characters'));
+  assert.equal(audit.provenance.totalRows > 0, true);
+  assert.equal(audit.provenance.coveredRows, 0);
+  assert.equal(audit.issues.filter((entry) => entry.code === 'starting-state-provenance-missing').length,
+    audit.provenance.totalRows);
+  assert.match(renderOwnerTable(audit), /Starting-state provenance: \*\*0\//);
   assert.match(renderOwnerTable(audit), /production-derived diagnostic table/);
 
   const incompletePolitics = structuredClone(fixture);
@@ -75,4 +84,15 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   }));
   const agreementAudit = buildStartingStateAudit({ ...withAgreements, firstMonth: audit.firstMonth });
   assert.equal(agreementAudit.issues.some((entry) => entry.code === 'executable-agreement-missing'), false);
+
+  const oneValue = fixture.engineScenario.campaign.goals[0];
+  const oneClaim = structuredClone(fixture.authoring);
+  oneClaim.startingStateProvenance = [{
+    claimId: 'starting-state-claim:test-goal',
+    scenarioPath: '/campaign/goals/0',
+    valueChecksum: startingStateValueChecksum(oneValue),
+    basis: 'authored-estimate', sourceRefs: [], method: 'test', confidence: 'low', todo: 'replace',
+  }];
+  const provenance = auditStartingStateProvenance(fixture.engineScenario, oneClaim);
+  assert.equal(provenance.coveredRows, 1);
 });

@@ -7,6 +7,7 @@ import {
   compileHistoricalProjection,
   initState,
   resolveMonth,
+  startingStateValueChecksum,
 } from '@open-historia/engine';
 
 export const SCENARIO_ID = 'scenario:europe-1935-benchmark';
@@ -31,6 +32,36 @@ export const REQUIRED_MODULES = Object.freeze([
   'technology',
   'trade',
   'unrest',
+]);
+
+/** Historical rows whose complete authored object must have exact-value
+ * provenance before the owner checkpoint can be reviewed. Economy and region
+ * totals use the stronger dedicated national/regional control contract. */
+export const STARTING_STATE_PROVENANCE_COLLECTIONS = Object.freeze([
+  '/diplomacy/relations',
+  '/diplomacy/tradeRoutes',
+  '/diplomacy/startingAgreements',
+  '/military/polities',
+  '/military/commanders',
+  '/military/formations',
+  '/military/supplyLinks',
+  '/campaign/goals',
+  '/campaign/crisisTemplates',
+  '/campaign/legacyBaselines',
+  '/statecraft/finance',
+  '/statecraft/capacities',
+  '/statecraft/projectTemplates',
+  '/statecraft/intelligenceFacts',
+  '/statecraft/knowledgeSeeds',
+  '/politics/polities',
+  '/politics/factions',
+  '/politics/characters',
+  '/capabilities/catalog',
+  '/capabilities/starting',
+  '/identity/cultures',
+  '/identity/religions',
+  '/identity/regions',
+  '/identity/polities',
 ]);
 
 /**
@@ -133,6 +164,41 @@ function controlsForPolity(polityId, engineScenario, authoring) {
 
 const issue = (code, severity, path, detail) => ({ code, severity, path, detail });
 
+function valueAtPath(root, pointer) {
+  let value = root;
+  for (const segment of pointer.slice(1).split('/')) {
+    if (value === null || typeof value !== 'object' || !Object.hasOwn(value, segment)) return undefined;
+    value = value[segment];
+  }
+  return value;
+}
+
+export function auditStartingStateProvenance(engineScenario, authoring) {
+  const claims = new Map((authoring.startingStateProvenance ?? []).map((entry) => [entry.scenarioPath, entry]));
+  const rows = STARTING_STATE_PROVENANCE_COLLECTIONS.flatMap((collectionPath) => {
+    const collection = valueAtPath(engineScenario, collectionPath);
+    if (!Array.isArray(collection)) return [];
+    return collection.map((value, index) => {
+      const scenarioPath = `${collectionPath}/${index}`;
+      const expectedChecksum = startingStateValueChecksum(value);
+      const claim = claims.get(scenarioPath);
+      return {
+        scenarioPath,
+        expectedChecksum,
+        claimId: claim?.claimId ?? null,
+        status: !claim ? 'missing' : claim.valueChecksum === expectedChecksum ? 'covered' : 'checksum-mismatch',
+      };
+    });
+  });
+  return {
+    totalRows: rows.length,
+    coveredRows: rows.filter((entry) => entry.status === 'covered').length,
+    missingRows: rows.filter((entry) => entry.status === 'missing').length,
+    checksumMismatches: rows.filter((entry) => entry.status === 'checksum-mismatch').length,
+    rows,
+  };
+}
+
 export function buildStartingStateAudit({ manifest, scenario, authoring, engineScenario, firstMonth }) {
   const issues = [];
   const polityLevels = scenario.fidelity?.polityLevels ?? {};
@@ -144,6 +210,7 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
   const formations = engineScenario.military?.formations ?? [];
   const commanders = engineScenario.military?.commanders ?? [];
   const politicalPolities = byId(engineScenario.politics?.polities ?? [], (entry) => entry.polityId);
+  const provenance = auditStartingStateProvenance(engineScenario, authoring);
 
   if (manifest.id !== SCENARIO_ID || engineScenario.scenarioId !== SCENARIO_ID || authoring.scenarioId !== SCENARIO_ID) {
     issues.push(issue('scenario-id-drift', 'blocking', '/', `expected every projection to use ${SCENARIO_ID}`));
@@ -251,6 +318,13 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
   if (!engineScenario.politics) issues.push(issue('politics-missing', 'blocking', '/engine/politics', 'governments, leaders and factions need authored seeds'));
   if (!engineScenario.capabilities) issues.push(issue('capabilities-missing', 'blocking', '/engine/capabilities', 'technology catalog and starting capabilities need authored seeds'));
   if (!engineScenario.identity) issues.push(issue('identity-missing', 'blocking', '/engine/identity', 'society and identity inputs need authored seeds'));
+  for (const row of provenance.rows) {
+    if (row.status === 'missing') {
+      issues.push(issue('starting-state-provenance-missing', 'blocking', `/engine${row.scenarioPath}`, 'exact authored row has no source-derived or authored-estimate provenance claim'));
+    } else if (row.status === 'checksum-mismatch') {
+      issues.push(issue('starting-state-provenance-checksum-mismatch', 'blocking', `/engine${row.scenarioPath}`, 'provenance claim does not bind the current authored value'));
+    }
+  }
 
   const sortedIssues = issues.toSorted((left, right) => left.path.localeCompare(right.path) || left.code.localeCompare(right.code));
   const body = {
@@ -271,6 +345,7 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
     modules: Object.fromEntries(REQUIRED_MODULES.map((moduleName) => [moduleName, engineScenario.modules?.[moduleName] === true])),
     inertPolities: REQUIRED_INERT_POLITIES.map((entry) => ({ ...entry, present: enginePolityIds.has(entry.polityId) })),
     commitments: AUTHORED_COMMITMENT_EXPECTATIONS,
+    provenance,
     firstMonth,
     polities: polityRows,
     issues: sortedIssues,
@@ -291,6 +366,8 @@ export function renderOwnerTable(audit) {
     ...audit.polities.map((row) => `| ${row.polityId} | ${row.fidelity} | ${row.regionCount} | ${row.controls.matches ? 'exact' : 'MISMATCH'} | ${row.goals.length} | ${row.agreements} | ${row.formations} | ${row.commanders} | ${row.government ? 'yes' : 'no'} | ${row.factions} | ${row.finance ? 'yes' : 'no'} |`),
     '',
     `First-month baseline: **${audit.firstMonth.matches ? 'exact' : 'MISMATCH'}** (\`${audit.firstMonth.actualChecksum}\`).`,
+    '',
+    `Starting-state provenance: **${audit.provenance.coveredRows}/${audit.provenance.totalRows}** exact rows covered; ${audit.provenance.missingRows} missing; ${audit.provenance.checksumMismatches} checksum mismatches.`,
     '',
     '## Blocking issues',
     '',

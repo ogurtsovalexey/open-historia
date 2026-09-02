@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "open-historia-historical-authoring/1",
+  "schemaVersion": "open-historia-historical-authoring/2",
   "scenarioId": "scenario:europe-1935-benchmark",
   "horizonDate": "1940-07-01",
   "nationalControls": [
@@ -24,6 +24,7 @@
     {"regionId":"region:benchmark-1:SU","population":168000000,"baseMonthlyCapacity":180000,"infrastructureBp":3000,"sourceRefs":["source:europe-1935-benchmark:league-yearbook"],"method":"Strategic macro-region allocation (100%).","confidence":"low","todo":"Create western/central/eastern macro-regions."},
     {"regionId":"region:benchmark-1:US","population":127000000,"baseMonthlyCapacity":220000,"infrastructureBp":7200,"sourceRefs":["source:europe-1935-benchmark:us-census-1930"],"method":"Strategic macro-region allocation (100%).","confidence":"low","todo":"Create eastern/central/western macro-regions."}
   ],
+  "startingStateProvenance": [],
   "causalAnchors": [
     {"anchorId":"anchor:germany-revision","polityId":"polity:germany","interest":"Revise Versailles constraints and secure continental predominance.","threats":["French containment","Soviet power"],"obligations":[],"redLines":["Encirclement"],"applicability":["German government remains revisionist","military balance permits pressure"],"invalidators":["Germany is defeated or changes government","durable security settlement accepted"],"sourceRefs":["source:europe-1935-benchmark:league-yearbook"]},
     {"anchorId":"anchor:austria-independence","polityId":"polity:austria","interest":"Preserve sovereignty while managing German pressure.","threats":["German annexation pressure"],"obligations":["Regional status quo"],"redLines":["Loss of sovereign government"],"applicability":["Austria remains independent"],"invalidators":["Austria voluntarily unifies","Austria is occupied"],"sourceRefs":["source:europe-1935-benchmark:league-yearbook"]},

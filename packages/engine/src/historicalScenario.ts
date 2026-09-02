@@ -36,12 +36,30 @@ const regionalControlSchema = z.object({
   ...estimateFields,
 }).strict();
 
+const startingStateProvenanceSchema = z.object({
+  claimId: z.string().regex(/^starting-state-claim:[a-z0-9][a-z0-9._-]*$/),
+  scenarioPath: z.string().regex(/^\/(?:diplomacy|military|campaign|statecraft|politics|capabilities|identity)(?:\/[^/~]*(?:~[01][^/~]*)*)*$/),
+  valueChecksum: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  basis: z.enum(['source-derived', 'authored-estimate']),
+  sourceRefs: z.array(sourceIdSchema),
+  method: z.string().min(1),
+  confidence: z.enum(['high', 'medium', 'low']),
+  todo: z.string().min(1),
+}).strict().superRefine((claim, ctx) => {
+  if (claim.basis === 'source-derived' && claim.sourceRefs.length === 0) {
+    ctx.addIssue({ code: 'custom', path: ['sourceRefs'], message: 'source-derived starting-state claim requires a source' });
+  }
+});
+
 export const historicalAuthoringSchema = z.object({
-  schemaVersion: z.literal('open-historia-historical-authoring/1'),
+  schemaVersion: z.literal('open-historia-historical-authoring/2'),
   scenarioId: scenarioIdSchema,
   horizonDate: z.string().regex(/^\d{4}-\d{2}-01$/),
   nationalControls: z.array(nationalControlSchema).min(2),
   regionalControls: z.array(regionalControlSchema).min(1),
+  /** Row-level provenance for historical engine modules. Numeric economy and
+   * region controls remain covered by the dedicated controls above. */
+  startingStateProvenance: z.array(startingStateProvenanceSchema),
   causalAnchors: z.array(z.object({
     anchorId: z.string().regex(/^anchor:[a-z0-9][a-z0-9._-]*$/),
     polityId: polityIdSchema,
@@ -71,6 +89,22 @@ export interface HistoricalProjection {
   checksum: string;
 }
 
+export function startingStateValueChecksum(value: unknown): string {
+  return sha256OfString(canonicalStringify(value));
+}
+
+function resolveScenarioPath(root: unknown, pointer: string): unknown {
+  let current = root;
+  for (const encoded of pointer.slice(1).split('/')) {
+    const segment = encoded.replaceAll('~1', '/').replaceAll('~0', '~');
+    if (current === null || typeof current !== 'object' || !Object.prototype.hasOwnProperty.call(current, segment)) {
+      throw new Error(`starting-state provenance path does not exist: ${pointer}`);
+    }
+    current = (current as Record<string, unknown>)[segment];
+  }
+  return current;
+}
+
 /** Validates a checked-in projection; it never invents or rounds authored values. */
 export function compileHistoricalProjection(input: HistoricalProjectionInput): HistoricalProjection {
   const validated = new ScenarioV2Validator().validateBundle(input.bundle);
@@ -87,6 +121,17 @@ export function compileHistoricalProjection(input: HistoricalProjectionInput): H
   };
   for (const entry of [...authoring.nationalControls, ...authoring.regionalControls]) assertSources(entry.sourceRefs, 'estimate');
   for (const anchor of authoring.causalAnchors) assertSources(anchor.sourceRefs, anchor.anchorId);
+  const claimIds = new Set<string>();
+  const claimPaths = new Set<string>();
+  for (const claim of authoring.startingStateProvenance) {
+    assertSources(claim.sourceRefs, claim.claimId);
+    if (claimIds.has(claim.claimId)) throw new Error(`duplicate starting-state provenance claim: ${claim.claimId}`);
+    if (claimPaths.has(claim.scenarioPath)) throw new Error(`duplicate starting-state provenance path: ${claim.scenarioPath}`);
+    claimIds.add(claim.claimId);
+    claimPaths.add(claim.scenarioPath);
+    const actualChecksum = startingStateValueChecksum(resolveScenarioPath(scenario, claim.scenarioPath));
+    if (actualChecksum !== claim.valueChecksum) throw new Error(`starting-state provenance checksum mismatch for ${claim.scenarioPath}`);
+  }
 
   const v2Polities = new Set(Object.keys(input.bundle.scenario.polities));
   const enginePolities = new Set(scenario.polities.map((entry) => entry.id));

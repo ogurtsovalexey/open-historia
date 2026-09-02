@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import test from 'node:test';
-import { compileHistoricalProjection, initState } from '../src/index.js';
+import { compileHistoricalProjection, initState, startingStateValueChecksum } from '../src/index.js';
 
 const root = join(import.meta.dirname, '../../../data-packs/fixtures/europe-1935-benchmark');
 const json = (relative: string) => JSON.parse(readFileSync(join(root, relative), 'utf8'));
@@ -30,4 +30,35 @@ test('historical compiler rejects ownership, national-total and unknown-ID drift
   assert.throws(() => compileHistoricalProjection(total), /national totals mismatch/);
   const unknown = input(); unknown.authoring.regionalControls[0].regionId = 'region:benchmark-1:UNKNOWN';
   assert.throws(() => compileHistoricalProjection(unknown), /region ids do not match/);
+});
+
+test('historical compiler binds starting-state provenance to an exact engine value', () => {
+  const sourced = input();
+  const goal = sourced.engineScenario.campaign.goals[0];
+  sourced.authoring.startingStateProvenance = [{
+    claimId: 'starting-state-claim:germany-primary-goal',
+    scenarioPath: '/campaign/goals/0',
+    valueChecksum: startingStateValueChecksum(goal),
+    basis: 'source-derived',
+    sourceRefs: ['source:europe-1935-benchmark:league-yearbook'],
+    method: 'Fixture claim used to prove exact-value binding.',
+    confidence: 'low',
+    todo: 'Replace the benchmark source with a table-level political source.',
+  }];
+  assert.doesNotThrow(() => compileHistoricalProjection(sourced));
+
+  const drifted = structuredClone(sourced);
+  drifted.engineScenario.campaign.goals[0].initiallyActive = false;
+  assert.throws(() => compileHistoricalProjection(drifted), /provenance checksum mismatch/);
+
+  const duplicate = structuredClone(sourced);
+  duplicate.authoring.startingStateProvenance.push({
+    ...duplicate.authoring.startingStateProvenance[0],
+    claimId: 'starting-state-claim:duplicate-path',
+  });
+  assert.throws(() => compileHistoricalProjection(duplicate), /duplicate starting-state provenance path/);
+
+  const missingSource = structuredClone(sourced);
+  missingSource.authoring.startingStateProvenance[0].sourceRefs = [];
+  assert.throws(() => compileHistoricalProjection(missingSource), /source-derived starting-state claim requires a source/);
 });
