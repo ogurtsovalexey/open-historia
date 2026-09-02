@@ -35,11 +35,33 @@ lower-level polygons still need deterministic aggregation.
 | --- | ---: | --- |
 | Austria | 8 | Eight Länder are sound; a dated Wien polygon is missing. |
 | Czechoslovakia | 99+ | Czech districts are dense, but Slovak coverage is absent and aggregation is required. |
-| France | 18 | TRF-GIS military regions are exact for 1935, CC BY 4.0 and include Corse; 90 dated departments provide a topology control. |
+| France | 18 | TRF-GIS military regions are exact for 1935, CC BY 4.0, include Corse and cover the 90-department control union without measured gaps or overlaps. |
 | Germany | 27 | Aggregation to at most 25 is required; Hannover has an open inner ring and is excluded. |
 | Italy | 14 | Emilia, Liguria and Lombardia have open rings; Sicilia is absent from the dated inventory. |
 | Poland | 16 | The voivodeship layer is near-complete and directly usable after topology review. |
 | United Kingdom | 62 | Coverage is uneven, 13 candidate relations have open rings, and aggregation is required. |
+
+## Measured source topology
+
+The extractor now unions each selected source layer and measures it against the
+dated country boundary. It reports coverage, outside area and overlap excess;
+it never closes a ring or fills a gap. The threshold for a clean source layer
+is one part per million on every measure.
+
+- France's 18 military regions are `topology-clean` against the independent
+  union of its 90 departments: coverage 1.0, no measured gap, outside area or
+  overlap excess.
+- Poland's 16 voivodeships cover 0.999971976 of the OHM country boundary. The
+  remaining 0.000028024 and 0.000001260 outside ratio must be reconciled on
+  shared linework before approval; the extractor does not round them away.
+- Austria's eight Länder cover the country outline, but eight does not meet
+  the 10-region gameplay minimum and a 0.000007061 outside discrepancy remains.
+- Germany currently covers 0.913253494 because Hannover is excluded; Italy
+  covers 0.743877697 without Emilia, Liguria, Lombardia and Sicilia; the
+  level-5 UK selection covers 0.307355846.
+- The Czechoslovak district union triggers a deterministic polygon-clipping
+  geometry error. This is recorded as `source-geometry-error`, not repaired or
+  promoted.
 
 The generated `candidate-source-overlay.svg` deliberately says “NOT FOR OWNER
 APPROVAL”: it visualizes source coverage and gaps, not a topology-clean game

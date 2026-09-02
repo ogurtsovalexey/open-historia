@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   SNAPSHOT_DATE,
+  auditTopology,
   auditRelationGeometry,
   buildCheckpoint,
   classifyLicense,
@@ -91,4 +92,24 @@ test('Europe 1935 geography closes relation ways into deterministic polygons', (
   ] } }, [-1, -1, 2, 2]);
   assert.equal(scoped.geometry.type, 'Polygon');
   assert.equal(scoped.properties.excludedOuterRings, 1);
+});
+
+test('Europe 1935 topology audit exposes source gaps and overlaps without repairing them', () => {
+  const feature = (west, east) => ({ type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [[
+    [west, 0], [east, 0], [east, 1], [west, 1], [west, 0],
+  ]] } });
+  const boundary = feature(0, 2);
+  const exact = auditTopology(boundary, [feature(0, 1), feature(1, 2)]);
+  assert.equal(exact.status, 'topology-clean');
+  assert.deepEqual(exact, auditTopology(boundary, [feature(1, 2), feature(0, 1)]));
+  const gap = auditTopology(boundary, [feature(0, 0.9), feature(1.1, 2)]);
+  assert.equal(gap.status, 'topology-review-required');
+  assert.ok(gap.gapRatio > 0.09);
+  const overlap = auditTopology(boundary, [feature(0, 1.1), feature(0.9, 2)]);
+  assert.equal(overlap.status, 'topology-review-required');
+  assert.ok(overlap.overlapExcessRatio > 0.09);
+  assert.deepEqual(auditTopology(boundary, []), {
+    status: 'source-gap', regionCount: 0, coveredRatio: 0, gapRatio: 1,
+    outsideRatio: 0, overlapExcessRatio: 0,
+  });
 });

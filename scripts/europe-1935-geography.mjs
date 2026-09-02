@@ -242,6 +242,61 @@ export function overlapRatio(candidateGeometry, boundaryGeometry) {
   return Math.max(0, Math.min(1, intersectionArea / candidateArea));
 }
 
+const areaOfMultiPolygon = (coordinates) => coordinates.length === 0 ? 0 : area({
+  type: 'Feature', properties: {}, geometry: { type: 'MultiPolygon', coordinates },
+});
+
+/**
+ * Measures a selected polygon set against one country boundary. This is a
+ * diagnostic on source geometry, before shared-line simplification. It never
+ * repairs gaps or overlaps and therefore cannot silently turn an incomplete
+ * source into an approvable map.
+ */
+export function auditTopology(boundaryFeature, regionFeatures) {
+  const boundaryCoordinates = asMultiPolygonCoordinates(boundaryFeature.geometry);
+  const boundaryArea = areaOfMultiPolygon(boundaryCoordinates);
+  if (!Number.isFinite(boundaryArea) || boundaryArea <= 0) throw new Error('Boundary geometry has no positive area');
+  if (regionFeatures.length === 0) {
+    return {
+      status: 'source-gap', regionCount: 0, coveredRatio: 0, gapRatio: 1,
+      outsideRatio: 0, overlapExcessRatio: 0,
+    };
+  }
+  try {
+    const regionCoordinates = regionFeatures.map((feature) => asMultiPolygonCoordinates(feature.geometry));
+    const unionCoordinates = polygonClipping.union(...regionCoordinates);
+    const coveredCoordinates = polygonClipping.intersection(boundaryCoordinates, unionCoordinates);
+    const coveredArea = areaOfMultiPolygon(coveredCoordinates);
+    const unionArea = areaOfMultiPolygon(unionCoordinates);
+    const summedInsideArea = regionCoordinates.reduce((total, coordinates) => total
+      + areaOfMultiPolygon(polygonClipping.intersection(boundaryCoordinates, coordinates)), 0);
+    const coveredRatio = Math.max(0, Math.min(1, coveredArea / boundaryArea));
+    const gapRatio = Math.max(0, 1 - coveredRatio);
+    const outsideRatio = Math.max(0, (unionArea - coveredArea) / boundaryArea);
+    const overlapExcessRatio = Math.max(0, (summedInsideArea - coveredArea) / boundaryArea);
+    const rounded = (value) => Number(value.toFixed(9));
+    return {
+      status: gapRatio <= 1e-6 && outsideRatio <= 1e-6 && overlapExcessRatio <= 1e-6
+        ? 'topology-clean' : 'topology-review-required',
+      regionCount: regionFeatures.length,
+      coveredRatio: rounded(coveredRatio),
+      gapRatio: rounded(gapRatio),
+      outsideRatio: rounded(outsideRatio),
+      overlapExcessRatio: rounded(overlapExcessRatio),
+    };
+  } catch (error) {
+    return {
+      status: 'source-geometry-error',
+      regionCount: regionFeatures.length,
+      coveredRatio: null,
+      gapRatio: null,
+      outsideRatio: null,
+      overlapExcessRatio: null,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
 const pointInBbox = ([longitude, latitude], [west, south, east, north]) => longitude >= west
   && longitude <= east && latitude >= south && latitude <= north;
 
@@ -271,6 +326,7 @@ export function refineCoverageMatrix(coverage, boundaryFeatures, candidateFeatur
   const boundariesByRelation = new Map(boundaryFeatures.map((feature) => [feature.properties.relationId, feature]));
   const candidatesByRelation = new Map(candidateFeatures.map((feature) => [feature.properties.relationId, feature]));
   const issuesByRelation = new Map(geometryIssues.map((issue) => [issue.relationId, issue]));
+  const definitionByPolity = new Map(SUPPORTED_BOUNDARIES.map((definition) => [definition.polityId, definition]));
   return coverage.map((entry) => {
     const boundary = boundariesByRelation.get(entry.boundaryRelationId);
     const accepted = [];
@@ -290,6 +346,10 @@ export function refineCoverageMatrix(coverage, boundaryFeatures, candidateFeatur
       else excluded.push(result);
     }
     const count = accepted.length;
+    const topologyRelationIds = new Set(accepted.filter((candidate) => definitionByPolity.get(entry.polityId)
+      .overlayAdminLevels.includes(candidate.adminLevel)).map((candidate) => candidate.relationId));
+    const topology = auditTopology(boundary, candidateFeatures.filter((feature) => topologyRelationIds
+      .has(feature.properties.relationId)));
     return {
       ...entry,
       candidateCount: count,
@@ -298,6 +358,7 @@ export function refineCoverageMatrix(coverage, boundaryFeatures, candidateFeatur
       boundaryConflicts: conflicts,
       bboxExclusions: excluded,
       geometryExclusions: invalid,
+      topology,
     };
   });
 }
@@ -525,15 +586,24 @@ export async function runFranceCoverage(outputDirectory = DEFAULT_OUTPUT, option
   const departments = normalizeFranceDepartments(Array.isArray(parsedDepartments) ? parsedDepartments[0] : parsedDepartments);
   const parsedRegions = await parseZip(fetched[1].bytes);
   const regions = normalizeFranceMilitaryRegions(Array.isArray(parsedRegions) ? parsedRegions[0] : parsedRegions);
+  const departmentUnion = polygonClipping.union(...departments.features
+    .map((feature) => asMultiPolygonCoordinates(feature.geometry)));
+  const militaryRegionTopology = auditTopology({
+    type: 'Feature', properties: {}, geometry: { type: 'MultiPolygon', coordinates: departmentUnion },
+  }, regions.features);
   const checkpoint = {
     schemaVersion: 'open-historia-geography-external-source/1',
     scenarioId: 'scenario:europe-1935-benchmark',
     snapshotDate: SNAPSHOT_DATE,
     polityId: 'polity:france',
     sources: fetched.map(({ source, checksum }) => ({ ...source, checksum })),
-    gate: { status: 'candidate-selection-ready', candidateCount: regions.features.length,
+    gate: { status: militaryRegionTopology.status === 'topology-clean'
+      ? 'source-topology-ready' : 'topology-review-required', candidateCount: regions.features.length,
       departmentControlCount: departments.features.length,
       note: 'The 18 dated military regions are within the 10–25 game-region limit; departments remain a topology control.' },
+    topology: {
+      militaryRegions: militaryRegionTopology,
+    },
   };
   fs.mkdirSync(outputDirectory, { recursive: true });
   for (const result of fetched) fs.writeFileSync(result.cachedPath, result.bytes);
