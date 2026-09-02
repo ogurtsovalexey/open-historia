@@ -50,7 +50,10 @@ is one part per million on every measure.
 
 - France's 18 military regions are `topology-clean` against the independent
   union of its 90 departments: coverage 1.0, no measured gap, outside area or
-  overlap excess.
+  overlap excess. Exact seven-decimal source segments derive 37 reciprocal
+  land-adjacency edges, with no isolated region and no segment owned by more
+  than two regions. Point contacts do not create edges; Corse remains inside
+  its metropolitan military region without acquiring a false mainland link.
 - Poland's 16 voivodeships cover 0.999971976 of the OHM country boundary. The
   remaining 0.000028024 and 0.000001260 outside ratio must be reconciled on
   shared linework before approval; the extractor does not round them away.

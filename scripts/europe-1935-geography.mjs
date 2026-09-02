@@ -227,6 +227,65 @@ const asMultiPolygonCoordinates = (geometry) => geometry.type === 'Polygon'
   ? [geometry.coordinates]
   : geometry.coordinates;
 
+const ringsOfGeometry = (geometry) => asMultiPolygonCoordinates(geometry).flatMap((polygon) => polygon);
+
+/** Land adjacency is derived only from shared source linework. A point touch,
+ * strait, sea route or external macro-power link never becomes a land edge. */
+export function deriveLandAdjacency(featureCollection) {
+  if (featureCollection?.type !== 'FeatureCollection' || !Array.isArray(featureCollection.features)) {
+    throw new Error('Land adjacency requires a FeatureCollection');
+  }
+  const segmentOwners = new Map();
+  const ids = new Set();
+  for (const feature of [...featureCollection.features]
+    .sort((left, right) => left.properties.nativeId.localeCompare(right.properties.nativeId))) {
+    const regionId = String(feature.properties?.nativeId ?? '');
+    if (!regionId || ids.has(regionId)) throw new Error(`Land adjacency requires unique nativeId values: ${regionId || '<missing>'}`);
+    ids.add(regionId);
+    for (const ring of ringsOfGeometry(feature.geometry)) {
+      for (let index = 1; index < ring.length; index += 1) {
+        const left = coordinateKey(ring[index - 1]);
+        const right = coordinateKey(ring[index]);
+        if (left === right) continue;
+        const key = left < right ? `${left}|${right}` : `${right}|${left}`;
+        const owners = segmentOwners.get(key) ?? new Set();
+        owners.add(regionId);
+        segmentOwners.set(key, owners);
+      }
+    }
+  }
+  const edgeCounts = new Map();
+  const nonManifoldSegments = [];
+  for (const [segment, owners] of [...segmentOwners.entries()].sort(([left], [right]) => left.localeCompare(right))) {
+    const sorted = [...owners].sort();
+    if (sorted.length > 2) nonManifoldSegments.push({ segment, regionIds: sorted });
+    for (let left = 0; left < sorted.length; left += 1) {
+      for (let right = left + 1; right < sorted.length; right += 1) {
+        const key = `${sorted[left]}|${sorted[right]}`;
+        edgeCounts.set(key, (edgeCounts.get(key) ?? 0) + 1);
+      }
+    }
+  }
+  const edges = [...edgeCounts.entries()].map(([key, sharedSegmentCount]) => {
+    const [fromRegionId, toRegionId] = key.split('|');
+    return { fromRegionId, toRegionId, sharedSegmentCount };
+  }).sort((left, right) => left.fromRegionId.localeCompare(right.fromRegionId)
+    || left.toRegionId.localeCompare(right.toRegionId));
+  const neighbors = new Map([...ids].sort().map((regionId) => [regionId, []]));
+  for (const edge of edges) {
+    neighbors.get(edge.fromRegionId).push(edge.toRegionId);
+    neighbors.get(edge.toRegionId).push(edge.fromRegionId);
+  }
+  return {
+    method: 'exact-shared-source-segments-7dp',
+    regions: [...neighbors.entries()].map(([regionId, adjacentRegionIds]) => ({
+      regionId, adjacentRegionIds: adjacentRegionIds.sort(),
+    })),
+    edges,
+    nonManifoldSegments,
+  };
+}
+
 export function overlapRatio(candidateGeometry, boundaryGeometry) {
   const candidateFeature = { type: 'Feature', properties: {}, geometry: candidateGeometry };
   const candidateArea = area(candidateFeature);
@@ -591,6 +650,17 @@ export async function runFranceCoverage(outputDirectory = DEFAULT_OUTPUT, option
   const militaryRegionTopology = auditTopology({
     type: 'Feature', properties: {}, geometry: { type: 'MultiPolygon', coordinates: departmentUnion },
   }, regions.features);
+  const adjacency = deriveLandAdjacency(regions);
+  const regionsWithAdjacency = {
+    ...regions,
+    features: regions.features.map((feature) => ({
+      ...feature,
+      properties: {
+        ...feature.properties,
+        adjacentNativeIds: adjacency.regions.find((entry) => entry.regionId === feature.properties.nativeId).adjacentRegionIds,
+      },
+    })),
+  };
   const checkpoint = {
     schemaVersion: 'open-historia-geography-external-source/1',
     scenarioId: 'scenario:europe-1935-benchmark',
@@ -603,18 +673,26 @@ export async function runFranceCoverage(outputDirectory = DEFAULT_OUTPUT, option
       note: 'The 18 dated military regions are within the 10–25 game-region limit; departments remain a topology control.' },
     topology: {
       militaryRegions: militaryRegionTopology,
+      adjacency: {
+        method: adjacency.method,
+        edgeCount: adjacency.edges.length,
+        isolatedRegionIds: adjacency.regions.filter((entry) => entry.adjacentRegionIds.length === 0).map((entry) => entry.regionId),
+        nonManifoldSegmentCount: adjacency.nonManifoldSegments.length,
+        checksum: sha256(canonical(adjacency)),
+      },
     },
   };
   fs.mkdirSync(outputDirectory, { recursive: true });
   for (const result of fetched) fs.writeFileSync(result.cachedPath, result.bytes);
   fs.writeFileSync(path.join(outputDirectory, 'france-departments-1935.geojson'), `${JSON.stringify(departments)}\n`);
-  fs.writeFileSync(path.join(outputDirectory, 'france-regions-1935.geojson'), `${JSON.stringify(regions)}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'france-regions-1935.geojson'), `${JSON.stringify(regionsWithAdjacency)}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'france-land-adjacency.json'), `${JSON.stringify(adjacency, null, 2)}\n`);
   fs.writeFileSync(path.join(outputDirectory, 'france-source-overlay.svg'), buildRegionalOverlay(
     regions, 'France 1935 — régions militaires source layer', POLITY_COLORS['polity:france'],
   ));
   fs.writeFileSync(path.join(outputDirectory, 'france-source-manifest.json'), `${JSON.stringify({
     ...checkpoint, departmentGeojsonChecksum: sha256(canonical(departments)),
-    regionGeojsonChecksum: sha256(canonical(regions)),
+    regionGeojsonChecksum: sha256(canonical(regionsWithAdjacency)),
   }, null, 2)}\n`);
   return checkpoint;
 }

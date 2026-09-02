@@ -6,6 +6,7 @@ import {
   auditRelationGeometry,
   buildCheckpoint,
   classifyLicense,
+  deriveLandAdjacency,
   filterFeaturePolygonsToBbox,
   isEffectiveAt,
   normalizeRelationGeometry,
@@ -112,4 +113,24 @@ test('Europe 1935 topology audit exposes source gaps and overlaps without repair
     status: 'source-gap', regionCount: 0, coveredRatio: 0, gapRatio: 1,
     outsideRatio: 0, overlapExcessRatio: 0,
   });
+});
+
+test('land adjacency requires a shared source segment and is byte-order deterministic', () => {
+  const feature = (nativeId, coordinates) => ({
+    type: 'Feature', properties: { nativeId }, geometry: { type: 'Polygon', coordinates: [coordinates] },
+  });
+  const regions = { type: 'FeatureCollection', features: [
+    feature('A', [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]),
+    feature('B', [[1, 0], [2, 0], [2, 1], [1, 1], [1, 0]]),
+    feature('C', [[2, 1], [3, 1], [3, 2], [2, 2], [2, 1]]),
+  ] };
+  const adjacency = deriveLandAdjacency(regions);
+  assert.deepEqual(adjacency.edges, [{ fromRegionId: 'A', toRegionId: 'B', sharedSegmentCount: 1 }]);
+  assert.deepEqual(adjacency.regions, [
+    { regionId: 'A', adjacentRegionIds: ['B'] },
+    { regionId: 'B', adjacentRegionIds: ['A'] },
+    { regionId: 'C', adjacentRegionIds: [] },
+  ]);
+  assert.deepEqual(adjacency, deriveLandAdjacency({ ...regions, features: regions.features.toReversed() }));
+  assert.throws(() => deriveLandAdjacency({ ...regions, features: [...regions.features, regions.features[0]] }), /unique nativeId/);
 });
