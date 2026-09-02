@@ -35,7 +35,7 @@ lower-level polygons still need deterministic aggregation.
 | --- | ---: | --- |
 | Austria | 8 | Eight Länder are sound; a dated Wien polygon is missing. |
 | Czechoslovakia | 99+ | Czech districts are dense, but Slovak coverage is absent and aggregation is required. |
-| France | 1 | Corse is sound; the dated metropolitan department sample is malformed or incomplete. |
+| France | 18 | TRF-GIS military regions are exact for 1935, CC BY 4.0 and include Corse; 90 dated departments provide a topology control. |
 | Germany | 27 | Aggregation to at most 25 is required; Hannover has an open inner ring and is excluded. |
 | Italy | 14 | Emilia, Liguria and Lombardia have open rings; Sicilia is absent from the dated inventory. |
 | Poland | 16 | The voivodeship layer is near-complete and directly usable after topology review. |
@@ -46,11 +46,19 @@ APPROVAL”: it visualizes source coverage and gaps, not a topology-clean game
 map. It omits overlapping high-level relations when a lower level is being
 audited.
 
+France is supplemented from the [TRF-GIS departments dataset](https://doi.org/10.7910/DVN/ULQYM5)
+and its [1935 military-regions series](https://doi.org/10.7910/DVN/SQPEUW).
+Both Dataverse records state CC BY 4.0 terms. The exact downloaded files and
+SHA-256 pins are enforced by the extractor. The otherwise attractive
+[1931 Great Britain county layer](https://geodata.lib.utexas.edu/catalog/stanford-yd604rg3256)
+is CC BY-SA 4.0 and therefore remains excluded pending a separate owner
+licensing decision.
+
 ## Blocking decisions and next work
 
 1. Repair incomplete OHM multipolygons only from dated, attributable source
    evidence; never bridge an open ring by visual guess.
-2. Audit compatible historical alternatives for France, Slovakia, Wien,
+2. Audit compatible historical alternatives for Slovakia, Wien,
    Sicilia and incomplete British counties. ODbL/share-alike data remains
    blocked until the owner makes a separate licensing decision.
 3. Freeze 10–25 aggregate definitions per Supported polity, then compute

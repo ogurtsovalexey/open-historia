@@ -7,6 +7,7 @@ import area from '@turf/area';
 import simplify from '@turf/simplify';
 import { geoIdentity, geoPath } from 'd3-geo';
 import polygonClipping from 'polygon-clipping';
+import { parseZip } from 'shpjs';
 
 export const SNAPSHOT_DATE = '1935-01-01';
 export const OHM_ENDPOINT = 'https://overpass-api.openhistoricalmap.org/api/interpreter';
@@ -24,6 +25,22 @@ const POLITY_COLORS = Object.freeze({
   'polity:austria': '#d94848', 'polity:czechoslovakia': '#4f78c4', 'polity:france': '#4169a8',
   'polity:germany': '#555555', 'polity:italy': '#4f9960', 'polity:poland': '#d8d8d8',
   'polity:united-kingdom': '#b44747',
+});
+export const TRF_GIS_FRANCE_1935 = Object.freeze({
+  datasetDoi: 'doi:10.7910/DVN/ULQYM5',
+  dataFileId: 4083159,
+  filename: 'DEPARTEMENTS_1935.zip',
+  downloadUrl: 'https://dataverse.harvard.edu/api/access/datafile/4083159',
+  license: 'CC BY 4.0',
+  expectedSha256: 'sha256:17a4b0a13e08c9344c71f5c1e733f97e8e9f0262d6ed8105e89493d499cce2ef',
+});
+export const TRF_GIS_FRANCE_MILITARY_1935 = Object.freeze({
+  datasetDoi: 'doi:10.7910/DVN/SQPEUW',
+  dataFileId: 4087371,
+  filename: 'MIL_REGIONS_1935.zip',
+  downloadUrl: 'https://dataverse.harvard.edu/api/access/datafile/4087371',
+  license: 'CC BY 4.0',
+  expectedSha256: 'sha256:26dfb0a8bc6fd9cabcb175e7ced71b12ec76a4d5fc80bfde7c678a3a79078573',
 });
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_OUTPUT = path.join(ROOT, 'runs', 'campaign-lab', 'europe-1935-geography-checkpoint');
@@ -308,6 +325,87 @@ export function buildCandidateOverlay(boundaryFeatures, candidateFeatures, cover
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc"><title id="title">Europe 1935 candidate source overlay</title><desc id="desc">Diagnostic source coverage. Not an owner approval overlay.</desc><rect width="1200" height="900" fill="#f5f0e6"/><text x="24" y="30" font-family="system-ui" font-size="22" font-weight="700">Europe 1935 — candidate source coverage</text><text x="24" y="53" font-family="system-ui" font-size="13">Diagnostic only · overlaps/gaps unresolved · NOT FOR OWNER APPROVAL</text><g>${regionPaths}${boundaryPaths}</g><g font-family="system-ui" font-size="11">${legend}</g></svg>\n`;
 }
 
+export function buildRegionalOverlay(featureCollection, title, color) {
+  const simplified = { type: 'FeatureCollection', features: featureCollection.features.map((feature) => simplify(feature,
+    { tolerance: 0.015, highQuality: false, mutate: false })) };
+  const projection = geoIdentity().reflectY(true).fitExtent([[24, 70], [876, 720]], simplified);
+  const renderPath = geoPath(projection);
+  const paths = simplified.features.map((feature) => `<path d="${renderPath(feature)}" fill="${color}" fill-opacity="0.38" stroke="#20242a" stroke-width="0.7"><title>${xmlEscape(feature.properties.nativeName)}</title></path>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 780" role="img" aria-labelledby="title desc"><title id="title">${xmlEscape(title)}</title><desc id="desc">Diagnostic source coverage. Not an owner approval overlay.</desc><rect width="900" height="780" fill="#f5f0e6"/><text x="24" y="30" font-family="system-ui" font-size="22" font-weight="700">${xmlEscape(title)}</text><text x="24" y="53" font-family="system-ui" font-size="13">${simplified.features.length} dated source regions · NOT FOR OWNER APPROVAL</text><g>${paths}</g></svg>\n`;
+}
+
+export function normalizeFranceDepartments(featureCollection) {
+  if (featureCollection?.type !== 'FeatureCollection' || !Array.isArray(featureCollection.features)) {
+    throw new Error('TRF-GIS 1935 departments must be a FeatureCollection');
+  }
+  if (featureCollection.features.length !== 90) {
+    throw new Error(`TRF-GIS 1935 departments: expected 90 features, received ${featureCollection.features.length}`);
+  }
+  const seen = new Set();
+  return {
+    type: 'FeatureCollection',
+    features: featureCollection.features.map((feature) => {
+      const nativeId = String(feature.properties?.dep_id ?? '').padStart(2, '0');
+      const nativeName = String(feature.properties?.dep_name ?? '').trim();
+      if (!nativeId || !nativeName) throw new Error('TRF-GIS 1935 department lacks id or name');
+      if (seen.has(nativeId)) throw new Error(`TRF-GIS 1935 duplicate department ${nativeId}`);
+      seen.add(nativeId);
+      if (!['Polygon', 'MultiPolygon'].includes(feature.geometry?.type)) {
+        throw new Error(`TRF-GIS 1935 department ${nativeId} lacks polygon geometry`);
+      }
+      return {
+        type: 'Feature', geometry: feature.geometry, properties: {
+          nativeId, nativeName, polityId: 'polity:france', effectiveAt: SNAPSHOT_DATE,
+          source: { datasetDoi: TRF_GIS_FRANCE_1935.datasetDoi, dataFileId: TRF_GIS_FRANCE_1935.dataFileId,
+            license: TRF_GIS_FRANCE_1935.license },
+        },
+      };
+    }).sort((left, right) => left.properties.nativeId.localeCompare(right.properties.nativeId)),
+  };
+}
+
+export function normalizeFranceMilitaryRegions(featureCollection) {
+  if (featureCollection?.type !== 'FeatureCollection' || !Array.isArray(featureCollection.features)) {
+    throw new Error('TRF-GIS 1935 military regions must be a FeatureCollection');
+  }
+  if (featureCollection.features.length !== 18) {
+    throw new Error(`TRF-GIS 1935 military regions: expected 18 features, received ${featureCollection.features.length}`);
+  }
+  const seen = new Set();
+  return {
+    type: 'FeatureCollection',
+    features: featureCollection.features.map((feature) => {
+      const nativeId = String(feature.properties?.pmreg ?? '').padStart(2, '0');
+      const nativeName = String(feature.properties?.pmreg_name ?? '').trim();
+      if (!nativeId || !nativeName) throw new Error('TRF-GIS 1935 military region lacks id or name');
+      if (seen.has(nativeId)) throw new Error(`TRF-GIS 1935 duplicate military region ${nativeId}`);
+      seen.add(nativeId);
+      if (!['Polygon', 'MultiPolygon'].includes(feature.geometry?.type)) {
+        throw new Error(`TRF-GIS 1935 military region ${nativeId} lacks polygon geometry`);
+      }
+      return {
+        type: 'Feature', geometry: feature.geometry, properties: {
+          nativeId, nativeName, polityId: 'polity:france', effectiveAt: SNAPSHOT_DATE,
+          source: { datasetDoi: TRF_GIS_FRANCE_MILITARY_1935.datasetDoi,
+            dataFileId: TRF_GIS_FRANCE_MILITARY_1935.dataFileId,
+            license: TRF_GIS_FRANCE_MILITARY_1935.license },
+        },
+      };
+    }).sort((left, right) => left.properties.nativeId.localeCompare(right.properties.nativeId)),
+  };
+}
+
+export async function fetchPinnedSource(source, fetchImpl = fetch) {
+  const response = await fetchImpl(source.downloadUrl, { signal: AbortSignal.timeout(120_000) });
+  if (!response.ok) throw new Error(`${source.filename} download failed: ${response.status} ${await response.text()}`);
+  const bytes = Buffer.from(await response.arrayBuffer());
+  const checksum = sha256(bytes);
+  if (checksum !== source.expectedSha256) {
+    throw new Error(`${source.filename} checksum mismatch: expected ${source.expectedSha256}, received ${checksum}`);
+  }
+  return { bytes, checksum };
+}
+
 export async function fetchInventory(fetchImpl = fetch) {
   const query = inventoryQuery();
   const response = await fetchImpl(OHM_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
@@ -411,13 +509,55 @@ export async function runBoundaryCoverage(outputDirectory = DEFAULT_OUTPUT, opti
   return checkpoint;
 }
 
+export async function runFranceCoverage(outputDirectory = DEFAULT_OUTPUT, options = {}) {
+  const sources = [TRF_GIS_FRANCE_1935, TRF_GIS_FRANCE_MILITARY_1935];
+  const fetched = [];
+  for (const source of sources) {
+    const cachedPath = path.join(outputDirectory, source.filename);
+    const result = options.cached ? { bytes: fs.readFileSync(cachedPath) } : await fetchPinnedSource(source);
+    const checksum = sha256(result.bytes);
+    if (checksum !== source.expectedSha256) {
+      throw new Error(`${source.filename} checksum mismatch: expected ${source.expectedSha256}, received ${checksum}`);
+    }
+    fetched.push({ source, bytes: result.bytes, checksum, cachedPath });
+  }
+  const parsedDepartments = await parseZip(fetched[0].bytes);
+  const departments = normalizeFranceDepartments(Array.isArray(parsedDepartments) ? parsedDepartments[0] : parsedDepartments);
+  const parsedRegions = await parseZip(fetched[1].bytes);
+  const regions = normalizeFranceMilitaryRegions(Array.isArray(parsedRegions) ? parsedRegions[0] : parsedRegions);
+  const checkpoint = {
+    schemaVersion: 'open-historia-geography-external-source/1',
+    scenarioId: 'scenario:europe-1935-benchmark',
+    snapshotDate: SNAPSHOT_DATE,
+    polityId: 'polity:france',
+    sources: fetched.map(({ source, checksum }) => ({ ...source, checksum })),
+    gate: { status: 'candidate-selection-ready', candidateCount: regions.features.length,
+      departmentControlCount: departments.features.length,
+      note: 'The 18 dated military regions are within the 10–25 game-region limit; departments remain a topology control.' },
+  };
+  fs.mkdirSync(outputDirectory, { recursive: true });
+  for (const result of fetched) fs.writeFileSync(result.cachedPath, result.bytes);
+  fs.writeFileSync(path.join(outputDirectory, 'france-departments-1935.geojson'), `${JSON.stringify(departments)}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'france-regions-1935.geojson'), `${JSON.stringify(regions)}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'france-source-overlay.svg'), buildRegionalOverlay(
+    regions, 'France 1935 — régions militaires source layer', POLITY_COLORS['polity:france'],
+  ));
+  fs.writeFileSync(path.join(outputDirectory, 'france-source-manifest.json'), `${JSON.stringify({
+    ...checkpoint, departmentGeojsonChecksum: sha256(canonical(departments)),
+    regionGeojsonChecksum: sha256(canonical(regions)),
+  }, null, 2)}\n`);
+  return checkpoint;
+}
+
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   const outputFlag = process.argv.indexOf('--output');
   const output = outputFlag >= 0 && process.argv[outputFlag + 1] ? path.resolve(process.argv[outputFlag + 1]) : DEFAULT_OUTPUT;
-  const operation = process.argv.includes('--boundaries') ? runBoundaryCoverage : runInventory;
+  const operation = process.argv.includes('--france') ? runFranceCoverage
+    : process.argv.includes('--boundaries') ? runBoundaryCoverage : runInventory;
   operation(output, { cached: process.argv.includes('--cached') }).then((checkpoint) => process.stdout.write(`${JSON.stringify(checkpoint.counts
     ? { output, counts: checkpoint.counts, blockedRelations: checkpoint.blockedRelations.length }
-    : { output, status: checkpoint.gate.status, coverage: Object.fromEntries(checkpoint.coverage
-      .map(({ polityId, candidateCount }) => [polityId, candidateCount])) }, null, 2)}\n`))
+    : { output, status: checkpoint.gate.status, ...(checkpoint.coverage
+      ? { coverage: Object.fromEntries(checkpoint.coverage.map(({ polityId, candidateCount }) => [polityId, candidateCount])) }
+      : { polityId: checkpoint.polityId, candidateCount: checkpoint.gate.candidateCount }) }, null, 2)}\n`))
     .catch((error) => { process.stderr.write(`${error instanceof Error ? error.stack : String(error)}\n`); process.exitCode = 1; });
 }

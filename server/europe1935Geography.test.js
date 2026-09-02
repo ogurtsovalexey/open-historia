@@ -10,6 +10,8 @@ import {
   normalizeRelationGeometry,
   normalizeInventory,
   overlapRatio,
+  normalizeFranceDepartments,
+  normalizeFranceMilitaryRegions,
   stitchRings,
 } from '../scripts/europe-1935-geography.mjs';
 
@@ -29,6 +31,31 @@ test('Europe 1935 geography inventory applies date and license gates determinist
   ] };
   assert.deepEqual(normalizeInventory(raw).map((entry) => entry.relationId), [1, 2]);
   assert.deepEqual(buildCheckpoint(raw, 'query', 'sha256:source'), buildCheckpoint(raw, 'query', 'sha256:source'));
+});
+
+test('TRF-GIS France 1935 normalization requires 90 unique dated polygons', () => {
+  const raw = { type: 'FeatureCollection', features: Array.from({ length: 90 }, (_, index) => ({
+    type: 'Feature',
+    geometry: { type: 'Polygon', coordinates: [[[index, 0], [index + 0.5, 0], [index + 0.5, 0.5], [index, 0]]] },
+    properties: { dep_id: index + 1, dep_name: `DEPARTEMENT-${index + 1}` },
+  })) };
+  const normalized = normalizeFranceDepartments(raw);
+  assert.equal(normalized.features.length, 90);
+  assert.equal(normalized.features[0].properties.nativeId, '01');
+  assert.equal(normalized.features[0].properties.effectiveAt, '1935-01-01');
+  assert.throws(() => normalizeFranceDepartments({ ...raw, features: raw.features.slice(1) }), /expected 90/);
+});
+
+test('TRF-GIS France military layer fits the 10–25 game-region gate', () => {
+  const raw = { type: 'FeatureCollection', features: Array.from({ length: 18 }, (_, index) => ({
+    type: 'Feature',
+    geometry: { type: 'Polygon', coordinates: [[[index, 0], [index + 0.5, 0], [index + 0.5, 0.5], [index, 0]]] },
+    properties: { pmreg: index + 1, pmreg_name: `REGION-${index + 1}` },
+  })) };
+  const normalized = normalizeFranceMilitaryRegions(raw);
+  assert.equal(normalized.features.length, 18);
+  assert.equal(normalized.features[0].properties.source.license, 'CC BY 4.0');
+  assert.throws(() => normalizeFranceMilitaryRegions({ ...raw, features: raw.features.slice(1) }), /expected 18/);
 });
 
 test('Europe 1935 geography closes relation ways into deterministic polygons', () => {
