@@ -222,14 +222,49 @@ export interface StrategicBriefV4Options {
 /** Builds one private session payload for exactly one polity. */
 export function buildStrategicBriefV4(state: EconWorldState, polityId: string, options: StrategicBriefV4Options): StrategicBriefV4 {
   const triggers = strategicTriggerV4Schema.array().parse(options.triggers ?? []);
-  const relevant = new Set(options.relevantFamilies ?? ALL_FAMILIES);
-  relevant.add('conserve');
-  for (const trigger of triggers) for (const family of trigger.compatibleTools) relevant.add(family);
   const v3 = buildStrategicBriefV3(state, polityId, {
     strategicContext: options.strategicContext,
     externalSupplierPolityIds: options.externalSupplierPolityIds,
   });
   const allActions = expandStrategicAffordancesV3(v3);
+  const relevant = new Set<StrategicActionV2['tool']>();
+  const relevanceReasons = new Map<StrategicActionV2['tool'], Set<string>>();
+  const include = (families: StrategicActionV2['tool'][], reason: string) => {
+    for (const family of families) {
+      relevant.add(family);
+      const reasons = relevanceReasons.get(family) ?? new Set<string>();
+      reasons.add(reason);
+      relevanceReasons.set(family, reasons);
+    }
+  };
+  if (options.relevantFamilies === undefined) include(ALL_FAMILIES, 'Complete legal surface requested.');
+  else include(options.relevantFamilies, 'Explicit checkpoint relevance input.');
+  include(['conserve'], 'A typed hold is always legal.');
+  for (const trigger of triggers) include(trigger.compatibleTools, `Compatible with trigger ${trigger.triggerId}.`);
+
+  for (const goal of v3.goals) {
+    if (goal.status !== 'active') continue;
+    if (goal.kind === 'secure-alliance') include(['propose-agreement'], `Required by active goal ${String(goal.goalId)}.`);
+    else if (goal.kind === 'control-region') include(['apply-diplomatic-pressure', 'declare-war'], `Required by active goal ${String(goal.goalId)}.`);
+    else if (goal.kind === 'unlock-capability') include(['start-project'], `Required by active goal ${String(goal.goalId)}.`);
+    else if (goal.kind === 'stabilize-government') include(['change-policy', 'respond-faction'], `Required by active goal ${String(goal.goalId)}.`);
+  }
+  const invocationFamilies: Partial<Record<z.infer<typeof strategicInvocationReasonSchema>, StrategicActionV2['tool'][]>> = {
+    proposal: ['respond-proposal'],
+    war: ['mobilize', 'issue-order', 'negotiate-peace'],
+    occupation: ['mobilize', 'issue-order', 'negotiate-peace'],
+    peace: ['issue-order', 'negotiate-peace'],
+    crisis: ['change-policy', 'respond-faction', 'mobilize'],
+    'government-change': ['change-policy', 'respond-faction'],
+    default: ['change-policy', 'start-project', 'negotiate-trade', 'external-import'],
+    'resource-emergency': ['invest', 'reallocate-production', 'negotiate-trade', 'external-import'],
+  };
+  if (triggers.length === 0) include(invocationFamilies[options.invocation.reason] ?? [], `Required by ${options.invocation.reason} checkpoint.`);
+  if (v3.economy.foodShortfall > 0 || v3.economy.limitingInputs.length > 0
+    || v3.economy.resources.some((entry) => entry.runwayMonths !== null && entry.runwayMonths <= 3)) {
+    include(['negotiate-trade', 'external-import'], 'Required by a material resource deficit.');
+  }
+  if (options.durablePlan) include(ALL_FAMILIES, 'Durable plan and commitments require a complete legal surface.');
   const choices = allActions.filter((action) => relevant.has(action.tool)).map((action) => {
     let preview: StrategicPreviewV3 | undefined;
     for (const affordance of v3.affordances) {
@@ -260,7 +295,7 @@ export function buildStrategicBriefV4(state: EconWorldState, polityId: string, o
     const published = choices.filter((entry) => entry.family === family).length;
     return { family, considered, published,
       disposition: published ? 'published' : considered ? 'excluded-not-relevant' : 'excluded-no-legal-choice',
-      reason: published ? 'Relevant; engine dry run accepted.'
+      reason: published ? `${[...(relevanceReasons.get(family) ?? [])].join(' ')} Engine dry run accepted.`
         : considered ? 'Not selected by current relevance inputs.'
           : 'No legal choice at this revision.' };
   });

@@ -361,6 +361,7 @@ test('StrategicBriefV4 is a single-actor bounded ID catalog with politics and co
       compatibleTools: ['invest' as const], evidenceIds: ['evidence:iron-runway'] }],
     relevantFamilies: ['invest' as const], political: politicalV4('polity:germany'), systemText: 'Compact production prompt.',
     strategicContext: { redLines: ['Loss of sovereignty'], obligations: ['Existing commitments are constraints.'] },
+    countTokens: (text: string) => Math.ceil(Buffer.byteLength(text, 'utf8') / 4),
   };
   const first = buildStrategicBriefV4(state, 'polity:germany', options);
   const second = buildStrategicBriefV4(state, 'polity:germany', options);
@@ -369,7 +370,7 @@ test('StrategicBriefV4 is a single-actor bounded ID catalog with politics and co
   assert.match(first.role, /Germany/);
   assert.equal(first.political.decisionAuthority.knowledgePolicy, 'scenario-only');
   assert.ok(first.inputTokenCount <= 8000);
-  assert.equal(first.tokenCountMethod, 'utf8-upper-bound');
+  assert.equal(first.tokenCountMethod, 'provider');
   assert.equal(first.candidateAudit.length, 15);
   assert.ok(first.choices.every((entry) => entry.choiceId.startsWith('choice:')));
   assert.equal(new Set(first.choices.map((entry) => entry.choiceId)).size, first.choices.length);
@@ -382,7 +383,7 @@ test('StrategicBriefV4 derives authority from canonical politics and observes a 
   assert.equal(political.identity.nativeLabel, 'Bundesstaat Österreich');
   assert.equal(political.decisionAuthority.characterId, 'character:austria-ruler');
   const brief = buildStrategicBriefV4(initial, 'polity:austria', {
-    invocation: { reason: 'scheduled-quarter', detail: 'Quarterly review.' }, relevantFamilies: ['conserve'],
+    invocation: { reason: 'scheduled-quarter', detail: 'Quarterly review.' }, relevantFamilies: ['conserve'], countTokens: () => 1,
   });
   assert.equal(brief.political.rulingGroup, 'Austria Establishment');
   const abdicated = runTurn(initial, { commands: [econCommandSchema.parse({
@@ -390,10 +391,27 @@ test('StrategicBriefV4 derives authority from canonical politics and observes a 
     actorPolityId: 'polity:austria', expectedRevision: initial.revision, effectiveMonth: initial.month,
   })] }).result.state;
   const changed = buildStrategicBriefV4(abdicated, 'polity:austria', {
-    invocation: { reason: 'government-change', detail: 'Power transferred.' }, relevantFamilies: ['conserve'],
+    invocation: { reason: 'government-change', detail: 'Power transferred.' }, relevantFamilies: ['conserve'], countTokens: () => 1,
   });
   assert.equal(changed.political.headOfState.characterId, 'character:austria-heir');
   assert.equal(changed.political.decisionAuthority.characterId, 'character:austria-heir');
+});
+
+test('StrategicBriefV4 cannot hide families required by active goals or material checkpoints', () => {
+  const state = benchmarkInitial();
+  const czech = buildStrategicBriefV4(state, 'polity:czechoslovakia', {
+    invocation: { reason: 'scheduled-quarter', detail: 'Quarterly review.' },
+    relevantFamilies: ['invest'], political: politicalV4('polity:czechoslovakia'), countTokens: () => 1,
+  });
+  assert.equal(czech.choices.some((entry) => entry.family === 'propose-agreement'), true);
+  assert.match(czech.candidateAudit.find((entry) => entry.family === 'propose-agreement')?.reason ?? '', /active goal/);
+
+  const poland = buildStrategicBriefV4(state, 'polity:poland', {
+    invocation: { reason: 'war', detail: 'A supplied hostile formation is adjacent.' },
+    relevantFamilies: ['invest'], political: politicalV4('polity:poland'), countTokens: () => 1,
+  });
+  assert.equal(poland.candidateAudit.find((entry) => entry.family === 'mobilize')?.disposition, 'published');
+  assert.match(poland.candidateAudit.find((entry) => entry.family === 'mobilize')?.reason ?? '', /war checkpoint/);
 });
 
 test('StrategicDecisionV3 expands frozen IDs and requires exact compatible mandatory coverage', () => {
@@ -402,7 +420,7 @@ test('StrategicDecisionV3 expands frozen IDs and requires exact compatible manda
     invocation: { reason: 'resource-emergency', detail: 'Iron exhaustion checkpoint.' },
     triggers: [{ triggerId: 'trigger:iron', kind: 'resource-emergency', summary: 'Protect iron supply.', mandatory: true,
       compatibleTools: ['invest'], evidenceIds: ['evidence:iron'] }],
-    relevantFamilies: ['invest'], political: politicalV4('polity:germany'),
+    relevantFamilies: ['invest'], political: politicalV4('polity:germany'), countTokens: () => 1,
   });
   const selected = brief.choices.find((entry) => entry.family === 'invest')!;
   const rejected = brief.choices.find((entry) => entry.choiceId !== selected.choiceId)!;
@@ -447,6 +465,12 @@ test('political identity contract is era-neutral and V4 refuses an over-budget p
     invocation: { reason: 'scheduled-quarter', detail: 'Review.' }, relevantFamilies: ['invest'],
     political: politicalV4('polity:germany'), countTokens: () => 8001,
   }), /exceeds 8000 tokens/);
+  const fallbackCount = buildStrategicBriefV4(initial(), 'polity:austria', {
+    invocation: { reason: 'scheduled-quarter', detail: 'Review.' }, relevantFamilies: ['conserve'],
+    political: politicalV4('polity:austria'),
+  });
+  assert.equal(fallbackCount.tokenCountMethod, 'utf8-upper-bound');
+  assert.ok(fallbackCount.inputTokenCount <= 8000);
 });
 
 test('V4 run compatibility is explicit and durable plans commit only with accepted actions', () => {

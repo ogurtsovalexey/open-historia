@@ -21,6 +21,11 @@ cannot resume or validate a V4 run.
   excluded. Every independently legal choice receives a revision-stable
   `choiceId`; the model returns IDs only. The application rechecks actor,
   revision, trigger compatibility and the complete engine dry run.
+- A caller-supplied relevance list is a floor, never a ceiling: compatible
+  mandatory-trigger families, active-goal families, checkpoint-specific
+  responses and material shortage responses are added deterministically. A
+  durable plan exposes the complete bounded legal surface. No required family
+  can disappear because a transport caller omitted it.
 - Normal capacity is five material choices. Mandatory overflow permits at most
   one covered choice per trigger and ten total; optional choices cannot consume
   expanded slots. Mandatory triggers receive exact, unique coverage. An
