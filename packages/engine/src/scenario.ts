@@ -190,9 +190,26 @@ export const authoredTradeRouteSchema = z.object({
   monthlyCapacity: z.number().int().positive(),
 }).strict();
 
+/** An agreement already in force at the scenario snapshot, not a runtime proposal. */
+export const authoredStartingAgreementSchema = z.object({
+  agreementId: z.string().regex(/^agreement:[a-z0-9][a-z0-9._-]{0,99}$/),
+  /** Stable authored provenance bridge for the existing agreement state shape. */
+  sourceProposalId: z.string().regex(/^proposal:[a-z0-9][a-z0-9._-]{0,99}$/),
+  acceptedMonth: gameDateSchema,
+  // Kept structurally identical to diplomacy.ts without importing it: that
+  // module already imports resourceIdSchema from this file.
+  terms: z.object({
+    kind: z.literal('agreement'),
+    agreementType: z.enum(['non-aggression', 'defensive-alliance', 'guarantee', 'military-access']),
+    fromPolityId: polityIdSchema,
+    toPolityId: polityIdSchema,
+  }).strict().refine((terms) => terms.fromPolityId !== terms.toPolityId, { message: 'agreement parties must differ' }),
+}).strict();
+
 export const authoredDiplomacySchema = z.object({
   relations: z.array(authoredRelationSchema),
   tradeRoutes: z.array(authoredTradeRouteSchema),
+  startingAgreements: z.array(authoredStartingAgreementSchema).optional(),
 }).strict();
 
 export const econScenarioSchema = z
@@ -525,6 +542,28 @@ export const econScenarioSchema = z
         const key = `${left}|${right}`;
         if (routePairs.has(key)) ctx.addIssue({ code: 'custom', message: `duplicate trade route pair ${key}`, path: ['diplomacy', 'tradeRoutes', index] });
         routePairs.add(key);
+      }
+      const agreementIds = new Set<string>();
+      const agreementTerms = new Set<string>();
+      for (const [index, agreement] of (scenario.diplomacy.startingAgreements ?? []).entries()) {
+        const { fromPolityId, toPolityId, agreementType } = agreement.terms;
+        if (!polityIds.has(fromPolityId) || !polityIds.has(toPolityId)) {
+          ctx.addIssue({ code: 'custom', message: 'starting agreement parties must be known polities', path: ['diplomacy', 'startingAgreements', index, 'terms'] });
+        }
+        if (agreement.acceptedMonth > scenario.startMonth) {
+          ctx.addIssue({ code: 'custom', message: 'starting agreement cannot postdate the scenario start', path: ['diplomacy', 'startingAgreements', index, 'acceptedMonth'] });
+        }
+        if (agreementIds.has(agreement.agreementId)) {
+          ctx.addIssue({ code: 'custom', message: `duplicate starting agreement id ${agreement.agreementId}`, path: ['diplomacy', 'startingAgreements', index, 'agreementId'] });
+        }
+        agreementIds.add(agreement.agreementId);
+        const direction = agreementType === 'guarantee' ? `${fromPolityId}|${toPolityId}`
+          : [fromPolityId, toPolityId].sort().join('|');
+        const termsKey = `${agreementType}|${direction}`;
+        if (agreementTerms.has(termsKey)) {
+          ctx.addIssue({ code: 'custom', message: `duplicate starting agreement terms ${termsKey}`, path: ['diplomacy', 'startingAgreements', index, 'terms'] });
+        }
+        agreementTerms.add(termsKey);
       }
     }
     const active = new Set<string>(scenario.activeResources);

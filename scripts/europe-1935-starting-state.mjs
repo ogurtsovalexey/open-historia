@@ -42,12 +42,14 @@ export const AUTHORED_COMMITMENT_EXPECTATIONS = Object.freeze([
   {
     commitmentId: 'commitment:czechoslovakia-france-security',
     polityIds: ['polity:czechoslovakia', 'polity:france'],
+    agreementType: 'defensive-alliance',
     sourceAnchorIds: ['anchor:czechoslovakia-security', 'anchor:france-containment'],
     matchingGoalId: 'goal:czechoslovakia-france',
   },
   {
     commitmentId: 'commitment:poland-france-security',
     polityIds: ['polity:poland', 'polity:france'],
+    agreementType: 'defensive-alliance',
     sourceAnchorIds: ['anchor:poland-balance', 'anchor:france-containment'],
     matchingGoalId: 'goal:poland-france',
   },
@@ -172,6 +174,8 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
     const polityCommanders = commanders.filter((entry) => entry.polityId === polityId);
     const factions = (engineScenario.politics?.factions ?? []).filter((entry) => entry.polityId === polityId);
     const characters = (engineScenario.politics?.characters ?? []).filter((entry) => entry.polityId === polityId);
+    const agreements = (engineScenario.diplomacy?.startingAgreements ?? []).filter((entry) =>
+      entry.terms.fromPolityId === polityId || entry.terms.toPolityId === polityId);
     const controls = controlsForPolity(polityId, engineScenario, authoring);
 
     if (!controls.matches) issues.push(issue('national-control-mismatch', 'blocking', `/polities/${polityId}/controls`, 'authored national controls do not equal engine aggregates'));
@@ -210,6 +214,7 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
       government: politicalPolities.has(polityId),
       factions: factions.length,
       characters: characters.length,
+      agreements: agreements.length,
       finance: Boolean(engineScenario.statecraft?.finance?.some((entry) => entry.polityId === polityId)),
       capacities: Boolean(engineScenario.statecraft?.capacities?.some((entry) => entry.polityId === polityId)),
       activeGoalCount: activeGoals.length,
@@ -222,7 +227,11 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
       issues.push(issue('commitment-anchor-missing', 'blocking', `/commitments/${expectation.commitmentId}`, `missing anchors: ${missingAnchors.join(', ')}`));
       continue;
     }
-    issues.push(issue('executable-agreement-missing', 'blocking', `/commitments/${expectation.commitmentId}`, 'authored security relationship has no executable starting agreement'));
+    const agreement = (engineScenario.diplomacy?.startingAgreements ?? []).find((entry) => entry.terms.agreementType === expectation.agreementType
+      && expectation.polityIds.every((polityId) => [entry.terms.fromPolityId, entry.terms.toPolityId].includes(polityId)));
+    if (!agreement) {
+      issues.push(issue('executable-agreement-missing', 'blocking', `/commitments/${expectation.commitmentId}`, 'authored security relationship has no executable starting agreement'));
+    }
     const goal = engineScenario.campaign?.goals?.find((entry) => entry.goalId === expectation.matchingGoalId);
     if (goal?.initiallyActive) {
       issues.push(issue('goal-conflicts-with-existing-commitment', 'blocking', `/engine/campaign/goals/${goal.goalId}`, 'an in-force relationship must be a commitment/constraint, not a goal to conclude it'));
@@ -268,9 +277,9 @@ export function renderOwnerTable(audit) {
     '',
     `Scenario: \`${audit.scenarioId}\`; snapshot: \`${audit.snapshotMonth}\`; audit checksum: \`${audit.checksum}\`.`,
     '',
-    '| Polity | Fidelity | Regions | National totals | Goals | Formations | Commanders | Government | Factions | Finance |',
-    '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
-    ...audit.polities.map((row) => `| ${row.polityId} | ${row.fidelity} | ${row.regionCount} | ${row.controls.matches ? 'exact' : 'MISMATCH'} | ${row.goals.length} | ${row.formations} | ${row.commanders} | ${row.government ? 'yes' : 'no'} | ${row.factions} | ${row.finance ? 'yes' : 'no'} |`),
+    '| Polity | Fidelity | Regions | National totals | Goals | Agreements | Formations | Commanders | Government | Factions | Finance |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
+    ...audit.polities.map((row) => `| ${row.polityId} | ${row.fidelity} | ${row.regionCount} | ${row.controls.matches ? 'exact' : 'MISMATCH'} | ${row.goals.length} | ${row.agreements} | ${row.formations} | ${row.commanders} | ${row.government ? 'yes' : 'no'} | ${row.factions} | ${row.finance ? 'yes' : 'no'} |`),
     '',
     `First-month baseline: **${audit.firstMonth.matches ? 'exact' : 'MISMATCH'}** (\`${audit.firstMonth.actualChecksum}\`).`,
     '',

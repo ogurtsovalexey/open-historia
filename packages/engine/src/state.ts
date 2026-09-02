@@ -165,7 +165,9 @@ export function initState(scenario: EconScenario): EconWorldState {
           .sort((left, right) => `${left.polities[0]}|${left.polities[1]}`.localeCompare(`${right.polities[0]}|${right.polities[1]}`))
           .map((relation) => ({ ...relation, updatedMonth: scenario.startMonth })),
         proposals: [],
-        agreements: [],
+        agreements: [...(scenario.diplomacy.startingAgreements ?? [])]
+          .map((agreement) => ({ ...agreement, terms: { ...agreement.terms } }))
+          .sort((left, right) => left.agreementId.localeCompare(right.agreementId)),
       },
       ...(scenario.modules?.trade === true ? {
         trade: {

@@ -21,7 +21,55 @@ const agree = (state: EconWorldState, from: string, to: string, type: 'defensive
   return tick(state, [{ kind: 'diplomacy.respond', ...common(state, to, suffix + 1), proposalId, response: 'accept' }]).state;
 };
 
+const withStartingAlliance = () => {
+  const raw = JSON.parse(readFileSync(resolve(here, '../../fixtures/scenario-dev-map-6c/scenario.json'), 'utf8'));
+  raw.diplomacy.startingAgreements = [{
+    agreementId: 'agreement:authored-austria-france',
+    sourceProposalId: 'proposal:authored-austria-france',
+    acceptedMonth: '1934-01-01',
+    terms: {
+      kind: 'agreement', agreementType: 'defensive-alliance',
+      fromPolityId: 'polity:austria', toPolityId: 'polity:france',
+    },
+  }];
+  return parseScenario(raw);
+};
+
 describe('P8 executable alliance obligations (canon 17)', () => {
+  it('materialises an in-force scenario agreement before the first decision', () => {
+    const initial = initState(withStartingAlliance());
+    assert.deepEqual(initial.diplomacy?.agreements, [{
+      agreementId: 'agreement:authored-austria-france',
+      sourceProposalId: 'proposal:authored-austria-france',
+      acceptedMonth: '1934-01-01',
+      terms: {
+        kind: 'agreement', agreementType: 'defensive-alliance',
+        fromPolityId: 'polity:austria', toPolityId: 'polity:france',
+      },
+    }]);
+    const declared = tick(initial, [{ kind: 'war.declare', ...common(initial, 'polity:germany', 30),
+      warId: 'war:p8-authored-alliance', defenderPolityId: 'polity:austria', reason: 'rivalry' }]);
+    assert.deepEqual(declared.state.military?.callsToArms?.map((entry) => ({
+      calledPolityId: entry.calledPolityId,
+      beneficiaryPolityId: entry.beneficiaryPolityId,
+      sourceAgreementIds: entry.sourceAgreementIds,
+    })), [{
+      calledPolityId: 'polity:france', beneficiaryPolityId: 'polity:austria',
+      sourceAgreementIds: ['agreement:authored-austria-france'],
+    }]);
+  });
+
+  it('rejects future, duplicate and unknown-party starting agreements', () => {
+    const raw = JSON.parse(readFileSync(resolve(here, '../../fixtures/scenario-dev-map-6c/scenario.json'), 'utf8'));
+    const agreement = {
+      agreementId: 'agreement:authored-invalid', sourceProposalId: 'proposal:authored-invalid',
+      acceptedMonth: '1936-01-01', terms: { kind: 'agreement', agreementType: 'guarantee',
+        fromPolityId: 'polity:france', toPolityId: 'polity:unknown' },
+    };
+    raw.diplomacy.startingAgreements = [agreement, { ...agreement }];
+    assert.throws(() => parseScenario(raw), /starting agreement parties|starting agreement cannot postdate|duplicate starting agreement/);
+  });
+
   it('reads a pre-P8 military state and writes the optional collection on its next tick', () => {
     const legacy = structuredClone(initState(scenario));
     delete legacy.military!.callsToArms;

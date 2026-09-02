@@ -31,6 +31,12 @@ currencies or migration without playtest evidence.
   brief. No model chooses numeric penalties or edits belligerent arrays.
 - Old military states may omit `callsToArms`. The field appears on the first
   real military update, preserving readable pre-P8 sessions.
+- A scenario may seed diplomatic agreements already in force at its snapshot.
+  Their ids, parties, type and acceptance month are schema-validated; the
+  acceptance month cannot postdate the scenario. They materialise before the
+  first decision and drive the same call-to-arms path as negotiated agreements.
+  Missing or duplicate parties/ids fail scenario parsing rather than becoming
+  model-authored history.
 
 ## Acceptance
 

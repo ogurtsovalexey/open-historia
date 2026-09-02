@@ -53,4 +53,17 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   assert.equal(audit.issues.filter((entry) => entry.code === 'executable-agreement-missing').length,
     AUTHORED_COMMITMENT_EXPECTATIONS.length);
   assert.match(renderOwnerTable(audit), /production-derived diagnostic table/);
+
+  const withAgreements = structuredClone(fixture);
+  withAgreements.engineScenario.diplomacy.startingAgreements = AUTHORED_COMMITMENT_EXPECTATIONS.map((entry) => ({
+    agreementId: `agreement:audit-${entry.commitmentId.split(':').at(-1)}`,
+    sourceProposalId: `proposal:audit-${entry.commitmentId.split(':').at(-1)}`,
+    acceptedMonth: '1935-01-01',
+    terms: {
+      kind: 'agreement', agreementType: entry.agreementType,
+      fromPolityId: entry.polityIds[0], toPolityId: entry.polityIds[1],
+    },
+  }));
+  const agreementAudit = buildStartingStateAudit({ ...withAgreements, firstMonth: audit.firstMonth });
+  assert.equal(agreementAudit.issues.some((entry) => entry.code === 'executable-agreement-missing'), false);
 });
