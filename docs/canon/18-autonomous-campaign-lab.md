@@ -33,6 +33,10 @@ therefore exposes no plugin, app or MCP tool to a model; the subsequent isolated
 schema run disables all three explicitly. Availability inspection is not the schema-transport
 preflight and performs no model turn; the latter remains mandatory for each
 model/contract combination before first use.
+The preflight uses the production `StrategicDecisionV3` JSON Schema in a fresh
+ephemeral read-only process, validates a frozen sentinel response, and stores a
+mode-0600 record containing only CLI/model/effort/contract and schema/response
+checksums. Raw preflight responses and ChatGPT credentials are not persisted.
 
 ## 2026-09-02 Codex-local renewal
 

@@ -1,14 +1,23 @@
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { PassThrough } from "node:stream";
 import test from "node:test";
+import { z } from "zod";
+import { strategicDecisionV3Schema } from "@open-historia/agent-runtime";
 import {
   codexAppServerArgs,
+  codexStructuredExecArgs,
   hasChatGptLogin,
   inspectCodexSubscription,
   normalizeCodexModelCatalog,
   queryCodexModels,
+  readCodexPreflights,
+  runCodexSchemaPreflight,
   sanitizeCodexProviderEnvironment,
+  strategicDecisionV3JsonSchema,
 } from "./codexSubscriptionProvider.js";
 
 const rawModels = [{
@@ -82,4 +91,48 @@ test("desktop inspection exposes CLI models but keeps schema transport pending",
   assert.equal(status.preflightRequired, true);
   assert.equal(status.models.length, 2);
   assert.equal(JSON.stringify(status).includes("token"), false);
+});
+
+test("schema preflight is isolated, validates the exact V3 payload and stores only checksums", async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "open-historia-codex-preflight-test-"));
+  try {
+    let invocation;
+    const record = await runCodexSchemaPreflight({
+      model: "gpt-5.6-luna", effort: "medium", cliVersion: "codex-cli test", directory,
+      invoke: async (options) => {
+        invocation = options;
+        const sentinel = JSON.parse(options.prompt.split("\n").at(-1));
+        return { response: sentinel, stdout: '{"type":"turn.completed"}\n' };
+      },
+    });
+    assert.equal(record.contract, "StrategicBriefV4+StrategicDecisionV3");
+    assert.equal(record.model, "gpt-5.6-luna");
+    assert.equal(record.preflightChecksum.startsWith("sha256:"), true);
+    assert.equal(invocation.schema.type, "object");
+    assert.equal(invocation.schema.properties.hold.anyOf.length, 2);
+    assert.deepEqual(readCodexPreflights(directory), [record]);
+    const bytes = fs.readFileSync(path.join(directory, `${record.preflightChecksum.slice(7)}.json`), "utf8");
+    assert.equal(bytes.includes("Transport preflight only"), false, "raw model response is not persisted");
+    assert.equal(bytes.includes("token"), false);
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("server preflight schema stays structurally identical to canonical StrategicDecisionV3", () => {
+  const canonical = z.toJSONSchema(strategicDecisionV3Schema);
+  delete canonical.$schema;
+  assert.deepEqual(strategicDecisionV3JsonSchema(), canonical);
+});
+
+test("structured Codex turns disable ambient config, plugins, apps and writable sandboxes", () => {
+  const args = codexStructuredExecArgs({
+    cwd: "/tmp/preflight", schemaPath: "/tmp/preflight/schema.json", outputPath: "/tmp/preflight/out.json",
+    model: "gpt-5.6-terra", effort: "high",
+  });
+  for (const required of ["--ephemeral", "--ignore-user-config", "--ignore-rules", "read-only", "gpt-5.6-terra",
+    'model_reasoning_effort="high"', "features.plugins=false", "features.apps=false", "mcp_servers={}"]) {
+    assert.ok(args.includes(required), required);
+  }
+  assert.throws(() => codexStructuredExecArgs({ cwd: "/tmp/x", schemaPath: "/tmp/s", outputPath: "/tmp/o", model: "../bad", effort: "medium" }), /model id/);
 });

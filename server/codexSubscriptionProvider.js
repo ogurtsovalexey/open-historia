@@ -1,4 +1,8 @@
 import { execFileSync, spawn, spawnSync } from "node:child_process";
+import crypto from "node:crypto";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 export const CODEX_SUBSCRIPTION_PROVIDER = "codex-subscription";
 export const CODEX_TESTED_MODELS = Object.freeze([
@@ -8,6 +12,8 @@ export const CODEX_TESTED_MODELS = Object.freeze([
 ]);
 
 const APP_SERVER_TIMEOUT_MS = 15_000;
+const STRUCTURED_TURN_TIMEOUT_MS = 10 * 60_000;
+export const CODEX_STRATEGIC_CONTRACT = "StrategicBriefV4+StrategicDecisionV3";
 
 export function sanitizeCodexProviderEnvironment(source = process.env) {
   return Object.fromEntries(Object.entries(source).filter(([name, value]) => {
@@ -59,6 +65,188 @@ export function normalizeCodexModelCatalog(raw) {
       badge: tested.has(id) ? "tested" : "unverified",
     };
   }).sort((left, right) => Number(right.isDefault) - Number(left.isDefault) || left.id.localeCompare(right.id));
+}
+
+export function strategicDecisionV3JsonSchema() {
+  const string = (maxLength) => ({ type: "string", minLength: 1, ...(maxLength ? { maxLength } : {}) });
+  const array = (items, maxItems, minItems) => ({
+    ...(minItems ? { minItems } : {}), ...(maxItems ? { maxItems } : {}), type: "array", items,
+  });
+  const object = (properties) => ({ type: "object", properties, required: Object.keys(properties), additionalProperties: false });
+  const hold = object({
+    reason: { type: "string", enum: ["no-legal-action", "waiting-response", "insufficient-resources", "plan-sequencing", "risk-too-high", "mandatory-overflow", "stale"] },
+    detail: string(320),
+    revisitAfterMonths: { type: "integer", minimum: 1, maximum: 12 },
+  });
+  return object({
+    polityId: string(),
+    revision: string(),
+    objective: object({
+      domain: { type: "string", enum: ["economy", "diplomacy", "politics", "military", "statecraft", "campaign"] },
+      summary: string(320),
+      horizon: { type: "string", enum: ["short", "medium", "long"] },
+    }),
+    selectedChoices: array(object({
+      choiceId: string(), purpose: string(240), evidenceIds: array(string(), 12, 1), expectedConsequence: string(320),
+    }), 10),
+    triggerCoverage: array(object({ triggerId: string(), choiceIds: array(string(), 10, 1) }), 32),
+    rejectedChoices: array(object({ choiceId: string(), reason: string(240) }), 3),
+    durablePlan: object({ objective: string(320), futureSteps: array(string(240), 8), commitments: array(string(240), 8) }),
+    contingency: string(500),
+    hold: { anyOf: [hold, { type: "null" }] },
+  });
+}
+
+const safeModel = (value) => {
+  const model = String(value ?? "").trim();
+  if (!/^[a-z0-9][a-z0-9._-]{0,119}$/i.test(model)) throw new Error("Invalid Codex model id");
+  return model;
+};
+
+const safeEffort = (value) => {
+  const effort = String(value ?? "medium").trim();
+  if (!new Set(["low", "medium", "high", "xhigh", "max", "ultra"]).has(effort)) throw new Error("Invalid Codex reasoning effort");
+  return effort;
+};
+
+export function codexStructuredExecArgs({ cwd, schemaPath, outputPath, model, effort }) {
+  return [
+    "exec", "--ephemeral", "--ignore-user-config", "--ignore-rules", "--skip-git-repo-check", "--json",
+    "--output-schema", schemaPath, "--output-last-message", outputPath, "--cd", cwd, "--sandbox", "read-only",
+    "--model", safeModel(model),
+    "--config", 'forced_login_method="chatgpt"',
+    "--config", `model_reasoning_effort="${safeEffort(effort)}"`,
+    "--config", 'model_verbosity="low"',
+    "--config", "features.fast_mode=false",
+    "--config", "features.plugins=false",
+    "--config", "features.apps=false",
+    "--config", "features.multi_agent=false",
+    "--config", "mcp_servers={}",
+    "-",
+  ];
+}
+
+export function invokeCodexStructured({
+  prompt,
+  schema,
+  model,
+  effort = "medium",
+  spawnImpl = spawn,
+  timeoutMs = STRUCTURED_TURN_TIMEOUT_MS,
+  environment = process.env,
+} = {}) {
+  if (!prompt || typeof prompt !== "string") throw new Error("Codex prompt must be a non-empty string");
+  const workingDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "open-historia-codex-provider-"));
+  const schemaPath = path.join(workingDirectory, "output-schema.json");
+  const outputPath = path.join(workingDirectory, "last-message.json");
+  fs.writeFileSync(schemaPath, `${JSON.stringify(schema, null, 2)}\n`, "utf8");
+  const args = codexStructuredExecArgs({ cwd: workingDirectory, schemaPath, outputPath, model, effort });
+  return new Promise((resolve, reject) => {
+    const child = spawnImpl("codex", args, {
+      cwd: workingDirectory,
+      env: sanitizeCodexProviderEnvironment(environment),
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    let settled = false;
+    const cleanup = () => fs.rmSync(workingDirectory, { recursive: true, force: true });
+    const finish = (error, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      if (error) reject(error);
+      else resolve(value);
+      cleanup();
+    };
+    const timeout = setTimeout(() => {
+      child.kill("SIGTERM");
+      finish(new Error("Codex schema transport timed out"));
+    }, timeoutMs);
+    child.on("error", (error) => finish(error));
+    child.stdout.on("data", (chunk) => { stdout += chunk.toString(); });
+    child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
+    child.on("close", (code) => {
+      if (code !== 0) {
+        finish(new Error(`Codex schema transport failed (code ${code}): ${stderr.trim()}`));
+        return;
+      }
+      try {
+        const response = JSON.parse(fs.readFileSync(outputPath, "utf8"));
+        const completed = stdout.split(/\r?\n/).filter(Boolean).some((line) => {
+          try { return JSON.parse(line).type === "turn.completed"; } catch { return false; }
+        });
+        if (!completed) throw new Error("Codex exited without a completed turn");
+        finish(null, { response, stdout });
+      } catch (error) {
+        finish(error);
+      }
+    });
+    child.stdin.end(prompt);
+  });
+}
+
+const preflightResponse = Object.freeze({
+  polityId: "polity:preflight",
+  revision: "revision:preflight",
+  objective: { domain: "campaign", summary: "Verify the structured decision transport.", horizon: "short" },
+  selectedChoices: [],
+  triggerCoverage: [],
+  rejectedChoices: [],
+  durablePlan: { objective: "Verify transport only.", futureSteps: [], commitments: [] },
+  contingency: "Do not materialize this diagnostic response.",
+  hold: { reason: "plan-sequencing", detail: "Transport preflight only.", revisitAfterMonths: 1 },
+});
+
+const checksum = (value) => crypto.createHash("sha256").update(typeof value === "string" ? value : JSON.stringify(value)).digest("hex");
+
+export function readCodexPreflights(directory) {
+  try {
+    return fs.readdirSync(directory).filter((name) => /^[a-f0-9]{64}\.json$/.test(name)).sort().flatMap((name) => {
+      try { return [JSON.parse(fs.readFileSync(path.join(directory, name), "utf8"))]; } catch { return []; }
+    });
+  } catch {
+    return [];
+  }
+}
+
+export async function runCodexSchemaPreflight({
+  model,
+  effort = "medium",
+  cliVersion,
+  directory,
+  invoke = invokeCodexStructured,
+} = {}) {
+  const selectedModel = safeModel(model);
+  const selectedEffort = safeEffort(effort);
+  if (!directory) throw new Error("Codex preflight directory is required");
+  const schema = strategicDecisionV3JsonSchema();
+  const prompt = [
+    "This is a transport-only structured-output preflight. Return exactly the JSON object below.",
+    "Do not add prose, markdown, tools, or numeric effects.",
+    JSON.stringify(preflightResponse),
+  ].join("\n");
+  const result = await invoke({ prompt, schema, model: selectedModel, effort: selectedEffort });
+  const parsed = result.response;
+  if (JSON.stringify(parsed) !== JSON.stringify(preflightResponse)) throw new Error("Codex preflight response did not preserve the frozen sentinel payload");
+  const record = {
+    schemaVersion: "open-historia-codex-preflight/1",
+    provider: CODEX_SUBSCRIPTION_PROVIDER,
+    contract: CODEX_STRATEGIC_CONTRACT,
+    model: selectedModel,
+    effort: selectedEffort,
+    cliVersion: String(cliVersion ?? "unknown"),
+    schemaChecksum: `sha256:${checksum(schema)}`,
+    responseChecksum: `sha256:${checksum(parsed)}`,
+  };
+  const preflightChecksum = `sha256:${checksum(record)}`;
+  const stored = { ...record, preflightChecksum };
+  fs.mkdirSync(directory, { recursive: true });
+  const target = path.join(directory, `${preflightChecksum.slice("sha256:".length)}.json`);
+  const temporary = `${target}.tmp-${process.pid}`;
+  fs.writeFileSync(temporary, `${JSON.stringify(stored, null, 2)}\n`, { encoding: "utf8", mode: 0o600 });
+  fs.renameSync(temporary, target);
+  return stored;
 }
 
 export function queryCodexModels({

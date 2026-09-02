@@ -69,7 +69,7 @@ import {
   RelayError,
   RELAY_ERROR_CODES,
 } from "./security.js";
-import { inspectCodexSubscription } from "./codexSubscriptionProvider.js";
+import { inspectCodexSubscription, readCodexPreflights, runCodexSchemaPreflight } from "./codexSubscriptionProvider.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 import { DATA_DIR } from "./dataDir.js";
@@ -80,14 +80,6 @@ const distDir = path.join(__dirname, "../dist");
 const jsonParser = express.json({ limit: "64mb" });
 const largeJsonParser = express.json({ limit: "2048mb" });
 const uploadParser = express.raw({ type: () => true, limit: "2048mb" });
-
-app.get("/api/codex-subscription/status", async (_req, res) => {
-  try {
-    res.json(await inspectCodexSubscription());
-  } catch (error) {
-    sendError(res, 500, error);
-  }
-});
 
 // The Android app's connect screen lives on the WebView's own origin, so its
 // probe of this server is a cross-origin request — without these headers the
@@ -110,6 +102,33 @@ app.use((req, res, next) => {
     return res.sendStatus(204);
   }
   next();
+});
+
+const codexPreflightDirectory = path.join(DATA_DIR, "codex-preflights");
+
+app.get("/api/codex-subscription/status", async (_req, res) => {
+  try {
+    const status = await inspectCodexSubscription();
+    res.json({ ...status, preflights: status.available ? readCodexPreflights(codexPreflightDirectory) : [] });
+  } catch (error) {
+    sendError(res, 500, error);
+  }
+});
+
+app.post("/api/codex-subscription/preflight", jsonParser, async (req, res) => {
+  try {
+    const status = await inspectCodexSubscription();
+    if (!status.available) return sendError(res, 400, status.message);
+    const model = status.models.find((entry) => entry.id === req.body?.model);
+    if (!model) return sendError(res, 400, "Selected model is not present in the installed Codex catalog.");
+    if (!model.supportedEfforts.includes(req.body?.effort)) return sendError(res, 400, "Selected effort is not supported by this model.");
+    const record = await runCodexSchemaPreflight({
+      model: model.id, effort: req.body.effort, cliVersion: status.cliVersion, directory: codexPreflightDirectory,
+    });
+    return res.json(record);
+  } catch (error) {
+    return sendError(res, 500, error);
+  }
 });
 
 ensureScenarioStore();

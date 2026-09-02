@@ -418,11 +418,13 @@ const SettingsInput = ({
     </div>
 );
 
-const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReasoning = true, codexStatus }) => {
+const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReasoning = true, codexStatus, onCodexPreflight }) => {
     const meta = getProviderMeta(provider);
     const supportsModelDiscovery = providerSupportsModelDiscovery(provider);
     // Global reasoning toggle — one switch, applied in every provider mode.
     const [reasoningOn, setReasoningOn] = useState(() => getReasoningEnabled());
+    const [preflightRunning, setPreflightRunning] = useState(false);
+    const [preflightError, setPreflightError] = useState("");
     const toggleReasoning = () => {
         const next = !reasoningOn;
         setReasoningOn(next);
@@ -620,7 +622,13 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
                 <label style={labelStyle}>Model</label>
                 <select
                 value={settings.codexSubscriptionModel ?? "gpt-5.6-luna"}
-                onChange={(event) => onSettingChange("codexSubscriptionModel", event.target.value)}
+                onChange={(event) => {
+                    const model = (codexStatus.models ?? []).find((entry) => entry.id === event.target.value);
+                    onSettingChange("codexSubscriptionModel", event.target.value);
+                    if (model && !model.supportedEfforts.includes(settings.codexSubscriptionEffort)) {
+                        onSettingChange("codexSubscriptionEffort", model.defaultEffort || "medium");
+                    }
+                }}
                 style={{ ...inputStyle, cursor: "pointer" }}
                 >
                 {(codexStatus.models ?? []).map((model) => (
@@ -647,6 +655,33 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
                 })()}
                 </select>
                 </div>
+                {(() => {
+                    const model = settings.codexSubscriptionModel ?? "gpt-5.6-luna";
+                    const effort = settings.codexSubscriptionEffort ?? "medium";
+                    const passed = (codexStatus.preflights ?? []).some((record) => record.model === model
+                        && record.effort === effort && record.cliVersion === codexStatus.cliVersion
+                        && record.contract === "StrategicBriefV4+StrategicDecisionV3");
+                    return (
+                        <div style={fieldGroupStyle}>
+                        <button
+                        type="button"
+                        disabled={preflightRunning || passed}
+                        onClick={async () => {
+                            setPreflightRunning(true);
+                            setPreflightError("");
+                            try { await onCodexPreflight?.({ model, effort }); }
+                            catch (error) { setPreflightError(error?.message ?? String(error)); }
+                            finally { setPreflightRunning(false); }
+                        }}
+                        style={{ ...inputStyle, cursor: preflightRunning || passed ? "default" : "pointer",
+                            backgroundColor: passed ? "rgba(34,197,94,0.18)" : "rgba(59,130,246,0.18)" }}
+                        >
+                        {passed ? "Schema preflight passed" : preflightRunning ? "Running schema preflight…" : "Run schema preflight"}
+                        </button>
+                        {preflightError && <div style={{ ...helperStyle, color: "#fca5a5" }}>{preflightError}</div>}
+                        </div>
+                    );
+                })()}
                 </>
             )}
             </>
@@ -869,6 +904,20 @@ const SettingsMenu = ({
         return () => { active = false; };
     }, []);
 
+    const runCodexPreflight = async ({ model, effort }) => {
+        const response = await fetch("/api/codex-subscription/preflight", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ model, effort }),
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error ?? `Codex preflight failed (HTTP ${response.status}).`);
+        setCodexStatus((current) => ({ ...current, preflights: [
+            ...(current.preflights ?? []).filter((record) => record.preflightChecksum !== payload.preflightChecksum), payload,
+        ] }));
+        return payload;
+    };
+
     return (
         <div
         style={{
@@ -912,6 +961,7 @@ const SettingsMenu = ({
         settings={providerSettings ?? {}}
         onSettingChange={onProviderSettingChange ?? (() => {})}
         codexStatus={codexStatus}
+        onCodexPreflight={runCodexPreflight}
         />
 
         <ApiProviderSelector
@@ -927,6 +977,7 @@ const SettingsMenu = ({
         onSettingChange={onUtilityProviderSettingChange ?? (() => {})}
         showReasoning={false}
         codexStatus={codexStatus}
+        onCodexPreflight={runCodexPreflight}
         />
 
         <LanguageSelector />
