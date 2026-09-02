@@ -374,7 +374,9 @@ test('StrategicBriefV4 is a single-actor bounded ID catalog with politics and co
   assert.equal(first.tokenCountMethod, 'provider');
   assert.equal(first.candidateAudit.length, 15);
   assert.ok(first.choices.every((entry) => entry.choiceId.startsWith('choice:')));
+  assert.ok(first.choices.every((entry) => entry.evidenceId === entry.choiceId.replace(/^choice:/, 'evidence:')));
   assert.equal(new Set(first.choices.map((entry) => entry.choiceId)).size, first.choices.length);
+  assert.equal(new Set(first.choices.map((entry) => entry.evidenceId)).size, first.choices.length);
   assert.equal(JSON.stringify(first).includes('geometry'), false);
   const prompt = renderStrategicPromptV4(first, options.systemText);
   assert.equal(first.inputTokenCount, options.countTokens(prompt));
@@ -446,6 +448,8 @@ test('StrategicDecisionV3 expands frozen IDs and requires exact compatible manda
   assert.ok(accepted.commands.length > 0);
   assert.equal(runTurn(state, { commands: accepted.commands }).result.rejections.length, 0);
   assert.equal(materializeStrategicDecisionV4(state, { ...decision, selectedChoices: [{ ...decision.selectedChoices[0], choiceId: 'choice:invented' }] }, brief).status, 'terminal');
+  assert.equal(materializeStrategicDecisionV4(state, { ...decision, selectedChoices: [{ ...decision.selectedChoices[0], evidenceIds: ['evidence:invented'] }] }, brief).status, 'terminal');
+  assert.equal(materializeStrategicDecisionV4(state, { ...decision, triggerCoverage: [decision.triggerCoverage[0], decision.triggerCoverage[0]] }, brief).status, 'terminal');
   assert.equal(materializeStrategicDecisionV4(state, { ...decision, triggerCoverage: [] }, brief).status, 'hold');
   const advanced = runTurn(state, { commands: [] }).result.state;
   assert.equal(materializeStrategicDecisionV4(advanced, decision, brief).status, 'hold');

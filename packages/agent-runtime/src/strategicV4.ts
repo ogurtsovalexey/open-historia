@@ -59,6 +59,7 @@ export type StrategicTriggerV4 = z.infer<typeof strategicTriggerV4Schema>;
 
 export interface StrategicChoiceV4 {
   choiceId: string;
+  evidenceId: string;
   family: StrategicActionV2['tool'];
   action: StrategicActionV2;
   preview: StrategicPreviewV3;
@@ -318,7 +319,8 @@ export function buildStrategicBriefV4(state: EconWorldState, polityId: string, o
       else if (affordance.tool === 'negotiate-peace') affordance.wars.flatMap((entry) => entry.choices).forEach(visit);
     }
     if (!preview) throw new Error(`missing preview for ${action.tool}`);
-    return { choiceId: choiceKey(state.revision, polityId, action), family: action.tool, action, preview };
+    const choiceId = choiceKey(state.revision, polityId, action);
+    return { choiceId, evidenceId: `evidence:${choiceId.slice('choice:'.length)}`, family: action.tool, action, preview };
   });
   const candidateAudit = ALL_FAMILIES.map((family): CandidateAuditV4 => {
     const considered = allActions.filter((entry) => entry.tool === family).length;
@@ -385,12 +387,21 @@ export function materializeStrategicDecisionV4(state: EconWorldState, raw: unkno
   if (new Set(selectedIds).size !== selectedIds.length || selectedIds.some((id) => !choices.has(id))) {
     return { status: 'terminal', commands: [], decision: null, pendingTriggerIds: pending, reason: 'invented or duplicate choiceId' };
   }
+  const allowedEvidenceIds = new Set([
+    ...brief.triggers.flatMap((entry) => [entry.triggerId, ...entry.evidenceIds]),
+    ...brief.ownIntelligence.map((entry) => entry.evidenceId),
+    ...selectedIds.map((id) => choices.get(id)!.evidenceId),
+  ]);
+  if (decision.selectedChoices.some((entry) => entry.evidenceIds.some((id) => !allowedEvidenceIds.has(id)))) {
+    return { status: 'terminal', commands: [], decision: null, pendingTriggerIds: pending, reason: 'invented evidence reference' };
+  }
   const triggerMap = new Map(brief.triggers.map((entry) => [entry.triggerId, entry]));
   const coverageCount = new Map<string, number>();
   for (const coverage of decision.triggerCoverage) {
     const trigger = triggerMap.get(coverage.triggerId);
     if (!trigger || new Set(coverage.choiceIds).size !== coverage.choiceIds.length) return { status: 'terminal', commands: [], decision: null, pendingTriggerIds: pending, reason: 'unknown trigger or duplicate trigger choice' };
-    coverageCount.set(coverage.triggerId, (coverageCount.get(coverage.triggerId) ?? 0) + 1);
+    if (coverageCount.has(coverage.triggerId)) return { status: 'terminal', commands: [], decision: null, pendingTriggerIds: pending, reason: 'duplicate trigger coverage' };
+    coverageCount.set(coverage.triggerId, 1);
     for (const id of coverage.choiceIds) {
       const choice = choices.get(id);
       if (!choice || !selectedIds.includes(id) || !compatible(trigger, choice)) return { status: 'terminal', commands: [], decision: null, pendingTriggerIds: pending, reason: 'trigger coverage references an incompatible or unselected choice' };

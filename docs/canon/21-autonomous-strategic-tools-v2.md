@@ -20,7 +20,10 @@ cannot resume or validate a V4 run.
 - The candidate audit records every tool family and why it was published or
   excluded. Every independently legal choice receives a revision-stable
   `choiceId`; the model returns IDs only. The application rechecks actor,
-  revision, trigger compatibility and the complete engine dry run.
+  revision, trigger compatibility and the complete engine dry run. Each frozen
+  preview also receives a stable evidence ID; invented evidence and duplicate
+  trigger coverage are terminal validation failures, while missing mandatory
+  coverage alone becomes the diagnostic hold.
 - A caller-supplied relevance list is a floor, never a ceiling: compatible
   mandatory-trigger families, active-goal families, checkpoint-specific
   responses and material shortage responses are added deterministically. A
