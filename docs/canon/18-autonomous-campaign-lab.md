@@ -1,6 +1,27 @@
 # 18 — Autonomous Campaign Lab
 
-Status: accepted implementation contract; Codex-local renewal accepted 2026-09-02.
+Status: accepted implementation contract; V4 Gate 0 revision accepted 2026-09-02.
+
+## V4 Gate 0 freeze prerequisites
+
+No new model turn may run until the owner approves both the Europe 1935
+geography overlay and the complete starting-state table. The immutable V4 lab
+round stores exact prompt/schema, candidate audit, raw response,
+normalization/materialization, scoring, thread id, usage and checksums beneath
+`runs/campaign-lab/`; only redacted aggregates may enter Git.
+
+The hard live budget is 40 completed turns. Evaluation begins with the fixed
+old-vs-new one-shot A/B, then the Czech/Poland two-step and reversed-order
+probes, followed by bounded cross-model checks and the two final Gate 0 runs.
+One-shot is production default when it meets the same quality threshold as
+two-step. Every final prompt uses `StrategicBriefV4+StrategicDecisionV3`, is at
+most 8,000 input tokens and has one private country session.
+
+Provider/model failure never falls back automatically: it creates a hold,
+keeps triggers pending and asks the player to change configuration manually.
+Campaign Lab freezes provider, model, effort and preflight at start. Regular
+games may change them only for the next checkpoint and record the change in
+provenance.
 
 ## 2026-09-02 Codex-local renewal
 

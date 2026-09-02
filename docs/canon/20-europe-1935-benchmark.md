@@ -1,6 +1,40 @@
 # 20 — Europe 1935 benchmark
 
-Status: accepted benchmark contract, 2026-09-01.
+Status: accepted benchmark contract; major foundation revision approved for implementation 2026-09-02.
+
+## Major foundation revision gate
+
+The scenario id and `1935-01-01` date remain stable, while the replacement
+package raises its major content/schema versions. Old saves and runs remain
+preserved but fail resume with an explicit incompatibility error; there is no
+adapter that invents missing historical state.
+
+Before the package can be frozen, the owner separately approves (1) a visual
+geography overlay and (2) the complete starting-state table. Until both gates
+pass, no new benchmark model call is allowed.
+
+- The seven Supported polities receive 10–25 regions aggregated from real
+  administrative polygons valid on the scenario date. Saar and Danzig are
+  inert non-player polities. USSR and USA remain a few Baseline strategic
+  macro-regions. Metropolitan islands are included; colonies, protectorates,
+  dominions and distant theatres are excluded.
+- Simplified GeoJSON, source hashes, effective dates, per-object licenses and
+  provenance are deterministic. OpenHistoricalMap is CC0 except where an
+  element's `license=*` says otherwise; share-alike content requires a separate
+  owner decision. Land adjacency derives from geometry; straits, sea routes
+  and external links are authored.
+- National population/capacity controls and the first aggregate month are
+  preserved. Regional specialization follows sources; every estimate declares
+  confidence, method and TODO.
+- Every mature module is audited together. Executable agreements, governments,
+  ruling factions, finance/intelligence/projects, 2–4 ranked goals, commanders
+  and conservative theatre-level peacetime formations must agree. A treaty
+  already in force is a commitment, never an active goal to conclude it.
+
+The geography gate checks dates/licenses, topology, ownership, adjacency and
+the approved overlay. The starting-state gate checks national totals,
+first-month reproduction, cross-module consistency and provenance for every
+value.
 
 ## Scope
 

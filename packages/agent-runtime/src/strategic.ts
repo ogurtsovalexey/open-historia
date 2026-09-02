@@ -645,24 +645,27 @@ const buildEconomyV3 = (state: EconWorldState, polityId: string, baselineOutput?
       } ] } };
 };
 
-const previewFor = (state: EconWorldState, actorId: string, action: StrategicActionV2, commands: EconCommand[], after: EconWorldState): StrategicPreviewV3 => {
+const previewFor = (noOp: EconWorldState, actorId: string, action: StrategicActionV2, commands: EconCommand[], after: EconWorldState): StrategicPreviewV3 => {
   const deltas: StrategicPreviewV3['deltas'] = [];
-  const beforePolity = state.polities.find((entry) => entry.id === actorId)!;
+  // Attribute only the difference between two runs over the same opening
+  // snapshot and month. Comparing against `state` leaks ordinary monthly tick
+  // changes into the advertised effect of the action.
+  const beforePolity = noOp.polities.find((entry) => entry.id === actorId)!;
   const afterPolity = after.polities.find((entry) => entry.id === actorId)!;
   if (beforePolity.treasury !== afterPolity.treasury) deltas.push({ path: `polities.${actorId}.treasury`, before: beforePolity.treasury, after: afterPolity.treasury });
   const command = commands[0];
   if (command?.kind === 'economy.invest-region') {
-    const before = state.regions.find((entry) => entry.regionId === command.targetRegionId)!.infrastructureBp;
+    const before = noOp.regions.find((entry) => entry.regionId === command.targetRegionId)!.infrastructureBp;
     const value = after.regions.find((entry) => entry.regionId === command.targetRegionId)!.infrastructureBp;
     deltas.push({ path: `regions.${command.targetRegionId}.infrastructureBp`, before, after: value });
   } else if (command?.kind === 'economy.reallocate-production') {
-    const before = state.regions.find((entry) => entry.regionId === command.targetRegionId)?.activities ?? [];
+    const before = noOp.regions.find((entry) => entry.regionId === command.targetRegionId)?.activities ?? [];
     const changed = command.allocations.map((entry, index) => ({ index, beforeBp: before[index]?.allocationBp, afterBp: entry.allocationBp }))
       .filter((entry) => entry.beforeBp !== entry.afterBp);
     deltas.push({ path: `regions.${command.targetRegionId}.allocationBp`, before: changed.map((entry) => [entry.index, entry.beforeBp]),
       after: changed.map((entry) => [entry.index, entry.afterBp]) });
   } else if (command?.kind === 'finance.set-policy') {
-    const current = state.finance!.polities.find((entry) => entry.polityId === actorId)!;
+    const current = noOp.finance!.polities.find((entry) => entry.polityId === actorId)!;
     deltas.push({ path: `finance.${actorId}.taxBurdenBp`, before: current.taxBurdenBp, after: command.taxBurdenBp });
     deltas.push({ path: `finance.${actorId}.priorities`, before: current.priorities, after: command.priorities });
   } else if (command?.kind === 'diplomacy.propose') {
@@ -681,9 +684,10 @@ const compileChoice = <A extends StrategicActionV2>(state: EconWorldState, actor
   try {
     const commands = mapStrategicActionToCommandsUncheckedV3(state, actorId, action);
     if (commands.length === 0) return null;
+    const noOp = runTurn(state, { commands: [] }).result;
     const dry = runTurn(state, { commands }).result;
     if (dry.rejections.length) return null;
-    return { action, preview: previewFor(state, actorId, action, commands, dry.state) };
+    return { action, preview: previewFor(noOp.state, actorId, action, commands, dry.state) };
   } catch { return null; }
 };
 

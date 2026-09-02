@@ -27,6 +27,16 @@ import {
   expandStrategicAffordancesV3,
   materializeStrategicDecisionV3,
   materializeStrategicBatchV3,
+  buildStrategicBriefV4,
+  materializeStrategicDecisionV4,
+  dispatchStrategicSessions,
+  stableStrategicCommitOrder,
+  strategicCallBudget,
+  isQuarterlyCheckpoint,
+  politicalIdentitySchema,
+  assertStrategicRunCompatible,
+  commitStrategicMemory,
+  pendingTriggerRetryMonth,
   type AgentState,
 } from '../src/index.js';
 import { initState, parseScenario, runTurn, stateChecksum, type EconWorldState } from '@open-historia/engine';
@@ -44,6 +54,21 @@ const holdV2 = (polityId: string) => ({
   actions: [{ tool: 'conserve' as const }], futurePlan: [], contingency: 'Review after new evidence.', rationale: 'No supported material action is justified.',
   hold: { reason: 'plan-sequencing' as const, detail: 'Wait for the next checkpoint.', revisit: { afterMonths: 1, triggers: ['resource-deficit' as const] } },
 });
+
+const politicalV4 = (polityId: string) => {
+  const card = (role: 'head-of-state' | 'head-of-government' | 'decision-authority') => ({
+    characterId: `character:${polityId.slice(7)}:leader`, name: 'Scenario Leader', role, historical: false,
+    factCard: ['Exercises the authority declared by the scenario.'], knowledgePolicy: 'scenario-only' as const,
+    sourceRefs: ['source:test:scenario'],
+  });
+  return {
+    identity: { nativeLabel: 'Scenario government', legitimacyBases: ['Authored constitutional order'],
+      governingPrinciples: ['Preserve sovereignty'], strategicPreferences: ['Use material evidence'], taboos: ['Inventing state facts'],
+      riskAttitude: 'balanced' as const },
+    headOfState: card('head-of-state'), headOfGovernment: card('head-of-government'), decisionAuthority: card('decision-authority'),
+    rulingGroup: 'Scenario cabinet', currentConstraints: ['Remain within authored law'],
+  };
+};
 
 test('StrategicBriefV2 exposes monthly flows, iron runway and parameterized tools without geometry', () => {
   const state = benchmarkInitial();
@@ -275,6 +300,109 @@ test('Strategic V3 briefs, previews, commands, and batches are byte-deterministi
     JSON.stringify(materializeStrategicDecisionV3(state, { ...holdV2('polity:austria'), actions: [action], hold: null }, second)));
   assert.equal(JSON.stringify(buildStrategicBatchesV3(state, 'polity:germany', { systemText: 'system' })),
     JSON.stringify(buildStrategicBatchesV3(state, 'polity:germany', { systemText: 'system' })));
+});
+
+test('strategic previews attribute action minus no-op over the same monthly tick', () => {
+  const state = benchmarkInitial();
+  const noOp = runTurn(state, { commands: [] }).result.state;
+  const brief = buildStrategicBriefV3(state, 'polity:germany', { requestedTools: ['invest'] });
+  const invest = brief.affordances.find((entry) => entry.tool === 'invest');
+  assert.ok(invest?.tool === 'invest');
+  const treasury = invest.regions[0]!.scales[0]!.preview.deltas.find((entry) => entry.path.endsWith('.treasury'))!;
+  assert.equal(treasury.before, noOp.polities.find((entry) => entry.id === 'polity:germany')!.treasury);
+  assert.notEqual(treasury.before, state.polities.find((entry) => entry.id === 'polity:germany')!.treasury,
+    'fixture must have an ordinary monthly treasury tick so the regression is meaningful');
+});
+
+test('StrategicBriefV4 is a single-actor bounded ID catalog with politics and complete candidate audit', () => {
+  const state = benchmarkInitial();
+  const options = {
+    invocation: { reason: 'scheduled-quarter' as const, detail: 'Quarterly strategic review.' },
+    triggers: [{ triggerId: 'trigger:iron', kind: 'resource-emergency' as const, summary: 'Protect the iron runway.', mandatory: true,
+      compatibleTools: ['invest' as const], evidenceIds: ['evidence:iron-runway'] }],
+    relevantFamilies: ['invest' as const], political: politicalV4('polity:germany'), systemText: 'Compact production prompt.',
+    strategicContext: { redLines: ['Loss of sovereignty'], obligations: ['Existing commitments are constraints.'] },
+  };
+  const first = buildStrategicBriefV4(state, 'polity:germany', options);
+  const second = buildStrategicBriefV4(state, 'polity:germany', options);
+  assert.deepEqual(first, second);
+  assert.equal(first.promptContract, 'StrategicBriefV4+StrategicDecisionV3');
+  assert.match(first.role, /Germany/);
+  assert.equal(first.political.decisionAuthority.knowledgePolicy, 'scenario-only');
+  assert.ok(first.inputTokenCount <= 8000);
+  assert.equal(first.tokenCountMethod, 'utf8-upper-bound');
+  assert.equal(first.candidateAudit.length, 15);
+  assert.ok(first.choices.every((entry) => entry.choiceId.startsWith('choice:')));
+  assert.equal(new Set(first.choices.map((entry) => entry.choiceId)).size, first.choices.length);
+  assert.equal(JSON.stringify(first).includes('geometry'), false);
+});
+
+test('StrategicDecisionV3 expands frozen IDs and requires exact compatible mandatory coverage', () => {
+  const state = benchmarkInitial();
+  const brief = buildStrategicBriefV4(state, 'polity:germany', {
+    invocation: { reason: 'resource-emergency', detail: 'Iron exhaustion checkpoint.' },
+    triggers: [{ triggerId: 'trigger:iron', kind: 'resource-emergency', summary: 'Protect iron supply.', mandatory: true,
+      compatibleTools: ['invest'], evidenceIds: ['evidence:iron'] }],
+    relevantFamilies: ['invest'], political: politicalV4('polity:germany'),
+  });
+  const selected = brief.choices.find((entry) => entry.family === 'invest')!;
+  const rejected = brief.choices.find((entry) => entry.choiceId !== selected.choiceId)!;
+  const decision = {
+    polityId: 'polity:germany', revision: state.revision,
+    objective: { domain: 'economy' as const, summary: 'Protect industrial resilience.', horizon: 'medium' as const },
+    selectedChoices: [{ choiceId: selected.choiceId, purpose: 'Improve a legal domestic target.', evidenceIds: ['trigger:iron'],
+      expectedConsequence: 'The engine preview shows a bounded infrastructure improvement.' }],
+    triggerCoverage: [{ triggerId: 'trigger:iron', choiceIds: [selected.choiceId] }],
+    rejectedChoices: [{ choiceId: rejected.choiceId, reason: 'Less useful at this checkpoint.' }],
+    durablePlan: { objective: 'Preserve industrial resilience.', futureSteps: ['Reassess supply next quarter.'], commitments: [] },
+    contingency: 'Use another published supply choice if conditions change.', hold: null,
+  };
+  const accepted = materializeStrategicDecisionV4(state, decision, brief);
+  assert.equal(accepted.status, 'accepted');
+  assert.ok(accepted.commands.length > 0);
+  assert.equal(runTurn(state, { commands: accepted.commands }).result.rejections.length, 0);
+  assert.equal(materializeStrategicDecisionV4(state, { ...decision, selectedChoices: [{ ...decision.selectedChoices[0], choiceId: 'choice:invented' }] }, brief).status, 'terminal');
+  assert.equal(materializeStrategicDecisionV4(state, { ...decision, triggerCoverage: [] }, brief).status, 'hold');
+  const advanced = runTurn(state, { commands: [] }).result.state;
+  assert.equal(materializeStrategicDecisionV4(advanced, decision, brief).status, 'hold');
+});
+
+test('V4 scheduling is quarterly, bounded to four sessions, budgeted, and committed in stable polity order', () => {
+  assert.equal(isQuarterlyCheckpoint('1935-01-01', '1935-01-01'), true);
+  assert.equal(isQuarterlyCheckpoint('1935-01-01', '1935-02-01'), false);
+  assert.equal(isQuarterlyCheckpoint('1935-01-01', '1935-04-01'), true);
+  assert.deepEqual(dispatchStrategicSessions(['polity:e', 'polity:a', 'polity:d', 'polity:c', 'polity:b']),
+    [['polity:a', 'polity:b', 'polity:c', 'polity:d'], ['polity:e']]);
+  assert.equal(strategicCallBudget(7, '1935-01-01', '1936-01-01', 9), 44);
+  assert.deepEqual(stableStrategicCommitOrder([{ polityId: 'polity:b' }, { polityId: 'polity:a' }]),
+    [{ polityId: 'polity:a' }, { polityId: 'polity:b' }]);
+});
+
+test('political identity contract is era-neutral and V4 refuses an over-budget production prompt', () => {
+  for (const nativeLabel of ['Mercian kingship (800)', 'Estate monarchy (1400)', 'Constitutional cabinet (1800)', 'Coalition republic (2026)']) {
+    assert.equal(politicalIdentitySchema.parse({ nativeLabel, legitimacyBases: ['Authored lawful authority'],
+      governingPrinciples: ['Preserve the polity'], strategicPreferences: ['Balance commitments and capacity'],
+      taboos: [], riskAttitude: 'cautious' }).nativeLabel, nativeLabel);
+  }
+  assert.throws(() => buildStrategicBriefV4(benchmarkInitial(), 'polity:germany', {
+    invocation: { reason: 'scheduled-quarter', detail: 'Review.' }, relevantFamilies: ['invest'],
+    political: politicalV4('polity:germany'), countTokens: () => 8001,
+  }), /exceeds 8000 tokens/);
+});
+
+test('V4 run compatibility is explicit and durable plans commit only with accepted actions', () => {
+  const manifest = { schemaVersion: 'open-historia-strategic-run/3' as const, scenarioId: 'scenario:europe-1935-benchmark',
+    scenarioContentVersion: '1.0.0', promptContract: 'StrategicBriefV4+StrategicDecisionV3' as const,
+    provider: 'codex-subscription', model: 'gpt-5.6-luna', effort: 'medium', preflightChecksum: 'sha256:test' };
+  assert.deepEqual(assertStrategicRunCompatible(manifest, manifest), manifest);
+  assert.throws(() => assertStrategicRunCompatible({ ...manifest, schemaVersion: 'open-historia-strategic-run/2' }, manifest), /cannot resume/);
+  assert.throws(() => assertStrategicRunCompatible({ ...manifest, model: 'gpt-5.6-sol' }, manifest), /frozen model changed/);
+  const previous = { polityId: 'polity:germany', durablePlan: null, lastDecisionRevision: null };
+  const held = commitStrategicMemory(previous, { status: 'hold', commands: [], decision: null,
+    pendingTriggerIds: ['trigger:test'], reason: 'provider failure' });
+  assert.deepEqual(held, previous);
+  assert.notEqual(held, previous);
+  assert.equal(pendingTriggerRetryMonth('1935-12-01'), '1936-01-01');
 });
 
 test('strategic diplomacy batch is bounded, deterministic and contains no full map', () => {

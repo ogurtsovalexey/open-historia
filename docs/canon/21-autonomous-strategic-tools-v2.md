@@ -1,6 +1,41 @@
-# 21 — Autonomous strategic tools V2 output and V3 brief correction
+# 21 — Autonomous strategic tools V2 output and V4 decision boundary
 
-Status: V2 output retained; V3 brief correction owner-approved 2026-09-02.
+Status: V2/V3 retained only for frozen diagnostics; V4 boundary owner-approved 2026-09-02.
+
+## 2026-09-02 V4 replacement
+
+The production boundary is `StrategicBriefV4+StrategicDecisionV3`. V3 briefs
+and V2 decisions remain readable only by their frozen diagnostic runners; they
+cannot resume or validate a V4 run.
+
+- One fresh private session controls exactly one country and states its actor,
+  current decision authority, invocation reason, success criterion and ordered
+  decision hierarchy. Six-actor batches are transport-only fixtures.
+- The brief carries mandatory triggers, goals/red lines, at most three current
+  political constraints, public state, own evidence, durable plan and changes
+  since the previous decision. `politicalIdentity` is bounded authored prose,
+  never an engine coefficient. Historical leader knowledge is a soft
+  pre-scenario prior subordinate to the authored card; fictional leaders are
+  `scenario-only`.
+- The candidate audit records every tool family and why it was published or
+  excluded. Every independently legal choice receives a revision-stable
+  `choiceId`; the model returns IDs only. The application rechecks actor,
+  revision, trigger compatibility and the complete engine dry run.
+- Normal capacity is five material choices. Mandatory overflow permits at most
+  one covered choice per trigger and ten total; optional choices cannot consume
+  expanded slots. Mandatory triggers receive exact, unique coverage. An
+  uncovered response becomes a typed hold without a semantic retry.
+- Preview evidence is the delta between an action run and a no-op run from the
+  same snapshot over the same month. Ordinary tick effects are not attributed
+  to the action.
+- The complete prompt is limited to 8,000 input tokens. Missing choices are
+  never silently truncated. Schema/normalization/semantic failures terminalize
+  the attempt; provider failure or staleness produces a visible hold and keeps
+  its trigger pending.
+- Scheduled decisions are quarterly. Material war, proposal, crisis,
+  government, occupation/peace and default checkpoints are immediate. At most
+  four country sessions run concurrently and accepted packages commit in
+  stable polity-id order.
 
 ## 2026-09-02 correction
 
