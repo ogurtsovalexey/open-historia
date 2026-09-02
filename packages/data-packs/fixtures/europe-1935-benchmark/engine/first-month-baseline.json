@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "open-historia-first-month-baseline/1",
+  "scenarioId": "scenario:europe-1935-benchmark",
+  "openingMonth": "1935-01-01",
+  "closingMonth": "1935-02-01",
+  "turn": 1,
+  "polities": [
+    {
+      "polityId": "polity:austria",
+      "populationOpening": 6760000,
+      "populationClosing": 6762816,
+      "production": [{ "resource": "food", "total": 4800 }, { "resource": "goods", "total": 2400 }, { "resource": "wood", "total": 4800 }],
+      "taxTotal": 2016,
+      "food": { "need": 6762, "consumed": 6762, "shortfall": 0 },
+      "treasuryOpening": 4200,
+      "treasuryClosing": 6216,
+      "stockpileClosing": [{ "resource": "coal", "amount": 117600 }, { "resource": "food", "amount": 698038 }, { "resource": "goods", "amount": 72400 }, { "resource": "iron", "amount": 87600 }, { "resource": "oil", "amount": 30000 }, { "resource": "wood", "amount": 184800 }]
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "populationOpening": 15000000,
+      "populationClosing": 15008750,
+      "production": [{ "resource": "coal", "total": 15128 }, { "resource": "goods", "total": 11346 }, { "resource": "iron", "total": 11346 }],
+      "taxTotal": 11799,
+      "food": { "need": 15008, "consumed": 15008, "shortfall": 0 },
+      "treasuryOpening": 7600,
+      "treasuryClosing": 19399,
+      "stockpileClosing": [{ "resource": "coal", "amount": 523782 }, { "resource": "food", "amount": 1484992 }, { "resource": "goods", "amount": 191346 }, { "resource": "iron", "amount": 360000 }, { "resource": "oil", "amount": 50000 }, { "resource": "wood", "amount": 260000 }]
+    },
+    {
+      "polityId": "polity:france",
+      "populationOpening": 41900000,
+      "populationClosing": 41906984,
+      "production": [{ "resource": "food", "total": 21948 }, { "resource": "goods", "total": 29264 }, { "resource": "iron", "total": 21948 }],
+      "taxTotal": 23775,
+      "food": { "need": 41906, "consumed": 41906, "shortfall": 0 },
+      "treasuryOpening": 16000,
+      "treasuryClosing": 39775,
+      "stockpileClosing": [{ "resource": "coal", "amount": 1070736 }, { "resource": "food", "amount": 4280042 }, { "resource": "goods", "amount": 549264 }, { "resource": "iron", "amount": 712684 }, { "resource": "oil", "amount": 420000 }, { "resource": "wood", "amount": 800000 }]
+    },
+    {
+      "polityId": "polity:germany",
+      "populationOpening": 66000000,
+      "populationClosing": 66038500,
+      "production": [{ "resource": "coal", "total": 20800 }, { "resource": "goods", "total": 72800 }, { "resource": "iron", "total": 10400 }],
+      "taxTotal": 51792,
+      "food": { "need": 66038, "consumed": 66038, "shortfall": 0 },
+      "treasuryOpening": 18000,
+      "treasuryClosing": 69792,
+      "stockpileClosing": [{ "resource": "coal", "amount": 1448000 }, { "resource": "food", "amount": 5133962 }, { "resource": "goods", "amount": 672800 }, { "resource": "iron", "amount": 837600 }, { "resource": "oil", "amount": 300000 }, { "resource": "wood", "amount": 900000 }]
+    },
+    {
+      "polityId": "polity:italy",
+      "populationOpening": 43400000,
+      "populationClosing": 43436167,
+      "production": [{ "resource": "food", "total": 20250 }, { "resource": "goods", "total": 12150 }, { "resource": "iron", "total": 8100 }],
+      "taxTotal": 10003,
+      "food": { "need": 43436, "consumed": 43436, "shortfall": 0 },
+      "treasuryOpening": 10500,
+      "treasuryClosing": 20503,
+      "stockpileClosing": [{ "resource": "coal", "amount": 347850 }, { "resource": "food", "amount": 4376814 }, { "resource": "goods", "amount": 272150 }, { "resource": "iron", "amount": 285950 }, { "resource": "oil", "amount": 160000 }, { "resource": "wood", "amount": 550000 }]
+    },
+    {
+      "polityId": "polity:poland",
+      "populationOpening": 34000000,
+      "populationClosing": 34034000,
+      "production": [{ "resource": "coal", "total": 10296 }, { "resource": "food", "total": 17160 }, { "resource": "goods", "total": 6864 }],
+      "taxTotal": 6450,
+      "food": { "need": 34034, "consumed": 34034, "shortfall": 0 },
+      "treasuryOpening": 7200,
+      "treasuryClosing": 13650,
+      "stockpileClosing": [{ "resource": "coal", "amount": 723432 }, { "resource": "food", "amount": 3483126 }, { "resource": "goods", "amount": 166864 }, { "resource": "iron", "amount": 273136 }, { "resource": "oil", "amount": 160000 }, { "resource": "wood", "amount": 520000 }]
+    },
+    {
+      "polityId": "polity:soviet-union",
+      "populationOpening": 168000000,
+      "populationClosing": 168140000,
+      "production": [{ "resource": "food", "total": 16200 }, { "resource": "iron", "total": 16200 }, { "resource": "oil", "total": 21600 }],
+      "taxTotal": 11502,
+      "food": { "need": 168140, "consumed": 168140, "shortfall": 0 },
+      "treasuryOpening": 21000,
+      "treasuryClosing": 32502,
+      "stockpileClosing": [{ "resource": "coal", "amount": 2400000 }, { "resource": "food", "amount": 16848060 }, { "resource": "goods", "amount": 500000 }, { "resource": "iron", "amount": 1516200 }, { "resource": "oil", "amount": 1821600 }, { "resource": "wood", "amount": 3000000 }]
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "populationOpening": 46900000,
+      "populationClosing": 46911725,
+      "production": [{ "resource": "coal", "total": 26928 }, { "resource": "food", "total": 26928 }, { "resource": "goods", "total": 35904 }],
+      "taxTotal": 27824,
+      "food": { "need": 46911, "consumed": 46911, "shortfall": 0 },
+      "treasuryOpening": 19000,
+      "treasuryClosing": 46824,
+      "stockpileClosing": [{ "resource": "coal", "amount": 1391024 }, { "resource": "food", "amount": 4680017 }, { "resource": "goods", "amount": 685904 }, { "resource": "iron", "amount": 614096 }, { "resource": "oil", "amount": 620000 }, { "resource": "wood", "amount": 700000 }]
+    },
+    {
+      "polityId": "polity:united-states",
+      "populationOpening": 127000000,
+      "populationClosing": 127063500,
+      "production": [{ "resource": "food", "total": 63360 }, { "resource": "goods", "total": 31680 }, { "resource": "iron", "total": 31680 }, { "resource": "oil", "total": 31680 }],
+      "taxTotal": 39915,
+      "food": { "need": 127063, "consumed": 127063, "shortfall": 0 },
+      "treasuryOpening": 28000,
+      "treasuryClosing": 67915,
+      "stockpileClosing": [{ "resource": "coal", "amount": 2568320 }, { "resource": "food", "amount": 12936297 }, { "resource": "goods", "amount": 931680 }, { "resource": "iron", "amount": 1800000 }, { "resource": "oil", "amount": 2431680 }, { "resource": "wood", "amount": 2500000 }]
+    }
+  ],
+  "checksum": "sha256:209d64e8a4e25fac211aa5343f276f4da1f3fa7fb4c19e5f1fad6cff9b09d9a1"
+}
