@@ -94,6 +94,16 @@ test('every task is routed to an explicit utility or strategic model role', () =
   assert.equal(registry.validateTask('timeline.advance', 'manual').modelRole, 'strategic');
 });
 
+test('call ledger accepts the desktop Codex subscription as an explicit provider without fallback', () => {
+  const record = ledger.createInvocationRecord({
+    taskId: 'timeline.advance', taskVersion: 1, taskVariant: 'manual', parentInvocationId: null,
+    profile: { providerKind: 'codex-subscription', model: 'gpt-5.6-luna', endpointClass: 'provider-default', reasoningMode: 'standard' },
+    context: context(), budget: registry.getBudgetPolicy('small-fast'),
+  });
+  assert.equal(record.profile.providerKind, 'codex-subscription');
+  assert.equal(record.profile.model, 'gpt-5.6-luna');
+});
+
 test('production unknown-task path returns a stable non-dispatchable registry failure', () => {
   assert.throws(() => registry.resolveTaskForDispatch('unknown.task'), /Unknown task ID/);
   assert.deepEqual(registry.resolveTaskForDispatch('unknown.task', null, { production: true }), {

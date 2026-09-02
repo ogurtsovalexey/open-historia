@@ -52,7 +52,7 @@ const generateInvocationId = () => 'inv_' + Array.from(crypto.getRandomValues(ne
   .join('');
 
 const cloneProfile = (profile) => {
-  const providerKinds = new Set(['gemini', 'openai', 'anthropic', 'openai-compatible', 'anthropic-compatible']);
+  const providerKinds = new Set(['gemini', 'openai', 'anthropic', 'openai-compatible', 'anthropic-compatible', 'codex-subscription']);
   const endpointClasses = new Set(['provider-default', 'loopback', 'lan', 'remote-custom']);
   if (!profile || !providerKinds.has(profile.providerKind)) throw new Error(`Invalid providerKind: ${profile?.providerKind}`);
   if (!endpointClasses.has(profile.endpointClass)) throw new Error(`Invalid endpointClass: ${profile.endpointClass}`);

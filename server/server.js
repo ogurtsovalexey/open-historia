@@ -69,6 +69,7 @@ import {
   RelayError,
   RELAY_ERROR_CODES,
 } from "./security.js";
+import { inspectCodexSubscription } from "./codexSubscriptionProvider.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 import { DATA_DIR } from "./dataDir.js";
@@ -79,6 +80,14 @@ const distDir = path.join(__dirname, "../dist");
 const jsonParser = express.json({ limit: "64mb" });
 const largeJsonParser = express.json({ limit: "2048mb" });
 const uploadParser = express.raw({ type: () => true, limit: "2048mb" });
+
+app.get("/api/codex-subscription/status", async (_req, res) => {
+  try {
+    res.json(await inspectCodexSubscription());
+  } catch (error) {
+    sendError(res, 500, error);
+  }
+});
 
 // The Android app's connect screen lives on the WebView's own origin, so its
 // probe of this server is a cross-origin request — without these headers the

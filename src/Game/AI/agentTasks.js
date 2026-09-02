@@ -11,7 +11,7 @@ const profileFor = (role) => {
     providerKind: provider,
     model: settings.model || "configured-model",
     endpointClass: settings.endpoint ? "remote-custom" : "provider-default",
-    reasoningMode: "off",
+    reasoningMode: provider === "codex-subscription" && settings.effort !== "low" ? "standard" : "off",
   };
 };
 

@@ -232,7 +232,7 @@ const Toggle = ({ label, enabled, onToggle }) => (
     </div>
 );
 
-const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider" }) => {
+const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider", codexStatus }) => {
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
     const [query, setQuery] = useState("");
     const selectedProvider = getProviderMeta(provider);
@@ -321,11 +321,13 @@ const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider"
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 {group.items.map((option) => {
                     const selected = option.value === provider;
+                    const unavailable = option.desktopOnly && codexStatus?.available !== true;
 
                     return (
                         <button
                         key={option.value}
-                        onClick={() => handleProviderSelect(option.value)}
+                        disabled={unavailable}
+                        onClick={() => !unavailable && handleProviderSelect(option.value)}
                         style={{
                             width: "100%",
                             padding: "0.7rem 0.75rem",
@@ -333,8 +335,9 @@ const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider"
                             border: "1px solid",
                             borderColor: selected ? "rgba(59,130,246,0.8)" : "rgba(255,255,255,0.08)",
                             backgroundColor: selected ? "rgba(59,130,246,0.18)" : "rgba(0,0,0,0.16)",
-                            color: "white",
-                            cursor: "pointer",
+                            color: unavailable ? "rgba(255,255,255,0.45)" : "white",
+                            cursor: unavailable ? "not-allowed" : "pointer",
+                            opacity: unavailable ? 0.72 : 1,
                             textAlign: "left",
                         }}
                         >
@@ -351,6 +354,11 @@ const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider"
                         <div style={{ marginTop: "0.18rem", fontSize: "0.72rem", lineHeight: 1.4, color: "rgba(255,255,255,0.6)" }}>
                         {option.description}
                         </div>
+                        {unavailable && (
+                            <div style={{ marginTop: "0.2rem", fontSize: "0.68rem", color: "#fbbf24" }}>
+                            {codexStatus?.message ?? "Checking desktop Codex availability…"}
+                            </div>
+                        )}
                         </button>
                     );
                 })}
@@ -410,7 +418,7 @@ const SettingsInput = ({
     </div>
 );
 
-const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReasoning = true }) => {
+const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReasoning = true, codexStatus }) => {
     const meta = getProviderMeta(provider);
     const supportsModelDiscovery = providerSupportsModelDiscovery(provider);
     // Global reasoning toggle — one switch, applied in every provider mode.
@@ -601,7 +609,50 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
             </>
         )}
 
-        {showReasoning && <div style={{ marginTop: "0.5rem" }}>
+        {provider === "codex-subscription" && (
+            <>
+            <div style={{ ...helperStyle, marginTop: 0, marginBottom: "0.85rem", color: codexStatus?.available ? "#86efac" : "#fbbf24" }}>
+            {codexStatus?.message ?? "Checking the desktop Codex CLI…"}
+            </div>
+            {codexStatus?.available && (
+                <>
+                <div style={fieldGroupStyle}>
+                <label style={labelStyle}>Model</label>
+                <select
+                value={settings.codexSubscriptionModel ?? "gpt-5.6-luna"}
+                onChange={(event) => onSettingChange("codexSubscriptionModel", event.target.value)}
+                style={{ ...inputStyle, cursor: "pointer" }}
+                >
+                {(codexStatus.models ?? []).map((model) => (
+                    <option key={model.id} value={model.id} style={{ color: "black" }}>
+                    {model.displayName} — {model.badge}
+                    </option>
+                ))}
+                </select>
+                <div style={helperStyle}>
+                Models come from the installed CLI. Tested badges are global; every model/contract pair still needs a local schema preflight.
+                </div>
+                </div>
+                <div style={fieldGroupStyle}>
+                <label style={labelStyle}>Reasoning effort</label>
+                <select
+                value={settings.codexSubscriptionEffort ?? "medium"}
+                onChange={(event) => onSettingChange("codexSubscriptionEffort", event.target.value)}
+                style={{ ...inputStyle, cursor: "pointer" }}
+                >
+                {(() => {
+                    const selected = (codexStatus.models ?? []).find((model) => model.id === settings.codexSubscriptionModel);
+                    const efforts = selected?.supportedEfforts?.length ? selected.supportedEfforts : ["medium"];
+                    return efforts.map((effort) => <option key={effort} value={effort} style={{ color: "black" }}>{effort}</option>);
+                })()}
+                </select>
+                </div>
+                </>
+            )}
+            </>
+        )}
+
+        {showReasoning && provider !== "codex-subscription" && <div style={{ marginTop: "0.5rem" }}>
         <Toggle
         label="Model reasoning"
         enabled={reasoningOn}
@@ -784,6 +835,13 @@ const SettingsMenu = ({
     githubUrl,
 }) => {
     const selectedProvider = apiProvider ?? DEFAULT_PROVIDER;
+    const [codexStatus, setCodexStatus] = useState(() => ({
+        available: false,
+        message: import.meta.env.VITE_OH_WEB
+            ? "Codex subscription is unavailable in the web build. Use the desktop app."
+            : "Checking the desktop Codex CLI…",
+        models: [],
+    }));
 
     const [mapSettings, setMapSettingsState] = useState(() => ({
         hideCountryLabels: getMapSetting(MAP_SETTING_KEYS.hideCountryLabels),
@@ -796,6 +854,20 @@ const SettingsMenu = ({
         setMapSetting(settingKey, value);
         setMapSettingsState((current) => ({ ...current, [stateKey]: value }));
     };
+
+    useEffect(() => {
+        if (import.meta.env.VITE_OH_WEB) return undefined;
+        let active = true;
+        fetch("/api/codex-subscription/status", { cache: "no-store" })
+            .then((response) => response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`)))
+            .then((status) => { if (active) setCodexStatus(status); })
+            .catch(() => { if (active) setCodexStatus({
+                available: false,
+                message: "Codex subscription status is unavailable on this platform.",
+                models: [],
+            }); });
+        return () => { active = false; };
+    }, []);
 
     return (
         <div
@@ -832,18 +904,21 @@ const SettingsMenu = ({
         provider={selectedProvider}
         onProviderChange={onApiProviderChange ?? (() => {})}
         label="Strategic AI provider"
+        codexStatus={codexStatus}
         />
 
         <ProviderSettingsPanel
         provider={selectedProvider}
         settings={providerSettings ?? {}}
         onSettingChange={onProviderSettingChange ?? (() => {})}
+        codexStatus={codexStatus}
         />
 
         <ApiProviderSelector
         provider={utilityProvider ?? selectedProvider}
         onProviderChange={onUtilityProviderChange ?? (() => {})}
         label="Utility AI provider"
+        codexStatus={codexStatus}
         />
 
         <ProviderSettingsPanel
@@ -851,6 +926,7 @@ const SettingsMenu = ({
         settings={utilityProviderSettings ?? {}}
         onSettingChange={onUtilityProviderSettingChange ?? (() => {})}
         showReasoning={false}
+        codexStatus={codexStatus}
         />
 
         <LanguageSelector />

@@ -37,6 +37,14 @@ export const PROVIDER_OPTIONS = [
         description: "Self-hosted proxy that speaks the Anthropic Messages API",
         searchTerms: ["claude", "anthropic", "messages api", "proxy", "gateway", "self-hosted"],
     },
+    {
+        value: "codex-subscription",
+        label: "Codex subscription",
+        group: "Desktop subscription",
+        description: "Installed Codex CLI using your ChatGPT login; desktop only",
+        searchTerms: ["codex", "chatgpt", "subscription", "desktop", "luna", "terra", "sol"],
+        desktopOnly: true,
+    },
 ];
 
 const PROVIDER_SETTINGS = {
@@ -80,6 +88,10 @@ const PROVIDER_SETTINGS = {
         },
         customParams: { storageKey: "openai_compatible_custom_params", defaultValue: "" },
     },
+    "codex-subscription": {
+        model: { storageKey: "codex_subscription_model", defaultValue: "gpt-5.6-luna" },
+        effort: { storageKey: "codex_subscription_effort", defaultValue: "medium" },
+    },
 };
 
 const FORM_FIELD_MAP = {
@@ -100,6 +112,8 @@ const FORM_FIELD_MAP = {
     openaiCompatibleEndpoint: { provider: "openai-compatible", field: "endpoint" },
     openaiCompatibleModel: { provider: "openai-compatible", field: "model" },
     openaiCompatibleCustomParams: { provider: "openai-compatible", field: "customParams" },
+    codexSubscriptionModel: { provider: "codex-subscription", field: "model" },
+    codexSubscriptionEffort: { provider: "codex-subscription", field: "effort" },
 };
 
 function isSupportedProvider(value) {
@@ -144,7 +158,7 @@ export function getProviderMeta(provider) {
 
 export function providerSupportsModelDiscovery(provider) {
     const normalized = normalizeProvider(provider);
-    return normalized === "openai" || normalized === "openai-compatible";
+    return normalized === "openai" || normalized === "openai-compatible" || normalized === "codex-subscription";
 }
 
 export function getProviderField(provider, field, role = "strategic") {
@@ -171,6 +185,7 @@ export function getProviderSettings(provider, role = "strategic") {
         endpoint: getProviderField(normalized, "endpoint", role),
         model: getProviderField(normalized, "model", role),
         customParams: getProviderField(normalized, "customParams", role),
+        effort: getProviderField(normalized, "effort", role),
     };
 }
 

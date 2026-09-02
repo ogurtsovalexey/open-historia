@@ -21,7 +21,7 @@
 
 /**
  * @typedef {Object} AiProfileSnapshot
- * @property {'gemini'|'openai'|'anthropic'|'openai-compatible'|'anthropic-compatible'} providerKind
+ * @property {'gemini'|'openai'|'anthropic'|'openai-compatible'|'anthropic-compatible'|'codex-subscription'} providerKind
  * @property {string} model - Model identifier
  * @property {'provider-default'|'loopback'|'lan'|'remote-custom'} endpointClass
  * @property {'off'|'fast'|'standard'} reasoningMode

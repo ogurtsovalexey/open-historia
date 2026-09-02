@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  PROVIDER_OPTIONS,
   getProviderSettings,
   getStoredProvider,
   setProviderField,
@@ -42,4 +43,20 @@ test('an unconfigured utility role inherits the strategic profile for old saves'
   setProviderField('gemini', 'apiKey', 'existing-key');
   assert.equal(getStoredProvider('utility'), 'gemini');
   assert.equal(getProviderSettings('gemini', 'utility').apiKey, 'existing-key');
+});
+
+test('Codex subscription is independently configurable without storing a ChatGPT token', () => {
+  const values = installStorage();
+  setStoredProvider('codex-subscription', 'strategic');
+  setProviderField('codex-subscription', 'model', 'gpt-5.6-terra', 'strategic');
+  setProviderField('codex-subscription', 'effort', 'high', 'strategic');
+  setStoredProvider('codex-subscription', 'utility');
+  setProviderField('codex-subscription', 'model', 'gpt-5.6-luna', 'utility');
+
+  assert.deepEqual(getProviderSettings('codex-subscription', 'strategic'), {
+    provider: 'codex-subscription', apiKey: '', endpoint: '', model: 'gpt-5.6-terra', customParams: '', effort: 'high',
+  });
+  assert.equal(getProviderSettings('codex-subscription', 'utility').model, 'gpt-5.6-luna');
+  assert.equal(PROVIDER_OPTIONS.find((entry) => entry.value === 'codex-subscription').desktopOnly, true);
+  assert.equal([...values.keys()].some((key) => /token|api_key/i.test(key)), false);
 });

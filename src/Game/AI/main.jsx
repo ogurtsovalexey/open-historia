@@ -1130,6 +1130,8 @@ export async function callAI(systemPrompt, history, opts = {}) {
         return callAnthropicCompatible(systemPrompt, history, providerOpts);
     case "openai-compatible":
         return callOpenAICompatible(systemPrompt, history, providerOpts);
+    case "codex-subscription":
+        throw new Error("Codex subscription requires a successful local model/contract schema preflight. No fallback provider was used.");
     case "gemini":
     default:
         return callGemini(systemPrompt, history, providerOpts);

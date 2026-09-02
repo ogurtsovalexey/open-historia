@@ -28,6 +28,10 @@ const ASSETS_DIR = path.join(USER_ROOT, "public", "assets");
 // changes to the fetcher, and one place that decides the layout.
 process.env.OH_DATA_DIR = DATA_DIR;
 process.env.OH_ASSETS_DIR = ASSETS_DIR;
+// Server-side Codex subscription endpoints are enabled only for this Electron
+// host. A browser or Android process running the same Express app must never
+// gain permission merely because it happens to use localhost.
+process.env.OH_DESKTOP_RUNTIME = "1";
 
 // The build id the release workflow stamped in. The server passes it to the page so
 // the update banner can compare it against the published one. Deliberately routed

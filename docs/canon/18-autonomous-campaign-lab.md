@@ -23,6 +23,17 @@ Campaign Lab freezes provider, model, effort and preflight at start. Regular
 games may change them only for the next checkpoint and record the change in
 provenance.
 
+Codex subscription is a separately selectable provider for both strategic and
+utility roles in the desktop app. Web and Android report it as unavailable.
+The game stores only model and effort, never a ChatGPT token. The embedded
+server inspects the installed system CLI, requires ChatGPT login, obtains the
+complete model catalog through `model/list`, marks Luna/Terra/Sol `tested` and
+all other discovered models `unverified`. Model discovery starts no thread and
+therefore exposes no plugin, app or MCP tool to a model; the subsequent isolated
+schema run disables all three explicitly. Availability inspection is not the schema-transport
+preflight and performs no model turn; the latter remains mandatory for each
+model/contract combination before first use.
+
 ## 2026-09-02 Codex-local renewal
 
 Principles 1–4 remain binding. The failed 2026-09-01 evidence is immutable
