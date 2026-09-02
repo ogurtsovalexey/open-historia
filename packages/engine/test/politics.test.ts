@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { initState, parseScenario, parseTurnCommands, resolveMonth, type EconWorldState } from '../src/index.js';
+import { currentPoliticalStrategy, initState, parseScenario, parseTurnCommands, resolveMonth, type EconWorldState } from '../src/index.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const scenarioRaw = JSON.parse(readFileSync(resolve(here, '../../fixtures/scenario-dev-map-6c/scenario.json'), 'utf8'));
@@ -13,6 +13,30 @@ const base = (state: EconWorldState, actorPolityId: string, suffix: number) => (
   commandId: commandId(suffix), actorPolityId, expectedRevision: state.revision, effectiveMonth: state.month,
 });
 const tick = (state: EconWorldState, commands: unknown[] = []) => resolveMonth(state, parseTurnCommands({ commands }));
+const strategyScenario = () => {
+  const raw = structuredClone(scenarioRaw);
+  const polity = raw.politics.polities.find((entry: { polityId: string }) => entry.polityId === 'polity:austria');
+  polity.strategyAuthority = {
+    headOfStateCharacterId: 'character:austria-ruler',
+    headOfGovernmentCharacterId: 'character:austria-ruler',
+    decisionAuthorityCharacterId: 'character:austria-ruler',
+    rulingFactionId: 'faction:austria-establishment',
+    currentConstraints: ['Preserve sovereign government.', 'Avoid diplomatic isolation.'],
+  };
+  const identity = {
+    nativeLabel: 'Bundesstaat Österreich', legitimacyBases: ['Federal constitution'],
+    governingPrinciples: ['Preserve Austrian independence'], strategicPreferences: ['Seek external guarantees'],
+    taboos: ['Unforced loss of sovereignty'], riskAttitude: 'cautious',
+  };
+  raw.politics.factions.find((entry: { factionId: string }) => entry.factionId === 'faction:austria-establishment').politicalIdentity = identity;
+  for (const characterId of ['character:austria-ruler', 'character:austria-heir']) {
+    raw.politics.characters.find((entry: { characterId: string }) => entry.characterId === characterId).leaderCard = {
+      historical: false, factCard: ['Exercises only authority defined by this fixture.'],
+      knowledgePolicy: 'scenario-only', sourceRefs: ['source:fixture:politics'],
+    };
+  }
+  return raw;
+};
 
 describe('P4 internal politics and characters (canon 13)', () => {
   it('materialises authored factions, characters and unique offices', () => {
@@ -25,6 +49,33 @@ describe('P4 internal politics and characters (canon 13)', () => {
       const heldOffices: Array<string | null> = state.politics?.characters.filter((entry) => entry.polityId === polity.id && entry.office).map((entry) => entry.office) ?? [];
       assert.equal(new Set(heldOffices).size, heldOffices.length);
     }
+  });
+
+  it('materialises authored strategic authority and updates it in the power-transfer revision', () => {
+    const initial = initState(parseScenario(strategyScenario()));
+    const before = currentPoliticalStrategy(initial.politics!, 'polity:austria');
+    assert.equal(before.decisionAuthority.characterId, 'character:austria-ruler');
+    assert.equal(before.identity.nativeLabel, 'Bundesstaat Österreich');
+    assert.deepEqual(before.currentConstraints, ['Preserve sovereign government.', 'Avoid diplomatic isolation.']);
+    const abdicated = tick(initial, [{ kind: 'politics.abdicate', ...base(initial, 'polity:austria', 20) }]);
+    const after = currentPoliticalStrategy(abdicated.state.politics!, 'polity:austria');
+    assert.equal(after.headOfState.characterId, 'character:austria-heir');
+    assert.equal(after.decisionAuthority.characterId, 'character:austria-heir');
+    assert.equal(after.rulingFaction.factionId, 'faction:austria-establishment');
+    assert.equal(after.identity.nativeLabel, 'Bundesstaat Österreich');
+    assert.throws(() => currentPoliticalStrategy(initial.politics!, 'polity:france'), /authority missing/);
+  });
+
+  it('rejects strategic authority without same-polity leader cards and a faction identity', () => {
+    const raw = strategyScenario();
+    delete raw.politics.characters.find((entry: { characterId: string }) => entry.characterId === 'character:austria-ruler').leaderCard;
+    assert.throws(() => parseScenario(raw), /strategic authority requires/);
+    const prior = strategyScenario();
+    prior.politics.characters.find((entry: { characterId: string }) => entry.characterId === 'character:austria-ruler').leaderCard = {
+      historical: false, factCard: ['Invalid prior.'], knowledgePolicy: 'authored-card-plus-pre-scenario-prior',
+      sourceRefs: ['source:fixture:politics'],
+    };
+    assert.throws(() => parseScenario(prior), /non-historical leaders require scenario-only knowledge/);
   });
 
   it('rejects unknown political references and duplicate authored offices', () => {

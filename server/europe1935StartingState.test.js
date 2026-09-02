@@ -54,6 +54,15 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
     AUTHORED_COMMITMENT_EXPECTATIONS.length);
   assert.match(renderOwnerTable(audit), /production-derived diagnostic table/);
 
+  const incompletePolitics = structuredClone(fixture);
+  incompletePolitics.engineScenario.politics = {
+    polities: [{ polityId: 'polity:france' }], factions: [], characters: [],
+  };
+  const politicsAudit = buildStartingStateAudit({ ...incompletePolitics, firstMonth: audit.firstMonth });
+  assert.equal(politicsAudit.issues.some((entry) => entry.code === 'strategic-authority-incomplete'
+    && entry.path === '/polities/polity:france/politics/strategyAuthority'), true);
+  assert.equal(politicsAudit.polities.find((entry) => entry.polityId === 'polity:france').government, false);
+
   const withAgreements = structuredClone(fixture);
   withAgreements.engineScenario.diplomacy.startingAgreements = AUTHORED_COMMITMENT_EXPECTATIONS.map((entry) => ({
     agreementId: `agreement:audit-${entry.commitmentId.split(':').at(-1)}`,

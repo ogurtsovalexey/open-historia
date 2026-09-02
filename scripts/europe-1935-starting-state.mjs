@@ -174,6 +174,13 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
     const polityCommanders = commanders.filter((entry) => entry.polityId === polityId);
     const factions = (engineScenario.politics?.factions ?? []).filter((entry) => entry.polityId === polityId);
     const characters = (engineScenario.politics?.characters ?? []).filter((entry) => entry.polityId === polityId);
+    const politicalPolity = politicalPolities.get(polityId);
+    const authority = politicalPolity?.strategyAuthority;
+    const strategyReady = Boolean(authority
+      && characters.some((entry) => entry.characterId === authority.headOfStateCharacterId && entry.leaderCard)
+      && characters.some((entry) => entry.characterId === authority.headOfGovernmentCharacterId && entry.leaderCard)
+      && characters.some((entry) => entry.characterId === authority.decisionAuthorityCharacterId && entry.leaderCard)
+      && factions.some((entry) => entry.factionId === authority.rulingFactionId && entry.politicalIdentity));
     const agreements = (engineScenario.diplomacy?.startingAgreements ?? []).filter((entry) =>
       entry.terms.fromPolityId === polityId || entry.terms.toPolityId === polityId);
     const controls = controlsForPolity(polityId, engineScenario, authoring);
@@ -193,6 +200,8 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
     }
     if (fidelity === 'Supported' && !politicalPolities.has(polityId)) {
       issues.push(issue('government-missing', 'blocking', `/polities/${polityId}/politics`, 'requires head of state, head of government and decision authority'));
+    } else if (fidelity === 'Supported' && !strategyReady) {
+      issues.push(issue('strategic-authority-incomplete', 'blocking', `/polities/${polityId}/politics/strategyAuthority`, 'requires three leader cards, a ruling-faction political identity and current constraints'));
     }
     if (fidelity === 'Supported' && (factions.length < 3 || factions.length > 6)) {
       issues.push(issue('faction-count', 'blocking', `/polities/${polityId}/factions`, `${factions.length} factions; expected 3–6`));
@@ -211,7 +220,7 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
       })),
       formations: polityFormations.length,
       commanders: polityCommanders.length,
-      government: politicalPolities.has(polityId),
+      government: strategyReady,
       factions: factions.length,
       characters: characters.length,
       agreements: agreements.length,

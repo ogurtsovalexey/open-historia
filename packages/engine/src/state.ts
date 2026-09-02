@@ -202,12 +202,23 @@ export function initState(scenario: EconScenario): EconWorldState {
     ...(scenario.modules?.politics === true && scenario.politics ? {
       politics: {
         polities: [...scenario.politics.polities].map((entry) => ({
-          ...entry, governmentChanges: 0, lastTransferMonth: null,
+          ...entry, ...(entry.strategyAuthority ? { strategyAuthority: {
+            ...entry.strategyAuthority, currentConstraints: [...entry.strategyAuthority.currentConstraints],
+          } } : {}), governmentChanges: 0, lastTransferMonth: null,
         })).sort((a, b) => a.polityId.localeCompare(b.polityId)),
         factions: [...scenario.politics.factions].map((entry) => ({
-          ...entry, lastResponseMonth: null,
+          ...entry, ...(entry.politicalIdentity ? { politicalIdentity: {
+            ...entry.politicalIdentity,
+            legitimacyBases: [...entry.politicalIdentity.legitimacyBases],
+            governingPrinciples: [...entry.politicalIdentity.governingPrinciples],
+            strategicPreferences: [...entry.politicalIdentity.strategicPreferences],
+            taboos: [...entry.politicalIdentity.taboos],
+          } } : {}), lastResponseMonth: null,
         })).sort((a, b) => a.factionId.localeCompare(b.factionId)),
-        characters: [...scenario.politics.characters].sort((a, b) => a.characterId.localeCompare(b.characterId)),
+        characters: [...scenario.politics.characters].map((entry) => ({
+          ...entry, ...(entry.leaderCard ? { leaderCard: { ...entry.leaderCard,
+            factCard: [...entry.leaderCard.factCard], sourceRefs: [...entry.leaderCard.sourceRefs] } } : {}),
+        })).sort((a, b) => a.characterId.localeCompare(b.characterId)),
       },
     } : {}),
     ...(scenario.modules?.armedForces === true && scenario.military ? {

@@ -441,6 +441,17 @@ export const econScenarioSchema = z
           || (polity.heirCharacterId && (!heir || heir.polityId !== polity.polityId || heir.office !== 'heir'))) {
           ctx.addIssue({ code: 'custom', message: 'political ruler/heir must match their polity and offices', path: ['politics', 'polities', index] });
         }
+        if (polity.strategyAuthority) {
+          const authority = polity.strategyAuthority;
+          const referencedCharacters = [authority.headOfStateCharacterId, authority.headOfGovernmentCharacterId,
+            authority.decisionAuthorityCharacterId].map((characterId) => scenario.politics!.characters
+            .find((entry) => entry.characterId === characterId));
+          const rulingFaction = scenario.politics.factions.find((entry) => entry.factionId === authority.rulingFactionId);
+          if (referencedCharacters.some((entry) => !entry || entry.polityId !== polity.polityId || !entry.leaderCard)
+            || !rulingFaction || rulingFaction.polityId !== polity.polityId || !rulingFaction.politicalIdentity) {
+            ctx.addIssue({ code: 'custom', message: 'strategic authority requires same-polity leader cards and a ruling-faction identity', path: ['politics', 'polities', index, 'strategyAuthority'] });
+          }
+        }
       }
     }
     if (scenario.military) {

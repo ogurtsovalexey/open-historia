@@ -34,12 +34,13 @@ import {
   strategicCallBudget,
   isQuarterlyCheckpoint,
   politicalIdentitySchema,
+  buildStrategicPoliticsFromState,
   assertStrategicRunCompatible,
   commitStrategicMemory,
   pendingTriggerRetryMonth,
   type AgentState,
 } from '../src/index.js';
-import { initState, parseScenario, runTurn, stateChecksum, type EconWorldState } from '@open-historia/engine';
+import { econCommandSchema, initState, parseScenario, runTurn, stateChecksum, type EconWorldState } from '@open-historia/engine';
 
 const fixture = fileURLToPath(new URL('../../../engine/fixtures/scenario-dev-map-4c/scenario.json', import.meta.url));
 const fallbackGolden = fileURLToPath(new URL('../../test/golden/p3a-fallback-chain.json', import.meta.url));
@@ -48,6 +49,27 @@ const diplomacyFixture = fileURLToPath(new URL('../../../engine/fixtures/scenari
 const diplomacyInitial = () => initState(parseScenario(JSON.parse(readFileSync(diplomacyFixture, 'utf8'))));
 const benchmarkFixture = fileURLToPath(new URL('../../../data-packs/fixtures/europe-1935-benchmark/engine/scenario.json', import.meta.url));
 const benchmarkInitial = () => initState(parseScenario(JSON.parse(readFileSync(benchmarkFixture, 'utf8'))));
+const canonicalPoliticalInitial = () => {
+  const raw = JSON.parse(readFileSync(diplomacyFixture, 'utf8'));
+  const polity = raw.politics.polities.find((entry: { polityId: string }) => entry.polityId === 'polity:austria');
+  polity.strategyAuthority = {
+    headOfStateCharacterId: 'character:austria-ruler', headOfGovernmentCharacterId: 'character:austria-ruler',
+    decisionAuthorityCharacterId: 'character:austria-ruler', rulingFactionId: 'faction:austria-establishment',
+    currentConstraints: ['Preserve sovereign government.', 'Avoid diplomatic isolation.'],
+  };
+  raw.politics.factions.find((entry: { factionId: string }) => entry.factionId === 'faction:austria-establishment').politicalIdentity = {
+    nativeLabel: 'Bundesstaat Österreich', legitimacyBases: ['Federal constitution'],
+    governingPrinciples: ['Preserve Austrian independence'], strategicPreferences: ['Seek external guarantees'],
+    taboos: ['Unforced loss of sovereignty'], riskAttitude: 'cautious',
+  };
+  for (const characterId of ['character:austria-ruler', 'character:austria-heir']) {
+    raw.politics.characters.find((entry: { characterId: string }) => entry.characterId === characterId).leaderCard = {
+      historical: false, factCard: ['Exercises only authority defined by this fixture.'],
+      knowledgePolicy: 'scenario-only', sourceRefs: ['source:fixture:politics'],
+    };
+  }
+  return initState(parseScenario(raw));
+};
 
 const holdV2 = (polityId: string) => ({
   polityId, objective: { domain: 'economy' as const, summary: 'Preserve room to manoeuvre.', horizon: 'short' as const },
@@ -335,6 +357,26 @@ test('StrategicBriefV4 is a single-actor bounded ID catalog with politics and co
   assert.ok(first.choices.every((entry) => entry.choiceId.startsWith('choice:')));
   assert.equal(new Set(first.choices.map((entry) => entry.choiceId)).size, first.choices.length);
   assert.equal(JSON.stringify(first).includes('geometry'), false);
+});
+
+test('StrategicBriefV4 derives authority from canonical politics and observes a same-revision transfer', () => {
+  const initial = canonicalPoliticalInitial();
+  const political = buildStrategicPoliticsFromState(initial, 'polity:austria');
+  assert.equal(political.identity.nativeLabel, 'Bundesstaat Österreich');
+  assert.equal(political.decisionAuthority.characterId, 'character:austria-ruler');
+  const brief = buildStrategicBriefV4(initial, 'polity:austria', {
+    invocation: { reason: 'scheduled-quarter', detail: 'Quarterly review.' }, relevantFamilies: ['conserve'],
+  });
+  assert.equal(brief.political.rulingGroup, 'Austria Establishment');
+  const abdicated = runTurn(initial, { commands: [econCommandSchema.parse({
+    kind: 'politics.abdicate', commandId: '70000000-0000-4000-8000-000000000001',
+    actorPolityId: 'polity:austria', expectedRevision: initial.revision, effectiveMonth: initial.month,
+  })] }).result.state;
+  const changed = buildStrategicBriefV4(abdicated, 'polity:austria', {
+    invocation: { reason: 'government-change', detail: 'Power transferred.' }, relevantFamilies: ['conserve'],
+  });
+  assert.equal(changed.political.headOfState.characterId, 'character:austria-heir');
+  assert.equal(changed.political.decisionAuthority.characterId, 'character:austria-heir');
 });
 
 test('StrategicDecisionV3 expands frozen IDs and requires exact compatible mandatory coverage', () => {

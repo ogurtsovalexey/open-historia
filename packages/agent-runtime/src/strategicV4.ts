@@ -1,5 +1,12 @@
 import { z } from 'zod';
-import { runTurn, sha256OfString, type EconCommand, type EconWorldState } from '@open-historia/engine';
+import {
+  currentPoliticalStrategy,
+  politicalIdentitySchema as enginePoliticalIdentitySchema,
+  runTurn,
+  sha256OfString,
+  type EconCommand,
+  type EconWorldState,
+} from '@open-historia/engine';
 import {
   buildStrategicBriefV3,
   expandStrategicAffordancesV3,
@@ -26,14 +33,7 @@ export const strategicInvocationReasonSchema = z.enum([
   'peace', 'default', 'resource-emergency', 'pending-trigger', 'transport-coverage',
 ]);
 
-export const politicalIdentitySchema = z.object({
-  nativeLabel: z.string().min(1).max(120),
-  legitimacyBases: z.array(z.string().min(1).max(160)).min(1).max(6),
-  governingPrinciples: z.array(z.string().min(1).max(160)).min(1).max(8),
-  strategicPreferences: z.array(z.string().min(1).max(160)).min(1).max(8),
-  taboos: z.array(z.string().min(1).max(160)).max(8),
-  riskAttitude: z.enum(['averse', 'cautious', 'balanced', 'assertive', 'risk-seeking']),
-}).strict();
+export const politicalIdentitySchema = enginePoliticalIdentitySchema;
 export type PoliticalIdentity = z.infer<typeof politicalIdentitySchema>;
 
 export const strategicLeaderCardSchema = z.object({
@@ -102,6 +102,29 @@ export interface StrategicBriefV4 {
   candidateAudit: CandidateAuditV4[];
   inputTokenCount: number;
   tokenCountMethod: 'provider' | 'utf8-upper-bound';
+}
+
+/** Builds the private political section from canonical engine state only. */
+export function buildStrategicPoliticsFromState(state: EconWorldState, polityId: string): StrategicBriefV4['political'] {
+  if (!state.politics) throw new Error(`politics state missing for ${polityId}`);
+  const profile = currentPoliticalStrategy(state.politics, polityId);
+  const leader = (character: typeof profile.headOfState, role: StrategicLeaderCard['role']): StrategicLeaderCard => {
+    if (!character.leaderCard) throw new Error(`leader card missing for ${character.characterId}`);
+    return strategicLeaderCardSchema.parse({
+      characterId: character.characterId,
+      name: character.displayName.en,
+      role,
+      ...character.leaderCard,
+    });
+  };
+  return {
+    identity: politicalIdentitySchema.parse(profile.identity),
+    headOfState: leader(profile.headOfState, 'head-of-state'),
+    headOfGovernment: leader(profile.headOfGovernment, 'head-of-government'),
+    decisionAuthority: leader(profile.decisionAuthority, 'decision-authority'),
+    rulingGroup: profile.rulingFaction.displayName.en,
+    currentConstraints: profile.currentConstraints.slice(0, 3),
+  };
 }
 
 const selectedChoiceSchema = z.object({
@@ -186,7 +209,7 @@ export interface StrategicBriefV4Options {
   relevantFamilies?: StrategicActionV2['tool'][];
   strategicContext?: Partial<StrategicContextV3>;
   externalSupplierPolityIds?: string[];
-  political: StrategicBriefV4['political'];
+  political?: StrategicBriefV4['political'];
   ownIntelligence?: StrategicBriefV4['ownIntelligence'];
   durablePlan?: StrategicBriefV4['durablePlan'];
   changesSinceLastDecision?: string[];
@@ -241,13 +264,14 @@ export function buildStrategicBriefV4(state: EconWorldState, polityId: string, o
         : considered ? 'Not selected by current relevance inputs.'
           : 'No legal choice at this revision.' };
   });
+  const politicalInput = options.political ?? buildStrategicPoliticsFromState(state, polityId);
   const political = {
-    ...options.political,
-    identity: politicalIdentitySchema.parse(options.political.identity),
-    headOfState: strategicLeaderCardSchema.parse(options.political.headOfState),
-    headOfGovernment: strategicLeaderCardSchema.parse(options.political.headOfGovernment),
-    decisionAuthority: strategicLeaderCardSchema.parse(options.political.decisionAuthority),
-    currentConstraints: options.political.currentConstraints.slice(0, 3),
+    ...politicalInput,
+    identity: politicalIdentitySchema.parse(politicalInput.identity),
+    headOfState: strategicLeaderCardSchema.parse(politicalInput.headOfState),
+    headOfGovernment: strategicLeaderCardSchema.parse(politicalInput.headOfGovernment),
+    decisionAuthority: strategicLeaderCardSchema.parse(politicalInput.decisionAuthority),
+    currentConstraints: politicalInput.currentConstraints.slice(0, 3),
   };
   const draft: Omit<StrategicBriefV4, 'inputTokenCount' | 'tokenCountMethod'> = {
     schemaVersion: 'open-historia-strategic-brief/4', decisionSchemaVersion: 'open-historia-strategic-decision/3',

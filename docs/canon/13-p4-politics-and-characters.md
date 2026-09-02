@@ -20,6 +20,18 @@ of canon 10 after the accepted P3c slice.
 - Characters have a stable id, name, polity, faction, office, starting and
   experience traits, loyalty, ambition and a bounded list of significant
   relations. Offices are unique inside a polity.
+- A scenario may attach a bounded universal `politicalIdentity` to a faction,
+  leader fact cards to characters, and a strategic-authority record to a
+  polity. The record separately names head of state, head of government,
+  decision authority, ruling faction and two or three current constraints.
+  Every reference must resolve inside the same polity. Non-historical leaders
+  are always `scenario-only`; historical cards may permit general knowledge
+  only as a soft pre-scenario prior subordinate to the authored facts.
+- A power transfer updates head of state, decision authority when the former
+  ruler held it, and the ruling faction in the same revision. A coup always
+  moves those authority fields to its successful leader. Strategic brief
+  construction fails explicitly if the resulting leader card or faction
+  identity is absent.
 - The monthly engine derives faction support from effective taxes, budget
   priorities, matching active projects and diplomatic agreements. Weighted
   dissatisfaction derives unrest; legitimacy and stability respond gradually.

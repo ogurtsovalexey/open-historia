@@ -43,11 +43,20 @@ export type PoliticsEngineEvent =
   | { type: 'political-escalation'; polityId: PolityId; factionId: string; from: string; to: string };
 
 const clonePolitics = (state: PoliticsState): PoliticsState => ({
-  polities: state.polities.map((entry) => ({ ...entry })),
-  factions: state.factions.map((entry) => ({ ...entry, displayName: { ...entry.displayName } })),
+  polities: state.polities.map((entry) => ({ ...entry, ...(entry.strategyAuthority ? { strategyAuthority: {
+    ...entry.strategyAuthority, currentConstraints: [...entry.strategyAuthority.currentConstraints],
+  } } : {}) })),
+  factions: state.factions.map((entry) => ({ ...entry, displayName: { ...entry.displayName },
+    ...(entry.politicalIdentity ? { politicalIdentity: { ...entry.politicalIdentity,
+      legitimacyBases: [...entry.politicalIdentity.legitimacyBases],
+      governingPrinciples: [...entry.politicalIdentity.governingPrinciples],
+      strategicPreferences: [...entry.politicalIdentity.strategicPreferences], taboos: [...entry.politicalIdentity.taboos],
+    } } : {}) })),
   characters: state.characters.map((entry) => ({
     ...entry, displayName: { ...entry.displayName }, startingTraits: [...entry.startingTraits],
     experienceTraits: [...entry.experienceTraits], relations: entry.relations.map((relation) => ({ ...relation })),
+    ...(entry.leaderCard ? { leaderCard: { ...entry.leaderCard,
+      factCard: [...entry.leaderCard.factCard], sourceRefs: [...entry.leaderCard.sourceRefs] } } : {}),
   })),
 });
 
@@ -66,6 +75,15 @@ const transferPower = (
   }
   successor.office = 'ruler';
   polity.rulerCharacterId = successor.characterId;
+  if (polity.strategyAuthority) {
+    if (polity.strategyAuthority.headOfStateCharacterId === oldRuler.characterId || cause === 'coup') {
+      polity.strategyAuthority.headOfStateCharacterId = successor.characterId;
+    }
+    if (polity.strategyAuthority.decisionAuthorityCharacterId === oldRuler.characterId || cause === 'coup') {
+      polity.strategyAuthority.decisionAuthorityCharacterId = successor.characterId;
+    }
+    polity.strategyAuthority.rulingFactionId = successor.factionId;
+  }
   polity.heirCharacterId = politics.characters
     .filter((entry) => entry.polityId === polityId && entry.characterId !== successor.characterId
       && entry.characterId !== oldRuler.characterId && entry.office === null)
