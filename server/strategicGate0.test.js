@@ -63,3 +63,23 @@ test('production Gate 0 can run an explicit unique probe subset without reorderi
   assert.deepEqual(result.probes.map((entry) => entry.probeId), ['czech-reject', 'poland-mobilization']);
   assert.throws(() => run('run', '--mode', 'mock', '--run', 'gate0-bad-subset', '--only', 'unknown'), /unknown Gate 0 probe/);
 });
+
+test('committed Gate 0 evidence is redacted and cannot claim owner acceptance while criteria remain unmet', () => {
+  const report = JSON.parse(fs.readFileSync(path.resolve('docs/reports/europe-1935-strategic-gate0.json'), 'utf8'));
+  assert.equal(report.schemaVersion, 'open-historia-strategic-gate0-aggregate/1');
+  assert.equal(report.budget.completedTurns, report.budget.maximumTurns);
+  assert.equal(report.budget.remainingTurns, 0);
+  assert.equal(report.canonicalAutomatedCoverage.probeCount, 12);
+  assert.equal(report.canonicalAutomatedCoverage.structuredOutputRate, 1);
+  assert.equal(report.canonicalAutomatedCoverage.actorAndTriggerCoverageRate, 1);
+  assert.equal(report.canonicalAutomatedCoverage.legalMaterializationRate, 1);
+  assert.ok(report.canonicalAutomatedCoverage.maximumApplicationInputTokens <= report.canonicalAutomatedCoverage.applicationInputTokenLimit);
+  assert.equal(report.canonicalAutomatedCoverage.evaluatorMutationCount, 0);
+  assert.equal(report.canonicalAutomatedCoverage.inventedReferenceCount, 0);
+  assert.equal(report.redaction.rawPromptsIncluded, false);
+  assert.equal(report.redaction.rawResponsesIncluded, false);
+  assert.equal(report.redaction.threadIdsIncluded, false);
+  assert.equal(report.ownerAssessment.status, 'pending');
+  assert.equal(report.status, 'blocked');
+  assert.ok(report.unmetAcceptanceCriteria.length > 0);
+});

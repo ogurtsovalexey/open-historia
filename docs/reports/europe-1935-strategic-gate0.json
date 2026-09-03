@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "open-historia-strategic-gate0-aggregate/1",
+  "scenarioId": "scenario:europe-1935-benchmark",
+  "scenarioContentVersion": "1.0.0",
+  "promptContract": "StrategicBriefV4+StrategicDecisionV3",
+  "packageChecksum": "sha256:a62a01c0ee94f040871081c8213cb6d586d0213f973a377fde9146bbe67e3af4",
+  "status": "blocked",
+  "budget": {
+    "completedTurns": 40,
+    "maximumTurns": 40,
+    "decisionTurns": 36,
+    "schemaPreflightTurns": 4,
+    "remainingTurns": 0
+  },
+  "canonicalAutomatedCoverage": {
+    "status": "pass",
+    "immutableSourceManifests": [
+      "sha256:894dce748329c73096c32440b4c3156806e95b8647fcedf5fdca3973f201d8db",
+      "sha256:9ccd22504deca956f8ee1a344a891e9f5be355602b2bf58a37c7edd04fdb28ed"
+    ],
+    "probeCount": 12,
+    "structuredOutputRate": 1,
+    "actorAndTriggerCoverageRate": 1,
+    "legalMaterializationRate": 1,
+    "semanticPassRate": 1,
+    "groundedReferenceRate": 1,
+    "evaluatorMutationCount": 0,
+    "inventedReferenceCount": 0,
+    "authoritativeNumericClaimCount": 0,
+    "privateDoctrineLeakCount": 0,
+    "maximumApplicationInputTokens": 7918,
+    "applicationInputTokenLimit": 8000,
+    "probes": [
+      {
+        "probeId": "transport-austria",
+        "polityId": "polity:austria",
+        "selectedFamilies": ["change-policy"]
+      },
+      {
+        "probeId": "transport-czechoslovakia",
+        "polityId": "polity:czechoslovakia",
+        "selectedFamilies": ["change-policy"]
+      },
+      {
+        "probeId": "transport-france",
+        "polityId": "polity:france",
+        "selectedFamilies": ["change-policy"]
+      },
+      {
+        "probeId": "transport-italy",
+        "polityId": "polity:italy",
+        "selectedFamilies": ["change-policy"]
+      },
+      {
+        "probeId": "transport-poland",
+        "polityId": "polity:poland",
+        "selectedFamilies": ["start-project"]
+      },
+      {
+        "probeId": "transport-united-kingdom",
+        "polityId": "polity:united-kingdom",
+        "selectedFamilies": ["change-policy"]
+      },
+      {
+        "probeId": "austria-scheduled",
+        "polityId": "polity:austria",
+        "selectedFamilies": ["change-policy"]
+      },
+      {
+        "probeId": "uk-iron-exhaustion",
+        "polityId": "polity:united-kingdom",
+        "selectedFamilies": ["external-import"]
+      },
+      {
+        "probeId": "czech-accept",
+        "polityId": "polity:czechoslovakia",
+        "selectedFamilies": ["respond-proposal"]
+      },
+      {
+        "probeId": "czech-reject",
+        "polityId": "polity:czechoslovakia",
+        "selectedFamilies": ["respond-proposal"]
+      },
+      {
+        "probeId": "poland-real-threat",
+        "polityId": "polity:poland",
+        "selectedFamilies": ["mobilize", "issue-order"]
+      },
+      {
+        "probeId": "poland-mobilization",
+        "polityId": "polity:poland",
+        "selectedFamilies": ["mobilize"]
+      }
+    ]
+  },
+  "crossModelChecks": [
+    {
+      "profile": "gpt-5.6-terra/low",
+      "manifestChecksum": "sha256:f3c02b751123e34ffb482d0e727f27323cec665e87051eb1595ae034b7cad379",
+      "probeId": "poland-real-threat",
+      "status": "pass",
+      "selectedFamilies": ["issue-order", "mobilize"]
+    },
+    {
+      "profile": "gpt-5.6-sol/low",
+      "manifestChecksum": "sha256:6ec904d52b458f47ed7b91eb89780a0e56f751391d7cb9994523f8c6faf22e19",
+      "probeId": "poland-real-threat",
+      "status": "pass",
+      "selectedFamilies": ["issue-order", "mobilize"]
+    },
+    {
+      "profile": "gpt-5.6-luna/medium",
+      "manifestChecksum": "sha256:b8c7a36e8c24251630195efd801eb608b742eb6ca12b326f93923b6253bff21c",
+      "probeIds": ["czech-accept", "poland-real-threat"],
+      "status": "pass"
+    }
+  ],
+  "diagnosticHistory": {
+    "completedDecisionTurns": 36,
+    "acceptedDecisions": 32,
+    "holds": 2,
+    "terminalRejections": 2,
+    "groundedDecisions": 36,
+    "evaluatorMutationCount": 0,
+    "resolvedContractDefects": [
+      "brief-bound output schema",
+      "published-choice evidence scope",
+      "micro-probe intent binding",
+      "rejected-choice audit minimum"
+    ]
+  },
+  "unmetAcceptanceCriteria": [
+    "The frozen 40-turn budget ended before a dedicated reversed-affordance-order live pair could be completed.",
+    "Blind owner scoring has not yet established 100% mandatory triage and at least 90% relevance/coherence scores of 4/5 or higher."
+  ],
+  "ownerAssessment": {
+    "status": "pending",
+    "mandatoryTriageRate": null,
+    "relevanceCoherenceAtLeastFourRate": null
+  },
+  "protocolDeviation": {
+    "legacyUiProviderRequestsBeforeOwnerApprovals": 10,
+    "provider": "gemini",
+    "includedInV4Budget": false,
+    "committedArtifacts": false,
+    "note": "An opt-in Playwright path inherited GEMINI_API_KEY before both owner approvals. The requests were disclosed, their temporary games were deleted, and the suite was rerun with provider credentials removed."
+  },
+  "redaction": {
+    "rawPromptsIncluded": false,
+    "rawResponsesIncluded": false,
+    "threadIdsIncluded": false,
+    "providerCredentialsIncluded": false
+  }
+}
