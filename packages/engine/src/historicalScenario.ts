@@ -24,7 +24,7 @@ const nationalControlSchema = z.object({
   economicPower: z.number().int().nonnegative(),
   stockpile: z.partialRecord(z.enum(RESOURCE_CATALOG), z.number().int().nonnegative()),
   industrialCapacity: z.number().int().nonnegative(),
-  infrastructureCapacity: z.number().int().nonnegative(),
+  infrastructureIndexBp: z.number().int().min(0).max(10000),
   ...estimateFields,
 }).strict();
 
@@ -52,7 +52,7 @@ const startingStateProvenanceSchema = z.object({
 });
 
 export const historicalAuthoringSchema = z.object({
-  schemaVersion: z.literal('open-historia-historical-authoring/2'),
+  schemaVersion: z.literal('open-historia-historical-authoring/3'),
   scenarioId: scenarioIdSchema,
   horizonDate: z.string().regex(/^\d{4}-\d{2}-01$/),
   nationalControls: z.array(nationalControlSchema).min(2),
@@ -91,6 +91,32 @@ export interface HistoricalProjection {
 
 export function startingStateValueChecksum(value: unknown): string {
   return sha256OfString(canonicalStringify(value));
+}
+
+/** National infrastructure is a population-weighted index, never a sum of
+ * regional basis points. This keeps the control meaningful after region split. */
+export function populationWeightedInfrastructureBp(
+  regions: ReadonlyArray<{ population: number; infrastructureBp: number }>,
+): number {
+  let populationTotal = 0;
+  let weightedTotal = 0;
+  for (const [index, region] of regions.entries()) {
+    if (!Number.isSafeInteger(region.population) || region.population < 0) {
+      throw new RangeError(`region ${index} population is not a non-negative safe integer`);
+    }
+    if (!Number.isSafeInteger(region.infrastructureBp) || region.infrastructureBp < 0
+      || region.infrastructureBp > 10000) {
+      throw new RangeError(`region ${index} infrastructureBp is outside 0..10000`);
+    }
+    const weighted = region.population * region.infrastructureBp;
+    if (!Number.isSafeInteger(weighted)) throw new RangeError(`region ${index} weighted infrastructure is not a safe integer`);
+    populationTotal += region.population;
+    weightedTotal += weighted;
+    if (!Number.isSafeInteger(populationTotal) || !Number.isSafeInteger(weightedTotal)) {
+      throw new RangeError('national infrastructure inputs exceed safe-integer range');
+    }
+  }
+  return populationTotal === 0 ? 0 : Math.floor(weightedTotal / populationTotal);
 }
 
 function resolveScenarioPath(root: unknown, pointer: string): unknown {
@@ -157,10 +183,10 @@ export function compileHistoricalProjection(input: HistoricalProjectionInput): H
     const population = regions.reduce((sum, entry) => sum + entry.population, 0);
     const workforce = regions.reduce((sum, entry) => sum + Math.floor((entry.population * entry.workforceRateBp) / 10000), 0);
     const industrialCapacity = regions.reduce((sum, entry) => sum + entry.baseMonthlyCapacity, 0);
-    const infrastructureCapacity = regions.reduce((sum, entry) => sum + entry.infrastructureBp, 0);
+    const infrastructureIndexBp = populationWeightedInfrastructureBp(regions);
     const stockpile = Object.fromEntries(polity.stockpile.map((entry) => [entry.resource, entry.amount]));
     if (control.population !== population || control.workforce !== workforce || control.treasury !== polity.treasury
-      || control.industrialCapacity !== industrialCapacity || control.infrastructureCapacity !== infrastructureCapacity
+      || control.industrialCapacity !== industrialCapacity || control.infrastructureIndexBp !== infrastructureIndexBp
       || canonicalStringify(control.stockpile) !== canonicalStringify(stockpile)) throw new Error(`national totals mismatch for ${polity.id}`);
     const military = scenario.military?.polities.find((entry) => entry.polityId === polity.id);
     if (military && military.maxMobilizationBp !== control.maxMobilizationBp) throw new Error(`mobilization mismatch for ${polity.id}`);

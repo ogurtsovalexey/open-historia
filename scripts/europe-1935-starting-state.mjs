@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import {
   compileHistoricalProjection,
   initState,
+  populationWeightedInfrastructureBp,
   resolveMonth,
   startingStateValueChecksum,
 } from '@open-historia/engine';
@@ -255,11 +256,11 @@ function controlsForPolity(polityId, engineScenario, authoring) {
     population: sum(regions, (entry) => entry.population),
     workforce: sum(regions, (entry) => Math.floor((entry.population * entry.workforceRateBp) / 10000)),
     industrialCapacity: sum(regions, (entry) => entry.baseMonthlyCapacity),
-    infrastructureCapacity: sum(regions, (entry) => entry.infrastructureBp),
+    infrastructureIndexBp: populationWeightedInfrastructureBp(regions),
     treasury: engineScenario.polities.find((entry) => entry.id === polityId)?.treasury ?? null,
     stockpile,
   };
-  const fields = ['population', 'workforce', 'industrialCapacity', 'infrastructureCapacity', 'treasury', 'stockpile'];
+  const fields = ['population', 'workforce', 'industrialCapacity', 'infrastructureIndexBp', 'treasury', 'stockpile'];
   const matches = national !== undefined && fields.every((field) => canonical(national[field]) === canonical(computed[field]));
   return {
     authored: national ? Object.fromEntries(fields.map((field) => [field, national[field]])) : null,

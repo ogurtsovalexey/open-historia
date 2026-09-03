@@ -2,7 +2,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import test from 'node:test';
-import { compileHistoricalProjection, initState, startingStateValueChecksum } from '../src/index.js';
+import {
+  compileHistoricalProjection,
+  initState,
+  populationWeightedInfrastructureBp,
+  startingStateValueChecksum,
+} from '../src/index.js';
 
 const root = join(import.meta.dirname, '../../../data-packs/fixtures/europe-1935-benchmark');
 const json = (relative: string) => JSON.parse(readFileSync(join(root, relative), 'utf8'));
@@ -21,6 +26,18 @@ test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine pr
   assert.equal(first.scenario.campaign?.softHorizonMonth, '1940-07-01');
   assert.equal(first.mapLink?.regions.find((entry) => entry.engineRegionId === 'region:benchmark-1:DE')?.mapRegionIds.length, 3);
   assert.equal(initState(first.scenario).label, 'historical-projection');
+});
+
+test('historical authoring uses a population-weighted infrastructure index and rejects schema v2', () => {
+  assert.equal(populationWeightedInfrastructureBp([
+    { population: 3, infrastructureBp: 5000 },
+    { population: 1, infrastructureBp: 1000 },
+  ]), 4000);
+  assert.equal(populationWeightedInfrastructureBp([{ population: 0, infrastructureBp: 9000 }]), 0);
+  assert.throws(() => populationWeightedInfrastructureBp([{ population: 1, infrastructureBp: 10001 }]), /outside/);
+  const legacy = input();
+  legacy.authoring.schemaVersion = 'open-historia-historical-authoring/2';
+  assert.throws(() => compileHistoricalProjection(legacy), /open-historia-historical-authoring\/3/);
 });
 
 test('historical compiler rejects ownership, national-total and unknown-ID drift', () => {

@@ -23,6 +23,11 @@ industry and infrastructure. Regional population, production and resource
 allocations must exactly sum to declared national controls. Approximation is
 allowed only when named as an assumption; missing provenance is not.
 
+Historical authoring schema `/3` defines the national infrastructure control as
+`infrastructureIndexBp`: the integer-floor, population-weighted mean of regional
+`infrastructureBp`. Basis-point indexes are never added across regions. Schema
+`/2` is incompatible and rejected rather than heuristically migrated.
+
 ## Compiler contract
 
 The compiler validates ScenarioV2 first, then validates the engine projection,
@@ -45,4 +50,3 @@ application asset and never enters AI context.
 Before a scenario is called curated, its population, industrial and regional
 resource estimates receive a dedicated research/review pass. Until then the
 fidelity manifest and TODOs must expose the gap honestly.
-
