@@ -22,6 +22,7 @@ test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine pr
   assert.equal(first.checksum, second.checksum);
   assert.equal(first.scenario.scenarioId, 'scenario:europe-1935-benchmark');
   assert.equal(first.scenario.polities.length, 9);
+  assert.equal(input().bundle.manifest.contentVersion, '1.0.0');
   assert.equal(first.scenario.startMonth, '1935-01-01');
   assert.equal(first.scenario.campaign?.softHorizonMonth, '1940-07-01');
   assert.deepEqual(first.scenario.diplomacy?.startingAgreements?.map((entry) => entry.agreementId), [

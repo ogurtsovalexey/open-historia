@@ -103,6 +103,8 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   assert.equal(audit.gate.status, 'blocked');
   assert.equal(audit.gate.supportedPolities, 7);
   assert.equal(audit.gate.baselinePolities, 2);
+  assert.equal(audit.generatedFrom.manifestContentVersion, '1.0.0');
+  assert.equal(audit.issues.some((entry) => entry.code === 'major-content-version-pending'), false);
   assert.equal(audit.firstMonth.matches, true);
   assert.equal(audit.polities.filter((entry) => entry.fidelity === 'Supported').every((entry) => entry.controls.matches), true);
   assert.equal(audit.polities.filter((entry) => entry.fidelity === 'Supported').every((entry) => entry.regionCount === 1), true);

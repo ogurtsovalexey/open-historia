@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "id": "scenario:europe-1935-benchmark",
-  "contentVersion": "0.1.0",
+  "contentVersion": "1.0.0",
   "engineRange": ">=0.1.0",
   "defaultLocale": "en",
   "scenarioPath": "scenario.json",
