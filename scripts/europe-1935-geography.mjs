@@ -53,6 +53,8 @@ export const OHM_POLAND_1935 = Object.freeze({
 });
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_OUTPUT = path.join(ROOT, 'runs', 'campaign-lab', 'europe-1935-geography-checkpoint');
+const POLAND_ADJACENCY_CONTROL_PATH = path.join(ROOT, 'packages', 'data-packs', 'fixtures',
+  'europe-1935-benchmark', 'geography', 'poland-land-adjacency.json');
 
 const sha256 = (bytes) => `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
 const groupBy = (rows, selector) => rows.reduce((groups, row) => {
@@ -65,6 +67,46 @@ const canonical = (value) => {
   if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
   return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`;
 };
+
+export function loadPolandAdjacencyControl(controlPath = POLAND_ADJACENCY_CONTROL_PATH) {
+  const control = JSON.parse(fs.readFileSync(controlPath, 'utf8'));
+  if (control.schemaVersion !== 'open-historia-land-adjacency-control/1'
+    || control.polityId !== 'polity:poland' || control.snapshotDate !== SNAPSHOT_DATE
+    || control.sourceNormalizedChecksum !== OHM_POLAND_1935.normalizedSourceChecksum
+    || control.method !== 'exact-shared-source-segments-7dp'
+    || !/^sha256:[a-f0-9]{64}$/.test(control.adjacencyChecksum)
+    || !Array.isArray(control.edges) || control.edges.length !== 30) {
+    throw new Error('invalid Poland land-adjacency control header');
+  }
+  const expectedRelations = new Set(OHM_POLAND_1935.regionRelationIds);
+  const seen = new Set();
+  for (const edge of control.edges) {
+    const [left, right] = edge.relationIds ?? [];
+    const key = `${left}|${right}`;
+    if (!Number.isInteger(left) || !Number.isInteger(right) || left >= right
+      || !expectedRelations.has(left) || !expectedRelations.has(right)
+      || !Number.isInteger(edge.sharedSegmentCount) || edge.sharedSegmentCount <= 0 || seen.has(key)) {
+      throw new Error(`invalid Poland land-adjacency control edge: ${key}`);
+    }
+    seen.add(key);
+  }
+  return control;
+}
+
+export function assertPolandAdjacencyControl(adjacency, control = loadPolandAdjacencyControl()) {
+  const actualEdges = adjacency.edges.map((edge) => ({
+    relationIds: [edge.fromRegionId, edge.toRegionId].map((regionId) => Number(String(regionId).replace('ohm-relation-', ''))),
+    sharedSegmentCount: edge.sharedSegmentCount,
+  }));
+  const isolated = adjacency.regions.filter((entry) => entry.adjacentRegionIds.length === 0);
+  if (adjacency.method !== control.method || adjacency.regions.length !== OHM_POLAND_1935.regionRelationIds.length
+    || isolated.length !== 0 || adjacency.nonManifoldSegments.length !== 0
+    || canonical(actualEdges) !== canonical(control.edges)
+    || sha256(canonical(adjacency)) !== control.adjacencyChecksum) {
+    throw new Error('OHM Poland 1935 land adjacency drifted from its pinned source-derived control');
+  }
+  return control;
+}
 
 export function isEffectiveAt(tags, date = SNAPSHOT_DATE) {
   const start = String(tags?.start_date ?? '');
@@ -759,6 +801,7 @@ export async function runPolandCoverage(outputDirectory = DEFAULT_OUTPUT, option
   const regionTopology = auditTopology(regionBoundary, regions.features);
   const boundaryCrossCheck = auditTopology(countryBoundary, regions.features);
   const adjacency = deriveLandAdjacency(regions);
+  const adjacencyControl = assertPolandAdjacencyControl(adjacency);
   const isolatedRegionIds = adjacency.regions.filter((entry) => entry.adjacentRegionIds.length === 0)
     .map((entry) => entry.regionId);
   const ready = regionTopology.status === 'topology-clean'
@@ -789,7 +832,7 @@ export async function runPolandCoverage(outputDirectory = DEFAULT_OUTPUT, option
       adjacency: {
         method: adjacency.method, edgeCount: adjacency.edges.length, isolatedRegionIds,
         nonManifoldSegmentCount: adjacency.nonManifoldSegments.length,
-        checksum: sha256(canonical(adjacency)),
+        checksum: sha256(canonical(adjacency)), controlStatus: adjacencyControl.status,
       },
     },
   };

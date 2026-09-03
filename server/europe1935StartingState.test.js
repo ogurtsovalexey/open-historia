@@ -60,7 +60,7 @@ test('Poland regional economy candidate preserves national controls and the comp
   const first = buildPolandRegionalProjectionCandidate(fixture.engineScenario);
   const second = buildPolandRegionalProjectionCandidate(fixture.engineScenario);
   assert.deepEqual(first, second);
-  assert.equal(first.checksum, 'sha256:fcc42e2762fa8c051d666f3b0b8eb6809c343a28d77e7d5bf1439ed06c064c2a');
+  assert.equal(first.checksum, 'sha256:f38c989897b6c5249c893e258c2f7223502c1ca8336ca50c7c50fd2a9bb1cc77');
   assert.equal(first.rows.length, 16);
   assert.deepEqual(first.nationalControls, {
     population: 34_000_000,
@@ -73,6 +73,9 @@ test('Poland regional economy candidate preserves national controls and the comp
   assert.equal(first.rows.find((row) => row.activity.kind === 'processing').regionId,
     'region:ohm-1935:2741475');
   assert.equal(first.firstMonth.checksum, baseline.checksum);
+  assert.equal(first.landAdjacency.edgeCount, 30);
+  assert.equal(first.landAdjacency.checksum,
+    'sha256:f23783aa4c712a80e4be8c1c3ff4969efeb29aa0a3c2944cd852b31366c4c881');
   assert.equal(first.externalSupplyLinks.length, 3);
 });
 

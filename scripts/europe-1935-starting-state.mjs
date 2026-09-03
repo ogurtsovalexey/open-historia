@@ -139,6 +139,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURE_ROOT = path.join(ROOT, 'packages', 'data-packs', 'fixtures', 'europe-1935-benchmark');
 const DEFAULT_OUTPUT = path.join(ROOT, 'runs', 'campaign-lab', 'europe-1935-starting-state-checkpoint');
 const BASELINE_PATH = path.join(FIXTURE_ROOT, 'engine', 'first-month-baseline.json');
+const POLAND_ADJACENCY_CONTROL_PATH = path.join(FIXTURE_ROOT, 'geography', 'poland-land-adjacency.json');
 
 const canonical = (value) => {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
@@ -336,6 +337,12 @@ function buildPolandCandidateScenario(engineScenario) {
 export function buildPolandRegionalProjectionCandidate(engineScenario) {
   const { scenario, regions, activityRows } = buildPolandCandidateScenario(engineScenario);
   const firstMonth = buildFirstMonthBaseline(resolveMonth(initState(scenario), { commands: [] }));
+  const adjacency = JSON.parse(fs.readFileSync(POLAND_ADJACENCY_CONTROL_PATH, 'utf8'));
+  const relationIds = new Set(regions.map((entry) => Number(entry.regionId.split(':').at(-1))));
+  if (adjacency.sourceNormalizedChecksum !== 'sha256:9ebf6e3f1c6cca66bdca58b110f78d3c2115c0c3c398820c3bea29da37078cfe'
+    || adjacency.edges.length !== 30 || adjacency.edges.some((edge) => edge.relationIds.some((relationId) => !relationIds.has(relationId)))) {
+    throw new Error('Poland economy candidate does not match the pinned land-adjacency control');
+  }
   const body = {
     schemaVersion: 'open-historia-regional-projection-candidate/1',
     polityId: 'polity:poland',
@@ -352,6 +359,12 @@ export function buildPolandRegionalProjectionCandidate(engineScenario) {
     },
     activityCapacity: Object.fromEntries(activityRows.map((group) => [group.family, group.targetCapacity])),
     processingRegionCount: regions.filter((entry) => entry.activity.kind === 'processing').length,
+    landAdjacency: {
+      status: adjacency.status,
+      method: adjacency.method,
+      edgeCount: adjacency.edges.length,
+      checksum: adjacency.adjacencyChecksum,
+    },
     externalSupplyLinks: Object.entries(POLAND_1935_REGIONAL_ECONOMY.externalSupplyLinks).map(([externalRegionId, relationId]) => ({
       externalRegionId, candidateRegionId: `region:ohm-1935:${relationId}`,
     })),

@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   SNAPSHOT_DATE,
   OHM_POLAND_1935,
+  assertPolandAdjacencyControl,
   auditTopology,
   auditRelationGeometry,
   buildCheckpoint,
@@ -10,6 +11,7 @@ import {
   deriveLandAdjacency,
   filterFeaturePolygonsToBbox,
   isEffectiveAt,
+  loadPolandAdjacencyControl,
   normalizeRelationGeometry,
   normalizeInventory,
   overlapRatio,
@@ -80,6 +82,33 @@ test('OHM Poland 1935 normalization requires the exact dated and licensed voivod
   const blocked = structuredClone(features);
   blocked[0].properties.license = { class: 'share-alike', value: 'CC BY-SA 4.0', allowed: false };
   assert.throws(() => normalizePolandRegions(blocked), /blocked license/);
+});
+
+test('Poland source-derived land adjacency is pinned independently of ignored run artifacts', () => {
+  const control = loadPolandAdjacencyControl();
+  const neighbors = new Map(OHM_POLAND_1935.regionRelationIds.map((relationId) =>
+    [`ohm-relation-${relationId}`, []]));
+  const edges = control.edges.map(({ relationIds: [left, right], sharedSegmentCount }) => {
+    const fromRegionId = `ohm-relation-${left}`;
+    const toRegionId = `ohm-relation-${right}`;
+    neighbors.get(fromRegionId).push(toRegionId);
+    neighbors.get(toRegionId).push(fromRegionId);
+    return { fromRegionId, toRegionId, sharedSegmentCount };
+  });
+  const adjacency = {
+    method: control.method,
+    regions: [...neighbors.entries()].map(([regionId, adjacentRegionIds]) => ({
+      regionId, adjacentRegionIds: adjacentRegionIds.sort(),
+    })),
+    edges,
+    nonManifoldSegments: [],
+  };
+  assert.equal(assertPolandAdjacencyControl(adjacency).adjacencyChecksum,
+    'sha256:f23783aa4c712a80e4be8c1c3ff4969efeb29aa0a3c2944cd852b31366c4c881');
+  assert.equal(control.edges.length, 30);
+  const drifted = structuredClone(adjacency);
+  drifted.edges[0].sharedSegmentCount += 1;
+  assert.throws(() => assertPolandAdjacencyControl(drifted, control), /adjacency drifted/);
 });
 
 test('Europe 1935 geography closes relation ways into deterministic polygons', () => {
