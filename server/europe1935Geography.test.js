@@ -7,11 +7,15 @@ import {
   auditTopology,
   auditRelationGeometry,
   buildCheckpoint,
+  buildFranceOwnerRegions,
+  buildPlannedPartition,
   classifyLicense,
   deriveLandAdjacency,
   filterFeaturePolygonsToBbox,
   isEffectiveAt,
   loadPolandAdjacencyControl,
+  loadCandidateRegionPlan,
+  normalizeHistoricCounties,
   normalizeRelationGeometry,
   normalizeInventory,
   overlapRatio,
@@ -20,6 +24,22 @@ import {
   normalizePolandRegions,
   stitchRings,
 } from '../scripts/europe-1935-geography.mjs';
+
+test('Europe 1935 owner candidate plan bounds every Supported polity and assigns UK counties once', () => {
+  const plan = loadCandidateRegionPlan();
+  assert.equal(plan.status, 'candidate-pending-owner-approval');
+  assert.deepEqual(Object.fromEntries(Object.entries(plan.supportedPolities)
+    .map(([polityId, definition]) => [polityId, definition.regions.length])), {
+    'polity:austria': 10,
+    'polity:czechoslovakia': 10,
+    'polity:germany': 21,
+    'polity:italy': 18,
+    'polity:united-kingdom': 13,
+  });
+  assert.deepEqual(plan.baselineMacroRegions['polity:soviet-union'], ['Запад', 'Центр', 'Восток']);
+  assert.ok(plan.inertPolities.some(({ polityId }) => polityId === 'polity:saargebiet'));
+  assert.ok(plan.inertPolities.some(({ polityId }) => polityId === 'polity:free-city-of-danzig'));
+});
 
 test('Europe 1935 geography inventory applies date and license gates deterministically', () => {
   assert.equal(SNAPSHOT_DATE, '1935-01-01');
@@ -184,4 +204,69 @@ test('land adjacency requires a shared source segment and is byte-order determin
   ]);
   assert.deepEqual(adjacency, deriveLandAdjacency({ ...regions, features: regions.features.toReversed() }));
   assert.throws(() => deriveLandAdjacency({ ...regions, features: [...regions.features, regions.features[0]] }), /unique nativeId/);
+});
+
+test('owner partition rebuilds precision-normalized source and authored cuts without gaps or overlaps', () => {
+  const polygon = (west, east, relationId) => ({
+    type: 'Feature', properties: { relationId, startDate: '1930', endDate: '1940',
+      license: { class: 'ohm-default-cc0', value: 'CC0 (OHM default)', allowed: true } },
+    geometry: { type: 'Polygon', coordinates: [[[west, 0], [east, 0], [east, 1], [west, 1], [west, 0]]] },
+  });
+  const boundary = polygon(0, 3, 100);
+  const first = buildPlannedPartition(boundary, [polygon(0, 1, 1), polygon(2, 3, 3)], {
+    remainderRegionId: 'middle',
+    regions: [
+      { id: 'west', name: 'West', sourceRelationIds: [1] },
+      { id: 'east', name: 'East', sourceRelationIds: [3] },
+      { id: 'middle', name: 'Middle', sourceRelationIds: [2], method: 'country-remainder-plus-dated-source' },
+    ],
+  }, 'polity:test', { precision: 7 });
+  assert.equal(auditTopology(first.boundary, first.features).status, 'topology-clean');
+  assert.deepEqual(deriveLandAdjacency({ type: 'FeatureCollection', features: first.features }).edges
+    .map(({ fromRegionId, toRegionId }) => [fromRegionId, toRegionId]), [
+    ['east', 'middle'], ['middle', 'west'],
+  ]);
+  assert.deepEqual(first.features.find(({ properties }) => properties.nativeId === 'middle').properties.sourceObjects, [{
+    relationId: 100, startDate: '1930', endDate: '1940',
+    license: { class: 'ohm-default-cc0', value: 'CC0 (OHM default)', allowed: true },
+  }]);
+  assert.deepEqual(first, buildPlannedPartition(boundary, [polygon(0, 1, 1), polygon(2, 3, 3)], {
+    remainderRegionId: 'middle',
+    regions: [
+      { id: 'west', name: 'West', sourceRelationIds: [1] },
+      { id: 'east', name: 'East', sourceRelationIds: [3] },
+      { id: 'middle', name: 'Middle', sourceRelationIds: [2], method: 'country-remainder-plus-dated-source' },
+    ],
+  }, 'polity:test', { precision: 7 }));
+});
+
+test('Historic Counties Trust input is exact, unique and deterministically ordered', () => {
+  const countyCode = (index) => `A${String.fromCharCode(65 + Math.floor(index / 26))}${String.fromCharCode(65 + (index % 26))}`;
+  const raw = { type: 'FeatureCollection', features: Array.from({ length: 92 }, (_, index) => ({
+    type: 'Feature',
+    properties: { HCS_CODE: countyCode(index), NAME: `County ${index}` },
+    geometry: { type: 'Polygon', coordinates: [[[index, 0], [index + 1, 0], [index + 1, 1], [index, 0]]] },
+  })) };
+  const normalized = normalizeHistoricCounties(raw);
+  assert.equal(normalized.features.length, 92);
+  assert.equal(normalized.features[0].properties.countyCode, 'AAA');
+  assert.throws(() => normalizeHistoricCounties({ ...raw, features: raw.features.slice(1) }), /exactly 92/);
+  const duplicate = structuredClone(raw);
+  duplicate.features[1].properties.HCS_CODE = 'AAA';
+  assert.throws(() => normalizeHistoricCounties(duplicate), /invalid or duplicate/);
+});
+
+test('France owner geography promotes Corse to an explicit region and remains topology-clean', () => {
+  const square = (west, east, south, north) => [[[west, south], [east, south], [east, north], [west, north], [west, south]]];
+  const regions = { type: 'FeatureCollection', features: [
+    { type: 'Feature', properties: { nativeId: '15', nativeName: 'MARSEILLE' }, geometry: {
+      type: 'MultiPolygon', coordinates: [square(4, 7, 43, 45), square(8.5, 9.5, 41, 43)],
+    } },
+    { type: 'Feature', properties: { nativeId: '22', nativeName: 'PARIS' }, geometry: {
+      type: 'Polygon', coordinates: square(4, 7, 45, 47),
+    } },
+  ] };
+  const partition = buildFranceOwnerRegions(regions, 7);
+  assert.deepEqual(partition.features.map(({ properties }) => properties.nativeId), ['marseille', 'corse', 'paris']);
+  assert.equal(auditTopology(partition.boundary, partition.features).status, 'topology-clean');
 });

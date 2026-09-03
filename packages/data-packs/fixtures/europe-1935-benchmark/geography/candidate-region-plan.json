@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "open-historia-geography-candidate-plan/1",
+  "scenarioId": "scenario:europe-1935-benchmark",
+  "snapshotDate": "1935-01-01",
+  "status": "candidate-pending-owner-approval",
+  "supportedPolities": {
+    "polity:austria": {
+      "remainderRegionId": "niederoesterreich",
+      "regions": [
+        { "id": "wien", "name": "Wien", "clipBbox": [16.18, 48.10, 16.58, 48.34], "carveFirst": true, "method": "authored-estimate-within-dated-country-boundary", "confidence": "low", "todo": "Replace the bounded 1935 urban approximation with a permissively licensed contemporary municipal polygon." },
+        { "id": "osttirol", "name": "Osttirol", "sourceRelationIds": [2746440], "clipBbox": [12.0, 46.6, 13.0, 47.2], "method": "dated-source-subregion", "confidence": "medium", "todo": "Confirm the exact interwar Bezirk Lienz outline." },
+        { "id": "burgenland", "name": "Burgenland", "sourceRelationIds": [2747803] },
+        { "id": "kaernten", "name": "Kärnten", "sourceRelationIds": [2746370] },
+        { "id": "oberoesterreich", "name": "Oberösterreich", "sourceRelationIds": [2928473] },
+        { "id": "salzburg", "name": "Salzburg", "sourceRelationIds": [2852310] },
+        { "id": "steiermark", "name": "Steiermark", "sourceRelationIds": [2742908] },
+        { "id": "tirol", "name": "Tirol", "sourceRelationIds": [2746440] },
+        { "id": "vorarlberg", "name": "Vorarlberg", "sourceRelationIds": [2684073] },
+        { "id": "niederoesterreich", "name": "Niederösterreich", "sourceRelationIds": [2684077] }
+      ]
+    },
+    "polity:czechoslovakia": {
+      "remainderRegionId": "slovensko",
+      "regions": [
+        { "id": "praha", "name": "Praha", "parentRelationId": 2856853, "sourceRelationIds": [2931737] },
+        { "id": "zapadni-cechy", "name": "Západní Čechy", "parentRelationId": 2856853, "sourceRelationIds": [2664911, 2665894, 2683697, 2684440, 2685458, 2686023, 2686361, 2686533, 2686819, 2687557, 2688016, 2689449, 2689718, 2691732, 2692335, 2699525, 2703603, 2716177, 2735168, 2737746, 2737923, 2853225, 2853226, 2856861] },
+        { "id": "severni-cechy", "name": "Severní Čechy", "parentRelationId": 2856853, "sourceRelationIds": [2665922, 2671653, 2671957, 2684013, 2685123, 2685282, 2685415, 2685698, 2686158, 2686581, 2686912, 2688317, 2688880, 2689138, 2689584, 2690148, 2692481, 2704798, 2704911, 2705150, 2705209, 2734875, 2735117, 2736550, 2738494, 2738670, 2739124, 2851955, 2854899, 2854900] },
+        { "id": "jizni-cechy", "name": "Jižní Čechy", "parentRelationId": 2856853, "sourceRelationIds": [2684672, 2686418, 2688150, 2690008, 2690463, 2692116, 2700276, 2737184, 2739420] },
+        { "id": "vychodni-cechy", "name": "Východní Čechy", "parentRelationId": 2856853, "sourceRelationIds": [2684312, 2684805, 2684878, 2685057, 2685253, 2685491, 2685613, 2685968, 2687691, 2687874, 2690295, 2690807, 2691109, 2705013, 2736131, 2736915, 2738914] },
+        { "id": "stredni-cechy", "name": "Střední Čechy", "parentRelationId": 2856853, "sourceRelationIds": [2683592, 2683854, 2688976, 2690038, 2691463, 2704575, 2735306, 2737406], "parentRemainder": true },
+        { "id": "slezsko", "name": "Slezsko", "parentRelationId": 2857449, "sourceRelationIds": [2661759, 2661866] },
+        { "id": "morava", "name": "Morava", "parentRelationId": 2857449, "sourceRelationIds": [2950119], "parentRemainder": true },
+        { "id": "podkarpatska-rus", "name": "Podkarpatská Rus", "sourceRelationIds": [2857483] },
+        { "id": "slovensko", "name": "Slovensko", "method": "country-remainder-between-dated-land-relations", "confidence": "medium", "todo": "Pin a permissively licensed 1928–1938 Slovak Land polygon if a complete source becomes available." }
+      ],
+      "method": "union-of-dated-okres-polygons-within-dated-land",
+      "confidence": "medium",
+      "todo": "Owner-review the strategic aggregation of dated okres polygons; no rectangular geographic cuts remain."
+    },
+    "polity:germany": {
+      "remainderRegionId": "hannover-braunschweig",
+      "regions": [
+        { "id": "baden", "name": "Baden", "sourceRelationIds": [2661248] },
+        { "id": "bayern", "name": "Bayern", "sourceRelationIds": [2661374] },
+        { "id": "bremen-oldenburg", "name": "Bremen–Oldenburg", "sourceRelationIds": [2691491, 2691493] },
+        { "id": "schleswig-holstein", "name": "Schleswig-Holstein", "sourceRelationIds": [2693616, 2691970, 2856514] },
+        { "id": "anhalt-provinz-sachsen", "name": "Anhalt–Provinz Sachsen", "sourceRelationIds": [2856580, 2806983] },
+        { "id": "westfalen-lippe", "name": "Westfalen-Lippe", "sourceRelationIds": [2690429, 2690418, 2690428] },
+        { "id": "sachsen", "name": "Sachsen", "sourceRelationIds": [2856631] },
+        { "id": "grenzmark", "name": "Grenzmark Posen-Westpreußen", "sourceRelationIds": [2694718] },
+        { "id": "hessen", "name": "Hessen", "sourceRelationIds": [2746244] },
+        { "id": "hohenzollern", "name": "Hohenzollerische Lande", "sourceRelationIds": [2894236] },
+        { "id": "mecklenburg", "name": "Mecklenburg", "sourceRelationIds": [2691477] },
+        { "id": "brandenburg", "name": "Brandenburg", "sourceRelationIds": [2806722] },
+        { "id": "hessen-nassau", "name": "Hessen-Nassau", "sourceRelationIds": [2745180] },
+        { "id": "niederschlesien", "name": "Niederschlesien", "sourceRelationIds": [2694765] },
+        { "id": "oberschlesien", "name": "Oberschlesien", "sourceRelationIds": [2693608] },
+        { "id": "ostpreussen", "name": "Ostpreußen", "sourceRelationIds": [2691479] },
+        { "id": "pommern", "name": "Pommern", "sourceRelationIds": [2694035] },
+        { "id": "rheinprovinz", "name": "Rheinprovinz", "sourceRelationIds": [2690504] },
+        { "id": "thueringen", "name": "Thüringen", "sourceRelationIds": [2745091] },
+        { "id": "wuerttemberg", "name": "Württemberg", "sourceRelationIds": [2661270] },
+        { "id": "hannover-braunschweig", "name": "Hannover–Braunschweig", "sourceRelationIds": [2745181, 2691487], "method": "country-remainder-plus-dated-source", "confidence": "medium", "todo": "Replace the source-remainder reconstruction when the incomplete Hannover inner ring is repaired upstream." }
+      ]
+    },
+    "polity:italy": {
+      "remainderRegionId": "emilia",
+      "regions": [
+        { "id": "sicilia", "name": "Sicilia", "boundaryComponentsBbox": [11.8, 35.2, 15.8, 38.9], "method": "dated-country-island-component", "confidence": "high", "todo": "Pin a post-1923 regional relation if OHM adds one." },
+        { "id": "liguria", "name": "Liguria", "clipBbox": [7.3, 43.45, 10.15, 44.8], "sourceRelationIds": [2851787], "method": "country-remainder-plus-dated-source" },
+        { "id": "lombardia", "name": "Lombardia", "clipBbox": [8.25, 44.55, 11.55, 46.75], "sourceRelationIds": [2799651], "method": "country-remainder-plus-dated-source" },
+        { "id": "abruzzi-molise", "name": "Abruzzi e Molise", "sourceRelationIds": [2860797] },
+        { "id": "calabrie", "name": "Calabrie", "sourceRelationIds": [2851488] },
+        { "id": "campania", "name": "Campania", "sourceRelationIds": [2851490] },
+        { "id": "lazio", "name": "Lazio", "sourceRelationIds": [2879805] },
+        { "id": "lucania", "name": "Lucania", "sourceRelationIds": [2851925] },
+        { "id": "marche", "name": "Marche", "sourceRelationIds": [2802248] },
+        { "id": "piemonte", "name": "Piemonte", "sourceRelationIds": [2851246] },
+        { "id": "puglie", "name": "Puglie", "sourceRelationIds": [2851489] },
+        { "id": "sardegna", "name": "Sardegna", "sourceRelationIds": [2851386] },
+        { "id": "toscana", "name": "Toscana", "sourceRelationIds": [2750959] },
+        { "id": "umbria", "name": "Umbria", "sourceRelationIds": [2751199] },
+        { "id": "veneto", "name": "Veneto", "sourceRelationIds": [2851388] },
+        { "id": "venezia-giulia", "name": "Venezia Giulia", "sourceRelationIds": [2805375] },
+        { "id": "venezia-tridentina", "name": "Venezia Tridentina", "sourceRelationIds": [2879991] },
+        { "id": "emilia", "name": "Emilia", "sourceRelationIds": [2750928], "clipBbox": [8.8, 43.7, 12.9, 45.25], "method": "country-remainder-plus-dated-source", "confidence": "medium", "todo": "Replace reconstruction when the incomplete OHM outer ring is repaired upstream." }
+      ]
+    },
+    "polity:united-kingdom": {
+      "remainderRegionId": "south-east-england",
+      "source": "historic-counties-trust-definition-a",
+      "regions": [
+        { "id": "highlands-islands", "name": "Highlands and Islands", "countyCodes": ["ARG", "BNF", "BTE", "CRT", "CTN", "INS", "NRN", "ORN", "RSS", "SHT", "SRL"] },
+        { "id": "north-east-scotland", "name": "North-East Scotland", "countyCodes": ["ABN", "ANG", "KNC", "MOY", "PRT"] },
+        { "id": "central-scotland", "name": "Central Scotland", "countyCodes": ["CLM", "DUN", "FFE", "KNR", "LNK", "RNF", "STL", "WLT"] },
+        { "id": "southern-scotland", "name": "Southern Scotland", "countyCodes": ["AYS", "BRW", "DMF", "ELT", "KCB", "MLT", "PBS", "RXB", "SKK", "WGT"] },
+        { "id": "northern-england", "name": "Northern England", "countyCodes": ["CUM", "DRH", "NHB", "WML", "YRK"] },
+        { "id": "north-west-england", "name": "North-West England", "countyCodes": ["CHE", "LCS"] },
+        { "id": "midlands", "name": "Midlands", "countyCodes": ["DRB", "HRF", "LCR", "LNC", "NHP", "NOT", "RTL", "SHP", "STF", "WRC", "WRW"] },
+        { "id": "east-england", "name": "East of England", "countyCodes": ["BED", "CMB", "ESE", "HNT", "HTF", "NRF", "SFF"] },
+        { "id": "southern-england", "name": "Southern England", "countyCodes": ["BER", "BUC", "HMP", "OXD", "SUS", "WTS"] },
+        { "id": "south-west-england", "name": "South-West England", "countyCodes": ["CNW", "DRS", "DVN", "GLC", "SMS"] },
+        { "id": "cymru", "name": "Cymru", "countyCodes": ["AGL", "BRN", "CRD", "CRM", "CRN", "DBH", "FLT", "GLM", "MNM", "MRN", "MTG", "PMB", "RDN"] },
+        { "id": "northern-ireland", "name": "Northern Ireland", "countyCodes": ["ANM", "ARH", "DWN", "FRM", "LDR", "TYN"] },
+        { "id": "south-east-england", "name": "South-East England", "countyCodes": ["KNT", "MSX", "SUR"] }
+      ]
+    }
+  },
+  "inertPolities": [
+    { "polityId": "polity:saargebiet", "regionId": "saargebiet", "name": "Saargebiet", "sourceRelationId": 2690373 },
+    { "polityId": "polity:free-city-of-danzig", "regionId": "freie-stadt-danzig", "name": "Freie Stadt Danzig", "sourceRelationId": 2691478 }
+  ],
+  "baselineMacroRegions": {
+    "polity:soviet-union": ["Запад", "Центр", "Восток"],
+    "polity:united-states": ["East", "Central", "West"]
+  },
+  "manualConnections": [
+    { "kind": "strait", "from": "polity:italy/sicilia", "to": "polity:italy/calabrie" },
+    { "kind": "sea-route", "from": "polity:italy/sardegna", "to": "polity:italy/lazio" },
+    { "kind": "sea-route", "from": "polity:france/corse", "to": "polity:france/marseille" },
+    { "kind": "sea-route", "from": "polity:united-kingdom/northern-ireland", "to": "polity:united-kingdom/southern-scotland" },
+    { "kind": "external-land", "from": "polity:germany/ostpreussen", "to": "polity:free-city-of-danzig/freie-stadt-danzig" }
+  ]
+}

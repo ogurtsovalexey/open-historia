@@ -1,6 +1,6 @@
 # Europe 1935 geography source audit
 
-Status: active source audit; not an owner-approved geography checkpoint.
+Status: owner-review candidate generated; not owner-approved and not integrated into runtime.
 
 Date: 2026-09-02. Scenario date: 1935-01-01.
 
@@ -40,6 +40,49 @@ lower-level polygons still need deterministic aggregation.
 | Italy | 14 | Emilia, Liguria and Lombardia have open rings; Sicilia is absent from the dated inventory. |
 | Poland | 16 | The voivodeship layer is near-complete and directly usable after topology review. |
 | United Kingdom | 62 | Coverage is uneven, 13 candidate relations have open rings, and aggregation is required. |
+
+## Owner-review candidate
+
+Run `npm run geography:europe-1935:owner` for a fresh source extraction or add
+`-- --cached` to reproduce the checkpoint from the checksum-pinned ignored
+downloads. The command writes `owner-geography-overlay.svg`,
+`owner-geography-report.md`, `owner-geography-manifest.json`,
+`owner-regions.geojson` and `owner-land-adjacency.json` beneath the ignored
+checkpoint directory. It never edits the runtime scenario.
+
+The current candidate has this bounded surface:
+
+| Polity | Regions | Land edges | Source treatment |
+| --- | ---: | ---: | --- |
+| Austria | 10 | 15 | Dated Länder; Tirol split into Tirol/Osttirol; a visibly low-confidence Wien cut awaits owner review. |
+| Czechoslovakia | 10 | 16 | Ninety-six dated okres polygons aggregated inside the dated Czech and Moravian-Silesian lands; Slovensko is the deterministic remainder between dated land polygons. |
+| France | 19 | 37 | Eighteen TRF-GIS military regions with Corse promoted from the Marseille multipolygon into an explicit region. |
+| Germany | 21 | 45 | Dated states/provinces aggregated to the gameplay limit; incomplete Hannover is reconstructed from the dated country remainder and Braunschweig source. |
+| Italy | 18 | 33 | Dated regions plus deterministic country-remainder reconstruction for incomplete northern relations; Sicilia is the dated country island component. |
+| Poland | 16 | 30 | The already pinned voivodeship layer and adjacency control, unchanged. |
+| United Kingdom | 13 | 18 | All 92 permissively reusable Historic County Borders Project Definition A polygons assigned once to strategic aggregates. |
+| Saargebiet / Freie Stadt Danzig | 1 each | 0 | Exact dated OHM relations; inert-polity integration waits for approval. |
+
+Every candidate partition is `topology-clean`, has zero non-manifold segments
+and no unexpected isolated region. Corse, Sicilia, Sardegna, Northern Ireland,
+Ostpreußen and the two single-region inert polities are explicitly classified;
+straits, sea routes and the Danzig connection remain authored rather than
+inferred as land edges. The manifest also records three named strategic
+macro-regions each for the Baseline USSR and USA; they are intentionally absent
+from the Europe-focused geometry overlay.
+
+Coordinates are normalized to five decimal places and the partition is rebuilt
+from one linework pass before adjacency is derived. The review SVG alone uses
+Douglas–Peucker simplification; independently simplifying authoritative region
+polygons was tested and rejected because it broke a shared German boundary.
+The generated manifest binds every complete region feature to a SHA-256 value.
+
+The UK candidate deliberately does **not** use the otherwise precise 1931
+administrative-counties layer because its CC BY-SA 4.0 terms require a separate
+owner decision. The Historic County Borders Project publishes Definition A for
+personal, educational and commercial reuse with acknowledgement requested; the
+candidate labels it as a stable geographic approximation rather than silently
+claiming 1931 administrative fidelity.
 
 ## Measured source topology
 

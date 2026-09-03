@@ -42,6 +42,15 @@ export const TRF_GIS_FRANCE_MILITARY_1935 = Object.freeze({
   license: 'CC BY 4.0',
   expectedSha256: 'sha256:26dfb0a8bc6fd9cabcb175e7ced71b12ec76a4d5fc80bfde7c678a3a79078573',
 });
+export const HISTORIC_COUNTIES_TRUST = Object.freeze({
+  dataset: 'Historic County Borders Project, Definition A, WGS84 simplified',
+  effectiveAt: SNAPSHOT_DATE,
+  filename: 'UKDefinitionA_WG84_Simplified.zip',
+  downloadUrl: 'https://www.county-borders.co.uk/UKDefinitionA_WG84_Simplified.zip',
+  termsUrl: 'https://www.county-borders.co.uk/',
+  license: 'Free commercial reuse; acknowledgement requested',
+  expectedSha256: 'sha256:9a85b79b81e7e8c86356a88dce567e767f006127e7fd1cf4c9b8e12cfa883cbb',
+});
 export const OHM_POLAND_1935 = Object.freeze({
   boundaryRelationId: 2692205,
   regionRelationIds: Object.freeze([
@@ -55,6 +64,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_OUTPUT = path.join(ROOT, 'runs', 'campaign-lab', 'europe-1935-geography-checkpoint');
 const POLAND_ADJACENCY_CONTROL_PATH = path.join(ROOT, 'packages', 'data-packs', 'fixtures',
   'europe-1935-benchmark', 'geography', 'poland-land-adjacency.json');
+const CANDIDATE_PLAN_PATH = path.join(ROOT, 'packages', 'data-packs', 'fixtures',
+  'europe-1935-benchmark', 'geography', 'candidate-region-plan.json');
 
 const sha256 = (bytes) => `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
 const groupBy = (rows, selector) => rows.reduce((groups, row) => {
@@ -407,6 +418,274 @@ export function auditTopology(boundaryFeature, regionFeatures) {
   }
 }
 
+const geometryFromMultiPolygon = (coordinates) => {
+  if (!Array.isArray(coordinates) || coordinates.length === 0) return null;
+  return coordinates.length === 1
+    ? { type: 'Polygon', coordinates: coordinates[0] }
+    : { type: 'MultiPolygon', coordinates };
+};
+
+const featureFromMultiPolygon = (coordinates, properties = {}) => {
+  const geometry = geometryFromMultiPolygon(coordinates);
+  if (!geometry) return null;
+  return { type: 'Feature', geometry, properties };
+};
+
+const unionFeatures = (features, properties = {}) => {
+  if (!features.length) return null;
+  return featureFromMultiPolygon(polygonClipping.union(...features
+    .map((feature) => asMultiPolygonCoordinates(feature.geometry))), properties);
+};
+
+const bboxFeature = ([west, south, east, north]) => ({
+  type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [[
+    [west, south], [east, south], [east, north], [west, north], [west, south],
+  ]] },
+});
+
+const intersectFeatures = (left, right, properties = {}) => featureFromMultiPolygon(
+  polygonClipping.intersection(asMultiPolygonCoordinates(left.geometry), asMultiPolygonCoordinates(right.geometry)),
+  properties,
+);
+
+const subtractFeatures = (left, right, properties = {}) => featureFromMultiPolygon(
+  polygonClipping.difference(asMultiPolygonCoordinates(left.geometry), asMultiPolygonCoordinates(right.geometry)),
+  properties,
+);
+
+export function loadCandidateRegionPlan(planPath = CANDIDATE_PLAN_PATH) {
+  const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
+  if (plan.schemaVersion !== 'open-historia-geography-candidate-plan/1'
+    || plan.scenarioId !== 'scenario:europe-1935-benchmark' || plan.snapshotDate !== SNAPSHOT_DATE) {
+    throw new Error('invalid Europe 1935 candidate region plan header');
+  }
+  for (const [polityId, definition] of Object.entries(plan.supportedPolities ?? {})) {
+    const ids = new Set(definition.regions?.map(({ id }) => id));
+    if (ids.size !== definition.regions?.length || ids.size < 10 || ids.size > 25
+      || !ids.has(definition.remainderRegionId)) {
+      throw new Error(`invalid supported candidate plan for ${polityId}`);
+    }
+  }
+  const countyCodes = plan.supportedPolities?.['polity:united-kingdom']?.regions
+    .flatMap((region) => region.countyCodes ?? []) ?? [];
+  if (countyCodes.length !== 92 || new Set(countyCodes).size !== 92) {
+    throw new Error('United Kingdom candidate plan must assign all 92 historic counties exactly once');
+  }
+  return plan;
+}
+
+/**
+ * Produces a closed, non-overlapping candidate partition from dated source
+ * polygons and explicitly marked authored cuts. Source coordinates are
+ * quantized before the partition is rebuilt, so every shared edge used by
+ * adjacency is emitted by the same polygon-clipping pass.
+ */
+export function buildPlannedPartition(boundaryFeature, sourceFeatures, definition, polityId,
+  { precision = 5 } = {}) {
+  const sourceByRelation = new Map(sourceFeatures.map((feature) => [feature.properties?.relationId, feature]));
+  const simplifiedBoundary = quantizeFeature(boundaryFeature, precision);
+  const candidates = definition.regions.map((region) => {
+    const availableSources = (region.sourceRelationIds ?? []).map((relationId) => sourceByRelation.get(relationId))
+      .filter(Boolean);
+    let candidate = unionFeatures(availableSources);
+    if (region.boundaryComponentsBbox) {
+      const [west, south, east, north] = region.boundaryComponentsBbox;
+      const components = asMultiPolygonCoordinates(simplifiedBoundary.geometry).filter((polygon) => {
+        const outer = polygon[0];
+        const bounds = outer.reduce((result, [longitude, latitude]) => ({
+          west: Math.min(result.west, longitude), south: Math.min(result.south, latitude),
+          east: Math.max(result.east, longitude), north: Math.max(result.north, latitude),
+        }), { west: Infinity, south: Infinity, east: -Infinity, north: -Infinity });
+        const longitude = (bounds.west + bounds.east) / 2;
+        const latitude = (bounds.south + bounds.north) / 2;
+        return longitude >= west && longitude <= east && latitude >= south && latitude <= north;
+      });
+      candidate = featureFromMultiPolygon(components);
+    }
+    if (region.clipBbox) {
+      const clip = bboxFeature(region.clipBbox);
+      candidate = candidate ? intersectFeatures(candidate, clip) : intersectFeatures(simplifiedBoundary, clip);
+    }
+    if (candidate) candidate = intersectFeatures(simplifiedBoundary, quantizeFeature(candidate, precision));
+    return {
+      region,
+      candidate,
+      availableSourceRelationIds: availableSources.map((feature) => feature.properties.relationId)
+        .sort((left, right) => String(left).localeCompare(String(right), 'en', { numeric: true })),
+    };
+  });
+  const ordered = candidates.map((candidate, index) => ({ ...candidate, index }))
+    .filter(({ candidate, region }) => candidate || region.id !== definition.remainderRegionId)
+    .sort((left, right) => Number(Boolean(right.region.carveFirst)) - Number(Boolean(left.region.carveFirst))
+      || Number(Boolean(right.availableSourceRelationIds.length)) - Number(Boolean(left.availableSourceRelationIds.length))
+      || left.index - right.index);
+  const resolved = new Map();
+  let claimed = null;
+  for (const entry of ordered) {
+    if (!entry.candidate) throw new Error(`${polityId}/${entry.region.id} has no source or authored cut geometry`);
+    const geometry = claimed ? subtractFeatures(entry.candidate, claimed) : entry.candidate;
+    if (!geometry && entry.region.id === definition.remainderRegionId) continue;
+    if (!geometry) throw new Error(`${polityId}/${entry.region.id} became empty during deterministic partitioning`);
+    resolved.set(entry.region.id, geometry);
+    claimed = unionFeatures(claimed ? [claimed, geometry] : [geometry]);
+  }
+  const residual = claimed ? subtractFeatures(simplifiedBoundary, claimed) : simplifiedBoundary;
+  if (residual) {
+    const bounds = (feature) => ringsOfGeometry(feature.geometry).flat()
+      .reduce((result, [longitude, latitude]) => ({ west: Math.min(result.west, longitude),
+        south: Math.min(result.south, latitude), east: Math.max(result.east, longitude),
+        north: Math.max(result.north, latitude) }), { west: Infinity, south: Infinity, east: -Infinity, north: -Infinity });
+    const distance = (left, right) => {
+      const longitude = Math.max(0, left.west - right.east, right.west - left.east);
+      const latitude = Math.max(0, left.south - right.north, right.south - left.north);
+      return longitude * longitude + latitude * latitude;
+    };
+    const unseededRemainder = !resolved.has(definition.remainderRegionId);
+    for (const polygon of asMultiPolygonCoordinates(residual.geometry)) {
+      const component = featureFromMultiPolygon([polygon]);
+      const targetId = unseededRemainder ? definition.remainderRegionId
+        : [...resolved.entries()].map(([regionId, feature]) => ({ regionId, distance: distance(bounds(component), bounds(feature)) }))
+          .sort((left, right) => left.distance - right.distance || left.regionId.localeCompare(right.regionId))[0].regionId;
+      resolved.set(targetId, resolved.has(targetId) ? unionFeatures([resolved.get(targetId), component]) : component);
+    }
+  }
+  if (!resolved.has(definition.remainderRegionId)) {
+    throw new Error(`${polityId}/${definition.remainderRegionId} has no source or remainder geometry`);
+  }
+  const features = definition.regions.map((region) => {
+    const entry = candidates.find((candidate) => candidate.region.id === region.id);
+    const sourceObjects = entry.availableSourceRelationIds.flatMap((relationId) => {
+      const source = sourceByRelation.get(relationId)?.properties ?? {};
+      return source.sourceObjects ?? [{ relationId,
+        startDate: source.startDate ?? source.source?.startDate ?? source.effectiveAt ?? null,
+        endDate: source.endDate ?? source.source?.endDate ?? null,
+        license: source.license ?? source.source?.license
+          ?? { class: 'external-permissive', value: 'see source manifest', allowed: true } }];
+    });
+    if (!sourceObjects.length) sourceObjects.push({
+      relationId: boundaryFeature.properties?.relationId ?? null,
+      startDate: boundaryFeature.properties?.startDate ?? boundaryFeature.properties?.effectiveAt ?? SNAPSHOT_DATE,
+      endDate: boundaryFeature.properties?.endDate ?? null,
+      license: boundaryFeature.properties?.license
+        ?? { class: 'external-permissive', value: 'see source manifest', allowed: true },
+    });
+    return {
+      ...resolved.get(region.id),
+      properties: {
+        nativeId: region.id,
+        nativeName: region.name,
+        polityId,
+        effectiveAt: SNAPSHOT_DATE,
+        sourceRelationIds: region.sourceRelationIds ?? [],
+        availableSourceRelationIds: entry.availableSourceRelationIds,
+        sourceObjects,
+        method: region.method ?? definition.method ?? 'union-of-dated-source-polygons',
+        confidence: region.confidence ?? definition.confidence ?? 'high',
+        todo: region.todo ?? definition.todo ?? null,
+      },
+    };
+  });
+  return { boundary: simplifiedBoundary, features };
+}
+
+export function normalizeHistoricCounties(featureCollection) {
+  if (featureCollection?.type !== 'FeatureCollection' || !Array.isArray(featureCollection.features)
+    || featureCollection.features.length !== 92) {
+    throw new Error('Historic Counties Trust Definition A must contain exactly 92 counties');
+  }
+  const seen = new Set();
+  return {
+    type: 'FeatureCollection',
+    features: featureCollection.features.map((feature) => {
+      const countyCode = String(feature.properties?.HCS_CODE ?? '');
+      const nativeName = String(feature.properties?.NAME ?? '').trim();
+      if (!/^[A-Z]{3}$/.test(countyCode) || !nativeName || seen.has(countyCode)
+        || !['Polygon', 'MultiPolygon'].includes(feature.geometry?.type)) {
+        throw new Error(`invalid or duplicate Historic Counties Trust feature ${countyCode || '<missing>'}`);
+      }
+      seen.add(countyCode);
+      return { ...feature, properties: { countyCode, nativeName } };
+    }).sort((left, right) => left.properties.countyCode.localeCompare(right.properties.countyCode)),
+  };
+}
+
+const quantizeFeature = (feature, precision = 5) => ({
+  ...feature,
+  geometry: {
+    ...feature.geometry,
+    coordinates: feature.geometry.coordinates.map(function quantize(value) {
+      return typeof value[0] === 'number'
+        ? value.map((coordinate) => Number(coordinate.toFixed(precision)))
+        : value.map(quantize);
+    }),
+  },
+});
+
+export function buildUnitedKingdomRegions(counties, definition, precision = 5) {
+  const byCode = new Map(counties.features.map((feature) => [feature.properties.countyCode, feature]));
+  const features = definition.regions.map((region) => {
+    const members = region.countyCodes.map((code) => byCode.get(code));
+    if (members.some((feature) => !feature)) throw new Error(`United Kingdom region ${region.id} has an unknown county`);
+    return unionFeatures(members, {
+      nativeId: region.id, nativeName: region.name, polityId: 'polity:united-kingdom',
+      effectiveAt: SNAPSHOT_DATE, countyCodes: [...region.countyCodes],
+      method: 'union-of-historic-county-polygons', confidence: 'medium',
+      todo: 'Owner review: historic-county geography is used as a permissive stable approximation of the 1935 administrative surface.',
+    });
+  });
+  const boundary = unionFeatures(features);
+  return buildPlannedPartition(boundary, features.map((feature, index) => ({
+    ...feature, properties: { ...feature.properties, relationId: index + 1 },
+  })), {
+    ...definition,
+    regions: definition.regions.map((region, index) => ({ ...region, sourceRelationIds: [index + 1] })),
+  }, 'polity:united-kingdom', { precision });
+}
+
+export function buildCzechoslovakiaRegions(countryBoundary, sourceFeatures, definition, precision = 5) {
+  const byRelation = new Map(sourceFeatures.map((feature) => [feature.properties.relationId, feature]));
+  const parentPartitions = [];
+  for (const parentRelationId of [2856853, 2857449]) {
+    const parent = byRelation.get(parentRelationId);
+    if (!parent) throw new Error(`Czechoslovakia source lacks parent land relation ${parentRelationId}`);
+    const regions = definition.regions.filter((region) => region.parentRelationId === parentRelationId);
+    const remainder = regions.find((region) => region.parentRemainder);
+    if (!remainder) throw new Error(`Czechoslovakia parent ${parentRelationId} lacks a remainder region`);
+    parentPartitions.push(...buildPlannedPartition(parent, sourceFeatures, {
+      remainderRegionId: remainder.id, regions,
+    }, 'polity:czechoslovakia', { precision }).features);
+  }
+  const rutheniaDefinition = definition.regions.find(({ id }) => id === 'podkarpatska-rus');
+  const ruthenia = byRelation.get(rutheniaDefinition.sourceRelationIds[0]);
+  if (!ruthenia) throw new Error('Czechoslovakia source lacks Podkarpatská Rus');
+  const landUnion = unionFeatures([byRelation.get(2856853), byRelation.get(2857449), ruthenia]);
+  const slovakia = subtractFeatures(countryBoundary, landUnion, {
+    nativeId: definition.remainderRegionId, nativeName: 'Slovensko', polityId: 'polity:czechoslovakia',
+    effectiveAt: SNAPSHOT_DATE, method: 'country-remainder-between-dated-land-relations', confidence: 'medium',
+    todo: 'Pin a permissively licensed 1928–1938 Slovak Land polygon if a complete source becomes available.',
+    sourceObjects: [2856853, 2857449, ruthenia.properties.relationId].map((relationId) => {
+      const source = byRelation.get(relationId).properties;
+      return { relationId, startDate: source.startDate, endDate: source.endDate, license: source.license };
+    }),
+  });
+  if (!slovakia) throw new Error('Czechoslovakia source lands leave no Slovensko remainder');
+  const seeded = [...parentPartitions, {
+    ...ruthenia,
+    properties: { ...ruthenia.properties, nativeId: rutheniaDefinition.id, nativeName: rutheniaDefinition.name,
+      polityId: 'polity:czechoslovakia', effectiveAt: SNAPSHOT_DATE,
+      sourceObjects: [{ relationId: ruthenia.properties.relationId, startDate: ruthenia.properties.startDate,
+        endDate: ruthenia.properties.endDate, license: ruthenia.properties.license }] },
+  }, slovakia];
+  const syntheticSources = seeded.map((feature) => ({
+    ...feature, properties: { ...feature.properties, relationId: feature.properties.nativeId },
+  }));
+  return buildPlannedPartition(countryBoundary, syntheticSources, {
+    remainderRegionId: definition.remainderRegionId,
+    regions: definition.regions.map((region) => ({ ...region, sourceRelationIds: [region.id],
+      parentRelationId: undefined, parentRemainder: undefined })),
+  }, 'polity:czechoslovakia', { precision });
+}
+
 const pointInBbox = ([longitude, latitude], [west, south, east, north]) => longitude >= west
   && longitude <= east && latitude >= south && latitude <= north;
 
@@ -618,6 +897,103 @@ export async function fetchInventory(fetchImpl = fetch) {
   const bytes = Buffer.from(await response.arrayBuffer());
   return { query, bytes, raw: JSON.parse(bytes.toString('utf8')) };
 }
+
+const slugifyNativeName = (name) => String(name).toLowerCase().normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+export function buildFranceOwnerRegions(regions, precision = 5) {
+  const sourceFeatures = [];
+  const regionDefinitions = [];
+  for (const feature of regions.features) {
+    if (feature.properties.nativeId !== '15') {
+      const id = slugifyNativeName(feature.properties.nativeName);
+      sourceFeatures.push({ ...feature, properties: { ...feature.properties, relationId: feature.properties.nativeId } });
+      regionDefinitions.push({ id, name: feature.properties.nativeName, sourceRelationIds: [feature.properties.nativeId] });
+      continue;
+    }
+    const polygons = asMultiPolygonCoordinates(feature.geometry);
+    const corsica = polygons.filter((polygon) => Math.min(...polygon[0].map(([longitude]) => longitude)) > 8);
+    const mainland = polygons.filter((polygon) => Math.min(...polygon[0].map(([longitude]) => longitude)) <= 8);
+    if (!corsica.length || !mainland.length) throw new Error('France military region 15 cannot be split into Corse and Marseille');
+    sourceFeatures.push(featureFromMultiPolygon(mainland, { ...feature.properties, relationId: '15-mainland' }));
+    sourceFeatures.push(featureFromMultiPolygon(corsica, { ...feature.properties, relationId: '15-corse' }));
+    regionDefinitions.push({ id: 'marseille', name: 'MARSEILLE', sourceRelationIds: ['15-mainland'] });
+    regionDefinitions.push({ id: 'corse', name: 'Corse', sourceRelationIds: ['15-corse'] });
+  }
+  const boundary = unionFeatures(sourceFeatures);
+  return buildPlannedPartition(boundary, sourceFeatures, {
+    remainderRegionId: 'paris', regions: regionDefinitions,
+  }, 'polity:france', { precision });
+}
+
+export function buildPolandOwnerRegions(regions, precision = 5) {
+  const sourceFeatures = regions.features.map((feature) => ({
+    ...feature, properties: { ...feature.properties, relationId: feature.properties.nativeId },
+  }));
+  const definitions = sourceFeatures.map((feature) => ({
+    id: feature.properties.nativeId,
+    name: feature.properties.nativeName,
+    sourceRelationIds: [feature.properties.nativeId],
+  }));
+  return buildPlannedPartition(unionFeatures(sourceFeatures), sourceFeatures, {
+    remainderRegionId: 'ohm-relation-2741469', regions: definitions,
+  }, 'polity:poland', { precision });
+}
+
+const annotateAdjacency = (partition) => {
+  const collection = { type: 'FeatureCollection', features: partition.features };
+  const adjacency = deriveLandAdjacency(collection);
+  return {
+    ...partition,
+    features: partition.features.map((feature) => ({
+      ...feature,
+      properties: { ...feature.properties, adjacentNativeIds: adjacency.regions
+        .find(({ regionId }) => regionId === feature.properties.nativeId).adjacentRegionIds },
+    })),
+    adjacency,
+  };
+};
+
+const buildOwnerOverlay = (featureCollection, summaries) => {
+  const simplified = { type: 'FeatureCollection', features: featureCollection.features.map((feature) => simplify(feature,
+    { tolerance: 0.025, highQuality: false, mutate: false })) };
+  const projection = geoIdentity().reflectY(true).fitExtent([[24, 70], [1376, 790]], simplified);
+  const renderPath = geoPath(projection);
+  const paths = simplified.features.map((feature) => `<path d="${renderPath(feature)}" fill="${POLITY_COLORS[feature.properties.polityId] ?? '#9b7d55'}" fill-opacity="0.48" stroke="#20242a" stroke-width="0.55"><title>${xmlEscape(`${feature.properties.polityId}: ${feature.properties.nativeName}`)}</title></path>`).join('');
+  const legend = summaries.map((entry, index) => `<g transform="translate(${24 + (index % 4) * 340} ${826 + Math.floor(index / 4) * 28})"><rect width="14" height="14" fill="${POLITY_COLORS[entry.polityId] ?? '#9b7d55'}"/><text x="21" y="12">${xmlEscape(`${entry.polityId.replace('polity:', '')}: ${entry.regionCount} · ${entry.topology.status}`)}</text></g>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 920" role="img" aria-labelledby="title desc"><title id="title">Europe 1935 geography owner checkpoint</title><desc id="desc">Deterministic candidate regions for owner approval. Runtime is unchanged.</desc><rect width="1400" height="920" fill="#f5f0e6"/><text x="24" y="30" font-family="system-ui" font-size="22" font-weight="700">Europe 1935 — geography owner checkpoint</text><text x="24" y="53" font-family="system-ui" font-size="13">Candidate only · runtime unchanged · review low-confidence authored cuts in the report</text><g>${paths}</g><g font-family="system-ui" font-size="11">${legend}</g></svg>\n`;
+};
+
+const renderGeographyOwnerReport = (manifest) => {
+  const rows = manifest.polities.map((entry) => `| ${entry.polityId} | ${entry.regionCount} | ${entry.topology.status} | ${entry.adjacency.edgeCount} | ${entry.expectedDisconnectedRegionIds.join(', ') || '—'} |`);
+  const lowConfidence = manifest.objects.filter((entry) => entry.confidence === 'low')
+    .map((entry) => `- \`${entry.polityId}/${entry.regionId}\`: ${entry.method}. ${entry.todo ?? ''}`);
+  return `# Europe 1935 geography owner checkpoint
+
+Status: **${manifest.gate.status}**. Snapshot: ${manifest.snapshotDate}. This is a candidate review artifact; runtime geography has not changed.
+
+| Polity | Regions | Topology | Land edges | Expected disconnected regions |
+| --- | ---: | --- | ---: | --- |
+${rows.join('\n')}
+
+The layer contains metropolitan Europe only. Corse, Sicilia, Sardegna and Northern Ireland are explicit regions. Saargebiet and Freie Stadt Danzig are one-region inert polities. Soviet and United States Baseline macro-region names are recorded in the manifest but omitted from this Europe-focused geometry overlay.
+
+## Review-required estimates
+
+${lowConfidence.length ? lowConfidence.join('\n') : '- None.'}
+
+## Sources and licensing
+
+- OpenHistoricalMap dated relations: per-object dates and license classifications are embedded in the object records; response hashes are pinned in the manifest. OHM default is CC0 unless an object says otherwise.
+- TRF-GIS France 1935 departments and military regions: CC BY 4.0; both archives are checksum-pinned.
+- Historic County Borders Project Definition A: free personal, educational and commercial reuse; acknowledgement requested; archive checksum is pinned. It is used as a stable geographic approximation, not silently represented as the 1931 CC BY-SA administrative-counties dataset.
+- No ODbL or share-alike geometry is included.
+
+## Deterministic method
+
+Source coordinates are normalized to a fixed precision, clipped and rebuilt as a single non-overlapping partition. The SVG overlay is deterministically simplified for review, while candidate GeoJSON retains the shared partition linework. Land adjacency comes only from exact shared output segments. Straits, sea routes and the East Prussian external connection remain explicit manual connections. Every object checksum binds its complete GeoJSON feature.
+`;
+};
 
 export function buildCheckpoint(raw, query, sourceChecksum) {
   const inventory = normalizeInventory(raw);
@@ -849,15 +1225,160 @@ export async function runPolandCoverage(outputDirectory = DEFAULT_OUTPUT, option
   return checkpoint;
 }
 
+export async function runOwnerGeography(outputDirectory = DEFAULT_OUTPUT, options = {}) {
+  const plan = loadCandidateRegionPlan();
+  await runBoundaryCoverage(outputDirectory, options);
+  await runFranceCoverage(outputDirectory, options);
+  await runPolandCoverage(outputDirectory, options);
+
+  const boundaryBytes = fs.readFileSync(path.join(outputDirectory, 'ohm-boundaries.raw.json'));
+  const candidateBytes = fs.readFileSync(path.join(outputDirectory, 'ohm-candidates.raw.json'));
+  const boundaryRaw = JSON.parse(boundaryBytes);
+  const candidateRaw = JSON.parse(candidateBytes);
+  const boundaryFeatures = normalizeRelationGeometry(boundaryRaw,
+    SUPPORTED_BOUNDARIES.map(({ relationId }) => relationId)).map((feature) => {
+    const definition = SUPPORTED_BOUNDARIES.find(({ relationId }) => relationId === feature.properties.relationId);
+    return filterFeaturePolygonsToBbox(feature, definition.candidateBbox);
+  });
+  const candidateRelationIds = [...new Set(Object.values(plan.supportedPolities).flatMap((definition) => definition.regions)
+    .flatMap((region) => [...(region.sourceRelationIds ?? []), region.parentRelationId])
+    .filter((relationId) => Number.isInteger(relationId)))];
+  const candidateAudit = auditRelationGeometry(candidateRelationIds, candidateRaw);
+  const sourceFeatures = candidateAudit.features;
+  const boundaryByPolity = new Map(SUPPORTED_BOUNDARIES.map((definition) => [definition.polityId,
+    boundaryFeatures.find((feature) => feature.properties.relationId === definition.relationId)]));
+
+  const partitions = new Map();
+  for (const polityId of ['polity:austria', 'polity:germany', 'polity:italy']) {
+    partitions.set(polityId, annotateAdjacency(buildPlannedPartition(
+      boundaryByPolity.get(polityId), sourceFeatures, plan.supportedPolities[polityId], polityId,
+    )));
+  }
+  partitions.set('polity:czechoslovakia', annotateAdjacency(buildCzechoslovakiaRegions(
+    boundaryByPolity.get('polity:czechoslovakia'), sourceFeatures, plan.supportedPolities['polity:czechoslovakia'],
+  )));
+  const franceRegions = JSON.parse(fs.readFileSync(path.join(outputDirectory, 'france-regions-1935.geojson')));
+  partitions.set('polity:france', annotateAdjacency(buildFranceOwnerRegions(franceRegions)));
+  const polandRegions = JSON.parse(fs.readFileSync(path.join(outputDirectory, 'poland-regions-1935.geojson')));
+  partitions.set('polity:poland', annotateAdjacency(buildPolandOwnerRegions(polandRegions)));
+
+  const countyPath = path.join(outputDirectory, HISTORIC_COUNTIES_TRUST.filename);
+  const countyFetch = options.cached
+    ? { bytes: fs.readFileSync(countyPath), checksum: sha256(fs.readFileSync(countyPath)) }
+    : await fetchPinnedSource(HISTORIC_COUNTIES_TRUST);
+  if (countyFetch.checksum !== HISTORIC_COUNTIES_TRUST.expectedSha256) {
+    throw new Error(`${HISTORIC_COUNTIES_TRUST.filename} checksum mismatch: expected ${HISTORIC_COUNTIES_TRUST.expectedSha256}, received ${countyFetch.checksum}`);
+  }
+  fs.writeFileSync(countyPath, countyFetch.bytes);
+  const parsedCounties = await parseZip(countyFetch.bytes);
+  const counties = normalizeHistoricCounties(Array.isArray(parsedCounties) ? parsedCounties[0] : parsedCounties);
+  partitions.set('polity:united-kingdom', annotateAdjacency(buildUnitedKingdomRegions(
+    counties, plan.supportedPolities['polity:united-kingdom'],
+  )));
+
+  const inertIds = plan.inertPolities.map(({ sourceRelationId }) => sourceRelationId);
+  const inertPath = path.join(outputDirectory, 'ohm-inert-polities.raw.json');
+  const inertFetch = options.cached ? readCachedResult(outputDirectory, path.basename(inertPath), relationGeometryQuery(inertIds))
+    : await fetchRelationGeometry(inertIds);
+  const inertSourceFeatures = normalizeRelationGeometry(inertFetch.raw, inertIds);
+  for (const inert of plan.inertPolities) {
+    const source = inertSourceFeatures.find((feature) => feature.properties.relationId === inert.sourceRelationId);
+    const feature = simplify({ ...source, properties: {
+      nativeId: inert.regionId, nativeName: inert.name, polityId: inert.polityId,
+      effectiveAt: SNAPSHOT_DATE, sourceObjects: [{ relationId: inert.sourceRelationId,
+        startDate: source.properties.startDate, endDate: source.properties.endDate, license: source.properties.license }],
+      method: 'dated-source-polygon', confidence: 'high', todo: null,
+    } }, { tolerance: 0.002, highQuality: false, mutate: false });
+    partitions.set(inert.polityId, annotateAdjacency({ boundary: feature, features: [feature] }));
+  }
+  fs.writeFileSync(inertPath, inertFetch.bytes);
+
+  const summaries = [];
+  const allFeatures = [];
+  const adjacency = {};
+  const expectedByPolity = new Map();
+  for (const inert of plan.inertPolities) expectedByPolity.set(inert.polityId, new Set([inert.regionId]));
+  for (const connection of plan.manualConnections) {
+    const [polityId, regionId] = connection.from.split('/');
+    const values = expectedByPolity.get(polityId) ?? new Set();
+    values.add(regionId);
+    expectedByPolity.set(polityId, values);
+  }
+  for (const [polityId, partition] of [...partitions.entries()].sort(([left], [right]) => left.localeCompare(right))) {
+    const topology = auditTopology(partition.boundary, partition.features);
+    const isolated = partition.adjacency.regions.filter(({ adjacentRegionIds }) => adjacentRegionIds.length === 0)
+      .map(({ regionId }) => regionId);
+    const expectedDisconnectedRegionIds = [...(expectedByPolity.get(polityId) ?? [])].filter((id) => isolated.includes(id)).sort();
+    const unexpectedIsolatedRegionIds = isolated.filter((id) => !expectedDisconnectedRegionIds.includes(id));
+    summaries.push({ polityId, regionCount: partition.features.length, topology,
+      adjacency: { method: partition.adjacency.method, edgeCount: partition.adjacency.edges.length,
+        checksum: sha256(canonical(partition.adjacency)), nonManifoldSegmentCount: partition.adjacency.nonManifoldSegments.length },
+      expectedDisconnectedRegionIds, unexpectedIsolatedRegionIds });
+    allFeatures.push(...partition.features);
+    adjacency[polityId] = partition.adjacency;
+  }
+  const collection = { type: 'FeatureCollection', features: allFeatures };
+  const objects = allFeatures.map((feature) => ({
+    polityId: feature.properties.polityId, regionId: feature.properties.nativeId,
+    nativeName: feature.properties.nativeName, effectiveAt: feature.properties.effectiveAt,
+    license: feature.properties.sourceObjects?.map(({ license }) => license.value ?? license).filter(Boolean)
+      ?? [feature.properties.polityId === 'polity:united-kingdom' ? HISTORIC_COUNTIES_TRUST.license : 'OHM default CC0'],
+    sourceObjects: feature.properties.sourceObjects ?? [], method: feature.properties.method,
+    confidence: feature.properties.confidence, todo: feature.properties.todo,
+    valueChecksum: sha256(canonical(feature)),
+  }));
+  const objectKeys = objects.map(({ polityId, regionId }) => `${polityId}/${regionId}`);
+  const supportedReady = summaries.filter(({ polityId }) => plan.supportedPolities[polityId]).every((summary) =>
+    summary.regionCount >= 10 && summary.regionCount <= 25 && summary.topology.status === 'topology-clean'
+    && summary.adjacency.nonManifoldSegmentCount === 0 && summary.unexpectedIsolatedRegionIds.length === 0);
+  const licensesReady = objects.every((entry) => entry.license.length > 0
+    && entry.license.every((license) => !/share.?alike|odbl/i.test(String(license))));
+  const provenanceReady = objects.every((entry) => entry.effectiveAt === SNAPSHOT_DATE
+    && entry.sourceObjects.length > 0 && entry.sourceObjects.every((source) => source.startDate
+      && source.startDate <= SNAPSHOT_DATE && source.license && source.license.allowed !== false));
+  const manifest = {
+    schemaVersion: 'open-historia-geography-owner-checkpoint/1',
+    scenarioId: plan.scenarioId, snapshotDate: SNAPSHOT_DATE,
+    gate: { status: supportedReady && licensesReady && provenanceReady && new Set(objectKeys).size === objectKeys.length
+      ? 'owner-approval-ready' : 'blocked', runtimeIntegrated: false },
+    sources: [
+      { provider: 'OpenHistoricalMap', copyright: OHM_POLAND_1935.copyright,
+        boundaryResponseChecksum: sha256(boundaryBytes), candidateResponseChecksum: sha256(candidateBytes),
+        inertResponseChecksum: sha256(inertFetch.bytes) },
+      { provider: 'TRF-GIS', datasets: [TRF_GIS_FRANCE_1935, TRF_GIS_FRANCE_MILITARY_1935]
+        .map(({ datasetDoi, dataFileId, license, expectedSha256 }) => ({ datasetDoi, dataFileId, license, checksum: expectedSha256 })) },
+      { provider: 'Historic Counties Trust', dataset: HISTORIC_COUNTIES_TRUST.dataset,
+        termsUrl: HISTORIC_COUNTIES_TRUST.termsUrl, license: HISTORIC_COUNTIES_TRUST.license,
+        checksum: countyFetch.checksum },
+    ],
+    baselineMacroRegions: plan.baselineMacroRegions,
+    manualConnections: plan.manualConnections,
+    polities: summaries,
+    objects,
+    collectionChecksum: sha256(canonical(collection)),
+    adjacencyChecksum: sha256(canonical(adjacency)),
+    candidatePlanChecksum: sha256(canonical(plan)),
+  };
+  fs.writeFileSync(path.join(outputDirectory, 'owner-regions.geojson'), `${JSON.stringify(collection)}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'owner-land-adjacency.json'), `${JSON.stringify(adjacency, null, 2)}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'owner-geography-overlay.svg'), buildOwnerOverlay(collection, summaries));
+  fs.writeFileSync(path.join(outputDirectory, 'owner-geography-manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+  fs.writeFileSync(path.join(outputDirectory, 'owner-geography-report.md'), renderGeographyOwnerReport(manifest));
+  return manifest;
+}
+
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   const outputFlag = process.argv.indexOf('--output');
   const output = outputFlag >= 0 && process.argv[outputFlag + 1] ? path.resolve(process.argv[outputFlag + 1]) : DEFAULT_OUTPUT;
-  const operation = process.argv.includes('--france') ? runFranceCoverage
+  const operation = process.argv.includes('--owner') ? runOwnerGeography
+    : process.argv.includes('--france') ? runFranceCoverage
     : process.argv.includes('--poland') ? runPolandCoverage
     : process.argv.includes('--boundaries') ? runBoundaryCoverage : runInventory;
   operation(output, { cached: process.argv.includes('--cached') }).then((checkpoint) => process.stdout.write(`${JSON.stringify(checkpoint.counts
     ? { output, counts: checkpoint.counts, blockedRelations: checkpoint.blockedRelations.length }
-    : { output, status: checkpoint.gate.status, ...(checkpoint.coverage
+    : { output, status: checkpoint.gate.status, ...(checkpoint.polities
+      ? { polities: Object.fromEntries(checkpoint.polities.map(({ polityId, regionCount }) => [polityId, regionCount])) }
+      : checkpoint.coverage
       ? { coverage: Object.fromEntries(checkpoint.coverage.map(({ polityId, candidateCount }) => [polityId, candidateCount])) }
       : { polityId: checkpoint.polityId, candidateCount: checkpoint.gate.candidateCount }) }, null, 2)}\n`))
     .catch((error) => { process.stderr.write(`${error instanceof Error ? error.stack : String(error)}\n`); process.exitCode = 1; });
