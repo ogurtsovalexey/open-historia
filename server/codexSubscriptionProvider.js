@@ -89,7 +89,7 @@ export function strategicDecisionV3JsonSchema() {
     selectedChoices: array(object({
       choiceId: string(), purpose: string(240), evidenceIds: array(string(), 12, 1), expectedConsequence: string(320),
     }), 10),
-    triggerCoverage: array(object({ triggerId: string(), choiceIds: array(string(), 10, 1) }), 32),
+    triggerCoverage: array(object({ triggerId: string(), choiceIds: array(string(), 1, 1) }), 32),
     rejectedChoices: array(object({ choiceId: string(), reason: string(240) }), 3),
     durablePlan: object({ objective: string(320), futureSteps: array(string(240), 8), commitments: array(string(240), 8) }),
     contingency: string(500),

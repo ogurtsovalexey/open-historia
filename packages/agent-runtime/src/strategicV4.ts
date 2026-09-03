@@ -146,7 +146,7 @@ export const strategicDecisionV3Schema = z.object({
   selectedChoices: z.array(selectedChoiceSchema).max(STRATEGIC_TRIGGER_ACTION_LIMIT),
   triggerCoverage: z.array(z.object({
     triggerId: z.string().min(1),
-    choiceIds: z.array(z.string().min(1)).min(1).max(STRATEGIC_TRIGGER_ACTION_LIMIT),
+    choiceIds: z.array(z.string().min(1)).length(1),
   }).strict()).max(32),
   rejectedChoices: z.array(z.object({ choiceId: z.string().min(1), reason: z.string().min(1).max(240) }).strict()).max(3),
   durablePlan: z.object({

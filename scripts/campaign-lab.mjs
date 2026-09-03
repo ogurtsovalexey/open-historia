@@ -1,3 +1,5 @@
+// Frozen StrategicDecisionV2 diagnostic runner. Production Campaign Lab uses
+// scripts/strategic-gate0.mjs and StrategicBriefV4 + StrategicDecisionV3.
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";

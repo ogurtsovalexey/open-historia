@@ -30,6 +30,7 @@ import {
   buildStrategicBriefV4,
   renderStrategicPromptV4,
   materializeStrategicDecisionV4,
+  strategicDecisionV3Schema,
   dispatchStrategicSessions,
   stableStrategicCommitOrder,
   strategicCallBudget,
@@ -472,6 +473,9 @@ test('StrategicDecisionV3 expands frozen IDs and requires exact compatible manda
   assert.equal(materializeStrategicDecisionV4(state, { ...decision, selectedChoices: [{ ...decision.selectedChoices[0], choiceId: 'choice:invented' }] }, brief).status, 'terminal');
   assert.equal(materializeStrategicDecisionV4(state, { ...decision, selectedChoices: [{ ...decision.selectedChoices[0], evidenceIds: ['evidence:invented'] }] }, brief).status, 'terminal');
   assert.equal(materializeStrategicDecisionV4(state, { ...decision, triggerCoverage: [decision.triggerCoverage[0], decision.triggerCoverage[0]] }, brief).status, 'terminal');
+  assert.equal(strategicDecisionV3Schema.safeParse({ ...decision,
+    triggerCoverage: [{ ...decision.triggerCoverage[0], choiceIds: [decision.selectedChoices[0]!.choiceId, decision.selectedChoices[0]!.choiceId] }],
+  }).success, false);
   assert.equal(materializeStrategicDecisionV4(state, { ...decision, triggerCoverage: [] }, brief).status, 'hold');
   const advanced = runTurn(state, { commands: [] }).result.state;
   assert.equal(materializeStrategicDecisionV4(advanced, decision, brief).status, 'hold');

@@ -48,7 +48,8 @@
     "build:engine": "cd packages/engine && npm run build",
     "typecheck:engine": "cd packages/engine && npm run typecheck",
     "play:engine": "cd packages/engine && npm run play"
-    ,"campaign-lab": "npm run build:data-packs && npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/campaign-lab.mjs",
+    ,"campaign-lab": "npm run build:data-packs && npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/strategic-gate0.mjs",
+    "campaign-lab:legacy-v2": "npm run build:data-packs && npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/campaign-lab.mjs",
     "gemini:preflight": "npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/gemini-preflight.mjs",
     "codex:luna:capability": "npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/codex-luna-capability.mjs",
     "geography:europe-1935": "node scripts/europe-1935-geography.mjs",
