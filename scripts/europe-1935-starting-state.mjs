@@ -52,6 +52,22 @@ export const POLAND_1931_CENSUS = Object.freeze({
     { relationId: 2_930_186, nativeName: 'Województwo stanisławowskie', sourcePopulation: 1_480_285 },
   ]),
 });
+export const POLAND_1935_REGIONAL_ECONOMY = Object.freeze({
+  sourceRefs: Object.freeze([
+    POLAND_1931_CENSUS.sourceId,
+    'source:europe-1935-benchmark:world-production',
+  ]),
+  populationQuantum: 5,
+  capacityQuantum: 100,
+  maxCapacityReconciliationUnits: 15,
+  processingRelationId: 2_741_475,
+  coalRelationIds: Object.freeze([2_741_470, 2_741_471, 2_927_190]),
+  externalSupplyLinks: Object.freeze({
+    'region:benchmark-1:CS': 2_927_190,
+    'region:benchmark-1:DE': 2_741_476,
+    'region:benchmark-1:SU': 2_696_109,
+  }),
+});
 export const REQUIRED_MODULES = Object.freeze([
   'armedForces',
   'budget',
@@ -212,6 +228,139 @@ export function buildPolandPopulationAllocation() {
   return { ...body, checksum: sha256(body) };
 }
 
+const taxForOutput = (output, accountingValue, taxRateBp) =>
+  Math.floor((output * accountingValue * taxRateBp) / 10000);
+
+function reconcileCapacityUnits(rows, targetUnits, targetTax, outputPerUnit, accountingValue, taxRateBp) {
+  let states = new Map([['0:0', { cost: 0, units: [] }]]);
+  for (const row of rows) {
+    const next = new Map();
+    const minimum = Math.max(1, row.amount - POLAND_1935_REGIONAL_ECONOMY.maxCapacityReconciliationUnits);
+    const maximum = row.amount + POLAND_1935_REGIONAL_ECONOMY.maxCapacityReconciliationUnits;
+    for (const [key, state] of states) {
+      const [usedUnits, usedTax] = key.split(':').map(Number);
+      for (let units = minimum; units <= maximum; units += 1) {
+        const totalUnits = usedUnits + units;
+        const totalTax = usedTax + taxForOutput(units * outputPerUnit, accountingValue, taxRateBp);
+        if (totalUnits > targetUnits || totalTax > targetTax) continue;
+        const candidate = { cost: state.cost + Math.abs(units - row.amount), units: [...state.units, units] };
+        const candidateKey = `${totalUnits}:${totalTax}`;
+        const current = next.get(candidateKey);
+        if (!current || candidate.cost < current.cost) next.set(candidateKey, candidate);
+      }
+    }
+    states = next;
+  }
+  const result = states.get(`${targetUnits}:${targetTax}`);
+  if (!result) throw new Error(`no bounded capacity allocation preserves ${targetUnits} units and tax ${targetTax}`);
+  return rows.map((row, index) => ({ ...row, amount: result.units[index] }));
+}
+
+function buildPolandCandidateScenario(engineScenario) {
+  const scenario = structuredClone(engineScenario);
+  const macroRegionId = 'region:benchmark-1:PL';
+  const macro = scenario.regions.find((entry) => entry.regionId === macroRegionId);
+  if (!macro) throw new Error(`missing Poland macro-region ${macroRegionId}`);
+  if (macro.activities?.length !== 3) throw new Error('Poland macro-region must retain the approved 50/30/20 activity control');
+
+  const populationRows = apportionIntegerTotal(POLAND_1931_CENSUS.rows.map((row) => ({
+    id: `region:ohm-1935:${row.relationId}`,
+    weight: row.sourcePopulation,
+  })), POLAND_1931_CENSUS.targetPopulation / POLAND_1935_REGIONAL_ECONOMY.populationQuantum)
+    .map((row) => ({ ...row, amount: row.amount * POLAND_1935_REGIONAL_ECONOMY.populationQuantum }));
+  const populationById = new Map(populationRows.map((row) => [row.id, row]));
+
+  // The smallest five-person-quantum transfer which preserves the macro
+  // region's month-one demographic rounding. Ties are resolved by region id.
+  populationById.get('region:ohm-1935:2696109').amount -= 35;
+  populationById.get('region:ohm-1935:2741469').amount += 35;
+
+  const processingIds = new Set([POLAND_1935_REGIONAL_ECONOMY.processingRelationId]);
+  const coalIds = new Set(POLAND_1935_REGIONAL_ECONOMY.coalRelationIds);
+  const activityRows = macro.activities.map((allocated) => {
+    const family = allocated.activity.kind === 'processing' ? 'goods' : allocated.activity.resource;
+    const relationIds = POLAND_1931_CENSUS.rows.map((row) => row.relationId).filter((relationId) =>
+      family === 'goods' ? processingIds.has(relationId) : family === 'coal' ? coalIds.has(relationId)
+        : !processingIds.has(relationId) && !coalIds.has(relationId));
+    const targetCapacity = Math.floor((macro.baseMonthlyCapacity * allocated.allocationBp) / 10000);
+    const targetUnits = targetCapacity / POLAND_1935_REGIONAL_ECONOMY.capacityQuantum;
+    const base = apportionIntegerTotal(relationIds.map((relationId) => ({
+      id: `region:ohm-1935:${relationId}`,
+      weight: populationById.get(`region:ohm-1935:${relationId}`).amount,
+    })), targetUnits);
+    const outputPerUnit = Math.floor((POLAND_1935_REGIONAL_ECONOMY.capacityQuantum * macro.infrastructureBp) / 10000);
+    const resource = family === 'goods' ? 'goods' : family;
+    const params = scenario.economy.resourceParams.find((entry) => entry.resource === resource);
+    const targetOutput = Math.floor((targetCapacity * macro.infrastructureBp) / 10000);
+    const targetTax = taxForOutput(targetOutput, params.accountingValue, params.taxRateBp);
+    const reconciled = reconcileCapacityUnits(base, targetUnits, targetTax, outputPerUnit,
+      params.accountingValue, params.taxRateBp);
+    return { family, allocated, targetCapacity, rows: reconciled };
+  });
+  const capacityById = new Map(activityRows.flatMap((group) => group.rows.map((row) => [row.id, {
+    capacity: row.amount * POLAND_1935_REGIONAL_ECONOMY.capacityQuantum,
+    activity: group.allocated.activity,
+  }])));
+  const censusByRelation = new Map(POLAND_1931_CENSUS.rows.map((row) => [row.relationId, row]));
+  const regions = [...populationById.values()].map((populationRow) => {
+    const relationId = Number(populationRow.id.split(':').at(-1));
+    const census = censusByRelation.get(relationId);
+    const economic = capacityById.get(populationRow.id);
+    return {
+      regionId: populationRow.id,
+      controllerId: 'polity:poland',
+      displayName: { en: census.nativeName, ru: census.nativeName },
+      activity: economic.activity,
+      population: populationRow.amount,
+      annualBirthRateBp: macro.annualBirthRateBp,
+      annualDeathRateBp: macro.annualDeathRateBp,
+      workforceRateBp: macro.workforceRateBp,
+      infrastructureBp: macro.infrastructureBp,
+      damageBp: macro.damageBp,
+      baseMonthlyCapacity: economic.capacity,
+      outputPerWorker: macro.outputPerWorker,
+      capacityCeiling: Math.floor((economic.capacity * 3) / 2),
+    };
+  }).toSorted((left, right) => left.regionId.localeCompare(right.regionId));
+  scenario.regions = scenario.regions.flatMap((entry) => entry.regionId === macroRegionId ? regions : [entry]);
+  scenario.military.supplyLinks = scenario.military.supplyLinks.map((link) => {
+    if (!link.regions.includes(macroRegionId)) return link;
+    const externalRegionId = link.regions.find((regionId) => regionId !== macroRegionId);
+    const relationId = POLAND_1935_REGIONAL_ECONOMY.externalSupplyLinks[externalRegionId];
+    if (!relationId) throw new Error(`unreviewed external Poland supply link: ${externalRegionId}`);
+    return { ...link, regions: [externalRegionId, `region:ohm-1935:${relationId}`].sort() };
+  });
+  return { scenario, regions, activityRows };
+}
+
+export function buildPolandRegionalProjectionCandidate(engineScenario) {
+  const { scenario, regions, activityRows } = buildPolandCandidateScenario(engineScenario);
+  const firstMonth = buildFirstMonthBaseline(resolveMonth(initState(scenario), { commands: [] }));
+  const body = {
+    schemaVersion: 'open-historia-regional-projection-candidate/1',
+    polityId: 'polity:poland',
+    status: 'economy-ready-geography-pending-owner-review',
+    sourceRefs: POLAND_1935_REGIONAL_ECONOMY.sourceRefs,
+    method: 'Population is census-weighted in five-person quanta; the smallest deterministic transfer preserves month-one demographic rounding. Capacity preserves the approved national 50/30/20 activity totals, uses one Łódzkie processing region as required by Canon 04, and applies bounded tax-rounding reconciliation after population-weighted allocation.',
+    confidence: 'low',
+    todo: 'Owner-review the geography overlay and replace national-scale specialization estimates with table-level regional production evidence before publishing the 16-region runtime projection.',
+    nationalControls: {
+      population: sum(regions, (entry) => entry.population),
+      workforce: sum(regions, (entry) => Math.floor((entry.population * entry.workforceRateBp) / 10000)),
+      industrialCapacity: sum(regions, (entry) => entry.baseMonthlyCapacity),
+      infrastructureIndexBp: populationWeightedInfrastructureBp(regions),
+    },
+    activityCapacity: Object.fromEntries(activityRows.map((group) => [group.family, group.targetCapacity])),
+    processingRegionCount: regions.filter((entry) => entry.activity.kind === 'processing').length,
+    externalSupplyLinks: Object.entries(POLAND_1935_REGIONAL_ECONOMY.externalSupplyLinks).map(([externalRegionId, relationId]) => ({
+      externalRegionId, candidateRegionId: `region:ohm-1935:${relationId}`,
+    })),
+    firstMonth,
+    rows: regions,
+  };
+  return { ...body, checksum: sha256(body) };
+}
+
 export function buildFirstMonthBaseline(turnResult) {
   const polities = turnResult.ledger.polities.map((entry) => ({
     polityId: entry.polityId,
@@ -323,6 +472,12 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
   const politicalPolities = byId(engineScenario.politics?.polities ?? [], (entry) => entry.polityId);
   const provenance = auditStartingStateProvenance(engineScenario, authoring);
   const polandPopulation = buildPolandPopulationAllocation();
+  const polandProjection = buildPolandRegionalProjectionCandidate(engineScenario);
+  const polandProjectionFirstMonth = {
+    matches: polandProjection.firstMonth.checksum === firstMonth.expectedChecksum,
+    expectedChecksum: firstMonth.expectedChecksum,
+    actualChecksum: polandProjection.firstMonth.checksum,
+  };
 
   if (manifest.id !== SCENARIO_ID || engineScenario.scenarioId !== SCENARIO_ID || authoring.scenarioId !== SCENARIO_ID) {
     issues.push(issue('scenario-id-drift', 'blocking', '/', `expected every projection to use ${SCENARIO_ID}`));
@@ -460,7 +615,10 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
     modules: Object.fromEntries(REQUIRED_MODULES.map((moduleName) => [moduleName, engineScenario.modules?.[moduleName] === true])),
     inertPolities: REQUIRED_INERT_POLITIES.map((entry) => ({ ...entry, present: enginePolityIds.has(entry.polityId) })),
     commitments: AUTHORED_COMMITMENT_EXPECTATIONS,
-    regionalResearch: { population: [polandPopulation] },
+    regionalResearch: {
+      population: [polandPopulation],
+      projectionCandidates: [{ ...polandProjection, firstMonthComparison: polandProjectionFirstMonth }],
+    },
     provenance,
     firstMonth,
     polities: polityRows,
@@ -488,6 +646,7 @@ export function renderOwnerTable(audit) {
     '## Sourced regional allocations ready for projection',
     '',
     ...audit.regionalResearch.population.map((entry) => `- ${entry.polityId}: ${entry.rows.length} regions, ${entry.sourcePopulationTotal.toLocaleString('en-US')} source persons apportioned to exact target ${entry.targetPopulation.toLocaleString('en-US')} (\`${entry.checksum}\`).`),
+    ...audit.regionalResearch.projectionCandidates.map((entry) => `- ${entry.polityId} economy candidate: ${entry.rows.length} regions, ${entry.processingRegionCount} processing region, national population/capacity ${entry.nationalControls.population.toLocaleString('en-US')}/${entry.nationalControls.industrialCapacity.toLocaleString('en-US')}; first month **${entry.firstMonthComparison.matches ? 'exact' : 'MISMATCH'}** (\`${entry.checksum}\`).`),
     '',
     '## Blocking issues',
     '',

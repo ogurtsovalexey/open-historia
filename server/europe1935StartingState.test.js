@@ -13,6 +13,7 @@ import {
   auditStartingStateProvenance,
   buildFirstMonthBaseline,
   buildPolandPopulationAllocation,
+  buildPolandRegionalProjectionCandidate,
   buildStartingStateAudit,
   calculateCheckpoint,
   compareFirstMonthBaseline,
@@ -54,6 +55,27 @@ test('Poland population research reconciles the GUS table and preserves the nati
   assert.equal(allocation.checksum, 'sha256:fb3c9c75910e877eeca881afcf81e0e1335d333853af70b0ace7a723e05acce5');
 });
 
+test('Poland regional economy candidate preserves national controls and the complete first month', () => {
+  const fixture = loadFixture();
+  const first = buildPolandRegionalProjectionCandidate(fixture.engineScenario);
+  const second = buildPolandRegionalProjectionCandidate(fixture.engineScenario);
+  assert.deepEqual(first, second);
+  assert.equal(first.checksum, 'sha256:fcc42e2762fa8c051d666f3b0b8eb6809c343a28d77e7d5bf1439ed06c064c2a');
+  assert.equal(first.rows.length, 16);
+  assert.deepEqual(first.nationalControls, {
+    population: 34_000_000,
+    workforce: 13_600_000,
+    industrialCapacity: 88_000,
+    infrastructureIndexBp: 3900,
+  });
+  assert.deepEqual(first.activityCapacity, { food: 44_000, coal: 26_400, goods: 17_600 });
+  assert.equal(first.processingRegionCount, 1);
+  assert.equal(first.rows.find((row) => row.activity.kind === 'processing').regionId,
+    'region:ohm-1935:2741475');
+  assert.equal(first.firstMonth.checksum, baseline.checksum);
+  assert.equal(first.externalSupplyLinks.length, 3);
+});
+
 test('Europe 1935 pins its existing first aggregate month before regional replacement', () => {
   const fixture = loadFixture();
   const first = calculateCheckpoint(fixture, baseline);
@@ -93,10 +115,12 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   assert.equal(audit.provenance.coveredRows, AUTHORED_COMMITMENT_EXPECTATIONS.length);
   assert.equal(audit.regionalResearch.population[0].rows.length, 16);
   assert.equal(audit.regionalResearch.population[0].targetPopulation, 34_000_000);
+  assert.equal(audit.regionalResearch.projectionCandidates[0].firstMonthComparison.matches, true);
   assert.equal(audit.issues.filter((entry) => entry.code === 'starting-state-provenance-missing').length,
     audit.provenance.missingRows);
   assert.match(renderOwnerTable(audit), /Starting-state provenance: \*\*2\//);
   assert.match(renderOwnerTable(audit), /31,915,779 source persons apportioned to exact target 34,000,000/);
+  assert.match(renderOwnerTable(audit), /economy candidate: 16 regions, 1 processing region/);
   assert.match(renderOwnerTable(audit), /production-derived diagnostic table/);
 
   const incompletePolitics = structuredClone(fixture);
