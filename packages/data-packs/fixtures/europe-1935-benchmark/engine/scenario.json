@@ -66,6 +66,10 @@
       {"polities":["polity:germany","polity:soviet-union"],"monthlyCapacity":120000},
       {"polities":["polity:italy","polity:united-kingdom"],"monthlyCapacity":80000},
       {"polities":["polity:united-kingdom","polity:united-states"],"monthlyCapacity":180000}
+    ],
+    "startingAgreements": [
+      {"agreementId":"agreement:france-czechoslovakia-1924","sourceProposalId":"proposal:authored-france-czechoslovakia-1924","acceptedMonth":"1924-03-01","terms":{"kind":"agreement","agreementType":"defensive-alliance","fromPolityId":"polity:france","toPolityId":"polity:czechoslovakia"}},
+      {"agreementId":"agreement:france-poland-1921","sourceProposalId":"proposal:authored-france-poland-1921","acceptedMonth":"1922-05-01","terms":{"kind":"agreement","agreementType":"defensive-alliance","fromPolityId":"polity:france","toPolityId":"polity:poland"}}
     ]
   },
   "military": {
@@ -99,8 +103,6 @@
     "goals": [
       {"goalId":"goal:germany-austria","polityId":"polity:germany","displayName":{"en":"Control Austria","ru":"Контролировать Австрию"},"initiallyActive":true,"kind":"control-region","regionId":"region:benchmark-1:AT"},
       {"goalId":"goal:austria-france","polityId":"polity:austria","displayName":{"en":"Secure French alliance","ru":"Союз с Францией"},"initiallyActive":false,"kind":"secure-alliance","targetPolityId":"polity:france"},
-      {"goalId":"goal:czechoslovakia-france","polityId":"polity:czechoslovakia","displayName":{"en":"Secure French alliance","ru":"Союз с Францией"},"initiallyActive":true,"kind":"secure-alliance","targetPolityId":"polity:france"},
-      {"goalId":"goal:poland-france","polityId":"polity:poland","displayName":{"en":"Secure French alliance","ru":"Союз с Францией"},"initiallyActive":true,"kind":"secure-alliance","targetPolityId":"polity:france"},
       {"goalId":"goal:france-czechoslovakia","polityId":"polity:france","displayName":{"en":"Secure Czechoslovak alliance","ru":"Союз с Чехословакией"},"initiallyActive":false,"kind":"secure-alliance","targetPolityId":"polity:czechoslovakia"},
       {"goalId":"goal:britain-france","polityId":"polity:united-kingdom","displayName":{"en":"Continental commitment","ru":"Континентальные обязательства"},"initiallyActive":false,"kind":"secure-alliance","targetPolityId":"polity:france"},
       {"goalId":"goal:italy-france","polityId":"polity:italy","displayName":{"en":"Preserve western alignment","ru":"Сохранить западную ориентацию"},"initiallyActive":false,"kind":"secure-alliance","targetPolityId":"polity:france"}

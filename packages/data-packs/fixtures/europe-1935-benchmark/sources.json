@@ -39,5 +39,27 @@
     "contentHash": "sha256:877259f5a9218ea54225902a6caf4eacd82d70ba418eb6262b06b8ff7b68986c",
     "license": { "status": "metadata-only" },
     "note": "Official final 1931 resident-population table by voivodeship (Przegląd ogólny, p. 1). The 16-polygon projection combines the separately printed M. st. Warszawa row with Województwo warszawskie; the source PDF itself is not redistributed."
+  },
+  {
+    "id": "source:europe-1935-benchmark:franco-polish-agreement-1921",
+    "title": "Umowa polityczna francusko-polska, podpisana w Paryżu dnia 19 lutego 1921 r.",
+    "publisher": "Dziennik Ustaw Rzeczypospolitej Polskiej",
+    "publicationDate": "1922-08-09",
+    "locator": "https://eli.gov.pl/api/acts/DU/1922/563/text/O/D19220563.pdf",
+    "retrievedAt": "2026-09-03",
+    "contentHash": "sha256:9d5f0a6dd0c5b31bd824d00492fc7724a267b0e3e71aca9682999de12d78a529",
+    "license": { "status": "metadata-only" },
+    "note": "Official Polish promulgation. Article 3 provides consultation for territorial defence if either party is attacked without provocation; represented by the engine's bounded defensive-alliance agreement type."
+  },
+  {
+    "id": "source:europe-1935-benchmark:franco-czechoslovak-treaty-1924",
+    "title": "Treaty of Alliance and Friendship between France and Czechoslovakia, signed at Paris January 25, 1924",
+    "publisher": "League of Nations Treaty Series, Volume 23, No. 588",
+    "publicationDate": "1924",
+    "locator": "https://treaties.un.org/doc/Publication/UNTS/LON/Volume%2023/v23.pdf#page=165",
+    "retrievedAt": "2026-09-03",
+    "contentHash": "sha256:16c06d26b39921bdfeb462a646f73ee22f1ce56e579bbfbe6599eec73e6130b0",
+    "license": { "status": "metadata-only" },
+    "note": "Registered treaty No. 588. Articles 1–2 require consultation and agreed measures when common security interests are threatened; represented by the engine's bounded defensive-alliance agreement type."
   }
 ]

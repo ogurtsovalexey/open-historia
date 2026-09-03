@@ -86,17 +86,16 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   assert.equal(audit.polities.filter((entry) => entry.fidelity === 'Supported').every((entry) => entry.regionCount === 1), true);
   assert.equal(audit.issues.filter((entry) => entry.code === 'formation-missing').length, 7);
   assert.equal(audit.issues.filter((entry) => entry.code === 'commander-missing').length, 7);
-  assert.equal(audit.issues.filter((entry) => entry.code === 'goal-conflicts-with-existing-commitment').length, 2);
-  assert.equal(audit.issues.filter((entry) => entry.code === 'executable-agreement-missing').length,
-    AUTHORED_COMMITMENT_EXPECTATIONS.length);
+  assert.equal(audit.issues.filter((entry) => entry.code === 'goal-conflicts-with-existing-commitment').length, 0);
+  assert.equal(audit.issues.filter((entry) => entry.code === 'executable-agreement-missing').length, 0);
   assert(STARTING_STATE_PROVENANCE_COLLECTIONS.includes('/politics/characters'));
   assert.equal(audit.provenance.totalRows > 0, true);
-  assert.equal(audit.provenance.coveredRows, 0);
+  assert.equal(audit.provenance.coveredRows, AUTHORED_COMMITMENT_EXPECTATIONS.length);
   assert.equal(audit.regionalResearch.population[0].rows.length, 16);
   assert.equal(audit.regionalResearch.population[0].targetPopulation, 34_000_000);
   assert.equal(audit.issues.filter((entry) => entry.code === 'starting-state-provenance-missing').length,
-    audit.provenance.totalRows);
-  assert.match(renderOwnerTable(audit), /Starting-state provenance: \*\*0\//);
+    audit.provenance.missingRows);
+  assert.match(renderOwnerTable(audit), /Starting-state provenance: \*\*2\//);
   assert.match(renderOwnerTable(audit), /31,915,779 source persons apportioned to exact target 34,000,000/);
   assert.match(renderOwnerTable(audit), /production-derived diagnostic table/);
 

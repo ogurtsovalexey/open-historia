@@ -110,14 +110,12 @@ export const AUTHORED_COMMITMENT_EXPECTATIONS = Object.freeze([
     polityIds: ['polity:czechoslovakia', 'polity:france'],
     agreementType: 'defensive-alliance',
     sourceAnchorIds: ['anchor:czechoslovakia-security', 'anchor:france-containment'],
-    matchingGoalId: 'goal:czechoslovakia-france',
   },
   {
     commitmentId: 'commitment:poland-france-security',
     polityIds: ['polity:poland', 'polity:france'],
     agreementType: 'defensive-alliance',
     sourceAnchorIds: ['anchor:poland-balance', 'anchor:france-containment'],
-    matchingGoalId: 'goal:poland-france',
   },
 ]);
 
@@ -422,9 +420,12 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
     if (!agreement) {
       issues.push(issue('executable-agreement-missing', 'blocking', `/commitments/${expectation.commitmentId}`, 'authored security relationship has no executable starting agreement'));
     }
-    const goal = engineScenario.campaign?.goals?.find((entry) => entry.goalId === expectation.matchingGoalId);
-    if (goal?.initiallyActive) {
-      issues.push(issue('goal-conflicts-with-existing-commitment', 'blocking', `/engine/campaign/goals/${goal.goalId}`, 'an in-force relationship must be a commitment/constraint, not a goal to conclude it'));
+    const conflictingGoal = engineScenario.campaign?.goals?.find((entry) => entry.initiallyActive
+      && entry.kind === 'secure-alliance'
+      && expectation.polityIds.includes(entry.polityId)
+      && expectation.polityIds.includes(entry.targetPolityId));
+    if (conflictingGoal) {
+      issues.push(issue('goal-conflicts-with-existing-commitment', 'blocking', `/engine/campaign/goals/${conflictingGoal.goalId}`, 'an in-force relationship must be a commitment/constraint, not a goal to conclude it'));
     }
   }
 

@@ -407,7 +407,16 @@ test('StrategicBriefV4 derives authority from canonical politics and observes a 
 });
 
 test('StrategicBriefV4 cannot hide families required by active goals or material checkpoints', () => {
-  const state = benchmarkInitial();
+  const raw = JSON.parse(readFileSync(benchmarkFixture, 'utf8'));
+  raw.campaign.goals.push({
+    goalId: 'goal:test-czechoslovakia-united-kingdom',
+    polityId: 'polity:czechoslovakia',
+    displayName: { en: 'Test British alliance', ru: 'Тестовый союз с Великобританией' },
+    initiallyActive: true,
+    kind: 'secure-alliance',
+    targetPolityId: 'polity:united-kingdom',
+  });
+  const state = initState(parseScenario(raw));
   const czech = buildStrategicBriefV4(state, 'polity:czechoslovakia', {
     invocation: { reason: 'scheduled-quarter', detail: 'Quarterly review.' },
     relevantFamilies: ['invest'], political: politicalV4('polity:czechoslovakia'), countTokens: () => 1,

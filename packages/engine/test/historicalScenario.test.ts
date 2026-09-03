@@ -24,8 +24,14 @@ test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine pr
   assert.equal(first.scenario.polities.length, 9);
   assert.equal(first.scenario.startMonth, '1935-01-01');
   assert.equal(first.scenario.campaign?.softHorizonMonth, '1940-07-01');
+  assert.deepEqual(first.scenario.diplomacy?.startingAgreements?.map((entry) => entry.agreementId), [
+    'agreement:france-czechoslovakia-1924',
+    'agreement:france-poland-1921',
+  ]);
   assert.equal(first.mapLink?.regions.find((entry) => entry.engineRegionId === 'region:benchmark-1:DE')?.mapRegionIds.length, 3);
-  assert.equal(initState(first.scenario).label, 'historical-projection');
+  const state = initState(first.scenario);
+  assert.equal(state.label, 'historical-projection');
+  assert.equal(state.diplomacy?.agreements.length, 2);
 });
 
 test('historical authoring uses a population-weighted infrastructure index and rejects schema v2', () => {
