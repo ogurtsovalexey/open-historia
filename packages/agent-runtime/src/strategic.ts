@@ -417,14 +417,23 @@ export function buildStrategicBatchesV2(state: EconWorldState, playerPolityId: s
   const allowed = new Set<string>(state.polities.filter((entry) => entry.id !== playerPolityId && isStrategicActor(entry)).map((entry) => entry.id));
   const polityIds = (options.requestedPolityIds ?? [...allowed]).filter((entry) => allowed.has(entry)).sort();
   const batches: StrategicBatchV2[] = [];
-  for (let index = 0; index < polityIds.length; index += 6) {
-    const ids = polityIds.slice(index, index + 6);
-    const briefs = ids.map((polityId) => buildStrategicBriefV2(state, polityId, { strategicContext: options.strategicContextByPolity?.[polityId] }));
+  let ids: string[] = [];
+  let briefs: StrategicBriefV2[] = [];
+  const publish = () => {
+    if (ids.length === 0) return;
     const characterCount = JSON.stringify(briefs).length;
-    if (characterCount > 40000) throw new Error('strategic V2 batch exceeds character budget');
     batches.push({ schemaVersion: 'open-historia-strategic-batch/2', batchId: sha256OfString(`${state.revision}|strategic-v2|${ids.join('|')}`),
       month: state.month, baseRevision: state.revision, polityIds: ids, briefs, characterCount });
+    ids = []; briefs = [];
+  };
+  for (const polityId of polityIds) {
+    const brief = buildStrategicBriefV2(state, polityId, { strategicContext: options.strategicContextByPolity?.[polityId] });
+    if (JSON.stringify([brief]).length > 40000) throw new Error('strategic V2 brief exceeds character budget');
+    const candidateBriefs = [...briefs, brief];
+    if (ids.length === 6 || JSON.stringify(candidateBriefs).length > 40000) publish();
+    ids.push(polityId); briefs.push(brief);
   }
+  publish();
   return batches;
 }
 

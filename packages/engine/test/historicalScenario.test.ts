@@ -25,6 +25,12 @@ test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine pr
   assert.equal(first.scenario.regions.length, 115);
   assert.equal(input().bundle.manifest.contentVersion, '1.0.0');
   assert.equal(first.scenario.startMonth, '1935-01-01');
+  assert.equal(Object.values(first.scenario.modules ?? {}).every(Boolean), true);
+  assert.equal(first.scenario.politics?.polities.length, 11);
+  assert.equal(first.scenario.statecraft?.finance.length, 11);
+  assert.equal(first.scenario.identity?.regions.length, 115);
+  assert.equal(first.scenario.military?.formations.length, 7);
+  assert.equal(first.scenario.campaign?.goals.length, 14);
   assert.equal(first.scenario.campaign?.softHorizonMonth, '1940-07-01');
   assert.deepEqual(first.scenario.diplomacy?.startingAgreements?.map((entry) => entry.agreementId), [
     'agreement:france-czechoslovakia-1924',
@@ -38,6 +44,13 @@ test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine pr
   const state = initState(first.scenario);
   assert.equal(state.label, 'historical-projection');
   assert.equal(state.diplomacy?.agreements.length, 2);
+  assert.equal(state.politics?.polities.length, 11);
+  assert.equal(input().authoring.startingStateProvenance.length, 565);
+  assert.deepEqual(input().bundle.manifest.assets.filter((entry: { path: string }) => entry.path.startsWith('starting-state/'))
+    .map((entry: { path: string }) => entry.path).sort(), [
+    'starting-state/politics-bundle.json',
+    'starting-state/starting-state-manifest.json',
+  ]);
 });
 
 test('historical authoring uses a population-weighted infrastructure index and rejects schema v2', () => {

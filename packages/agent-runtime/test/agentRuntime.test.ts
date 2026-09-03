@@ -176,8 +176,10 @@ test('materializer rejects incompatible actions atomically and reports unsupport
 test('Strategic V2 batches are bounded and materialize all actors against one revision', () => {
   const state = benchmarkInitial();
   const batches = buildStrategicBatchesV2(state, 'polity:germany');
-  assert.equal(batches.length, 2);
+  assert.ok(batches.length >= 2);
   assert.ok(batches.every((entry) => entry.polityIds.length <= 6 && entry.characterCount <= 40000));
+  assert.deepEqual(batches.flatMap((entry) => entry.polityIds),
+    state.polities.filter((entry) => entry.id !== 'polity:germany' && entry.decisionMode !== 'inert').map((entry) => entry.id).sort());
   const batch = batches[0]!;
   const materialized = materializeStrategicBatchV2(state, { decisions: batch.polityIds.map(holdV2) }, batch);
   assert.deepEqual(materialized, { commands: [], unsupportedResidual: [], rejected: [] });

@@ -403,12 +403,22 @@ export function buildPoliticsCandidateAudit(engineScenario, sources, candidatePa
   const sourceIds = new Set(sources.map((entry) => entry.id));
   const unknownSources = candidate.sourceRefs.filter((sourceId) => !sourceIds.has(sourceId));
   if (unknownSources.length) throw new Error(`Poland politics candidate has unknown sources: ${unknownSources.join(', ')}`);
-  const raw = structuredClone(engineScenario);
-  raw.politics = candidate.politics;
-  parseScenario(raw);
-  const strategy = currentPoliticalStrategy(candidate.politics, candidate.polityId);
-  const factions = candidate.politics.factions.filter((entry) => entry.polityId === candidate.polityId);
-  const characters = candidate.politics.characters.filter((entry) => entry.polityId === candidate.polityId);
+  const integrated = engineScenario.modules?.politics === true && engineScenario.politics;
+  const politics = integrated ? {
+    polities: engineScenario.politics.polities.filter((entry) => entry.polityId === candidate.polityId),
+    factions: engineScenario.politics.factions.filter((entry) => entry.polityId === candidate.polityId),
+    characters: engineScenario.politics.characters.filter((entry) => entry.polityId === candidate.polityId),
+  } : candidate.politics;
+  if (integrated) parseScenario(engineScenario);
+  else {
+    const raw = structuredClone(engineScenario);
+    raw.politics = politics;
+    if (raw.campaign) raw.campaign.goals = raw.campaign.goals.filter((entry) => entry.kind !== 'stabilize-government');
+    parseScenario(raw);
+  }
+  const strategy = currentPoliticalStrategy(politics, candidate.polityId);
+  const factions = politics.factions;
+  const characters = politics.characters;
   const unknownCardSources = characters.flatMap((entry) => entry.leaderCard?.sourceRefs ?? [])
     .filter((sourceId) => !sourceIds.has(sourceId));
   if (unknownCardSources.length) throw new Error(`Poland politics fact cards have unknown sources: ${unknownCardSources.join(', ')}`);
@@ -417,7 +427,7 @@ export function buildPoliticsCandidateAudit(engineScenario, sources, candidatePa
   }
   const body = {
     schemaVersion: candidate.schemaVersion,
-    status: candidate.status,
+    status: integrated ? 'complete-bundle-pending-owner-review' : candidate.status,
     polityId: candidate.polityId,
     effectiveAt: candidate.effectiveAt,
     sourceRefs: candidate.sourceRefs,
@@ -430,7 +440,7 @@ export function buildPoliticsCandidateAudit(engineScenario, sources, candidatePa
     currentConstraints: strategy.currentConstraints,
     factionCount: factions.length,
     characterCount: characters.length,
-    politics: candidate.politics,
+    politics,
   };
   return { ...body, checksum: sha256(body) };
 }
@@ -632,6 +642,13 @@ export function buildStartingStateAudit({ manifest, scenario, sources, authoring
       formations: polityFormations.length,
       commanders: polityCommanders.length,
       government: strategyReady,
+      authority: strategyReady ? {
+        headOfState: characters.find((entry) => entry.characterId === authority.headOfStateCharacterId).displayName.en,
+        headOfGovernment: characters.find((entry) => entry.characterId === authority.headOfGovernmentCharacterId).displayName.en,
+        decisionAuthority: characters.find((entry) => entry.characterId === authority.decisionAuthorityCharacterId).displayName.en,
+        rulingFaction: factions.find((entry) => entry.factionId === authority.rulingFactionId).displayName.en,
+        currentConstraints: authority.currentConstraints,
+      } : null,
       factions: factions.length,
       characters: characters.length,
       agreements: agreements.length,
@@ -721,6 +738,12 @@ export function renderOwnerTable(audit) {
     '',
     `Starting-state provenance: **${audit.provenance.coveredRows}/${audit.provenance.totalRows}** exact rows covered; ${audit.provenance.missingRows} missing; ${audit.provenance.checksumMismatches} checksum mismatches.`,
     '',
+    '## Political authority',
+    '',
+    ...audit.polities.map((entry) => entry.authority
+      ? `- ${entry.polityId}: head of state **${entry.authority.headOfState}**; head of government **${entry.authority.headOfGovernment}**; decision authority **${entry.authority.decisionAuthority}**; ruling faction **${entry.authority.rulingFaction}**.`
+      : `- ${entry.polityId}: incomplete.`),
+    '',
     '## Sourced regional allocations ready for projection',
     '',
     ...audit.regionalResearch.population.map((entry) => `- ${entry.polityId}: ${entry.rows.length} regions, ${entry.sourcePopulationTotal.toLocaleString('en-US')} source persons apportioned to exact target ${entry.targetPopulation.toLocaleString('en-US')} (\`${entry.checksum}\`).`),
@@ -734,7 +757,9 @@ export function renderOwnerTable(audit) {
     '',
     ...audit.issues.map((entry) => `- \`${entry.code}\` at \`${entry.path}\`: ${entry.detail}`),
     '',
-    '> This is a production-derived diagnostic table, not an owner approval artifact. Approval follows only after every blocking row has sourced replacement data.',
+    audit.gate.status === 'ready-for-owner-review'
+      ? '> This is the checksum-bound owner checkpoint. Explicit owner approval is required before any model call.'
+      : '> This is a production-derived diagnostic table, not an owner approval artifact. Approval follows only after every blocking row has sourced replacement data.',
     '',
   ];
   return lines.join('\n');

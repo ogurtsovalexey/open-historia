@@ -6,6 +6,10 @@ import { startingStateValueChecksum } from '@open-historia/engine';
 import { fileURLToPath } from 'node:url';
 import { OHM_POLAND_1935 } from '../scripts/europe-1935-geography.mjs';
 import {
+  buildCompleteStartingState,
+  verifyCompleteStartingState,
+} from '../scripts/europe-1935-complete-starting-state.mjs';
+import {
   AUTHORED_COMMITMENT_EXPECTATIONS,
   POLAND_1931_CENSUS,
   STARTING_STATE_PROVENANCE_COLLECTIONS,
@@ -81,20 +85,21 @@ test('Poland regional economy candidate preserves national controls and the comp
   assert.equal(first.externalSupplyLinks.length, 3);
 });
 
-test('Poland politics candidate separates offices from actual decision authority without enabling a partial module', () => {
+test('Poland politics candidate separates offices from actual decision authority inside the atomic bundle', () => {
   const fixture = loadFixture();
   const first = buildPoliticsCandidateAudit(fixture.engineScenario, fixture.sources);
   const second = buildPoliticsCandidateAudit(fixture.engineScenario, fixture.sources);
   assert.deepEqual(first, second);
-  assert.equal(first.checksum, 'sha256:47b3156bc33929ae68f086265b3514d8540b8e35a682803430bb3cd25d0bd8b9');
+  assert.equal(first.checksum, 'sha256:44e174c641022dcc7bb61e180528856f6cfb40be174101764eae2d2bcc522955');
   assert.deepEqual(first.headOfState, { characterId: 'character:poland-moscicki', name: 'Ignacy Mościcki' });
   assert.deepEqual(first.headOfGovernment, { characterId: 'character:poland-kozlowski', name: 'Leon Kozłowski' });
   assert.deepEqual(first.decisionAuthority, { characterId: 'character:poland-pilsudski', name: 'Józef Piłsudski' });
   assert.equal(first.rulingFaction.factionId, 'faction:poland-sanacja');
   assert.equal(first.factionCount, 4);
   assert.equal(first.characterCount, 5);
-  assert.notEqual(fixture.engineScenario.modules.politics, true);
-  assert.equal(fixture.engineScenario.politics, undefined);
+  assert.equal(first.status, 'complete-bundle-pending-owner-review');
+  assert.equal(fixture.engineScenario.modules.politics, true);
+  assert.equal(fixture.engineScenario.politics.polities.length, 11);
   assert.throws(() => buildPoliticsCandidateAudit(fixture.engineScenario,
     fixture.sources.filter((source) => source.id !== 'source:europe-1935-benchmark:pilsudski-museum-marshal')), /unknown sources/);
 });
@@ -118,12 +123,13 @@ test('Europe 1935 preserves the pinned aggregate first month after regional repl
   } }).scenarioId, 'scenario:test');
 });
 
-test('Europe 1935 starting-state gate reports every known foundation gap deterministically', () => {
+test('Europe 1935 complete starting-state gate is deterministic and ready for owner review', () => {
   const fixture = loadFixture();
   const { audit } = calculateCheckpoint(fixture, baseline);
   const again = buildStartingStateAudit({ ...fixture, firstMonth: audit.firstMonth });
   assert.deepEqual(audit, again);
-  assert.equal(audit.gate.status, 'blocked');
+  assert.equal(audit.gate.status, 'ready-for-owner-review');
+  assert.equal(audit.gate.blockingIssues, 0);
   assert.equal(audit.gate.supportedPolities, 7);
   assert.equal(audit.gate.baselinePolities, 4);
   assert.equal(audit.generatedFrom.manifestContentVersion, '1.0.0');
@@ -133,26 +139,31 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   assert.equal(audit.polities.filter((entry) => entry.fidelity === 'Supported')
     .every((entry) => entry.regionCount >= 10 && entry.regionCount <= 25), true);
   assert.equal(audit.inertPolities.every((entry) => entry.present), true);
-  assert.equal(audit.issues.filter((entry) => entry.code === 'formation-missing').length, 7);
-  assert.equal(audit.issues.filter((entry) => entry.code === 'commander-missing').length, 7);
+  assert.equal(audit.issues.filter((entry) => entry.code === 'formation-missing').length, 0);
+  assert.equal(audit.issues.filter((entry) => entry.code === 'commander-missing').length, 0);
   assert.equal(audit.issues.filter((entry) => entry.code === 'goal-conflicts-with-existing-commitment').length, 0);
   assert.equal(audit.issues.filter((entry) => entry.code === 'executable-agreement-missing').length, 0);
   assert(STARTING_STATE_PROVENANCE_COLLECTIONS.includes('/politics/characters'));
   assert.equal(audit.provenance.totalRows > 0, true);
-  assert.equal(audit.provenance.coveredRows, AUTHORED_COMMITMENT_EXPECTATIONS.length);
+  assert.equal(audit.provenance.totalRows, 565);
+  assert.equal(audit.provenance.coveredRows, audit.provenance.totalRows);
+  assert.equal(audit.provenance.missingRows, 0);
+  assert.equal(audit.provenance.checksumMismatches, 0);
   assert.equal(audit.regionalResearch.population[0].rows.length, 16);
   assert.equal(audit.regionalResearch.population[0].targetPopulation, 34_000_000);
   assert.equal(audit.regionalResearch.projectionCandidates[0].firstMonthComparison.matches, true);
   assert.equal(audit.politicsCandidates[0].decisionAuthority.characterId, 'character:poland-pilsudski');
   assert.equal(audit.issues.filter((entry) => entry.code === 'starting-state-provenance-missing').length,
     audit.provenance.missingRows);
-  assert.match(renderOwnerTable(audit), /Starting-state provenance: \*\*2\//);
+  assert.match(renderOwnerTable(audit), /Starting-state provenance: \*\*565\/565\*\*/);
   assert.match(renderOwnerTable(audit), /31,915,779 source persons apportioned to exact target 34,000,000/);
   assert.match(renderOwnerTable(audit), /economy candidate: 16 regions, 1 processing region/);
   assert.match(renderOwnerTable(audit), /decision authority Józef Piłsudski; 4 factions/);
-  assert.match(renderOwnerTable(audit), /production-derived diagnostic table/);
+  assert.match(renderOwnerTable(audit), /checksum-bound owner checkpoint/);
+  assert.match(renderOwnerTable(audit), /decision authority \*\*Józef Piłsudski\*\*/);
 
   const incompletePolitics = structuredClone(fixture);
+  incompletePolitics.engineScenario.modules.politics = false;
   incompletePolitics.engineScenario.politics = {
     polities: [{ polityId: 'polity:france' }], factions: [], characters: [],
   };
@@ -184,4 +195,52 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   }];
   const provenance = auditStartingStateProvenance(fixture.engineScenario, oneClaim);
   assert.equal(provenance.coveredRows, 1);
+});
+
+test('complete starting-state publication is atomic, idempotent and includes a supplied German threat', () => {
+  const fixture = loadFixture();
+  const first = buildCompleteStartingState(fixture);
+  const second = buildCompleteStartingState({ ...fixture, engineScenario: first.scenario, authoring: first.authoring, sources: first.sources });
+  assert.deepEqual(second, first);
+  assert.deepEqual(Object.keys(first.scenario.modules).sort(), [
+    'armedForces', 'budget', 'campaign', 'combat', 'diplomacy', 'finance', 'intelligence',
+    'politics', 'projects', 'shortages', 'societyAndIdentity', 'technology', 'trade', 'unrest',
+  ]);
+  assert.equal(Object.values(first.scenario.modules).every(Boolean), true);
+  assert.equal(first.scenario.politics.polities.length, 11);
+  assert.equal(first.scenario.statecraft.finance.length, 11);
+  assert.equal(first.scenario.identity.regions.length, 115);
+  assert.equal(first.scenario.identity.polities.length, 11);
+  for (const polity of first.scenario.identity.polities) {
+    const accepted = new Set([polity.officialCultureId, ...polity.acceptedCultureIds]);
+    const controlled = new Set(first.scenario.regions.filter((entry) => entry.controllerId === polity.polityId)
+      .map((entry) => entry.regionId));
+    for (const region of first.scenario.identity.regions.filter((entry) => controlled.has(entry.regionId))) {
+      assert(accepted.has(region.culture.primaryId));
+      assert.equal(region.culture.minorities.every((entry) => accepted.has(entry.identityId)), true);
+    }
+  }
+  assert.equal(first.scenario.identity.regions.find((entry) => entry.regionId === 'region:europe-1935:cs-slovensko')
+    .culture.primaryId, 'culture:slovak');
+  assert.equal(first.scenario.identity.regions.find((entry) => entry.regionId === 'region:europe-1935:gb-northern-ireland')
+    .culture.primaryId, 'culture:irish');
+  assert.equal(first.scenario.military.formations.length, 7);
+  assert.equal(first.scenario.campaign.goals.length, 14);
+  const germanFormation = first.scenario.military.formations.find((entry) => entry.polityId === 'polity:germany');
+  assert.equal(germanFormation.locationRegionId, 'region:europe-1935:de-pommern');
+  assert(first.scenario.military.supplyLinks.some((entry) => entry.regions.includes(germanFormation.locationRegionId)
+    && entry.regions.includes('region:ohm-1935:2741476')));
+  assert.deepEqual(first.scenario.polities.filter((entry) => entry.decisionMode === 'inert').map((entry) => entry.id), [
+    'polity:free-city-of-danzig', 'polity:saargebiet',
+  ]);
+  const verified = verifyCompleteStartingState({
+    manifest: fixture.manifest,
+    scenarioV2: fixture.scenario,
+    mapLink: fixture.mapLink,
+    expectedBaseline: baseline,
+    engineScenario: fixture.engineScenario,
+    authoring: fixture.authoring,
+    sources: fixture.sources,
+  });
+  assert.equal(verified.firstMonth.checksum, baseline.checksum);
 });

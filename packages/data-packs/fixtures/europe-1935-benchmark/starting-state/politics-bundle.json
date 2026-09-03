@@ -1,0 +1,2265 @@
+{
+  "schemaVersion": "open-historia-politics-bundle/1",
+  "status": "complete-pending-owner-review",
+  "effectiveAt": "1935-01-01",
+  "polityCount": 11,
+  "politics": {
+    "polities": [
+      {
+        "polityId": "polity:austria",
+        "legitimacyBp": 5000,
+        "stabilityBp": 4300,
+        "unrestBp": 4100,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:austria-miklas",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:austria-miklas",
+          "headOfGovernmentCharacterId": "character:austria-schuschnigg",
+          "decisionAuthorityCharacterId": "character:austria-schuschnigg",
+          "rulingFactionId": "faction:austria-fatherland-front",
+          "currentConstraints": [
+            "Preserve Austrian independence against German absorption.",
+            "Maintain the corporatist constitutional order while containing domestic violence.",
+            "Avoid strategic isolation from Italy and the western powers."
+          ]
+        }
+      },
+      {
+        "polityId": "polity:czechoslovakia",
+        "legitimacyBp": 7200,
+        "stabilityBp": 6500,
+        "unrestBp": 2600,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:czechoslovakia-masaryk",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:czechoslovakia-masaryk",
+          "headOfGovernmentCharacterId": "character:czechoslovakia-malypetr",
+          "decisionAuthorityCharacterId": "character:czechoslovakia-malypetr",
+          "rulingFactionId": "faction:czechoslovakia-castle-coalition",
+          "currentConstraints": [
+            "Defend the constitutional republic and its territorial integrity.",
+            "Treat the French alliance as an existing security commitment.",
+            "Manage multinational representation without empowering secession."
+          ]
+        }
+      },
+      {
+        "polityId": "polity:france",
+        "legitimacyBp": 6200,
+        "stabilityBp": 4900,
+        "unrestBp": 3300,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:france-lebrun",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:france-lebrun",
+          "headOfGovernmentCharacterId": "character:france-flandin",
+          "decisionAuthorityCharacterId": "character:france-flandin",
+          "rulingFactionId": "faction:france-republican-centre",
+          "currentConstraints": [
+            "Preserve parliamentary legitimacy amid cabinet instability.",
+            "Treat the Polish and Czechoslovak alliances as existing commitments.",
+            "Coordinate continental security without acting beyond available support."
+          ]
+        }
+      },
+      {
+        "polityId": "polity:free-city-of-danzig",
+        "legitimacyBp": 4600,
+        "stabilityBp": 4300,
+        "unrestBp": 3600,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:free-city-of-danzig-greiser",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:free-city-of-danzig-greiser",
+          "headOfGovernmentCharacterId": "character:free-city-of-danzig-greiser",
+          "decisionAuthorityCharacterId": "character:free-city-of-danzig-greiser",
+          "rulingFactionId": "faction:free-city-of-danzig-danzig-senate",
+          "currentConstraints": [
+            "Remain an inert treaty polity outside AI scheduling.",
+            "Preserve bounded administration of the Free City.",
+            "Do not create independent strategic turns."
+          ]
+        }
+      },
+      {
+        "polityId": "polity:germany",
+        "legitimacyBp": 6700,
+        "stabilityBp": 6900,
+        "unrestBp": 1800,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:germany-hitler",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:germany-hitler",
+          "headOfGovernmentCharacterId": "character:germany-hitler",
+          "decisionAuthorityCharacterId": "character:germany-hitler",
+          "rulingFactionId": "faction:germany-nsdap",
+          "currentConstraints": [
+            "Concentrate strategic authority in the Führer.",
+            "Revise the postwar territorial and military settlement.",
+            "Avoid a premature coalition war before rearmament is sufficient."
+          ]
+        }
+      },
+      {
+        "polityId": "polity:italy",
+        "legitimacyBp": 6500,
+        "stabilityBp": 6400,
+        "unrestBp": 2200,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:italy-victor-emmanuel-iii",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:italy-victor-emmanuel-iii",
+          "headOfGovernmentCharacterId": "character:italy-mussolini",
+          "decisionAuthorityCharacterId": "character:italy-mussolini",
+          "rulingFactionId": "faction:italy-pni",
+          "currentConstraints": [
+            "Preserve the monarchy–Fascist governing compact.",
+            "Pursue great-power status without strategic subordination to Germany.",
+            "Keep Mediterranean supply and military readiness credible."
+          ]
+        }
+      },
+      {
+        "polityId": "polity:poland",
+        "legitimacyBp": 5600,
+        "stabilityBp": 5200,
+        "unrestBp": 3600,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:poland-moscicki",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:poland-moscicki",
+          "headOfGovernmentCharacterId": "character:poland-kozlowski",
+          "decisionAuthorityCharacterId": "character:poland-pilsudski",
+          "rulingFactionId": "faction:poland-sanacja",
+          "currentConstraints": [
+            "Preserve sovereignty between German and Soviet power.",
+            "Treat the French defensive alliance as an existing commitment, not a new objective.",
+            "Avoid dependence on either neighboring great power while bilateral non-aggression remains viable."
+          ]
+        }
+      },
+      {
+        "polityId": "polity:saargebiet",
+        "legitimacyBp": 5000,
+        "stabilityBp": 5000,
+        "unrestBp": 3000,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:saargebiet-knox",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:saargebiet-knox",
+          "headOfGovernmentCharacterId": "character:saargebiet-knox",
+          "decisionAuthorityCharacterId": "character:saargebiet-knox",
+          "rulingFactionId": "faction:saargebiet-league-commission",
+          "currentConstraints": [
+            "Remain an inert League-administered polity outside AI scheduling.",
+            "Administer the territory pending the January 1935 plebiscite.",
+            "Do not create independent strategic turns."
+          ]
+        }
+      },
+      {
+        "polityId": "polity:soviet-union",
+        "legitimacyBp": 6300,
+        "stabilityBp": 6100,
+        "unrestBp": 2400,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:soviet-union-kalinin",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:soviet-union-kalinin",
+          "headOfGovernmentCharacterId": "character:soviet-union-molotov",
+          "decisionAuthorityCharacterId": "character:soviet-union-stalin",
+          "rulingFactionId": "faction:soviet-union-vkpb",
+          "currentConstraints": [
+            "Preserve Communist Party control of state policy.",
+            "Prioritize industrial and military capacity under the second five-year plan.",
+            "Avoid strategic encirclement while retaining freedom of action."
+          ]
+        }
+      },
+      {
+        "polityId": "polity:united-kingdom",
+        "legitimacyBp": 7600,
+        "stabilityBp": 7000,
+        "unrestBp": 2100,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:united-kingdom-george-v",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:united-kingdom-george-v",
+          "headOfGovernmentCharacterId": "character:united-kingdom-macdonald",
+          "decisionAuthorityCharacterId": "character:united-kingdom-macdonald",
+          "rulingFactionId": "faction:united-kingdom-national-government",
+          "currentConstraints": [
+            "Maintain parliamentary confidence in the National Government.",
+            "Balance rearmament against fiscal and public resistance.",
+            "Avoid an unsupported continental commitment."
+          ]
+        }
+      },
+      {
+        "polityId": "polity:united-states",
+        "legitimacyBp": 7300,
+        "stabilityBp": 6500,
+        "unrestBp": 3000,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:united-states-roosevelt",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:united-states-roosevelt",
+          "headOfGovernmentCharacterId": "character:united-states-roosevelt",
+          "decisionAuthorityCharacterId": "character:united-states-roosevelt",
+          "rulingFactionId": "faction:united-states-new-deal-democrats",
+          "currentConstraints": [
+            "Sustain constitutional support for economic recovery.",
+            "Work within congressional and judicial limits.",
+            "Avoid binding European security commitments."
+          ]
+        }
+      }
+    ],
+    "factions": [
+      {
+        "factionId": "faction:austria-fatherland-front",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Vaterländische Front",
+          "ru": "Vaterländische Front"
+        },
+        "leaderCharacterId": "character:austria-schuschnigg",
+        "powerBp": 6000,
+        "supportBp": 6000,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7000,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Vaterländische Front",
+          "legitimacyBases": [
+            "Authored constitutional or governing authority at the snapshot date",
+            "Support of the ruling political organization"
+          ],
+          "governingPrinciples": [
+            "Preserve the governing order",
+            "Protect state sovereignty",
+            "Use bounded state capacity"
+          ],
+          "strategicPreferences": [
+            "Act through available diplomatic and material instruments",
+            "Maintain room for manoeuvre"
+          ],
+          "taboos": [
+            "Unforced loss of sovereign decision authority"
+          ],
+          "riskAttitude": "cautious"
+        }
+      },
+      {
+        "factionId": "faction:austria-institutional-opposition",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Institutional opposition",
+          "ru": "Institutional opposition"
+        },
+        "leaderCharacterId": "character:austria-starhemberg",
+        "powerBp": 2500,
+        "supportBp": 2500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "pacifist",
+        "ideology": "liberal",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:austria-social-opposition",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Social and labour opposition",
+          "ru": "Social and labour opposition"
+        },
+        "leaderCharacterId": "character:austria-labour-representative",
+        "powerBp": 1500,
+        "supportBp": 1500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:czechoslovakia-castle-coalition",
+        "polityId": "polity:czechoslovakia",
+        "displayName": {
+          "en": "Hradní koalice",
+          "ru": "Hradní koalice"
+        },
+        "leaderCharacterId": "character:czechoslovakia-malypetr",
+        "powerBp": 6000,
+        "supportBp": 6000,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "liberal",
+        "traditionalismBp": 3000,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Hradní koalice",
+          "legitimacyBases": [
+            "Authored constitutional or governing authority at the snapshot date",
+            "Support of the ruling political organization"
+          ],
+          "governingPrinciples": [
+            "Preserve the governing order",
+            "Protect state sovereignty",
+            "Use bounded state capacity"
+          ],
+          "strategicPreferences": [
+            "Act through available diplomatic and material instruments",
+            "Maintain room for manoeuvre"
+          ],
+          "taboos": [
+            "Unforced loss of sovereign decision authority"
+          ],
+          "riskAttitude": "cautious"
+        }
+      },
+      {
+        "factionId": "faction:czechoslovakia-institutional-opposition",
+        "polityId": "polity:czechoslovakia",
+        "displayName": {
+          "en": "Institutional opposition",
+          "ru": "Institutional opposition"
+        },
+        "leaderCharacterId": "character:czechoslovakia-benes",
+        "powerBp": 2500,
+        "supportBp": 2500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "pacifist",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:czechoslovakia-social-opposition",
+        "polityId": "polity:czechoslovakia",
+        "displayName": {
+          "en": "Social and labour opposition",
+          "ru": "Social and labour opposition"
+        },
+        "leaderCharacterId": "character:czechoslovakia-labour-representative",
+        "powerBp": 1500,
+        "supportBp": 1500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:france-institutional-opposition",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "Institutional opposition",
+          "ru": "Institutional opposition"
+        },
+        "leaderCharacterId": "character:france-laval",
+        "powerBp": 2500,
+        "supportBp": 2500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "pacifist",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:france-republican-centre",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "Alliance démocratique",
+          "ru": "Alliance démocratique"
+        },
+        "leaderCharacterId": "character:france-flandin",
+        "powerBp": 6000,
+        "supportBp": 6000,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "liberal",
+        "traditionalismBp": 3000,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Alliance démocratique",
+          "legitimacyBases": [
+            "Authored constitutional or governing authority at the snapshot date",
+            "Support of the ruling political organization"
+          ],
+          "governingPrinciples": [
+            "Preserve the governing order",
+            "Protect state sovereignty",
+            "Use bounded state capacity"
+          ],
+          "strategicPreferences": [
+            "Act through available diplomatic and material instruments",
+            "Maintain room for manoeuvre"
+          ],
+          "taboos": [
+            "Unforced loss of sovereign decision authority"
+          ],
+          "riskAttitude": "averse"
+        }
+      },
+      {
+        "factionId": "faction:france-social-opposition",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "Social and labour opposition",
+          "ru": "Social and labour opposition"
+        },
+        "leaderCharacterId": "character:france-labour-representative",
+        "powerBp": 1500,
+        "supportBp": 1500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:free-city-of-danzig-danzig-senate",
+        "polityId": "polity:free-city-of-danzig",
+        "displayName": {
+          "en": "Senat der Freien Stadt Danzig",
+          "ru": "Senat der Freien Stadt Danzig"
+        },
+        "leaderCharacterId": "character:free-city-of-danzig-greiser",
+        "powerBp": 6000,
+        "supportBp": 6000,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "nationalist",
+        "traditionalismBp": 7000,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Senat der Freien Stadt Danzig",
+          "legitimacyBases": [
+            "Authored constitutional or governing authority at the snapshot date",
+            "Support of the ruling political organization"
+          ],
+          "governingPrinciples": [
+            "Preserve the governing order",
+            "Protect state sovereignty",
+            "Use bounded state capacity"
+          ],
+          "strategicPreferences": [
+            "Act through available diplomatic and material instruments",
+            "Maintain room for manoeuvre"
+          ],
+          "taboos": [
+            "Unforced loss of sovereign decision authority"
+          ],
+          "riskAttitude": "cautious"
+        }
+      },
+      {
+        "factionId": "faction:free-city-of-danzig-institutional-opposition",
+        "polityId": "polity:free-city-of-danzig",
+        "displayName": {
+          "en": "Institutional opposition",
+          "ru": "Institutional opposition"
+        },
+        "leaderCharacterId": "character:free-city-of-danzig-rauschning",
+        "powerBp": 2500,
+        "supportBp": 2500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "pacifist",
+        "ideology": "liberal",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:free-city-of-danzig-social-opposition",
+        "polityId": "polity:free-city-of-danzig",
+        "displayName": {
+          "en": "Social and labour opposition",
+          "ru": "Social and labour opposition"
+        },
+        "leaderCharacterId": "character:free-city-of-danzig-labour-representative",
+        "powerBp": 1500,
+        "supportBp": 1500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:germany-institutional-opposition",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Institutional opposition",
+          "ru": "Institutional opposition"
+        },
+        "leaderCharacterId": "character:germany-goering",
+        "powerBp": 2500,
+        "supportBp": 2500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "pacifist",
+        "ideology": "liberal",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:germany-nsdap",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Nationalsozialistische Deutsche Arbeiterpartei",
+          "ru": "Nationalsozialistische Deutsche Arbeiterpartei"
+        },
+        "leaderCharacterId": "character:germany-hitler",
+        "powerBp": 6000,
+        "supportBp": 6000,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "nationalist",
+        "traditionalismBp": 7000,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Nationalsozialistische Deutsche Arbeiterpartei",
+          "legitimacyBases": [
+            "Authored constitutional or governing authority at the snapshot date",
+            "Support of the ruling political organization"
+          ],
+          "governingPrinciples": [
+            "Preserve the governing order",
+            "Protect state sovereignty",
+            "Use bounded state capacity"
+          ],
+          "strategicPreferences": [
+            "Act through available diplomatic and material instruments",
+            "Maintain room for manoeuvre"
+          ],
+          "taboos": [
+            "Unforced loss of sovereign decision authority"
+          ],
+          "riskAttitude": "risk-seeking"
+        }
+      },
+      {
+        "factionId": "faction:germany-social-opposition",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Social and labour opposition",
+          "ru": "Social and labour opposition"
+        },
+        "leaderCharacterId": "character:germany-labour-representative",
+        "powerBp": 1500,
+        "supportBp": 1500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:italy-institutional-opposition",
+        "polityId": "polity:italy",
+        "displayName": {
+          "en": "Institutional opposition",
+          "ru": "Institutional opposition"
+        },
+        "leaderCharacterId": "character:italy-balbo",
+        "powerBp": 2500,
+        "supportBp": 2500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "pacifist",
+        "ideology": "liberal",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:italy-pni",
+        "polityId": "polity:italy",
+        "displayName": {
+          "en": "Partito Nazionale Fascista",
+          "ru": "Partito Nazionale Fascista"
+        },
+        "leaderCharacterId": "character:italy-mussolini",
+        "powerBp": 6000,
+        "supportBp": 6000,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "nationalist",
+        "traditionalismBp": 7000,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Partito Nazionale Fascista",
+          "legitimacyBases": [
+            "Authored constitutional or governing authority at the snapshot date",
+            "Support of the ruling political organization"
+          ],
+          "governingPrinciples": [
+            "Preserve the governing order",
+            "Protect state sovereignty",
+            "Use bounded state capacity"
+          ],
+          "strategicPreferences": [
+            "Act through available diplomatic and material instruments",
+            "Maintain room for manoeuvre"
+          ],
+          "taboos": [
+            "Unforced loss of sovereign decision authority"
+          ],
+          "riskAttitude": "assertive"
+        }
+      },
+      {
+        "factionId": "faction:italy-social-opposition",
+        "polityId": "polity:italy",
+        "displayName": {
+          "en": "Social and labour opposition",
+          "ru": "Social and labour opposition"
+        },
+        "leaderCharacterId": "character:italy-labour-representative",
+        "powerBp": 1500,
+        "supportBp": 1500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:poland-national-opposition",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Obóz narodowy",
+          "ru": "Obóz narodowy"
+        },
+        "leaderCharacterId": "character:poland-dmowski",
+        "powerBp": 1800,
+        "supportBp": 4300,
+        "idealTaxBurdenBp": 10300,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "hawk",
+        "ideology": "nationalist",
+        "traditionalismBp": 7600,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:poland-presidential-circle",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Krąg prezydencki",
+          "ru": "Krąg prezydencki"
+        },
+        "leaderCharacterId": "character:poland-moscicki",
+        "powerBp": 1900,
+        "supportBp": 5000,
+        "idealTaxBurdenBp": 9400,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "traditionalist",
+        "traditionalismBp": 6500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:poland-sanacja",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Obóz sanacyjny",
+          "ru": "Obóz sanacyjny"
+        },
+        "leaderCharacterId": "character:poland-pilsudski",
+        "powerBp": 4800,
+        "supportBp": 5600,
+        "idealTaxBurdenBp": 9800,
+        "preferredBudgetCategory": "military",
+        "foreignPolicy": "status-quo",
+        "ideology": "nationalist",
+        "traditionalismBp": 5800,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Obóz sanacyjny",
+          "legitimacyBases": [
+            "Control of the executive after the May Coup",
+            "Piłsudski's military and independence prestige",
+            "Formal authority of the President and cabinet"
+          ],
+          "governingPrinciples": [
+            "Strengthen the state executive",
+            "Preserve an independent Polish state",
+            "Keep military and foreign policy under trusted leadership"
+          ],
+          "strategicPreferences": [
+            "Balance Germany and the Soviet Union",
+            "Retain the French security commitment",
+            "Prefer bilateral room for manoeuvre over dependence"
+          ],
+          "taboos": [
+            "Submission to German or Soviet domination",
+            "Unforced abandonment of sovereign territory"
+          ],
+          "riskAttitude": "cautious"
+        }
+      },
+      {
+        "factionId": "faction:poland-socialist-opposition",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Polska Partia Socjalistyczna",
+          "ru": "Polska Partia Socjalistyczna"
+        },
+        "leaderCharacterId": "character:poland-niedzialkowski",
+        "powerBp": 1500,
+        "supportBp": 4000,
+        "idealTaxBurdenBp": 11600,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "status-quo",
+        "ideology": "socialist",
+        "traditionalismBp": 2200,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:saargebiet-institutional-opposition",
+        "polityId": "polity:saargebiet",
+        "displayName": {
+          "en": "Institutional opposition",
+          "ru": "Institutional opposition"
+        },
+        "leaderCharacterId": "character:saargebiet-hoffmann",
+        "powerBp": 2500,
+        "supportBp": 2500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "pacifist",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:saargebiet-league-commission",
+        "polityId": "polity:saargebiet",
+        "displayName": {
+          "en": "Regierungskommission des Saargebietes",
+          "ru": "Regierungskommission des Saargebietes"
+        },
+        "leaderCharacterId": "character:saargebiet-knox",
+        "powerBp": 6000,
+        "supportBp": 6000,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "liberal",
+        "traditionalismBp": 3000,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Regierungskommission des Saargebietes",
+          "legitimacyBases": [
+            "Authored constitutional or governing authority at the snapshot date",
+            "Support of the ruling political organization"
+          ],
+          "governingPrinciples": [
+            "Preserve the governing order",
+            "Protect state sovereignty",
+            "Use bounded state capacity"
+          ],
+          "strategicPreferences": [
+            "Act through available diplomatic and material instruments",
+            "Maintain room for manoeuvre"
+          ],
+          "taboos": [
+            "Unforced loss of sovereign decision authority"
+          ],
+          "riskAttitude": "averse"
+        }
+      },
+      {
+        "factionId": "faction:saargebiet-social-opposition",
+        "polityId": "polity:saargebiet",
+        "displayName": {
+          "en": "Social and labour opposition",
+          "ru": "Social and labour opposition"
+        },
+        "leaderCharacterId": "character:saargebiet-labour-representative",
+        "powerBp": 1500,
+        "supportBp": 1500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:soviet-union-institutional-opposition",
+        "polityId": "polity:soviet-union",
+        "displayName": {
+          "en": "Institutional opposition",
+          "ru": "Institutional opposition"
+        },
+        "leaderCharacterId": "character:soviet-union-stalin",
+        "powerBp": 2500,
+        "supportBp": 2500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "pacifist",
+        "ideology": "liberal",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:soviet-union-social-opposition",
+        "polityId": "polity:soviet-union",
+        "displayName": {
+          "en": "Social and labour opposition",
+          "ru": "Social and labour opposition"
+        },
+        "leaderCharacterId": "character:soviet-union-labour-representative",
+        "powerBp": 1500,
+        "supportBp": 1500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:soviet-union-vkpb",
+        "polityId": "polity:soviet-union",
+        "displayName": {
+          "en": "Всесоюзная коммунистическая партия (большевиков)",
+          "ru": "Всесоюзная коммунистическая партия (большевиков)"
+        },
+        "leaderCharacterId": "character:soviet-union-molotov",
+        "powerBp": 6000,
+        "supportBp": 6000,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Всесоюзная коммунистическая партия (большевиков)",
+          "legitimacyBases": [
+            "Authored constitutional or governing authority at the snapshot date",
+            "Support of the ruling political organization"
+          ],
+          "governingPrinciples": [
+            "Preserve the governing order",
+            "Protect state sovereignty",
+            "Use bounded state capacity"
+          ],
+          "strategicPreferences": [
+            "Act through available diplomatic and material instruments",
+            "Maintain room for manoeuvre"
+          ],
+          "taboos": [
+            "Unforced loss of sovereign decision authority"
+          ],
+          "riskAttitude": "assertive"
+        }
+      },
+      {
+        "factionId": "faction:united-kingdom-institutional-opposition",
+        "polityId": "polity:united-kingdom",
+        "displayName": {
+          "en": "Institutional opposition",
+          "ru": "Institutional opposition"
+        },
+        "leaderCharacterId": "character:united-kingdom-baldwin",
+        "powerBp": 2500,
+        "supportBp": 2500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "pacifist",
+        "ideology": "liberal",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:united-kingdom-national-government",
+        "polityId": "polity:united-kingdom",
+        "displayName": {
+          "en": "National Government",
+          "ru": "National Government"
+        },
+        "leaderCharacterId": "character:united-kingdom-macdonald",
+        "powerBp": 6000,
+        "supportBp": 6000,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7000,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "National Government",
+          "legitimacyBases": [
+            "Authored constitutional or governing authority at the snapshot date",
+            "Support of the ruling political organization"
+          ],
+          "governingPrinciples": [
+            "Preserve the governing order",
+            "Protect state sovereignty",
+            "Use bounded state capacity"
+          ],
+          "strategicPreferences": [
+            "Act through available diplomatic and material instruments",
+            "Maintain room for manoeuvre"
+          ],
+          "taboos": [
+            "Unforced loss of sovereign decision authority"
+          ],
+          "riskAttitude": "averse"
+        }
+      },
+      {
+        "factionId": "faction:united-kingdom-social-opposition",
+        "polityId": "polity:united-kingdom",
+        "displayName": {
+          "en": "Social and labour opposition",
+          "ru": "Social and labour opposition"
+        },
+        "leaderCharacterId": "character:united-kingdom-labour-representative",
+        "powerBp": 1500,
+        "supportBp": 1500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:united-states-institutional-opposition",
+        "polityId": "polity:united-states",
+        "displayName": {
+          "en": "Institutional opposition",
+          "ru": "Institutional opposition"
+        },
+        "leaderCharacterId": "character:united-states-garner",
+        "powerBp": 2500,
+        "supportBp": 2500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "pacifist",
+        "ideology": "traditionalist",
+        "traditionalismBp": 7000,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:united-states-new-deal-democrats",
+        "polityId": "polity:united-states",
+        "displayName": {
+          "en": "Democratic Party — New Deal coalition",
+          "ru": "Democratic Party — New Deal coalition"
+        },
+        "leaderCharacterId": "character:united-states-roosevelt",
+        "powerBp": 6000,
+        "supportBp": 6000,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "liberal",
+        "traditionalismBp": 3000,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Democratic Party — New Deal coalition",
+          "legitimacyBases": [
+            "Authored constitutional or governing authority at the snapshot date",
+            "Support of the ruling political organization"
+          ],
+          "governingPrinciples": [
+            "Preserve the governing order",
+            "Protect state sovereignty",
+            "Use bounded state capacity"
+          ],
+          "strategicPreferences": [
+            "Act through available diplomatic and material instruments",
+            "Maintain room for manoeuvre"
+          ],
+          "taboos": [
+            "Unforced loss of sovereign decision authority"
+          ],
+          "riskAttitude": "balanced"
+        }
+      },
+      {
+        "factionId": "faction:united-states-social-opposition",
+        "polityId": "polity:united-states",
+        "displayName": {
+          "en": "Social and labour opposition",
+          "ru": "Social and labour opposition"
+        },
+        "leaderCharacterId": "character:united-states-labour-representative",
+        "powerBp": 1500,
+        "supportBp": 1500,
+        "idealTaxBurdenBp": 10000,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "pacifist",
+        "ideology": "socialist",
+        "traditionalismBp": 3000,
+        "escalation": "calm"
+      }
+    ],
+    "characters": [
+      {
+        "characterId": "character:austria-labour-representative",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Wilhelm Miklas era labour representative",
+          "ru": "Wilhelm Miklas era labour representative"
+        },
+        "origin": "authored",
+        "factionId": "faction:austria-social-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 5600,
+        "ambitionBp": 4500,
+        "relations": [],
+        "leaderCard": {
+          "historical": false,
+          "factCard": [
+            "Composite scenario representative for a bounded secondary political faction."
+          ],
+          "knowledgePolicy": "scenario-only",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:austrian-presidency-miklas"
+          ]
+        }
+      },
+      {
+        "characterId": "character:austria-miklas",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Wilhelm Miklas",
+          "ru": "Wilhelm Miklas"
+        },
+        "origin": "authored",
+        "factionId": "faction:austria-fatherland-front",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 5200,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Wilhelm Miklas held the office of head of state at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:austrian-presidency-miklas"
+          ]
+        }
+      },
+      {
+        "characterId": "character:austria-schuschnigg",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Kurt Schuschnigg",
+          "ru": "Kurt Schuschnigg"
+        },
+        "origin": "authored",
+        "factionId": "faction:austria-fatherland-front",
+        "office": "head-of-government",
+        "startingTraits": [
+          "administrator",
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7000,
+        "ambitionBp": 6500,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Kurt Schuschnigg held the office of head of government at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:austrian-presidency-miklas"
+          ]
+        }
+      },
+      {
+        "characterId": "character:austria-starhemberg",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Ernst Rüdiger Starhemberg",
+          "ru": "Ernst Rüdiger Starhemberg"
+        },
+        "origin": "authored",
+        "factionId": "faction:austria-institutional-opposition",
+        "office": null,
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5800,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Ernst Rüdiger Starhemberg held a significant political leadership role at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:austrian-presidency-miklas"
+          ]
+        }
+      },
+      {
+        "characterId": "character:czechoslovakia-benes",
+        "polityId": "polity:czechoslovakia",
+        "displayName": {
+          "en": "Edvard Beneš",
+          "ru": "Edvard Beneš"
+        },
+        "origin": "authored",
+        "factionId": "faction:czechoslovakia-institutional-opposition",
+        "office": null,
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5800,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Edvard Beneš held a significant political leadership role at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:prague-castle-masaryk"
+          ]
+        }
+      },
+      {
+        "characterId": "character:czechoslovakia-labour-representative",
+        "polityId": "polity:czechoslovakia",
+        "displayName": {
+          "en": "Tomáš Garrigue Masaryk era labour representative",
+          "ru": "Tomáš Garrigue Masaryk era labour representative"
+        },
+        "origin": "authored",
+        "factionId": "faction:czechoslovakia-social-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 5600,
+        "ambitionBp": 4500,
+        "relations": [],
+        "leaderCard": {
+          "historical": false,
+          "factCard": [
+            "Composite scenario representative for a bounded secondary political faction."
+          ],
+          "knowledgePolicy": "scenario-only",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:prague-castle-masaryk"
+          ]
+        }
+      },
+      {
+        "characterId": "character:czechoslovakia-malypetr",
+        "polityId": "polity:czechoslovakia",
+        "displayName": {
+          "en": "Jan Malypetr",
+          "ru": "Jan Malypetr"
+        },
+        "origin": "authored",
+        "factionId": "faction:czechoslovakia-castle-coalition",
+        "office": "head-of-government",
+        "startingTraits": [
+          "administrator",
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7000,
+        "ambitionBp": 6500,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Jan Malypetr held the office of head of government at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:czech-government-malypetr"
+          ]
+        }
+      },
+      {
+        "characterId": "character:czechoslovakia-masaryk",
+        "polityId": "polity:czechoslovakia",
+        "displayName": {
+          "en": "Tomáš Garrigue Masaryk",
+          "ru": "Tomáš Garrigue Masaryk"
+        },
+        "origin": "authored",
+        "factionId": "faction:czechoslovakia-castle-coalition",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 5200,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Tomáš Garrigue Masaryk held the office of head of state at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:prague-castle-masaryk"
+          ]
+        }
+      },
+      {
+        "characterId": "character:france-flandin",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "Pierre-Étienne Flandin",
+          "ru": "Pierre-Étienne Flandin"
+        },
+        "origin": "authored",
+        "factionId": "faction:france-republican-centre",
+        "office": "head-of-government",
+        "startingTraits": [
+          "administrator",
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7000,
+        "ambitionBp": 6500,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Pierre-Étienne Flandin held the office of head of government at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:french-assembly-flandin"
+          ]
+        }
+      },
+      {
+        "characterId": "character:france-labour-representative",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "Albert Lebrun era labour representative",
+          "ru": "Albert Lebrun era labour representative"
+        },
+        "origin": "authored",
+        "factionId": "faction:france-social-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 5600,
+        "ambitionBp": 4500,
+        "relations": [],
+        "leaderCard": {
+          "historical": false,
+          "factCard": [
+            "Composite scenario representative for a bounded secondary political faction."
+          ],
+          "knowledgePolicy": "scenario-only",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:elysee-lebrun"
+          ]
+        }
+      },
+      {
+        "characterId": "character:france-laval",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "Pierre Laval",
+          "ru": "Pierre Laval"
+        },
+        "origin": "authored",
+        "factionId": "faction:france-institutional-opposition",
+        "office": null,
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5800,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Pierre Laval held a significant political leadership role at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:elysee-lebrun"
+          ]
+        }
+      },
+      {
+        "characterId": "character:france-lebrun",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "Albert Lebrun",
+          "ru": "Albert Lebrun"
+        },
+        "origin": "authored",
+        "factionId": "faction:france-republican-centre",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 5200,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Albert Lebrun held the office of head of state at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:elysee-lebrun"
+          ]
+        }
+      },
+      {
+        "characterId": "character:free-city-of-danzig-greiser",
+        "polityId": "polity:free-city-of-danzig",
+        "displayName": {
+          "en": "Arthur Greiser",
+          "ru": "Arthur Greiser"
+        },
+        "origin": "authored",
+        "factionId": "faction:free-city-of-danzig-danzig-senate",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 5200,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Arthur Greiser held the office of head of state at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:league-yearbook"
+          ]
+        }
+      },
+      {
+        "characterId": "character:free-city-of-danzig-labour-representative",
+        "polityId": "polity:free-city-of-danzig",
+        "displayName": {
+          "en": "Arthur Greiser era labour representative",
+          "ru": "Arthur Greiser era labour representative"
+        },
+        "origin": "authored",
+        "factionId": "faction:free-city-of-danzig-social-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 5600,
+        "ambitionBp": 4500,
+        "relations": [],
+        "leaderCard": {
+          "historical": false,
+          "factCard": [
+            "Composite scenario representative for a bounded secondary political faction."
+          ],
+          "knowledgePolicy": "scenario-only",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:league-yearbook"
+          ]
+        }
+      },
+      {
+        "characterId": "character:free-city-of-danzig-rauschning",
+        "polityId": "polity:free-city-of-danzig",
+        "displayName": {
+          "en": "Hermann Rauschning",
+          "ru": "Hermann Rauschning"
+        },
+        "origin": "authored",
+        "factionId": "faction:free-city-of-danzig-institutional-opposition",
+        "office": null,
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5800,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Hermann Rauschning held a significant political leadership role at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:league-yearbook"
+          ]
+        }
+      },
+      {
+        "characterId": "character:germany-goering",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Hermann Göring",
+          "ru": "Hermann Göring"
+        },
+        "origin": "authored",
+        "factionId": "faction:germany-institutional-opposition",
+        "office": null,
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5800,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Hermann Göring held a significant political leadership role at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:ushmm-hitler-government"
+          ]
+        }
+      },
+      {
+        "characterId": "character:germany-hitler",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Adolf Hitler",
+          "ru": "Adolf Hitler"
+        },
+        "origin": "authored",
+        "factionId": "faction:germany-nsdap",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 5200,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Adolf Hitler held the office of head of state at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:ushmm-hitler-government"
+          ]
+        }
+      },
+      {
+        "characterId": "character:germany-labour-representative",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Adolf Hitler era labour representative",
+          "ru": "Adolf Hitler era labour representative"
+        },
+        "origin": "authored",
+        "factionId": "faction:germany-social-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 5600,
+        "ambitionBp": 4500,
+        "relations": [],
+        "leaderCard": {
+          "historical": false,
+          "factCard": [
+            "Composite scenario representative for a bounded secondary political faction."
+          ],
+          "knowledgePolicy": "scenario-only",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:ushmm-hitler-government"
+          ]
+        }
+      },
+      {
+        "characterId": "character:italy-balbo",
+        "polityId": "polity:italy",
+        "displayName": {
+          "en": "Italo Balbo",
+          "ru": "Italo Balbo"
+        },
+        "origin": "authored",
+        "factionId": "faction:italy-institutional-opposition",
+        "office": null,
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5800,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Italo Balbo held a significant political leadership role at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:quirinale-italian-monarchy"
+          ]
+        }
+      },
+      {
+        "characterId": "character:italy-labour-representative",
+        "polityId": "polity:italy",
+        "displayName": {
+          "en": "Vittorio Emanuele III era labour representative",
+          "ru": "Vittorio Emanuele III era labour representative"
+        },
+        "origin": "authored",
+        "factionId": "faction:italy-social-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 5600,
+        "ambitionBp": 4500,
+        "relations": [],
+        "leaderCard": {
+          "historical": false,
+          "factCard": [
+            "Composite scenario representative for a bounded secondary political faction."
+          ],
+          "knowledgePolicy": "scenario-only",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:quirinale-italian-monarchy"
+          ]
+        }
+      },
+      {
+        "characterId": "character:italy-mussolini",
+        "polityId": "polity:italy",
+        "displayName": {
+          "en": "Benito Mussolini",
+          "ru": "Benito Mussolini"
+        },
+        "origin": "authored",
+        "factionId": "faction:italy-pni",
+        "office": "head-of-government",
+        "startingTraits": [
+          "administrator",
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7000,
+        "ambitionBp": 6500,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Benito Mussolini held the office of head of government at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:italian-senate-mussolini-government"
+          ]
+        }
+      },
+      {
+        "characterId": "character:italy-victor-emmanuel-iii",
+        "polityId": "polity:italy",
+        "displayName": {
+          "en": "Vittorio Emanuele III",
+          "ru": "Vittorio Emanuele III"
+        },
+        "origin": "authored",
+        "factionId": "faction:italy-pni",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 5200,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Vittorio Emanuele III held the office of head of state at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:quirinale-italian-monarchy"
+          ]
+        }
+      },
+      {
+        "characterId": "character:poland-dmowski",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Roman Dmowski",
+          "ru": "Roman Dmowski"
+        },
+        "origin": "authored",
+        "factionId": "faction:poland-national-opposition",
+        "office": null,
+        "startingTraits": [
+          "traditionalist",
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5900,
+        "relations": [
+          {
+            "characterId": "character:poland-pilsudski",
+            "sentiment": "rival"
+          }
+        ],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Principal historical figure of National Democracy and an opponent of Piłsudski's political camp."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:polish-presidency-second-republic"
+          ]
+        }
+      },
+      {
+        "characterId": "character:poland-kozlowski",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Leon Kozłowski",
+          "ru": "Leon Kozłowski"
+        },
+        "origin": "authored",
+        "factionId": "faction:poland-sanacja",
+        "office": "head-of-government",
+        "startingTraits": [
+          "administrator",
+          "loyalist"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6900,
+        "ambitionBp": 5000,
+        "relations": [
+          {
+            "characterId": "character:poland-pilsudski",
+            "sentiment": "ally"
+          },
+          {
+            "characterId": "character:poland-moscicki",
+            "sentiment": "ally"
+          }
+        ],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Prime Minister at the 1935-01-01 scenario snapshot.",
+            "Led the cabinet sworn in under President Mościcki in May 1934."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:polish-national-archives-kozlowski-cabinet"
+          ]
+        }
+      },
+      {
+        "characterId": "character:poland-moscicki",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Ignacy Mościcki",
+          "ru": "Ignacy Mościcki"
+        },
+        "origin": "authored",
+        "factionId": "faction:poland-presidential-circle",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator",
+          "loyalist"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7400,
+        "ambitionBp": 4800,
+        "relations": [
+          {
+            "characterId": "character:poland-pilsudski",
+            "sentiment": "ally"
+          },
+          {
+            "characterId": "character:poland-kozlowski",
+            "sentiment": "ally"
+          }
+        ],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "President of the Republic from 1926 to 1939.",
+            "Selected for the presidency after Piłsudski declined the office following the May Coup."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:polish-presidency-second-republic"
+          ]
+        }
+      },
+      {
+        "characterId": "character:poland-niedzialkowski",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Mieczysław Niedziałkowski",
+          "ru": "Mieczysław Niedziałkowski"
+        },
+        "origin": "authored",
+        "factionId": "faction:poland-socialist-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer",
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6500,
+        "ambitionBp": 5200,
+        "relations": [
+          {
+            "characterId": "character:poland-pilsudski",
+            "sentiment": "rival"
+          }
+        ],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Leading PPS activist, parliamentarian and editor of the party newspaper Robotnik."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:ipn-niedzialkowski"
+          ]
+        }
+      },
+      {
+        "characterId": "character:poland-pilsudski",
+        "polityId": "polity:poland",
+        "displayName": {
+          "en": "Józef Piłsudski",
+          "ru": "Józef Piłsudski"
+        },
+        "origin": "authored",
+        "factionId": "faction:poland-sanacja",
+        "office": "military",
+        "startingTraits": [
+          "commander",
+          "traditionalist"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7600,
+        "ambitionBp": 7200,
+        "relations": [
+          {
+            "characterId": "character:poland-moscicki",
+            "sentiment": "ally"
+          },
+          {
+            "characterId": "character:poland-kozlowski",
+            "sentiment": "ally"
+          },
+          {
+            "characterId": "character:poland-dmowski",
+            "sentiment": "rival"
+          }
+        ],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Minister of Military Affairs and Inspector General through 1935.",
+            "Held exceptional authority over military and foreign-policy decisions.",
+            "Pursued room for manoeuvre between Germany and the Soviet Union while retaining concern about both."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:pilsudski-museum-marshal"
+          ]
+        }
+      },
+      {
+        "characterId": "character:saargebiet-hoffmann",
+        "polityId": "polity:saargebiet",
+        "displayName": {
+          "en": "Johannes Hoffmann",
+          "ru": "Johannes Hoffmann"
+        },
+        "origin": "authored",
+        "factionId": "faction:saargebiet-institutional-opposition",
+        "office": null,
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5800,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Johannes Hoffmann held a significant political leadership role at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:league-yearbook"
+          ]
+        }
+      },
+      {
+        "characterId": "character:saargebiet-knox",
+        "polityId": "polity:saargebiet",
+        "displayName": {
+          "en": "Geoffrey Knox",
+          "ru": "Geoffrey Knox"
+        },
+        "origin": "authored",
+        "factionId": "faction:saargebiet-league-commission",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 5200,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Geoffrey Knox held the office of head of state at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:league-yearbook"
+          ]
+        }
+      },
+      {
+        "characterId": "character:saargebiet-labour-representative",
+        "polityId": "polity:saargebiet",
+        "displayName": {
+          "en": "Geoffrey Knox era labour representative",
+          "ru": "Geoffrey Knox era labour representative"
+        },
+        "origin": "authored",
+        "factionId": "faction:saargebiet-social-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 5600,
+        "ambitionBp": 4500,
+        "relations": [],
+        "leaderCard": {
+          "historical": false,
+          "factCard": [
+            "Composite scenario representative for a bounded secondary political faction."
+          ],
+          "knowledgePolicy": "scenario-only",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:league-yearbook"
+          ]
+        }
+      },
+      {
+        "characterId": "character:soviet-union-kalinin",
+        "polityId": "polity:soviet-union",
+        "displayName": {
+          "en": "Mikhail Kalinin",
+          "ru": "Mikhail Kalinin"
+        },
+        "origin": "authored",
+        "factionId": "faction:soviet-union-vkpb",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 5200,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Mikhail Kalinin held the office of head of state at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:frus-soviet-leadership"
+          ]
+        }
+      },
+      {
+        "characterId": "character:soviet-union-labour-representative",
+        "polityId": "polity:soviet-union",
+        "displayName": {
+          "en": "Mikhail Kalinin era labour representative",
+          "ru": "Mikhail Kalinin era labour representative"
+        },
+        "origin": "authored",
+        "factionId": "faction:soviet-union-social-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 5600,
+        "ambitionBp": 4500,
+        "relations": [],
+        "leaderCard": {
+          "historical": false,
+          "factCard": [
+            "Composite scenario representative for a bounded secondary political faction."
+          ],
+          "knowledgePolicy": "scenario-only",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:frus-soviet-leadership"
+          ]
+        }
+      },
+      {
+        "characterId": "character:soviet-union-molotov",
+        "polityId": "polity:soviet-union",
+        "displayName": {
+          "en": "Vyacheslav Molotov",
+          "ru": "Vyacheslav Molotov"
+        },
+        "origin": "authored",
+        "factionId": "faction:soviet-union-vkpb",
+        "office": "head-of-government",
+        "startingTraits": [
+          "administrator",
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7000,
+        "ambitionBp": 6500,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Vyacheslav Molotov held the office of head of government at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:frus-soviet-leadership"
+          ]
+        }
+      },
+      {
+        "characterId": "character:soviet-union-stalin",
+        "polityId": "polity:soviet-union",
+        "displayName": {
+          "en": "Joseph Stalin",
+          "ru": "Joseph Stalin"
+        },
+        "origin": "authored",
+        "factionId": "faction:soviet-union-institutional-opposition",
+        "office": null,
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5800,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Joseph Stalin held a significant political leadership role at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:frus-soviet-leadership"
+          ]
+        }
+      },
+      {
+        "characterId": "character:united-kingdom-baldwin",
+        "polityId": "polity:united-kingdom",
+        "displayName": {
+          "en": "Stanley Baldwin",
+          "ru": "Stanley Baldwin"
+        },
+        "origin": "authored",
+        "factionId": "faction:united-kingdom-institutional-opposition",
+        "office": null,
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5800,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Stanley Baldwin held a significant political leadership role at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:uk-prime-ministers-macdonald"
+          ]
+        }
+      },
+      {
+        "characterId": "character:united-kingdom-george-v",
+        "polityId": "polity:united-kingdom",
+        "displayName": {
+          "en": "George V",
+          "ru": "George V"
+        },
+        "origin": "authored",
+        "factionId": "faction:united-kingdom-national-government",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 5200,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "George V held the office of head of state at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:uk-prime-ministers-macdonald"
+          ]
+        }
+      },
+      {
+        "characterId": "character:united-kingdom-labour-representative",
+        "polityId": "polity:united-kingdom",
+        "displayName": {
+          "en": "George V era labour representative",
+          "ru": "George V era labour representative"
+        },
+        "origin": "authored",
+        "factionId": "faction:united-kingdom-social-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 5600,
+        "ambitionBp": 4500,
+        "relations": [],
+        "leaderCard": {
+          "historical": false,
+          "factCard": [
+            "Composite scenario representative for a bounded secondary political faction."
+          ],
+          "knowledgePolicy": "scenario-only",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:uk-prime-ministers-macdonald"
+          ]
+        }
+      },
+      {
+        "characterId": "character:united-kingdom-macdonald",
+        "polityId": "polity:united-kingdom",
+        "displayName": {
+          "en": "Ramsay MacDonald",
+          "ru": "Ramsay MacDonald"
+        },
+        "origin": "authored",
+        "factionId": "faction:united-kingdom-national-government",
+        "office": "head-of-government",
+        "startingTraits": [
+          "administrator",
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7000,
+        "ambitionBp": 6500,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Ramsay MacDonald held the office of head of government at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:uk-prime-ministers-macdonald"
+          ]
+        }
+      },
+      {
+        "characterId": "character:united-states-garner",
+        "polityId": "polity:united-states",
+        "displayName": {
+          "en": "John Nance Garner",
+          "ru": "John Nance Garner"
+        },
+        "origin": "authored",
+        "factionId": "faction:united-states-institutional-opposition",
+        "office": null,
+        "startingTraits": [
+          "diplomat"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5800,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "John Nance Garner held a significant political leadership role at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:fdr-library-biography"
+          ]
+        }
+      },
+      {
+        "characterId": "character:united-states-labour-representative",
+        "polityId": "polity:united-states",
+        "displayName": {
+          "en": "Franklin D. Roosevelt era labour representative",
+          "ru": "Franklin D. Roosevelt era labour representative"
+        },
+        "origin": "authored",
+        "factionId": "faction:united-states-social-opposition",
+        "office": null,
+        "startingTraits": [
+          "reformer"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 5600,
+        "ambitionBp": 4500,
+        "relations": [],
+        "leaderCard": {
+          "historical": false,
+          "factCard": [
+            "Composite scenario representative for a bounded secondary political faction."
+          ],
+          "knowledgePolicy": "scenario-only",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:fdr-library-biography"
+          ]
+        }
+      },
+      {
+        "characterId": "character:united-states-roosevelt",
+        "polityId": "polity:united-states",
+        "displayName": {
+          "en": "Franklin D. Roosevelt",
+          "ru": "Franklin D. Roosevelt"
+        },
+        "origin": "authored",
+        "factionId": "faction:united-states-new-deal-democrats",
+        "office": "ruler",
+        "startingTraits": [
+          "administrator"
+        ],
+        "experienceTraits": [],
+        "loyaltyBp": 7200,
+        "ambitionBp": 5200,
+        "relations": [],
+        "leaderCard": {
+          "historical": true,
+          "factCard": [
+            "Franklin D. Roosevelt held the office of head of state at the 1935-01-01 scenario snapshot.",
+            "Knowledge is bounded to this authored card and information available before the scenario date."
+          ],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": [
+            "source:europe-1935-benchmark:fdr-library-biography"
+          ]
+        }
+      }
+    ]
+  }
+}

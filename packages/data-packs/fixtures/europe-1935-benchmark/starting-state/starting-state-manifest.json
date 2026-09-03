@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "open-historia-starting-state-manifest/1",
+  "status": "complete-pending-owner-review",
+  "scenarioId": "scenario:europe-1935-benchmark",
+  "effectiveAt": "1935-01-01",
+  "modules": [
+    "armedForces",
+    "budget",
+    "campaign",
+    "combat",
+    "diplomacy",
+    "finance",
+    "intelligence",
+    "politics",
+    "projects",
+    "shortages",
+    "societyAndIdentity",
+    "technology",
+    "trade",
+    "unrest"
+  ],
+  "polityCount": 11,
+  "regionCount": 115,
+  "projectionChecksum": "sha256:dd3c307e4d39703a5245be4229a7c143527a4e16f867903e15f418e9c0630a63",
+  "firstMonthChecksum": "sha256:209d64e8a4e25fac211aa5343f276f4da1f3fa7fb4c19e5f1fad6cff9b09d9a1",
+  "provenanceRows": 565,
+  "artifacts": {
+    "engineScenario": "sha256:2023b55dc201715d936d2b7a5f423311488e1282503d8f06781928e851e7d4c8",
+    "authoring": "sha256:da7278852c2344216a1bb032cb91eb5b87ebdb388fe2e05bac948e312f80c4aa",
+    "sources": "sha256:ccd63764f9766b367a402372f5257363f01e88a074a99975e403d6f933ccb213",
+    "politicsBundle": "sha256:9037fb13d3e24cf8089cf56eabc11c0b6b99107725b7ca4cd1258ef0da6bbe3b"
+  }
+}
