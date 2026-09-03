@@ -31,7 +31,9 @@ test('production Gate 0 mock freezes twelve single-actor V4 packages without mod
     assert.equal(brief.schemaVersion, 'open-historia-strategic-brief/4');
     assert.equal(brief.promptContract, 'StrategicBriefV4+StrategicDecisionV3');
     assert.equal(brief.actor.id, probe.polityId);
-    assert.equal(schema.properties.polityId.type, 'string');
+    assert.deepEqual(schema.properties.polityId.enum, [probe.polityId]);
+    assert.deepEqual(schema.properties.revision.enum, [brief.revision]);
+    assert.ok(brief.inputTokenCount <= 8000);
     assert.match(prompt, /\[CANDIDATE_AUDIT\]/);
     assert.match(prompt, /\[FROZEN_CHOICES\]/);
     assert.equal(validation.resolution.status, 'accepted');

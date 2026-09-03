@@ -4,6 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { countTokens } from 'gpt-tokenizer';
 import {
   initState, parseScenario, runTurn, stateChecksum,
 } from '../packages/engine/dist/index.js';
@@ -63,7 +64,27 @@ const commandBase = (state, actorPolityId, suffix) => ({
   commandId: `94000000-0000-4000-8000-${String(suffix).padStart(12, '0')}`,
   actorPolityId, expectedRevision: state.revision, effectiveMonth: state.month,
 });
-const tokenCount = (text) => Math.ceil(Buffer.byteLength(text, 'utf8') / 4);
+const tokenCount = (text) => countTokens(text);
+
+const schemaForBrief = (brief) => {
+  const schema = strategicDecisionV3JsonSchema();
+  const choiceIds = brief.choices.map((entry) => entry.choiceId);
+  const evidenceIds = [...new Set([
+    ...brief.choices.map((entry) => entry.evidenceId),
+    ...brief.triggers.flatMap((entry) => [entry.triggerId, ...entry.evidenceIds]),
+    ...brief.ownIntelligence.map((entry) => entry.evidenceId),
+  ])];
+  schema.properties.polityId = { type: 'string', enum: [brief.actor.id] };
+  schema.properties.revision = { type: 'string', enum: [brief.revision] };
+  schema.properties.selectedChoices.items.properties.choiceId = { type: 'string', enum: choiceIds };
+  schema.properties.selectedChoices.items.properties.evidenceIds.items = { type: 'string', enum: evidenceIds };
+  schema.properties.rejectedChoices.items.properties.choiceId = { type: 'string', enum: choiceIds };
+  if (brief.triggers.length) schema.properties.triggerCoverage.items.properties.triggerId = {
+    type: 'string', enum: brief.triggers.map((entry) => entry.triggerId),
+  };
+  schema.properties.triggerCoverage.items.properties.choiceIds.items = { type: 'string', enum: choiceIds };
+  return schema;
+};
 
 const loadApprovedState = () => {
   const starting = readJson(path.join(FIXTURE, 'starting-state/starting-state-manifest.json'));
@@ -220,11 +241,11 @@ const runSuite = async (args) => {
   const manifest = { schemaVersion: 'open-historia-strategic-gate0/1', runId, mode, status: 'running', freeze,
     codeRevision: gitRevision(), packageChecksum, maxCompletedModelTurns: 40, completedModelTurns: 0, probes: [] };
   atomicJson(path.join(output, 'manifest.json'), manifest);
-  const schema = strategicDecisionV3JsonSchema();
   for (const [index, probe] of probes.entries()) {
     const directory = path.join(output, `${String(index + 1).padStart(2, '0')}-${probe.id}`);
     fs.mkdirSync(directory, { recursive: false });
     const prompt = renderStrategicPromptV4(probe.brief, SYSTEM_TEXT);
+    const schema = schemaForBrief(probe.brief);
     atomicJson(path.join(directory, 'brief.json'), probe.brief);
     atomicJson(path.join(directory, 'candidate-audit.json'), probe.brief.candidateAudit);
     atomicJson(path.join(directory, 'output-schema.json'), schema);
