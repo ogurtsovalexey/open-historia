@@ -390,7 +390,7 @@ export function materializeStrategicDecisionV4(state: EconWorldState, raw: unkno
   const allowedEvidenceIds = new Set([
     ...brief.triggers.flatMap((entry) => [entry.triggerId, ...entry.evidenceIds]),
     ...brief.ownIntelligence.map((entry) => entry.evidenceId),
-    ...selectedIds.map((id) => choices.get(id)!.evidenceId),
+    ...brief.choices.map((entry) => entry.evidenceId),
   ]);
   if (decision.selectedChoices.some((entry) => entry.evidenceIds.some((id) => !allowedEvidenceIds.has(id)))) {
     return { status: 'terminal', commands: [], decision: null, pendingTriggerIds: pending, reason: 'invented evidence reference' };

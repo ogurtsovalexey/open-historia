@@ -470,6 +470,8 @@ test('StrategicDecisionV3 expands frozen IDs and requires exact compatible manda
   assert.equal(accepted.status, 'accepted');
   assert.ok(accepted.commands.length > 0);
   assert.equal(runTurn(state, { commands: accepted.commands }).result.rejections.length, 0);
+  assert.equal(materializeStrategicDecisionV4(state, { ...decision, selectedChoices: [{ ...decision.selectedChoices[0],
+    evidenceIds: [rejected.evidenceId] }] }, brief).status, 'accepted');
   assert.equal(materializeStrategicDecisionV4(state, { ...decision, selectedChoices: [{ ...decision.selectedChoices[0], choiceId: 'choice:invented' }] }, brief).status, 'terminal');
   assert.equal(materializeStrategicDecisionV4(state, { ...decision, selectedChoices: [{ ...decision.selectedChoices[0], evidenceIds: ['evidence:invented'] }] }, brief).status, 'terminal');
   assert.equal(materializeStrategicDecisionV4(state, { ...decision, triggerCoverage: [decision.triggerCoverage[0], decision.triggerCoverage[0]] }, brief).status, 'terminal');
