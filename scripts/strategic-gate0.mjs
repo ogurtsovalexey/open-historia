@@ -96,6 +96,7 @@ const schemaForBrief = (brief) => {
   schema.properties.selectedChoices.items.properties.choiceId = { type: 'string', enum: choiceIds };
   schema.properties.selectedChoices.items.properties.evidenceIds.items = { type: 'string', enum: evidenceIds };
   schema.properties.rejectedChoices.items.properties.choiceId = { type: 'string', enum: choiceIds };
+  schema.properties.rejectedChoices.minItems = brief.choices.length > 1 ? 1 : 0;
   if (brief.triggers.length) schema.properties.triggerCoverage.items.properties.triggerId = {
     type: 'string', enum: brief.triggers.map((entry) => entry.triggerId),
   };

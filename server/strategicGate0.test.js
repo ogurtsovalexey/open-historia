@@ -33,6 +33,7 @@ test('production Gate 0 mock freezes twelve single-actor V4 packages without mod
     assert.equal(brief.actor.id, probe.polityId);
     assert.deepEqual(schema.properties.polityId.enum, [probe.polityId]);
     assert.deepEqual(schema.properties.revision.enum, [brief.revision]);
+    assert.equal(schema.properties.rejectedChoices.minItems, brief.choices.length > 1 ? 1 : 0);
     assert.ok(brief.inputTokenCount <= 8000);
     assert.match(prompt, /\[CANDIDATE_AUDIT\]/);
     assert.match(prompt, /\[FROZEN_CHOICES\]/);
