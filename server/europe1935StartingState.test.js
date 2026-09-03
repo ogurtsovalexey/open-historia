@@ -12,6 +12,7 @@ import {
   apportionIntegerTotal,
   auditStartingStateProvenance,
   buildFirstMonthBaseline,
+  buildPoliticsCandidateAudit,
   buildPolandPopulationAllocation,
   buildPolandRegionalProjectionCandidate,
   buildStartingStateAudit,
@@ -79,6 +80,24 @@ test('Poland regional economy candidate preserves national controls and the comp
   assert.equal(first.externalSupplyLinks.length, 3);
 });
 
+test('Poland politics candidate separates offices from actual decision authority without enabling a partial module', () => {
+  const fixture = loadFixture();
+  const first = buildPoliticsCandidateAudit(fixture.engineScenario, fixture.sources);
+  const second = buildPoliticsCandidateAudit(fixture.engineScenario, fixture.sources);
+  assert.deepEqual(first, second);
+  assert.equal(first.checksum, 'sha256:47b3156bc33929ae68f086265b3514d8540b8e35a682803430bb3cd25d0bd8b9');
+  assert.deepEqual(first.headOfState, { characterId: 'character:poland-moscicki', name: 'Ignacy Mościcki' });
+  assert.deepEqual(first.headOfGovernment, { characterId: 'character:poland-kozlowski', name: 'Leon Kozłowski' });
+  assert.deepEqual(first.decisionAuthority, { characterId: 'character:poland-pilsudski', name: 'Józef Piłsudski' });
+  assert.equal(first.rulingFaction.factionId, 'faction:poland-sanacja');
+  assert.equal(first.factionCount, 4);
+  assert.equal(first.characterCount, 5);
+  assert.notEqual(fixture.engineScenario.modules.politics, true);
+  assert.equal(fixture.engineScenario.politics, undefined);
+  assert.throws(() => buildPoliticsCandidateAudit(fixture.engineScenario,
+    fixture.sources.filter((source) => source.id !== 'source:europe-1935-benchmark:pilsudski-museum-marshal')), /unknown sources/);
+});
+
 test('Europe 1935 pins its existing first aggregate month before regional replacement', () => {
   const fixture = loadFixture();
   const first = calculateCheckpoint(fixture, baseline);
@@ -121,11 +140,13 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   assert.equal(audit.regionalResearch.population[0].rows.length, 16);
   assert.equal(audit.regionalResearch.population[0].targetPopulation, 34_000_000);
   assert.equal(audit.regionalResearch.projectionCandidates[0].firstMonthComparison.matches, true);
+  assert.equal(audit.politicsCandidates[0].decisionAuthority.characterId, 'character:poland-pilsudski');
   assert.equal(audit.issues.filter((entry) => entry.code === 'starting-state-provenance-missing').length,
     audit.provenance.missingRows);
   assert.match(renderOwnerTable(audit), /Starting-state provenance: \*\*2\//);
   assert.match(renderOwnerTable(audit), /31,915,779 source persons apportioned to exact target 34,000,000/);
   assert.match(renderOwnerTable(audit), /economy candidate: 16 regions, 1 processing region/);
+  assert.match(renderOwnerTable(audit), /decision authority Józef Piłsudski; 4 factions/);
   assert.match(renderOwnerTable(audit), /production-derived diagnostic table/);
 
   const incompletePolitics = structuredClone(fixture);

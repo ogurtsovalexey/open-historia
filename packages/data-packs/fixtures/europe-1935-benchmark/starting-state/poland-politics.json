@@ -1,0 +1,205 @@
+{
+  "schemaVersion": "open-historia-politics-candidate/1",
+  "status": "source-grounded-candidate-pending-complete-politics-bundle-and-owner-review",
+  "polityId": "polity:poland",
+  "effectiveAt": "1935-01-01",
+  "sourceRefs": [
+    "source:europe-1935-benchmark:polish-presidency-second-republic",
+    "source:europe-1935-benchmark:polish-national-archives-kozlowski-cabinet",
+    "source:europe-1935-benchmark:pilsudski-museum-marshal",
+    "source:europe-1935-benchmark:ipn-niedzialkowski"
+  ],
+  "provenance": {
+    "basis": "authored-estimate",
+    "method": "Named offices, leaders and political alignments follow the cited institutional sources at the snapshot date. Engine-only basis-point fields are conservative ordinal estimates, not measured vote shares; grouped factions compress the political field to the Canon 13 limit.",
+    "confidence": "low",
+    "todo": "Owner-review every fact card and constraint; replace power/support estimates with a documented cross-country rubric before atomically enabling politics for every scenario polity."
+  },
+  "politics": {
+    "polities": [
+      {
+        "polityId": "polity:poland",
+        "legitimacyBp": 5600,
+        "stabilityBp": 5200,
+        "unrestBp": 3600,
+        "successionLaw": "appointment",
+        "rulerCharacterId": "character:poland-moscicki",
+        "heirCharacterId": null,
+        "strategyAuthority": {
+          "headOfStateCharacterId": "character:poland-moscicki",
+          "headOfGovernmentCharacterId": "character:poland-kozlowski",
+          "decisionAuthorityCharacterId": "character:poland-pilsudski",
+          "rulingFactionId": "faction:poland-sanacja",
+          "currentConstraints": [
+            "Preserve sovereignty between German and Soviet power.",
+            "Treat the French defensive alliance as an existing commitment, not a new objective.",
+            "Avoid dependence on either neighboring great power while bilateral non-aggression remains viable."
+          ]
+        }
+      }
+    ],
+    "factions": [
+      {
+        "factionId": "faction:poland-sanacja",
+        "polityId": "polity:poland",
+        "displayName": {"en":"Obóz sanacyjny","ru":"Obóz sanacyjny"},
+        "leaderCharacterId": "character:poland-pilsudski",
+        "powerBp": 4800,
+        "supportBp": 5600,
+        "idealTaxBurdenBp": 9800,
+        "preferredBudgetCategory": "military",
+        "foreignPolicy": "status-quo",
+        "ideology": "nationalist",
+        "traditionalismBp": 5800,
+        "escalation": "calm",
+        "politicalIdentity": {
+          "nativeLabel": "Obóz sanacyjny",
+          "legitimacyBases": ["Control of the executive after the May Coup", "Piłsudski's military and independence prestige", "Formal authority of the President and cabinet"],
+          "governingPrinciples": ["Strengthen the state executive", "Preserve an independent Polish state", "Keep military and foreign policy under trusted leadership"],
+          "strategicPreferences": ["Balance Germany and the Soviet Union", "Retain the French security commitment", "Prefer bilateral room for manoeuvre over dependence"],
+          "taboos": ["Submission to German or Soviet domination", "Unforced abandonment of sovereign territory"],
+          "riskAttitude": "cautious"
+        }
+      },
+      {
+        "factionId": "faction:poland-presidential-circle",
+        "polityId": "polity:poland",
+        "displayName": {"en":"Krąg prezydencki","ru":"Krąg prezydencki"},
+        "leaderCharacterId": "character:poland-moscicki",
+        "powerBp": 1900,
+        "supportBp": 5000,
+        "idealTaxBurdenBp": 9400,
+        "preferredBudgetCategory": "administration",
+        "foreignPolicy": "status-quo",
+        "ideology": "traditionalist",
+        "traditionalismBp": 6500,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:poland-national-opposition",
+        "polityId": "polity:poland",
+        "displayName": {"en":"Obóz narodowy","ru":"Obóz narodowy"},
+        "leaderCharacterId": "character:poland-dmowski",
+        "powerBp": 1800,
+        "supportBp": 4300,
+        "idealTaxBurdenBp": 10300,
+        "preferredBudgetCategory": "security",
+        "foreignPolicy": "hawk",
+        "ideology": "nationalist",
+        "traditionalismBp": 7600,
+        "escalation": "calm"
+      },
+      {
+        "factionId": "faction:poland-socialist-opposition",
+        "polityId": "polity:poland",
+        "displayName": {"en":"Polska Partia Socjalistyczna","ru":"Polska Partia Socjalistyczna"},
+        "leaderCharacterId": "character:poland-niedzialkowski",
+        "powerBp": 1500,
+        "supportBp": 4000,
+        "idealTaxBurdenBp": 11600,
+        "preferredBudgetCategory": "industry",
+        "foreignPolicy": "status-quo",
+        "ideology": "socialist",
+        "traditionalismBp": 2200,
+        "escalation": "calm"
+      }
+    ],
+    "characters": [
+      {
+        "characterId": "character:poland-pilsudski",
+        "polityId": "polity:poland",
+        "displayName": {"en":"Józef Piłsudski","ru":"Józef Piłsudski"},
+        "origin": "authored",
+        "factionId": "faction:poland-sanacja",
+        "office": "military",
+        "startingTraits": ["commander", "traditionalist"],
+        "experienceTraits": [],
+        "loyaltyBp": 7600,
+        "ambitionBp": 7200,
+        "relations": [{"characterId":"character:poland-moscicki","sentiment":"ally"},{"characterId":"character:poland-kozlowski","sentiment":"ally"},{"characterId":"character:poland-dmowski","sentiment":"rival"}],
+        "leaderCard": {
+          "historical": true,
+          "factCard": ["Minister of Military Affairs and Inspector General through 1935.", "Held exceptional authority over military and foreign-policy decisions.", "Pursued room for manoeuvre between Germany and the Soviet Union while retaining concern about both."],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": ["source:europe-1935-benchmark:pilsudski-museum-marshal"]
+        }
+      },
+      {
+        "characterId": "character:poland-moscicki",
+        "polityId": "polity:poland",
+        "displayName": {"en":"Ignacy Mościcki","ru":"Ignacy Mościcki"},
+        "origin": "authored",
+        "factionId": "faction:poland-presidential-circle",
+        "office": "ruler",
+        "startingTraits": ["administrator", "loyalist"],
+        "experienceTraits": [],
+        "loyaltyBp": 7400,
+        "ambitionBp": 4800,
+        "relations": [{"characterId":"character:poland-pilsudski","sentiment":"ally"},{"characterId":"character:poland-kozlowski","sentiment":"ally"}],
+        "leaderCard": {
+          "historical": true,
+          "factCard": ["President of the Republic from 1926 to 1939.", "Selected for the presidency after Piłsudski declined the office following the May Coup."],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": ["source:europe-1935-benchmark:polish-presidency-second-republic"]
+        }
+      },
+      {
+        "characterId": "character:poland-kozlowski",
+        "polityId": "polity:poland",
+        "displayName": {"en":"Leon Kozłowski","ru":"Leon Kozłowski"},
+        "origin": "authored",
+        "factionId": "faction:poland-sanacja",
+        "office": "head-of-government",
+        "startingTraits": ["administrator", "loyalist"],
+        "experienceTraits": [],
+        "loyaltyBp": 6900,
+        "ambitionBp": 5000,
+        "relations": [{"characterId":"character:poland-pilsudski","sentiment":"ally"},{"characterId":"character:poland-moscicki","sentiment":"ally"}],
+        "leaderCard": {
+          "historical": true,
+          "factCard": ["Prime Minister at the 1935-01-01 scenario snapshot.", "Led the cabinet sworn in under President Mościcki in May 1934."],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": ["source:europe-1935-benchmark:polish-national-archives-kozlowski-cabinet"]
+        }
+      },
+      {
+        "characterId": "character:poland-dmowski",
+        "polityId": "polity:poland",
+        "displayName": {"en":"Roman Dmowski","ru":"Roman Dmowski"},
+        "origin": "authored",
+        "factionId": "faction:poland-national-opposition",
+        "office": null,
+        "startingTraits": ["traditionalist", "diplomat"],
+        "experienceTraits": [],
+        "loyaltyBp": 6000,
+        "ambitionBp": 5900,
+        "relations": [{"characterId":"character:poland-pilsudski","sentiment":"rival"}],
+        "leaderCard": {
+          "historical": true,
+          "factCard": ["Principal historical figure of National Democracy and an opponent of Piłsudski's political camp."],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": ["source:europe-1935-benchmark:polish-presidency-second-republic"]
+        }
+      },
+      {
+        "characterId": "character:poland-niedzialkowski",
+        "polityId": "polity:poland",
+        "displayName": {"en":"Mieczysław Niedziałkowski","ru":"Mieczysław Niedziałkowski"},
+        "origin": "authored",
+        "factionId": "faction:poland-socialist-opposition",
+        "office": null,
+        "startingTraits": ["reformer", "diplomat"],
+        "experienceTraits": [],
+        "loyaltyBp": 6500,
+        "ambitionBp": 5200,
+        "relations": [{"characterId":"character:poland-pilsudski","sentiment":"rival"}],
+        "leaderCard": {
+          "historical": true,
+          "factCard": ["Leading PPS activist, parliamentarian and editor of the party newspaper Robotnik."],
+          "knowledgePolicy": "authored-card-plus-pre-scenario-prior",
+          "sourceRefs": ["source:europe-1935-benchmark:ipn-niedzialkowski"]
+        }
+      }
+    ]
+  }
+}

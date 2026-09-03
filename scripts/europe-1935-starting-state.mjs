@@ -5,7 +5,9 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import {
   compileHistoricalProjection,
+  currentPoliticalStrategy,
   initState,
+  parseScenario,
   populationWeightedInfrastructureBp,
   resolveMonth,
   startingStateValueChecksum,
@@ -140,6 +142,7 @@ const FIXTURE_ROOT = path.join(ROOT, 'packages', 'data-packs', 'fixtures', 'euro
 const DEFAULT_OUTPUT = path.join(ROOT, 'runs', 'campaign-lab', 'europe-1935-starting-state-checkpoint');
 const BASELINE_PATH = path.join(FIXTURE_ROOT, 'engine', 'first-month-baseline.json');
 const POLAND_ADJACENCY_CONTROL_PATH = path.join(FIXTURE_ROOT, 'geography', 'poland-land-adjacency.json');
+const POLAND_POLITICS_CANDIDATE_PATH = path.join(FIXTURE_ROOT, 'starting-state', 'poland-politics.json');
 
 const canonical = (value) => {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
@@ -374,6 +377,48 @@ export function buildPolandRegionalProjectionCandidate(engineScenario) {
   return { ...body, checksum: sha256(body) };
 }
 
+export function buildPoliticsCandidateAudit(engineScenario, sources, candidatePath = POLAND_POLITICS_CANDIDATE_PATH) {
+  const candidate = JSON.parse(fs.readFileSync(candidatePath, 'utf8'));
+  if (candidate.schemaVersion !== 'open-historia-politics-candidate/1'
+    || candidate.polityId !== 'polity:poland' || candidate.effectiveAt !== START_MONTH
+    || candidate.provenance?.basis !== 'authored-estimate' || candidate.provenance?.confidence !== 'low') {
+    throw new Error('invalid Poland politics candidate header or provenance');
+  }
+  const sourceIds = new Set(sources.map((entry) => entry.id));
+  const unknownSources = candidate.sourceRefs.filter((sourceId) => !sourceIds.has(sourceId));
+  if (unknownSources.length) throw new Error(`Poland politics candidate has unknown sources: ${unknownSources.join(', ')}`);
+  const raw = structuredClone(engineScenario);
+  raw.politics = candidate.politics;
+  parseScenario(raw);
+  const strategy = currentPoliticalStrategy(candidate.politics, candidate.polityId);
+  const factions = candidate.politics.factions.filter((entry) => entry.polityId === candidate.polityId);
+  const characters = candidate.politics.characters.filter((entry) => entry.polityId === candidate.polityId);
+  const unknownCardSources = characters.flatMap((entry) => entry.leaderCard?.sourceRefs ?? [])
+    .filter((sourceId) => !sourceIds.has(sourceId));
+  if (unknownCardSources.length) throw new Error(`Poland politics fact cards have unknown sources: ${unknownCardSources.join(', ')}`);
+  if (factions.length < 3 || factions.length > 6 || characters.some((entry) => !entry.leaderCard?.historical)) {
+    throw new Error('Poland politics candidate requires 3-6 factions and fact cards for every historical character');
+  }
+  const body = {
+    schemaVersion: candidate.schemaVersion,
+    status: candidate.status,
+    polityId: candidate.polityId,
+    effectiveAt: candidate.effectiveAt,
+    sourceRefs: candidate.sourceRefs,
+    provenance: candidate.provenance,
+    headOfState: { characterId: strategy.headOfState.characterId, name: strategy.headOfState.displayName.en },
+    headOfGovernment: { characterId: strategy.headOfGovernment.characterId, name: strategy.headOfGovernment.displayName.en },
+    decisionAuthority: { characterId: strategy.decisionAuthority.characterId, name: strategy.decisionAuthority.displayName.en },
+    rulingFaction: { factionId: strategy.rulingFaction.factionId, name: strategy.rulingFaction.displayName.en },
+    politicalIdentity: strategy.identity,
+    currentConstraints: strategy.currentConstraints,
+    factionCount: factions.length,
+    characterCount: characters.length,
+    politics: candidate.politics,
+  };
+  return { ...body, checksum: sha256(body) };
+}
+
 export function buildFirstMonthBaseline(turnResult) {
   const polities = turnResult.ledger.polities.map((entry) => ({
     polityId: entry.polityId,
@@ -472,7 +517,7 @@ export function auditStartingStateProvenance(engineScenario, authoring) {
   };
 }
 
-export function buildStartingStateAudit({ manifest, scenario, authoring, engineScenario, firstMonth }) {
+export function buildStartingStateAudit({ manifest, scenario, sources, authoring, engineScenario, firstMonth }) {
   const issues = [];
   const polityLevels = scenario.fidelity?.polityLevels ?? {};
   const supportedIds = Object.entries(polityLevels).filter(([, level]) => level === 'Supported').map(([id]) => id).sort();
@@ -491,6 +536,7 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
     expectedChecksum: firstMonth.expectedChecksum,
     actualChecksum: polandProjection.firstMonth.checksum,
   };
+  const politicsCandidates = [buildPoliticsCandidateAudit(engineScenario, sources)];
 
   if (manifest.id !== SCENARIO_ID || engineScenario.scenarioId !== SCENARIO_ID || authoring.scenarioId !== SCENARIO_ID) {
     issues.push(issue('scenario-id-drift', 'blocking', '/', `expected every projection to use ${SCENARIO_ID}`));
@@ -632,6 +678,7 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
       population: [polandPopulation],
       projectionCandidates: [{ ...polandProjection, firstMonthComparison: polandProjectionFirstMonth }],
     },
+    politicsCandidates,
     provenance,
     firstMonth,
     polities: polityRows,
@@ -660,6 +707,10 @@ export function renderOwnerTable(audit) {
     '',
     ...audit.regionalResearch.population.map((entry) => `- ${entry.polityId}: ${entry.rows.length} regions, ${entry.sourcePopulationTotal.toLocaleString('en-US')} source persons apportioned to exact target ${entry.targetPopulation.toLocaleString('en-US')} (\`${entry.checksum}\`).`),
     ...audit.regionalResearch.projectionCandidates.map((entry) => `- ${entry.polityId} economy candidate: ${entry.rows.length} regions, ${entry.processingRegionCount} processing region, national population/capacity ${entry.nationalControls.population.toLocaleString('en-US')}/${entry.nationalControls.industrialCapacity.toLocaleString('en-US')}; first month **${entry.firstMonthComparison.matches ? 'exact' : 'MISMATCH'}** (\`${entry.checksum}\`).`),
+    '',
+    '## Politics candidates',
+    '',
+    ...audit.politicsCandidates.map((entry) => `- ${entry.polityId}: head of state ${entry.headOfState.name}; head of government ${entry.headOfGovernment.name}; decision authority ${entry.decisionAuthority.name}; ${entry.factionCount} factions; status **${entry.status}** (\`${entry.checksum}\`).`),
     '',
     '## Blocking issues',
     '',

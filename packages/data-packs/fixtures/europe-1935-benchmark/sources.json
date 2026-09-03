@@ -61,5 +61,43 @@
     "contentHash": "sha256:16c06d26b39921bdfeb462a646f73ee22f1ce56e579bbfbe6599eec73e6130b0",
     "license": { "status": "metadata-only" },
     "note": "Registered treaty No. 588. Articles 1–2 require consultation and agreed measures when common security interests are threatened; represented by the engine's bounded defensive-alliance agreement type."
+  },
+  {
+    "id": "source:europe-1935-benchmark:polish-presidency-second-republic",
+    "title": "Odzyskanie niepodległości i wojna polsko-sowiecka",
+    "publisher": "Kancelaria Prezydenta Rzeczypospolitej Polskiej",
+    "locator": "https://www.prezydent.pl/aktualnosci/wydarzenia/odzyskanie-niepodleglosci-i-wojna-polsko-sowiecka-%2C1915",
+    "retrievedAt": "2026-09-03",
+    "license": { "status": "metadata-only" },
+    "note": "Official historical overview identifying Mościcki as Piłsudski's nominee, the Sanacja government after 1926, and National Democracy as organized opposition."
+  },
+  {
+    "id": "source:europe-1935-benchmark:polish-national-archives-kozlowski-cabinet",
+    "title": "Uroczystość zaprzysiężenia gabinetu premiera Leona Kozłowskiego",
+    "publisher": "Narodowe Archiwum Cyfrowe / Szukaj w Archiwach",
+    "publicationDate": "1934-05-15",
+    "locator": "https://www.szukajwarchiwach.gov.pl/jednostka/-/jednostka/5948324/obiekty/243861",
+    "retrievedAt": "2026-09-03",
+    "license": { "status": "redistributable", "name": "Public domain" },
+    "note": "Official archival description identifies President Ignacy Mościcki, Marshal and military minister Józef Piłsudski, and Prime Minister Leon Kozłowski at the cabinet swearing-in."
+  },
+  {
+    "id": "source:europe-1935-benchmark:pilsudski-museum-marshal",
+    "title": "Marszałek",
+    "publisher": "Muzeum Józefa Piłsudskiego w Sulejówku",
+    "locator": "https://muzeumpilsudski.pl/jozef-pilsudski/marszalek/",
+    "retrievedAt": "2026-09-03",
+    "license": { "status": "metadata-only" },
+    "note": "Museum biography records Piłsudski as Minister of Military Affairs and Inspector General through 1935, with particular control of foreign and military policy and ultimate responsibility for decisions he considered vital to the state."
+  },
+  {
+    "id": "source:europe-1935-benchmark:ipn-niedzialkowski",
+    "title": "Hołd dla Polaków zamordowanych przez Niemców w Palmirach — Maciej Rataj i Mieczysław Niedziałkowski",
+    "publisher": "Instytut Pamięci Narodowej",
+    "publicationDate": "2020-06-19",
+    "locator": "https://ipn.gov.pl/pl/aktualnosci/101697,Hold-dla-Polakow-zamordowanych-przez-Niemcow-w-Palmirach-w-80-rocznice-zbrodni-n.html",
+    "retrievedAt": "2026-09-03",
+    "license": { "status": "metadata-only" },
+    "note": "Institutional biography identifies Niedziałkowski as a leading PPS activist, parliamentarian and editor of Robotnik; used only to anchor the aggregated socialist-opposition candidate."
   }
 ]
