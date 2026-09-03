@@ -256,7 +256,15 @@ const runSuite = async (args) => {
   const model = args.model ?? MODEL;
   const effort = args.effort ?? EFFORT;
   const preflight = mode === 'live' ? validatePreflight(args.preflight, model, effort) : null;
-  const { probes, contentVersion, packageChecksum } = buildProbes();
+  const built = buildProbes();
+  const requestedProbeIds = args.only ? args.only.split(',').filter(Boolean) : null;
+  if (requestedProbeIds && new Set(requestedProbeIds).size !== requestedProbeIds.length) throw new Error('--only requires unique probe ids');
+  const probes = requestedProbeIds ? requestedProbeIds.map((probeId) => {
+    const probe = built.probes.find((entry) => entry.id === probeId);
+    if (!probe) throw new Error(`unknown Gate 0 probe ${probeId}`);
+    return probe;
+  }) : built.probes;
+  const { contentVersion, packageChecksum } = built;
   const freeze = { schemaVersion: 'open-historia-strategic-run/3', scenarioId: 'scenario:europe-1935-benchmark',
     scenarioContentVersion: contentVersion, promptContract: CODEX_STRATEGIC_CONTRACT,
     provider: mode === 'live' ? 'codex-subscription' : 'deterministic-mock', model: mode === 'live' ? model : 'deterministic-mock',

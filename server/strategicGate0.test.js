@@ -56,3 +56,9 @@ test('production Gate 0 rejects old manifests and prompt snapshots are reproduci
   }));
   assert.throws(() => run('resume', '--run', 'legacy-v2'), /incompatible strategic run/);
 });
+
+test('production Gate 0 can run an explicit unique probe subset without reordering it', () => {
+  const result = run('run', '--mode', 'mock', '--run', 'gate0-subset', '--only', 'czech-reject,poland-mobilization');
+  assert.deepEqual(result.probes.map((entry) => entry.probeId), ['czech-reject', 'poland-mobilization']);
+  assert.throws(() => run('run', '--mode', 'mock', '--run', 'gate0-bad-subset', '--only', 'unknown'), /unknown Gate 0 probe/);
+});
