@@ -60,6 +60,23 @@ const safeRunId = (value) => {
   if (!/^[a-z0-9][a-z0-9._-]{0,119}$/.test(value ?? '')) throw new Error('run id must be a safe lowercase token');
   return value;
 };
+const completedTurnsOnDisk = () => {
+  let turns = 0;
+  if (!fs.existsSync(RUNS)) return turns;
+  for (const entry of fs.readdirSync(RUNS, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const manifestPath = path.join(RUNS, entry.name, 'manifest.json');
+    if (!fs.existsSync(manifestPath)) continue;
+    try {
+      const manifest = readJson(manifestPath);
+      if (manifest.schemaVersion === 'open-historia-strategic-gate0/1') turns += manifest.completedModelTurns ?? 0;
+    } catch { /* Ignore incomplete diagnostic directories. */ }
+  }
+  const preflightDirectory = path.join(RUNS, 'codex-preflights');
+  if (fs.existsSync(preflightDirectory)) turns += fs.readdirSync(preflightDirectory)
+    .filter((name) => /^[a-f0-9]{64}\.json$/.test(name)).length;
+  return turns;
+};
 const commandBase = (state, actorPolityId, suffix) => ({
   commandId: `94000000-0000-4000-8000-${String(suffix).padStart(12, '0')}`,
   actorPolityId, expectedRevision: state.revision, effectiveMonth: state.month,
@@ -107,7 +124,9 @@ const contextFor = (polityId) => ({
 });
 
 const makeProbe = ({ id, state, polityId, reason, detail, tools, trigger = null, preferred, choiceFilter = null,
+  instruction = '',
   expect = (actions) => actions.length > 0 }) => {
+  const systemText = instruction ? `${SYSTEM_TEXT} ${instruction}` : SYSTEM_TEXT;
   const brief = buildStrategicBriefV4(state, polityId, {
     invocation: { reason, detail },
     triggers: trigger ? [trigger] : [],
@@ -115,13 +134,13 @@ const makeProbe = ({ id, state, polityId, reason, detail, tools, trigger = null,
     strategicContext: contextFor(polityId),
     externalSupplierPolityIds: ['polity:soviet-union', 'polity:united-states'],
     changesSinceLastDecision: [detail],
-    systemText: SYSTEM_TEXT,
+    systemText,
     countTokens: tokenCount,
   });
   const matching = brief.choices.filter((choice) => preferred.includes(choice.family)
     && (!choiceFilter || choiceFilter(choice.action)));
   if (!matching.length) throw new Error(`${id} has no preferred executable choice (${preferred.join(', ')})`);
-  return { id, state, brief, selectedChoiceId: matching[0].choiceId, expect };
+  return { id, state, brief, selectedChoiceId: matching[0].choiceId, expect, systemText };
 };
 
 const buildProbes = () => {
@@ -164,10 +183,12 @@ const buildProbes = () => {
   probes.push(makeProbe({ id: 'czech-accept', state: proposal.state, polityId: 'polity:czechoslovakia', reason: 'proposal',
     detail: 'Evaluate the legal accept path.', tools: ['respond-proposal', 'conserve'], trigger: proposalTrigger,
     preferred: ['respond-proposal'], choiceFilter: (action) => action.response === 'accept',
+    instruction: 'This is an accept-path contract micro-probe: select the published choice whose response is accept.',
     expect: (actions) => actions.some((entry) => entry.tool === 'respond-proposal' && entry.response === 'accept') }));
   probes.push(makeProbe({ id: 'czech-reject', state: proposal.state, polityId: 'polity:czechoslovakia', reason: 'proposal',
     detail: 'Evaluate the legal reject path.', tools: ['respond-proposal', 'conserve'], trigger: proposalTrigger,
     preferred: ['respond-proposal'], choiceFilter: (action) => action.response === 'reject',
+    instruction: 'This is a reject-path contract micro-probe: select the published choice whose response is reject.',
     expect: (actions) => actions.some((entry) => entry.tool === 'respond-proposal' && entry.response === 'reject') }));
 
   const war = runTurn(base, { commands: [{ kind: 'war.declare', ...commandBase(base, 'polity:germany', 2),
@@ -178,10 +199,12 @@ const buildProbes = () => {
   probes.push(makeProbe({ id: 'poland-real-threat', state: war.state, polityId: 'polity:poland', reason: 'war',
     detail: 'Respond to the real adjacent supplied German threat.', tools: ['mobilize', 'issue-order', 'negotiate-peace', 'conserve'],
     trigger: warTrigger, preferred: ['issue-order', 'mobilize', 'negotiate-peace'],
+    instruction: 'Select a published war-facing response causally connected to the active German attack.',
     expect: (actions) => actions.some((entry) => ['mobilize', 'issue-order', 'negotiate-peace'].includes(entry.tool)) }));
   probes.push(makeProbe({ id: 'poland-mobilization', state: war.state, polityId: 'polity:poland', reason: 'war',
     detail: 'Mobilization micro-probe: select a legal mobilization response.', tools: ['mobilize', 'conserve'],
     trigger: { ...warTrigger, triggerId: 'trigger:poland-mobilize', compatibleTools: ['mobilize'] }, preferred: ['mobilize'],
+    instruction: 'This is a mobilization contract micro-probe: select exactly one published mobilize choice.',
     expect: (actions) => actions.length === 1 && actions[0].tool === 'mobilize' }));
   return { probes, contentVersion, packageChecksum: stateChecksum(base) };
 };
@@ -239,12 +262,13 @@ const runSuite = async (args) => {
     provider: mode === 'live' ? 'codex-subscription' : 'deterministic-mock', model: mode === 'live' ? model : 'deterministic-mock',
     effort: mode === 'live' ? effort : 'off', preflightChecksum: preflight?.preflightChecksum ?? 'sha256:mock' };
   const manifest = { schemaVersion: 'open-historia-strategic-gate0/1', runId, mode, status: 'running', freeze,
-    codeRevision: gitRevision(), packageChecksum, maxCompletedModelTurns: 40, completedModelTurns: 0, probes: [] };
+    codeRevision: gitRevision(), packageChecksum, maxCompletedModelTurns: 40,
+    globalCompletedTurnsAtStart: mode === 'live' ? completedTurnsOnDisk() : 0, completedModelTurns: 0, probes: [] };
   atomicJson(path.join(output, 'manifest.json'), manifest);
   for (const [index, probe] of probes.entries()) {
     const directory = path.join(output, `${String(index + 1).padStart(2, '0')}-${probe.id}`);
     fs.mkdirSync(directory, { recursive: false });
-    const prompt = renderStrategicPromptV4(probe.brief, SYSTEM_TEXT);
+    const prompt = renderStrategicPromptV4(probe.brief, probe.systemText);
     const schema = schemaForBrief(probe.brief);
     atomicJson(path.join(directory, 'brief.json'), probe.brief);
     atomicJson(path.join(directory, 'candidate-audit.json'), probe.brief.candidateAudit);
@@ -256,7 +280,9 @@ const runSuite = async (args) => {
     try {
       if (mode === 'mock') raw = decisionFor(probe);
       else {
-        if (manifest.completedModelTurns >= manifest.maxCompletedModelTurns) throw new Error('Gate 0 completed-turn cap reached');
+        if (manifest.globalCompletedTurnsAtStart + manifest.completedModelTurns >= manifest.maxCompletedModelTurns) {
+          throw new Error('global Gate 0 completed-turn cap reached');
+        }
         const result = await invokeCodexStructured({ prompt, schema, model, effort });
         raw = result.response; transport = parseTransport(result.stdout); manifest.completedModelTurns += 1;
         fs.writeFileSync(path.join(directory, 'events.jsonl'), result.stdout, { encoding: 'utf8', mode: 0o600 });
@@ -309,6 +335,7 @@ const main = async () => {
     return;
   }
   if (command === 'preflight') {
+    if (completedTurnsOnDisk() >= 40) throw new Error('global Gate 0 completed-turn cap reached');
     const model = args.model ?? MODEL;
     const effort = args.effort ?? 'medium';
     const inspection = await inspectCodexSubscription({ desktopRuntime: true });
