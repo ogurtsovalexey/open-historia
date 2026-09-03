@@ -4,11 +4,15 @@ import path from 'node:path';
 import test from 'node:test';
 import { startingStateValueChecksum } from '@open-historia/engine';
 import { fileURLToPath } from 'node:url';
+import { OHM_POLAND_1935 } from '../scripts/europe-1935-geography.mjs';
 import {
   AUTHORED_COMMITMENT_EXPECTATIONS,
+  POLAND_1931_CENSUS,
   STARTING_STATE_PROVENANCE_COLLECTIONS,
+  apportionIntegerTotal,
   auditStartingStateProvenance,
   buildFirstMonthBaseline,
+  buildPolandPopulationAllocation,
   buildStartingStateAudit,
   calculateCheckpoint,
   compareFirstMonthBaseline,
@@ -19,6 +23,36 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const baseline = JSON.parse(fs.readFileSync(path.join(root,
   'packages/data-packs/fixtures/europe-1935-benchmark/engine/first-month-baseline.json'), 'utf8'));
+
+test('integer apportionment is exact, input-order independent and rejects ambiguous inputs', () => {
+  const rows = [{ id: 'b', weight: 1 }, { id: 'a', weight: 1 }, { id: 'c', weight: 1 }];
+  const expected = [
+    { id: 'a', weight: 1, amount: 2 },
+    { id: 'b', weight: 1, amount: 2 },
+    { id: 'c', weight: 1, amount: 1 },
+  ];
+  assert.deepEqual(apportionIntegerTotal(rows, 5), expected);
+  assert.deepEqual(apportionIntegerTotal(rows.toReversed(), 5), expected);
+  assert.throws(() => apportionIntegerTotal([], 1), /at least one row/);
+  assert.throws(() => apportionIntegerTotal([{ id: 'a', weight: 1 }, { id: 'a', weight: 2 }], 1), /duplicate/);
+  assert.throws(() => apportionIntegerTotal([{ id: 'a', weight: 0 }], 1), /positive safe integer/);
+  assert.throws(() => apportionIntegerTotal([{ id: 'a', weight: Number.MAX_SAFE_INTEGER }], 2), /product/);
+});
+
+test('Poland population research reconciles the GUS table and preserves the national control', () => {
+  const allocation = buildPolandPopulationAllocation();
+  assert.equal(allocation.rows.length, 16);
+  assert.deepEqual(allocation.rows.map((row) => row.relationId).toSorted((left, right) => left - right),
+    [...OHM_POLAND_1935.regionRelationIds].toSorted((left, right) => left - right));
+  assert.equal(allocation.sourcePopulationTotal, 31_915_779);
+  assert.equal(allocation.sourcePopulationTotal + allocation.barrackedMilitaryExcludedFromRows,
+    allocation.publishedNationalPopulation);
+  assert.equal(allocation.rows.reduce((total, row) => total + row.population, 0), 34_000_000);
+  assert.equal(allocation.rows.find((row) => row.relationId === 2_741_469).sourcePopulation,
+    2_529_228 + 1_171_898);
+  assert.equal(allocation.sourceContentHash, POLAND_1931_CENSUS.sourceContentHash);
+  assert.equal(allocation.checksum, 'sha256:fb3c9c75910e877eeca881afcf81e0e1335d333853af70b0ace7a723e05acce5');
+});
 
 test('Europe 1935 pins its existing first aggregate month before regional replacement', () => {
   const fixture = loadFixture();
@@ -58,9 +92,12 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   assert(STARTING_STATE_PROVENANCE_COLLECTIONS.includes('/politics/characters'));
   assert.equal(audit.provenance.totalRows > 0, true);
   assert.equal(audit.provenance.coveredRows, 0);
+  assert.equal(audit.regionalResearch.population[0].rows.length, 16);
+  assert.equal(audit.regionalResearch.population[0].targetPopulation, 34_000_000);
   assert.equal(audit.issues.filter((entry) => entry.code === 'starting-state-provenance-missing').length,
     audit.provenance.totalRows);
   assert.match(renderOwnerTable(audit), /Starting-state provenance: \*\*0\//);
+  assert.match(renderOwnerTable(audit), /31,915,779 source persons apportioned to exact target 34,000,000/);
   assert.match(renderOwnerTable(audit), /production-derived diagnostic table/);
 
   const incompletePolitics = structuredClone(fixture);

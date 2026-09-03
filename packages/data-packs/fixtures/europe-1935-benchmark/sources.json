@@ -28,5 +28,16 @@
     "retrievedAt": "2026-09-01",
     "license": { "status": "metadata-only" },
     "note": "Official baseline for the interpolated United States macro-polity population."
+  },
+  {
+    "id": "source:europe-1935-benchmark:poland-census-1931",
+    "title": "Drugi Powszechny Spis Ludności z dn. 9.XII 1931 r.: Mieszkania i gospodarstwa domowe. Ludność. Polska",
+    "publisher": "Główny Urząd Statystyczny Rzeczypospolitej Polskiej",
+    "publicationDate": "1938",
+    "locator": "https://statlibr.stat.gov.pl/exlibris/aleph/a22_1/apache_media/VUNVGMLANSCQQFGYHCN3VDLK12A9U5.pdf",
+    "retrievedAt": "2026-09-03",
+    "contentHash": "sha256:877259f5a9218ea54225902a6caf4eacd82d70ba418eb6262b06b8ff7b68986c",
+    "license": { "status": "metadata-only" },
+    "note": "Official final 1931 resident-population table by voivodeship (Przegląd ogólny, p. 1). The 16-polygon projection combines the separately printed M. st. Warszawa row with Województwo warszawskie; the source PDF itself is not redistributed."
   }
 ]

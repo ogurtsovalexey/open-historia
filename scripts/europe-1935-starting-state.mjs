@@ -17,6 +17,40 @@ export const REQUIRED_INERT_POLITIES = Object.freeze([
   { polityId: 'polity:danzig', displayName: 'Freie Stadt Danzig' },
   { polityId: 'polity:saar', displayName: 'Saargebiet' },
 ]);
+export const POLAND_1931_CENSUS = Object.freeze({
+  sourceId: 'source:europe-1935-benchmark:poland-census-1931',
+  sourceContentHash: 'sha256:877259f5a9218ea54225902a6caf4eacd82d70ba418eb6262b06b8ff7b68986c',
+  censusDate: '1931-12-09',
+  nationalPopulationIncludingBarrackedMilitary: 32_107_252,
+  barrackedMilitaryExcludedFromVoivodeshipRows: 191_473,
+  targetPopulation: 34_000_000,
+  rows: Object.freeze([
+    { relationId: 2_696_109, nativeName: 'Województwo wileńskie', sourcePopulation: 1_275_939 },
+    { relationId: 2_698_169, nativeName: 'Województwo wołyńskie', sourcePopulation: 2_085_574 },
+    { relationId: 2_698_170, nativeName: 'Województwo poleskie', sourcePopulation: 1_131_939 },
+    { relationId: 2_741_463, nativeName: 'Województwo lubelskie', sourcePopulation: 2_464_936 },
+    { relationId: 2_741_466, nativeName: 'Województwo nowogródzkie', sourcePopulation: 1_057_147 },
+    { relationId: 2_741_468, nativeName: 'Województwo białostockie', sourcePopulation: 1_643_844 },
+    {
+      relationId: 2_741_469,
+      nativeName: 'Województwo warszawskie',
+      sourcePopulation: 3_701_126,
+      sourceComponents: Object.freeze([
+        { nativeName: 'Województwo warszawskie', population: 2_529_228 },
+        { nativeName: 'M. st. Warszawa', population: 1_171_898 },
+      ]),
+    },
+    { relationId: 2_741_470, nativeName: 'Województwo kieleckie', sourcePopulation: 2_935_697 },
+    { relationId: 2_741_471, nativeName: 'Województwo śląskie', sourcePopulation: 1_295_027 },
+    { relationId: 2_741_475, nativeName: 'Województwo łódzkie', sourcePopulation: 2_632_010 },
+    { relationId: 2_741_476, nativeName: 'Województwo poznańskie', sourcePopulation: 2_106_500 },
+    { relationId: 2_741_477, nativeName: 'Województwo pomorskie', sourcePopulation: 1_080_138 },
+    { relationId: 2_927_190, nativeName: 'Województwo krakowskie', sourcePopulation: 2_297_802 },
+    { relationId: 2_927_191, nativeName: 'Województwo lwowskie', sourcePopulation: 3_127_409 },
+    { relationId: 2_929_589, nativeName: 'Województwo tarnopolskie', sourcePopulation: 1_600_406 },
+    { relationId: 2_930_186, nativeName: 'Województwo stanisławowskie', sourcePopulation: 1_480_285 },
+  ]),
+});
 export const REQUIRED_MODULES = Object.freeze([
   'armedForces',
   'budget',
@@ -100,6 +134,84 @@ const canonical = (value) => {
 const sha256 = (value) => `sha256:${crypto.createHash('sha256').update(canonical(value)).digest('hex')}`;
 const sum = (rows, selector) => rows.reduce((total, row) => total + selector(row), 0);
 const byId = (rows, selector) => new Map(rows.map((row) => [selector(row), row]));
+
+/** Largest-remainder apportionment over checked non-negative integers.
+ * Output is sorted by id, so input order can never affect authored values. */
+export function apportionIntegerTotal(rows, targetTotal) {
+  if (!Number.isSafeInteger(targetTotal) || targetTotal < 0) {
+    throw new RangeError(`target total must be a non-negative safe integer: ${targetTotal}`);
+  }
+  const ordered = rows.map((row) => ({ id: row.id, weight: row.weight }));
+  if (ordered.length === 0) throw new RangeError('apportionment requires at least one row');
+  const ids = new Set();
+  let weightTotal = 0;
+  for (const row of ordered) {
+    if (typeof row.id !== 'string' || row.id.length === 0) throw new TypeError('apportionment id must be non-empty');
+    if (ids.has(row.id)) throw new Error(`duplicate apportionment id: ${row.id}`);
+    ids.add(row.id);
+    if (!Number.isSafeInteger(row.weight) || row.weight <= 0) {
+      throw new RangeError(`apportionment weight for ${row.id} must be a positive safe integer: ${row.weight}`);
+    }
+    weightTotal += row.weight;
+    if (!Number.isSafeInteger(weightTotal)) throw new RangeError('apportionment weight total is not a safe integer');
+  }
+  const apportioned = ordered.map((row) => {
+    const numerator = targetTotal * row.weight;
+    if (!Number.isSafeInteger(numerator)) throw new RangeError(`apportionment product for ${row.id} is not a safe integer`);
+    const amount = Math.floor(numerator / weightTotal);
+    return { ...row, amount, remainder: numerator - amount * weightTotal };
+  });
+  let remaining = targetTotal - sum(apportioned, (row) => row.amount);
+  for (const row of apportioned.toSorted((left, right) => right.remainder - left.remainder
+    || left.id.localeCompare(right.id))) {
+    if (remaining === 0) break;
+    row.amount += 1;
+    remaining -= 1;
+  }
+  if (remaining !== 0) throw new Error(`apportionment left ${remaining} units unresolved`);
+  return apportioned.toSorted((left, right) => left.id.localeCompare(right.id))
+    .map(({ id, weight, amount }) => ({ id, weight, amount }));
+}
+
+export function buildPolandPopulationAllocation() {
+  const sourcePopulationTotal = sum(POLAND_1931_CENSUS.rows, (row) => row.sourcePopulation);
+  if (sourcePopulationTotal + POLAND_1931_CENSUS.barrackedMilitaryExcludedFromVoivodeshipRows
+    !== POLAND_1931_CENSUS.nationalPopulationIncludingBarrackedMilitary) {
+    throw new Error('Poland census voivodeship rows do not reconcile to the published national total');
+  }
+  const allocationById = new Map(apportionIntegerTotal(POLAND_1931_CENSUS.rows.map((row) => ({
+    id: `region:ohm-1935:${row.relationId}`,
+    weight: row.sourcePopulation,
+  })), POLAND_1931_CENSUS.targetPopulation).map((row) => [row.id, row]));
+  const rows = POLAND_1931_CENSUS.rows.map((row) => {
+    const regionId = `region:ohm-1935:${row.relationId}`;
+    return {
+      regionId,
+      relationId: row.relationId,
+      nativeName: row.nativeName,
+      sourcePopulation: row.sourcePopulation,
+      ...(row.sourceComponents ? { sourceComponents: row.sourceComponents } : {}),
+      population: allocationById.get(regionId).amount,
+    };
+  }).toSorted((left, right) => left.regionId.localeCompare(right.regionId));
+  const body = {
+    schemaVersion: 'open-historia-regional-population-allocation/1',
+    polityId: 'polity:poland',
+    censusDate: POLAND_1931_CENSUS.censusDate,
+    scenarioSnapshotDate: START_MONTH,
+    sourceRefs: [POLAND_1931_CENSUS.sourceId],
+    sourceContentHash: POLAND_1931_CENSUS.sourceContentHash,
+    sourcePopulationTotal,
+    publishedNationalPopulation: POLAND_1931_CENSUS.nationalPopulationIncludingBarrackedMilitary,
+    barrackedMilitaryExcludedFromRows: POLAND_1931_CENSUS.barrackedMilitaryExcludedFromVoivodeshipRows,
+    targetPopulation: POLAND_1931_CENSUS.targetPopulation,
+    method: 'Combine the separate M. st. Warszawa census row with the containing OHM Warszawskie polygon, then apply largest-remainder proportional scaling from the 1931 resident civilian rows to the approved 1935 benchmark total.',
+    confidence: 'medium',
+    todo: 'Owner-review the 1931-to-1935 normalization and replace proportional growth with sourced intercensal regional estimates where available.',
+    rows,
+  };
+  return { ...body, checksum: sha256(body) };
+}
 
 export function buildFirstMonthBaseline(turnResult) {
   const polities = turnResult.ledger.polities.map((entry) => ({
@@ -211,6 +323,7 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
   const commanders = engineScenario.military?.commanders ?? [];
   const politicalPolities = byId(engineScenario.politics?.polities ?? [], (entry) => entry.polityId);
   const provenance = auditStartingStateProvenance(engineScenario, authoring);
+  const polandPopulation = buildPolandPopulationAllocation();
 
   if (manifest.id !== SCENARIO_ID || engineScenario.scenarioId !== SCENARIO_ID || authoring.scenarioId !== SCENARIO_ID) {
     issues.push(issue('scenario-id-drift', 'blocking', '/', `expected every projection to use ${SCENARIO_ID}`));
@@ -345,6 +458,7 @@ export function buildStartingStateAudit({ manifest, scenario, authoring, engineS
     modules: Object.fromEntries(REQUIRED_MODULES.map((moduleName) => [moduleName, engineScenario.modules?.[moduleName] === true])),
     inertPolities: REQUIRED_INERT_POLITIES.map((entry) => ({ ...entry, present: enginePolityIds.has(entry.polityId) })),
     commitments: AUTHORED_COMMITMENT_EXPECTATIONS,
+    regionalResearch: { population: [polandPopulation] },
     provenance,
     firstMonth,
     polities: polityRows,
@@ -368,6 +482,10 @@ export function renderOwnerTable(audit) {
     `First-month baseline: **${audit.firstMonth.matches ? 'exact' : 'MISMATCH'}** (\`${audit.firstMonth.actualChecksum}\`).`,
     '',
     `Starting-state provenance: **${audit.provenance.coveredRows}/${audit.provenance.totalRows}** exact rows covered; ${audit.provenance.missingRows} missing; ${audit.provenance.checksumMismatches} checksum mismatches.`,
+    '',
+    '## Sourced regional allocations ready for projection',
+    '',
+    ...audit.regionalResearch.population.map((entry) => `- ${entry.polityId}: ${entry.rows.length} regions, ${entry.sourcePopulationTotal.toLocaleString('en-US')} source persons apportioned to exact target ${entry.targetPopulation.toLocaleString('en-US')} (\`${entry.checksum}\`).`),
     '',
     '## Blocking issues',
     '',
