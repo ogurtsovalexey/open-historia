@@ -1,6 +1,6 @@
 {
   "schemaVersion": "open-historia-starting-state-manifest/1",
-  "status": "complete-pending-owner-review",
+  "status": "owner-approved-runtime",
   "scenarioId": "scenario:europe-1935-benchmark",
   "effectiveAt": "1935-01-01",
   "modules": [
@@ -28,6 +28,6 @@
     "engineScenario": "sha256:97e935adf2efa925537f54eb33c502761a456066b379816b76741f850c0af776",
     "authoring": "sha256:76d253faa5b4023ec39d20dc1ada886697dffbf4a7841ca535fa9acd41745258",
     "sources": "sha256:ccd63764f9766b367a402372f5257363f01e88a074a99975e403d6f933ccb213",
-    "politicsBundle": "sha256:9037fb13d3e24cf8089cf56eabc11c0b6b99107725b7ca4cd1258ef0da6bbe3b"
+    "politicsBundle": "sha256:5d2b69ecce8acfe4a5824ed759077f6b3410a40171cda65e025d6d53025396a4"
   }
 }

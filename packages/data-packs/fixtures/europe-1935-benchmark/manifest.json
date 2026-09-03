@@ -27,7 +27,7 @@
       "id": "asset:europe-1935-benchmark:politics-bundle",
       "kind": "other",
       "path": "starting-state/politics-bundle.json",
-      "contentAddress": "sha256:6c50e8790b69a5dab557c3649c00faf9b82ac0a571ce3aa322b5d39232b52de2",
+      "contentAddress": "sha256:73400fbeae2d7e3bdcad303d771dd2e10189b516132bbcea669e0fde0ca1c18d",
       "mediaType": "application/json",
       "required": true
     },
@@ -43,7 +43,7 @@
       "id": "asset:europe-1935-benchmark:starting-state-manifest",
       "kind": "other",
       "path": "starting-state/starting-state-manifest.json",
-      "contentAddress": "sha256:501e4416422b0d4a467c93b86db514660dd34b7c73a87ae1e8aaa9afe2b42142",
+      "contentAddress": "sha256:3cd2258c23a838a5d61d97a9b0a477db9676870547beac6df19f03e5d57149f5",
       "mediaType": "application/json",
       "required": true
     }

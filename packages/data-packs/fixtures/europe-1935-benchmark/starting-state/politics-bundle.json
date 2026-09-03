@@ -1,6 +1,6 @@
 {
   "schemaVersion": "open-historia-politics-bundle/1",
-  "status": "complete-pending-owner-review",
+  "status": "owner-approved-runtime",
   "effectiveAt": "1935-01-01",
   "polityCount": 11,
   "politics": {
