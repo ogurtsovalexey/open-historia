@@ -21,7 +21,8 @@ test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine pr
   const second = compileHistoricalProjection(input());
   assert.equal(first.checksum, second.checksum);
   assert.equal(first.scenario.scenarioId, 'scenario:europe-1935-benchmark');
-  assert.equal(first.scenario.polities.length, 9);
+  assert.equal(first.scenario.polities.length, 11);
+  assert.equal(first.scenario.regions.length, 115);
   assert.equal(input().bundle.manifest.contentVersion, '1.0.0');
   assert.equal(first.scenario.startMonth, '1935-01-01');
   assert.equal(first.scenario.campaign?.softHorizonMonth, '1940-07-01');
@@ -29,7 +30,11 @@ test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine pr
     'agreement:france-czechoslovakia-1924',
     'agreement:france-poland-1921',
   ]);
-  assert.equal(first.mapLink?.regions.find((entry) => entry.engineRegionId === 'region:benchmark-1:DE')?.mapRegionIds.length, 3);
+  assert.equal(first.mapLink?.regions.length, 115);
+  assert.deepEqual(first.scenario.polities.filter((entry) => entry.decisionMode === 'inert').map((entry) => entry.id), [
+    'polity:free-city-of-danzig',
+    'polity:saargebiet',
+  ]);
   const state = initState(first.scenario);
   assert.equal(state.label, 'historical-projection');
   assert.equal(state.diplomacy?.agreements.length, 2);

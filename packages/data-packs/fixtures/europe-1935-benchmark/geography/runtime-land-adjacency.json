@@ -1,0 +1,2001 @@
+{
+  "schemaVersion": "open-historia-runtime-land-adjacency/1",
+  "scenarioId": "scenario:europe-1935-benchmark",
+  "snapshotDate": "1935-01-01",
+  "approvedAdjacencyChecksum": "sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d",
+  "polities": [
+    {
+      "polityId": "polity:austria",
+      "method": "exact-shared-source-segments-7dp",
+      "regions": [
+        {
+          "regionId": "region:europe-1935:at-burgenland",
+          "adjacentRegionIds": [
+            "region:europe-1935:at-niederoesterreich",
+            "region:europe-1935:at-steiermark"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:at-kaernten",
+          "adjacentRegionIds": [
+            "region:europe-1935:at-osttirol",
+            "region:europe-1935:at-salzburg",
+            "region:europe-1935:at-steiermark"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:at-niederoesterreich",
+          "adjacentRegionIds": [
+            "region:europe-1935:at-burgenland",
+            "region:europe-1935:at-oberoesterreich",
+            "region:europe-1935:at-steiermark",
+            "region:europe-1935:at-wien"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:at-oberoesterreich",
+          "adjacentRegionIds": [
+            "region:europe-1935:at-niederoesterreich",
+            "region:europe-1935:at-salzburg",
+            "region:europe-1935:at-steiermark"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:at-osttirol",
+          "adjacentRegionIds": [
+            "region:europe-1935:at-kaernten",
+            "region:europe-1935:at-salzburg",
+            "region:europe-1935:at-tirol"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:at-salzburg",
+          "adjacentRegionIds": [
+            "region:europe-1935:at-kaernten",
+            "region:europe-1935:at-oberoesterreich",
+            "region:europe-1935:at-osttirol",
+            "region:europe-1935:at-steiermark",
+            "region:europe-1935:at-tirol"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:at-steiermark",
+          "adjacentRegionIds": [
+            "region:europe-1935:at-burgenland",
+            "region:europe-1935:at-kaernten",
+            "region:europe-1935:at-niederoesterreich",
+            "region:europe-1935:at-oberoesterreich",
+            "region:europe-1935:at-salzburg"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:at-tirol",
+          "adjacentRegionIds": [
+            "region:europe-1935:at-osttirol",
+            "region:europe-1935:at-salzburg",
+            "region:europe-1935:at-vorarlberg"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:at-vorarlberg",
+          "adjacentRegionIds": [
+            "region:europe-1935:at-tirol"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:at-wien",
+          "adjacentRegionIds": [
+            "region:europe-1935:at-niederoesterreich"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "fromRegionId": "region:europe-1935:at-burgenland",
+          "toRegionId": "region:europe-1935:at-niederoesterreich",
+          "sharedSegmentCount": 805
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-burgenland",
+          "toRegionId": "region:europe-1935:at-steiermark",
+          "sharedSegmentCount": 85
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-kaernten",
+          "toRegionId": "region:europe-1935:at-osttirol",
+          "sharedSegmentCount": 60
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-kaernten",
+          "toRegionId": "region:europe-1935:at-salzburg",
+          "sharedSegmentCount": 87
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-kaernten",
+          "toRegionId": "region:europe-1935:at-steiermark",
+          "sharedSegmentCount": 320
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-niederoesterreich",
+          "toRegionId": "region:europe-1935:at-oberoesterreich",
+          "sharedSegmentCount": 505
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-niederoesterreich",
+          "toRegionId": "region:europe-1935:at-steiermark",
+          "sharedSegmentCount": 242
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-niederoesterreich",
+          "toRegionId": "region:europe-1935:at-wien",
+          "sharedSegmentCount": 4
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-oberoesterreich",
+          "toRegionId": "region:europe-1935:at-salzburg",
+          "sharedSegmentCount": 165
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-oberoesterreich",
+          "toRegionId": "region:europe-1935:at-steiermark",
+          "sharedSegmentCount": 213
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-osttirol",
+          "toRegionId": "region:europe-1935:at-salzburg",
+          "sharedSegmentCount": 51
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-osttirol",
+          "toRegionId": "region:europe-1935:at-tirol",
+          "sharedSegmentCount": 4
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-salzburg",
+          "toRegionId": "region:europe-1935:at-steiermark",
+          "sharedSegmentCount": 142
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-salzburg",
+          "toRegionId": "region:europe-1935:at-tirol",
+          "sharedSegmentCount": 42
+        },
+        {
+          "fromRegionId": "region:europe-1935:at-tirol",
+          "toRegionId": "region:europe-1935:at-vorarlberg",
+          "sharedSegmentCount": 17
+        }
+      ]
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "method": "exact-shared-source-segments-7dp",
+      "regions": [
+        {
+          "regionId": "region:europe-1935:cs-jizni-cechy",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-morava",
+            "region:europe-1935:cs-stredni-cechy",
+            "region:europe-1935:cs-zapadni-cechy"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:cs-morava",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-jizni-cechy",
+            "region:europe-1935:cs-slezsko",
+            "region:europe-1935:cs-slovensko",
+            "region:europe-1935:cs-stredni-cechy",
+            "region:europe-1935:cs-vychodni-cechy"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:cs-podkarpatska-rus",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-slovensko"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:cs-praha",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-severni-cechy",
+            "region:europe-1935:cs-stredni-cechy"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:cs-severni-cechy",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-praha",
+            "region:europe-1935:cs-stredni-cechy",
+            "region:europe-1935:cs-vychodni-cechy",
+            "region:europe-1935:cs-zapadni-cechy"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:cs-slezsko",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-morava",
+            "region:europe-1935:cs-slovensko"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:cs-slovensko",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-morava",
+            "region:europe-1935:cs-podkarpatska-rus",
+            "region:europe-1935:cs-slezsko"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:cs-stredni-cechy",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-jizni-cechy",
+            "region:europe-1935:cs-morava",
+            "region:europe-1935:cs-praha",
+            "region:europe-1935:cs-severni-cechy",
+            "region:europe-1935:cs-vychodni-cechy",
+            "region:europe-1935:cs-zapadni-cechy"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:cs-vychodni-cechy",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-morava",
+            "region:europe-1935:cs-severni-cechy",
+            "region:europe-1935:cs-stredni-cechy"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:cs-zapadni-cechy",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-jizni-cechy",
+            "region:europe-1935:cs-severni-cechy",
+            "region:europe-1935:cs-stredni-cechy"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "fromRegionId": "region:europe-1935:cs-jizni-cechy",
+          "toRegionId": "region:europe-1935:cs-morava",
+          "sharedSegmentCount": 2487
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-jizni-cechy",
+          "toRegionId": "region:europe-1935:cs-stredni-cechy",
+          "sharedSegmentCount": 9937
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-jizni-cechy",
+          "toRegionId": "region:europe-1935:cs-zapadni-cechy",
+          "sharedSegmentCount": 4226
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-morava",
+          "toRegionId": "region:europe-1935:cs-slezsko",
+          "sharedSegmentCount": 5283
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-morava",
+          "toRegionId": "region:europe-1935:cs-slovensko",
+          "sharedSegmentCount": 6183
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-morava",
+          "toRegionId": "region:europe-1935:cs-stredni-cechy",
+          "sharedSegmentCount": 2717
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-morava",
+          "toRegionId": "region:europe-1935:cs-vychodni-cechy",
+          "sharedSegmentCount": 10698
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-podkarpatska-rus",
+          "toRegionId": "region:europe-1935:cs-slovensko",
+          "sharedSegmentCount": 392
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-praha",
+          "toRegionId": "region:europe-1935:cs-severni-cechy",
+          "sharedSegmentCount": 3250
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-praha",
+          "toRegionId": "region:europe-1935:cs-stredni-cechy",
+          "sharedSegmentCount": 1160
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-severni-cechy",
+          "toRegionId": "region:europe-1935:cs-stredni-cechy",
+          "sharedSegmentCount": 5614
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-severni-cechy",
+          "toRegionId": "region:europe-1935:cs-vychodni-cechy",
+          "sharedSegmentCount": 9749
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-severni-cechy",
+          "toRegionId": "region:europe-1935:cs-zapadni-cechy",
+          "sharedSegmentCount": 6052
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-slezsko",
+          "toRegionId": "region:europe-1935:cs-slovensko",
+          "sharedSegmentCount": 46
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-stredni-cechy",
+          "toRegionId": "region:europe-1935:cs-vychodni-cechy",
+          "sharedSegmentCount": 7321
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-stredni-cechy",
+          "toRegionId": "region:europe-1935:cs-zapadni-cechy",
+          "sharedSegmentCount": 1372
+        }
+      ]
+    },
+    {
+      "polityId": "polity:france",
+      "method": "exact-shared-source-segments-7dp",
+      "regions": [
+        {
+          "regionId": "region:europe-1935:fr-amiens",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-lille",
+            "region:europe-1935:fr-metz",
+            "region:europe-1935:fr-paris",
+            "region:europe-1935:fr-rouen"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-besancon",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-dijon",
+            "region:europe-1935:fr-lyon",
+            "region:europe-1935:fr-metz",
+            "region:europe-1935:fr-nancy"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-bordeaux",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-nantes",
+            "region:europe-1935:fr-toulouse",
+            "region:europe-1935:fr-tours"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-clermont-ferrand",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-dijon",
+            "region:europe-1935:fr-lyon",
+            "region:europe-1935:fr-marseille",
+            "region:europe-1935:fr-montpellier",
+            "region:europe-1935:fr-orleans",
+            "region:europe-1935:fr-toulouse",
+            "region:europe-1935:fr-tours"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-corse",
+          "adjacentRegionIds": []
+        },
+        {
+          "regionId": "region:europe-1935:fr-dijon",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-besancon",
+            "region:europe-1935:fr-clermont-ferrand",
+            "region:europe-1935:fr-lyon",
+            "region:europe-1935:fr-metz",
+            "region:europe-1935:fr-orleans",
+            "region:europe-1935:fr-paris"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-le-mans",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-nantes",
+            "region:europe-1935:fr-orleans",
+            "region:europe-1935:fr-paris",
+            "region:europe-1935:fr-rouen",
+            "region:europe-1935:fr-tours"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-lille",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-amiens"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-lyon",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-besancon",
+            "region:europe-1935:fr-clermont-ferrand",
+            "region:europe-1935:fr-dijon",
+            "region:europe-1935:fr-marseille"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-marseille",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-clermont-ferrand",
+            "region:europe-1935:fr-lyon",
+            "region:europe-1935:fr-montpellier"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-metz",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-amiens",
+            "region:europe-1935:fr-besancon",
+            "region:europe-1935:fr-dijon",
+            "region:europe-1935:fr-nancy",
+            "region:europe-1935:fr-paris"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-montpellier",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-clermont-ferrand",
+            "region:europe-1935:fr-marseille",
+            "region:europe-1935:fr-toulouse"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-nancy",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-besancon",
+            "region:europe-1935:fr-metz"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-nantes",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-bordeaux",
+            "region:europe-1935:fr-le-mans",
+            "region:europe-1935:fr-tours"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-orleans",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-clermont-ferrand",
+            "region:europe-1935:fr-dijon",
+            "region:europe-1935:fr-le-mans",
+            "region:europe-1935:fr-paris",
+            "region:europe-1935:fr-tours"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-paris",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-amiens",
+            "region:europe-1935:fr-dijon",
+            "region:europe-1935:fr-le-mans",
+            "region:europe-1935:fr-metz",
+            "region:europe-1935:fr-orleans",
+            "region:europe-1935:fr-rouen"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-rouen",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-amiens",
+            "region:europe-1935:fr-le-mans",
+            "region:europe-1935:fr-paris"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-toulouse",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-bordeaux",
+            "region:europe-1935:fr-clermont-ferrand",
+            "region:europe-1935:fr-montpellier",
+            "region:europe-1935:fr-tours"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:fr-tours",
+          "adjacentRegionIds": [
+            "region:europe-1935:fr-bordeaux",
+            "region:europe-1935:fr-clermont-ferrand",
+            "region:europe-1935:fr-le-mans",
+            "region:europe-1935:fr-nantes",
+            "region:europe-1935:fr-orleans",
+            "region:europe-1935:fr-toulouse"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "fromRegionId": "region:europe-1935:fr-amiens",
+          "toRegionId": "region:europe-1935:fr-lille",
+          "sharedSegmentCount": 291
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-amiens",
+          "toRegionId": "region:europe-1935:fr-metz",
+          "sharedSegmentCount": 272
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-amiens",
+          "toRegionId": "region:europe-1935:fr-paris",
+          "sharedSegmentCount": 190
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-amiens",
+          "toRegionId": "region:europe-1935:fr-rouen",
+          "sharedSegmentCount": 139
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-besancon",
+          "toRegionId": "region:europe-1935:fr-dijon",
+          "sharedSegmentCount": 391
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-besancon",
+          "toRegionId": "region:europe-1935:fr-lyon",
+          "sharedSegmentCount": 77
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-besancon",
+          "toRegionId": "region:europe-1935:fr-metz",
+          "sharedSegmentCount": 91
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-besancon",
+          "toRegionId": "region:europe-1935:fr-nancy",
+          "sharedSegmentCount": 282
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-bordeaux",
+          "toRegionId": "region:europe-1935:fr-nantes",
+          "sharedSegmentCount": 42
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-bordeaux",
+          "toRegionId": "region:europe-1935:fr-toulouse",
+          "sharedSegmentCount": 407
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-bordeaux",
+          "toRegionId": "region:europe-1935:fr-tours",
+          "sharedSegmentCount": 330
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-clermont-ferrand",
+          "toRegionId": "region:europe-1935:fr-dijon",
+          "sharedSegmentCount": 131
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-clermont-ferrand",
+          "toRegionId": "region:europe-1935:fr-lyon",
+          "sharedSegmentCount": 150
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-clermont-ferrand",
+          "toRegionId": "region:europe-1935:fr-marseille",
+          "sharedSegmentCount": 123
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-clermont-ferrand",
+          "toRegionId": "region:europe-1935:fr-montpellier",
+          "sharedSegmentCount": 217
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-clermont-ferrand",
+          "toRegionId": "region:europe-1935:fr-orleans",
+          "sharedSegmentCount": 146
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-clermont-ferrand",
+          "toRegionId": "region:europe-1935:fr-toulouse",
+          "sharedSegmentCount": 47
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-clermont-ferrand",
+          "toRegionId": "region:europe-1935:fr-tours",
+          "sharedSegmentCount": 313
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-dijon",
+          "toRegionId": "region:europe-1935:fr-lyon",
+          "sharedSegmentCount": 124
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-dijon",
+          "toRegionId": "region:europe-1935:fr-metz",
+          "sharedSegmentCount": 97
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-dijon",
+          "toRegionId": "region:europe-1935:fr-orleans",
+          "sharedSegmentCount": 326
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-dijon",
+          "toRegionId": "region:europe-1935:fr-paris",
+          "sharedSegmentCount": 88
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-le-mans",
+          "toRegionId": "region:europe-1935:fr-nantes",
+          "sharedSegmentCount": 342
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-le-mans",
+          "toRegionId": "region:europe-1935:fr-orleans",
+          "sharedSegmentCount": 195
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-le-mans",
+          "toRegionId": "region:europe-1935:fr-paris",
+          "sharedSegmentCount": 109
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-le-mans",
+          "toRegionId": "region:europe-1935:fr-rouen",
+          "sharedSegmentCount": 343
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-le-mans",
+          "toRegionId": "region:europe-1935:fr-tours",
+          "sharedSegmentCount": 171
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-lyon",
+          "toRegionId": "region:europe-1935:fr-marseille",
+          "sharedSegmentCount": 371
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-marseille",
+          "toRegionId": "region:europe-1935:fr-montpellier",
+          "sharedSegmentCount": 258
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-metz",
+          "toRegionId": "region:europe-1935:fr-nancy",
+          "sharedSegmentCount": 224
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-metz",
+          "toRegionId": "region:europe-1935:fr-paris",
+          "sharedSegmentCount": 46
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-montpellier",
+          "toRegionId": "region:europe-1935:fr-toulouse",
+          "sharedSegmentCount": 453
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-nantes",
+          "toRegionId": "region:europe-1935:fr-tours",
+          "sharedSegmentCount": 240
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-orleans",
+          "toRegionId": "region:europe-1935:fr-paris",
+          "sharedSegmentCount": 101
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-orleans",
+          "toRegionId": "region:europe-1935:fr-tours",
+          "sharedSegmentCount": 238
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-paris",
+          "toRegionId": "region:europe-1935:fr-rouen",
+          "sharedSegmentCount": 53
+        },
+        {
+          "fromRegionId": "region:europe-1935:fr-toulouse",
+          "toRegionId": "region:europe-1935:fr-tours",
+          "sharedSegmentCount": 193
+        }
+      ]
+    },
+    {
+      "polityId": "polity:free-city-of-danzig",
+      "method": "exact-shared-source-segments-7dp",
+      "regions": [
+        {
+          "regionId": "region:europe-1935:danzig-freie-stadt-danzig",
+          "adjacentRegionIds": []
+        }
+      ],
+      "edges": []
+    },
+    {
+      "polityId": "polity:germany",
+      "method": "exact-shared-source-segments-7dp",
+      "regions": [
+        {
+          "regionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-bayern",
+            "region:europe-1935:de-brandenburg",
+            "region:europe-1935:de-bremen-oldenburg",
+            "region:europe-1935:de-hannover-braunschweig",
+            "region:europe-1935:de-hessen-nassau",
+            "region:europe-1935:de-mecklenburg",
+            "region:europe-1935:de-niederschlesien",
+            "region:europe-1935:de-pommern",
+            "region:europe-1935:de-sachsen",
+            "region:europe-1935:de-schleswig-holstein",
+            "region:europe-1935:de-thueringen",
+            "region:europe-1935:de-westfalen-lippe"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-baden",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-bayern",
+            "region:europe-1935:de-hessen",
+            "region:europe-1935:de-hohenzollern",
+            "region:europe-1935:de-wuerttemberg"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-bayern",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-baden",
+            "region:europe-1935:de-hessen",
+            "region:europe-1935:de-hessen-nassau",
+            "region:europe-1935:de-hohenzollern",
+            "region:europe-1935:de-rheinprovinz",
+            "region:europe-1935:de-sachsen",
+            "region:europe-1935:de-thueringen",
+            "region:europe-1935:de-wuerttemberg"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-brandenburg",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-grenzmark",
+            "region:europe-1935:de-mecklenburg",
+            "region:europe-1935:de-niederschlesien",
+            "region:europe-1935:de-pommern"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-bremen-oldenburg",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-rheinprovinz",
+            "region:europe-1935:de-schleswig-holstein"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-grenzmark",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-brandenburg",
+            "region:europe-1935:de-niederschlesien",
+            "region:europe-1935:de-pommern"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-hannover-braunschweig",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-westfalen-lippe"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-hessen",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-baden",
+            "region:europe-1935:de-bayern",
+            "region:europe-1935:de-hessen-nassau",
+            "region:europe-1935:de-rheinprovinz",
+            "region:europe-1935:de-wuerttemberg"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-hessen-nassau",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-bayern",
+            "region:europe-1935:de-hessen",
+            "region:europe-1935:de-rheinprovinz",
+            "region:europe-1935:de-thueringen",
+            "region:europe-1935:de-westfalen-lippe"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-hohenzollern",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-baden",
+            "region:europe-1935:de-bayern",
+            "region:europe-1935:de-wuerttemberg"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-mecklenburg",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-brandenburg",
+            "region:europe-1935:de-pommern",
+            "region:europe-1935:de-schleswig-holstein"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-niederschlesien",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-brandenburg",
+            "region:europe-1935:de-grenzmark",
+            "region:europe-1935:de-oberschlesien",
+            "region:europe-1935:de-sachsen"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-oberschlesien",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-niederschlesien"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-ostpreussen",
+          "adjacentRegionIds": []
+        },
+        {
+          "regionId": "region:europe-1935:de-pommern",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-brandenburg",
+            "region:europe-1935:de-grenzmark",
+            "region:europe-1935:de-mecklenburg"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-rheinprovinz",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-bayern",
+            "region:europe-1935:de-bremen-oldenburg",
+            "region:europe-1935:de-hessen",
+            "region:europe-1935:de-hessen-nassau",
+            "region:europe-1935:de-westfalen-lippe"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-sachsen",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-bayern",
+            "region:europe-1935:de-niederschlesien",
+            "region:europe-1935:de-thueringen"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-schleswig-holstein",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-bremen-oldenburg",
+            "region:europe-1935:de-mecklenburg"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-thueringen",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-bayern",
+            "region:europe-1935:de-hessen-nassau",
+            "region:europe-1935:de-sachsen"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-westfalen-lippe",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-anhalt-provinz-sachsen",
+            "region:europe-1935:de-hannover-braunschweig",
+            "region:europe-1935:de-hessen-nassau",
+            "region:europe-1935:de-rheinprovinz"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:de-wuerttemberg",
+          "adjacentRegionIds": [
+            "region:europe-1935:de-baden",
+            "region:europe-1935:de-bayern",
+            "region:europe-1935:de-hessen",
+            "region:europe-1935:de-hohenzollern"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-bayern",
+          "sharedSegmentCount": 15
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-brandenburg",
+          "sharedSegmentCount": 2580
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-bremen-oldenburg",
+          "sharedSegmentCount": 3216
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-hannover-braunschweig",
+          "sharedSegmentCount": 6237
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-hessen-nassau",
+          "sharedSegmentCount": 2956
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-mecklenburg",
+          "sharedSegmentCount": 651
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-niederschlesien",
+          "sharedSegmentCount": 98
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-pommern",
+          "sharedSegmentCount": 660
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-sachsen",
+          "sharedSegmentCount": 1177
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-schleswig-holstein",
+          "sharedSegmentCount": 1427
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-thueringen",
+          "sharedSegmentCount": 5753
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+          "toRegionId": "region:europe-1935:de-westfalen-lippe",
+          "sharedSegmentCount": 3548
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-baden",
+          "toRegionId": "region:europe-1935:de-bayern",
+          "sharedSegmentCount": 1403
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-baden",
+          "toRegionId": "region:europe-1935:de-hessen",
+          "sharedSegmentCount": 1606
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-baden",
+          "toRegionId": "region:europe-1935:de-hohenzollern",
+          "sharedSegmentCount": 2727
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-baden",
+          "toRegionId": "region:europe-1935:de-wuerttemberg",
+          "sharedSegmentCount": 8134
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-bayern",
+          "toRegionId": "region:europe-1935:de-hessen",
+          "sharedSegmentCount": 2586
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-bayern",
+          "toRegionId": "region:europe-1935:de-hessen-nassau",
+          "sharedSegmentCount": 240
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-bayern",
+          "toRegionId": "region:europe-1935:de-hohenzollern",
+          "sharedSegmentCount": 177
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-bayern",
+          "toRegionId": "region:europe-1935:de-rheinprovinz",
+          "sharedSegmentCount": 1510
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-bayern",
+          "toRegionId": "region:europe-1935:de-sachsen",
+          "sharedSegmentCount": 120
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-bayern",
+          "toRegionId": "region:europe-1935:de-thueringen",
+          "sharedSegmentCount": 1114
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-bayern",
+          "toRegionId": "region:europe-1935:de-wuerttemberg",
+          "sharedSegmentCount": 19847
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-brandenburg",
+          "toRegionId": "region:europe-1935:de-grenzmark",
+          "sharedSegmentCount": 682
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-brandenburg",
+          "toRegionId": "region:europe-1935:de-mecklenburg",
+          "sharedSegmentCount": 1517
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-brandenburg",
+          "toRegionId": "region:europe-1935:de-niederschlesien",
+          "sharedSegmentCount": 1134
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-brandenburg",
+          "toRegionId": "region:europe-1935:de-pommern",
+          "sharedSegmentCount": 781
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-bremen-oldenburg",
+          "toRegionId": "region:europe-1935:de-rheinprovinz",
+          "sharedSegmentCount": 568
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-bremen-oldenburg",
+          "toRegionId": "region:europe-1935:de-schleswig-holstein",
+          "sharedSegmentCount": 715
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-grenzmark",
+          "toRegionId": "region:europe-1935:de-niederschlesien",
+          "sharedSegmentCount": 419
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-grenzmark",
+          "toRegionId": "region:europe-1935:de-pommern",
+          "sharedSegmentCount": 583
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-hannover-braunschweig",
+          "toRegionId": "region:europe-1935:de-westfalen-lippe",
+          "sharedSegmentCount": 180
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-hessen",
+          "toRegionId": "region:europe-1935:de-hessen-nassau",
+          "sharedSegmentCount": 6761
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-hessen",
+          "toRegionId": "region:europe-1935:de-rheinprovinz",
+          "sharedSegmentCount": 164
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-hessen",
+          "toRegionId": "region:europe-1935:de-wuerttemberg",
+          "sharedSegmentCount": 245
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-hessen-nassau",
+          "toRegionId": "region:europe-1935:de-rheinprovinz",
+          "sharedSegmentCount": 2258
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-hessen-nassau",
+          "toRegionId": "region:europe-1935:de-thueringen",
+          "sharedSegmentCount": 1471
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-hessen-nassau",
+          "toRegionId": "region:europe-1935:de-westfalen-lippe",
+          "sharedSegmentCount": 1867
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-hohenzollern",
+          "toRegionId": "region:europe-1935:de-wuerttemberg",
+          "sharedSegmentCount": 7474
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-mecklenburg",
+          "toRegionId": "region:europe-1935:de-pommern",
+          "sharedSegmentCount": 1322
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-mecklenburg",
+          "toRegionId": "region:europe-1935:de-schleswig-holstein",
+          "sharedSegmentCount": 833
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-niederschlesien",
+          "toRegionId": "region:europe-1935:de-oberschlesien",
+          "sharedSegmentCount": 456
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-niederschlesien",
+          "toRegionId": "region:europe-1935:de-sachsen",
+          "sharedSegmentCount": 671
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-rheinprovinz",
+          "toRegionId": "region:europe-1935:de-westfalen-lippe",
+          "sharedSegmentCount": 2030
+        },
+        {
+          "fromRegionId": "region:europe-1935:de-sachsen",
+          "toRegionId": "region:europe-1935:de-thueringen",
+          "sharedSegmentCount": 3930
+        }
+      ]
+    },
+    {
+      "polityId": "polity:italy",
+      "method": "exact-shared-source-segments-7dp",
+      "regions": [
+        {
+          "regionId": "region:europe-1935:it-abruzzi-molise",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-calabrie",
+            "region:europe-1935:it-campania",
+            "region:europe-1935:it-emilia",
+            "region:europe-1935:it-lazio",
+            "region:europe-1935:it-lucania",
+            "region:europe-1935:it-marche",
+            "region:europe-1935:it-puglie",
+            "region:europe-1935:it-toscana"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-calabrie",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-abruzzi-molise",
+            "region:europe-1935:it-lucania"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-campania",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-abruzzi-molise",
+            "region:europe-1935:it-lazio",
+            "region:europe-1935:it-lucania",
+            "region:europe-1935:it-puglie"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-emilia",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-abruzzi-molise",
+            "region:europe-1935:it-liguria",
+            "region:europe-1935:it-lombardia",
+            "region:europe-1935:it-marche",
+            "region:europe-1935:it-toscana",
+            "region:europe-1935:it-veneto",
+            "region:europe-1935:it-venezia-giulia"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-lazio",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-abruzzi-molise",
+            "region:europe-1935:it-campania",
+            "region:europe-1935:it-marche",
+            "region:europe-1935:it-toscana",
+            "region:europe-1935:it-umbria"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-liguria",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-emilia",
+            "region:europe-1935:it-lombardia",
+            "region:europe-1935:it-piemonte",
+            "region:europe-1935:it-toscana"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-lombardia",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-emilia",
+            "region:europe-1935:it-liguria",
+            "region:europe-1935:it-piemonte",
+            "region:europe-1935:it-veneto",
+            "region:europe-1935:it-venezia-tridentina"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-lucania",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-abruzzi-molise",
+            "region:europe-1935:it-calabrie",
+            "region:europe-1935:it-campania",
+            "region:europe-1935:it-puglie"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-marche",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-abruzzi-molise",
+            "region:europe-1935:it-emilia",
+            "region:europe-1935:it-lazio",
+            "region:europe-1935:it-toscana",
+            "region:europe-1935:it-umbria"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-piemonte",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-liguria",
+            "region:europe-1935:it-lombardia"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-puglie",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-abruzzi-molise",
+            "region:europe-1935:it-campania",
+            "region:europe-1935:it-lucania"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-sardegna",
+          "adjacentRegionIds": []
+        },
+        {
+          "regionId": "region:europe-1935:it-sicilia",
+          "adjacentRegionIds": []
+        },
+        {
+          "regionId": "region:europe-1935:it-toscana",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-abruzzi-molise",
+            "region:europe-1935:it-emilia",
+            "region:europe-1935:it-lazio",
+            "region:europe-1935:it-liguria",
+            "region:europe-1935:it-marche",
+            "region:europe-1935:it-umbria"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-umbria",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-lazio",
+            "region:europe-1935:it-marche",
+            "region:europe-1935:it-toscana"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-veneto",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-emilia",
+            "region:europe-1935:it-lombardia",
+            "region:europe-1935:it-venezia-giulia",
+            "region:europe-1935:it-venezia-tridentina"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-venezia-giulia",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-emilia",
+            "region:europe-1935:it-veneto"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:it-venezia-tridentina",
+          "adjacentRegionIds": [
+            "region:europe-1935:it-lombardia",
+            "region:europe-1935:it-veneto"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "fromRegionId": "region:europe-1935:it-abruzzi-molise",
+          "toRegionId": "region:europe-1935:it-calabrie",
+          "sharedSegmentCount": 1859
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-abruzzi-molise",
+          "toRegionId": "region:europe-1935:it-campania",
+          "sharedSegmentCount": 2267
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-abruzzi-molise",
+          "toRegionId": "region:europe-1935:it-emilia",
+          "sharedSegmentCount": 3
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-abruzzi-molise",
+          "toRegionId": "region:europe-1935:it-lazio",
+          "sharedSegmentCount": 1576
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-abruzzi-molise",
+          "toRegionId": "region:europe-1935:it-lucania",
+          "sharedSegmentCount": 148
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-abruzzi-molise",
+          "toRegionId": "region:europe-1935:it-marche",
+          "sharedSegmentCount": 1545
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-abruzzi-molise",
+          "toRegionId": "region:europe-1935:it-puglie",
+          "sharedSegmentCount": 4914
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-abruzzi-molise",
+          "toRegionId": "region:europe-1935:it-toscana",
+          "sharedSegmentCount": 574
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-calabrie",
+          "toRegionId": "region:europe-1935:it-lucania",
+          "sharedSegmentCount": 380
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-campania",
+          "toRegionId": "region:europe-1935:it-lazio",
+          "sharedSegmentCount": 38
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-campania",
+          "toRegionId": "region:europe-1935:it-lucania",
+          "sharedSegmentCount": 155
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-campania",
+          "toRegionId": "region:europe-1935:it-puglie",
+          "sharedSegmentCount": 82
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-emilia",
+          "toRegionId": "region:europe-1935:it-liguria",
+          "sharedSegmentCount": 2
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-emilia",
+          "toRegionId": "region:europe-1935:it-lombardia",
+          "sharedSegmentCount": 2
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-emilia",
+          "toRegionId": "region:europe-1935:it-marche",
+          "sharedSegmentCount": 576
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-emilia",
+          "toRegionId": "region:europe-1935:it-toscana",
+          "sharedSegmentCount": 1232
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-emilia",
+          "toRegionId": "region:europe-1935:it-veneto",
+          "sharedSegmentCount": 1025
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-emilia",
+          "toRegionId": "region:europe-1935:it-venezia-giulia",
+          "sharedSegmentCount": 884
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-lazio",
+          "toRegionId": "region:europe-1935:it-marche",
+          "sharedSegmentCount": 369
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-lazio",
+          "toRegionId": "region:europe-1935:it-toscana",
+          "sharedSegmentCount": 91
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-lazio",
+          "toRegionId": "region:europe-1935:it-umbria",
+          "sharedSegmentCount": 509
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-liguria",
+          "toRegionId": "region:europe-1935:it-lombardia",
+          "sharedSegmentCount": 1
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-liguria",
+          "toRegionId": "region:europe-1935:it-piemonte",
+          "sharedSegmentCount": 2359
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-liguria",
+          "toRegionId": "region:europe-1935:it-toscana",
+          "sharedSegmentCount": 357
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-lombardia",
+          "toRegionId": "region:europe-1935:it-piemonte",
+          "sharedSegmentCount": 791
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-lombardia",
+          "toRegionId": "region:europe-1935:it-veneto",
+          "sharedSegmentCount": 367
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-lombardia",
+          "toRegionId": "region:europe-1935:it-venezia-tridentina",
+          "sharedSegmentCount": 319
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-lucania",
+          "toRegionId": "region:europe-1935:it-puglie",
+          "sharedSegmentCount": 3293
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-marche",
+          "toRegionId": "region:europe-1935:it-toscana",
+          "sharedSegmentCount": 138
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-marche",
+          "toRegionId": "region:europe-1935:it-umbria",
+          "sharedSegmentCount": 5680
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-toscana",
+          "toRegionId": "region:europe-1935:it-umbria",
+          "sharedSegmentCount": 229
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-veneto",
+          "toRegionId": "region:europe-1935:it-venezia-giulia",
+          "sharedSegmentCount": 3850
+        },
+        {
+          "fromRegionId": "region:europe-1935:it-veneto",
+          "toRegionId": "region:europe-1935:it-venezia-tridentina",
+          "sharedSegmentCount": 624
+        }
+      ]
+    },
+    {
+      "polityId": "polity:poland",
+      "method": "exact-shared-source-segments-7dp",
+      "regions": [
+        {
+          "regionId": "region:ohm-1935:2696109",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2741466",
+            "region:ohm-1935:2741468"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2698169",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2698170",
+            "region:ohm-1935:2741463",
+            "region:ohm-1935:2927191",
+            "region:ohm-1935:2929589"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2698170",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2698169",
+            "region:ohm-1935:2741463",
+            "region:ohm-1935:2741466",
+            "region:ohm-1935:2741468"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2741463",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2698169",
+            "region:ohm-1935:2698170",
+            "region:ohm-1935:2741468",
+            "region:ohm-1935:2741469",
+            "region:ohm-1935:2741470",
+            "region:ohm-1935:2927191"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2741466",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2696109",
+            "region:ohm-1935:2698170",
+            "region:ohm-1935:2741468"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2741468",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2696109",
+            "region:ohm-1935:2698170",
+            "region:ohm-1935:2741463",
+            "region:ohm-1935:2741466",
+            "region:ohm-1935:2741469"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2741469",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2741463",
+            "region:ohm-1935:2741468",
+            "region:ohm-1935:2741470",
+            "region:ohm-1935:2741475",
+            "region:ohm-1935:2741476",
+            "region:ohm-1935:2741477"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2741470",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2741463",
+            "region:ohm-1935:2741469",
+            "region:ohm-1935:2741471",
+            "region:ohm-1935:2741475",
+            "region:ohm-1935:2927190",
+            "region:ohm-1935:2927191"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2741471",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2741470",
+            "region:ohm-1935:2927190"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2741475",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2741469",
+            "region:ohm-1935:2741470",
+            "region:ohm-1935:2741476"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2741476",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2741469",
+            "region:ohm-1935:2741475",
+            "region:ohm-1935:2741477"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2741477",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2741469",
+            "region:ohm-1935:2741476"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2927190",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2741470",
+            "region:ohm-1935:2741471",
+            "region:ohm-1935:2927191"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2927191",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2698169",
+            "region:ohm-1935:2741463",
+            "region:ohm-1935:2741470",
+            "region:ohm-1935:2927190",
+            "region:ohm-1935:2929589",
+            "region:ohm-1935:2930186"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2929589",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2698169",
+            "region:ohm-1935:2927191",
+            "region:ohm-1935:2930186"
+          ]
+        },
+        {
+          "regionId": "region:ohm-1935:2930186",
+          "adjacentRegionIds": [
+            "region:ohm-1935:2927191",
+            "region:ohm-1935:2929589"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "fromRegionId": "region:ohm-1935:2696109",
+          "toRegionId": "region:ohm-1935:2741466",
+          "sharedSegmentCount": 77
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2696109",
+          "toRegionId": "region:ohm-1935:2741468",
+          "sharedSegmentCount": 11
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2698169",
+          "toRegionId": "region:ohm-1935:2698170",
+          "sharedSegmentCount": 87
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2698169",
+          "toRegionId": "region:ohm-1935:2741463",
+          "sharedSegmentCount": 3216
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2698169",
+          "toRegionId": "region:ohm-1935:2927191",
+          "sharedSegmentCount": 361
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2698169",
+          "toRegionId": "region:ohm-1935:2929589",
+          "sharedSegmentCount": 1068
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2698170",
+          "toRegionId": "region:ohm-1935:2741463",
+          "sharedSegmentCount": 306
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2698170",
+          "toRegionId": "region:ohm-1935:2741466",
+          "sharedSegmentCount": 16
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2698170",
+          "toRegionId": "region:ohm-1935:2741468",
+          "sharedSegmentCount": 26
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741463",
+          "toRegionId": "region:ohm-1935:2741468",
+          "sharedSegmentCount": 129
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741463",
+          "toRegionId": "region:ohm-1935:2741469",
+          "sharedSegmentCount": 6
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741463",
+          "toRegionId": "region:ohm-1935:2741470",
+          "sharedSegmentCount": 149
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741463",
+          "toRegionId": "region:ohm-1935:2927191",
+          "sharedSegmentCount": 1033
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741466",
+          "toRegionId": "region:ohm-1935:2741468",
+          "sharedSegmentCount": 3
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741468",
+          "toRegionId": "region:ohm-1935:2741469",
+          "sharedSegmentCount": 4
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741469",
+          "toRegionId": "region:ohm-1935:2741470",
+          "sharedSegmentCount": 6
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741469",
+          "toRegionId": "region:ohm-1935:2741475",
+          "sharedSegmentCount": 307
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741469",
+          "toRegionId": "region:ohm-1935:2741476",
+          "sharedSegmentCount": 492
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741469",
+          "toRegionId": "region:ohm-1935:2741477",
+          "sharedSegmentCount": 582
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741470",
+          "toRegionId": "region:ohm-1935:2741471",
+          "sharedSegmentCount": 84
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741470",
+          "toRegionId": "region:ohm-1935:2741475",
+          "sharedSegmentCount": 51
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741470",
+          "toRegionId": "region:ohm-1935:2927190",
+          "sharedSegmentCount": 1425
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741470",
+          "toRegionId": "region:ohm-1935:2927191",
+          "sharedSegmentCount": 33
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741471",
+          "toRegionId": "region:ohm-1935:2927190",
+          "sharedSegmentCount": 984
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741475",
+          "toRegionId": "region:ohm-1935:2741476",
+          "sharedSegmentCount": 594
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2741476",
+          "toRegionId": "region:ohm-1935:2741477",
+          "sharedSegmentCount": 763
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2927190",
+          "toRegionId": "region:ohm-1935:2927191",
+          "sharedSegmentCount": 2044
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2927191",
+          "toRegionId": "region:ohm-1935:2929589",
+          "sharedSegmentCount": 1312
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2927191",
+          "toRegionId": "region:ohm-1935:2930186",
+          "sharedSegmentCount": 3271
+        },
+        {
+          "fromRegionId": "region:ohm-1935:2929589",
+          "toRegionId": "region:ohm-1935:2930186",
+          "sharedSegmentCount": 698
+        }
+      ]
+    },
+    {
+      "polityId": "polity:saargebiet",
+      "method": "exact-shared-source-segments-7dp",
+      "regions": [
+        {
+          "regionId": "region:europe-1935:saar-saargebiet",
+          "adjacentRegionIds": []
+        }
+      ],
+      "edges": []
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "method": "exact-shared-source-segments-7dp",
+      "regions": [
+        {
+          "regionId": "region:europe-1935:gb-central-scotland",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-highlands-islands",
+            "region:europe-1935:gb-north-east-scotland",
+            "region:europe-1935:gb-southern-scotland"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-cymru",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-midlands",
+            "region:europe-1935:gb-north-west-england",
+            "region:europe-1935:gb-south-west-england"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-east-england",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-midlands",
+            "region:europe-1935:gb-south-east-england",
+            "region:europe-1935:gb-southern-england"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-highlands-islands",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-central-scotland",
+            "region:europe-1935:gb-north-east-scotland"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-midlands",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-cymru",
+            "region:europe-1935:gb-east-england",
+            "region:europe-1935:gb-north-west-england",
+            "region:europe-1935:gb-northern-england",
+            "region:europe-1935:gb-south-west-england",
+            "region:europe-1935:gb-southern-england"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-north-east-scotland",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-central-scotland",
+            "region:europe-1935:gb-highlands-islands"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-north-west-england",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-cymru",
+            "region:europe-1935:gb-midlands",
+            "region:europe-1935:gb-northern-england"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-northern-england",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-midlands",
+            "region:europe-1935:gb-north-west-england",
+            "region:europe-1935:gb-southern-scotland"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-northern-ireland",
+          "adjacentRegionIds": []
+        },
+        {
+          "regionId": "region:europe-1935:gb-south-east-england",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-east-england",
+            "region:europe-1935:gb-southern-england"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-south-west-england",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-cymru",
+            "region:europe-1935:gb-midlands",
+            "region:europe-1935:gb-southern-england"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-southern-england",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-east-england",
+            "region:europe-1935:gb-midlands",
+            "region:europe-1935:gb-south-east-england",
+            "region:europe-1935:gb-south-west-england"
+          ]
+        },
+        {
+          "regionId": "region:europe-1935:gb-southern-scotland",
+          "adjacentRegionIds": [
+            "region:europe-1935:gb-central-scotland",
+            "region:europe-1935:gb-northern-england"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "fromRegionId": "region:europe-1935:gb-central-scotland",
+          "toRegionId": "region:europe-1935:gb-highlands-islands",
+          "sharedSegmentCount": 248
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-central-scotland",
+          "toRegionId": "region:europe-1935:gb-north-east-scotland",
+          "sharedSegmentCount": 1928
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-central-scotland",
+          "toRegionId": "region:europe-1935:gb-southern-scotland",
+          "sharedSegmentCount": 2251
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-cymru",
+          "toRegionId": "region:europe-1935:gb-midlands",
+          "sharedSegmentCount": 2991
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-cymru",
+          "toRegionId": "region:europe-1935:gb-north-west-england",
+          "sharedSegmentCount": 570
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-cymru",
+          "toRegionId": "region:europe-1935:gb-south-west-england",
+          "sharedSegmentCount": 267
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-east-england",
+          "toRegionId": "region:europe-1935:gb-midlands",
+          "sharedSegmentCount": 1255
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-east-england",
+          "toRegionId": "region:europe-1935:gb-south-east-england",
+          "sharedSegmentCount": 1115
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-east-england",
+          "toRegionId": "region:europe-1935:gb-southern-england",
+          "sharedSegmentCount": 1197
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-highlands-islands",
+          "toRegionId": "region:europe-1935:gb-north-east-scotland",
+          "sharedSegmentCount": 3340
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-midlands",
+          "toRegionId": "region:europe-1935:gb-north-west-england",
+          "sharedSegmentCount": 1491
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-midlands",
+          "toRegionId": "region:europe-1935:gb-northern-england",
+          "sharedSegmentCount": 1363
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-midlands",
+          "toRegionId": "region:europe-1935:gb-south-west-england",
+          "sharedSegmentCount": 2445
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-midlands",
+          "toRegionId": "region:europe-1935:gb-southern-england",
+          "sharedSegmentCount": 1564
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-north-west-england",
+          "toRegionId": "region:europe-1935:gb-northern-england",
+          "sharedSegmentCount": 2607
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-northern-england",
+          "toRegionId": "region:europe-1935:gb-southern-scotland",
+          "sharedSegmentCount": 1273
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-south-east-england",
+          "toRegionId": "region:europe-1935:gb-southern-england",
+          "sharedSegmentCount": 2164
+        },
+        {
+          "fromRegionId": "region:europe-1935:gb-south-west-england",
+          "toRegionId": "region:europe-1935:gb-southern-england",
+          "sharedSegmentCount": 2415
+        }
+      ]
+    }
+  ],
+  "manualConnections": [
+    {
+      "kind": "strait",
+      "from": "polity:italy/sicilia",
+      "to": "polity:italy/calabrie"
+    },
+    {
+      "kind": "sea-route",
+      "from": "polity:italy/sardegna",
+      "to": "polity:italy/lazio"
+    },
+    {
+      "kind": "sea-route",
+      "from": "polity:france/corse",
+      "to": "polity:france/marseille"
+    },
+    {
+      "kind": "sea-route",
+      "from": "polity:united-kingdom/northern-ireland",
+      "to": "polity:united-kingdom/southern-scotland"
+    },
+    {
+      "kind": "external-land",
+      "from": "polity:germany/ostpreussen",
+      "to": "polity:free-city-of-danzig/freie-stadt-danzig"
+    }
+  ]
+}

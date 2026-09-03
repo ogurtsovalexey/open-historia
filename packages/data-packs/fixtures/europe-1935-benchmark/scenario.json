@@ -5,93 +5,1233 @@
     "title": "Europe, 1935–1940 Benchmark",
     "description": "Conditional-history benchmark for autonomous campaign evaluation.",
     "locales": {
-      "en": { "title": "Europe, 1935–1940 Benchmark", "description": "Conditional-history benchmark for autonomous campaign evaluation." },
-      "ru": { "title": "Европа, 1935–1940", "description": "Benchmark условной истории для автономных кампаний." }
+      "en": {
+        "title": "Europe, 1935–1940 Benchmark",
+        "description": "Conditional-history benchmark for autonomous campaign evaluation."
+      },
+      "ru": {
+        "title": "Европа, 1935–1940",
+        "description": "Benchmark условной истории для автономных кампаний."
+      }
     }
   },
-  "game": { "startDate": "1935-01-01", "defaultPlayer": "polity:germany" },
+  "game": {
+    "startDate": "1935-01-01",
+    "defaultPlayer": "polity:germany"
+  },
   "polities": {
-    "polity:germany": { "id": "polity:germany", "name": "Germany", "aliases": ["German Reich"], "color": "#555555" },
-    "polity:austria": { "id": "polity:austria", "name": "Austria", "color": "#d94848" },
-    "polity:czechoslovakia": { "id": "polity:czechoslovakia", "name": "Czechoslovakia", "color": "#4f78c4" },
-    "polity:poland": { "id": "polity:poland", "name": "Poland", "color": "#d8d8d8" },
-    "polity:france": { "id": "polity:france", "name": "France", "color": "#4169a8" },
-    "polity:united-kingdom": { "id": "polity:united-kingdom", "name": "United Kingdom", "aliases": ["Britain"], "color": "#b44747" },
-    "polity:italy": { "id": "polity:italy", "name": "Italy", "color": "#4f9960" },
-    "polity:soviet-union": { "id": "polity:soviet-union", "name": "Soviet Union", "aliases": ["USSR"], "color": "#a72d2d" },
-    "polity:united-states": { "id": "polity:united-states", "name": "United States", "aliases": ["USA"], "color": "#526fa8" }
+    "polity:austria": {
+      "id": "polity:austria",
+      "name": "Austria",
+      "color": "#d94848"
+    },
+    "polity:czechoslovakia": {
+      "id": "polity:czechoslovakia",
+      "name": "Czechoslovakia",
+      "color": "#4f78c4"
+    },
+    "polity:france": {
+      "id": "polity:france",
+      "name": "France",
+      "color": "#4169a8"
+    },
+    "polity:free-city-of-danzig": {
+      "id": "polity:free-city-of-danzig",
+      "name": "Freie Stadt Danzig",
+      "color": "#c9a45c"
+    },
+    "polity:germany": {
+      "id": "polity:germany",
+      "name": "Germany",
+      "aliases": [
+        "German Reich"
+      ],
+      "color": "#555555"
+    },
+    "polity:italy": {
+      "id": "polity:italy",
+      "name": "Italy",
+      "color": "#4f9960"
+    },
+    "polity:poland": {
+      "id": "polity:poland",
+      "name": "Poland",
+      "color": "#d8d8d8"
+    },
+    "polity:saargebiet": {
+      "id": "polity:saargebiet",
+      "name": "Saargebiet",
+      "color": "#7d8b94"
+    },
+    "polity:soviet-union": {
+      "id": "polity:soviet-union",
+      "name": "Soviet Union",
+      "aliases": [
+        "USSR"
+      ],
+      "color": "#a72d2d"
+    },
+    "polity:united-kingdom": {
+      "id": "polity:united-kingdom",
+      "name": "United Kingdom",
+      "aliases": [
+        "Britain"
+      ],
+      "color": "#b44747"
+    },
+    "polity:united-states": {
+      "id": "polity:united-states",
+      "name": "United States",
+      "aliases": [
+        "USA"
+      ],
+      "color": "#526fa8"
+    }
   },
   "regions": [
-    { "id": "region:benchmark-1:DE", "dataset": "benchmark", "datasetVersion": "1", "nativeId": "DE" },
-    { "id": "region:benchmark-1:AT", "dataset": "benchmark", "datasetVersion": "1", "nativeId": "AT" },
-    { "id": "region:benchmark-1:CS", "dataset": "benchmark", "datasetVersion": "1", "nativeId": "CS" },
-    { "id": "region:benchmark-1:PL", "dataset": "benchmark", "datasetVersion": "1", "nativeId": "PL" },
-    { "id": "region:benchmark-1:FR", "dataset": "benchmark", "datasetVersion": "1", "nativeId": "FR" },
-    { "id": "region:benchmark-1:GB", "dataset": "benchmark", "datasetVersion": "1", "nativeId": "GB" },
-    { "id": "region:benchmark-1:IT", "dataset": "benchmark", "datasetVersion": "1", "nativeId": "IT" },
-    { "id": "region:benchmark-1:SU", "dataset": "benchmark", "datasetVersion": "1", "nativeId": "SU" },
-    { "id": "region:benchmark-1:US", "dataset": "benchmark", "datasetVersion": "1", "nativeId": "US" }
+    {
+      "id": "region:europe-1935:at-burgenland",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "at-burgenland"
+    },
+    {
+      "id": "region:europe-1935:at-kaernten",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "at-kaernten"
+    },
+    {
+      "id": "region:europe-1935:at-niederoesterreich",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "at-niederoesterreich"
+    },
+    {
+      "id": "region:europe-1935:at-oberoesterreich",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "at-oberoesterreich"
+    },
+    {
+      "id": "region:europe-1935:at-osttirol",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "at-osttirol"
+    },
+    {
+      "id": "region:europe-1935:at-salzburg",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "at-salzburg"
+    },
+    {
+      "id": "region:europe-1935:at-steiermark",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "at-steiermark"
+    },
+    {
+      "id": "region:europe-1935:at-tirol",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "at-tirol"
+    },
+    {
+      "id": "region:europe-1935:at-vorarlberg",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "at-vorarlberg"
+    },
+    {
+      "id": "region:europe-1935:at-wien",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "at-wien"
+    },
+    {
+      "id": "region:europe-1935:cs-jizni-cechy",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-jizni-cechy"
+    },
+    {
+      "id": "region:europe-1935:cs-morava",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-morava"
+    },
+    {
+      "id": "region:europe-1935:cs-podkarpatska-rus",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-podkarpatska-rus"
+    },
+    {
+      "id": "region:europe-1935:cs-praha",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-praha"
+    },
+    {
+      "id": "region:europe-1935:cs-severni-cechy",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-severni-cechy"
+    },
+    {
+      "id": "region:europe-1935:cs-slezsko",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-slezsko"
+    },
+    {
+      "id": "region:europe-1935:cs-slovensko",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-slovensko"
+    },
+    {
+      "id": "region:europe-1935:cs-stredni-cechy",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-stredni-cechy"
+    },
+    {
+      "id": "region:europe-1935:cs-vychodni-cechy",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-vychodni-cechy"
+    },
+    {
+      "id": "region:europe-1935:cs-zapadni-cechy",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-zapadni-cechy"
+    },
+    {
+      "id": "region:europe-1935:danzig-freie-stadt-danzig",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "danzig-freie-stadt-danzig"
+    },
+    {
+      "id": "region:europe-1935:de-anhalt-provinz-sachsen",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-anhalt-provinz-sachsen"
+    },
+    {
+      "id": "region:europe-1935:de-baden",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-baden"
+    },
+    {
+      "id": "region:europe-1935:de-bayern",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-bayern"
+    },
+    {
+      "id": "region:europe-1935:de-brandenburg",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-brandenburg"
+    },
+    {
+      "id": "region:europe-1935:de-bremen-oldenburg",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-bremen-oldenburg"
+    },
+    {
+      "id": "region:europe-1935:de-grenzmark",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-grenzmark"
+    },
+    {
+      "id": "region:europe-1935:de-hannover-braunschweig",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-hannover-braunschweig"
+    },
+    {
+      "id": "region:europe-1935:de-hessen",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-hessen"
+    },
+    {
+      "id": "region:europe-1935:de-hessen-nassau",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-hessen-nassau"
+    },
+    {
+      "id": "region:europe-1935:de-hohenzollern",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-hohenzollern"
+    },
+    {
+      "id": "region:europe-1935:de-mecklenburg",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-mecklenburg"
+    },
+    {
+      "id": "region:europe-1935:de-niederschlesien",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-niederschlesien"
+    },
+    {
+      "id": "region:europe-1935:de-oberschlesien",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-oberschlesien"
+    },
+    {
+      "id": "region:europe-1935:de-ostpreussen",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-ostpreussen"
+    },
+    {
+      "id": "region:europe-1935:de-pommern",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-pommern"
+    },
+    {
+      "id": "region:europe-1935:de-rheinprovinz",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-rheinprovinz"
+    },
+    {
+      "id": "region:europe-1935:de-sachsen",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-sachsen"
+    },
+    {
+      "id": "region:europe-1935:de-schleswig-holstein",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-schleswig-holstein"
+    },
+    {
+      "id": "region:europe-1935:de-thueringen",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-thueringen"
+    },
+    {
+      "id": "region:europe-1935:de-westfalen-lippe",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-westfalen-lippe"
+    },
+    {
+      "id": "region:europe-1935:de-wuerttemberg",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "de-wuerttemberg"
+    },
+    {
+      "id": "region:europe-1935:fr-amiens",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-amiens"
+    },
+    {
+      "id": "region:europe-1935:fr-besancon",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-besancon"
+    },
+    {
+      "id": "region:europe-1935:fr-bordeaux",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-bordeaux"
+    },
+    {
+      "id": "region:europe-1935:fr-clermont-ferrand",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-clermont-ferrand"
+    },
+    {
+      "id": "region:europe-1935:fr-corse",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-corse"
+    },
+    {
+      "id": "region:europe-1935:fr-dijon",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-dijon"
+    },
+    {
+      "id": "region:europe-1935:fr-le-mans",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-le-mans"
+    },
+    {
+      "id": "region:europe-1935:fr-lille",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-lille"
+    },
+    {
+      "id": "region:europe-1935:fr-lyon",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-lyon"
+    },
+    {
+      "id": "region:europe-1935:fr-marseille",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-marseille"
+    },
+    {
+      "id": "region:europe-1935:fr-metz",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-metz"
+    },
+    {
+      "id": "region:europe-1935:fr-montpellier",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-montpellier"
+    },
+    {
+      "id": "region:europe-1935:fr-nancy",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-nancy"
+    },
+    {
+      "id": "region:europe-1935:fr-nantes",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-nantes"
+    },
+    {
+      "id": "region:europe-1935:fr-orleans",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-orleans"
+    },
+    {
+      "id": "region:europe-1935:fr-paris",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-paris"
+    },
+    {
+      "id": "region:europe-1935:fr-rouen",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-rouen"
+    },
+    {
+      "id": "region:europe-1935:fr-toulouse",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-toulouse"
+    },
+    {
+      "id": "region:europe-1935:fr-tours",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "fr-tours"
+    },
+    {
+      "id": "region:europe-1935:gb-central-scotland",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-central-scotland"
+    },
+    {
+      "id": "region:europe-1935:gb-cymru",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-cymru"
+    },
+    {
+      "id": "region:europe-1935:gb-east-england",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-east-england"
+    },
+    {
+      "id": "region:europe-1935:gb-highlands-islands",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-highlands-islands"
+    },
+    {
+      "id": "region:europe-1935:gb-midlands",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-midlands"
+    },
+    {
+      "id": "region:europe-1935:gb-north-east-scotland",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-north-east-scotland"
+    },
+    {
+      "id": "region:europe-1935:gb-north-west-england",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-north-west-england"
+    },
+    {
+      "id": "region:europe-1935:gb-northern-england",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-northern-england"
+    },
+    {
+      "id": "region:europe-1935:gb-northern-ireland",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-northern-ireland"
+    },
+    {
+      "id": "region:europe-1935:gb-south-east-england",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-south-east-england"
+    },
+    {
+      "id": "region:europe-1935:gb-south-west-england",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-south-west-england"
+    },
+    {
+      "id": "region:europe-1935:gb-southern-england",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-southern-england"
+    },
+    {
+      "id": "region:europe-1935:gb-southern-scotland",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "gb-southern-scotland"
+    },
+    {
+      "id": "region:europe-1935:it-abruzzi-molise",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-abruzzi-molise"
+    },
+    {
+      "id": "region:europe-1935:it-calabrie",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-calabrie"
+    },
+    {
+      "id": "region:europe-1935:it-campania",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-campania"
+    },
+    {
+      "id": "region:europe-1935:it-emilia",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-emilia"
+    },
+    {
+      "id": "region:europe-1935:it-lazio",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-lazio"
+    },
+    {
+      "id": "region:europe-1935:it-liguria",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-liguria"
+    },
+    {
+      "id": "region:europe-1935:it-lombardia",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-lombardia"
+    },
+    {
+      "id": "region:europe-1935:it-lucania",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-lucania"
+    },
+    {
+      "id": "region:europe-1935:it-marche",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-marche"
+    },
+    {
+      "id": "region:europe-1935:it-piemonte",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-piemonte"
+    },
+    {
+      "id": "region:europe-1935:it-puglie",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-puglie"
+    },
+    {
+      "id": "region:europe-1935:it-sardegna",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-sardegna"
+    },
+    {
+      "id": "region:europe-1935:it-sicilia",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-sicilia"
+    },
+    {
+      "id": "region:europe-1935:it-toscana",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-toscana"
+    },
+    {
+      "id": "region:europe-1935:it-umbria",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-umbria"
+    },
+    {
+      "id": "region:europe-1935:it-veneto",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-veneto"
+    },
+    {
+      "id": "region:europe-1935:it-venezia-giulia",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-venezia-giulia"
+    },
+    {
+      "id": "region:europe-1935:it-venezia-tridentina",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "it-venezia-tridentina"
+    },
+    {
+      "id": "region:europe-1935:saar-saargebiet",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "saar-saargebiet"
+    },
+    {
+      "id": "region:europe-1935:su-tsentr",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "su-tsentr"
+    },
+    {
+      "id": "region:europe-1935:su-vostok",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "su-vostok"
+    },
+    {
+      "id": "region:europe-1935:su-zapad",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "su-zapad"
+    },
+    {
+      "id": "region:europe-1935:us-central",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "us-central"
+    },
+    {
+      "id": "region:europe-1935:us-east",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "us-east"
+    },
+    {
+      "id": "region:europe-1935:us-west",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "us-west"
+    },
+    {
+      "id": "region:ohm-1935:2696109",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2696109"
+    },
+    {
+      "id": "region:ohm-1935:2698169",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2698169"
+    },
+    {
+      "id": "region:ohm-1935:2698170",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2698170"
+    },
+    {
+      "id": "region:ohm-1935:2741463",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2741463"
+    },
+    {
+      "id": "region:ohm-1935:2741466",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2741466"
+    },
+    {
+      "id": "region:ohm-1935:2741468",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2741468"
+    },
+    {
+      "id": "region:ohm-1935:2741469",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2741469"
+    },
+    {
+      "id": "region:ohm-1935:2741470",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2741470"
+    },
+    {
+      "id": "region:ohm-1935:2741471",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2741471"
+    },
+    {
+      "id": "region:ohm-1935:2741475",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2741475"
+    },
+    {
+      "id": "region:ohm-1935:2741476",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2741476"
+    },
+    {
+      "id": "region:ohm-1935:2741477",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2741477"
+    },
+    {
+      "id": "region:ohm-1935:2927190",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2927190"
+    },
+    {
+      "id": "region:ohm-1935:2927191",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2927191"
+    },
+    {
+      "id": "region:ohm-1935:2929589",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2929589"
+    },
+    {
+      "id": "region:ohm-1935:2930186",
+      "dataset": "ohm",
+      "datasetVersion": "1935",
+      "nativeId": "2930186"
+    }
   ],
   "regionAssignments": {
-    "region:benchmark-1:DE": "polity:germany",
-    "region:benchmark-1:AT": "polity:austria",
-    "region:benchmark-1:CS": "polity:czechoslovakia",
-    "region:benchmark-1:PL": "polity:poland",
-    "region:benchmark-1:FR": "polity:france",
-    "region:benchmark-1:GB": "polity:united-kingdom",
-    "region:benchmark-1:IT": "polity:italy",
-    "region:benchmark-1:SU": "polity:soviet-union",
-    "region:benchmark-1:US": "polity:united-states"
+    "region:europe-1935:at-burgenland": "polity:austria",
+    "region:europe-1935:at-kaernten": "polity:austria",
+    "region:europe-1935:at-niederoesterreich": "polity:austria",
+    "region:europe-1935:at-oberoesterreich": "polity:austria",
+    "region:europe-1935:at-osttirol": "polity:austria",
+    "region:europe-1935:at-salzburg": "polity:austria",
+    "region:europe-1935:at-steiermark": "polity:austria",
+    "region:europe-1935:at-tirol": "polity:austria",
+    "region:europe-1935:at-vorarlberg": "polity:austria",
+    "region:europe-1935:at-wien": "polity:austria",
+    "region:europe-1935:cs-jizni-cechy": "polity:czechoslovakia",
+    "region:europe-1935:cs-morava": "polity:czechoslovakia",
+    "region:europe-1935:cs-podkarpatska-rus": "polity:czechoslovakia",
+    "region:europe-1935:cs-praha": "polity:czechoslovakia",
+    "region:europe-1935:cs-severni-cechy": "polity:czechoslovakia",
+    "region:europe-1935:cs-slezsko": "polity:czechoslovakia",
+    "region:europe-1935:cs-slovensko": "polity:czechoslovakia",
+    "region:europe-1935:cs-stredni-cechy": "polity:czechoslovakia",
+    "region:europe-1935:cs-vychodni-cechy": "polity:czechoslovakia",
+    "region:europe-1935:cs-zapadni-cechy": "polity:czechoslovakia",
+    "region:europe-1935:danzig-freie-stadt-danzig": "polity:free-city-of-danzig",
+    "region:europe-1935:de-anhalt-provinz-sachsen": "polity:germany",
+    "region:europe-1935:de-baden": "polity:germany",
+    "region:europe-1935:de-bayern": "polity:germany",
+    "region:europe-1935:de-brandenburg": "polity:germany",
+    "region:europe-1935:de-bremen-oldenburg": "polity:germany",
+    "region:europe-1935:de-grenzmark": "polity:germany",
+    "region:europe-1935:de-hannover-braunschweig": "polity:germany",
+    "region:europe-1935:de-hessen": "polity:germany",
+    "region:europe-1935:de-hessen-nassau": "polity:germany",
+    "region:europe-1935:de-hohenzollern": "polity:germany",
+    "region:europe-1935:de-mecklenburg": "polity:germany",
+    "region:europe-1935:de-niederschlesien": "polity:germany",
+    "region:europe-1935:de-oberschlesien": "polity:germany",
+    "region:europe-1935:de-ostpreussen": "polity:germany",
+    "region:europe-1935:de-pommern": "polity:germany",
+    "region:europe-1935:de-rheinprovinz": "polity:germany",
+    "region:europe-1935:de-sachsen": "polity:germany",
+    "region:europe-1935:de-schleswig-holstein": "polity:germany",
+    "region:europe-1935:de-thueringen": "polity:germany",
+    "region:europe-1935:de-westfalen-lippe": "polity:germany",
+    "region:europe-1935:de-wuerttemberg": "polity:germany",
+    "region:europe-1935:fr-amiens": "polity:france",
+    "region:europe-1935:fr-besancon": "polity:france",
+    "region:europe-1935:fr-bordeaux": "polity:france",
+    "region:europe-1935:fr-clermont-ferrand": "polity:france",
+    "region:europe-1935:fr-corse": "polity:france",
+    "region:europe-1935:fr-dijon": "polity:france",
+    "region:europe-1935:fr-le-mans": "polity:france",
+    "region:europe-1935:fr-lille": "polity:france",
+    "region:europe-1935:fr-lyon": "polity:france",
+    "region:europe-1935:fr-marseille": "polity:france",
+    "region:europe-1935:fr-metz": "polity:france",
+    "region:europe-1935:fr-montpellier": "polity:france",
+    "region:europe-1935:fr-nancy": "polity:france",
+    "region:europe-1935:fr-nantes": "polity:france",
+    "region:europe-1935:fr-orleans": "polity:france",
+    "region:europe-1935:fr-paris": "polity:france",
+    "region:europe-1935:fr-rouen": "polity:france",
+    "region:europe-1935:fr-toulouse": "polity:france",
+    "region:europe-1935:fr-tours": "polity:france",
+    "region:europe-1935:gb-central-scotland": "polity:united-kingdom",
+    "region:europe-1935:gb-cymru": "polity:united-kingdom",
+    "region:europe-1935:gb-east-england": "polity:united-kingdom",
+    "region:europe-1935:gb-highlands-islands": "polity:united-kingdom",
+    "region:europe-1935:gb-midlands": "polity:united-kingdom",
+    "region:europe-1935:gb-north-east-scotland": "polity:united-kingdom",
+    "region:europe-1935:gb-north-west-england": "polity:united-kingdom",
+    "region:europe-1935:gb-northern-england": "polity:united-kingdom",
+    "region:europe-1935:gb-northern-ireland": "polity:united-kingdom",
+    "region:europe-1935:gb-south-east-england": "polity:united-kingdom",
+    "region:europe-1935:gb-south-west-england": "polity:united-kingdom",
+    "region:europe-1935:gb-southern-england": "polity:united-kingdom",
+    "region:europe-1935:gb-southern-scotland": "polity:united-kingdom",
+    "region:europe-1935:it-abruzzi-molise": "polity:italy",
+    "region:europe-1935:it-calabrie": "polity:italy",
+    "region:europe-1935:it-campania": "polity:italy",
+    "region:europe-1935:it-emilia": "polity:italy",
+    "region:europe-1935:it-lazio": "polity:italy",
+    "region:europe-1935:it-liguria": "polity:italy",
+    "region:europe-1935:it-lombardia": "polity:italy",
+    "region:europe-1935:it-lucania": "polity:italy",
+    "region:europe-1935:it-marche": "polity:italy",
+    "region:europe-1935:it-piemonte": "polity:italy",
+    "region:europe-1935:it-puglie": "polity:italy",
+    "region:europe-1935:it-sardegna": "polity:italy",
+    "region:europe-1935:it-sicilia": "polity:italy",
+    "region:europe-1935:it-toscana": "polity:italy",
+    "region:europe-1935:it-umbria": "polity:italy",
+    "region:europe-1935:it-veneto": "polity:italy",
+    "region:europe-1935:it-venezia-giulia": "polity:italy",
+    "region:europe-1935:it-venezia-tridentina": "polity:italy",
+    "region:europe-1935:saar-saargebiet": "polity:saargebiet",
+    "region:europe-1935:su-tsentr": "polity:soviet-union",
+    "region:europe-1935:su-vostok": "polity:soviet-union",
+    "region:europe-1935:su-zapad": "polity:soviet-union",
+    "region:europe-1935:us-central": "polity:united-states",
+    "region:europe-1935:us-east": "polity:united-states",
+    "region:europe-1935:us-west": "polity:united-states",
+    "region:ohm-1935:2696109": "polity:poland",
+    "region:ohm-1935:2698169": "polity:poland",
+    "region:ohm-1935:2698170": "polity:poland",
+    "region:ohm-1935:2741463": "polity:poland",
+    "region:ohm-1935:2741466": "polity:poland",
+    "region:ohm-1935:2741468": "polity:poland",
+    "region:ohm-1935:2741469": "polity:poland",
+    "region:ohm-1935:2741470": "polity:poland",
+    "region:ohm-1935:2741471": "polity:poland",
+    "region:ohm-1935:2741475": "polity:poland",
+    "region:ohm-1935:2741476": "polity:poland",
+    "region:ohm-1935:2741477": "polity:poland",
+    "region:ohm-1935:2927190": "polity:poland",
+    "region:ohm-1935:2927191": "polity:poland",
+    "region:ohm-1935:2929589": "polity:poland",
+    "region:ohm-1935:2930186": "polity:poland"
   },
   "simulationRules": {
     "era": "interwar",
     "aiHistoryMode": "conditional",
     "eraNarrative": "European collective security is under pressure; historical intentions remain conditional on canonical state.",
-    "constraints": { "noNaval": true, "narrativeRules": ["No automatic historical events", "Colonies and distant theatres are strategic capabilities only"] },
-    "technologyLevel": { "era": "industrial-1935", "notable": ["motorization", "radio coordination", "strategic aviation abstracted"] }
+    "constraints": {
+      "noNaval": true,
+      "narrativeRules": [
+        "No automatic historical events",
+        "Colonies and distant theatres are strategic capabilities only"
+      ]
+    },
+    "technologyLevel": {
+      "era": "industrial-1935",
+      "notable": [
+        "motorization",
+        "radio coordination",
+        "strategic aviation abstracted"
+      ]
+    }
   },
   "historicalFacts": [
     {
       "id": "fact:europe-1935-benchmark:national-controls",
       "role": "starting-value",
-      "subjectRefs": ["polity:germany", "polity:austria", "polity:czechoslovakia", "polity:poland", "polity:france", "polity:united-kingdom", "polity:italy", "polity:soviet-union", "polity:united-states"],
+      "subjectRefs": [
+        "polity:germany",
+        "polity:austria",
+        "polity:czechoslovakia",
+        "polity:poland",
+        "polity:france",
+        "polity:united-kingdom",
+        "polity:italy",
+        "polity:soviet-union",
+        "polity:united-states"
+      ],
       "predicate": "benchmark-national-controls",
-      "effectiveRange": { "from": "1935-01-01" },
-      "value": { "kind": "text", "value": "Approximate 1935 population, production, finance and resource controls are declared in authoring.json." },
-      "sourceRefs": ["source:europe-1935-benchmark:league-yearbook", "source:europe-1935-benchmark:world-production", "source:europe-1935-benchmark:us-census-1930"],
-      "assumptionRefs": ["assumption:europe-1935-benchmark:macro-abstraction"],
+      "effectiveRange": {
+        "from": "1935-01-01"
+      },
+      "value": {
+        "kind": "text",
+        "value": "Approximate 1935 population, production, finance and resource controls are declared in authoring.json."
+      },
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:us-census-1930"
+      ],
+      "assumptionRefs": [
+        "assumption:europe-1935-benchmark:macro-abstraction"
+      ],
       "confidence": "low",
-      "transformation": [{ "operation": "aggregation", "description": "Normalize heterogeneous historical series into deterministic benchmark units.", "inputSourceRefs": ["source:europe-1935-benchmark:league-yearbook", "source:europe-1935-benchmark:world-production"], "formula": "country estimate -> integer benchmark control" }]
+      "transformation": [
+        {
+          "operation": "aggregation",
+          "description": "Normalize heterogeneous historical series into deterministic benchmark units.",
+          "inputSourceRefs": [
+            "source:europe-1935-benchmark:league-yearbook",
+            "source:europe-1935-benchmark:world-production"
+          ],
+          "formula": "country estimate -> integer benchmark control"
+        }
+      ]
     }
   ],
   "assumptions": [
     {
       "id": "assumption:europe-1935-benchmark:macro-abstraction",
-      "statement": "Each polity is initially represented by one economic macro-region; USSR and USA are Baseline strategic powers.",
-      "rationale": "The benchmark tests campaign logic before region-level historical research and distant-theatre mechanics.",
-      "affectedPaths": ["/regions", "/macroRegions", "/fidelity"],
-      "sourceRefs": ["source:europe-1935-benchmark:league-yearbook"],
+      "statement": "Approved 1935 geometry is runtime canonical; regional numeric allocations remain national-control-preserving estimates except for Poland census weights.",
+      "rationale": "The benchmark requires deterministic regional play before table-level evidence exists for every regional economy.",
+      "affectedPaths": [
+        "/regions",
+        "/macroRegions",
+        "/fidelity"
+      ],
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
       "status": "authored"
     }
   ],
   "macroRegions": [
-    { "id": "macro-region:europe-1935-benchmark:germany", "name": "Germany macro-region", "members": ["region:benchmark-1:DE"], "purpose": "aggregation" },
-    { "id": "macro-region:europe-1935-benchmark:austria", "name": "Austria macro-region", "members": ["region:benchmark-1:AT"], "purpose": "aggregation" },
-    { "id": "macro-region:europe-1935-benchmark:czechoslovakia", "name": "Czechoslovakia macro-region", "members": ["region:benchmark-1:CS"], "purpose": "aggregation" },
-    { "id": "macro-region:europe-1935-benchmark:poland", "name": "Poland macro-region", "members": ["region:benchmark-1:PL"], "purpose": "aggregation" },
-    { "id": "macro-region:europe-1935-benchmark:france", "name": "France macro-region", "members": ["region:benchmark-1:FR"], "purpose": "aggregation" },
-    { "id": "macro-region:europe-1935-benchmark:united-kingdom", "name": "United Kingdom macro-region", "members": ["region:benchmark-1:GB"], "purpose": "aggregation" },
-    { "id": "macro-region:europe-1935-benchmark:italy", "name": "Italy macro-region", "members": ["region:benchmark-1:IT"], "purpose": "aggregation" },
-    { "id": "macro-region:europe-1935-benchmark:soviet-union", "name": "Soviet macro-region", "members": ["region:benchmark-1:SU"], "purpose": "aggregation" },
-    { "id": "macro-region:europe-1935-benchmark:united-states", "name": "United States macro-region", "members": ["region:benchmark-1:US"], "purpose": "aggregation" }
+    {
+      "id": "macro-region:europe-1935-benchmark:at-aggregation",
+      "name": "Austria aggregation",
+      "members": [
+        "region:europe-1935:at-burgenland",
+        "region:europe-1935:at-kaernten",
+        "region:europe-1935:at-niederoesterreich",
+        "region:europe-1935:at-oberoesterreich",
+        "region:europe-1935:at-osttirol",
+        "region:europe-1935:at-salzburg",
+        "region:europe-1935:at-steiermark",
+        "region:europe-1935:at-tirol",
+        "region:europe-1935:at-vorarlberg",
+        "region:europe-1935:at-wien"
+      ],
+      "purpose": "aggregation",
+      "geometryAssetRef": "asset:europe-1935-benchmark:regions"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:cs-aggregation",
+      "name": "Czechoslovakia aggregation",
+      "members": [
+        "region:europe-1935:cs-jizni-cechy",
+        "region:europe-1935:cs-morava",
+        "region:europe-1935:cs-podkarpatska-rus",
+        "region:europe-1935:cs-praha",
+        "region:europe-1935:cs-severni-cechy",
+        "region:europe-1935:cs-slezsko",
+        "region:europe-1935:cs-slovensko",
+        "region:europe-1935:cs-stredni-cechy",
+        "region:europe-1935:cs-vychodni-cechy",
+        "region:europe-1935:cs-zapadni-cechy"
+      ],
+      "purpose": "aggregation",
+      "geometryAssetRef": "asset:europe-1935-benchmark:regions"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:danzig-aggregation",
+      "name": "Freie Stadt Danzig",
+      "members": [
+        "region:europe-1935:danzig-freie-stadt-danzig"
+      ],
+      "purpose": "historical-area",
+      "geometryAssetRef": "asset:europe-1935-benchmark:regions"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:de-aggregation",
+      "name": "Germany aggregation",
+      "members": [
+        "region:europe-1935:de-anhalt-provinz-sachsen",
+        "region:europe-1935:de-baden",
+        "region:europe-1935:de-bayern",
+        "region:europe-1935:de-brandenburg",
+        "region:europe-1935:de-bremen-oldenburg",
+        "region:europe-1935:de-grenzmark",
+        "region:europe-1935:de-hannover-braunschweig",
+        "region:europe-1935:de-hessen",
+        "region:europe-1935:de-hessen-nassau",
+        "region:europe-1935:de-hohenzollern",
+        "region:europe-1935:de-mecklenburg",
+        "region:europe-1935:de-niederschlesien",
+        "region:europe-1935:de-oberschlesien",
+        "region:europe-1935:de-ostpreussen",
+        "region:europe-1935:de-pommern",
+        "region:europe-1935:de-rheinprovinz",
+        "region:europe-1935:de-sachsen",
+        "region:europe-1935:de-schleswig-holstein",
+        "region:europe-1935:de-thueringen",
+        "region:europe-1935:de-westfalen-lippe",
+        "region:europe-1935:de-wuerttemberg"
+      ],
+      "purpose": "aggregation",
+      "geometryAssetRef": "asset:europe-1935-benchmark:regions"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:fr-aggregation",
+      "name": "France aggregation",
+      "members": [
+        "region:europe-1935:fr-amiens",
+        "region:europe-1935:fr-besancon",
+        "region:europe-1935:fr-bordeaux",
+        "region:europe-1935:fr-clermont-ferrand",
+        "region:europe-1935:fr-corse",
+        "region:europe-1935:fr-dijon",
+        "region:europe-1935:fr-le-mans",
+        "region:europe-1935:fr-lille",
+        "region:europe-1935:fr-lyon",
+        "region:europe-1935:fr-marseille",
+        "region:europe-1935:fr-metz",
+        "region:europe-1935:fr-montpellier",
+        "region:europe-1935:fr-nancy",
+        "region:europe-1935:fr-nantes",
+        "region:europe-1935:fr-orleans",
+        "region:europe-1935:fr-paris",
+        "region:europe-1935:fr-rouen",
+        "region:europe-1935:fr-toulouse",
+        "region:europe-1935:fr-tours"
+      ],
+      "purpose": "aggregation",
+      "geometryAssetRef": "asset:europe-1935-benchmark:regions"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:gb-aggregation",
+      "name": "United Kingdom aggregation",
+      "members": [
+        "region:europe-1935:gb-central-scotland",
+        "region:europe-1935:gb-cymru",
+        "region:europe-1935:gb-east-england",
+        "region:europe-1935:gb-highlands-islands",
+        "region:europe-1935:gb-midlands",
+        "region:europe-1935:gb-north-east-scotland",
+        "region:europe-1935:gb-north-west-england",
+        "region:europe-1935:gb-northern-england",
+        "region:europe-1935:gb-northern-ireland",
+        "region:europe-1935:gb-south-east-england",
+        "region:europe-1935:gb-south-west-england",
+        "region:europe-1935:gb-southern-england",
+        "region:europe-1935:gb-southern-scotland"
+      ],
+      "purpose": "aggregation",
+      "geometryAssetRef": "asset:europe-1935-benchmark:regions"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:it-aggregation",
+      "name": "Italy aggregation",
+      "members": [
+        "region:europe-1935:it-abruzzi-molise",
+        "region:europe-1935:it-calabrie",
+        "region:europe-1935:it-campania",
+        "region:europe-1935:it-emilia",
+        "region:europe-1935:it-lazio",
+        "region:europe-1935:it-liguria",
+        "region:europe-1935:it-lombardia",
+        "region:europe-1935:it-lucania",
+        "region:europe-1935:it-marche",
+        "region:europe-1935:it-piemonte",
+        "region:europe-1935:it-puglie",
+        "region:europe-1935:it-sardegna",
+        "region:europe-1935:it-sicilia",
+        "region:europe-1935:it-toscana",
+        "region:europe-1935:it-umbria",
+        "region:europe-1935:it-veneto",
+        "region:europe-1935:it-venezia-giulia",
+        "region:europe-1935:it-venezia-tridentina"
+      ],
+      "purpose": "aggregation",
+      "geometryAssetRef": "asset:europe-1935-benchmark:regions"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:saar-aggregation",
+      "name": "Saargebiet",
+      "members": [
+        "region:europe-1935:saar-saargebiet"
+      ],
+      "purpose": "historical-area",
+      "geometryAssetRef": "asset:europe-1935-benchmark:regions"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:su-tsentr",
+      "name": "Центр",
+      "members": [
+        "region:europe-1935:su-tsentr"
+      ],
+      "purpose": "aggregation"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:su-vostok",
+      "name": "Восток",
+      "members": [
+        "region:europe-1935:su-vostok"
+      ],
+      "purpose": "aggregation"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:su-zapad",
+      "name": "Запад",
+      "members": [
+        "region:europe-1935:su-zapad"
+      ],
+      "purpose": "aggregation"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:undefined-aggregation",
+      "name": "Poland aggregation",
+      "members": [
+        "region:ohm-1935:2696109",
+        "region:ohm-1935:2698169",
+        "region:ohm-1935:2698170",
+        "region:ohm-1935:2741463",
+        "region:ohm-1935:2741466",
+        "region:ohm-1935:2741468",
+        "region:ohm-1935:2741469",
+        "region:ohm-1935:2741470",
+        "region:ohm-1935:2741471",
+        "region:ohm-1935:2741475",
+        "region:ohm-1935:2741476",
+        "region:ohm-1935:2741477",
+        "region:ohm-1935:2927190",
+        "region:ohm-1935:2927191",
+        "region:ohm-1935:2929589",
+        "region:ohm-1935:2930186"
+      ],
+      "purpose": "aggregation",
+      "geometryAssetRef": "asset:europe-1935-benchmark:regions"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:us-central",
+      "name": "Central",
+      "members": [
+        "region:europe-1935:us-central"
+      ],
+      "purpose": "aggregation"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:us-east",
+      "name": "East",
+      "members": [
+        "region:europe-1935:us-east"
+      ],
+      "purpose": "aggregation"
+    },
+    {
+      "id": "macro-region:europe-1935-benchmark:us-west",
+      "name": "West",
+      "members": [
+        "region:europe-1935:us-west"
+      ],
+      "purpose": "aggregation"
+    }
   ],
   "fidelity": {
     "intendedUse": "playable-scenario",
     "polityLevels": {
-      "polity:germany": "Supported", "polity:austria": "Supported", "polity:czechoslovakia": "Supported", "polity:poland": "Supported", "polity:france": "Supported", "polity:united-kingdom": "Supported", "polity:italy": "Supported", "polity:soviet-union": "Baseline", "polity:united-states": "Baseline"
+      "polity:austria": "Supported",
+      "polity:czechoslovakia": "Supported",
+      "polity:france": "Supported",
+      "polity:free-city-of-danzig": "Baseline",
+      "polity:germany": "Supported",
+      "polity:italy": "Supported",
+      "polity:poland": "Supported",
+      "polity:saargebiet": "Baseline",
+      "polity:soviet-union": "Baseline",
+      "polity:united-kingdom": "Supported",
+      "polity:united-states": "Baseline"
     },
     "gaps": [
-      { "path": "/regions", "disposition": "assumption", "reason": "Macro-regions pending dedicated regional research.", "assumptionRef": "assumption:europe-1935-benchmark:macro-abstraction" }
+      {
+        "path": "/regions",
+        "disposition": "assumption",
+        "reason": "Regional population, infrastructure and production allocations remain estimates documented row by row in authoring.json.",
+        "assumptionRef": "assumption:europe-1935-benchmark:macro-abstraction"
+      }
     ]
   }
 }

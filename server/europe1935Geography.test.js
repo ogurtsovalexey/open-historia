@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
+import { ScenarioV2Builder } from '@open-historia/data-packs';
 import {
   SNAPSHOT_DATE,
   OHM_POLAND_1935,
@@ -24,6 +29,12 @@ import {
   normalizePolandRegions,
   stitchRings,
 } from '../scripts/europe-1935-geography.mjs';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const fixtureRoot = path.join(root, 'packages/data-packs/fixtures/europe-1935-benchmark');
+const readFixture = (relative) => JSON.parse(fs.readFileSync(path.join(fixtureRoot, relative), 'utf8'));
+const fileSha256 = (relative) => `sha256:${crypto.createHash('sha256')
+  .update(fs.readFileSync(path.join(fixtureRoot, relative))).digest('hex')}`;
 
 test('Europe 1935 owner candidate plan bounds every Supported polity and assigns UK counties once', () => {
   const plan = loadCandidateRegionPlan();
@@ -269,4 +280,37 @@ test('France owner geography promotes Corse to an explicit region and remains to
   const partition = buildFranceOwnerRegions(regions, 7);
   assert.deepEqual(partition.features.map(({ properties }) => properties.nativeId), ['marseille', 'corse', 'paris']);
   assert.equal(auditTopology(partition.boundary, partition.features).status, 'topology-clean');
+});
+
+test('owner-approved geography is content-addressed and integrated into the runtime projection', () => {
+  const manifest = readFixture('manifest.json');
+  const scenario = readFixture('scenario.json');
+  const engine = readFixture('engine/scenario.json');
+  const mapLink = readFixture('engine/map-link.json');
+  const runtime = readFixture('geography/runtime-geography-manifest.json');
+  const geojson = readFixture('geography/runtime-regions.geojson');
+  const adjacency = readFixture('geography/runtime-land-adjacency.json');
+  assert.deepEqual(runtime.gate, { status: 'owner-approved-runtime', runtimeIntegrated: true });
+  assert.equal(runtime.approvedCheckpoint.collectionChecksum,
+    'sha256:8571a3054bd50d557e6c33107b673764aefb9dfa992785c8894f7cd6feea3292');
+  assert.equal(runtime.approvedCheckpoint.adjacencyChecksum,
+    'sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d');
+  assert.equal(engine.polities.length, 11);
+  assert.equal(engine.regions.length, 115);
+  assert.equal(scenario.regions.length, 115);
+  assert.equal(mapLink.regions.length, 115);
+  assert.equal(geojson.features.length, 109);
+  assert.equal(adjacency.polities.length, 9);
+  assert.deepEqual(engine.polities.filter((entry) => entry.decisionMode === 'inert').map((entry) => entry.id),
+    ['polity:free-city-of-danzig', 'polity:saargebiet']);
+  assert.ok(geojson.features.some((entry) => entry.properties.name === 'Corse'));
+  assert.ok(geojson.features.some((entry) => entry.properties.name === 'Sicilia'));
+  assert.ok(geojson.features.some((entry) => entry.properties.name === 'Sardegna'));
+  assert.ok(geojson.features.some((entry) => entry.properties.name === 'Northern Ireland'));
+  for (const asset of manifest.assets) assert.equal(fileSha256(asset.path), asset.contentAddress);
+  assert.equal(new Set(engine.regions.map((entry) => entry.regionId)).size, 115);
+  assert.deepEqual(new Set(mapLink.regions.map((entry) => entry.engineRegionId)),
+    new Set(engine.regions.map((entry) => entry.regionId)));
+  const built = new ScenarioV2Builder().buildFromDirectory(fixtureRoot);
+  assert.equal(built.success, true, JSON.stringify(built.errors));
 });

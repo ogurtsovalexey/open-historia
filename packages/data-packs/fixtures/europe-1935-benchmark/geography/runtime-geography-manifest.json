@@ -1,0 +1,3959 @@
+{
+  "schemaVersion": "open-historia-geography-runtime-manifest/1",
+  "scenarioId": "scenario:europe-1935-benchmark",
+  "snapshotDate": "1935-01-01",
+  "gate": {
+    "status": "owner-approved-runtime",
+    "runtimeIntegrated": true
+  },
+  "sources": [
+    {
+      "provider": "OpenHistoricalMap",
+      "copyright": "https://www.openhistoricalmap.org/copyright",
+      "boundaryResponseChecksum": "sha256:b3d12adb64deb3c2bae4e4504126ff76f5ea4e635cf875af62b408ad846489ee",
+      "candidateResponseChecksum": "sha256:1ffa7deb264b53061decaf1015043fa1c38814deba8d803a07b404a8d516786f",
+      "inertResponseChecksum": "sha256:8eb0dceef2ff6508091ffad73cb2014ab3802bc7ca0358ec8b9e09975c380389"
+    },
+    {
+      "provider": "TRF-GIS",
+      "datasets": [
+        {
+          "datasetDoi": "doi:10.7910/DVN/ULQYM5",
+          "dataFileId": 4083159,
+          "license": "CC BY 4.0",
+          "checksum": "sha256:17a4b0a13e08c9344c71f5c1e733f97e8e9f0262d6ed8105e89493d499cce2ef"
+        },
+        {
+          "datasetDoi": "doi:10.7910/DVN/SQPEUW",
+          "dataFileId": 4087371,
+          "license": "CC BY 4.0",
+          "checksum": "sha256:26dfb0a8bc6fd9cabcb175e7ced71b12ec76a4d5fc80bfde7c678a3a79078573"
+        }
+      ]
+    },
+    {
+      "provider": "Historic Counties Trust",
+      "dataset": "Historic County Borders Project, Definition A, WGS84 simplified",
+      "termsUrl": "https://www.county-borders.co.uk/",
+      "license": "Free commercial reuse; acknowledgement requested",
+      "checksum": "sha256:9a85b79b81e7e8c86356a88dce567e767f006127e7fd1cf4c9b8e12cfa883cbb"
+    }
+  ],
+  "baselineMacroRegions": {
+    "polity:soviet-union": [
+      "Запад",
+      "Центр",
+      "Восток"
+    ],
+    "polity:united-states": [
+      "East",
+      "Central",
+      "West"
+    ]
+  },
+  "manualConnections": [
+    {
+      "kind": "strait",
+      "from": "polity:italy/sicilia",
+      "to": "polity:italy/calabrie"
+    },
+    {
+      "kind": "sea-route",
+      "from": "polity:italy/sardegna",
+      "to": "polity:italy/lazio"
+    },
+    {
+      "kind": "sea-route",
+      "from": "polity:france/corse",
+      "to": "polity:france/marseille"
+    },
+    {
+      "kind": "sea-route",
+      "from": "polity:united-kingdom/northern-ireland",
+      "to": "polity:united-kingdom/southern-scotland"
+    },
+    {
+      "kind": "external-land",
+      "from": "polity:germany/ostpreussen",
+      "to": "polity:free-city-of-danzig/freie-stadt-danzig"
+    }
+  ],
+  "polities": [
+    {
+      "polityId": "polity:austria",
+      "regionCount": 10,
+      "topology": {
+        "status": "topology-clean",
+        "regionCount": 10,
+        "coveredRatio": 1,
+        "gapRatio": 0,
+        "outsideRatio": 0,
+        "overlapExcessRatio": 0
+      },
+      "adjacency": {
+        "method": "exact-shared-source-segments-7dp",
+        "edgeCount": 15,
+        "checksum": "sha256:4800f8616728b005c046b76b7716b7785e9705f2d475b5c42b28ab6a4b6a9aa3",
+        "nonManifoldSegmentCount": 0
+      },
+      "expectedDisconnectedRegionIds": [],
+      "unexpectedIsolatedRegionIds": []
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionCount": 10,
+      "topology": {
+        "status": "topology-clean",
+        "regionCount": 10,
+        "coveredRatio": 1,
+        "gapRatio": 0,
+        "outsideRatio": 0,
+        "overlapExcessRatio": 0
+      },
+      "adjacency": {
+        "method": "exact-shared-source-segments-7dp",
+        "edgeCount": 16,
+        "checksum": "sha256:72814f8bb363d1261d1cf574776649e6fa43278e091894730168db1c7a0ca60e",
+        "nonManifoldSegmentCount": 0
+      },
+      "expectedDisconnectedRegionIds": [],
+      "unexpectedIsolatedRegionIds": []
+    },
+    {
+      "polityId": "polity:france",
+      "regionCount": 19,
+      "topology": {
+        "status": "topology-clean",
+        "regionCount": 19,
+        "coveredRatio": 1,
+        "gapRatio": 0,
+        "outsideRatio": 0,
+        "overlapExcessRatio": 0
+      },
+      "adjacency": {
+        "method": "exact-shared-source-segments-7dp",
+        "edgeCount": 37,
+        "checksum": "sha256:054e33d4fc95d1016d605fa00dcb51aff0a6ca5ef24e37a7de82f74dfd305f13",
+        "nonManifoldSegmentCount": 0
+      },
+      "expectedDisconnectedRegionIds": [
+        "corse"
+      ],
+      "unexpectedIsolatedRegionIds": []
+    },
+    {
+      "polityId": "polity:free-city-of-danzig",
+      "regionCount": 1,
+      "topology": {
+        "status": "topology-clean",
+        "regionCount": 1,
+        "coveredRatio": 1,
+        "gapRatio": 0,
+        "outsideRatio": 0,
+        "overlapExcessRatio": 0
+      },
+      "adjacency": {
+        "method": "exact-shared-source-segments-7dp",
+        "edgeCount": 0,
+        "checksum": "sha256:e5fbdb268da5511e91128da878e314b51b29cb8f40912098139900ac77c177ba",
+        "nonManifoldSegmentCount": 0
+      },
+      "expectedDisconnectedRegionIds": [
+        "freie-stadt-danzig"
+      ],
+      "unexpectedIsolatedRegionIds": []
+    },
+    {
+      "polityId": "polity:germany",
+      "regionCount": 21,
+      "topology": {
+        "status": "topology-clean",
+        "regionCount": 21,
+        "coveredRatio": 1,
+        "gapRatio": 0,
+        "outsideRatio": 0,
+        "overlapExcessRatio": 0
+      },
+      "adjacency": {
+        "method": "exact-shared-source-segments-7dp",
+        "edgeCount": 45,
+        "checksum": "sha256:dd9c8e178f266a19d734352cfaecd19c6d9fe49a15d02d84c44d65ad83b880e3",
+        "nonManifoldSegmentCount": 0
+      },
+      "expectedDisconnectedRegionIds": [
+        "ostpreussen"
+      ],
+      "unexpectedIsolatedRegionIds": []
+    },
+    {
+      "polityId": "polity:italy",
+      "regionCount": 18,
+      "topology": {
+        "status": "topology-clean",
+        "regionCount": 18,
+        "coveredRatio": 1,
+        "gapRatio": 0,
+        "outsideRatio": 0,
+        "overlapExcessRatio": 0
+      },
+      "adjacency": {
+        "method": "exact-shared-source-segments-7dp",
+        "edgeCount": 33,
+        "checksum": "sha256:e0987bcd72f0b563f9056dcd9a14d69eee1a154e01bb4d263b3f34ddb3a680c9",
+        "nonManifoldSegmentCount": 0
+      },
+      "expectedDisconnectedRegionIds": [
+        "sardegna",
+        "sicilia"
+      ],
+      "unexpectedIsolatedRegionIds": []
+    },
+    {
+      "polityId": "polity:poland",
+      "regionCount": 16,
+      "topology": {
+        "status": "topology-clean",
+        "regionCount": 16,
+        "coveredRatio": 1,
+        "gapRatio": 0,
+        "outsideRatio": 0,
+        "overlapExcessRatio": 0
+      },
+      "adjacency": {
+        "method": "exact-shared-source-segments-7dp",
+        "edgeCount": 30,
+        "checksum": "sha256:2a607963dd50f8f842e6e00124d79e3aa73801d7b9af500496813eea42d87219",
+        "nonManifoldSegmentCount": 0
+      },
+      "expectedDisconnectedRegionIds": [],
+      "unexpectedIsolatedRegionIds": []
+    },
+    {
+      "polityId": "polity:saargebiet",
+      "regionCount": 1,
+      "topology": {
+        "status": "topology-clean",
+        "regionCount": 1,
+        "coveredRatio": 1,
+        "gapRatio": 0,
+        "outsideRatio": 0,
+        "overlapExcessRatio": 0
+      },
+      "adjacency": {
+        "method": "exact-shared-source-segments-7dp",
+        "edgeCount": 0,
+        "checksum": "sha256:9836480f289ba2b806e1a7a98e722b1c8a0d108eade0ff2879e3f832accf2cbe",
+        "nonManifoldSegmentCount": 0
+      },
+      "expectedDisconnectedRegionIds": [
+        "saargebiet"
+      ],
+      "unexpectedIsolatedRegionIds": []
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionCount": 13,
+      "topology": {
+        "status": "topology-clean",
+        "regionCount": 13,
+        "coveredRatio": 1,
+        "gapRatio": 0,
+        "outsideRatio": 0,
+        "overlapExcessRatio": 0
+      },
+      "adjacency": {
+        "method": "exact-shared-source-segments-7dp",
+        "edgeCount": 18,
+        "checksum": "sha256:b7818356895d2fd68c3761c36bc683a817014a18ba5019fc08f037e61acb57dd",
+        "nonManifoldSegmentCount": 0
+      },
+      "expectedDisconnectedRegionIds": [
+        "northern-ireland"
+      ],
+      "unexpectedIsolatedRegionIds": []
+    }
+  ],
+  "objects": [
+    {
+      "polityId": "polity:austria",
+      "regionId": "wien",
+      "nativeName": "Wien",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2858751,
+          "startDate": "1922-10-01",
+          "endDate": "1938-03-13",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "authored-estimate-within-dated-country-boundary",
+      "confidence": "low",
+      "todo": "Replace the bounded 1935 urban approximation with a permissively licensed contemporary municipal polygon.",
+      "valueChecksum": "sha256:f1c69b38a2739a68617e5246e9f6f0358e11be2da7e1e931f303e106d6965cbf"
+    },
+    {
+      "polityId": "polity:austria",
+      "regionId": "osttirol",
+      "nativeName": "Osttirol",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2746440,
+          "startDate": "1920-07-16",
+          "endDate": "1939-05-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "dated-source-subregion",
+      "confidence": "medium",
+      "todo": "Confirm the exact interwar Bezirk Lienz outline.",
+      "valueChecksum": "sha256:ebb96fc5a80a31b45779d9ca9f7dec5127c9d380089737d6606569f39402bf51"
+    },
+    {
+      "polityId": "polity:austria",
+      "regionId": "burgenland",
+      "nativeName": "Burgenland",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2747803,
+          "startDate": "1921-11-10",
+          "endDate": "1939-05-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:c853b4f0bf3215ce09f94ff88a6d33009c491b0ecf024c69bc048944bf42c979"
+    },
+    {
+      "polityId": "polity:austria",
+      "regionId": "kaernten",
+      "nativeName": "Kärnten",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2746370,
+          "startDate": "1922-10-01",
+          "endDate": "1939-05-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:4f2dd2b6a03455974c752f749bcda86bc6a7047ca9fa49f2b1a7f4bc7ab8c321"
+    },
+    {
+      "polityId": "polity:austria",
+      "regionId": "oberoesterreich",
+      "nativeName": "Oberösterreich",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2928473,
+          "startDate": "1920-07-16",
+          "endDate": "1939-05-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:6ef790f9e72e7fdf6bf30d0d0362e5a550d97e1fda63c23ee17882f68ba27ca7"
+    },
+    {
+      "polityId": "polity:austria",
+      "regionId": "salzburg",
+      "nativeName": "Salzburg",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2852310,
+          "startDate": "1918-11-12",
+          "endDate": "1938-03-12",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:0cd860a27c60ced12c5b6c6df9c344559c997fd6c396499658b2f3e8300b3ecf"
+    },
+    {
+      "polityId": "polity:austria",
+      "regionId": "steiermark",
+      "nativeName": "Steiermark",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2742908,
+          "startDate": "1920-06-16",
+          "endDate": "1939-05-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:0c7d96237005b538b5e45984b80cda9fad59c44db22afb5919718feb25f85edb"
+    },
+    {
+      "polityId": "polity:austria",
+      "regionId": "tirol",
+      "nativeName": "Tirol",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2746440,
+          "startDate": "1920-07-16",
+          "endDate": "1939-05-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:01a8a30f6af0edfd7942e9b17a0fdf60405040e926c94939a166b9b82ddfb9ec"
+    },
+    {
+      "polityId": "polity:austria",
+      "regionId": "vorarlberg",
+      "nativeName": "Vorarlberg",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2684073,
+          "startDate": "1861-02-26",
+          "endDate": "1939-05-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:ec8a5b7e826d57f181ccbfc8c40b1781c7ce7c5c5f6a1446babe67945383be47"
+    },
+    {
+      "polityId": "polity:austria",
+      "regionId": "niederoesterreich",
+      "nativeName": "Niederösterreich",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2684077,
+          "startDate": "1920-07-16",
+          "endDate": "1939-05-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:05f3c4e0799ef30bc3a7a83027d69f90fded05a93f0254b842686e773cfe2b35"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "praha",
+      "nativeName": "Praha",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2931737,
+          "startDate": "1885-05-01",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:800d24b372ca6e66b2d9f11c838f0d986aa5757a3fa9e99d2554c93bce8d1718"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "zapadni-cechy",
+      "nativeName": "Západní Čechy",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2664911,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2665894,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2683697,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2684440,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685458,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686023,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686361,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686533,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686819,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2687557,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2688016,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2689449,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2689718,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2691732,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2692335,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2699525,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2703603,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2716177,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2735168,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2737746,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2737923,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2853225,
+          "startDate": "1902-10-01",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2853226,
+          "startDate": "1902-10-01",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2856861,
+          "startDate": "1878-07-13",
+          "endDate": "1936-07-03",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:cf654fe3c2e30d994931660f86d180a92bebcbb0f5d9914c8326f23446737215"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "severni-cechy",
+      "nativeName": "Severní Čechy",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2665922,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2671653,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2671957,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2684013,
+          "startDate": "1877-10-01",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685123,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685282,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685415,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685698,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686158,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686581,
+          "startDate": "1885-05-01",
+          "endDate": "1949",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686912,
+          "startDate": "1877-10-01",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2688317,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2688880,
+          "startDate": "1868-08-31",
+          "endDate": "1938-10-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2689138,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2689584,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2690148,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2692481,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2704798,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2704911,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2705150,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2705209,
+          "startDate": "1850",
+          "endDate": "1939-04-30",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2734875,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2735117,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2736550,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2738494,
+          "startDate": "1896-09-01",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2738670,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2739124,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2851955,
+          "startDate": "1896-09-01",
+          "endDate": "1939-05-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2854899,
+          "startDate": "1908-10-01",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2854900,
+          "startDate": "1908-10-01",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:44399a495ea873fe31b1d97916c58a6fe1820f980ed82b05ff8db8282304d0c2"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "jizni-cechy",
+      "nativeName": "Jižní Čechy",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2684672,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686418,
+          "startDate": "1868-08-31",
+          "endDate": "1949",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2688150,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2690008,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2690463,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2692116,
+          "startDate": "1868-08-31",
+          "endDate": "1949",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2700276,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2737184,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2739420,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:9730b8c69575d83b39ae6f7b44353cf32ff9b8cf31fa3685719566cabc24f146"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "vychodni-cechy",
+      "nativeName": "Východní Čechy",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2684312,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2684805,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2684878,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685057,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685253,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685491,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685613,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685968,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2687691,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2687874,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2690295,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2690807,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2691109,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2705013,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2736131,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2736915,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2738914,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:d1a482971284307f4e3a1c757f2889ea3d267fe522fd1639d7ff2e9b5977cf08"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "stredni-cechy",
+      "nativeName": "Střední Čechy",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2683592,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2683854,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2688976,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2690038,
+          "startDate": "1889-01-01",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2691463,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2704575,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2735306,
+          "startDate": "1889-01-01",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2737406,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:4441f1283436577b960a96ce59131bcef0cf7e3cd04a5f009a3cb66b8e6dcc39"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "slezsko",
+      "nativeName": "Slezsko",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2661759,
+          "startDate": "1900",
+          "endDate": "1949",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2661866,
+          "startDate": "1928",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:13c2d5f61ac26fc40aa568fe27ac8026906895e6b62da0f217dc44a9f7ef6f02"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "morava",
+      "nativeName": "Morava",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2950119,
+          "startDate": "1907",
+          "endDate": null,
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:29da0f1dc8d9074ebf459b838fc4f6be30e6809eedb65f2fa731f2f9b83ca003"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "podkarpatska-rus",
+      "nativeName": "Podkarpatská Rus",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2857483,
+          "startDate": "1920-08-10",
+          "endDate": "1938-11-02",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:95497dd34d6d358c9dff93a15bd0a8757229625514c6b517c8e963a3c6e498a8"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "slovensko",
+      "nativeName": "Slovensko",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2856853,
+          "startDate": "1925-01-01",
+          "endDate": "1936-07-03",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2857449,
+          "startDate": "1928-12-01",
+          "endDate": "1938-09-30",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2857483,
+          "startDate": "1920-08-10",
+          "endDate": "1938-11-02",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "country-remainder-between-dated-land-relations",
+      "confidence": "medium",
+      "todo": "Pin a permissively licensed 1928–1938 Slovak Land polygon if a complete source becomes available.",
+      "valueChecksum": "sha256:9ff44d05f2b107e69bf91a50e33b0930888995a567ea5ba06966bd43a92810d2"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "lille",
+      "nativeName": "LILLE",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "01",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:448eca49e571600f7805d3221c71f5bcc8abbb8147cb9db0418e1a88365aed73"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "amiens",
+      "nativeName": "AMIENS",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "02",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:0f2f7726f6e419fd59fb48a43158ff61b75198e0b1b77927991146fa89421aea"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "rouen",
+      "nativeName": "ROUEN",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "03",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:d115c6ecb0b36c804a14596632c1c401e4c8b67811c1dbed9e83ea4d4394234a"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "le-mans",
+      "nativeName": "LE MANS",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "04",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:0330c623b0fb61d7c1010b2a5acb3bb7da3ee325d4c67cd643a8f2511bdfa845"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "orleans",
+      "nativeName": "ORLEANS",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "05",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:c39c836d563ea74ce6d0f80957424eb7869e3af885b843f4c60d027d05a2c498"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "metz",
+      "nativeName": "METZ",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "06",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:28bfc8f78b760ff4863b193eab08dedc59bf8b32ea5477a0fceda2a977a0b82c"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "besancon",
+      "nativeName": "BESANCON",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "07",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:b57a914905254f7f96d982817d47a0b3365770ec188c6ebdce43c390ba5cbe30"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "dijon",
+      "nativeName": "DIJON",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "08",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:3a03550988b0359dd725582bf6b02794ff936b0c5af09dc6b61d60a4e6adb0bf"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "tours",
+      "nativeName": "TOURS",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "09",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:d6de957e2aa0c5c49f9fc18bb1f4a40862afc7688c853f85ec1b1ab0f4e7944b"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "nantes",
+      "nativeName": "NANTES",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "11",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:629d635f0a60d6b8e691ab121ad5eef3740ad995e9ee332cc6e888411968209f"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "clermont-ferrand",
+      "nativeName": "CLERMONT-FERRAND",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "13",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:9350da75f40799154a7ab3b461e13ea8e9bd60c6ec72effd395a08738f463f35"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "lyon",
+      "nativeName": "LYON",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "14",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:f18abd7cc41c033bc09ab7e2d64d68686c5bed6f9f61a45ca77fa057c6b4b5a2"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "marseille",
+      "nativeName": "MARSEILLE",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "15-mainland",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:b4e9e652fec7e4935747d38ac70b634cc2705a72b4839df42c7f01bc2fe7d482"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "corse",
+      "nativeName": "Corse",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "15-corse",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:dd9258f267bad2671b8681dd5f9382c88392d74bc8dbaadd52c37186ca4420b4"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "montpellier",
+      "nativeName": "MONTPELLIER",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "16",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:d85d875d98d98a07fbca472ff69624b81ea71896982ec410bd60d350079a4e6c"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "toulouse",
+      "nativeName": "TOULOUSE",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "17",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:80ee48976dfe95eb225dc026b11a9545cb3deb2473d65644018c81e099b5f6f3"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "bordeaux",
+      "nativeName": "BORDEAUX",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "18",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:fd9742a066fb5bfefa87ba1db5593e620a6ef086b6b1b71c827bdad94847944c"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "nancy",
+      "nativeName": "NANCY",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "20",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:42c4cf3e0700e887bf50bb3dc0f3a61745f3dff61131a327bf3f84210d51b7e2"
+    },
+    {
+      "polityId": "polity:france",
+      "regionId": "paris",
+      "nativeName": "PARIS",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC BY 4.0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "22",
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": "CC BY 4.0"
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:0d5d26d14caa4beb1134f2747b1f92866454eb72154017b5b4e9853c75a9ca56"
+    },
+    {
+      "polityId": "polity:free-city-of-danzig",
+      "regionId": "freie-stadt-danzig",
+      "nativeName": "Freie Stadt Danzig",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2691478,
+          "startDate": "1920-12-24",
+          "endDate": "1939-09-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "dated-source-polygon",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:33d556f494f0b36a1f39d1adf387041eea6079979fc7c5cd2b0388b683fc552b"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "baden",
+      "nativeName": "Baden",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2661248,
+          "startDate": "1918",
+          "endDate": "1945-12-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:f420eceb709ad770cd6a52a8fb10f173432d509c0863583692ce16d4f89aea8d"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "bayern",
+      "nativeName": "Bayern",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2661374,
+          "startDate": "1920-07-01",
+          "endDate": "1938-03-31",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:e49b04b07a85986f07c1efd98126d4c566453102fa200cfab3d01263d77f2939"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "bremen-oldenburg",
+      "nativeName": "Bremen–Oldenburg",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0",
+        "CC0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2691491,
+          "startDate": "1867-07-01",
+          "endDate": "1939",
+          "license": {
+            "class": "public-domain",
+            "value": "CC0",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2691493,
+          "startDate": "1918-11-11",
+          "endDate": "1937-04-01",
+          "license": {
+            "class": "public-domain",
+            "value": "CC0",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:f3ecec09334053a346f8e6797e8ba36e8e8b0219c7923ebd92c0039a7a81882a"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "schleswig-holstein",
+      "nativeName": "Schleswig-Holstein",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2691970,
+          "startDate": "1890",
+          "endDate": "1937-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2693616,
+          "startDate": "1867-07-01",
+          "endDate": "1937-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2856514,
+          "startDate": "1920-06-15",
+          "endDate": "1937-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:60fb95fffd0dec1334f00f54cda43633efaee67505975c36c5c9cc0c9cd8246c"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "anhalt-provinz-sachsen",
+      "nativeName": "Anhalt–Provinz Sachsen",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2806983,
+          "startDate": "1935",
+          "endDate": "1941-06-25",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2856580,
+          "startDate": "1929-05-01",
+          "endDate": "1942-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:955c3dd42c65c54855cd90c6ac17862667209781a0424144e248c43560f66e50"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "westfalen-lippe",
+      "nativeName": "Westfalen-Lippe",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0",
+        "CC0",
+        "CC0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2690418,
+          "startDate": "1918-11-15",
+          "endDate": "1946-08-23",
+          "license": {
+            "class": "public-domain",
+            "value": "CC0",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2690428,
+          "startDate": "1866-09-20",
+          "endDate": "1946-08-23",
+          "license": {
+            "class": "public-domain",
+            "value": "CC0",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2690429,
+          "startDate": "1918-11-15",
+          "endDate": "1947-01-21",
+          "license": {
+            "class": "public-domain",
+            "value": "CC0",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:64a5a8c48b4b7579c3236e0e7ad8090de36d65a0ab96b3f8ab98bb10974edda0"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "sachsen",
+      "nativeName": "Sachsen",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2856631,
+          "startDate": "1928-03-31",
+          "endDate": "1945-07-03",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:f257ee7866081014d5cac0a8e0ea612a535dab48c8f80e67fedc7b80bc8d21ab"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "grenzmark",
+      "nativeName": "Grenzmark Posen-Westpreußen",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2694718,
+          "startDate": "1922-07-01",
+          "endDate": "1938-10-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:0c788b2ba2e3d706bc298e4e74ad20ea9aab2facacacaf26525d7105ea1e576b"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "hessen",
+      "nativeName": "Hessen",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2746244,
+          "startDate": "1932-10-01",
+          "endDate": "1945-09-19",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:5ea9fcef540613f636c4575458ef8c0adbca050ac4ed92d1a27a905cbdde653c"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "hohenzollern",
+      "nativeName": "Hohenzollerische Lande",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2894236,
+          "startDate": "1928-11-19",
+          "endDate": "1945-10",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:bf2b15e7733d394cbd460fb5541628562fc7a6243945fccfe8fcc5fad7357ff4"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "mecklenburg",
+      "nativeName": "Mecklenburg",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2691477,
+          "startDate": "1934",
+          "endDate": "1937-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:6cd725b466b1cadd6ba128df4dd68c6a92ef03a0122b0e144175ab9d7f1efe49"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "brandenburg",
+      "nativeName": "Brandenburg",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2806722,
+          "startDate": "1924",
+          "endDate": "1937",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:0fbd148653cd340c62de61e56908ec9596ad1b5950ef556c91ecc4792f565b94"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "hessen-nassau",
+      "nativeName": "Hessen-Nassau",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2745180,
+          "startDate": "1932-10-01",
+          "endDate": "1937-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:2060bb52bce1b9028597252725dc57903d4592c0d1741ce35018d6bf4e236dd5"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "niederschlesien",
+      "nativeName": "Niederschlesien",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2694765,
+          "startDate": "1920-01-10",
+          "endDate": "1938-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:d18653df09aabc9febf9e96765dda9aedda017449410fe200545a1ff8e6c8234"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "oberschlesien",
+      "nativeName": "Oberschlesien",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2693608,
+          "startDate": "1922-06-20",
+          "endDate": "1938-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:34b79f7fff78574b755d6307c63b3509e362dfa2a78b4e2aa59360f3444b85d3"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "ostpreussen",
+      "nativeName": "Ostpreußen",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2691479,
+          "startDate": "1922-07-01",
+          "endDate": "1939-03-22",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:afc10b720ed0af8cb5e8c6844aeb74d8d4c3fe24a5fc70dcc0e73b586c05e5f5"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "pommern",
+      "nativeName": "Pommern",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2694035,
+          "startDate": "1920-01-10",
+          "endDate": "1937-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:2304b81fd6dabff046d934615c1ee80a8724cddff5a64448e7122b26a9855593"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "rheinprovinz",
+      "nativeName": "Rheinprovinz",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2690504,
+          "startDate": "1932-09-30",
+          "endDate": "1937-04-01",
+          "license": {
+            "class": "public-domain",
+            "value": "CC0",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:c8ff8f8a01a81f5a316473ed99cd4cee4af5d1c65b00d4fefff48c3f5a144fe3"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "thueringen",
+      "nativeName": "Thüringen",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2745091,
+          "startDate": "1928-03-31",
+          "endDate": "1944-07-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:8b5d10c53268087d56fce2ce01d077fe5dbdac6c7e2ad86d42210e5a883fce4d"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "wuerttemberg",
+      "nativeName": "Württemberg",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2661270,
+          "startDate": "1918-12-01",
+          "endDate": "1945-05-08",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:0448d2341531612229b7726ad9a714593ee288bcf3b911bdd648963f80a1a502"
+    },
+    {
+      "polityId": "polity:germany",
+      "regionId": "hannover-braunschweig",
+      "nativeName": "Hannover–Braunschweig",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2691487,
+          "startDate": "1918-11-10",
+          "endDate": "1941-06-25",
+          "license": {
+            "class": "public-domain",
+            "value": "CC0",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "country-remainder-plus-dated-source",
+      "confidence": "medium",
+      "todo": "Replace the source-remainder reconstruction when the incomplete Hannover inner ring is repaired upstream.",
+      "valueChecksum": "sha256:5b438908385e2e4d4c387030794c0e93a19cef29e3f0d643a49b66e1c4fee63c"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "sicilia",
+      "nativeName": "Sicilia",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851104,
+          "startDate": "1929-06-07",
+          "endDate": "1940-06-24",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "dated-country-island-component",
+      "confidence": "high",
+      "todo": "Pin a post-1923 regional relation if OHM adds one.",
+      "valueChecksum": "sha256:e689304dab05a0179b995b892cfcfce4db54c498a642c61968213f21f0bbb736"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "liguria",
+      "nativeName": "Liguria",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851104,
+          "startDate": "1929-06-07",
+          "endDate": "1940-06-24",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "country-remainder-plus-dated-source",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:217e5a0192a9308abb12f3997bab039877e9e26a2dc6b987a69f9af3e0028b62"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "lombardia",
+      "nativeName": "Lombardia",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851104,
+          "startDate": "1929-06-07",
+          "endDate": "1940-06-24",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "country-remainder-plus-dated-source",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:b1f20bd40b52946c283f0cca38450de92e09e84674d29309e28c67f4e8ccd5b6"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "abruzzi-molise",
+      "nativeName": "Abruzzi e Molise",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2860797,
+          "startDate": "1927",
+          "endDate": "1945-08-31",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:05ce8c0615313bd2b91f809aca56c16f627694f38c615fa39b7e700b83ac27e8"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "calabrie",
+      "nativeName": "Calabrie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851488,
+          "startDate": "1870",
+          "endDate": "1946",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:2a34835f9da0aba2b1eae0a2428e371de39ab3109bb718b6a49b9d475c049f82"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "campania",
+      "nativeName": "Campania",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851490,
+          "startDate": "1927",
+          "endDate": null,
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:33f916c6d2ca65d7742c7f03f3d55e5c5c31f8eae94aaf94b3e39590375eec05"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "lazio",
+      "nativeName": "Lazio",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2879805,
+          "startDate": "1929-02-11",
+          "endDate": null,
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:947a44208aee2d43796be97be37e3f7da6bdc4927489c64e9ae1c59eb6769234"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "lucania",
+      "nativeName": "Lucania",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851925,
+          "startDate": "1900",
+          "endDate": "1946",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:483d97b4373ae9cbaf78dea3526657fca8eea4e557999914d0fbd97d346c2ddf"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "marche",
+      "nativeName": "Marche",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2802248,
+          "startDate": "1929-02-10",
+          "endDate": "2009-08-02",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:c42dc66da17f7a7216bd9737b392625deb2423a4f93748b2e54a0b0417baebf2"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "piemonte",
+      "nativeName": "Piemonte",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851246,
+          "startDate": "1924",
+          "endDate": "1940-06-24",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:83afd49f8b0db4bcc27a39c7a604a19bc85aa6b1346e35d172181d84b566214c"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "puglie",
+      "nativeName": "Puglie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851489,
+          "startDate": "1924",
+          "endDate": "1946",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:128320815ac5f417b70056296dc74252a19038a843f820c43bac7746d3e28e29"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "sardegna",
+      "nativeName": "Sardegna",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851386,
+          "startDate": "1924",
+          "endDate": null,
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:eee19d28dfbafcee1a555626402ae764f7f057506930084ecc5ca40a339f08f6"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "toscana",
+      "nativeName": "Toscana",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2750959,
+          "startDate": "1870",
+          "endDate": null,
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:77e7caef0c7dadfe7aede282b2d52d18d3032e71f3b16a070098e2dd9ed3e3e6"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "umbria",
+      "nativeName": "Umbria",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2751199,
+          "startDate": "1923",
+          "endDate": null,
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:417e0d9380ec64d7c659c57db13535e19f72f375b59eac8f786e4779e391af7a"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "veneto",
+      "nativeName": "Veneto",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851388,
+          "startDate": "1929",
+          "endDate": "1943-09-10",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:0717bae1afee18063774484e8a514fe52c5ff5e87867c7f6d12fca339c28d96a"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "venezia-giulia",
+      "nativeName": "Venezia Giulia",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2805375,
+          "startDate": "1927-01-12",
+          "endDate": "1941-05-18",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:b710b53d42be9aad2612d6bbad0f42829c24835f37c365dc649286d0f88354e0"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "venezia-tridentina",
+      "nativeName": "Venezia Tridentina",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2879991,
+          "startDate": "1934",
+          "endDate": "1943-09-10",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:ab9ce763b9d297dabc47e978873ec8059e097fbe275b9bd84dbfb7332ebdc1ff"
+    },
+    {
+      "polityId": "polity:italy",
+      "regionId": "emilia",
+      "nativeName": "Emilia",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2851104,
+          "startDate": "1929-06-07",
+          "endDate": "1940-06-24",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "country-remainder-plus-dated-source",
+      "confidence": "medium",
+      "todo": "Replace reconstruction when the incomplete OHM outer ring is repaired upstream.",
+      "valueChecksum": "sha256:f363fda1f78e94b91f6a1ba28221d5ed7b87baf53426f16b90cb58469f88c9be"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2696109",
+      "nativeName": "Województwo wileńskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2696109",
+          "startDate": "1926-01-20",
+          "endDate": "1939-10-06",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:8f249b0357a2b1339e3c45576a1a5360ae7e3d0e41a4753ce887abc1756ed3c3"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2698169",
+      "nativeName": "Województwo wołyńskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2698169",
+          "startDate": "1930-12-16",
+          "endDate": "1939-10-06",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:5a9edf33954efc6876a05bb62c13a88ea5cf678a4690e908bc1828a19accb654"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2698170",
+      "nativeName": "Województwo poleskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2698170",
+          "startDate": "1930",
+          "endDate": "1939-10-06",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:567af160a8966b744743beb43842cc1a9d5568a33247464c350a651bbdcddf2d"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2741463",
+      "nativeName": "Wojewodztwo lubelskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2741463",
+          "startDate": "1919-08-14",
+          "endDate": "1938-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:aee2b303f86dcb616a3e78046e5587766f46729aa0d9e6cc8adb5ee6931f9193"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2741466",
+      "nativeName": "Województwo nowogródzkie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2741466",
+          "startDate": "1921-02-14",
+          "endDate": "1939-10-06",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:830787ac01c0cd9ff3bd7dd72674dd1a3afdc5232648dcbbef923455f542eee3"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2741468",
+      "nativeName": "Województwo białostockie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2741468",
+          "startDate": "1919",
+          "endDate": "1938-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:eb45c9a932c170c3e1b4e417ac295c8730beb8eac4db80426c5fafefe0ae5383"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2741469",
+      "nativeName": "Województwo warszawskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2741469",
+          "startDate": "1919",
+          "endDate": "1938-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:9a214f73229cffd3e07f90d9c6984f70e49af0616a19a11ca60683de53e5052f"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2741470",
+      "nativeName": "Województwo kieleckie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2741470",
+          "startDate": "1919-08-14",
+          "endDate": "1938-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:2ee6c9c4d1ab25cd7abc46298e253ca5bd5108a20b1198b80bc3ff791a1a65ff"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2741471",
+      "nativeName": "województwo śląskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2741471",
+          "startDate": "1924",
+          "endDate": "1938-11-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:ec240679a1fae0685a92ef337f4f9a5ca5bc55e160b2caa26f815e3fee99b4f2"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2741475",
+      "nativeName": "Wojewodztwo łódzkie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2741475",
+          "startDate": "1919-08-14",
+          "endDate": "1938-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:a4aa438993cc6e42f65a38c8df7d866101513966f0e701c3e4b5bf2c95de993f"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2741476",
+      "nativeName": "Województwo poznańskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2741476",
+          "startDate": "1919-08-12",
+          "endDate": "1938-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:189edbd80da2a8cc14cd75cb9fad9df41244fbf4559f269a76eccb8a55748050"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2741477",
+      "nativeName": "Województwo Pomorskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2741477",
+          "startDate": "1920-07-11",
+          "endDate": "1938-04-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:065e843baad8f4c7bd0d0f2a4b58ddf1821cebd62ef0d7e002e33cb9702ca38f"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2927190",
+      "nativeName": "województwo krakowskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2927190",
+          "startDate": "1934-07-23",
+          "endDate": "1939",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:6e8ad0dc1e8517e904c6974d784b5cb1051268ed00f8d529bb48e2aaa88409b3"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2927191",
+      "nativeName": "Województwo lwowskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2927191",
+          "startDate": "1934-07-23",
+          "endDate": "1939-10-06",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:f07deb3c5f4c733a74c8bae5daaf33aa9dde86d20104e708209e4cb269cec516"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2929589",
+      "nativeName": "Województwo tarnopolskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2929589",
+          "startDate": "1934-04-30",
+          "endDate": "1939-10-06",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:d865542ee8eb95f04e85639c0c337031c20d9af8e948f7498b179b414fc9bf51"
+    },
+    {
+      "polityId": "polity:poland",
+      "regionId": "ohm-relation-2930186",
+      "nativeName": "Województwo stanisławowskie",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": "ohm-relation-2930186",
+          "startDate": "1933-04-01",
+          "endDate": "1939-10-06",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:b9f937b82118e5bd9ed5c225182ff0dc83d17408dab16cdcba79ff98995db2a0"
+    },
+    {
+      "polityId": "polity:saargebiet",
+      "regionId": "saargebiet",
+      "nativeName": "Saargebiet",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2690373,
+          "startDate": "1920-01-10",
+          "endDate": "1935-03-01",
+          "license": {
+            "class": "public-domain",
+            "value": "CC0",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "dated-source-polygon",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:09574700542aedc4dbf5f21927208411646fa6c601ea35fc4d327d35abfb3351"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "highlands-islands",
+      "nativeName": "Highlands and Islands",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 1,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:a5dabe922b9429f2b0cc74125c1dde651644476f5681efc1a6ae8761886b23f1"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "north-east-scotland",
+      "nativeName": "North-East Scotland",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:da68e0018e91eacbd0023ea1d8cf553777b30b1efd8db85d3a51a7a6fe664715"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "central-scotland",
+      "nativeName": "Central Scotland",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 3,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:398e2399d9c3e46ed660a35e2f1861144fac4f9a306020818cac0152bd249001"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "southern-scotland",
+      "nativeName": "Southern Scotland",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 4,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:88c1ac33fc4f2f1ca9c310fe639c50f450b021a950cc8618c8088be29fccae11"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "northern-england",
+      "nativeName": "Northern England",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 5,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:68367825ee33a1a76ddbf206cc6d8c1f693f869f693a56db3bf1a8f6cabc9bd2"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "north-west-england",
+      "nativeName": "North-West England",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 6,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:2fff11cf63f2bb6038d300e66bd0611cfd626e2c082f97c6b6fda19cb1f31bfb"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "midlands",
+      "nativeName": "Midlands",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 7,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:e78845387b08ec020de6acbb9d71cb02ed645868243d4ac9d112213615265bea"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "east-england",
+      "nativeName": "East of England",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 8,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:b9588631494f93b163c35bbeb588cd1be9754bce8bb1083d6251fb2ba308c123"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "southern-england",
+      "nativeName": "Southern England",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 9,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:91851a23c197f9e88ef4992b2d9711954c4e9a9b7130d5acb68b9e26c4b61695"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "south-west-england",
+      "nativeName": "South-West England",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 10,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:7f7f7f7ae64c22c9ebf7daedec23338879e5b224983155f9f49cad3e88af15ea"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "cymru",
+      "nativeName": "Cymru",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 11,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:deca6c22ab0135d93e08d8b3acf23fc496e57bfb5d017fe0b01a8802a2002c49"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "northern-ireland",
+      "nativeName": "Northern Ireland",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 12,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:726345377ea8736e951d28862191def64a6841d532b526c2709caac552020fc1"
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "regionId": "south-east-england",
+      "nativeName": "South-East England",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "see source manifest"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 13,
+          "startDate": "1935-01-01",
+          "endDate": null,
+          "license": {
+            "class": "external-permissive",
+            "value": "see source manifest",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:feae270943e7b81e2ad68dc6b9f1389f273c85717360852de192f2a1350a1758"
+    }
+  ],
+  "collectionChecksum": "sha256:8571a3054bd50d557e6c33107b673764aefb9dfa992785c8894f7cd6feea3292",
+  "adjacencyChecksum": "sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d",
+  "candidatePlanChecksum": "sha256:43bb6a90bf657a94193e335eade289ccb94fb5bb764eda45e9ef164243f8e847",
+  "approvedCheckpoint": {
+    "collectionChecksum": "sha256:8571a3054bd50d557e6c33107b673764aefb9dfa992785c8894f7cd6feea3292",
+    "adjacencyChecksum": "sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d",
+    "candidatePlanChecksum": "sha256:43bb6a90bf657a94193e335eade289ccb94fb5bb764eda45e9ef164243f8e847"
+  },
+  "runtime": {
+    "regionCount": 115,
+    "polityCount": 11,
+    "activeStrategicPolities": 9,
+    "inertPolities": [
+      "polity:free-city-of-danzig",
+      "polity:saargebiet"
+    ],
+    "regionsAssetChecksum": "sha256:68d2a14f95f95b505c2845b68e5ebd02a25fb42dd8f2e26cef3feb979f16e2ad",
+    "adjacencyAssetChecksum": "sha256:1ac6a5853de358d241cc556c33f15f4f2868ebd96e9ed9f2cce21321561d5711",
+    "firstMonthChecksum": "sha256:209d64e8a4e25fac211aa5343f276f4da1f3fa7fb4c19e5f1fad6cff9b09d9a1"
+  }
+}

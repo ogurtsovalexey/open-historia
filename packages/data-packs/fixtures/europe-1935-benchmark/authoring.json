@@ -3,45 +3,2184 @@
   "scenarioId": "scenario:europe-1935-benchmark",
   "horizonDate": "1940-07-01",
   "nationalControls": [
-    {"polityId":"polity:germany","population":66000000,"workforce":26400000,"maxMobilizationBp":1200,"treasury":18000,"economicPower":160000,"stockpile":{"food":5200000,"wood":900000,"coal":1500000,"iron":900000,"oil":300000,"goods":600000},"industrialCapacity":160000,"infrastructureIndexBp":6500,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:world-production"],"method":"Rounded national series; economy normalized to benchmark integer controls.","confidence":"medium","todo":"Transcribe table-level 1935 values and split among historical regions."},
-    {"polityId":"polity:austria","population":6760000,"workforce":2704000,"maxMobilizationBp":900,"treasury":4200,"economicPower":24000,"stockpile":{"food":700000,"wood":180000,"coal":120000,"iron":90000,"oil":30000,"goods":70000},"industrialCapacity":24000,"infrastructureIndexBp":5000,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:world-production"],"method":"Rounded national series; economy normalized to benchmark integer controls.","confidence":"medium","todo":"Transcribe table-level 1935 values and split among historical regions."},
-    {"polityId":"polity:czechoslovakia","population":15000000,"workforce":6000000,"maxMobilizationBp":1100,"treasury":7600,"economicPower":62000,"stockpile":{"food":1500000,"wood":260000,"coal":520000,"iron":360000,"oil":50000,"goods":180000},"industrialCapacity":62000,"infrastructureIndexBp":6100,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:world-production"],"method":"Rounded national series; economy normalized to benchmark integer controls.","confidence":"medium","todo":"Transcribe table-level 1935 values and split among Czech, Slovak and border regions."},
-    {"polityId":"polity:poland","population":34000000,"workforce":13600000,"maxMobilizationBp":1200,"treasury":7200,"economicPower":88000,"stockpile":{"food":3500000,"wood":520000,"coal":720000,"iron":280000,"oil":160000,"goods":160000},"industrialCapacity":88000,"infrastructureIndexBp":3900,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:poland-census-1931","source:europe-1935-benchmark:world-production"],"method":"Population keeps the approved 34,000,000 national control and uses final 1931 GUS voivodeship rows as regional weights; economy remains normalized to benchmark integer controls.","confidence":"medium","todo":"Owner-review the population normalization, then separate Upper Silesia, central industry and eastern agricultural weights."},
-    {"polityId":"polity:france","population":41900000,"workforce":16760000,"maxMobilizationBp":1100,"treasury":16000,"economicPower":118000,"stockpile":{"food":4300000,"wood":800000,"coal":1100000,"iron":720000,"oil":420000,"goods":520000},"industrialCapacity":118000,"infrastructureIndexBp":6200,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:world-production"],"method":"Rounded metropolitan series; colonial effects represented in stocks and capacity.","confidence":"medium","todo":"Split metropolitan industrial basins and audit colonial contribution."},
-    {"polityId":"polity:united-kingdom","population":46900000,"workforce":18760000,"maxMobilizationBp":900,"treasury":19000,"economicPower":132000,"stockpile":{"food":4700000,"wood":700000,"coal":1400000,"iron":650000,"oil":620000,"goods":650000},"industrialCapacity":132000,"infrastructureIndexBp":6800,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:world-production"],"method":"Rounded metropolitan series; empire and fleet represented as stocks/capacity.","confidence":"medium","todo":"Audit imports, imperial access and naval abstraction separately."},
-    {"polityId":"polity:italy","population":43400000,"workforce":17360000,"maxMobilizationBp":1000,"treasury":10500,"economicPower":90000,"stockpile":{"food":4400000,"wood":550000,"coal":360000,"iron":290000,"oil":160000,"goods":260000},"industrialCapacity":90000,"infrastructureIndexBp":4500,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:world-production"],"method":"Rounded national series; economy normalized to benchmark integer controls.","confidence":"medium","todo":"Split northern industry, southern agriculture and import dependency."},
-    {"polityId":"polity:soviet-union","population":168000000,"workforce":67200000,"maxMobilizationBp":1500,"treasury":21000,"economicPower":180000,"stockpile":{"food":17000000,"wood":3000000,"coal":2400000,"iron":1500000,"oil":1800000,"goods":500000},"industrialCapacity":180000,"infrastructureIndexBp":3000,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:world-production"],"method":"Strategic Baseline macro-estimate; distant geography collapsed.","confidence":"low","todo":"Replace with western/central/eastern macro-regions before Supported fidelity."},
-    {"polityId":"polity:united-states","population":127000000,"workforce":50800000,"maxMobilizationBp":800,"treasury":28000,"economicPower":220000,"stockpile":{"food":13000000,"wood":2500000,"coal":2600000,"iron":1800000,"oil":2400000,"goods":900000},"industrialCapacity":220000,"infrastructureIndexBp":7200,"sourceRefs":["source:europe-1935-benchmark:us-census-1930","source:europe-1935-benchmark:world-production"],"method":"1930 census baseline interpolated and normalized as strategic Baseline macro-polity.","confidence":"low","todo":"Add official intercensal estimate and regional production split."}
+    {
+      "polityId": "polity:austria",
+      "population": 6760000,
+      "workforce": 2704000,
+      "maxMobilizationBp": 900,
+      "treasury": 4200,
+      "economicPower": 24000,
+      "stockpile": {
+        "food": 700000,
+        "wood": 180000,
+        "coal": 120000,
+        "iron": 90000,
+        "oil": 30000,
+        "goods": 70000
+      },
+      "industrialCapacity": 24000,
+      "infrastructureIndexBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded national series; economy normalized to benchmark integer controls.",
+      "confidence": "medium",
+      "todo": "Transcribe table-level 1935 values and split among historical regions."
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "population": 15000000,
+      "workforce": 6000000,
+      "maxMobilizationBp": 1100,
+      "treasury": 7600,
+      "economicPower": 62000,
+      "stockpile": {
+        "food": 1500000,
+        "wood": 260000,
+        "coal": 520000,
+        "iron": 360000,
+        "oil": 50000,
+        "goods": 180000
+      },
+      "industrialCapacity": 62000,
+      "infrastructureIndexBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded national series; economy normalized to benchmark integer controls.",
+      "confidence": "medium",
+      "todo": "Transcribe table-level 1935 values and split among Czech, Slovak and border regions."
+    },
+    {
+      "polityId": "polity:france",
+      "population": 41900000,
+      "workforce": 16760000,
+      "maxMobilizationBp": 1100,
+      "treasury": 16000,
+      "economicPower": 118000,
+      "stockpile": {
+        "food": 4300000,
+        "wood": 800000,
+        "coal": 1100000,
+        "iron": 720000,
+        "oil": 420000,
+        "goods": 520000
+      },
+      "industrialCapacity": 118000,
+      "infrastructureIndexBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded metropolitan series; colonial effects represented in stocks and capacity.",
+      "confidence": "medium",
+      "todo": "Split metropolitan industrial basins and audit colonial contribution."
+    },
+    {
+      "polityId": "polity:free-city-of-danzig",
+      "population": 0,
+      "workforce": 0,
+      "maxMobilizationBp": 100,
+      "treasury": 0,
+      "economicPower": 0,
+      "stockpile": {
+        "food": 0,
+        "wood": 0,
+        "coal": 0,
+        "iron": 0,
+        "oil": 0,
+        "goods": 0
+      },
+      "industrialCapacity": 0,
+      "infrastructureIndexBp": 0,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Inert one-region polity: dated territorial presence is canonical; numeric economy is explicitly zero in the bounded benchmark.",
+      "confidence": "low",
+      "todo": "Add sourced local population and economic values if inert-polity economics becomes strategically material."
+    },
+    {
+      "polityId": "polity:germany",
+      "population": 66000000,
+      "workforce": 26400000,
+      "maxMobilizationBp": 1200,
+      "treasury": 18000,
+      "economicPower": 160000,
+      "stockpile": {
+        "food": 5200000,
+        "wood": 900000,
+        "coal": 1500000,
+        "iron": 900000,
+        "oil": 300000,
+        "goods": 600000
+      },
+      "industrialCapacity": 160000,
+      "infrastructureIndexBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded national series; economy normalized to benchmark integer controls.",
+      "confidence": "medium",
+      "todo": "Transcribe table-level 1935 values and split among historical regions."
+    },
+    {
+      "polityId": "polity:italy",
+      "population": 43400000,
+      "workforce": 17360000,
+      "maxMobilizationBp": 1000,
+      "treasury": 10500,
+      "economicPower": 90000,
+      "stockpile": {
+        "food": 4400000,
+        "wood": 550000,
+        "coal": 360000,
+        "iron": 290000,
+        "oil": 160000,
+        "goods": 260000
+      },
+      "industrialCapacity": 90000,
+      "infrastructureIndexBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded national series; economy normalized to benchmark integer controls.",
+      "confidence": "medium",
+      "todo": "Split northern industry, southern agriculture and import dependency."
+    },
+    {
+      "polityId": "polity:poland",
+      "population": 34000000,
+      "workforce": 13600000,
+      "maxMobilizationBp": 1200,
+      "treasury": 7200,
+      "economicPower": 88000,
+      "stockpile": {
+        "food": 3500000,
+        "wood": 520000,
+        "coal": 720000,
+        "iron": 280000,
+        "oil": 160000,
+        "goods": 160000
+      },
+      "industrialCapacity": 88000,
+      "infrastructureIndexBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Population keeps the approved 34,000,000 national control and uses final 1931 GUS voivodeship rows as regional weights; economy remains normalized to benchmark integer controls.",
+      "confidence": "medium",
+      "todo": "Owner-review the population normalization, then separate Upper Silesia, central industry and eastern agricultural weights."
+    },
+    {
+      "polityId": "polity:saargebiet",
+      "population": 0,
+      "workforce": 0,
+      "maxMobilizationBp": 100,
+      "treasury": 0,
+      "economicPower": 0,
+      "stockpile": {
+        "food": 0,
+        "wood": 0,
+        "coal": 0,
+        "iron": 0,
+        "oil": 0,
+        "goods": 0
+      },
+      "industrialCapacity": 0,
+      "infrastructureIndexBp": 0,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Inert one-region polity: dated territorial presence is canonical; numeric economy is explicitly zero in the bounded benchmark.",
+      "confidence": "low",
+      "todo": "Add sourced local population and economic values if inert-polity economics becomes strategically material."
+    },
+    {
+      "polityId": "polity:soviet-union",
+      "population": 168000000,
+      "workforce": 67200000,
+      "maxMobilizationBp": 1500,
+      "treasury": 21000,
+      "economicPower": 180000,
+      "stockpile": {
+        "food": 17000000,
+        "wood": 3000000,
+        "coal": 2400000,
+        "iron": 1500000,
+        "oil": 1800000,
+        "goods": 500000
+      },
+      "industrialCapacity": 180000,
+      "infrastructureIndexBp": 3000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Strategic Baseline macro-estimate; distant geography collapsed.",
+      "confidence": "low",
+      "todo": "Replace with western/central/eastern macro-regions before Supported fidelity."
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "population": 46900000,
+      "workforce": 18760000,
+      "maxMobilizationBp": 900,
+      "treasury": 19000,
+      "economicPower": 132000,
+      "stockpile": {
+        "food": 4700000,
+        "wood": 700000,
+        "coal": 1400000,
+        "iron": 650000,
+        "oil": 620000,
+        "goods": 650000
+      },
+      "industrialCapacity": 132000,
+      "infrastructureIndexBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded metropolitan series; empire and fleet represented as stocks/capacity.",
+      "confidence": "medium",
+      "todo": "Audit imports, imperial access and naval abstraction separately."
+    },
+    {
+      "polityId": "polity:united-states",
+      "population": 127000000,
+      "workforce": 50800000,
+      "maxMobilizationBp": 800,
+      "treasury": 28000,
+      "economicPower": 220000,
+      "stockpile": {
+        "food": 13000000,
+        "wood": 2500000,
+        "coal": 2600000,
+        "iron": 1800000,
+        "oil": 2400000,
+        "goods": 900000
+      },
+      "industrialCapacity": 220000,
+      "infrastructureIndexBp": 7200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:us-census-1930",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "1930 census baseline interpolated and normalized as strategic Baseline macro-polity.",
+      "confidence": "low",
+      "todo": "Add official intercensal estimate and regional production split."
+    }
   ],
   "regionalControls": [
-    {"regionId":"region:benchmark-1:DE","population":66000000,"baseMonthlyCapacity":160000,"infrastructureBp":6500,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:world-production"],"method":"Single-region national allocation (100%).","confidence":"low","todo":"Research and allocate German historical regions."},
-    {"regionId":"region:benchmark-1:AT","population":6760000,"baseMonthlyCapacity":24000,"infrastructureBp":5000,"sourceRefs":["source:europe-1935-benchmark:league-yearbook"],"method":"Single-region national allocation (100%).","confidence":"low","todo":"Research and allocate Austrian Länder."},
-    {"regionId":"region:benchmark-1:CS","population":15000000,"baseMonthlyCapacity":62000,"infrastructureBp":6100,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:world-production"],"method":"Single-region national allocation (100%).","confidence":"low","todo":"Research Czech, Slovak and border-region allocation."},
-    {"regionId":"region:benchmark-1:PL","population":34000000,"baseMonthlyCapacity":88000,"infrastructureBp":3900,"sourceRefs":["source:europe-1935-benchmark:league-yearbook","source:europe-1935-benchmark:poland-census-1931"],"method":"Legacy macro-region remains at 100% until the owner-approved 16-region projection; the checkpoint records GUS regional weights without silently changing runtime state.","confidence":"medium","todo":"Project the reviewed 16-row population allocation together with capacity, infrastructure and first-month preservation."},
-    {"regionId":"region:benchmark-1:FR","population":41900000,"baseMonthlyCapacity":118000,"infrastructureBp":6200,"sourceRefs":["source:europe-1935-benchmark:league-yearbook"],"method":"Single-region metropolitan allocation (100%).","confidence":"low","todo":"Research French departments and industrial basins."},
-    {"regionId":"region:benchmark-1:GB","population":46900000,"baseMonthlyCapacity":132000,"infrastructureBp":6800,"sourceRefs":["source:europe-1935-benchmark:league-yearbook"],"method":"Single-region metropolitan allocation (100%).","confidence":"low","todo":"Research British regional allocation."},
-    {"regionId":"region:benchmark-1:IT","population":43400000,"baseMonthlyCapacity":90000,"infrastructureBp":4500,"sourceRefs":["source:europe-1935-benchmark:league-yearbook"],"method":"Single-region national allocation (100%).","confidence":"low","todo":"Research Italian regional allocation."},
-    {"regionId":"region:benchmark-1:SU","population":168000000,"baseMonthlyCapacity":180000,"infrastructureBp":3000,"sourceRefs":["source:europe-1935-benchmark:league-yearbook"],"method":"Strategic macro-region allocation (100%).","confidence":"low","todo":"Create western/central/eastern macro-regions."},
-    {"regionId":"region:benchmark-1:US","population":127000000,"baseMonthlyCapacity":220000,"infrastructureBp":7200,"sourceRefs":["source:europe-1935-benchmark:us-census-1930"],"method":"Strategic macro-region allocation (100%).","confidence":"low","todo":"Create eastern/central/western macro-regions."}
+    {
+      "regionId": "region:europe-1935:at-burgenland",
+      "population": 324000,
+      "baseMonthlyCapacity": 2400,
+      "infrastructureBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:at-kaernten",
+      "population": 768000,
+      "baseMonthlyCapacity": 1400,
+      "infrastructureBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:at-niederoesterreich",
+      "population": 1516000,
+      "baseMonthlyCapacity": 2600,
+      "infrastructureBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:at-oberoesterreich",
+      "population": 960000,
+      "baseMonthlyCapacity": 1800,
+      "infrastructureBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:at-osttirol",
+      "population": 168000,
+      "baseMonthlyCapacity": 1400,
+      "infrastructureBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Confirm the exact interwar Bezirk Lienz outline."
+    },
+    {
+      "regionId": "region:europe-1935:at-salzburg",
+      "population": 576000,
+      "baseMonthlyCapacity": 4200,
+      "infrastructureBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:at-steiermark",
+      "population": 1320000,
+      "baseMonthlyCapacity": 2200,
+      "infrastructureBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:at-tirol",
+      "population": 852000,
+      "baseMonthlyCapacity": 1600,
+      "infrastructureBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:at-vorarlberg",
+      "population": 216000,
+      "baseMonthlyCapacity": 1600,
+      "infrastructureBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:at-wien",
+      "population": 60000,
+      "baseMonthlyCapacity": 4800,
+      "infrastructureBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace the bounded 1935 urban approximation with a permissively licensed contemporary municipal polygon."
+    },
+    {
+      "regionId": "region:europe-1935:cs-jizni-cechy",
+      "population": 828000,
+      "baseMonthlyCapacity": 5500,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:cs-morava",
+      "population": 2796000,
+      "baseMonthlyCapacity": 6000,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:cs-podkarpatska-rus",
+      "population": 1344000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:cs-praha",
+      "population": 48000,
+      "baseMonthlyCapacity": 18600,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:cs-severni-cechy",
+      "population": 1440000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:cs-slezsko",
+      "population": 60000,
+      "baseMonthlyCapacity": 1000,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:cs-slovensko",
+      "population": 5244000,
+      "baseMonthlyCapacity": 6800,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Pin a permissively licensed 1928–1938 Slovak Land polygon if a complete source becomes available."
+    },
+    {
+      "regionId": "region:europe-1935:cs-stredni-cechy",
+      "population": 684000,
+      "baseMonthlyCapacity": 4500,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:cs-vychodni-cechy",
+      "population": 1212000,
+      "baseMonthlyCapacity": 7600,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:cs-zapadni-cechy",
+      "population": 1344000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:danzig-freie-stadt-danzig",
+      "population": 0,
+      "baseMonthlyCapacity": 0,
+      "infrastructureBp": 0,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Dated one-region inert polity with explicitly zero bounded-scenario economy.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+      "population": 9504000,
+      "baseMonthlyCapacity": 4800,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-baden",
+      "population": 2064000,
+      "baseMonthlyCapacity": 1600,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-bayern",
+      "population": 10296000,
+      "baseMonthlyCapacity": 5200,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-brandenburg",
+      "population": 5316000,
+      "baseMonthlyCapacity": 2800,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-bremen-oldenburg",
+      "population": 1032000,
+      "baseMonthlyCapacity": 2500,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-grenzmark",
+      "population": 1056000,
+      "baseMonthlyCapacity": 2500,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-hannover-braunschweig",
+      "population": 504000,
+      "baseMonthlyCapacity": 1200,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace the source-remainder reconstruction when the incomplete Hannover inner ring is repaired upstream."
+    },
+    {
+      "regionId": "region:europe-1935:de-hessen",
+      "population": 1044000,
+      "baseMonthlyCapacity": 2500,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-hessen-nassau",
+      "population": 2280000,
+      "baseMonthlyCapacity": 1600,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-hohenzollern",
+      "population": 156000,
+      "baseMonthlyCapacity": 500,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-mecklenburg",
+      "population": 2244000,
+      "baseMonthlyCapacity": 1600,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-niederschlesien",
+      "population": 3624000,
+      "baseMonthlyCapacity": 2000,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-oberschlesien",
+      "population": 1320000,
+      "baseMonthlyCapacity": 3100,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-ostpreussen",
+      "population": 5424000,
+      "baseMonthlyCapacity": 3200,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-pommern",
+      "population": 4800000,
+      "baseMonthlyCapacity": 2800,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-rheinprovinz",
+      "population": 3252000,
+      "baseMonthlyCapacity": 112000,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-sachsen",
+      "population": 2028000,
+      "baseMonthlyCapacity": 1200,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-schleswig-holstein",
+      "population": 2844000,
+      "baseMonthlyCapacity": 1600,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-thueringen",
+      "population": 1596000,
+      "baseMonthlyCapacity": 3700,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-westfalen-lippe",
+      "population": 2964000,
+      "baseMonthlyCapacity": 2000,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:de-wuerttemberg",
+      "population": 2652000,
+      "baseMonthlyCapacity": 1600,
+      "infrastructureBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-amiens",
+      "population": 1920000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-besancon",
+      "population": 2016000,
+      "baseMonthlyCapacity": 4250,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-bordeaux",
+      "population": 2952000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-clermont-ferrand",
+      "population": 3132000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-corse",
+      "population": 672000,
+      "baseMonthlyCapacity": 1500,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-dijon",
+      "population": 2364000,
+      "baseMonthlyCapacity": 4900,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-le-mans",
+      "population": 2628000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-lille",
+      "population": 948000,
+      "baseMonthlyCapacity": 2000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-lyon",
+      "population": 3144000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-marseille",
+      "population": 2760000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-metz",
+      "population": 1404000,
+      "baseMonthlyCapacity": 3000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-montpellier",
+      "population": 2784000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-nancy",
+      "population": 1344000,
+      "baseMonthlyCapacity": 3000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-nantes",
+      "population": 2304000,
+      "baseMonthlyCapacity": 4750,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-orleans",
+      "population": 2088000,
+      "baseMonthlyCapacity": 4250,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-paris",
+      "population": 924000,
+      "baseMonthlyCapacity": 47200,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-rouen",
+      "population": 1824000,
+      "baseMonthlyCapacity": 3750,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-toulouse",
+      "population": 2436000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:fr-tours",
+      "population": 4256000,
+      "baseMonthlyCapacity": 400,
+      "infrastructureBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:france-departments-1935",
+        "source:europe-1935-benchmark:france-military-regions-1935"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-central-scotland",
+      "population": 1300000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-cymru",
+      "population": 4004000,
+      "baseMonthlyCapacity": 7500,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-east-england",
+      "population": 3704000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-highlands-islands",
+      "population": 7672000,
+      "baseMonthlyCapacity": 9600,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-midlands",
+      "population": 5712000,
+      "baseMonthlyCapacity": 52800,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-north-east-scotland",
+      "population": 3128000,
+      "baseMonthlyCapacity": 9100,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-north-west-england",
+      "population": 1456000,
+      "baseMonthlyCapacity": 4500,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-northern-england",
+      "population": 5664000,
+      "baseMonthlyCapacity": 7500,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-northern-ireland",
+      "population": 2708000,
+      "baseMonthlyCapacity": 8500,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-south-east-england",
+      "population": 1312000,
+      "baseMonthlyCapacity": 4500,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-south-west-england",
+      "population": 3932000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-southern-england",
+      "population": 3336000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:gb-southern-scotland",
+      "population": 2972000,
+      "baseMonthlyCapacity": 9000,
+      "infrastructureBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:historic-counties-trust"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-abruzzi-molise",
+      "population": 6164000,
+      "baseMonthlyCapacity": 5000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-calabrie",
+      "population": 2304000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-campania",
+      "population": 1920000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-emilia",
+      "population": 1680000,
+      "baseMonthlyCapacity": 2000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace reconstruction when the incomplete OHM outer ring is repaired upstream."
+    },
+    {
+      "regionId": "region:europe-1935:it-lazio",
+      "population": 2328000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-liguria",
+      "population": 1224000,
+      "baseMonthlyCapacity": 4300,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-lombardia",
+      "population": 3924000,
+      "baseMonthlyCapacity": 27000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-lucania",
+      "population": 1320000,
+      "baseMonthlyCapacity": 4600,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-marche",
+      "population": 1332000,
+      "baseMonthlyCapacity": 4700,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-piemonte",
+      "population": 3732000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-puglie",
+      "population": 2832000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-sardegna",
+      "population": 3744000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-sicilia",
+      "population": 144000,
+      "baseMonthlyCapacity": 600,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Pin a post-1923 regional relation if OHM adds one."
+    },
+    {
+      "regionId": "region:europe-1935:it-toscana",
+      "population": 3180000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-umbria",
+      "population": 1080000,
+      "baseMonthlyCapacity": 3800,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-veneto",
+      "population": 3324000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-venezia-giulia",
+      "population": 1440000,
+      "baseMonthlyCapacity": 2000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:it-venezia-tridentina",
+      "population": 1728000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:saar-saargebiet",
+      "population": 0,
+      "baseMonthlyCapacity": 0,
+      "infrastructureBp": 0,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Dated one-region inert polity with explicitly zero bounded-scenario economy.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:su-tsentr",
+      "population": 50400000,
+      "baseMonthlyCapacity": 54000,
+      "infrastructureBp": 3000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Authored strategic macro-region weights preserve the national control exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:su-vostok",
+      "population": 33600000,
+      "baseMonthlyCapacity": 72000,
+      "infrastructureBp": 3000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Authored strategic macro-region weights preserve the national control exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:su-zapad",
+      "population": 84000000,
+      "baseMonthlyCapacity": 54000,
+      "infrastructureBp": 3000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Authored strategic macro-region weights preserve the national control exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:us-central",
+      "population": 38100000,
+      "baseMonthlyCapacity": 88000,
+      "infrastructureBp": 7200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:us-census-1930",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Authored strategic macro-region weights preserve the national control exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:us-east",
+      "population": 63496000,
+      "baseMonthlyCapacity": 44000,
+      "infrastructureBp": 7200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:us-census-1930",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Authored strategic macro-region weights preserve the national control exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:europe-1935:us-west",
+      "population": 25404000,
+      "baseMonthlyCapacity": 88000,
+      "infrastructureBp": 7200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:us-census-1930",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Authored strategic macro-region weights preserve the national control exactly.",
+      "confidence": "low",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2696109",
+      "population": 1359225,
+      "baseMonthlyCapacity": 2400,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2698169",
+      "population": 2221770,
+      "baseMonthlyCapacity": 3600,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2698170",
+      "population": 1205860,
+      "baseMonthlyCapacity": 1800,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2741463",
+      "population": 2625905,
+      "baseMonthlyCapacity": 5300,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2741466",
+      "population": 1126185,
+      "baseMonthlyCapacity": 1800,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2741468",
+      "population": 1751195,
+      "baseMonthlyCapacity": 3000,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2741469",
+      "population": 3942860,
+      "baseMonthlyCapacity": 7100,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2741470",
+      "population": 3127410,
+      "baseMonthlyCapacity": 11900,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2741471",
+      "population": 1379595,
+      "baseMonthlyCapacity": 5200,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2741475",
+      "population": 2803890,
+      "baseMonthlyCapacity": 17600,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2741476",
+      "population": 2244060,
+      "baseMonthlyCapacity": 5300,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2741477",
+      "population": 1150675,
+      "baseMonthlyCapacity": 1800,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2927190",
+      "population": 2447855,
+      "baseMonthlyCapacity": 9300,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2927191",
+      "population": 3331640,
+      "baseMonthlyCapacity": 5900,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2929589",
+      "population": 1704920,
+      "baseMonthlyCapacity": 3000,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    },
+    {
+      "regionId": "region:ohm-1935:2930186",
+      "population": 1576955,
+      "baseMonthlyCapacity": 3000,
+      "infrastructureBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "GUS 1931 voivodeship population weights plus a deterministic five-person reconciliation; capacity is an explicit national-control-preserving estimate.",
+      "confidence": "medium",
+      "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
+    }
   ],
   "startingStateProvenance": [
-    {"claimId":"starting-state-claim:france-czechoslovakia-alliance","scenarioPath":"/diplomacy/startingAgreements/0","valueChecksum":"sha256:ab36bf413e04d3aeb3fb7fc3f6d7bc7fa5098c54cc47223817f26682d69d8f6d","basis":"source-derived","sourceRefs":["source:europe-1935-benchmark:franco-czechoslovak-treaty-1924"],"method":"Encode the registered alliance and mutual-security consultation obligations as the closest bounded executable engine agreement type.","confidence":"medium","todo":"Audit later protocols and the exact 1935 operational military convention before increasing confidence."},
-    {"claimId":"starting-state-claim:france-poland-alliance","scenarioPath":"/diplomacy/startingAgreements/1","valueChecksum":"sha256:9062133d4a1bb8904c34822769658225c79e70f1e9c1edb80b19795a8a74a5f2","basis":"source-derived","sourceRefs":["source:europe-1935-benchmark:franco-polish-agreement-1921"],"method":"Encode Article 3 consultation for territorial defence after an unprovoked attack as the closest bounded executable engine agreement type.","confidence":"medium","todo":"Audit the supplementary military convention and later protocols before increasing confidence."}
+    {
+      "claimId": "starting-state-claim:france-czechoslovakia-alliance",
+      "scenarioPath": "/diplomacy/startingAgreements/0",
+      "valueChecksum": "sha256:ab36bf413e04d3aeb3fb7fc3f6d7bc7fa5098c54cc47223817f26682d69d8f6d",
+      "basis": "source-derived",
+      "sourceRefs": [
+        "source:europe-1935-benchmark:franco-czechoslovak-treaty-1924"
+      ],
+      "method": "Encode the registered alliance and mutual-security consultation obligations as the closest bounded executable engine agreement type.",
+      "confidence": "medium",
+      "todo": "Audit later protocols and the exact 1935 operational military convention before increasing confidence."
+    },
+    {
+      "claimId": "starting-state-claim:france-poland-alliance",
+      "scenarioPath": "/diplomacy/startingAgreements/1",
+      "valueChecksum": "sha256:9062133d4a1bb8904c34822769658225c79e70f1e9c1edb80b19795a8a74a5f2",
+      "basis": "source-derived",
+      "sourceRefs": [
+        "source:europe-1935-benchmark:franco-polish-agreement-1921"
+      ],
+      "method": "Encode Article 3 consultation for territorial defence after an unprovoked attack as the closest bounded executable engine agreement type.",
+      "confidence": "medium",
+      "todo": "Audit the supplementary military convention and later protocols before increasing confidence."
+    }
   ],
   "causalAnchors": [
-    {"anchorId":"anchor:germany-revision","polityId":"polity:germany","interest":"Revise Versailles constraints and secure continental predominance.","threats":["French containment","Soviet power"],"obligations":[],"redLines":["Encirclement"],"applicability":["German government remains revisionist","military balance permits pressure"],"invalidators":["Germany is defeated or changes government","durable security settlement accepted"],"sourceRefs":["source:europe-1935-benchmark:league-yearbook"]},
-    {"anchorId":"anchor:austria-independence","polityId":"polity:austria","interest":"Preserve sovereignty while managing German pressure.","threats":["German annexation pressure"],"obligations":["Regional status quo"],"redLines":["Loss of sovereign government"],"applicability":["Austria remains independent"],"invalidators":["Austria voluntarily unifies","Austria is occupied"],"sourceRefs":["source:europe-1935-benchmark:league-yearbook"]},
-    {"anchorId":"anchor:czechoslovakia-security","polityId":"polity:czechoslovakia","interest":"Defend territorial integrity through fortification and alliances.","threats":["German territorial pressure"],"obligations":["French security relationship"],"redLines":["Forced border cession"],"applicability":["State remains territorially viable"],"invalidators":["Security guarantors abandon commitments","government accepts dissolution"],"sourceRefs":["source:europe-1935-benchmark:league-yearbook"]},
-    {"anchorId":"anchor:poland-balance","polityId":"polity:poland","interest":"Avoid subordination to either Germany or the USSR.","threats":["German revisionism","Soviet revisionism"],"obligations":["French security relationship"],"redLines":["Loss of sovereign corridor access"],"applicability":["Both neighbours remain threats"],"invalidators":["Binding settlement with one neighbour","one neighbour ceases to threaten Poland"],"sourceRefs":["source:europe-1935-benchmark:league-yearbook"]},
-    {"anchorId":"anchor:france-containment","polityId":"polity:france","interest":"Contain German revision while avoiding an unsupported war.","threats":["German rearmament"],"obligations":["Eastern European security relationships"],"redLines":["Direct threat to French frontier"],"applicability":["Germany remains revisionist"],"invalidators":["Germany accepts durable settlement","France loses capacity to intervene"],"sourceRefs":["source:europe-1935-benchmark:league-yearbook"]},
-    {"anchorId":"anchor:britain-balance","polityId":"polity:united-kingdom","interest":"Prevent a hostile continental hegemon while limiting commitments.","threats":["Continental hegemony"],"obligations":["European balance"],"redLines":["Direct threat to France or Low Countries abstracted"],"applicability":["Balance can still be preserved"],"invalidators":["Durable continental settlement","Britain abandons Europe"],"sourceRefs":["source:europe-1935-benchmark:league-yearbook"]},
-    {"anchorId":"anchor:italy-stresa","polityId":"polity:italy","interest":"Trade Austrian influence and Mediterranean status against alignment choices.","threats":["German move into Austria","Western isolation"],"obligations":["Stresa understanding"],"redLines":["Unopposed German control of Austria"],"applicability":["Western relations remain workable"],"invalidators":["Italy aligns with Germany","Stresa partners sanction or attack Italy"],"sourceRefs":["source:europe-1935-benchmark:league-yearbook"]}
+    {
+      "anchorId": "anchor:germany-revision",
+      "polityId": "polity:germany",
+      "interest": "Revise Versailles constraints and secure continental predominance.",
+      "threats": [
+        "French containment",
+        "Soviet power"
+      ],
+      "obligations": [],
+      "redLines": [
+        "Encirclement"
+      ],
+      "applicability": [
+        "German government remains revisionist",
+        "military balance permits pressure"
+      ],
+      "invalidators": [
+        "Germany is defeated or changes government",
+        "durable security settlement accepted"
+      ],
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook"
+      ]
+    },
+    {
+      "anchorId": "anchor:austria-independence",
+      "polityId": "polity:austria",
+      "interest": "Preserve sovereignty while managing German pressure.",
+      "threats": [
+        "German annexation pressure"
+      ],
+      "obligations": [
+        "Regional status quo"
+      ],
+      "redLines": [
+        "Loss of sovereign government"
+      ],
+      "applicability": [
+        "Austria remains independent"
+      ],
+      "invalidators": [
+        "Austria voluntarily unifies",
+        "Austria is occupied"
+      ],
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook"
+      ]
+    },
+    {
+      "anchorId": "anchor:czechoslovakia-security",
+      "polityId": "polity:czechoslovakia",
+      "interest": "Defend territorial integrity through fortification and alliances.",
+      "threats": [
+        "German territorial pressure"
+      ],
+      "obligations": [
+        "French security relationship"
+      ],
+      "redLines": [
+        "Forced border cession"
+      ],
+      "applicability": [
+        "State remains territorially viable"
+      ],
+      "invalidators": [
+        "Security guarantors abandon commitments",
+        "government accepts dissolution"
+      ],
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook"
+      ]
+    },
+    {
+      "anchorId": "anchor:poland-balance",
+      "polityId": "polity:poland",
+      "interest": "Avoid subordination to either Germany or the USSR.",
+      "threats": [
+        "German revisionism",
+        "Soviet revisionism"
+      ],
+      "obligations": [
+        "French security relationship"
+      ],
+      "redLines": [
+        "Loss of sovereign corridor access"
+      ],
+      "applicability": [
+        "Both neighbours remain threats"
+      ],
+      "invalidators": [
+        "Binding settlement with one neighbour",
+        "one neighbour ceases to threaten Poland"
+      ],
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook"
+      ]
+    },
+    {
+      "anchorId": "anchor:france-containment",
+      "polityId": "polity:france",
+      "interest": "Contain German revision while avoiding an unsupported war.",
+      "threats": [
+        "German rearmament"
+      ],
+      "obligations": [
+        "Eastern European security relationships"
+      ],
+      "redLines": [
+        "Direct threat to French frontier"
+      ],
+      "applicability": [
+        "Germany remains revisionist"
+      ],
+      "invalidators": [
+        "Germany accepts durable settlement",
+        "France loses capacity to intervene"
+      ],
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook"
+      ]
+    },
+    {
+      "anchorId": "anchor:britain-balance",
+      "polityId": "polity:united-kingdom",
+      "interest": "Prevent a hostile continental hegemon while limiting commitments.",
+      "threats": [
+        "Continental hegemony"
+      ],
+      "obligations": [
+        "European balance"
+      ],
+      "redLines": [
+        "Direct threat to France or Low Countries abstracted"
+      ],
+      "applicability": [
+        "Balance can still be preserved"
+      ],
+      "invalidators": [
+        "Durable continental settlement",
+        "Britain abandons Europe"
+      ],
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook"
+      ]
+    },
+    {
+      "anchorId": "anchor:italy-stresa",
+      "polityId": "polity:italy",
+      "interest": "Trade Austrian influence and Mediterranean status against alignment choices.",
+      "threats": [
+        "German move into Austria",
+        "Western isolation"
+      ],
+      "obligations": [
+        "Stresa understanding"
+      ],
+      "redLines": [
+        "Unopposed German control of Austria"
+      ],
+      "applicability": [
+        "Western relations remain workable"
+      ],
+      "invalidators": [
+        "Italy aligns with Germany",
+        "Stresa partners sanction or attack Italy"
+      ],
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook"
+      ]
+    }
   ],
   "milestones": [
-    {"milestoneId":"milestone:rhineland","points":15,"description":"Remilitarization of the Rhineland","evidenceKinds":["occupation","military-order"],"invalidators":["Germany accepts binding western settlement","Germany loses control of western macro-region"]},
-    {"milestoneId":"milestone:anschluss","points":20,"description":"Anschluss","evidenceKinds":["territorial-settlement","peace-transfer"],"invalidators":["Austria secures durable independence","Germany ceases revisionism"]},
-    {"milestoneId":"milestone:czechoslovakia","points":20,"description":"Czechoslovak crisis and dissolution","evidenceKinds":["crisis","territorial-settlement","occupation"],"invalidators":["Czechoslovakia secures effective deterrence","Germany accepts its borders"]},
-    {"milestoneId":"milestone:poland-partition","points":25,"description":"German-Soviet partition of Poland","evidenceKinds":["war","occupation","peace-transfer"],"invalidators":["Poland reaches durable settlement with either neighbour","Germany and USSR become active enemies first"]},
-    {"milestoneId":"milestone:france-defeat","points":20,"description":"French defeat or capitulation by July 1940","evidenceKinds":["occupation","peace","government-change"],"invalidators":["Germany chooses a durable eastern-only strategy","France and Germany accept durable settlement"]}
+    {
+      "milestoneId": "milestone:rhineland",
+      "points": 15,
+      "description": "Remilitarization of the Rhineland",
+      "evidenceKinds": [
+        "occupation",
+        "military-order"
+      ],
+      "invalidators": [
+        "Germany accepts binding western settlement",
+        "Germany loses control of western macro-region"
+      ]
+    },
+    {
+      "milestoneId": "milestone:anschluss",
+      "points": 20,
+      "description": "Anschluss",
+      "evidenceKinds": [
+        "territorial-settlement",
+        "peace-transfer"
+      ],
+      "invalidators": [
+        "Austria secures durable independence",
+        "Germany ceases revisionism"
+      ]
+    },
+    {
+      "milestoneId": "milestone:czechoslovakia",
+      "points": 20,
+      "description": "Czechoslovak crisis and dissolution",
+      "evidenceKinds": [
+        "crisis",
+        "territorial-settlement",
+        "occupation"
+      ],
+      "invalidators": [
+        "Czechoslovakia secures effective deterrence",
+        "Germany accepts its borders"
+      ]
+    },
+    {
+      "milestoneId": "milestone:poland-partition",
+      "points": 25,
+      "description": "German-Soviet partition of Poland",
+      "evidenceKinds": [
+        "war",
+        "occupation",
+        "peace-transfer"
+      ],
+      "invalidators": [
+        "Poland reaches durable settlement with either neighbour",
+        "Germany and USSR become active enemies first"
+      ]
+    },
+    {
+      "milestoneId": "milestone:france-defeat",
+      "points": 20,
+      "description": "French defeat or capitulation by July 1940",
+      "evidenceKinds": [
+        "occupation",
+        "peace",
+        "government-change"
+      ],
+      "invalidators": [
+        "Germany chooses a durable eastern-only strategy",
+        "France and Germany accept durable settlement"
+      ]
+    }
   ]
 }

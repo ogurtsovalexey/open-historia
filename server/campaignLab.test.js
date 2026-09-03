@@ -29,7 +29,9 @@ test("mock Campaign Lab start/status/resume produces a deterministic final card 
   assert.equal(completed.status, "completed");
   const card = JSON.parse(fs.readFileSync(path.join(temp, "test-mock", "final-card.json"), "utf8"));
   assert.equal(card.finalMonth, "1940-07-01");
-  assert.equal(card.polities.length, 9);
+  assert.equal(card.polities.length, 11);
+  assert.deepEqual(card.polities.filter((entry) => ["polity:free-city-of-danzig", "polity:saargebiet"].includes(entry.polityId))
+    .map((entry) => entry.polityId), ["polity:free-city-of-danzig", "polity:saargebiet"]);
   assert.equal(card.telemetry.engineResolutions, 66);
   assert.ok(fs.statSync(path.join(temp, "test-mock", "chronicle.jsonl")).size > 0);
   assert.ok(fs.statSync(path.join(temp, "test-mock", "checkpoint-report.md")).size > 0);

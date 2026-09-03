@@ -17,8 +17,8 @@ export const SCENARIO_ID = 'scenario:europe-1935-benchmark';
 export const START_MONTH = '1935-01-01';
 export const SUPPORTED_REGION_RANGE = Object.freeze({ minimum: 10, maximum: 25 });
 export const REQUIRED_INERT_POLITIES = Object.freeze([
-  { polityId: 'polity:danzig', displayName: 'Freie Stadt Danzig' },
-  { polityId: 'polity:saar', displayName: 'Saargebiet' },
+  { polityId: 'polity:free-city-of-danzig', displayName: 'Freie Stadt Danzig' },
+  { polityId: 'polity:saargebiet', displayName: 'Saargebiet' },
 ]);
 export const POLAND_1931_CENSUS = Object.freeze({
   sourceId: 'source:europe-1935-benchmark:poland-census-1931',
@@ -264,7 +264,21 @@ function buildPolandCandidateScenario(engineScenario) {
   const scenario = structuredClone(engineScenario);
   const macroRegionId = 'region:benchmark-1:PL';
   const macro = scenario.regions.find((entry) => entry.regionId === macroRegionId);
-  if (!macro) throw new Error(`missing Poland macro-region ${macroRegionId}`);
+  if (!macro) {
+    const regions = scenario.regions.filter((entry) => entry.controllerId === 'polity:poland')
+      .toSorted((left, right) => left.regionId.localeCompare(right.regionId));
+    if (regions.length !== POLAND_1931_CENSUS.rows.length
+      || regions.some((entry) => !entry.regionId.startsWith('region:ohm-1935:'))) {
+      throw new Error(`missing Poland macro-region ${macroRegionId} and no published 16-region projection exists`);
+    }
+    const activityRows = [...Map.groupBy(regions, (entry) => entry.activity.kind === 'processing'
+      ? 'goods' : entry.activity.resource)].map(([family, rows]) => ({
+      family,
+      targetCapacity: sum(rows, (entry) => entry.baseMonthlyCapacity),
+      rows: rows.map((entry) => ({ id: entry.regionId, amount: entry.baseMonthlyCapacity })),
+    }));
+    return { scenario, regions, activityRows, integrated: true };
+  }
   if (macro.activities?.length !== 3) throw new Error('Poland macro-region must retain the approved 50/30/20 activity control');
 
   const populationRows = apportionIntegerTotal(POLAND_1931_CENSUS.rows.map((row) => ({
@@ -334,11 +348,11 @@ function buildPolandCandidateScenario(engineScenario) {
     if (!relationId) throw new Error(`unreviewed external Poland supply link: ${externalRegionId}`);
     return { ...link, regions: [externalRegionId, `region:ohm-1935:${relationId}`].sort() };
   });
-  return { scenario, regions, activityRows };
+  return { scenario, regions, activityRows, integrated: false };
 }
 
 export function buildPolandRegionalProjectionCandidate(engineScenario) {
-  const { scenario, regions, activityRows } = buildPolandCandidateScenario(engineScenario);
+  const { scenario, regions, activityRows, integrated } = buildPolandCandidateScenario(engineScenario);
   const firstMonth = buildFirstMonthBaseline(resolveMonth(initState(scenario), { commands: [] }));
   const adjacency = JSON.parse(fs.readFileSync(POLAND_ADJACENCY_CONTROL_PATH, 'utf8'));
   const relationIds = new Set(regions.map((entry) => Number(entry.regionId.split(':').at(-1))));
@@ -349,11 +363,13 @@ export function buildPolandRegionalProjectionCandidate(engineScenario) {
   const body = {
     schemaVersion: 'open-historia-regional-projection-candidate/1',
     polityId: 'polity:poland',
-    status: 'economy-ready-geography-pending-owner-review',
+    status: integrated ? 'owner-approved-runtime' : 'economy-ready-geography-pending-owner-review',
     sourceRefs: POLAND_1935_REGIONAL_ECONOMY.sourceRefs,
     method: 'Population is census-weighted in five-person quanta; the smallest deterministic transfer preserves month-one demographic rounding. Capacity preserves the approved national 50/30/20 activity totals, uses one Łódzkie processing region as required by Canon 04, and applies bounded tax-rounding reconciliation after population-weighted allocation.',
     confidence: 'low',
-    todo: 'Owner-review the geography overlay and replace national-scale specialization estimates with table-level regional production evidence before publishing the 16-region runtime projection.',
+    todo: integrated
+      ? 'Replace national-scale specialization estimates with table-level regional production evidence in a future content version.'
+      : 'Owner-review the geography overlay and replace national-scale specialization estimates with table-level regional production evidence before publishing the 16-region runtime projection.',
     nationalControls: {
       population: sum(regions, (entry) => entry.population),
       workforce: sum(regions, (entry) => Math.floor((entry.population * entry.workforceRateBp) / 10000)),
@@ -420,7 +436,9 @@ export function buildPoliticsCandidateAudit(engineScenario, sources, candidatePa
 }
 
 export function buildFirstMonthBaseline(turnResult) {
-  const polities = turnResult.ledger.polities.map((entry) => ({
+  const inertPolityIds = new Set((turnResult.state.polities ?? [])
+    .filter((entry) => entry.decisionMode === 'inert').map((entry) => entry.id));
+  const polities = turnResult.ledger.polities.filter((entry) => !inertPolityIds.has(entry.polityId)).map((entry) => ({
     polityId: entry.polityId,
     populationOpening: entry.populationOpening,
     populationClosing: entry.populationClosing,

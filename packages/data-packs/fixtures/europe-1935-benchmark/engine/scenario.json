@@ -2,124 +2,4771 @@
   "schemaVersion": "open-historia-engine-scenario/1",
   "scenarioId": "scenario:europe-1935-benchmark",
   "label": "historical-projection",
-  "displayName": { "en": "Europe 1935 Benchmark", "ru": "Европа 1935 — benchmark" },
+  "displayName": {
+    "en": "Europe 1935 Benchmark",
+    "ru": "Европа 1935 — benchmark"
+  },
   "startMonth": "1935-01-01",
   "rngSeed": 193501,
-  "activeResources": ["food", "wood", "coal", "iron", "oil", "goods"],
-  "modules": { "diplomacy": true, "trade": true, "armedForces": true, "combat": true, "campaign": true, "shortages": true },
-  "economy": {
-    "foodNeedPerPersonMilli": 1,
-    "infrastructureBpPerMoney": 1,
-    "resourceParams": [
-      { "resource": "food", "accountingValue": 1, "taxRateBp": 300 },
-      { "resource": "wood", "accountingValue": 2, "taxRateBp": 350 },
-      { "resource": "coal", "accountingValue": 3, "taxRateBp": 500 },
-      { "resource": "iron", "accountingValue": 4, "taxRateBp": 500 },
-      { "resource": "oil", "accountingValue": 6, "taxRateBp": 600 },
-      { "resource": "goods", "accountingValue": 8, "taxRateBp": 800 }
-    ]
+  "activeResources": [
+    "food",
+    "wood",
+    "coal",
+    "iron",
+    "oil",
+    "goods"
+  ],
+  "modules": {
+    "diplomacy": true,
+    "armedForces": true,
+    "combat": true,
+    "trade": true,
+    "shortages": true,
+    "campaign": true
   },
-  "polities": [
-    { "id": "polity:germany", "displayName": { "en": "Germany", "ru": "Германия" }, "treasury": 18000, "stockpile": [{"resource":"food","amount":5200000},{"resource":"wood","amount":900000},{"resource":"coal","amount":1500000},{"resource":"iron","amount":900000},{"resource":"oil","amount":300000},{"resource":"goods","amount":600000}] },
-    { "id": "polity:austria", "displayName": { "en": "Austria", "ru": "Австрия" }, "treasury": 4200, "stockpile": [{"resource":"food","amount":700000},{"resource":"wood","amount":180000},{"resource":"coal","amount":120000},{"resource":"iron","amount":90000},{"resource":"oil","amount":30000},{"resource":"goods","amount":70000}] },
-    { "id": "polity:czechoslovakia", "displayName": { "en": "Czechoslovakia", "ru": "Чехословакия" }, "treasury": 7600, "stockpile": [{"resource":"food","amount":1500000},{"resource":"wood","amount":260000},{"resource":"coal","amount":520000},{"resource":"iron","amount":360000},{"resource":"oil","amount":50000},{"resource":"goods","amount":180000}] },
-    { "id": "polity:poland", "displayName": { "en": "Poland", "ru": "Польша" }, "treasury": 7200, "stockpile": [{"resource":"food","amount":3500000},{"resource":"wood","amount":520000},{"resource":"coal","amount":720000},{"resource":"iron","amount":280000},{"resource":"oil","amount":160000},{"resource":"goods","amount":160000}] },
-    { "id": "polity:france", "displayName": { "en": "France", "ru": "Франция" }, "treasury": 16000, "stockpile": [{"resource":"food","amount":4300000},{"resource":"wood","amount":800000},{"resource":"coal","amount":1100000},{"resource":"iron","amount":720000},{"resource":"oil","amount":420000},{"resource":"goods","amount":520000}] },
-    { "id": "polity:united-kingdom", "displayName": { "en": "United Kingdom", "ru": "Великобритания" }, "treasury": 19000, "stockpile": [{"resource":"food","amount":4700000},{"resource":"wood","amount":700000},{"resource":"coal","amount":1400000},{"resource":"iron","amount":650000},{"resource":"oil","amount":620000},{"resource":"goods","amount":650000}] },
-    { "id": "polity:italy", "displayName": { "en": "Italy", "ru": "Италия" }, "treasury": 10500, "stockpile": [{"resource":"food","amount":4400000},{"resource":"wood","amount":550000},{"resource":"coal","amount":360000},{"resource":"iron","amount":290000},{"resource":"oil","amount":160000},{"resource":"goods","amount":260000}] },
-    { "id": "polity:soviet-union", "displayName": { "en": "Soviet Union", "ru": "СССР" }, "treasury": 21000, "stockpile": [{"resource":"food","amount":17000000},{"resource":"wood","amount":3000000},{"resource":"coal","amount":2400000},{"resource":"iron","amount":1500000},{"resource":"oil","amount":1800000},{"resource":"goods","amount":500000}] },
-    { "id": "polity:united-states", "displayName": { "en": "United States", "ru": "США" }, "treasury": 28000, "stockpile": [{"resource":"food","amount":13000000},{"resource":"wood","amount":2500000},{"resource":"coal","amount":2600000},{"resource":"iron","amount":1800000},{"resource":"oil","amount":2400000},{"resource":"goods","amount":900000}] }
-  ],
-  "regions": [
-    { "regionId":"region:benchmark-1:DE","controllerId":"polity:germany","displayName":{"en":"Germany macro-region","ru":"Германия"},"activities":[{"activity":{"kind":"processing","activity":"basic_goods"},"allocationBp":7000},{"activity":{"kind":"extraction","resource":"coal"},"allocationBp":2000},{"activity":{"kind":"extraction","resource":"iron"},"allocationBp":1000}],"population":66000000,"annualBirthRateBp":180,"annualDeathRateBp":110,"workforceRateBp":4000,"infrastructureBp":6500,"damageBp":0,"baseMonthlyCapacity":160000,"outputPerWorker":1,"capacityCeiling":240000 },
-    { "regionId":"region:benchmark-1:AT","controllerId":"polity:austria","displayName":{"en":"Austria macro-region","ru":"Австрия"},"activities":[{"activity":{"kind":"extraction","resource":"food"},"allocationBp":4000},{"activity":{"kind":"extraction","resource":"wood"},"allocationBp":4000},{"activity":{"kind":"processing","activity":"basic_goods"},"allocationBp":2000}],"population":6760000,"annualBirthRateBp":170,"annualDeathRateBp":120,"workforceRateBp":4000,"infrastructureBp":5000,"damageBp":0,"baseMonthlyCapacity":24000,"outputPerWorker":1,"capacityCeiling":36000 },
-    { "regionId":"region:benchmark-1:CS","controllerId":"polity:czechoslovakia","displayName":{"en":"Czechoslovakia macro-region","ru":"Чехословакия"},"activities":[{"activity":{"kind":"extraction","resource":"coal"},"allocationBp":4000},{"activity":{"kind":"extraction","resource":"iron"},"allocationBp":3000},{"activity":{"kind":"processing","activity":"basic_goods"},"allocationBp":3000}],"population":15000000,"annualBirthRateBp":190,"annualDeathRateBp":120,"workforceRateBp":4000,"infrastructureBp":6100,"damageBp":0,"baseMonthlyCapacity":62000,"outputPerWorker":1,"capacityCeiling":93000 },
-    { "regionId":"region:benchmark-1:PL","controllerId":"polity:poland","displayName":{"en":"Poland macro-region","ru":"Польша"},"activities":[{"activity":{"kind":"extraction","resource":"food"},"allocationBp":5000},{"activity":{"kind":"extraction","resource":"coal"},"allocationBp":3000},{"activity":{"kind":"processing","activity":"basic_goods"},"allocationBp":2000}],"population":34000000,"annualBirthRateBp":260,"annualDeathRateBp":140,"workforceRateBp":4000,"infrastructureBp":3900,"damageBp":0,"baseMonthlyCapacity":88000,"outputPerWorker":1,"capacityCeiling":132000 },
-    { "regionId":"region:benchmark-1:FR","controllerId":"polity:france","displayName":{"en":"France macro-region","ru":"Франция"},"activities":[{"activity":{"kind":"extraction","resource":"food"},"allocationBp":3000},{"activity":{"kind":"extraction","resource":"iron"},"allocationBp":3000},{"activity":{"kind":"processing","activity":"basic_goods"},"allocationBp":4000}],"population":41900000,"annualBirthRateBp":150,"annualDeathRateBp":130,"workforceRateBp":4000,"infrastructureBp":6200,"damageBp":0,"baseMonthlyCapacity":118000,"outputPerWorker":1,"capacityCeiling":177000 },
-    { "regionId":"region:benchmark-1:GB","controllerId":"polity:united-kingdom","displayName":{"en":"United Kingdom macro-region","ru":"Великобритания"},"activities":[{"activity":{"kind":"extraction","resource":"food"},"allocationBp":3000},{"activity":{"kind":"extraction","resource":"coal"},"allocationBp":3000},{"activity":{"kind":"processing","activity":"basic_goods"},"allocationBp":4000}],"population":46900000,"annualBirthRateBp":150,"annualDeathRateBp":120,"workforceRateBp":4000,"infrastructureBp":6800,"damageBp":0,"baseMonthlyCapacity":132000,"outputPerWorker":1,"capacityCeiling":198000 },
-    { "regionId":"region:benchmark-1:IT","controllerId":"polity:italy","displayName":{"en":"Italy macro-region","ru":"Италия"},"activities":[{"activity":{"kind":"extraction","resource":"food"},"allocationBp":5000},{"activity":{"kind":"extraction","resource":"iron"},"allocationBp":2000},{"activity":{"kind":"processing","activity":"basic_goods"},"allocationBp":3000}],"population":43400000,"annualBirthRateBp":230,"annualDeathRateBp":130,"workforceRateBp":4000,"infrastructureBp":4500,"damageBp":0,"baseMonthlyCapacity":90000,"outputPerWorker":1,"capacityCeiling":135000 },
-    { "regionId":"region:benchmark-1:SU","controllerId":"polity:soviet-union","displayName":{"en":"Soviet strategic macro-region","ru":"СССР"},"activities":[{"activity":{"kind":"extraction","resource":"food"},"allocationBp":3000},{"activity":{"kind":"extraction","resource":"iron"},"allocationBp":3000},{"activity":{"kind":"extraction","resource":"oil"},"allocationBp":4000}],"population":168000000,"annualBirthRateBp":270,"annualDeathRateBp":170,"workforceRateBp":4000,"infrastructureBp":3000,"damageBp":0,"baseMonthlyCapacity":180000,"outputPerWorker":1,"capacityCeiling":270000 },
-    { "regionId":"region:benchmark-1:US","controllerId":"polity:united-states","displayName":{"en":"United States strategic macro-region","ru":"США"},"activities":[{"activity":{"kind":"extraction","resource":"food"},"allocationBp":4000},{"activity":{"kind":"extraction","resource":"iron"},"allocationBp":2000},{"activity":{"kind":"extraction","resource":"oil"},"allocationBp":2000},{"activity":{"kind":"processing","activity":"basic_goods"},"allocationBp":2000}],"population":127000000,"annualBirthRateBp":170,"annualDeathRateBp":110,"workforceRateBp":4000,"infrastructureBp":7200,"damageBp":0,"baseMonthlyCapacity":220000,"outputPerWorker":1,"capacityCeiling":330000 }
-  ],
   "diplomacy": {
     "relations": [
-      {"polities":["polity:austria","polity:germany"],"opinion":1800,"trust":5200,"threat":4200},
-      {"polities":["polity:austria","polity:italy"],"opinion":1000,"trust":5600,"threat":1800},
-      {"polities":["polity:czechoslovakia","polity:france"],"opinion":1800,"trust":6800,"threat":1200},
-      {"polities":["polity:czechoslovakia","polity:germany"],"opinion":-2200,"trust":2200,"threat":7200},
-      {"polities":["polity:france","polity:germany"],"opinion":-1600,"trust":2800,"threat":6200},
-      {"polities":["polity:france","polity:italy"],"opinion":800,"trust":5000,"threat":2200},
-      {"polities":["polity:france","polity:poland"],"opinion":1200,"trust":6100,"threat":1300},
-      {"polities":["polity:france","polity:united-kingdom"],"opinion":1600,"trust":6900,"threat":800},
-      {"polities":["polity:germany","polity:italy"],"opinion":400,"trust":3800,"threat":1800},
-      {"polities":["polity:germany","polity:poland"],"opinion":-800,"trust":3100,"threat":4800},
-      {"polities":["polity:germany","polity:soviet-union"],"opinion":-1800,"trust":1800,"threat":5700},
-      {"polities":["polity:italy","polity:united-kingdom"],"opinion":400,"trust":4600,"threat":1800},
-      {"polities":["polity:poland","polity:soviet-union"],"opinion":-2200,"trust":1800,"threat":6500},
-      {"polities":["polity:united-kingdom","polity:united-states"],"opinion":1800,"trust":6500,"threat":600}
+      {
+        "polities": [
+          "polity:austria",
+          "polity:germany"
+        ],
+        "opinion": 1800,
+        "trust": 5200,
+        "threat": 4200
+      },
+      {
+        "polities": [
+          "polity:austria",
+          "polity:italy"
+        ],
+        "opinion": 1000,
+        "trust": 5600,
+        "threat": 1800
+      },
+      {
+        "polities": [
+          "polity:czechoslovakia",
+          "polity:france"
+        ],
+        "opinion": 1800,
+        "trust": 6800,
+        "threat": 1200
+      },
+      {
+        "polities": [
+          "polity:czechoslovakia",
+          "polity:germany"
+        ],
+        "opinion": -2200,
+        "trust": 2200,
+        "threat": 7200
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:germany"
+        ],
+        "opinion": -1600,
+        "trust": 2800,
+        "threat": 6200
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:italy"
+        ],
+        "opinion": 800,
+        "trust": 5000,
+        "threat": 2200
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:poland"
+        ],
+        "opinion": 1200,
+        "trust": 6100,
+        "threat": 1300
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:united-kingdom"
+        ],
+        "opinion": 1600,
+        "trust": 6900,
+        "threat": 800
+      },
+      {
+        "polities": [
+          "polity:germany",
+          "polity:italy"
+        ],
+        "opinion": 400,
+        "trust": 3800,
+        "threat": 1800
+      },
+      {
+        "polities": [
+          "polity:germany",
+          "polity:poland"
+        ],
+        "opinion": -800,
+        "trust": 3100,
+        "threat": 4800
+      },
+      {
+        "polities": [
+          "polity:germany",
+          "polity:soviet-union"
+        ],
+        "opinion": -1800,
+        "trust": 1800,
+        "threat": 5700
+      },
+      {
+        "polities": [
+          "polity:italy",
+          "polity:united-kingdom"
+        ],
+        "opinion": 400,
+        "trust": 4600,
+        "threat": 1800
+      },
+      {
+        "polities": [
+          "polity:poland",
+          "polity:soviet-union"
+        ],
+        "opinion": -2200,
+        "trust": 1800,
+        "threat": 6500
+      },
+      {
+        "polities": [
+          "polity:united-kingdom",
+          "polity:united-states"
+        ],
+        "opinion": 1800,
+        "trust": 6500,
+        "threat": 600
+      }
     ],
     "tradeRoutes": [
-      {"polities":["polity:austria","polity:germany"],"monthlyCapacity":100000},
-      {"polities":["polity:czechoslovakia","polity:france"],"monthlyCapacity":80000},
-      {"polities":["polity:france","polity:united-kingdom"],"monthlyCapacity":160000},
-      {"polities":["polity:germany","polity:poland"],"monthlyCapacity":100000},
-      {"polities":["polity:germany","polity:soviet-union"],"monthlyCapacity":120000},
-      {"polities":["polity:italy","polity:united-kingdom"],"monthlyCapacity":80000},
-      {"polities":["polity:united-kingdom","polity:united-states"],"monthlyCapacity":180000}
+      {
+        "polities": [
+          "polity:austria",
+          "polity:germany"
+        ],
+        "monthlyCapacity": 100000
+      },
+      {
+        "polities": [
+          "polity:czechoslovakia",
+          "polity:france"
+        ],
+        "monthlyCapacity": 80000
+      },
+      {
+        "polities": [
+          "polity:france",
+          "polity:united-kingdom"
+        ],
+        "monthlyCapacity": 160000
+      },
+      {
+        "polities": [
+          "polity:germany",
+          "polity:poland"
+        ],
+        "monthlyCapacity": 100000
+      },
+      {
+        "polities": [
+          "polity:germany",
+          "polity:soviet-union"
+        ],
+        "monthlyCapacity": 120000
+      },
+      {
+        "polities": [
+          "polity:italy",
+          "polity:united-kingdom"
+        ],
+        "monthlyCapacity": 80000
+      },
+      {
+        "polities": [
+          "polity:united-kingdom",
+          "polity:united-states"
+        ],
+        "monthlyCapacity": 180000
+      }
     ],
     "startingAgreements": [
-      {"agreementId":"agreement:france-czechoslovakia-1924","sourceProposalId":"proposal:authored-france-czechoslovakia-1924","acceptedMonth":"1924-03-01","terms":{"kind":"agreement","agreementType":"defensive-alliance","fromPolityId":"polity:france","toPolityId":"polity:czechoslovakia"}},
-      {"agreementId":"agreement:france-poland-1921","sourceProposalId":"proposal:authored-france-poland-1921","acceptedMonth":"1922-05-01","terms":{"kind":"agreement","agreementType":"defensive-alliance","fromPolityId":"polity:france","toPolityId":"polity:poland"}}
+      {
+        "agreementId": "agreement:france-czechoslovakia-1924",
+        "sourceProposalId": "proposal:authored-france-czechoslovakia-1924",
+        "acceptedMonth": "1924-03-01",
+        "terms": {
+          "kind": "agreement",
+          "agreementType": "defensive-alliance",
+          "fromPolityId": "polity:france",
+          "toPolityId": "polity:czechoslovakia"
+        }
+      },
+      {
+        "agreementId": "agreement:france-poland-1921",
+        "sourceProposalId": "proposal:authored-france-poland-1921",
+        "acceptedMonth": "1922-05-01",
+        "terms": {
+          "kind": "agreement",
+          "agreementType": "defensive-alliance",
+          "fromPolityId": "polity:france",
+          "toPolityId": "polity:poland"
+        }
+      }
     ]
   },
   "military": {
     "combatSeed": 193501,
     "polities": [
-      {"polityId":"polity:germany","maxMobilizationBp":1200,"equipmentReserve":1200000},
-      {"polityId":"polity:austria","maxMobilizationBp":900,"equipmentReserve":90000},
-      {"polityId":"polity:czechoslovakia","maxMobilizationBp":1100,"equipmentReserve":260000},
-      {"polityId":"polity:poland","maxMobilizationBp":1200,"equipmentReserve":420000},
-      {"polityId":"polity:france","maxMobilizationBp":1100,"equipmentReserve":720000},
-      {"polityId":"polity:united-kingdom","maxMobilizationBp":900,"equipmentReserve":620000},
-      {"polityId":"polity:italy","maxMobilizationBp":1000,"equipmentReserve":480000},
-      {"polityId":"polity:soviet-union","maxMobilizationBp":1500,"equipmentReserve":1800000},
-      {"polityId":"polity:united-states","maxMobilizationBp":800,"equipmentReserve":1500000}
+      {
+        "polityId": "polity:austria",
+        "maxMobilizationBp": 900,
+        "equipmentReserve": 90000
+      },
+      {
+        "polityId": "polity:czechoslovakia",
+        "maxMobilizationBp": 1100,
+        "equipmentReserve": 260000
+      },
+      {
+        "polityId": "polity:france",
+        "maxMobilizationBp": 1100,
+        "equipmentReserve": 720000
+      },
+      {
+        "polityId": "polity:free-city-of-danzig",
+        "maxMobilizationBp": 100,
+        "equipmentReserve": 0
+      },
+      {
+        "polityId": "polity:germany",
+        "maxMobilizationBp": 1200,
+        "equipmentReserve": 1200000
+      },
+      {
+        "polityId": "polity:italy",
+        "maxMobilizationBp": 1000,
+        "equipmentReserve": 480000
+      },
+      {
+        "polityId": "polity:poland",
+        "maxMobilizationBp": 1200,
+        "equipmentReserve": 420000
+      },
+      {
+        "polityId": "polity:saargebiet",
+        "maxMobilizationBp": 100,
+        "equipmentReserve": 0
+      },
+      {
+        "polityId": "polity:soviet-union",
+        "maxMobilizationBp": 1500,
+        "equipmentReserve": 1800000
+      },
+      {
+        "polityId": "polity:united-kingdom",
+        "maxMobilizationBp": 900,
+        "equipmentReserve": 620000
+      },
+      {
+        "polityId": "polity:united-states",
+        "maxMobilizationBp": 800,
+        "equipmentReserve": 1500000
+      }
     ],
-    "commanders": [], "formations": [],
+    "commanders": [],
+    "formations": [],
     "supplyLinks": [
-      {"regions":["region:benchmark-1:AT","region:benchmark-1:CS"],"capacity":100000},
-      {"regions":["region:benchmark-1:AT","region:benchmark-1:DE"],"capacity":120000},
-      {"regions":["region:benchmark-1:CS","region:benchmark-1:PL"],"capacity":110000},
-      {"regions":["region:benchmark-1:DE","region:benchmark-1:FR"],"capacity":140000},
-      {"regions":["region:benchmark-1:DE","region:benchmark-1:PL"],"capacity":140000},
-      {"regions":["region:benchmark-1:FR","region:benchmark-1:GB"],"capacity":150000},
-      {"regions":["region:benchmark-1:FR","region:benchmark-1:IT"],"capacity":110000},
-      {"regions":["region:benchmark-1:PL","region:benchmark-1:SU"],"capacity":120000},
-      {"regions":["region:benchmark-1:GB","region:benchmark-1:US"],"capacity":90000}
+      {
+        "regions": [
+          "region:europe-1935:at-burgenland",
+          "region:europe-1935:at-niederoesterreich"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-burgenland",
+          "region:europe-1935:at-steiermark"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-kaernten",
+          "region:europe-1935:at-osttirol"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-kaernten",
+          "region:europe-1935:at-salzburg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-kaernten",
+          "region:europe-1935:at-steiermark"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-niederoesterreich",
+          "region:europe-1935:at-oberoesterreich"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-niederoesterreich",
+          "region:europe-1935:at-steiermark"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-niederoesterreich",
+          "region:europe-1935:at-wien"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-niederoesterreich",
+          "region:europe-1935:cs-morava"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-oberoesterreich",
+          "region:europe-1935:at-salzburg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-oberoesterreich",
+          "region:europe-1935:at-steiermark"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-osttirol",
+          "region:europe-1935:at-salzburg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-osttirol",
+          "region:europe-1935:at-tirol"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-salzburg",
+          "region:europe-1935:at-steiermark"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-salzburg",
+          "region:europe-1935:at-tirol"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-salzburg",
+          "region:europe-1935:de-bayern"
+        ],
+        "capacity": 120000
+      },
+      {
+        "regions": [
+          "region:europe-1935:at-tirol",
+          "region:europe-1935:at-vorarlberg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-jizni-cechy",
+          "region:europe-1935:cs-morava"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-jizni-cechy",
+          "region:europe-1935:cs-stredni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-jizni-cechy",
+          "region:europe-1935:cs-zapadni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-morava",
+          "region:europe-1935:cs-slezsko"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-morava",
+          "region:europe-1935:cs-slovensko"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-morava",
+          "region:europe-1935:cs-stredni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-morava",
+          "region:europe-1935:cs-vychodni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-podkarpatska-rus",
+          "region:europe-1935:cs-slovensko"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-praha",
+          "region:europe-1935:cs-severni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-praha",
+          "region:europe-1935:cs-stredni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-severni-cechy",
+          "region:europe-1935:cs-stredni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-severni-cechy",
+          "region:europe-1935:cs-vychodni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-severni-cechy",
+          "region:europe-1935:cs-zapadni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-slezsko",
+          "region:europe-1935:cs-slovensko"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-slezsko",
+          "region:ohm-1935:2741470"
+        ],
+        "capacity": 110000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-stredni-cechy",
+          "region:europe-1935:cs-vychodni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:cs-stredni-cechy",
+          "region:europe-1935:cs-zapadni-cechy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-bayern"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-brandenburg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-bremen-oldenburg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-hannover-braunschweig"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-hessen-nassau"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-mecklenburg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-niederschlesien"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-pommern"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-sachsen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-schleswig-holstein"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-thueringen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-anhalt-provinz-sachsen",
+          "region:europe-1935:de-westfalen-lippe"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-baden",
+          "region:europe-1935:de-bayern"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-baden",
+          "region:europe-1935:de-hessen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-baden",
+          "region:europe-1935:de-hohenzollern"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-baden",
+          "region:europe-1935:de-wuerttemberg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-bayern",
+          "region:europe-1935:de-hessen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-bayern",
+          "region:europe-1935:de-hessen-nassau"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-bayern",
+          "region:europe-1935:de-hohenzollern"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-bayern",
+          "region:europe-1935:de-rheinprovinz"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-bayern",
+          "region:europe-1935:de-sachsen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-bayern",
+          "region:europe-1935:de-thueringen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-bayern",
+          "region:europe-1935:de-wuerttemberg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-brandenburg",
+          "region:europe-1935:de-grenzmark"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-brandenburg",
+          "region:europe-1935:de-mecklenburg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-brandenburg",
+          "region:europe-1935:de-niederschlesien"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-brandenburg",
+          "region:europe-1935:de-pommern"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-bremen-oldenburg",
+          "region:europe-1935:de-rheinprovinz"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-bremen-oldenburg",
+          "region:europe-1935:de-schleswig-holstein"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-grenzmark",
+          "region:europe-1935:de-niederschlesien"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-grenzmark",
+          "region:europe-1935:de-pommern"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-hannover-braunschweig",
+          "region:europe-1935:de-westfalen-lippe"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-hessen",
+          "region:europe-1935:de-hessen-nassau"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-hessen",
+          "region:europe-1935:de-rheinprovinz"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-hessen",
+          "region:europe-1935:de-wuerttemberg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-hessen-nassau",
+          "region:europe-1935:de-rheinprovinz"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-hessen-nassau",
+          "region:europe-1935:de-thueringen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-hessen-nassau",
+          "region:europe-1935:de-westfalen-lippe"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-hohenzollern",
+          "region:europe-1935:de-wuerttemberg"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-mecklenburg",
+          "region:europe-1935:de-pommern"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-mecklenburg",
+          "region:europe-1935:de-schleswig-holstein"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-niederschlesien",
+          "region:europe-1935:de-oberschlesien"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-niederschlesien",
+          "region:europe-1935:de-sachsen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-pommern",
+          "region:ohm-1935:2741476"
+        ],
+        "capacity": 140000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-rheinprovinz",
+          "region:europe-1935:de-westfalen-lippe"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-rheinprovinz",
+          "region:europe-1935:fr-metz"
+        ],
+        "capacity": 140000
+      },
+      {
+        "regions": [
+          "region:europe-1935:de-sachsen",
+          "region:europe-1935:de-thueringen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-amiens",
+          "region:europe-1935:fr-lille"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-amiens",
+          "region:europe-1935:fr-metz"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-amiens",
+          "region:europe-1935:fr-paris"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-amiens",
+          "region:europe-1935:fr-rouen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-besancon",
+          "region:europe-1935:fr-dijon"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-besancon",
+          "region:europe-1935:fr-lyon"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-besancon",
+          "region:europe-1935:fr-metz"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-besancon",
+          "region:europe-1935:fr-nancy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-bordeaux",
+          "region:europe-1935:fr-nantes"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-bordeaux",
+          "region:europe-1935:fr-toulouse"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-bordeaux",
+          "region:europe-1935:fr-tours"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-clermont-ferrand",
+          "region:europe-1935:fr-dijon"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-clermont-ferrand",
+          "region:europe-1935:fr-lyon"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-clermont-ferrand",
+          "region:europe-1935:fr-marseille"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-clermont-ferrand",
+          "region:europe-1935:fr-montpellier"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-clermont-ferrand",
+          "region:europe-1935:fr-orleans"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-clermont-ferrand",
+          "region:europe-1935:fr-toulouse"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-clermont-ferrand",
+          "region:europe-1935:fr-tours"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-dijon",
+          "region:europe-1935:fr-lyon"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-dijon",
+          "region:europe-1935:fr-metz"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-dijon",
+          "region:europe-1935:fr-orleans"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-dijon",
+          "region:europe-1935:fr-paris"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-le-mans",
+          "region:europe-1935:fr-nantes"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-le-mans",
+          "region:europe-1935:fr-orleans"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-le-mans",
+          "region:europe-1935:fr-paris"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-le-mans",
+          "region:europe-1935:fr-rouen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-le-mans",
+          "region:europe-1935:fr-tours"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-lille",
+          "region:europe-1935:gb-south-east-england"
+        ],
+        "capacity": 150000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-lyon",
+          "region:europe-1935:fr-marseille"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-marseille",
+          "region:europe-1935:fr-montpellier"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-marseille",
+          "region:europe-1935:it-liguria"
+        ],
+        "capacity": 110000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-metz",
+          "region:europe-1935:fr-nancy"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-metz",
+          "region:europe-1935:fr-paris"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-montpellier",
+          "region:europe-1935:fr-toulouse"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-nantes",
+          "region:europe-1935:fr-tours"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-orleans",
+          "region:europe-1935:fr-paris"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-orleans",
+          "region:europe-1935:fr-tours"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-paris",
+          "region:europe-1935:fr-rouen"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:fr-toulouse",
+          "region:europe-1935:fr-tours"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-central-scotland",
+          "region:europe-1935:gb-highlands-islands"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-central-scotland",
+          "region:europe-1935:gb-north-east-scotland"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-central-scotland",
+          "region:europe-1935:gb-southern-scotland"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-cymru",
+          "region:europe-1935:gb-midlands"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-cymru",
+          "region:europe-1935:gb-north-west-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-cymru",
+          "region:europe-1935:gb-south-west-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-east-england",
+          "region:europe-1935:gb-midlands"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-east-england",
+          "region:europe-1935:gb-south-east-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-east-england",
+          "region:europe-1935:gb-southern-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-highlands-islands",
+          "region:europe-1935:gb-north-east-scotland"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-midlands",
+          "region:europe-1935:gb-north-west-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-midlands",
+          "region:europe-1935:gb-northern-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-midlands",
+          "region:europe-1935:gb-south-west-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-midlands",
+          "region:europe-1935:gb-southern-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-north-west-england",
+          "region:europe-1935:gb-northern-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-northern-england",
+          "region:europe-1935:gb-southern-scotland"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-south-east-england",
+          "region:europe-1935:gb-southern-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-south-west-england",
+          "region:europe-1935:gb-southern-england"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:gb-south-west-england",
+          "region:europe-1935:us-east"
+        ],
+        "capacity": 90000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-abruzzi-molise",
+          "region:europe-1935:it-calabrie"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-abruzzi-molise",
+          "region:europe-1935:it-campania"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-abruzzi-molise",
+          "region:europe-1935:it-emilia"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-abruzzi-molise",
+          "region:europe-1935:it-lazio"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-abruzzi-molise",
+          "region:europe-1935:it-lucania"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-abruzzi-molise",
+          "region:europe-1935:it-marche"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-abruzzi-molise",
+          "region:europe-1935:it-puglie"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-abruzzi-molise",
+          "region:europe-1935:it-toscana"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-calabrie",
+          "region:europe-1935:it-lucania"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-campania",
+          "region:europe-1935:it-lazio"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-campania",
+          "region:europe-1935:it-lucania"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-campania",
+          "region:europe-1935:it-puglie"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-emilia",
+          "region:europe-1935:it-liguria"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-emilia",
+          "region:europe-1935:it-lombardia"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-emilia",
+          "region:europe-1935:it-marche"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-emilia",
+          "region:europe-1935:it-toscana"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-emilia",
+          "region:europe-1935:it-veneto"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-emilia",
+          "region:europe-1935:it-venezia-giulia"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-lazio",
+          "region:europe-1935:it-marche"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-lazio",
+          "region:europe-1935:it-toscana"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-lazio",
+          "region:europe-1935:it-umbria"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-liguria",
+          "region:europe-1935:it-lombardia"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-liguria",
+          "region:europe-1935:it-piemonte"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-liguria",
+          "region:europe-1935:it-toscana"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-lombardia",
+          "region:europe-1935:it-piemonte"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-lombardia",
+          "region:europe-1935:it-veneto"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-lombardia",
+          "region:europe-1935:it-venezia-tridentina"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-lucania",
+          "region:europe-1935:it-puglie"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-marche",
+          "region:europe-1935:it-toscana"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-marche",
+          "region:europe-1935:it-umbria"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-toscana",
+          "region:europe-1935:it-umbria"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-veneto",
+          "region:europe-1935:it-venezia-giulia"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:it-veneto",
+          "region:europe-1935:it-venezia-tridentina"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:europe-1935:su-zapad",
+          "region:ohm-1935:2696109"
+        ],
+        "capacity": 120000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2696109",
+          "region:ohm-1935:2741466"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2696109",
+          "region:ohm-1935:2741468"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2698169",
+          "region:ohm-1935:2698170"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2698169",
+          "region:ohm-1935:2741463"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2698169",
+          "region:ohm-1935:2927191"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2698169",
+          "region:ohm-1935:2929589"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2698170",
+          "region:ohm-1935:2741463"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2698170",
+          "region:ohm-1935:2741466"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2698170",
+          "region:ohm-1935:2741468"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741463",
+          "region:ohm-1935:2741468"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741463",
+          "region:ohm-1935:2741469"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741463",
+          "region:ohm-1935:2741470"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741463",
+          "region:ohm-1935:2927191"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741466",
+          "region:ohm-1935:2741468"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741468",
+          "region:ohm-1935:2741469"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741469",
+          "region:ohm-1935:2741470"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741469",
+          "region:ohm-1935:2741475"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741469",
+          "region:ohm-1935:2741476"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741469",
+          "region:ohm-1935:2741477"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741470",
+          "region:ohm-1935:2741471"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741470",
+          "region:ohm-1935:2741475"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741470",
+          "region:ohm-1935:2927190"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741470",
+          "region:ohm-1935:2927191"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741471",
+          "region:ohm-1935:2927190"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741475",
+          "region:ohm-1935:2741476"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2741476",
+          "region:ohm-1935:2741477"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2927190",
+          "region:ohm-1935:2927191"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2927191",
+          "region:ohm-1935:2929589"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2927191",
+          "region:ohm-1935:2930186"
+        ],
+        "capacity": 100000
+      },
+      {
+        "regions": [
+          "region:ohm-1935:2929589",
+          "region:ohm-1935:2930186"
+        ],
+        "capacity": 100000
+      }
     ]
   },
   "campaign": {
     "softHorizonMonth": "1940-07-01",
     "goals": [
-      {"goalId":"goal:germany-austria","polityId":"polity:germany","displayName":{"en":"Control Austria","ru":"Контролировать Австрию"},"initiallyActive":true,"kind":"control-region","regionId":"region:benchmark-1:AT"},
-      {"goalId":"goal:austria-france","polityId":"polity:austria","displayName":{"en":"Secure French alliance","ru":"Союз с Францией"},"initiallyActive":false,"kind":"secure-alliance","targetPolityId":"polity:france"},
-      {"goalId":"goal:france-czechoslovakia","polityId":"polity:france","displayName":{"en":"Secure Czechoslovak alliance","ru":"Союз с Чехословакией"},"initiallyActive":false,"kind":"secure-alliance","targetPolityId":"polity:czechoslovakia"},
-      {"goalId":"goal:britain-france","polityId":"polity:united-kingdom","displayName":{"en":"Continental commitment","ru":"Континентальные обязательства"},"initiallyActive":false,"kind":"secure-alliance","targetPolityId":"polity:france"},
-      {"goalId":"goal:italy-france","polityId":"polity:italy","displayName":{"en":"Preserve western alignment","ru":"Сохранить западную ориентацию"},"initiallyActive":false,"kind":"secure-alliance","targetPolityId":"polity:france"}
+      {
+        "goalId": "goal:germany-austria",
+        "polityId": "polity:germany",
+        "displayName": {
+          "en": "Control Austria",
+          "ru": "Контролировать Австрию"
+        },
+        "initiallyActive": true,
+        "kind": "control-region",
+        "regionId": "region:europe-1935:at-wien"
+      },
+      {
+        "goalId": "goal:austria-france",
+        "polityId": "polity:austria",
+        "displayName": {
+          "en": "Secure French alliance",
+          "ru": "Союз с Францией"
+        },
+        "initiallyActive": false,
+        "kind": "secure-alliance",
+        "targetPolityId": "polity:france"
+      },
+      {
+        "goalId": "goal:france-czechoslovakia",
+        "polityId": "polity:france",
+        "displayName": {
+          "en": "Secure Czechoslovak alliance",
+          "ru": "Союз с Чехословакией"
+        },
+        "initiallyActive": false,
+        "kind": "secure-alliance",
+        "targetPolityId": "polity:czechoslovakia"
+      },
+      {
+        "goalId": "goal:britain-france",
+        "polityId": "polity:united-kingdom",
+        "displayName": {
+          "en": "Continental commitment",
+          "ru": "Континентальные обязательства"
+        },
+        "initiallyActive": false,
+        "kind": "secure-alliance",
+        "targetPolityId": "polity:france"
+      },
+      {
+        "goalId": "goal:italy-france",
+        "polityId": "polity:italy",
+        "displayName": {
+          "en": "Preserve western alignment",
+          "ru": "Сохранить западную ориентацию"
+        },
+        "initiallyActive": false,
+        "kind": "secure-alliance",
+        "targetPolityId": "polity:france"
+      }
     ],
     "crisisTemplates": [
-      {"templateId":"crisis-template:german-escalation","displayName":{"en":"German escalation","ru":"Германская эскалация"},"participants":["polity:germany","polity:austria","polity:czechoslovakia","polity:france","polity:united-kingdom"],"kind":"war-escalation","subjectPolityId":"polity:germany"}
+      {
+        "templateId": "crisis-template:german-escalation",
+        "displayName": {
+          "en": "German escalation",
+          "ru": "Германская эскалация"
+        },
+        "participants": [
+          "polity:germany",
+          "polity:austria",
+          "polity:czechoslovakia",
+          "polity:france",
+          "polity:united-kingdom"
+        ],
+        "kind": "war-escalation",
+        "subjectPolityId": "polity:germany"
+      }
     ],
     "legacyBaselines": [
-      {"polityId":"polity:germany","treasuryReference":18000,"scores":{"prosperity":5000,"security":5000,"stability":5000,"diplomacy":5000,"capability":5000,"pluralism":5000}},
-      {"polityId":"polity:austria","treasuryReference":4200,"scores":{"prosperity":5000,"security":5000,"stability":5000,"diplomacy":5000,"capability":5000,"pluralism":5000}},
-      {"polityId":"polity:czechoslovakia","treasuryReference":7600,"scores":{"prosperity":5000,"security":5000,"stability":5000,"diplomacy":5000,"capability":5000,"pluralism":5000}},
-      {"polityId":"polity:poland","treasuryReference":7200,"scores":{"prosperity":5000,"security":5000,"stability":5000,"diplomacy":5000,"capability":5000,"pluralism":5000}},
-      {"polityId":"polity:france","treasuryReference":16000,"scores":{"prosperity":5000,"security":5000,"stability":5000,"diplomacy":5000,"capability":5000,"pluralism":5000}},
-      {"polityId":"polity:united-kingdom","treasuryReference":19000,"scores":{"prosperity":5000,"security":5000,"stability":5000,"diplomacy":5000,"capability":5000,"pluralism":5000}},
-      {"polityId":"polity:italy","treasuryReference":10500,"scores":{"prosperity":5000,"security":5000,"stability":5000,"diplomacy":5000,"capability":5000,"pluralism":5000}},
-      {"polityId":"polity:soviet-union","treasuryReference":21000,"scores":{"prosperity":5000,"security":5000,"stability":5000,"diplomacy":5000,"capability":5000,"pluralism":5000}},
-      {"polityId":"polity:united-states","treasuryReference":28000,"scores":{"prosperity":5000,"security":5000,"stability":5000,"diplomacy":5000,"capability":5000,"pluralism":5000}}
+      {
+        "polityId": "polity:austria",
+        "treasuryReference": 4200,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      },
+      {
+        "polityId": "polity:czechoslovakia",
+        "treasuryReference": 7600,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      },
+      {
+        "polityId": "polity:france",
+        "treasuryReference": 16000,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      },
+      {
+        "polityId": "polity:free-city-of-danzig",
+        "treasuryReference": 1,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      },
+      {
+        "polityId": "polity:germany",
+        "treasuryReference": 18000,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      },
+      {
+        "polityId": "polity:italy",
+        "treasuryReference": 10500,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      },
+      {
+        "polityId": "polity:poland",
+        "treasuryReference": 7200,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      },
+      {
+        "polityId": "polity:saargebiet",
+        "treasuryReference": 1,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      },
+      {
+        "polityId": "polity:soviet-union",
+        "treasuryReference": 21000,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      },
+      {
+        "polityId": "polity:united-kingdom",
+        "treasuryReference": 19000,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      },
+      {
+        "polityId": "polity:united-states",
+        "treasuryReference": 28000,
+        "scores": {
+          "prosperity": 5000,
+          "security": 5000,
+          "stability": 5000,
+          "diplomacy": 5000,
+          "capability": 5000,
+          "pluralism": 5000
+        }
+      }
     ]
-  }
+  },
+  "economy": {
+    "foodNeedPerPersonMilli": 1,
+    "infrastructureBpPerMoney": 1,
+    "resourceParams": [
+      {
+        "resource": "food",
+        "accountingValue": 1,
+        "taxRateBp": 300
+      },
+      {
+        "resource": "wood",
+        "accountingValue": 2,
+        "taxRateBp": 350
+      },
+      {
+        "resource": "coal",
+        "accountingValue": 3,
+        "taxRateBp": 500
+      },
+      {
+        "resource": "iron",
+        "accountingValue": 4,
+        "taxRateBp": 500
+      },
+      {
+        "resource": "oil",
+        "accountingValue": 6,
+        "taxRateBp": 600
+      },
+      {
+        "resource": "goods",
+        "accountingValue": 8,
+        "taxRateBp": 800
+      }
+    ]
+  },
+  "polities": [
+    {
+      "id": "polity:austria",
+      "displayName": {
+        "en": "Austria",
+        "ru": "Австрия"
+      },
+      "treasury": 4200,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 700000
+        },
+        {
+          "resource": "wood",
+          "amount": 180000
+        },
+        {
+          "resource": "coal",
+          "amount": 120000
+        },
+        {
+          "resource": "iron",
+          "amount": 90000
+        },
+        {
+          "resource": "oil",
+          "amount": 30000
+        },
+        {
+          "resource": "goods",
+          "amount": 70000
+        }
+      ]
+    },
+    {
+      "id": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Czechoslovakia",
+        "ru": "Чехословакия"
+      },
+      "treasury": 7600,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 1500000
+        },
+        {
+          "resource": "wood",
+          "amount": 260000
+        },
+        {
+          "resource": "coal",
+          "amount": 520000
+        },
+        {
+          "resource": "iron",
+          "amount": 360000
+        },
+        {
+          "resource": "oil",
+          "amount": 50000
+        },
+        {
+          "resource": "goods",
+          "amount": 180000
+        }
+      ]
+    },
+    {
+      "id": "polity:france",
+      "displayName": {
+        "en": "France",
+        "ru": "Франция"
+      },
+      "treasury": 16000,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 4300000
+        },
+        {
+          "resource": "wood",
+          "amount": 800000
+        },
+        {
+          "resource": "coal",
+          "amount": 1100000
+        },
+        {
+          "resource": "iron",
+          "amount": 720000
+        },
+        {
+          "resource": "oil",
+          "amount": 420000
+        },
+        {
+          "resource": "goods",
+          "amount": 520000
+        }
+      ]
+    },
+    {
+      "id": "polity:free-city-of-danzig",
+      "displayName": {
+        "en": "Freie Stadt Danzig",
+        "ru": "Freie Stadt Danzig"
+      },
+      "decisionMode": "inert",
+      "treasury": 0,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 0
+        },
+        {
+          "resource": "wood",
+          "amount": 0
+        },
+        {
+          "resource": "coal",
+          "amount": 0
+        },
+        {
+          "resource": "iron",
+          "amount": 0
+        },
+        {
+          "resource": "oil",
+          "amount": 0
+        },
+        {
+          "resource": "goods",
+          "amount": 0
+        }
+      ]
+    },
+    {
+      "id": "polity:germany",
+      "displayName": {
+        "en": "Germany",
+        "ru": "Германия"
+      },
+      "treasury": 18000,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 5200000
+        },
+        {
+          "resource": "wood",
+          "amount": 900000
+        },
+        {
+          "resource": "coal",
+          "amount": 1500000
+        },
+        {
+          "resource": "iron",
+          "amount": 900000
+        },
+        {
+          "resource": "oil",
+          "amount": 300000
+        },
+        {
+          "resource": "goods",
+          "amount": 600000
+        }
+      ]
+    },
+    {
+      "id": "polity:italy",
+      "displayName": {
+        "en": "Italy",
+        "ru": "Италия"
+      },
+      "treasury": 10500,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 4400000
+        },
+        {
+          "resource": "wood",
+          "amount": 550000
+        },
+        {
+          "resource": "coal",
+          "amount": 360000
+        },
+        {
+          "resource": "iron",
+          "amount": 290000
+        },
+        {
+          "resource": "oil",
+          "amount": 160000
+        },
+        {
+          "resource": "goods",
+          "amount": 260000
+        }
+      ]
+    },
+    {
+      "id": "polity:poland",
+      "displayName": {
+        "en": "Poland",
+        "ru": "Польша"
+      },
+      "treasury": 7200,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 3500000
+        },
+        {
+          "resource": "wood",
+          "amount": 520000
+        },
+        {
+          "resource": "coal",
+          "amount": 720000
+        },
+        {
+          "resource": "iron",
+          "amount": 280000
+        },
+        {
+          "resource": "oil",
+          "amount": 160000
+        },
+        {
+          "resource": "goods",
+          "amount": 160000
+        }
+      ]
+    },
+    {
+      "id": "polity:saargebiet",
+      "displayName": {
+        "en": "Saargebiet",
+        "ru": "Saargebiet"
+      },
+      "decisionMode": "inert",
+      "treasury": 0,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 0
+        },
+        {
+          "resource": "wood",
+          "amount": 0
+        },
+        {
+          "resource": "coal",
+          "amount": 0
+        },
+        {
+          "resource": "iron",
+          "amount": 0
+        },
+        {
+          "resource": "oil",
+          "amount": 0
+        },
+        {
+          "resource": "goods",
+          "amount": 0
+        }
+      ]
+    },
+    {
+      "id": "polity:soviet-union",
+      "displayName": {
+        "en": "Soviet Union",
+        "ru": "СССР"
+      },
+      "treasury": 21000,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 17000000
+        },
+        {
+          "resource": "wood",
+          "amount": 3000000
+        },
+        {
+          "resource": "coal",
+          "amount": 2400000
+        },
+        {
+          "resource": "iron",
+          "amount": 1500000
+        },
+        {
+          "resource": "oil",
+          "amount": 1800000
+        },
+        {
+          "resource": "goods",
+          "amount": 500000
+        }
+      ]
+    },
+    {
+      "id": "polity:united-kingdom",
+      "displayName": {
+        "en": "United Kingdom",
+        "ru": "Великобритания"
+      },
+      "treasury": 19000,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 4700000
+        },
+        {
+          "resource": "wood",
+          "amount": 700000
+        },
+        {
+          "resource": "coal",
+          "amount": 1400000
+        },
+        {
+          "resource": "iron",
+          "amount": 650000
+        },
+        {
+          "resource": "oil",
+          "amount": 620000
+        },
+        {
+          "resource": "goods",
+          "amount": 650000
+        }
+      ]
+    },
+    {
+      "id": "polity:united-states",
+      "displayName": {
+        "en": "United States",
+        "ru": "США"
+      },
+      "treasury": 28000,
+      "stockpile": [
+        {
+          "resource": "food",
+          "amount": 13000000
+        },
+        {
+          "resource": "wood",
+          "amount": 2500000
+        },
+        {
+          "resource": "coal",
+          "amount": 2600000
+        },
+        {
+          "resource": "iron",
+          "amount": 1800000
+        },
+        {
+          "resource": "oil",
+          "amount": 2400000
+        },
+        {
+          "resource": "goods",
+          "amount": 900000
+        }
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "regionId": "region:europe-1935:at-burgenland",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Burgenland",
+        "ru": "Burgenland"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 324000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2400,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3600
+    },
+    {
+      "regionId": "region:europe-1935:at-kaernten",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Kärnten",
+        "ru": "Kärnten"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 768000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1400,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2100
+    },
+    {
+      "regionId": "region:europe-1935:at-niederoesterreich",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Niederösterreich",
+        "ru": "Niederösterreich"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1516000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3900
+    },
+    {
+      "regionId": "region:europe-1935:at-oberoesterreich",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Oberösterreich",
+        "ru": "Oberösterreich"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 960000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2700
+    },
+    {
+      "regionId": "region:europe-1935:at-osttirol",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Osttirol",
+        "ru": "Osttirol"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 168000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1400,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2100
+    },
+    {
+      "regionId": "region:europe-1935:at-salzburg",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Salzburg",
+        "ru": "Salzburg"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 576000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4200,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6300
+    },
+    {
+      "regionId": "region:europe-1935:at-steiermark",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Steiermark",
+        "ru": "Steiermark"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1320000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2200,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3300
+    },
+    {
+      "regionId": "region:europe-1935:at-tirol",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Tirol",
+        "ru": "Tirol"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 852000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2400
+    },
+    {
+      "regionId": "region:europe-1935:at-vorarlberg",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Vorarlberg",
+        "ru": "Vorarlberg"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "wood"
+      },
+      "population": 216000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2400
+    },
+    {
+      "regionId": "region:europe-1935:at-wien",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Wien",
+        "ru": "Wien"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 60000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7200
+    },
+    {
+      "regionId": "region:europe-1935:cs-jizni-cechy",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Jižní Čechy",
+        "ru": "Jižní Čechy"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 828000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 8250
+    },
+    {
+      "regionId": "region:europe-1935:cs-morava",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Morava",
+        "ru": "Morava"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2796000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 6000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 9000
+    },
+    {
+      "regionId": "region:europe-1935:cs-podkarpatska-rus",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Podkarpatská Rus",
+        "ru": "Podkarpatská Rus"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 1344000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:cs-praha",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Praha",
+        "ru": "Praha"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 48000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 18600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 27900
+    },
+    {
+      "regionId": "region:europe-1935:cs-severni-cechy",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Severní Čechy",
+        "ru": "Severní Čechy"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 1440000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:cs-slezsko",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Slezsko",
+        "ru": "Slezsko"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 60000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 1500
+    },
+    {
+      "regionId": "region:europe-1935:cs-slovensko",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Slovensko",
+        "ru": "Slovensko"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 5244000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 6800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 10200
+    },
+    {
+      "regionId": "region:europe-1935:cs-stredni-cechy",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Střední Čechy",
+        "ru": "Střední Čechy"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 684000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6750
+    },
+    {
+      "regionId": "region:europe-1935:cs-vychodni-cechy",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Východní Čechy",
+        "ru": "Východní Čechy"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1212000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 7600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 11400
+    },
+    {
+      "regionId": "region:europe-1935:cs-zapadni-cechy",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Západní Čechy",
+        "ru": "Západní Čechy"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 1344000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:danzig-freie-stadt-danzig",
+      "controllerId": "polity:free-city-of-danzig",
+      "displayName": {
+        "en": "Freie Stadt Danzig",
+        "ru": "Freie Stadt Danzig"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 0,
+      "annualBirthRateBp": 0,
+      "annualDeathRateBp": 0,
+      "workforceRateBp": 0,
+      "infrastructureBp": 0,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 0,
+      "outputPerWorker": 0,
+      "capacityCeiling": 0
+    },
+    {
+      "regionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Anhalt–Provinz Sachsen",
+        "ru": "Anhalt–Provinz Sachsen"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 9504000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7200
+    },
+    {
+      "regionId": "region:europe-1935:de-baden",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Baden",
+        "ru": "Baden"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2064000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2400
+    },
+    {
+      "regionId": "region:europe-1935:de-bayern",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Bayern",
+        "ru": "Bayern"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 10296000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5200,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7800
+    },
+    {
+      "regionId": "region:europe-1935:de-brandenburg",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Brandenburg",
+        "ru": "Brandenburg"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 5316000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 4200
+    },
+    {
+      "regionId": "region:europe-1935:de-bremen-oldenburg",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Bremen–Oldenburg",
+        "ru": "Bremen–Oldenburg"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1032000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3750
+    },
+    {
+      "regionId": "region:europe-1935:de-grenzmark",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Grenzmark Posen-Westpreußen",
+        "ru": "Grenzmark Posen-Westpreußen"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1056000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3750
+    },
+    {
+      "regionId": "region:europe-1935:de-hannover-braunschweig",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Hannover–Braunschweig",
+        "ru": "Hannover–Braunschweig"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 504000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1200,
+      "outputPerWorker": 1,
+      "capacityCeiling": 1800
+    },
+    {
+      "regionId": "region:europe-1935:de-hessen",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Hessen",
+        "ru": "Hessen"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1044000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3750
+    },
+    {
+      "regionId": "region:europe-1935:de-hessen-nassau",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Hessen-Nassau",
+        "ru": "Hessen-Nassau"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2280000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2400
+    },
+    {
+      "regionId": "region:europe-1935:de-hohenzollern",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Hohenzollerische Lande",
+        "ru": "Hohenzollerische Lande"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 156000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 750
+    },
+    {
+      "regionId": "region:europe-1935:de-mecklenburg",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Mecklenburg",
+        "ru": "Mecklenburg"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2244000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2400
+    },
+    {
+      "regionId": "region:europe-1935:de-niederschlesien",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Niederschlesien",
+        "ru": "Niederschlesien"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 3624000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3000
+    },
+    {
+      "regionId": "region:europe-1935:de-oberschlesien",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Oberschlesien",
+        "ru": "Oberschlesien"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1320000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3100,
+      "outputPerWorker": 1,
+      "capacityCeiling": 4650
+    },
+    {
+      "regionId": "region:europe-1935:de-ostpreussen",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Ostpreußen",
+        "ru": "Ostpreußen"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 5424000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3200,
+      "outputPerWorker": 1,
+      "capacityCeiling": 4800
+    },
+    {
+      "regionId": "region:europe-1935:de-pommern",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Pommern",
+        "ru": "Pommern"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 4800000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 4200
+    },
+    {
+      "regionId": "region:europe-1935:de-rheinprovinz",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Rheinprovinz",
+        "ru": "Rheinprovinz"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 3252000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 112000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 168000
+    },
+    {
+      "regionId": "region:europe-1935:de-sachsen",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Sachsen",
+        "ru": "Sachsen"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2028000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1200,
+      "outputPerWorker": 1,
+      "capacityCeiling": 1800
+    },
+    {
+      "regionId": "region:europe-1935:de-schleswig-holstein",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Schleswig-Holstein",
+        "ru": "Schleswig-Holstein"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2844000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2400
+    },
+    {
+      "regionId": "region:europe-1935:de-thueringen",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Thüringen",
+        "ru": "Thüringen"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1596000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3700,
+      "outputPerWorker": 1,
+      "capacityCeiling": 5550
+    },
+    {
+      "regionId": "region:europe-1935:de-westfalen-lippe",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Westfalen-Lippe",
+        "ru": "Westfalen-Lippe"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2964000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3000
+    },
+    {
+      "regionId": "region:europe-1935:de-wuerttemberg",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Württemberg",
+        "ru": "Württemberg"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2652000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2400
+    },
+    {
+      "regionId": "region:europe-1935:fr-amiens",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "AMIENS",
+        "ru": "AMIENS"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1920000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:fr-besancon",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "BESANCON",
+        "ru": "BESANCON"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 2016000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4250,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6375
+    },
+    {
+      "regionId": "region:europe-1935:fr-bordeaux",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "BORDEAUX",
+        "ru": "BORDEAUX"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2952000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:fr-clermont-ferrand",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "CLERMONT-FERRAND",
+        "ru": "CLERMONT-FERRAND"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3132000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:fr-corse",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "Corse",
+        "ru": "Corse"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 672000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2250
+    },
+    {
+      "regionId": "region:europe-1935:fr-dijon",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "DIJON",
+        "ru": "DIJON"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 2364000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4900,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7350
+    },
+    {
+      "regionId": "region:europe-1935:fr-le-mans",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "LE MANS",
+        "ru": "LE MANS"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2628000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:fr-lille",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "LILLE",
+        "ru": "LILLE"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 948000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3000
+    },
+    {
+      "regionId": "region:europe-1935:fr-lyon",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "LYON",
+        "ru": "LYON"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3144000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:fr-marseille",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "MARSEILLE",
+        "ru": "MARSEILLE"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2760000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:fr-metz",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "METZ",
+        "ru": "METZ"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1404000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 4500
+    },
+    {
+      "regionId": "region:europe-1935:fr-montpellier",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "MONTPELLIER",
+        "ru": "MONTPELLIER"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2784000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:fr-nancy",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "NANCY",
+        "ru": "NANCY"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1344000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 4500
+    },
+    {
+      "regionId": "region:europe-1935:fr-nantes",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "NANTES",
+        "ru": "NANTES"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 2304000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4750,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7125
+    },
+    {
+      "regionId": "region:europe-1935:fr-orleans",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "ORLEANS",
+        "ru": "ORLEANS"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 2088000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4250,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6375
+    },
+    {
+      "regionId": "region:europe-1935:fr-paris",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "PARIS",
+        "ru": "PARIS"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 924000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 47200,
+      "outputPerWorker": 1,
+      "capacityCeiling": 70800
+    },
+    {
+      "regionId": "region:europe-1935:fr-rouen",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "ROUEN",
+        "ru": "ROUEN"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1824000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3750,
+      "outputPerWorker": 1,
+      "capacityCeiling": 5625
+    },
+    {
+      "regionId": "region:europe-1935:fr-toulouse",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "TOULOUSE",
+        "ru": "TOULOUSE"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2436000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:fr-tours",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "TOURS",
+        "ru": "TOURS"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 4256000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 400,
+      "outputPerWorker": 1,
+      "capacityCeiling": 600
+    },
+    {
+      "regionId": "region:europe-1935:gb-central-scotland",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "Central Scotland",
+        "ru": "Central Scotland"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 1300000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:gb-cymru",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "Cymru",
+        "ru": "Cymru"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 4004000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 7500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 11250
+    },
+    {
+      "regionId": "region:europe-1935:gb-east-england",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "East of England",
+        "ru": "East of England"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3704000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:gb-highlands-islands",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "Highlands and Islands",
+        "ru": "Highlands and Islands"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 7672000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 9600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 14400
+    },
+    {
+      "regionId": "region:europe-1935:gb-midlands",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "Midlands",
+        "ru": "Midlands"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 5712000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 52800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 79200
+    },
+    {
+      "regionId": "region:europe-1935:gb-north-east-scotland",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "North-East Scotland",
+        "ru": "North-East Scotland"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 3128000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 9100,
+      "outputPerWorker": 1,
+      "capacityCeiling": 13650
+    },
+    {
+      "regionId": "region:europe-1935:gb-north-west-england",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "North-West England",
+        "ru": "North-West England"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 1456000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6750
+    },
+    {
+      "regionId": "region:europe-1935:gb-northern-england",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "Northern England",
+        "ru": "Northern England"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 5664000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 7500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 11250
+    },
+    {
+      "regionId": "region:europe-1935:gb-northern-ireland",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "Northern Ireland",
+        "ru": "Northern Ireland"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2708000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 8500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 12750
+    },
+    {
+      "regionId": "region:europe-1935:gb-south-east-england",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "South-East England",
+        "ru": "South-East England"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 1312000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4500,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6750
+    },
+    {
+      "regionId": "region:europe-1935:gb-south-west-england",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "South-West England",
+        "ru": "South-West England"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3932000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:gb-southern-england",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "Southern England",
+        "ru": "Southern England"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3336000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:gb-southern-scotland",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "Southern Scotland",
+        "ru": "Southern Scotland"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2972000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 9000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 13500
+    },
+    {
+      "regionId": "region:europe-1935:it-abruzzi-molise",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Abruzzi e Molise",
+        "ru": "Abruzzi e Molise"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 6164000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7500
+    },
+    {
+      "regionId": "region:europe-1935:it-calabrie",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Calabrie",
+        "ru": "Calabrie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2304000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:it-campania",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Campania",
+        "ru": "Campania"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1920000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:it-emilia",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Emilia",
+        "ru": "Emilia"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1680000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3000
+    },
+    {
+      "regionId": "region:europe-1935:it-lazio",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Lazio",
+        "ru": "Lazio"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2328000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:it-liguria",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Liguria",
+        "ru": "Liguria"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1224000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4300,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6450
+    },
+    {
+      "regionId": "region:europe-1935:it-lombardia",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Lombardia",
+        "ru": "Lombardia"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 3924000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 27000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 40500
+    },
+    {
+      "regionId": "region:europe-1935:it-lucania",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Lucania",
+        "ru": "Lucania"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1320000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6900
+    },
+    {
+      "regionId": "region:europe-1935:it-marche",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Marche",
+        "ru": "Marche"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1332000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4700,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7050
+    },
+    {
+      "regionId": "region:europe-1935:it-piemonte",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Piemonte",
+        "ru": "Piemonte"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3732000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:it-puglie",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Puglie",
+        "ru": "Puglie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2832000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:it-sardegna",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Sardegna",
+        "ru": "Sardegna"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3744000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:it-sicilia",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Sicilia",
+        "ru": "Sicilia"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 144000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 900
+    },
+    {
+      "regionId": "region:europe-1935:it-toscana",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Toscana",
+        "ru": "Toscana"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3180000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:it-umbria",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Umbria",
+        "ru": "Umbria"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 1080000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 5700
+    },
+    {
+      "regionId": "region:europe-1935:it-veneto",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Veneto",
+        "ru": "Veneto"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3324000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:it-venezia-giulia",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Venezia Giulia",
+        "ru": "Venezia Giulia"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1440000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3000
+    },
+    {
+      "regionId": "region:europe-1935:it-venezia-tridentina",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Venezia Tridentina",
+        "ru": "Venezia Tridentina"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1728000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 4000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 6000
+    },
+    {
+      "regionId": "region:europe-1935:saar-saargebiet",
+      "controllerId": "polity:saargebiet",
+      "displayName": {
+        "en": "Saargebiet",
+        "ru": "Saargebiet"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 0,
+      "annualBirthRateBp": 0,
+      "annualDeathRateBp": 0,
+      "workforceRateBp": 0,
+      "infrastructureBp": 0,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 0,
+      "outputPerWorker": 0,
+      "capacityCeiling": 0
+    },
+    {
+      "regionId": "region:europe-1935:su-tsentr",
+      "controllerId": "polity:soviet-union",
+      "displayName": {
+        "en": "Центр",
+        "ru": "Центр"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "iron"
+      },
+      "population": 50400000,
+      "annualBirthRateBp": 270,
+      "annualDeathRateBp": 170,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 54000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 81000
+    },
+    {
+      "regionId": "region:europe-1935:su-vostok",
+      "controllerId": "polity:soviet-union",
+      "displayName": {
+        "en": "Восток",
+        "ru": "Восток"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "oil"
+      },
+      "population": 33600000,
+      "annualBirthRateBp": 270,
+      "annualDeathRateBp": 170,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 72000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 108000
+    },
+    {
+      "regionId": "region:europe-1935:su-zapad",
+      "controllerId": "polity:soviet-union",
+      "displayName": {
+        "en": "Запад",
+        "ru": "Запад"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 84000000,
+      "annualBirthRateBp": 270,
+      "annualDeathRateBp": 170,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 54000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 81000
+    },
+    {
+      "regionId": "region:europe-1935:us-central",
+      "controllerId": "polity:united-states",
+      "displayName": {
+        "en": "Central",
+        "ru": "Central"
+      },
+      "activities": [
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "iron"
+          },
+          "allocationBp": 5000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "oil"
+          },
+          "allocationBp": 5000
+        }
+      ],
+      "population": 38100000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 7200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 88000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 132000
+    },
+    {
+      "regionId": "region:europe-1935:us-east",
+      "controllerId": "polity:united-states",
+      "displayName": {
+        "en": "East",
+        "ru": "East"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 63496000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 7200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 44000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 66000
+    },
+    {
+      "regionId": "region:europe-1935:us-west",
+      "controllerId": "polity:united-states",
+      "displayName": {
+        "en": "West",
+        "ru": "West"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 25404000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 7200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 88000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 132000
+    },
+    {
+      "regionId": "region:ohm-1935:2696109",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo wileńskie",
+        "ru": "Województwo wileńskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1359225,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 2400,
+      "outputPerWorker": 1,
+      "capacityCeiling": 3600
+    },
+    {
+      "regionId": "region:ohm-1935:2698169",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo wołyńskie",
+        "ru": "Województwo wołyńskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2221770,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 5400
+    },
+    {
+      "regionId": "region:ohm-1935:2698170",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo poleskie",
+        "ru": "Województwo poleskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1205860,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2700
+    },
+    {
+      "regionId": "region:ohm-1935:2741463",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo lubelskie",
+        "ru": "Województwo lubelskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2625905,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5300,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7950
+    },
+    {
+      "regionId": "region:ohm-1935:2741466",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo nowogródzkie",
+        "ru": "Województwo nowogródzkie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1126185,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2700
+    },
+    {
+      "regionId": "region:ohm-1935:2741468",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo białostockie",
+        "ru": "Województwo białostockie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1751195,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 4500
+    },
+    {
+      "regionId": "region:ohm-1935:2741469",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo warszawskie",
+        "ru": "Województwo warszawskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3942860,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 7100,
+      "outputPerWorker": 1,
+      "capacityCeiling": 10650
+    },
+    {
+      "regionId": "region:ohm-1935:2741470",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo kieleckie",
+        "ru": "Województwo kieleckie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 3127410,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 11900,
+      "outputPerWorker": 1,
+      "capacityCeiling": 17850
+    },
+    {
+      "regionId": "region:ohm-1935:2741471",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo śląskie",
+        "ru": "Województwo śląskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 1379595,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5200,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7800
+    },
+    {
+      "regionId": "region:ohm-1935:2741475",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo łódzkie",
+        "ru": "Województwo łódzkie"
+      },
+      "activity": {
+        "kind": "processing",
+        "activity": "basic_goods"
+      },
+      "population": 2803890,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 17600,
+      "outputPerWorker": 1,
+      "capacityCeiling": 26400
+    },
+    {
+      "regionId": "region:ohm-1935:2741476",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo poznańskie",
+        "ru": "Województwo poznańskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 2244060,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5300,
+      "outputPerWorker": 1,
+      "capacityCeiling": 7950
+    },
+    {
+      "regionId": "region:ohm-1935:2741477",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo pomorskie",
+        "ru": "Województwo pomorskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1150675,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 1800,
+      "outputPerWorker": 1,
+      "capacityCeiling": 2700
+    },
+    {
+      "regionId": "region:ohm-1935:2927190",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo krakowskie",
+        "ru": "Województwo krakowskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "coal"
+      },
+      "population": 2447855,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 9300,
+      "outputPerWorker": 1,
+      "capacityCeiling": 13950
+    },
+    {
+      "regionId": "region:ohm-1935:2927191",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo lwowskie",
+        "ru": "Województwo lwowskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 3331640,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 5900,
+      "outputPerWorker": 1,
+      "capacityCeiling": 8850
+    },
+    {
+      "regionId": "region:ohm-1935:2929589",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo tarnopolskie",
+        "ru": "Województwo tarnopolskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1704920,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 4500
+    },
+    {
+      "regionId": "region:ohm-1935:2930186",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Województwo stanisławowskie",
+        "ru": "Województwo stanisławowskie"
+      },
+      "activity": {
+        "kind": "extraction",
+        "resource": "food"
+      },
+      "population": 1576955,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 3000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 4500
+    }
+  ]
 }

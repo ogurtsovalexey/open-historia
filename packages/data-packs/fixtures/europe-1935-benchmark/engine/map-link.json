@@ -1,19 +1,825 @@
 {
   "schemaVersion": "open-historia-engine-map-link/2",
-  "dataset": "benchmark-1",
-  "note": "Macro-region to multiple display polygons; geometry remains outside the engine and AI context.",
+  "dataset": "europe-1935",
+  "note": "Owner-approved dated custom geometry; baseline US/USSR macro-regions remain strategic abstractions outside the European asset.",
   "polityOwnerNames": {
-    "polity:germany":"Germany","polity:austria":"Austria","polity:czechoslovakia":"Czechoslovakia","polity:poland":"Poland","polity:france":"France","polity:united-kingdom":"United Kingdom","polity:italy":"Italy","polity:soviet-union":"Soviet Union","polity:united-states":"United States"
+    "polity:austria": "Austria",
+    "polity:czechoslovakia": "Czechoslovakia",
+    "polity:france": "France",
+    "polity:free-city-of-danzig": "Freie Stadt Danzig",
+    "polity:germany": "Germany",
+    "polity:italy": "Italy",
+    "polity:poland": "Poland",
+    "polity:saargebiet": "Saargebiet",
+    "polity:soviet-union": "Soviet Union",
+    "polity:united-kingdom": "United Kingdom",
+    "polity:united-states": "United States"
   },
   "regions": [
-    {"engineRegionId":"region:benchmark-1:DE","mapRegionIds":["DE.1","DE.2","DE.3"],"mapName":"Germany"},
-    {"engineRegionId":"region:benchmark-1:AT","mapRegionIds":["AT.1","AT.2"],"mapName":"Austria"},
-    {"engineRegionId":"region:benchmark-1:CS","mapRegionIds":["CS.1","CS.2","CS.3"],"mapName":"Czechoslovakia"},
-    {"engineRegionId":"region:benchmark-1:PL","mapRegionIds":["PL.1","PL.2","PL.3"],"mapName":"Poland"},
-    {"engineRegionId":"region:benchmark-1:FR","mapRegionIds":["FR.1","FR.2","FR.3"],"mapName":"France"},
-    {"engineRegionId":"region:benchmark-1:GB","mapRegionIds":["GB.1","GB.2"],"mapName":"United Kingdom"},
-    {"engineRegionId":"region:benchmark-1:IT","mapRegionIds":["IT.1","IT.2","IT.3"],"mapName":"Italy"},
-    {"engineRegionId":"region:benchmark-1:SU","mapRegionIds":["SU.WEST","SU.CENTRAL","SU.EAST"],"mapName":"Soviet Union"},
-    {"engineRegionId":"region:benchmark-1:US","mapRegionIds":["US.EAST","US.CENTRAL","US.WEST"],"mapName":"United States"}
+    {
+      "engineRegionId": "region:europe-1935:at-burgenland",
+      "mapRegionIds": [
+        "e1935-at-burgenland"
+      ],
+      "mapName": "Burgenland"
+    },
+    {
+      "engineRegionId": "region:europe-1935:at-kaernten",
+      "mapRegionIds": [
+        "e1935-at-kaernten"
+      ],
+      "mapName": "Kärnten"
+    },
+    {
+      "engineRegionId": "region:europe-1935:at-niederoesterreich",
+      "mapRegionIds": [
+        "e1935-at-niederoesterreich"
+      ],
+      "mapName": "Niederösterreich"
+    },
+    {
+      "engineRegionId": "region:europe-1935:at-oberoesterreich",
+      "mapRegionIds": [
+        "e1935-at-oberoesterreich"
+      ],
+      "mapName": "Oberösterreich"
+    },
+    {
+      "engineRegionId": "region:europe-1935:at-osttirol",
+      "mapRegionIds": [
+        "e1935-at-osttirol"
+      ],
+      "mapName": "Osttirol"
+    },
+    {
+      "engineRegionId": "region:europe-1935:at-salzburg",
+      "mapRegionIds": [
+        "e1935-at-salzburg"
+      ],
+      "mapName": "Salzburg"
+    },
+    {
+      "engineRegionId": "region:europe-1935:at-steiermark",
+      "mapRegionIds": [
+        "e1935-at-steiermark"
+      ],
+      "mapName": "Steiermark"
+    },
+    {
+      "engineRegionId": "region:europe-1935:at-tirol",
+      "mapRegionIds": [
+        "e1935-at-tirol"
+      ],
+      "mapName": "Tirol"
+    },
+    {
+      "engineRegionId": "region:europe-1935:at-vorarlberg",
+      "mapRegionIds": [
+        "e1935-at-vorarlberg"
+      ],
+      "mapName": "Vorarlberg"
+    },
+    {
+      "engineRegionId": "region:europe-1935:at-wien",
+      "mapRegionIds": [
+        "e1935-at-wien"
+      ],
+      "mapName": "Wien"
+    },
+    {
+      "engineRegionId": "region:europe-1935:cs-jizni-cechy",
+      "mapRegionIds": [
+        "e1935-cs-jizni-cechy"
+      ],
+      "mapName": "Jižní Čechy"
+    },
+    {
+      "engineRegionId": "region:europe-1935:cs-morava",
+      "mapRegionIds": [
+        "e1935-cs-morava"
+      ],
+      "mapName": "Morava"
+    },
+    {
+      "engineRegionId": "region:europe-1935:cs-podkarpatska-rus",
+      "mapRegionIds": [
+        "e1935-cs-podkarpatska-rus"
+      ],
+      "mapName": "Podkarpatská Rus"
+    },
+    {
+      "engineRegionId": "region:europe-1935:cs-praha",
+      "mapRegionIds": [
+        "e1935-cs-praha"
+      ],
+      "mapName": "Praha"
+    },
+    {
+      "engineRegionId": "region:europe-1935:cs-severni-cechy",
+      "mapRegionIds": [
+        "e1935-cs-severni-cechy"
+      ],
+      "mapName": "Severní Čechy"
+    },
+    {
+      "engineRegionId": "region:europe-1935:cs-slezsko",
+      "mapRegionIds": [
+        "e1935-cs-slezsko"
+      ],
+      "mapName": "Slezsko"
+    },
+    {
+      "engineRegionId": "region:europe-1935:cs-slovensko",
+      "mapRegionIds": [
+        "e1935-cs-slovensko"
+      ],
+      "mapName": "Slovensko"
+    },
+    {
+      "engineRegionId": "region:europe-1935:cs-stredni-cechy",
+      "mapRegionIds": [
+        "e1935-cs-stredni-cechy"
+      ],
+      "mapName": "Střední Čechy"
+    },
+    {
+      "engineRegionId": "region:europe-1935:cs-vychodni-cechy",
+      "mapRegionIds": [
+        "e1935-cs-vychodni-cechy"
+      ],
+      "mapName": "Východní Čechy"
+    },
+    {
+      "engineRegionId": "region:europe-1935:cs-zapadni-cechy",
+      "mapRegionIds": [
+        "e1935-cs-zapadni-cechy"
+      ],
+      "mapName": "Západní Čechy"
+    },
+    {
+      "engineRegionId": "region:europe-1935:danzig-freie-stadt-danzig",
+      "mapRegionIds": [
+        "e1935-danzig-freie-stadt-danzig"
+      ],
+      "mapName": "Freie Stadt Danzig"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-anhalt-provinz-sachsen",
+      "mapRegionIds": [
+        "e1935-de-anhalt-provinz-sachsen"
+      ],
+      "mapName": "Anhalt–Provinz Sachsen"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-baden",
+      "mapRegionIds": [
+        "e1935-de-baden"
+      ],
+      "mapName": "Baden"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-bayern",
+      "mapRegionIds": [
+        "e1935-de-bayern"
+      ],
+      "mapName": "Bayern"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-brandenburg",
+      "mapRegionIds": [
+        "e1935-de-brandenburg"
+      ],
+      "mapName": "Brandenburg"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-bremen-oldenburg",
+      "mapRegionIds": [
+        "e1935-de-bremen-oldenburg"
+      ],
+      "mapName": "Bremen–Oldenburg"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-grenzmark",
+      "mapRegionIds": [
+        "e1935-de-grenzmark"
+      ],
+      "mapName": "Grenzmark Posen-Westpreußen"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-hannover-braunschweig",
+      "mapRegionIds": [
+        "e1935-de-hannover-braunschweig"
+      ],
+      "mapName": "Hannover–Braunschweig"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-hessen",
+      "mapRegionIds": [
+        "e1935-de-hessen"
+      ],
+      "mapName": "Hessen"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-hessen-nassau",
+      "mapRegionIds": [
+        "e1935-de-hessen-nassau"
+      ],
+      "mapName": "Hessen-Nassau"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-hohenzollern",
+      "mapRegionIds": [
+        "e1935-de-hohenzollern"
+      ],
+      "mapName": "Hohenzollerische Lande"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-mecklenburg",
+      "mapRegionIds": [
+        "e1935-de-mecklenburg"
+      ],
+      "mapName": "Mecklenburg"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-niederschlesien",
+      "mapRegionIds": [
+        "e1935-de-niederschlesien"
+      ],
+      "mapName": "Niederschlesien"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-oberschlesien",
+      "mapRegionIds": [
+        "e1935-de-oberschlesien"
+      ],
+      "mapName": "Oberschlesien"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-ostpreussen",
+      "mapRegionIds": [
+        "e1935-de-ostpreussen"
+      ],
+      "mapName": "Ostpreußen"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-pommern",
+      "mapRegionIds": [
+        "e1935-de-pommern"
+      ],
+      "mapName": "Pommern"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-rheinprovinz",
+      "mapRegionIds": [
+        "e1935-de-rheinprovinz"
+      ],
+      "mapName": "Rheinprovinz"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-sachsen",
+      "mapRegionIds": [
+        "e1935-de-sachsen"
+      ],
+      "mapName": "Sachsen"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-schleswig-holstein",
+      "mapRegionIds": [
+        "e1935-de-schleswig-holstein"
+      ],
+      "mapName": "Schleswig-Holstein"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-thueringen",
+      "mapRegionIds": [
+        "e1935-de-thueringen"
+      ],
+      "mapName": "Thüringen"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-westfalen-lippe",
+      "mapRegionIds": [
+        "e1935-de-westfalen-lippe"
+      ],
+      "mapName": "Westfalen-Lippe"
+    },
+    {
+      "engineRegionId": "region:europe-1935:de-wuerttemberg",
+      "mapRegionIds": [
+        "e1935-de-wuerttemberg"
+      ],
+      "mapName": "Württemberg"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-amiens",
+      "mapRegionIds": [
+        "e1935-fr-amiens"
+      ],
+      "mapName": "AMIENS"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-besancon",
+      "mapRegionIds": [
+        "e1935-fr-besancon"
+      ],
+      "mapName": "BESANCON"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-bordeaux",
+      "mapRegionIds": [
+        "e1935-fr-bordeaux"
+      ],
+      "mapName": "BORDEAUX"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-clermont-ferrand",
+      "mapRegionIds": [
+        "e1935-fr-clermont-ferrand"
+      ],
+      "mapName": "CLERMONT-FERRAND"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-corse",
+      "mapRegionIds": [
+        "e1935-fr-corse"
+      ],
+      "mapName": "Corse"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-dijon",
+      "mapRegionIds": [
+        "e1935-fr-dijon"
+      ],
+      "mapName": "DIJON"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-le-mans",
+      "mapRegionIds": [
+        "e1935-fr-le-mans"
+      ],
+      "mapName": "LE MANS"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-lille",
+      "mapRegionIds": [
+        "e1935-fr-lille"
+      ],
+      "mapName": "LILLE"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-lyon",
+      "mapRegionIds": [
+        "e1935-fr-lyon"
+      ],
+      "mapName": "LYON"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-marseille",
+      "mapRegionIds": [
+        "e1935-fr-marseille"
+      ],
+      "mapName": "MARSEILLE"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-metz",
+      "mapRegionIds": [
+        "e1935-fr-metz"
+      ],
+      "mapName": "METZ"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-montpellier",
+      "mapRegionIds": [
+        "e1935-fr-montpellier"
+      ],
+      "mapName": "MONTPELLIER"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-nancy",
+      "mapRegionIds": [
+        "e1935-fr-nancy"
+      ],
+      "mapName": "NANCY"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-nantes",
+      "mapRegionIds": [
+        "e1935-fr-nantes"
+      ],
+      "mapName": "NANTES"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-orleans",
+      "mapRegionIds": [
+        "e1935-fr-orleans"
+      ],
+      "mapName": "ORLEANS"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-paris",
+      "mapRegionIds": [
+        "e1935-fr-paris"
+      ],
+      "mapName": "PARIS"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-rouen",
+      "mapRegionIds": [
+        "e1935-fr-rouen"
+      ],
+      "mapName": "ROUEN"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-toulouse",
+      "mapRegionIds": [
+        "e1935-fr-toulouse"
+      ],
+      "mapName": "TOULOUSE"
+    },
+    {
+      "engineRegionId": "region:europe-1935:fr-tours",
+      "mapRegionIds": [
+        "e1935-fr-tours"
+      ],
+      "mapName": "TOURS"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-central-scotland",
+      "mapRegionIds": [
+        "e1935-gb-central-scotland"
+      ],
+      "mapName": "Central Scotland"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-cymru",
+      "mapRegionIds": [
+        "e1935-gb-cymru"
+      ],
+      "mapName": "Cymru"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-east-england",
+      "mapRegionIds": [
+        "e1935-gb-east-england"
+      ],
+      "mapName": "East of England"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-highlands-islands",
+      "mapRegionIds": [
+        "e1935-gb-highlands-islands"
+      ],
+      "mapName": "Highlands and Islands"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-midlands",
+      "mapRegionIds": [
+        "e1935-gb-midlands"
+      ],
+      "mapName": "Midlands"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-north-east-scotland",
+      "mapRegionIds": [
+        "e1935-gb-north-east-scotland"
+      ],
+      "mapName": "North-East Scotland"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-north-west-england",
+      "mapRegionIds": [
+        "e1935-gb-north-west-england"
+      ],
+      "mapName": "North-West England"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-northern-england",
+      "mapRegionIds": [
+        "e1935-gb-northern-england"
+      ],
+      "mapName": "Northern England"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-northern-ireland",
+      "mapRegionIds": [
+        "e1935-gb-northern-ireland"
+      ],
+      "mapName": "Northern Ireland"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-south-east-england",
+      "mapRegionIds": [
+        "e1935-gb-south-east-england"
+      ],
+      "mapName": "South-East England"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-south-west-england",
+      "mapRegionIds": [
+        "e1935-gb-south-west-england"
+      ],
+      "mapName": "South-West England"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-southern-england",
+      "mapRegionIds": [
+        "e1935-gb-southern-england"
+      ],
+      "mapName": "Southern England"
+    },
+    {
+      "engineRegionId": "region:europe-1935:gb-southern-scotland",
+      "mapRegionIds": [
+        "e1935-gb-southern-scotland"
+      ],
+      "mapName": "Southern Scotland"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-abruzzi-molise",
+      "mapRegionIds": [
+        "e1935-it-abruzzi-molise"
+      ],
+      "mapName": "Abruzzi e Molise"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-calabrie",
+      "mapRegionIds": [
+        "e1935-it-calabrie"
+      ],
+      "mapName": "Calabrie"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-campania",
+      "mapRegionIds": [
+        "e1935-it-campania"
+      ],
+      "mapName": "Campania"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-emilia",
+      "mapRegionIds": [
+        "e1935-it-emilia"
+      ],
+      "mapName": "Emilia"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-lazio",
+      "mapRegionIds": [
+        "e1935-it-lazio"
+      ],
+      "mapName": "Lazio"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-liguria",
+      "mapRegionIds": [
+        "e1935-it-liguria"
+      ],
+      "mapName": "Liguria"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-lombardia",
+      "mapRegionIds": [
+        "e1935-it-lombardia"
+      ],
+      "mapName": "Lombardia"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-lucania",
+      "mapRegionIds": [
+        "e1935-it-lucania"
+      ],
+      "mapName": "Lucania"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-marche",
+      "mapRegionIds": [
+        "e1935-it-marche"
+      ],
+      "mapName": "Marche"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-piemonte",
+      "mapRegionIds": [
+        "e1935-it-piemonte"
+      ],
+      "mapName": "Piemonte"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-puglie",
+      "mapRegionIds": [
+        "e1935-it-puglie"
+      ],
+      "mapName": "Puglie"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-sardegna",
+      "mapRegionIds": [
+        "e1935-it-sardegna"
+      ],
+      "mapName": "Sardegna"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-sicilia",
+      "mapRegionIds": [
+        "e1935-it-sicilia"
+      ],
+      "mapName": "Sicilia"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-toscana",
+      "mapRegionIds": [
+        "e1935-it-toscana"
+      ],
+      "mapName": "Toscana"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-umbria",
+      "mapRegionIds": [
+        "e1935-it-umbria"
+      ],
+      "mapName": "Umbria"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-veneto",
+      "mapRegionIds": [
+        "e1935-it-veneto"
+      ],
+      "mapName": "Veneto"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-venezia-giulia",
+      "mapRegionIds": [
+        "e1935-it-venezia-giulia"
+      ],
+      "mapName": "Venezia Giulia"
+    },
+    {
+      "engineRegionId": "region:europe-1935:it-venezia-tridentina",
+      "mapRegionIds": [
+        "e1935-it-venezia-tridentina"
+      ],
+      "mapName": "Venezia Tridentina"
+    },
+    {
+      "engineRegionId": "region:europe-1935:saar-saargebiet",
+      "mapRegionIds": [
+        "e1935-saar-saargebiet"
+      ],
+      "mapName": "Saargebiet"
+    },
+    {
+      "engineRegionId": "region:europe-1935:su-tsentr",
+      "mapRegionIds": [
+        "su-tsentr"
+      ],
+      "mapName": "Центр"
+    },
+    {
+      "engineRegionId": "region:europe-1935:su-vostok",
+      "mapRegionIds": [
+        "su-vostok"
+      ],
+      "mapName": "Восток"
+    },
+    {
+      "engineRegionId": "region:europe-1935:su-zapad",
+      "mapRegionIds": [
+        "su-zapad"
+      ],
+      "mapName": "Запад"
+    },
+    {
+      "engineRegionId": "region:europe-1935:us-central",
+      "mapRegionIds": [
+        "us-central"
+      ],
+      "mapName": "Central"
+    },
+    {
+      "engineRegionId": "region:europe-1935:us-east",
+      "mapRegionIds": [
+        "us-east"
+      ],
+      "mapName": "East"
+    },
+    {
+      "engineRegionId": "region:europe-1935:us-west",
+      "mapRegionIds": [
+        "us-west"
+      ],
+      "mapName": "West"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2696109",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2696109"
+      ],
+      "mapName": "Województwo wileńskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2698169",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2698169"
+      ],
+      "mapName": "Województwo wołyńskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2698170",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2698170"
+      ],
+      "mapName": "Województwo poleskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2741463",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2741463"
+      ],
+      "mapName": "Wojewodztwo lubelskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2741466",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2741466"
+      ],
+      "mapName": "Województwo nowogródzkie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2741468",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2741468"
+      ],
+      "mapName": "Województwo białostockie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2741469",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2741469"
+      ],
+      "mapName": "Województwo warszawskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2741470",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2741470"
+      ],
+      "mapName": "Województwo kieleckie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2741471",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2741471"
+      ],
+      "mapName": "województwo śląskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2741475",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2741475"
+      ],
+      "mapName": "Wojewodztwo łódzkie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2741476",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2741476"
+      ],
+      "mapName": "Województwo poznańskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2741477",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2741477"
+      ],
+      "mapName": "Województwo Pomorskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2927190",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2927190"
+      ],
+      "mapName": "województwo krakowskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2927191",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2927191"
+      ],
+      "mapName": "Województwo lwowskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2929589",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2929589"
+      ],
+      "mapName": "Województwo tarnopolskie"
+    },
+    {
+      "engineRegionId": "region:ohm-1935:2930186",
+      "mapRegionIds": [
+        "e1935-undefined-ohm-relation-2930186"
+      ],
+      "mapName": "Województwo stanisławowskie"
+    }
   ]
 }

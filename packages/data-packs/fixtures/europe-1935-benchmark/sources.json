@@ -1,55 +1,31 @@
 [
   {
-    "id": "source:europe-1935-benchmark:league-yearbook",
-    "title": "Statistical Year-book of the League of Nations 1935/36",
-    "publisher": "League of Nations Economic Intelligence Service",
-    "publicationDate": "1936",
-    "locator": "https://books.google.com/books?id=XTOCAAAAIAAJ",
-    "retrievedAt": "2026-09-01",
-    "license": { "status": "metadata-only" },
-    "note": "Primary cross-country reference for population, production, public finance and trade; benchmark values remain approximate pending table-level transcription."
-  },
-  {
-    "id": "source:europe-1935-benchmark:world-production",
-    "title": "World Production and Prices 1935–1936",
-    "publisher": "League of Nations Economic Intelligence Service",
-    "publicationDate": "1936",
-    "locator": "http://hdl.handle.net/10973/53855",
-    "retrievedAt": "2026-09-01",
-    "license": { "status": "metadata-only" },
-    "note": "Primary reference for relative industrial and raw-material weights."
-  },
-  {
-    "id": "source:europe-1935-benchmark:us-census-1930",
-    "title": "1930 Decennial Census of Population and Housing",
-    "publisher": "United States Census Bureau",
-    "publicationDate": "1931",
-    "locator": "https://www.census.gov/programs-surveys/decennial-census/decade.1930.html",
-    "retrievedAt": "2026-09-01",
-    "license": { "status": "metadata-only" },
-    "note": "Official baseline for the interpolated United States macro-polity population."
-  },
-  {
-    "id": "source:europe-1935-benchmark:poland-census-1931",
-    "title": "Drugi Powszechny Spis Ludności z dn. 9.XII 1931 r.: Mieszkania i gospodarstwa domowe. Ludność. Polska",
-    "publisher": "Główny Urząd Statystyczny Rzeczypospolitej Polskiej",
-    "publicationDate": "1938",
-    "locator": "https://statlibr.stat.gov.pl/exlibris/aleph/a22_1/apache_media/VUNVGMLANSCQQFGYHCN3VDLK12A9U5.pdf",
+    "id": "source:europe-1935-benchmark:france-departments-1935",
+    "title": "French Departments 1935",
+    "publisher": "TRF-GIS / Harvard Dataverse",
+    "publicationDate": "2020",
+    "locator": "https://doi.org/10.7910/DVN/ULQYM5",
     "retrievedAt": "2026-09-03",
-    "contentHash": "sha256:877259f5a9218ea54225902a6caf4eacd82d70ba418eb6262b06b8ff7b68986c",
-    "license": { "status": "metadata-only" },
-    "note": "Official final 1931 resident-population table by voivodeship (Przegląd ogólny, p. 1). The 16-polygon projection combines the separately printed M. st. Warszawa row with Województwo warszawskie; the source PDF itself is not redistributed."
+    "contentHash": "sha256:17a4b0a13e08c9344c71f5c1e733f97e8e9f0262d6ed8105e89493d499cce2ef",
+    "license": {
+      "status": "redistributable",
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    }
   },
   {
-    "id": "source:europe-1935-benchmark:franco-polish-agreement-1921",
-    "title": "Umowa polityczna francusko-polska, podpisana w Paryżu dnia 19 lutego 1921 r.",
-    "publisher": "Dziennik Ustaw Rzeczypospolitej Polskiej",
-    "publicationDate": "1922-08-09",
-    "locator": "https://eli.gov.pl/api/acts/DU/1922/563/text/O/D19220563.pdf",
+    "id": "source:europe-1935-benchmark:france-military-regions-1935",
+    "title": "French Military Regions 1935",
+    "publisher": "TRF-GIS / Harvard Dataverse",
+    "publicationDate": "2020",
+    "locator": "https://doi.org/10.7910/DVN/SQPEUW",
     "retrievedAt": "2026-09-03",
-    "contentHash": "sha256:9d5f0a6dd0c5b31bd824d00492fc7724a267b0e3e71aca9682999de12d78a529",
-    "license": { "status": "metadata-only" },
-    "note": "Official Polish promulgation. Article 3 provides consultation for territorial defence if either party is attacked without provocation; represented by the engine's bounded defensive-alliance agreement type."
+    "contentHash": "sha256:26dfb0a8bc6fd9cabcb175e7ced71b12ec76a4d5fc80bfde7c678a3a79078573",
+    "license": {
+      "status": "redistributable",
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    }
   },
   {
     "id": "source:europe-1935-benchmark:franco-czechoslovak-treaty-1924",
@@ -59,36 +35,37 @@
     "locator": "https://treaties.un.org/doc/Publication/UNTS/LON/Volume%2023/v23.pdf#page=165",
     "retrievedAt": "2026-09-03",
     "contentHash": "sha256:16c06d26b39921bdfeb462a646f73ee22f1ce56e579bbfbe6599eec73e6130b0",
-    "license": { "status": "metadata-only" },
+    "license": {
+      "status": "metadata-only"
+    },
     "note": "Registered treaty No. 588. Articles 1–2 require consultation and agreed measures when common security interests are threatened; represented by the engine's bounded defensive-alliance agreement type."
   },
   {
-    "id": "source:europe-1935-benchmark:polish-presidency-second-republic",
-    "title": "Odzyskanie niepodległości i wojna polsko-sowiecka",
-    "publisher": "Kancelaria Prezydenta Rzeczypospolitej Polskiej",
-    "locator": "https://www.prezydent.pl/aktualnosci/wydarzenia/odzyskanie-niepodleglosci-i-wojna-polsko-sowiecka-%2C1915",
+    "id": "source:europe-1935-benchmark:franco-polish-agreement-1921",
+    "title": "Umowa polityczna francusko-polska, podpisana w Paryżu dnia 19 lutego 1921 r.",
+    "publisher": "Dziennik Ustaw Rzeczypospolitej Polskiej",
+    "publicationDate": "1922-08-09",
+    "locator": "https://eli.gov.pl/api/acts/DU/1922/563/text/O/D19220563.pdf",
     "retrievedAt": "2026-09-03",
-    "license": { "status": "metadata-only" },
-    "note": "Official historical overview identifying Mościcki as Piłsudski's nominee, the Sanacja government after 1926, and National Democracy as organized opposition."
+    "contentHash": "sha256:9d5f0a6dd0c5b31bd824d00492fc7724a267b0e3e71aca9682999de12d78a529",
+    "license": {
+      "status": "metadata-only"
+    },
+    "note": "Official Polish promulgation. Article 3 provides consultation for territorial defence if either party is attacked without provocation; represented by the engine's bounded defensive-alliance agreement type."
   },
   {
-    "id": "source:europe-1935-benchmark:polish-national-archives-kozlowski-cabinet",
-    "title": "Uroczystość zaprzysiężenia gabinetu premiera Leona Kozłowskiego",
-    "publisher": "Narodowe Archiwum Cyfrowe / Szukaj w Archiwach",
-    "publicationDate": "1934-05-15",
-    "locator": "https://www.szukajwarchiwach.gov.pl/jednostka/-/jednostka/5948324/obiekty/243861",
+    "id": "source:europe-1935-benchmark:historic-counties-trust",
+    "title": "Historic County Borders Project, Definition A, WGS84 simplified",
+    "publisher": "Historic Counties Trust",
+    "locator": "https://www.county-borders.co.uk/",
     "retrievedAt": "2026-09-03",
-    "license": { "status": "redistributable", "name": "Public domain" },
-    "note": "Official archival description identifies President Ignacy Mościcki, Marshal and military minister Józef Piłsudski, and Prime Minister Leon Kozłowski at the cabinet swearing-in."
-  },
-  {
-    "id": "source:europe-1935-benchmark:pilsudski-museum-marshal",
-    "title": "Marszałek",
-    "publisher": "Muzeum Józefa Piłsudskiego w Sulejówku",
-    "locator": "https://muzeumpilsudski.pl/jozef-pilsudski/marszalek/",
-    "retrievedAt": "2026-09-03",
-    "license": { "status": "metadata-only" },
-    "note": "Museum biography records Piłsudski as Minister of Military Affairs and Inspector General through 1935, with particular control of foreign and military policy and ultimate responsibility for decisions he considered vital to the state."
+    "contentHash": "sha256:9a85b79b81e7e8c86356a88dce567e767f006127e7fd1cf4c9b8e12cfa883cbb",
+    "license": {
+      "status": "redistributable",
+      "name": "Free commercial reuse; acknowledgement requested",
+      "url": "https://www.county-borders.co.uk/"
+    },
+    "note": "Definition A county polygons are grouped into owner-approved strategic regions; acknowledgement requested by the publisher."
   },
   {
     "id": "source:europe-1935-benchmark:ipn-niedzialkowski",
@@ -97,7 +74,107 @@
     "publicationDate": "2020-06-19",
     "locator": "https://ipn.gov.pl/pl/aktualnosci/101697,Hold-dla-Polakow-zamordowanych-przez-Niemcow-w-Palmirach-w-80-rocznice-zbrodni-n.html",
     "retrievedAt": "2026-09-03",
-    "license": { "status": "metadata-only" },
+    "license": {
+      "status": "metadata-only"
+    },
     "note": "Institutional biography identifies Niedziałkowski as a leading PPS activist, parliamentarian and editor of Robotnik; used only to anchor the aggregated socialist-opposition candidate."
+  },
+  {
+    "id": "source:europe-1935-benchmark:league-yearbook",
+    "title": "Statistical Year-book of the League of Nations 1935/36",
+    "publisher": "League of Nations Economic Intelligence Service",
+    "publicationDate": "1936",
+    "locator": "https://books.google.com/books?id=XTOCAAAAIAAJ",
+    "retrievedAt": "2026-09-01",
+    "license": {
+      "status": "metadata-only"
+    },
+    "note": "Primary cross-country reference for population, production, public finance and trade; benchmark values remain approximate pending table-level transcription."
+  },
+  {
+    "id": "source:europe-1935-benchmark:openhistoricalmap",
+    "title": "OpenHistoricalMap dated administrative boundaries",
+    "publisher": "OpenHistoricalMap contributors",
+    "locator": "https://www.openhistoricalmap.org/copyright",
+    "retrievedAt": "2026-09-03",
+    "contentHash": "sha256:1ffa7deb264b53061decaf1015043fa1c38814deba8d803a07b404a8d516786f",
+    "license": {
+      "status": "redistributable",
+      "name": "CC0 for selected default-licensed objects",
+      "url": "https://www.openhistoricalmap.org/copyright"
+    },
+    "note": "Only object rows passing the checkpoint license gate are redistributed; exact response checksums and per-object dates/licenses are bound in runtime-geography-manifest.json."
+  },
+  {
+    "id": "source:europe-1935-benchmark:pilsudski-museum-marshal",
+    "title": "Marszałek",
+    "publisher": "Muzeum Józefa Piłsudskiego w Sulejówku",
+    "locator": "https://muzeumpilsudski.pl/jozef-pilsudski/marszalek/",
+    "retrievedAt": "2026-09-03",
+    "license": {
+      "status": "metadata-only"
+    },
+    "note": "Museum biography records Piłsudski as Minister of Military Affairs and Inspector General through 1935, with particular control of foreign and military policy and ultimate responsibility for decisions he considered vital to the state."
+  },
+  {
+    "id": "source:europe-1935-benchmark:poland-census-1931",
+    "title": "Drugi Powszechny Spis Ludności z dn. 9.XII 1931 r.: Mieszkania i gospodarstwa domowe. Ludność. Polska",
+    "publisher": "Główny Urząd Statystyczny Rzeczypospolitej Polskiej",
+    "publicationDate": "1938",
+    "locator": "https://statlibr.stat.gov.pl/exlibris/aleph/a22_1/apache_media/VUNVGMLANSCQQFGYHCN3VDLK12A9U5.pdf",
+    "retrievedAt": "2026-09-03",
+    "contentHash": "sha256:877259f5a9218ea54225902a6caf4eacd82d70ba418eb6262b06b8ff7b68986c",
+    "license": {
+      "status": "metadata-only"
+    },
+    "note": "Official final 1931 resident-population table by voivodeship (Przegląd ogólny, p. 1). The 16-polygon projection combines the separately printed M. st. Warszawa row with Województwo warszawskie; the source PDF itself is not redistributed."
+  },
+  {
+    "id": "source:europe-1935-benchmark:polish-national-archives-kozlowski-cabinet",
+    "title": "Uroczystość zaprzysiężenia gabinetu premiera Leona Kozłowskiego",
+    "publisher": "Narodowe Archiwum Cyfrowe / Szukaj w Archiwach",
+    "publicationDate": "1934-05-15",
+    "locator": "https://www.szukajwarchiwach.gov.pl/jednostka/-/jednostka/5948324/obiekty/243861",
+    "retrievedAt": "2026-09-03",
+    "license": {
+      "status": "redistributable",
+      "name": "Public domain"
+    },
+    "note": "Official archival description identifies President Ignacy Mościcki, Marshal and military minister Józef Piłsudski, and Prime Minister Leon Kozłowski at the cabinet swearing-in."
+  },
+  {
+    "id": "source:europe-1935-benchmark:polish-presidency-second-republic",
+    "title": "Odzyskanie niepodległości i wojna polsko-sowiecka",
+    "publisher": "Kancelaria Prezydenta Rzeczypospolitej Polskiej",
+    "locator": "https://www.prezydent.pl/aktualnosci/wydarzenia/odzyskanie-niepodleglosci-i-wojna-polsko-sowiecka-%2C1915",
+    "retrievedAt": "2026-09-03",
+    "license": {
+      "status": "metadata-only"
+    },
+    "note": "Official historical overview identifying Mościcki as Piłsudski's nominee, the Sanacja government after 1926, and National Democracy as organized opposition."
+  },
+  {
+    "id": "source:europe-1935-benchmark:us-census-1930",
+    "title": "1930 Decennial Census of Population and Housing",
+    "publisher": "United States Census Bureau",
+    "publicationDate": "1931",
+    "locator": "https://www.census.gov/programs-surveys/decennial-census/decade.1930.html",
+    "retrievedAt": "2026-09-01",
+    "license": {
+      "status": "metadata-only"
+    },
+    "note": "Official baseline for the interpolated United States macro-polity population."
+  },
+  {
+    "id": "source:europe-1935-benchmark:world-production",
+    "title": "World Production and Prices 1935–1936",
+    "publisher": "League of Nations Economic Intelligence Service",
+    "publicationDate": "1936",
+    "locator": "http://hdl.handle.net/10973/53855",
+    "retrievedAt": "2026-09-01",
+    "license": {
+      "status": "metadata-only"
+    },
+    "note": "Primary reference for relative industrial and raw-material weights."
   }
 ]

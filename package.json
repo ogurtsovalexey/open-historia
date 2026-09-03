@@ -53,6 +53,7 @@
     "codex:luna:capability": "npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/codex-luna-capability.mjs",
     "geography:europe-1935": "node scripts/europe-1935-geography.mjs",
     "geography:europe-1935:owner": "node scripts/europe-1935-geography.mjs --owner",
+    "geography:europe-1935:publish": "npm run build:data-packs && npm run build:engine && node scripts/europe-1935-publish-geography.mjs",
     "geography:europe-1935:poland": "node scripts/europe-1935-geography.mjs --poland",
     "starting-state:europe-1935": "npm run build:data-packs && npm run build:engine && node scripts/europe-1935-starting-state.mjs"
   },

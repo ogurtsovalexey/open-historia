@@ -1,0 +1,603 @@
+{
+  "schemaVersion": "open-historia-geography-runtime-control/1",
+  "scenarioId": "scenario:europe-1935-benchmark",
+  "approvedCollectionChecksum": "sha256:8571a3054bd50d557e6c33107b673764aefb9dfa992785c8894f7cd6feea3292",
+  "approvedAdjacencyChecksum": "sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d",
+  "macroRegions": [
+    {
+      "regionId": "region:benchmark-1:DE",
+      "controllerId": "polity:germany",
+      "displayName": {
+        "en": "Germany macro-region",
+        "ru": "Германия"
+      },
+      "activities": [
+        {
+          "activity": {
+            "kind": "processing",
+            "activity": "basic_goods"
+          },
+          "allocationBp": 7000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "coal"
+          },
+          "allocationBp": 2000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "iron"
+          },
+          "allocationBp": 1000
+        }
+      ],
+      "population": 66000000,
+      "annualBirthRateBp": 180,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 160000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 240000
+    },
+    {
+      "regionId": "region:benchmark-1:AT",
+      "controllerId": "polity:austria",
+      "displayName": {
+        "en": "Austria macro-region",
+        "ru": "Австрия"
+      },
+      "activities": [
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "food"
+          },
+          "allocationBp": 4000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "wood"
+          },
+          "allocationBp": 4000
+        },
+        {
+          "activity": {
+            "kind": "processing",
+            "activity": "basic_goods"
+          },
+          "allocationBp": 2000
+        }
+      ],
+      "population": 6760000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 5000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 24000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 36000
+    },
+    {
+      "regionId": "region:benchmark-1:CS",
+      "controllerId": "polity:czechoslovakia",
+      "displayName": {
+        "en": "Czechoslovakia macro-region",
+        "ru": "Чехословакия"
+      },
+      "activities": [
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "coal"
+          },
+          "allocationBp": 4000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "iron"
+          },
+          "allocationBp": 3000
+        },
+        {
+          "activity": {
+            "kind": "processing",
+            "activity": "basic_goods"
+          },
+          "allocationBp": 3000
+        }
+      ],
+      "population": 15000000,
+      "annualBirthRateBp": 190,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6100,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 62000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 93000
+    },
+    {
+      "regionId": "region:benchmark-1:PL",
+      "controllerId": "polity:poland",
+      "displayName": {
+        "en": "Poland macro-region",
+        "ru": "Польша"
+      },
+      "activities": [
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "food"
+          },
+          "allocationBp": 5000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "coal"
+          },
+          "allocationBp": 3000
+        },
+        {
+          "activity": {
+            "kind": "processing",
+            "activity": "basic_goods"
+          },
+          "allocationBp": 2000
+        }
+      ],
+      "population": 34000000,
+      "annualBirthRateBp": 260,
+      "annualDeathRateBp": 140,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3900,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 88000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 132000
+    },
+    {
+      "regionId": "region:benchmark-1:FR",
+      "controllerId": "polity:france",
+      "displayName": {
+        "en": "France macro-region",
+        "ru": "Франция"
+      },
+      "activities": [
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "food"
+          },
+          "allocationBp": 3000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "iron"
+          },
+          "allocationBp": 3000
+        },
+        {
+          "activity": {
+            "kind": "processing",
+            "activity": "basic_goods"
+          },
+          "allocationBp": 4000
+        }
+      ],
+      "population": 41900000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 118000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 177000
+    },
+    {
+      "regionId": "region:benchmark-1:GB",
+      "controllerId": "polity:united-kingdom",
+      "displayName": {
+        "en": "United Kingdom macro-region",
+        "ru": "Великобритания"
+      },
+      "activities": [
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "food"
+          },
+          "allocationBp": 3000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "coal"
+          },
+          "allocationBp": 3000
+        },
+        {
+          "activity": {
+            "kind": "processing",
+            "activity": "basic_goods"
+          },
+          "allocationBp": 4000
+        }
+      ],
+      "population": 46900000,
+      "annualBirthRateBp": 150,
+      "annualDeathRateBp": 120,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 6800,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 132000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 198000
+    },
+    {
+      "regionId": "region:benchmark-1:IT",
+      "controllerId": "polity:italy",
+      "displayName": {
+        "en": "Italy macro-region",
+        "ru": "Италия"
+      },
+      "activities": [
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "food"
+          },
+          "allocationBp": 5000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "iron"
+          },
+          "allocationBp": 2000
+        },
+        {
+          "activity": {
+            "kind": "processing",
+            "activity": "basic_goods"
+          },
+          "allocationBp": 3000
+        }
+      ],
+      "population": 43400000,
+      "annualBirthRateBp": 230,
+      "annualDeathRateBp": 130,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 4500,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 90000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 135000
+    },
+    {
+      "regionId": "region:benchmark-1:SU",
+      "controllerId": "polity:soviet-union",
+      "displayName": {
+        "en": "Soviet strategic macro-region",
+        "ru": "СССР"
+      },
+      "activities": [
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "food"
+          },
+          "allocationBp": 3000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "iron"
+          },
+          "allocationBp": 3000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "oil"
+          },
+          "allocationBp": 4000
+        }
+      ],
+      "population": 168000000,
+      "annualBirthRateBp": 270,
+      "annualDeathRateBp": 170,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 3000,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 180000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 270000
+    },
+    {
+      "regionId": "region:benchmark-1:US",
+      "controllerId": "polity:united-states",
+      "displayName": {
+        "en": "United States strategic macro-region",
+        "ru": "США"
+      },
+      "activities": [
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "food"
+          },
+          "allocationBp": 4000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "iron"
+          },
+          "allocationBp": 2000
+        },
+        {
+          "activity": {
+            "kind": "extraction",
+            "resource": "oil"
+          },
+          "allocationBp": 2000
+        },
+        {
+          "activity": {
+            "kind": "processing",
+            "activity": "basic_goods"
+          },
+          "allocationBp": 2000
+        }
+      ],
+      "population": 127000000,
+      "annualBirthRateBp": 170,
+      "annualDeathRateBp": 110,
+      "workforceRateBp": 4000,
+      "infrastructureBp": 7200,
+      "damageBp": 0,
+      "baseMonthlyCapacity": 220000,
+      "outputPerWorker": 1,
+      "capacityCeiling": 330000
+    }
+  ],
+  "nationalControls": [
+    {
+      "polityId": "polity:germany",
+      "population": 66000000,
+      "workforce": 26400000,
+      "maxMobilizationBp": 1200,
+      "treasury": 18000,
+      "economicPower": 160000,
+      "stockpile": {
+        "food": 5200000,
+        "wood": 900000,
+        "coal": 1500000,
+        "iron": 900000,
+        "oil": 300000,
+        "goods": 600000
+      },
+      "industrialCapacity": 160000,
+      "infrastructureIndexBp": 6500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded national series; economy normalized to benchmark integer controls.",
+      "confidence": "medium",
+      "todo": "Transcribe table-level 1935 values and split among historical regions."
+    },
+    {
+      "polityId": "polity:austria",
+      "population": 6760000,
+      "workforce": 2704000,
+      "maxMobilizationBp": 900,
+      "treasury": 4200,
+      "economicPower": 24000,
+      "stockpile": {
+        "food": 700000,
+        "wood": 180000,
+        "coal": 120000,
+        "iron": 90000,
+        "oil": 30000,
+        "goods": 70000
+      },
+      "industrialCapacity": 24000,
+      "infrastructureIndexBp": 5000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded national series; economy normalized to benchmark integer controls.",
+      "confidence": "medium",
+      "todo": "Transcribe table-level 1935 values and split among historical regions."
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "population": 15000000,
+      "workforce": 6000000,
+      "maxMobilizationBp": 1100,
+      "treasury": 7600,
+      "economicPower": 62000,
+      "stockpile": {
+        "food": 1500000,
+        "wood": 260000,
+        "coal": 520000,
+        "iron": 360000,
+        "oil": 50000,
+        "goods": 180000
+      },
+      "industrialCapacity": 62000,
+      "infrastructureIndexBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded national series; economy normalized to benchmark integer controls.",
+      "confidence": "medium",
+      "todo": "Transcribe table-level 1935 values and split among Czech, Slovak and border regions."
+    },
+    {
+      "polityId": "polity:poland",
+      "population": 34000000,
+      "workforce": 13600000,
+      "maxMobilizationBp": 1200,
+      "treasury": 7200,
+      "economicPower": 88000,
+      "stockpile": {
+        "food": 3500000,
+        "wood": 520000,
+        "coal": 720000,
+        "iron": 280000,
+        "oil": 160000,
+        "goods": 160000
+      },
+      "industrialCapacity": 88000,
+      "infrastructureIndexBp": 3900,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:poland-census-1931",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Population keeps the approved 34,000,000 national control and uses final 1931 GUS voivodeship rows as regional weights; economy remains normalized to benchmark integer controls.",
+      "confidence": "medium",
+      "todo": "Owner-review the population normalization, then separate Upper Silesia, central industry and eastern agricultural weights."
+    },
+    {
+      "polityId": "polity:france",
+      "population": 41900000,
+      "workforce": 16760000,
+      "maxMobilizationBp": 1100,
+      "treasury": 16000,
+      "economicPower": 118000,
+      "stockpile": {
+        "food": 4300000,
+        "wood": 800000,
+        "coal": 1100000,
+        "iron": 720000,
+        "oil": 420000,
+        "goods": 520000
+      },
+      "industrialCapacity": 118000,
+      "infrastructureIndexBp": 6200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded metropolitan series; colonial effects represented in stocks and capacity.",
+      "confidence": "medium",
+      "todo": "Split metropolitan industrial basins and audit colonial contribution."
+    },
+    {
+      "polityId": "polity:united-kingdom",
+      "population": 46900000,
+      "workforce": 18760000,
+      "maxMobilizationBp": 900,
+      "treasury": 19000,
+      "economicPower": 132000,
+      "stockpile": {
+        "food": 4700000,
+        "wood": 700000,
+        "coal": 1400000,
+        "iron": 650000,
+        "oil": 620000,
+        "goods": 650000
+      },
+      "industrialCapacity": 132000,
+      "infrastructureIndexBp": 6800,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded metropolitan series; empire and fleet represented as stocks/capacity.",
+      "confidence": "medium",
+      "todo": "Audit imports, imperial access and naval abstraction separately."
+    },
+    {
+      "polityId": "polity:italy",
+      "population": 43400000,
+      "workforce": 17360000,
+      "maxMobilizationBp": 1000,
+      "treasury": 10500,
+      "economicPower": 90000,
+      "stockpile": {
+        "food": 4400000,
+        "wood": 550000,
+        "coal": 360000,
+        "iron": 290000,
+        "oil": 160000,
+        "goods": 260000
+      },
+      "industrialCapacity": 90000,
+      "infrastructureIndexBp": 4500,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Rounded national series; economy normalized to benchmark integer controls.",
+      "confidence": "medium",
+      "todo": "Split northern industry, southern agriculture and import dependency."
+    },
+    {
+      "polityId": "polity:soviet-union",
+      "population": 168000000,
+      "workforce": 67200000,
+      "maxMobilizationBp": 1500,
+      "treasury": 21000,
+      "economicPower": 180000,
+      "stockpile": {
+        "food": 17000000,
+        "wood": 3000000,
+        "coal": 2400000,
+        "iron": 1500000,
+        "oil": 1800000,
+        "goods": 500000
+      },
+      "industrialCapacity": 180000,
+      "infrastructureIndexBp": 3000,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "Strategic Baseline macro-estimate; distant geography collapsed.",
+      "confidence": "low",
+      "todo": "Replace with western/central/eastern macro-regions before Supported fidelity."
+    },
+    {
+      "polityId": "polity:united-states",
+      "population": 127000000,
+      "workforce": 50800000,
+      "maxMobilizationBp": 800,
+      "treasury": 28000,
+      "economicPower": 220000,
+      "stockpile": {
+        "food": 13000000,
+        "wood": 2500000,
+        "coal": 2600000,
+        "iron": 1800000,
+        "oil": 2400000,
+        "goods": 900000
+      },
+      "industrialCapacity": 220000,
+      "infrastructureIndexBp": 7200,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:us-census-1930",
+        "source:europe-1935-benchmark:world-production"
+      ],
+      "method": "1930 census baseline interpolated and normalized as strategic Baseline macro-polity.",
+      "confidence": "low",
+      "todo": "Add official intercensal estimate and regional production split."
+    }
+  ]
+}

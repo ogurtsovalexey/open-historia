@@ -6,5 +6,30 @@
   "defaultLocale": "en",
   "scenarioPath": "scenario.json",
   "sourcesPath": "sources.json",
-  "assets": []
+  "assets": [
+    {
+      "id": "asset:europe-1935-benchmark:regions",
+      "kind": "regions",
+      "path": "geography/runtime-regions.geojson",
+      "contentAddress": "sha256:68d2a14f95f95b505c2845b68e5ebd02a25fb42dd8f2e26cef3feb979f16e2ad",
+      "mediaType": "application/geo+json",
+      "required": true
+    },
+    {
+      "id": "asset:europe-1935-benchmark:land-adjacency",
+      "kind": "other",
+      "path": "geography/runtime-land-adjacency.json",
+      "contentAddress": "sha256:1ac6a5853de358d241cc556c33f15f4f2868ebd96e9ed9f2cce21321561d5711",
+      "mediaType": "application/json",
+      "required": true
+    },
+    {
+      "id": "asset:europe-1935-benchmark:geography-manifest",
+      "kind": "other",
+      "path": "geography/runtime-geography-manifest.json",
+      "contentAddress": "sha256:e4ba957fa2cab9269a741381b0a0359a9d04bb8ec657c71d6d8c362c0310dd45",
+      "mediaType": "application/json",
+      "required": true
+    }
+  ]
 }

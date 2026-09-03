@@ -55,6 +55,17 @@ const inertDiplomacyInitial = () => {
 };
 const benchmarkFixture = fileURLToPath(new URL('../../../data-packs/fixtures/europe-1935-benchmark/engine/scenario.json', import.meta.url));
 const benchmarkInitial = () => initState(parseScenario(JSON.parse(readFileSync(benchmarkFixture, 'utf8'))));
+const reallocationInitial = () => {
+  const raw = JSON.parse(readFileSync(fixture, 'utf8'));
+  const region = raw.regions.find((entry: { regionId: string }) => entry.regionId === 'region:gadm:DEU.3_1');
+  delete region.activity;
+  region.activities = [
+    { activity: { kind: 'processing', activity: 'basic_goods' }, allocationBp: 7000 },
+    { activity: { kind: 'extraction', resource: 'coal' }, allocationBp: 2000 },
+    { activity: { kind: 'extraction', resource: 'iron' }, allocationBp: 1000 },
+  ];
+  return initState(parseScenario(raw));
+};
 const canonicalPoliticalInitial = () => {
   const raw = JSON.parse(readFileSync(diplomacyFixture, 'utf8'));
   const polity = raw.politics.polities.find((entry: { polityId: string }) => entry.polityId === 'polity:austria');
@@ -114,7 +125,7 @@ test('StrategicDecisionV2 requires typed hold and limits compatible material act
   assert.deepEqual(strategicDecisionV2Schema.parse(holdV2('polity:germany')), holdV2('polity:germany'));
   assert.throws(() => strategicDecisionV2Schema.parse({ ...holdV2('polity:germany'), hold: null }), /hold is required/);
   assert.throws(() => strategicDecisionV2Schema.parse({ ...holdV2('polity:germany'), actions: [
-    { tool: 'invest', targetRegionId: 'region:benchmark-1:DE', scale: 'small' },
+    { tool: 'invest', targetRegionId: 'region:europe-1935:de-rheinprovinz', scale: 'small' },
     { tool: 'conserve' },
   ], hold: null }), /conserve cannot/);
 });
@@ -136,9 +147,9 @@ test('materializer creates deterministic ids and engine-priced trade commands', 
 });
 
 test('materializer turns qualitative production priority into exact conserved allocations', () => {
-  const state = benchmarkInitial();
+  const state = reallocationInitial();
   const decision = { polityId: 'polity:germany', objective: { domain: 'economy', summary: 'Extend raw-material runway.', horizon: 'short' },
-    actions: [{ tool: 'reallocate-production', targetRegionId: 'region:benchmark-1:DE', priority: 'raw-materials', scale: 'medium' }],
+    actions: [{ tool: 'reallocate-production', targetRegionId: 'region:gadm:DEU.3_1', priority: 'raw-materials', scale: 'medium' }],
     futurePlan: [], contingency: 'Seek imports if domestic allocation is insufficient.', rationale: 'Processing is consuming iron faster than domestic extraction replaces it.', hold: null };
   const result = materializeStrategicDecisionV2(state, decision);
   assert.equal(result.rejected.length, 0);
@@ -533,7 +544,7 @@ test('strategic diplomacy batch is bounded, deterministic and contains no full m
   assert.equal(buildDiplomacyBatch(initial(), 'polity:austria'), null);
 });
 
-test('nine-polity benchmark schedules every opponent in batches of at most six with bounded causal context', () => {
+test('eleven-polity benchmark excludes inert entities and batches every strategic opponent', () => {
   const fixture = fileURLToPath(new URL('../../../data-packs/fixtures/europe-1935-benchmark/engine/scenario.json', import.meta.url));
   const state = initState(parseScenario(JSON.parse(readFileSync(fixture, 'utf8'))));
   const memory = Array.from({ length: 12 }, (_, index) => `1935-${String(index + 1).padStart(2, '0')}-01 observed fact`);
@@ -543,7 +554,8 @@ test('nine-polity benchmark schedules every opponent in batches of at most six w
   }]));
   const batches = buildDiplomacyBatches(state, 'polity:germany', { strategicContextByPolity: context });
   assert.equal(batches.length, 2);
-  assert.deepEqual(batches.flatMap((entry) => entry.polityIds).sort(), state.polities.filter((entry) => entry.id !== 'polity:germany').map((entry) => entry.id).sort());
+  assert.deepEqual(batches.flatMap((entry) => entry.polityIds).sort(), state.polities
+    .filter((entry) => entry.id !== 'polity:germany' && entry.decisionMode !== 'inert').map((entry) => entry.id).sort());
   assert.ok(batches.every((entry) => entry.polityIds.length <= 6 && entry.characterCount <= MAX_BATCH_BRIEF_CHARS));
   assert.ok(batches.every((entry) => !JSON.stringify(entry).includes('geometry')));
   assert.ok(batches.flatMap((entry) => entry.briefs).every((entry) => entry.strategicContext?.memory.length === 12));

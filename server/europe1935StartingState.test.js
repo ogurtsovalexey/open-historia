@@ -61,7 +61,8 @@ test('Poland regional economy candidate preserves national controls and the comp
   const first = buildPolandRegionalProjectionCandidate(fixture.engineScenario);
   const second = buildPolandRegionalProjectionCandidate(fixture.engineScenario);
   assert.deepEqual(first, second);
-  assert.equal(first.checksum, 'sha256:f38c989897b6c5249c893e258c2f7223502c1ca8336ca50c7c50fd2a9bb1cc77');
+  assert.equal(first.checksum, 'sha256:7b8ecfcb9834949993e28b8850250b398ff19dbc4ba2ec95179e3649c99b99c0');
+  assert.equal(first.status, 'owner-approved-runtime');
   assert.equal(first.rows.length, 16);
   assert.deepEqual(first.nationalControls, {
     population: 34_000_000,
@@ -98,7 +99,7 @@ test('Poland politics candidate separates offices from actual decision authority
     fixture.sources.filter((source) => source.id !== 'source:europe-1935-benchmark:pilsudski-museum-marshal')), /unknown sources/);
 });
 
-test('Europe 1935 pins its existing first aggregate month before regional replacement', () => {
+test('Europe 1935 preserves the pinned aggregate first month after regional replacement', () => {
   const fixture = loadFixture();
   const first = calculateCheckpoint(fixture, baseline);
   const second = calculateCheckpoint(fixture, baseline);
@@ -124,12 +125,14 @@ test('Europe 1935 starting-state gate reports every known foundation gap determi
   assert.deepEqual(audit, again);
   assert.equal(audit.gate.status, 'blocked');
   assert.equal(audit.gate.supportedPolities, 7);
-  assert.equal(audit.gate.baselinePolities, 2);
+  assert.equal(audit.gate.baselinePolities, 4);
   assert.equal(audit.generatedFrom.manifestContentVersion, '1.0.0');
   assert.equal(audit.issues.some((entry) => entry.code === 'major-content-version-pending'), false);
   assert.equal(audit.firstMonth.matches, true);
   assert.equal(audit.polities.filter((entry) => entry.fidelity === 'Supported').every((entry) => entry.controls.matches), true);
-  assert.equal(audit.polities.filter((entry) => entry.fidelity === 'Supported').every((entry) => entry.regionCount === 1), true);
+  assert.equal(audit.polities.filter((entry) => entry.fidelity === 'Supported')
+    .every((entry) => entry.regionCount >= 10 && entry.regionCount <= 25), true);
+  assert.equal(audit.inertPolities.every((entry) => entry.present), true);
   assert.equal(audit.issues.filter((entry) => entry.code === 'formation-missing').length, 7);
   assert.equal(audit.issues.filter((entry) => entry.code === 'commander-missing').length, 7);
   assert.equal(audit.issues.filter((entry) => entry.code === 'goal-conflicts-with-existing-commitment').length, 0);
