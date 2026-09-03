@@ -42,7 +42,7 @@ test('Europe 1935 owner candidate plan bounds every Supported polity and assigns
   assert.deepEqual(Object.fromEntries(Object.entries(plan.supportedPolities)
     .map(([polityId, definition]) => [polityId, definition.regions.length])), {
     'polity:austria': 10,
-    'polity:czechoslovakia': 10,
+    'polity:czechoslovakia': 11,
     'polity:germany': 21,
     'polity:italy': 18,
     'polity:united-kingdom': 13,
@@ -292,14 +292,14 @@ test('owner-approved geography is content-addressed and integrated into the runt
   const adjacency = readFixture('geography/runtime-land-adjacency.json');
   assert.deepEqual(runtime.gate, { status: 'owner-approved-runtime', runtimeIntegrated: true });
   assert.equal(runtime.approvedCheckpoint.collectionChecksum,
-    'sha256:8571a3054bd50d557e6c33107b673764aefb9dfa992785c8894f7cd6feea3292');
+    'sha256:43ec6e5cdccfef0cd351c2849f0d1bbf2866d479b07cfcf5d42eabc9a636ab87');
   assert.equal(runtime.approvedCheckpoint.adjacencyChecksum,
-    'sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d');
+    'sha256:153536f3858af53d07dd4063c0337b3bddc5afe8ac89bef3d9d2e2d0db4f5bea');
   assert.equal(engine.polities.length, 11);
-  assert.equal(engine.regions.length, 115);
-  assert.equal(scenario.regions.length, 115);
-  assert.equal(mapLink.regions.length, 115);
-  assert.equal(geojson.features.length, 109);
+  assert.equal(engine.regions.length, 116);
+  assert.equal(scenario.regions.length, 116);
+  assert.equal(mapLink.regions.length, 116);
+  assert.equal(geojson.features.length, 110);
   assert.equal(adjacency.polities.length, 9);
   assert.deepEqual(engine.polities.filter((entry) => entry.decisionMode === 'inert').map((entry) => entry.id),
     ['polity:free-city-of-danzig', 'polity:saargebiet']);
@@ -307,8 +307,19 @@ test('owner-approved geography is content-addressed and integrated into the runt
   assert.ok(geojson.features.some((entry) => entry.properties.name === 'Sicilia'));
   assert.ok(geojson.features.some((entry) => entry.properties.name === 'Sardegna'));
   assert.ok(geojson.features.some((entry) => entry.properties.name === 'Northern Ireland'));
+  const sudety = geojson.features.filter((entry) => entry.properties.regionId === 'region:europe-1935:cs-sudety');
+  assert.equal(sudety.length, 1);
+  assert.equal(sudety[0].geometry.type, 'MultiPolygon');
+  assert.equal(sudety[0].properties.nameRu, 'Судетская область');
+  assert.equal(engine.regions.find((entry) => entry.regionId === 'region:europe-1935:cs-sudety').displayName.ru,
+    'Судетская область');
+  assert.equal(engine.regions.every((entry) => /[А-Яа-яЁё]/.test(entry.displayName.ru)), true);
+  assert.equal(geojson.features.every((entry) => /[А-Яа-яЁё]/.test(entry.properties.nameRu)), true);
+  const czechAdjacency = adjacency.polities.find((entry) => entry.polityId === 'polity:czechoslovakia');
+  assert(czechAdjacency.regions.find((entry) => entry.regionId === 'region:europe-1935:cs-sudety')
+    .adjacentRegionIds.length > 0);
   for (const asset of manifest.assets) assert.equal(fileSha256(asset.path), asset.contentAddress);
-  assert.equal(new Set(engine.regions.map((entry) => entry.regionId)).size, 115);
+  assert.equal(new Set(engine.regions.map((entry) => entry.regionId)).size, 116);
   assert.deepEqual(new Set(mapLink.regions.map((entry) => entry.engineRegionId)),
     new Set(engine.regions.map((entry) => entry.regionId)));
   const built = new ScenarioV2Builder().buildFromDirectory(fixtureRoot);

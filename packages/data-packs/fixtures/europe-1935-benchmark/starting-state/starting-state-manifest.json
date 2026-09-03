@@ -20,13 +20,13 @@
     "unrest"
   ],
   "polityCount": 11,
-  "regionCount": 115,
-  "projectionChecksum": "sha256:dd3c307e4d39703a5245be4229a7c143527a4e16f867903e15f418e9c0630a63",
+  "regionCount": 116,
+  "projectionChecksum": "sha256:7e27719c885ae89ce0ee7b6ab65dfdec4c183108e0e0d49420d50d7c2bba83f3",
   "firstMonthChecksum": "sha256:209d64e8a4e25fac211aa5343f276f4da1f3fa7fb4c19e5f1fad6cff9b09d9a1",
-  "provenanceRows": 565,
+  "provenanceRows": 571,
   "artifacts": {
-    "engineScenario": "sha256:2023b55dc201715d936d2b7a5f423311488e1282503d8f06781928e851e7d4c8",
-    "authoring": "sha256:da7278852c2344216a1bb032cb91eb5b87ebdb388fe2e05bac948e312f80c4aa",
+    "engineScenario": "sha256:97e935adf2efa925537f54eb33c502761a456066b379816b76741f850c0af776",
+    "authoring": "sha256:76d253faa5b4023ec39d20dc1ada886697dffbf4a7841ca535fa9acd41745258",
     "sources": "sha256:ccd63764f9766b367a402372f5257363f01e88a074a99975e403d6f933ccb213",
     "politicsBundle": "sha256:9037fb13d3e24cf8089cf56eabc11c0b6b99107725b7ca4cd1258ef0da6bbe3b"
   }

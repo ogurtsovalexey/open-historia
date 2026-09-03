@@ -143,6 +143,13 @@
       "mapName": "Střední Čechy"
     },
     {
+      "engineRegionId": "region:europe-1935:cs-sudety",
+      "mapRegionIds": [
+        "e1935-cs-sudety"
+      ],
+      "mapName": "Sudety"
+    },
+    {
       "engineRegionId": "region:europe-1935:cs-vychodni-cechy",
       "mapRegionIds": [
         "e1935-cs-vychodni-cechy"

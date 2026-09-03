@@ -22,13 +22,13 @@ test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine pr
   assert.equal(first.checksum, second.checksum);
   assert.equal(first.scenario.scenarioId, 'scenario:europe-1935-benchmark');
   assert.equal(first.scenario.polities.length, 11);
-  assert.equal(first.scenario.regions.length, 115);
+  assert.equal(first.scenario.regions.length, 116);
   assert.equal(input().bundle.manifest.contentVersion, '1.0.0');
   assert.equal(first.scenario.startMonth, '1935-01-01');
   assert.equal(Object.values(first.scenario.modules ?? {}).every(Boolean), true);
   assert.equal(first.scenario.politics?.polities.length, 11);
   assert.equal(first.scenario.statecraft?.finance.length, 11);
-  assert.equal(first.scenario.identity?.regions.length, 115);
+  assert.equal(first.scenario.identity?.regions.length, 116);
   assert.equal(first.scenario.military?.formations.length, 7);
   assert.equal(first.scenario.campaign?.goals.length, 14);
   assert.equal(first.scenario.campaign?.softHorizonMonth, '1940-07-01');
@@ -36,7 +36,7 @@ test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine pr
     'agreement:france-czechoslovakia-1924',
     'agreement:france-poland-1921',
   ]);
-  assert.equal(first.mapLink?.regions.length, 115);
+  assert.equal(first.mapLink?.regions.length, 116);
   assert.deepEqual(first.scenario.polities.filter((entry) => entry.decisionMode === 'inert').map((entry) => entry.id), [
     'polity:free-city-of-danzig',
     'polity:saargebiet',
@@ -45,7 +45,7 @@ test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine pr
   assert.equal(state.label, 'historical-projection');
   assert.equal(state.diplomacy?.agreements.length, 2);
   assert.equal(state.politics?.polities.length, 11);
-  assert.equal(input().authoring.startingStateProvenance.length, 565);
+  assert.equal(input().authoring.startingStateProvenance.length, 571);
   assert.deepEqual(input().bundle.manifest.assets.filter((entry: { path: string }) => entry.path.startsWith('starting-state/'))
     .map((entry: { path: string }) => entry.path).sort(), [
     'starting-state/politics-bundle.json',

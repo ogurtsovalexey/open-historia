@@ -16,21 +16,23 @@ import {
   buildPolandRegionalProjectionCandidate,
   compareFirstMonthBaseline,
 } from './europe-1935-starting-state.mjs';
+import { buildIdentity } from './europe-1935-complete-starting-state.mjs';
+import { europe1935RussianRegionName } from './europe-1935-region-names.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURE_ROOT = path.join(ROOT, 'packages', 'data-packs', 'fixtures', 'europe-1935-benchmark');
 const DEFAULT_CHECKPOINT = path.join(ROOT, 'runs', 'campaign-lab', 'europe-1935-geography-checkpoint');
 const CONTROL_PATH = path.join(FIXTURE_ROOT, 'geography', 'runtime-integration-control.json');
-const EXPECTED_APPROVED_COLLECTION = 'sha256:8571a3054bd50d557e6c33107b673764aefb9dfa992785c8894f7cd6feea3292';
-const EXPECTED_APPROVED_ADJACENCY = 'sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d';
+const EXPECTED_APPROVED_COLLECTION = 'sha256:43ec6e5cdccfef0cd351c2849f0d1bbf2866d479b07cfcf5d42eabc9a636ab87';
+const EXPECTED_APPROVED_ADJACENCY = 'sha256:153536f3858af53d07dd4063c0337b3bddc5afe8ac89bef3d9d2e2d0db4f5bea';
 const ACTIVE_POLITY_IDS = new Set([
   'polity:austria', 'polity:czechoslovakia', 'polity:france', 'polity:germany',
   'polity:italy', 'polity:poland', 'polity:soviet-union', 'polity:united-kingdom',
   'polity:united-states',
 ]);
 const INERT_POLITIES = Object.freeze([
-  { id: 'polity:free-city-of-danzig', name: 'Freie Stadt Danzig', color: '#c9a45c', nativeId: 'freie-stadt-danzig' },
-  { id: 'polity:saargebiet', name: 'Saargebiet', color: '#7d8b94', nativeId: 'saargebiet' },
+  { id: 'polity:free-city-of-danzig', name: 'Freie Stadt Danzig', nameRu: 'Свободный город Данциг', color: '#c9a45c', nativeId: 'freie-stadt-danzig' },
+  { id: 'polity:saargebiet', name: 'Saargebiet', nameRu: 'Саарская область', color: '#7d8b94', nativeId: 'saargebiet' },
 ]);
 const POLITY_CODE = Object.freeze({
   'polity:austria': 'at', 'polity:czechoslovakia': 'cs', 'polity:france': 'fr',
@@ -88,7 +90,14 @@ const regionIdFor = (polityId, nativeId) => polityId === 'polity:poland'
 const mapIdFor = (polityId, nativeId) => `e1935-${POLITY_CODE[polityId]}-${nativeId}`;
 
 function ensureControl(engineScenario, authoring, checkpointManifest) {
-  if (fs.existsSync(CONTROL_PATH)) return readJson(CONTROL_PATH);
+  if (fs.existsSync(CONTROL_PATH)) {
+    const control = readJson(CONTROL_PATH);
+    const updated = { ...control,
+      approvedCollectionChecksum: checkpointManifest.collectionChecksum,
+      approvedAdjacencyChecksum: checkpointManifest.adjacencyChecksum };
+    if (canonical(updated) !== canonical(control)) writeJson(CONTROL_PATH, updated);
+    return updated;
+  }
   const macroRegions = engineScenario.regions.filter((entry) => entry.regionId.startsWith('region:benchmark-1:'));
   if (macroRegions.length !== 9) throw new Error('cannot initialize geography integration control without nine macro regions');
   const control = {
@@ -157,7 +166,7 @@ function splitMacro(macro, descriptors, economy) {
       const descriptor = byNative.get(nativeId);
       return {
         regionId: descriptor.engineRegionId, controllerId: macro.controllerId,
-        displayName: { en: descriptor.name, ru: descriptor.name },
+        displayName: { en: descriptor.name, ru: descriptor.nameRu },
         ...(allocation.activities ? { activities: allocation.activities } : { activity: allocation.activity }),
         population: populationById.get(descriptor.engineRegionId),
         annualBirthRateBp: macro.annualBirthRateBp, annualDeathRateBp: macro.annualDeathRateBp,
@@ -174,6 +183,24 @@ function splitMacro(macro, descriptors, economy) {
   const processingDescriptor = processing
     ? descriptors.find((entry) => entry.nativeId === processingNativeId) ?? descriptors[0]
     : null;
+  if (processingDescriptor) {
+    const processingCapacity = Math.floor((macro.baseMonthlyCapacity * processing.allocationBp) / 10000);
+    const minimumPopulation = Math.ceil((processingCapacity * 10000)
+      / Math.max(1, macro.workforceRateBp * macro.outputPerWorker));
+    const quantum = populationQuantum(macro);
+    const requiredPopulation = Math.ceil(minimumPopulation / quantum) * quantum;
+    const currentPopulation = populationById.get(processingDescriptor.engineRegionId);
+    if (currentPopulation < requiredPopulation) {
+      const transfer = requiredPopulation - currentPopulation;
+      const donor = descriptors.filter((entry) => entry.engineRegionId !== processingDescriptor.engineRegionId
+        && populationById.get(entry.engineRegionId) > transfer)
+        .toSorted((left, right) => populationById.get(right.engineRegionId) - populationById.get(left.engineRegionId)
+          || left.engineRegionId.localeCompare(right.engineRegionId))[0];
+      if (!donor) throw new Error(`${macro.controllerId} cannot reserve processing-region workforce`);
+      populationById.set(donor.engineRegionId, populationById.get(donor.engineRegionId) - transfer);
+      populationById.set(processingDescriptor.engineRegionId, requiredPopulation);
+    }
+  }
   const assigned = new Map(processingDescriptor ? [[processingDescriptor.engineRegionId, processing]] : []);
   const rawDescriptors = descriptors.filter((entry) => entry.engineRegionId !== processingDescriptor?.engineRegionId)
     .toSorted((left, right) => right.weight - left.weight || left.engineRegionId.localeCompare(right.engineRegionId));
@@ -208,7 +235,7 @@ function splitMacro(macro, descriptors, economy) {
       result.push({
         regionId: descriptor.engineRegionId,
         controllerId: macro.controllerId,
-        displayName: { en: descriptor.name, ru: descriptor.name },
+        displayName: { en: descriptor.name, ru: descriptor.nameRu },
         activity: allocated.activity,
         population: populationById.get(descriptor.engineRegionId),
         annualBirthRateBp: macro.annualBirthRateBp,
@@ -228,13 +255,14 @@ function splitMacro(macro, descriptors, economy) {
   return result.toSorted((left, right) => left.regionId.localeCompare(right.regionId));
 }
 
-function makeDescriptors(collection, control) {
+export function makeDescriptors(collection, control) {
   const geographic = collection.features.map((feature) => {
     const { polityId, nativeId, nativeName } = feature.properties;
     return {
       polityId,
       nativeId,
       name: nativeName,
+      nameRu: europe1935RussianRegionName(polityId, nativeId),
       engineRegionId: regionIdFor(polityId, nativeId),
       mapRegionId: mapIdFor(polityId, nativeId),
       weight: Math.max(1, Math.round(area(feature) / 1000)),
@@ -242,7 +270,8 @@ function makeDescriptors(collection, control) {
     };
   });
   const baseline = Object.entries(BASELINE_REGIONS).flatMap(([polityId, rows]) => rows.map((row) => ({
-    polityId, ...row, engineRegionId: `region:europe-1935:${row.nativeId}`, mapRegionId: row.nativeId,
+    polityId, ...row, nameRu: europe1935RussianRegionName(polityId, row.nativeId),
+    engineRegionId: `region:europe-1935:${row.nativeId}`, mapRegionId: row.nativeId,
   })));
   const all = [...geographic, ...baseline].toSorted((left, right) => left.engineRegionId.localeCompare(right.engineRegionId));
   const knownPolities = new Set(control.macroRegions.map((entry) => entry.controllerId));
@@ -252,29 +281,32 @@ function makeDescriptors(collection, control) {
   return all;
 }
 
-function buildEngineScenario(original, control, descriptors, adjacency) {
+export function buildEngineScenario(original, control, descriptors, adjacency) {
   const scenario = structuredClone(original);
   const macroByPolity = new Map(control.macroRegions.map((entry) => [entry.controllerId, entry]));
-  const poland = buildPolandRegionalProjectionCandidate({ ...scenario, regions: control.macroRegions,
-    military: { ...scenario.military, supplyLinks: [] } }).rows;
+  const poland = buildPolandRegionalProjectionCandidate(scenario).rows;
   scenario.polities = [
     ...scenario.polities.filter((entry) => ACTIVE_POLITY_IDS.has(entry.id)),
     ...INERT_POLITIES.map((entry) => ({
-      id: entry.id, displayName: { en: entry.name, ru: entry.name }, decisionMode: 'inert', treasury: 0,
+      id: entry.id, displayName: { en: entry.name, ru: entry.nameRu }, decisionMode: 'inert', treasury: 0,
       stockpile: scenario.activeResources.map((resource) => ({ resource, amount: 0 })),
     })),
   ].toSorted((left, right) => left.id.localeCompare(right.id));
   scenario.regions = [];
   for (const [polityId, polityDescriptors] of Map.groupBy(descriptors, (entry) => entry.polityId)) {
     if (polityId === 'polity:poland') {
-      scenario.regions.push(...poland);
+      const byId = new Map(polityDescriptors.map((entry) => [entry.engineRegionId, entry]));
+      scenario.regions.push(...poland.map((region) => {
+        const descriptor = byId.get(region.regionId);
+        return { ...region, displayName: { en: descriptor.name, ru: descriptor.nameRu } };
+      }));
     } else if (macroByPolity.has(polityId)) {
       scenario.regions.push(...splitMacro(macroByPolity.get(polityId), polityDescriptors, scenario.economy));
     } else {
       const descriptor = polityDescriptors[0];
       scenario.regions.push({
         regionId: descriptor.engineRegionId, controllerId: polityId,
-        displayName: { en: descriptor.name, ru: descriptor.name },
+        displayName: { en: descriptor.name, ru: descriptor.nameRu },
         activity: { kind: 'extraction', resource: 'food' }, population: 0,
         annualBirthRateBp: 0, annualDeathRateBp: 0, workforceRateBp: 0,
         infrastructureBp: 0, damageBp: 0, baseMonthlyCapacity: 0,
@@ -283,6 +315,7 @@ function buildEngineScenario(original, control, descriptors, adjacency) {
     }
   }
   scenario.regions.sort((left, right) => left.regionId.localeCompare(right.regionId));
+  if (scenario.modules.societyAndIdentity) scenario.identity = buildIdentity(scenario);
   scenario.military.polities = [
     ...scenario.military.polities.filter((entry) => ACTIVE_POLITY_IDS.has(entry.polityId)),
     ...INERT_POLITIES.map((entry) => ({ polityId: entry.id, maxMobilizationBp: 100, equipmentReserve: 0 })),
@@ -445,7 +478,8 @@ function runtimeGeoJson(collection, descriptors) {
         type: 'Feature', geometry: feature.geometry,
         properties: {
           ...feature.properties, id: descriptor.mapRegionId, regionId: descriptor.engineRegionId,
-          name: descriptor.name, owner: descriptor.polityId, edited: true,
+          name: descriptor.name, nameEn: descriptor.name, nameRu: descriptor.nameRu,
+          owner: descriptor.polityId, edited: true,
         },
       };
     }),

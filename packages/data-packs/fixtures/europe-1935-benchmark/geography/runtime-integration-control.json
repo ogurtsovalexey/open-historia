@@ -1,8 +1,8 @@
 {
   "schemaVersion": "open-historia-geography-runtime-control/1",
   "scenarioId": "scenario:europe-1935-benchmark",
-  "approvedCollectionChecksum": "sha256:8571a3054bd50d557e6c33107b673764aefb9dfa992785c8894f7cd6feea3292",
-  "approvedAdjacencyChecksum": "sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d",
+  "approvedCollectionChecksum": "sha256:43ec6e5cdccfef0cd351c2849f0d1bbf2866d479b07cfcf5d42eabc9a636ab87",
+  "approvedAdjacencyChecksum": "sha256:153536f3858af53d07dd4063c0337b3bddc5afe8ac89bef3d9d2e2d0db4f5bea",
   "macroRegions": [
     {
       "regionId": "region:benchmark-1:DE",

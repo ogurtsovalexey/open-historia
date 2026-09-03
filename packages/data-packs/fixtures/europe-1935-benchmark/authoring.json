@@ -421,8 +421,8 @@
     },
     {
       "regionId": "region:europe-1935:cs-jizni-cechy",
-      "population": 828000,
-      "baseMonthlyCapacity": 5500,
+      "population": 624000,
+      "baseMonthlyCapacity": 6000,
       "infrastructureBp": 6100,
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook",
@@ -436,7 +436,7 @@
     {
       "regionId": "region:europe-1935:cs-morava",
       "population": 2796000,
-      "baseMonthlyCapacity": 6000,
+      "baseMonthlyCapacity": 4000,
       "infrastructureBp": 6100,
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook",
@@ -477,7 +477,7 @@
     },
     {
       "regionId": "region:europe-1935:cs-severni-cechy",
-      "population": 1440000,
+      "population": 924000,
       "baseMonthlyCapacity": 4000,
       "infrastructureBp": 6100,
       "sourceRefs": [
@@ -505,7 +505,7 @@
     },
     {
       "regionId": "region:europe-1935:cs-slovensko",
-      "population": 5244000,
+      "population": 5232000,
       "baseMonthlyCapacity": 6800,
       "infrastructureBp": 6100,
       "sourceRefs": [
@@ -520,7 +520,7 @@
     {
       "regionId": "region:europe-1935:cs-stredni-cechy",
       "population": 684000,
-      "baseMonthlyCapacity": 4500,
+      "baseMonthlyCapacity": 6600,
       "infrastructureBp": 6100,
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook",
@@ -532,9 +532,23 @@
       "todo": "Replace strategic allocation weights with table-level regional population, infrastructure and production evidence."
     },
     {
+      "regionId": "region:europe-1935:cs-sudety",
+      "population": 1944000,
+      "baseMonthlyCapacity": 4000,
+      "infrastructureBp": 6100,
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook",
+        "source:europe-1935-benchmark:world-production",
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Approved polygon area weights allocate population; activity-group capacity allocation preserves national controls and the aggregate first month exactly.",
+      "confidence": "low",
+      "todo": "Refine the strategic Sudeten border-region approximation against a permissively licensed 1938 language-majority or Munich cession line."
+    },
+    {
       "regionId": "region:europe-1935:cs-vychodni-cechy",
-      "population": 1212000,
-      "baseMonthlyCapacity": 7600,
+      "population": 876000,
+      "baseMonthlyCapacity": 2000,
       "infrastructureBp": 6100,
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook",
@@ -547,8 +561,8 @@
     },
     {
       "regionId": "region:europe-1935:cs-zapadni-cechy",
-      "population": 1344000,
-      "baseMonthlyCapacity": 4000,
+      "population": 468000,
+      "baseMonthlyCapacity": 5000,
       "infrastructureBp": 6100,
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook",
@@ -2723,7 +2737,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-19",
       "scenarioPath": "/military/supplyLinks/19",
-      "valueChecksum": "sha256:254d2c050299e704bf8284c7ad8eb906eb4d7e97b2d5ff6ff69b9296956fad52",
+      "valueChecksum": "sha256:cebc67e3d423e774dad6532136be2122d89a843aa7fe2ee1bf0f27c11d2bf019",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2735,7 +2749,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-20",
       "scenarioPath": "/military/supplyLinks/20",
-      "valueChecksum": "sha256:499236acc886d521939d65fc2436dd220dfeb8b39ebddd798ffabda4c8bb47dd",
+      "valueChecksum": "sha256:254d2c050299e704bf8284c7ad8eb906eb4d7e97b2d5ff6ff69b9296956fad52",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2747,7 +2761,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-21",
       "scenarioPath": "/military/supplyLinks/21",
-      "valueChecksum": "sha256:a2815e0027a5c370f5fed1b384c2d32903610ca764fc125fd007d180439b4265",
+      "valueChecksum": "sha256:499236acc886d521939d65fc2436dd220dfeb8b39ebddd798ffabda4c8bb47dd",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2759,7 +2773,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-22",
       "scenarioPath": "/military/supplyLinks/22",
-      "valueChecksum": "sha256:11342d89e4599ba0458dfa6a73e5d23559f1d7b0b02b74c88ed60d3a9a2897e0",
+      "valueChecksum": "sha256:a2815e0027a5c370f5fed1b384c2d32903610ca764fc125fd007d180439b4265",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2771,7 +2785,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-23",
       "scenarioPath": "/military/supplyLinks/23",
-      "valueChecksum": "sha256:464d5c4ee828bfe89e44b7a4e8d7dea625eb47355462200de03e0a2762298424",
+      "valueChecksum": "sha256:11342d89e4599ba0458dfa6a73e5d23559f1d7b0b02b74c88ed60d3a9a2897e0",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2783,7 +2797,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-24",
       "scenarioPath": "/military/supplyLinks/24",
-      "valueChecksum": "sha256:c7ad39a1015c00483581d8b03b318cac2ff0bdd2735745d48e63bdd2016c5f1c",
+      "valueChecksum": "sha256:7730128be81cd249c35b1f48bed2ea32654b11a6c68ccc6f3225c6d8102a3a30",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2795,7 +2809,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-25",
       "scenarioPath": "/military/supplyLinks/25",
-      "valueChecksum": "sha256:8a8198c101c3d60921a6d060ba666719e2437a7fef8d735509b44f86f90a5e0a",
+      "valueChecksum": "sha256:464d5c4ee828bfe89e44b7a4e8d7dea625eb47355462200de03e0a2762298424",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2807,7 +2821,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-26",
       "scenarioPath": "/military/supplyLinks/26",
-      "valueChecksum": "sha256:667e3b17232653ac52a2c4ff5dbc5eda6fce3a94521fb31a2415d7521876dbed",
+      "valueChecksum": "sha256:c7ad39a1015c00483581d8b03b318cac2ff0bdd2735745d48e63bdd2016c5f1c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2819,7 +2833,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-27",
       "scenarioPath": "/military/supplyLinks/27",
-      "valueChecksum": "sha256:07f919f5094cc815cbdb250cee0e3847c9d94ac4a8c24e0c8d40608914c16bfe",
+      "valueChecksum": "sha256:8a8198c101c3d60921a6d060ba666719e2437a7fef8d735509b44f86f90a5e0a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2831,7 +2845,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-28",
       "scenarioPath": "/military/supplyLinks/28",
-      "valueChecksum": "sha256:d0ca6958f02c58f8c64e19d9fe757f016c2c1e72c04265e03cf57f3726a6e423",
+      "valueChecksum": "sha256:667e3b17232653ac52a2c4ff5dbc5eda6fce3a94521fb31a2415d7521876dbed",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2843,7 +2857,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-29",
       "scenarioPath": "/military/supplyLinks/29",
-      "valueChecksum": "sha256:52a92cd3292d26e32ebb81a2f603f20772415837bd4efdc39b6f73eea6c0bb6b",
+      "valueChecksum": "sha256:07f919f5094cc815cbdb250cee0e3847c9d94ac4a8c24e0c8d40608914c16bfe",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2855,7 +2869,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-30",
       "scenarioPath": "/military/supplyLinks/30",
-      "valueChecksum": "sha256:1d9f683c97279aa90a14e6ce5a78264a0c2c42c3704af24efee9096020eb01b0",
+      "valueChecksum": "sha256:8d10e60cb1fd9997c0fa0ff3fc4c5f9c65e4928710cfe6e927711e3dfac18186",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2867,7 +2881,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-31",
       "scenarioPath": "/military/supplyLinks/31",
-      "valueChecksum": "sha256:89bd3a63295cbd0c0962e8c38beb3d1dcc933c7da3a71465f7e449a0fb98ece5",
+      "valueChecksum": "sha256:d0ca6958f02c58f8c64e19d9fe757f016c2c1e72c04265e03cf57f3726a6e423",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2879,7 +2893,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-32",
       "scenarioPath": "/military/supplyLinks/32",
-      "valueChecksum": "sha256:61dc522e5a9f41c7d6aca9b901ee73284d44fd128f92ba6b2bbe8323f8837a80",
+      "valueChecksum": "sha256:52a92cd3292d26e32ebb81a2f603f20772415837bd4efdc39b6f73eea6c0bb6b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2891,7 +2905,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-33",
       "scenarioPath": "/military/supplyLinks/33",
-      "valueChecksum": "sha256:69e5b26614e13c9626c1ddd417f1d39507ee5fe08f18e3942a482a52e8fa3439",
+      "valueChecksum": "sha256:1d9f683c97279aa90a14e6ce5a78264a0c2c42c3704af24efee9096020eb01b0",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2903,7 +2917,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-34",
       "scenarioPath": "/military/supplyLinks/34",
-      "valueChecksum": "sha256:85087fb67d46e430940035e90cf9e03c04927091b960b2355daa325fe4170de5",
+      "valueChecksum": "sha256:89bd3a63295cbd0c0962e8c38beb3d1dcc933c7da3a71465f7e449a0fb98ece5",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2915,7 +2929,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-35",
       "scenarioPath": "/military/supplyLinks/35",
-      "valueChecksum": "sha256:71cd08e977201a3d7abd8a0e2888770c231df50a55efec15b06409530d40111f",
+      "valueChecksum": "sha256:61dc522e5a9f41c7d6aca9b901ee73284d44fd128f92ba6b2bbe8323f8837a80",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2927,7 +2941,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-36",
       "scenarioPath": "/military/supplyLinks/36",
-      "valueChecksum": "sha256:53e750fbfe9037072b4a745f163ecf479882a1e8b56a1f1354fea7baf9df7081",
+      "valueChecksum": "sha256:69e5b26614e13c9626c1ddd417f1d39507ee5fe08f18e3942a482a52e8fa3439",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2939,7 +2953,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-37",
       "scenarioPath": "/military/supplyLinks/37",
-      "valueChecksum": "sha256:06fde127557a9e801fc86fb98a16c1b9d352d930a1e8c492af036d42ade76830",
+      "valueChecksum": "sha256:f6fb35bf2be01f06497d396d0d8d7cc5201644856b8877b0b19750634156d6f2",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2951,7 +2965,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-38",
       "scenarioPath": "/military/supplyLinks/38",
-      "valueChecksum": "sha256:c0307818b9d52128c58b37e04dd620134499093075bd20d75b94078302f3ccb3",
+      "valueChecksum": "sha256:334c44c8a6eee0e32b255875fe572aab0364bf2352961c0f3a73036ab5ac02db",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2963,7 +2977,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-39",
       "scenarioPath": "/military/supplyLinks/39",
-      "valueChecksum": "sha256:804cca0e0d42254a109e66c0626e1daa026fcb13f72dc110b1a3b11f3bd99ad9",
+      "valueChecksum": "sha256:85087fb67d46e430940035e90cf9e03c04927091b960b2355daa325fe4170de5",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2975,7 +2989,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-40",
       "scenarioPath": "/military/supplyLinks/40",
-      "valueChecksum": "sha256:76633ac528d59bf7a31d75b691b77bd367ef067138ad186608af56e868bbc66a",
+      "valueChecksum": "sha256:71cd08e977201a3d7abd8a0e2888770c231df50a55efec15b06409530d40111f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2987,7 +3001,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-41",
       "scenarioPath": "/military/supplyLinks/41",
-      "valueChecksum": "sha256:bbe65aa36737ca4137bfd64b1af6451ebd6290316c1309cc1a26d4a0666b8ffb",
+      "valueChecksum": "sha256:53e750fbfe9037072b4a745f163ecf479882a1e8b56a1f1354fea7baf9df7081",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -2999,7 +3013,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-42",
       "scenarioPath": "/military/supplyLinks/42",
-      "valueChecksum": "sha256:d0368a75c6bb773b647c35e372accd947c3db05988ffe22f73d75aa44bb26e38",
+      "valueChecksum": "sha256:06fde127557a9e801fc86fb98a16c1b9d352d930a1e8c492af036d42ade76830",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3011,7 +3025,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-43",
       "scenarioPath": "/military/supplyLinks/43",
-      "valueChecksum": "sha256:bbe0b9bc2ec281a71b8e9c78104fb2a8738085366fc5390592b1ed3055b02139",
+      "valueChecksum": "sha256:c0307818b9d52128c58b37e04dd620134499093075bd20d75b94078302f3ccb3",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3023,7 +3037,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-44",
       "scenarioPath": "/military/supplyLinks/44",
-      "valueChecksum": "sha256:ea3aad1bf111403c7172d90aa568c2c96ef1569e27ce709d44e77316519c1107",
+      "valueChecksum": "sha256:804cca0e0d42254a109e66c0626e1daa026fcb13f72dc110b1a3b11f3bd99ad9",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3035,7 +3049,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-45",
       "scenarioPath": "/military/supplyLinks/45",
-      "valueChecksum": "sha256:a84ffccf17bd3c09bf57afc103ebd2a4cac11c56b96358b3299df977f6f7759d",
+      "valueChecksum": "sha256:76633ac528d59bf7a31d75b691b77bd367ef067138ad186608af56e868bbc66a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3047,7 +3061,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-46",
       "scenarioPath": "/military/supplyLinks/46",
-      "valueChecksum": "sha256:c8bb960acd566b73ce9d637a507035e648c2faf7dd13552b0308a6875279d2f9",
+      "valueChecksum": "sha256:bbe65aa36737ca4137bfd64b1af6451ebd6290316c1309cc1a26d4a0666b8ffb",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3059,7 +3073,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-47",
       "scenarioPath": "/military/supplyLinks/47",
-      "valueChecksum": "sha256:6c8513610a2e0c721b11e99cc5514c564f61173e8f8d2654c438b97985549d46",
+      "valueChecksum": "sha256:d0368a75c6bb773b647c35e372accd947c3db05988ffe22f73d75aa44bb26e38",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3071,7 +3085,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-48",
       "scenarioPath": "/military/supplyLinks/48",
-      "valueChecksum": "sha256:48c81f66c2dd1a0279ae4b80c84873e4588fb01057dc6416955d499bd8b168a6",
+      "valueChecksum": "sha256:bbe0b9bc2ec281a71b8e9c78104fb2a8738085366fc5390592b1ed3055b02139",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3083,7 +3097,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-49",
       "scenarioPath": "/military/supplyLinks/49",
-      "valueChecksum": "sha256:c80b6fd3dd9777e3d83c33229838e56ac097519a9b194304d23f5a6db4b082f5",
+      "valueChecksum": "sha256:ea3aad1bf111403c7172d90aa568c2c96ef1569e27ce709d44e77316519c1107",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3095,7 +3109,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-50",
       "scenarioPath": "/military/supplyLinks/50",
-      "valueChecksum": "sha256:e425b9750f2a0f261ce7b91ce2c342b7a1a983bc5c27fe8c13fa2bf0d463548c",
+      "valueChecksum": "sha256:a84ffccf17bd3c09bf57afc103ebd2a4cac11c56b96358b3299df977f6f7759d",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3107,7 +3121,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-51",
       "scenarioPath": "/military/supplyLinks/51",
-      "valueChecksum": "sha256:aff8d855a47f1901e24850f15d43ffed4edd14a4346d4c5c4972803c7f67b980",
+      "valueChecksum": "sha256:c8bb960acd566b73ce9d637a507035e648c2faf7dd13552b0308a6875279d2f9",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3119,7 +3133,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-52",
       "scenarioPath": "/military/supplyLinks/52",
-      "valueChecksum": "sha256:ca8c68af93d2f7d78582cb04ecfaaa8b471dd82483543d0ac67be67e8acfc949",
+      "valueChecksum": "sha256:6c8513610a2e0c721b11e99cc5514c564f61173e8f8d2654c438b97985549d46",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3131,7 +3145,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-53",
       "scenarioPath": "/military/supplyLinks/53",
-      "valueChecksum": "sha256:30d92e1106a9b7d141c441a70f38f7389411f807c6f2c841864c909fcbc63c9d",
+      "valueChecksum": "sha256:48c81f66c2dd1a0279ae4b80c84873e4588fb01057dc6416955d499bd8b168a6",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3143,7 +3157,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-54",
       "scenarioPath": "/military/supplyLinks/54",
-      "valueChecksum": "sha256:acb201a75032d05de52f01bde78bf9c0b0443e4a565f217e1dbeeca08194073a",
+      "valueChecksum": "sha256:c80b6fd3dd9777e3d83c33229838e56ac097519a9b194304d23f5a6db4b082f5",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3155,7 +3169,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-55",
       "scenarioPath": "/military/supplyLinks/55",
-      "valueChecksum": "sha256:3ce4766d96362db513f44483aeb2fd7a5cb4e1c16350941e1b55a089eb98524d",
+      "valueChecksum": "sha256:e425b9750f2a0f261ce7b91ce2c342b7a1a983bc5c27fe8c13fa2bf0d463548c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3167,7 +3181,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-56",
       "scenarioPath": "/military/supplyLinks/56",
-      "valueChecksum": "sha256:f52ead01c3d22eb24494dd89e6f189ea3f7ef103ff0d6bb894d92bfdc623ba7d",
+      "valueChecksum": "sha256:aff8d855a47f1901e24850f15d43ffed4edd14a4346d4c5c4972803c7f67b980",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3179,7 +3193,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-57",
       "scenarioPath": "/military/supplyLinks/57",
-      "valueChecksum": "sha256:3247b45f98c3855e3dbae500413289b8e7f2f821acb26849d77720b2ca3d11a1",
+      "valueChecksum": "sha256:ca8c68af93d2f7d78582cb04ecfaaa8b471dd82483543d0ac67be67e8acfc949",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3191,7 +3205,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-58",
       "scenarioPath": "/military/supplyLinks/58",
-      "valueChecksum": "sha256:576726623cbcc9498182823c634acbdd177261f562fdd0c00b849bd14e7aa796",
+      "valueChecksum": "sha256:30d92e1106a9b7d141c441a70f38f7389411f807c6f2c841864c909fcbc63c9d",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3203,7 +3217,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-59",
       "scenarioPath": "/military/supplyLinks/59",
-      "valueChecksum": "sha256:ec1636f511e26085133cdbff27e886fe5d00985660f26816476a2834992bd5b9",
+      "valueChecksum": "sha256:acb201a75032d05de52f01bde78bf9c0b0443e4a565f217e1dbeeca08194073a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3215,7 +3229,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-60",
       "scenarioPath": "/military/supplyLinks/60",
-      "valueChecksum": "sha256:0b10a394b85003708337efa14ba5af7da2ac87cb7e85cbd845c29349cac70bdf",
+      "valueChecksum": "sha256:3ce4766d96362db513f44483aeb2fd7a5cb4e1c16350941e1b55a089eb98524d",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3227,7 +3241,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-61",
       "scenarioPath": "/military/supplyLinks/61",
-      "valueChecksum": "sha256:51f1d7d5c322dc33b284eae07d14eb719989994c19604beba02badca177dcbf3",
+      "valueChecksum": "sha256:f52ead01c3d22eb24494dd89e6f189ea3f7ef103ff0d6bb894d92bfdc623ba7d",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3239,7 +3253,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-62",
       "scenarioPath": "/military/supplyLinks/62",
-      "valueChecksum": "sha256:a7871f84ad7241cb82eda4ba241ecbc9e9211426a91e555ff4ac64b6e89e151a",
+      "valueChecksum": "sha256:3247b45f98c3855e3dbae500413289b8e7f2f821acb26849d77720b2ca3d11a1",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3251,7 +3265,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-63",
       "scenarioPath": "/military/supplyLinks/63",
-      "valueChecksum": "sha256:6bb689751bcffe81ec8db960b865585eb31587ec35d2969e0bb8ff19de310500",
+      "valueChecksum": "sha256:576726623cbcc9498182823c634acbdd177261f562fdd0c00b849bd14e7aa796",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3263,7 +3277,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-64",
       "scenarioPath": "/military/supplyLinks/64",
-      "valueChecksum": "sha256:6f7c7c5d6ec5eec12e7a8431a5b4c7bcd01cbacf8b015376e364b938cc00ac9e",
+      "valueChecksum": "sha256:ec1636f511e26085133cdbff27e886fe5d00985660f26816476a2834992bd5b9",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3275,7 +3289,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-65",
       "scenarioPath": "/military/supplyLinks/65",
-      "valueChecksum": "sha256:d7fbce2c01ac0dc2f75522688a7e782012e63ed4288789e53f85742b0872f6e9",
+      "valueChecksum": "sha256:0b10a394b85003708337efa14ba5af7da2ac87cb7e85cbd845c29349cac70bdf",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3287,7 +3301,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-66",
       "scenarioPath": "/military/supplyLinks/66",
-      "valueChecksum": "sha256:295cc1fd593bf9854d232b8c61ac05a985a14da6727b107a37c155e2d817669f",
+      "valueChecksum": "sha256:51f1d7d5c322dc33b284eae07d14eb719989994c19604beba02badca177dcbf3",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3299,7 +3313,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-67",
       "scenarioPath": "/military/supplyLinks/67",
-      "valueChecksum": "sha256:870082b7e325756943a0ee9eb3dbb07a7c1f9eb178887a4a2b38c7f79b163ecc",
+      "valueChecksum": "sha256:a7871f84ad7241cb82eda4ba241ecbc9e9211426a91e555ff4ac64b6e89e151a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3311,7 +3325,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-68",
       "scenarioPath": "/military/supplyLinks/68",
-      "valueChecksum": "sha256:1b698dde6379a29c4fe8f6e317fe598d9add8e2bff60a5cce965c76b4c51ee54",
+      "valueChecksum": "sha256:6bb689751bcffe81ec8db960b865585eb31587ec35d2969e0bb8ff19de310500",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3323,7 +3337,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-69",
       "scenarioPath": "/military/supplyLinks/69",
-      "valueChecksum": "sha256:6ea1531e1c8a01dbf9c6367b145b32880d93ce4294c5d81345012213a0f8e1da",
+      "valueChecksum": "sha256:6f7c7c5d6ec5eec12e7a8431a5b4c7bcd01cbacf8b015376e364b938cc00ac9e",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3335,7 +3349,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-70",
       "scenarioPath": "/military/supplyLinks/70",
-      "valueChecksum": "sha256:fd0e3dac277ca156aee641f3e866a5e8dc46795ebc2b7c6f7e20a6ede91a1fe1",
+      "valueChecksum": "sha256:d7fbce2c01ac0dc2f75522688a7e782012e63ed4288789e53f85742b0872f6e9",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3347,7 +3361,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-71",
       "scenarioPath": "/military/supplyLinks/71",
-      "valueChecksum": "sha256:fe16615424bde750d56dc9eb4db5c31613865bad71bd7d3ce3c962329f5bb868",
+      "valueChecksum": "sha256:295cc1fd593bf9854d232b8c61ac05a985a14da6727b107a37c155e2d817669f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3359,7 +3373,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-72",
       "scenarioPath": "/military/supplyLinks/72",
-      "valueChecksum": "sha256:faef56bdc2def73ecbfa8a78aa60f9698845e24e308c450c8112159aed9156e8",
+      "valueChecksum": "sha256:870082b7e325756943a0ee9eb3dbb07a7c1f9eb178887a4a2b38c7f79b163ecc",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3371,7 +3385,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-73",
       "scenarioPath": "/military/supplyLinks/73",
-      "valueChecksum": "sha256:c6d1d17a9dd068bf7b7db3c203f4213af41fb1859304dd0927ada6390b425e8d",
+      "valueChecksum": "sha256:1b698dde6379a29c4fe8f6e317fe598d9add8e2bff60a5cce965c76b4c51ee54",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3383,7 +3397,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-74",
       "scenarioPath": "/military/supplyLinks/74",
-      "valueChecksum": "sha256:7f8dbe6a7959cbf556ac61966b8452c5b0926cb38af00cabc44890da6602d847",
+      "valueChecksum": "sha256:6ea1531e1c8a01dbf9c6367b145b32880d93ce4294c5d81345012213a0f8e1da",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3395,7 +3409,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-75",
       "scenarioPath": "/military/supplyLinks/75",
-      "valueChecksum": "sha256:09ee86b4bac4b505a874c0b0be7af08ea06678a81b47a6f14b29fb0a37a3e8de",
+      "valueChecksum": "sha256:fd0e3dac277ca156aee641f3e866a5e8dc46795ebc2b7c6f7e20a6ede91a1fe1",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3407,7 +3421,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-76",
       "scenarioPath": "/military/supplyLinks/76",
-      "valueChecksum": "sha256:cbc4e6a64342d4d9a9f83237714934604bdcacd5ca9e918e472f90e58e37ea95",
+      "valueChecksum": "sha256:fe16615424bde750d56dc9eb4db5c31613865bad71bd7d3ce3c962329f5bb868",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3419,7 +3433,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-77",
       "scenarioPath": "/military/supplyLinks/77",
-      "valueChecksum": "sha256:b66a57f6e33aa2c17e356a13536aac4dbea265d11225e09a349811a6182fdd4c",
+      "valueChecksum": "sha256:faef56bdc2def73ecbfa8a78aa60f9698845e24e308c450c8112159aed9156e8",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3431,7 +3445,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-78",
       "scenarioPath": "/military/supplyLinks/78",
-      "valueChecksum": "sha256:3f5b7073a3e8b4fc0f60fbe4985bb0909e19517eaaad42a63a9a117fdb623cfa",
+      "valueChecksum": "sha256:c6d1d17a9dd068bf7b7db3c203f4213af41fb1859304dd0927ada6390b425e8d",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3443,7 +3457,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-79",
       "scenarioPath": "/military/supplyLinks/79",
-      "valueChecksum": "sha256:a7c892a3adaa4614a62395b8a326271b6ad40d8bc6be2e31361fc277fc3b61a7",
+      "valueChecksum": "sha256:7f8dbe6a7959cbf556ac61966b8452c5b0926cb38af00cabc44890da6602d847",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3455,7 +3469,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-80",
       "scenarioPath": "/military/supplyLinks/80",
-      "valueChecksum": "sha256:86ea2258a57b02a472b5a6b114dccebee1c47e1c72eba17415996ae722025c06",
+      "valueChecksum": "sha256:09ee86b4bac4b505a874c0b0be7af08ea06678a81b47a6f14b29fb0a37a3e8de",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3467,7 +3481,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-81",
       "scenarioPath": "/military/supplyLinks/81",
-      "valueChecksum": "sha256:2f51643f88917d157b2da2e37df710e84c3a1c2dc4b3926ae1baacc3150e479c",
+      "valueChecksum": "sha256:cbc4e6a64342d4d9a9f83237714934604bdcacd5ca9e918e472f90e58e37ea95",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3479,7 +3493,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-82",
       "scenarioPath": "/military/supplyLinks/82",
-      "valueChecksum": "sha256:d581658b1bddd9cdbb42e6e8ad3fbcdac0c33e2aa2d7f9a5a30aa61af6e55769",
+      "valueChecksum": "sha256:b66a57f6e33aa2c17e356a13536aac4dbea265d11225e09a349811a6182fdd4c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3491,7 +3505,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-83",
       "scenarioPath": "/military/supplyLinks/83",
-      "valueChecksum": "sha256:5b4855e61b78edec1a5ee4a419df62f9c94fe38c550d88829e1bc57b6dda881e",
+      "valueChecksum": "sha256:3f5b7073a3e8b4fc0f60fbe4985bb0909e19517eaaad42a63a9a117fdb623cfa",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3503,7 +3517,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-84",
       "scenarioPath": "/military/supplyLinks/84",
-      "valueChecksum": "sha256:b29e03a95029d7484f41fed32eb15daf34d65a3f0540830a07e9c841dcbab728",
+      "valueChecksum": "sha256:a7c892a3adaa4614a62395b8a326271b6ad40d8bc6be2e31361fc277fc3b61a7",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3515,7 +3529,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-85",
       "scenarioPath": "/military/supplyLinks/85",
-      "valueChecksum": "sha256:b3313f99a4d6621851b3fca9b54824dee320fac9e094658392b7e812997cccf8",
+      "valueChecksum": "sha256:86ea2258a57b02a472b5a6b114dccebee1c47e1c72eba17415996ae722025c06",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3527,7 +3541,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-86",
       "scenarioPath": "/military/supplyLinks/86",
-      "valueChecksum": "sha256:96a3d1bdd98e5ef39306df5c5e028a160e6a2155318402ca3154fb8e0fbf1b3c",
+      "valueChecksum": "sha256:2f51643f88917d157b2da2e37df710e84c3a1c2dc4b3926ae1baacc3150e479c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3539,7 +3553,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-87",
       "scenarioPath": "/military/supplyLinks/87",
-      "valueChecksum": "sha256:8eeff6605588204e7213c18e04364ce9865dfdf97998a4e60ccb5909b8c078c7",
+      "valueChecksum": "sha256:d581658b1bddd9cdbb42e6e8ad3fbcdac0c33e2aa2d7f9a5a30aa61af6e55769",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3551,7 +3565,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-88",
       "scenarioPath": "/military/supplyLinks/88",
-      "valueChecksum": "sha256:385a2273e0b474ca845d4a664b78d6093f66ee2b5aa5cf894ee169783c8e7209",
+      "valueChecksum": "sha256:5b4855e61b78edec1a5ee4a419df62f9c94fe38c550d88829e1bc57b6dda881e",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3563,7 +3577,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-89",
       "scenarioPath": "/military/supplyLinks/89",
-      "valueChecksum": "sha256:ac89f7af4f0ee39caace6500bf7b3b071fc7654d51c109695ec9685238782937",
+      "valueChecksum": "sha256:b29e03a95029d7484f41fed32eb15daf34d65a3f0540830a07e9c841dcbab728",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3575,7 +3589,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-90",
       "scenarioPath": "/military/supplyLinks/90",
-      "valueChecksum": "sha256:ef975169f36646422fb91c8a7bd7dc2bdb6178e85615f00405fea4c53511d1ba",
+      "valueChecksum": "sha256:b3313f99a4d6621851b3fca9b54824dee320fac9e094658392b7e812997cccf8",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3587,7 +3601,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-91",
       "scenarioPath": "/military/supplyLinks/91",
-      "valueChecksum": "sha256:0965b6bdb32e6102296af60bde62cf6021ac9b11d7f8660320ed3bbec0d5de8c",
+      "valueChecksum": "sha256:96a3d1bdd98e5ef39306df5c5e028a160e6a2155318402ca3154fb8e0fbf1b3c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3599,7 +3613,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-92",
       "scenarioPath": "/military/supplyLinks/92",
-      "valueChecksum": "sha256:5163600befdb339c69fa040a9a999ceacee063402079c86de37c2ef7530cac6e",
+      "valueChecksum": "sha256:8eeff6605588204e7213c18e04364ce9865dfdf97998a4e60ccb5909b8c078c7",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3611,7 +3625,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-93",
       "scenarioPath": "/military/supplyLinks/93",
-      "valueChecksum": "sha256:f2f7d8b1c9e8c18c4a9b45898fef65842795991c9f744cd90c6f3b89f088ce1f",
+      "valueChecksum": "sha256:385a2273e0b474ca845d4a664b78d6093f66ee2b5aa5cf894ee169783c8e7209",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3623,7 +3637,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-94",
       "scenarioPath": "/military/supplyLinks/94",
-      "valueChecksum": "sha256:decf2a142c405e7952f245bcd898740f7bed252acd1ab3348741fb2b06011920",
+      "valueChecksum": "sha256:ac89f7af4f0ee39caace6500bf7b3b071fc7654d51c109695ec9685238782937",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3635,7 +3649,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-95",
       "scenarioPath": "/military/supplyLinks/95",
-      "valueChecksum": "sha256:97ed9f76900f5abb3ebbd80cdb3d79bdea9b8776fb94f24c02cfad452b7585da",
+      "valueChecksum": "sha256:ef975169f36646422fb91c8a7bd7dc2bdb6178e85615f00405fea4c53511d1ba",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3647,7 +3661,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-96",
       "scenarioPath": "/military/supplyLinks/96",
-      "valueChecksum": "sha256:e5f121f54cd4ee76b2d21b74c2a7d083f355328f2ce6385a3c2b97a609ce3ae6",
+      "valueChecksum": "sha256:0965b6bdb32e6102296af60bde62cf6021ac9b11d7f8660320ed3bbec0d5de8c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3659,7 +3673,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-97",
       "scenarioPath": "/military/supplyLinks/97",
-      "valueChecksum": "sha256:f300f346d51dc6df2623a601c814b1c85f1acd30993406b6d43d59444e481600",
+      "valueChecksum": "sha256:5163600befdb339c69fa040a9a999ceacee063402079c86de37c2ef7530cac6e",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3671,7 +3685,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-98",
       "scenarioPath": "/military/supplyLinks/98",
-      "valueChecksum": "sha256:19708083d5c83d4ae59d20f4b62bd14ca58cb75a43695273654858f1d8c26d95",
+      "valueChecksum": "sha256:f2f7d8b1c9e8c18c4a9b45898fef65842795991c9f744cd90c6f3b89f088ce1f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3683,7 +3697,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-99",
       "scenarioPath": "/military/supplyLinks/99",
-      "valueChecksum": "sha256:970931c6638040cb4e16e072d5cca011ef7656bf6381bd2f67e9ab7c3145302c",
+      "valueChecksum": "sha256:decf2a142c405e7952f245bcd898740f7bed252acd1ab3348741fb2b06011920",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3695,7 +3709,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-100",
       "scenarioPath": "/military/supplyLinks/100",
-      "valueChecksum": "sha256:7495d159864ee9f0d5cfbd3a28528be9766cff2500bce39ccbc6aee3cd20e08d",
+      "valueChecksum": "sha256:97ed9f76900f5abb3ebbd80cdb3d79bdea9b8776fb94f24c02cfad452b7585da",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3707,7 +3721,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-101",
       "scenarioPath": "/military/supplyLinks/101",
-      "valueChecksum": "sha256:794933a6341b651ce7eaaa4caaa3d1587b52b4ee7cbff0ac62e2acbdfa18181f",
+      "valueChecksum": "sha256:e5f121f54cd4ee76b2d21b74c2a7d083f355328f2ce6385a3c2b97a609ce3ae6",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3719,7 +3733,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-102",
       "scenarioPath": "/military/supplyLinks/102",
-      "valueChecksum": "sha256:46afedbe1a4d7bda7fa65a74d9566160b27b5fa8ccac336ffdcc39d85449ea71",
+      "valueChecksum": "sha256:f300f346d51dc6df2623a601c814b1c85f1acd30993406b6d43d59444e481600",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3731,7 +3745,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-103",
       "scenarioPath": "/military/supplyLinks/103",
-      "valueChecksum": "sha256:8eeb64408f5626eb0c1998ebcd61a35ea961ff9e2058ef6f9f468fc73aec0bf2",
+      "valueChecksum": "sha256:19708083d5c83d4ae59d20f4b62bd14ca58cb75a43695273654858f1d8c26d95",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3743,7 +3757,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-104",
       "scenarioPath": "/military/supplyLinks/104",
-      "valueChecksum": "sha256:86c6715ff2ded58301ef8340353a30abe97d874ff0293ffcc76be65a30352ded",
+      "valueChecksum": "sha256:970931c6638040cb4e16e072d5cca011ef7656bf6381bd2f67e9ab7c3145302c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3755,7 +3769,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-105",
       "scenarioPath": "/military/supplyLinks/105",
-      "valueChecksum": "sha256:45475b9be951e7fe1dfb07b8daac91f07c4a70e9081f4ce060c6db797a8163aa",
+      "valueChecksum": "sha256:7495d159864ee9f0d5cfbd3a28528be9766cff2500bce39ccbc6aee3cd20e08d",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3767,7 +3781,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-106",
       "scenarioPath": "/military/supplyLinks/106",
-      "valueChecksum": "sha256:61a6b694bfa0083d57e7a8d200e51566db05335ff98574b1008b6447a2f068a1",
+      "valueChecksum": "sha256:794933a6341b651ce7eaaa4caaa3d1587b52b4ee7cbff0ac62e2acbdfa18181f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3779,7 +3793,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-107",
       "scenarioPath": "/military/supplyLinks/107",
-      "valueChecksum": "sha256:185b457f105e149ab6543eb332967f5e5f8c8ae935346e9ec6b9b782da5be5da",
+      "valueChecksum": "sha256:46afedbe1a4d7bda7fa65a74d9566160b27b5fa8ccac336ffdcc39d85449ea71",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3791,7 +3805,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-108",
       "scenarioPath": "/military/supplyLinks/108",
-      "valueChecksum": "sha256:3384c13e99f8a7598bc92d794b421101f86ae9b9e5bc15e012bd3c3655bd16f3",
+      "valueChecksum": "sha256:8eeb64408f5626eb0c1998ebcd61a35ea961ff9e2058ef6f9f468fc73aec0bf2",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3803,7 +3817,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-109",
       "scenarioPath": "/military/supplyLinks/109",
-      "valueChecksum": "sha256:10a0e2b6bce1ea3e3d0b6f4617b479a66b0dace941ee91e33745d47e9a777acd",
+      "valueChecksum": "sha256:86c6715ff2ded58301ef8340353a30abe97d874ff0293ffcc76be65a30352ded",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3815,7 +3829,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-110",
       "scenarioPath": "/military/supplyLinks/110",
-      "valueChecksum": "sha256:ec2cb9ec7f31f76e3373813d1314b0856d0c1980bb757a109abc1d8a775cc6d8",
+      "valueChecksum": "sha256:45475b9be951e7fe1dfb07b8daac91f07c4a70e9081f4ce060c6db797a8163aa",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3827,7 +3841,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-111",
       "scenarioPath": "/military/supplyLinks/111",
-      "valueChecksum": "sha256:8517c77b27f13a5ddd5a24740be8527120f9fa9f82b68c46710a3dd04d1e1a94",
+      "valueChecksum": "sha256:61a6b694bfa0083d57e7a8d200e51566db05335ff98574b1008b6447a2f068a1",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3839,7 +3853,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-112",
       "scenarioPath": "/military/supplyLinks/112",
-      "valueChecksum": "sha256:b46122b9a3b30f1e335569787278207ead4d6173aca06095098f4bb00b1e210f",
+      "valueChecksum": "sha256:185b457f105e149ab6543eb332967f5e5f8c8ae935346e9ec6b9b782da5be5da",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3851,7 +3865,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-113",
       "scenarioPath": "/military/supplyLinks/113",
-      "valueChecksum": "sha256:7b407af77aa7be4e0a9c55fde9a262d455e42463f31639505b80d0f491616e48",
+      "valueChecksum": "sha256:3384c13e99f8a7598bc92d794b421101f86ae9b9e5bc15e012bd3c3655bd16f3",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3863,7 +3877,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-114",
       "scenarioPath": "/military/supplyLinks/114",
-      "valueChecksum": "sha256:a9b1ff4d303ea22b16c294adb6d125e289ecb14624928267a0486a9f97ed588a",
+      "valueChecksum": "sha256:10a0e2b6bce1ea3e3d0b6f4617b479a66b0dace941ee91e33745d47e9a777acd",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3875,7 +3889,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-115",
       "scenarioPath": "/military/supplyLinks/115",
-      "valueChecksum": "sha256:f0cfb30d6df4841140702a628d63e8710b40e4cfbb27e5200cfeaebd2a217bc8",
+      "valueChecksum": "sha256:ec2cb9ec7f31f76e3373813d1314b0856d0c1980bb757a109abc1d8a775cc6d8",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3887,7 +3901,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-116",
       "scenarioPath": "/military/supplyLinks/116",
-      "valueChecksum": "sha256:e9a0d18f0c86199a83d5580b1f0741270f4606998fcd0283e98c1222a333d096",
+      "valueChecksum": "sha256:8517c77b27f13a5ddd5a24740be8527120f9fa9f82b68c46710a3dd04d1e1a94",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3899,7 +3913,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-117",
       "scenarioPath": "/military/supplyLinks/117",
-      "valueChecksum": "sha256:b729d2064a6c8a0e97c10fe8f1488e33fdf16b8e70b762b1c1009156f593fa9b",
+      "valueChecksum": "sha256:b46122b9a3b30f1e335569787278207ead4d6173aca06095098f4bb00b1e210f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3911,7 +3925,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-118",
       "scenarioPath": "/military/supplyLinks/118",
-      "valueChecksum": "sha256:516c8eafb2865d80d21c2c626d65d5ceef98164409b555d68a892a7d0ce16c56",
+      "valueChecksum": "sha256:7b407af77aa7be4e0a9c55fde9a262d455e42463f31639505b80d0f491616e48",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3923,7 +3937,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-119",
       "scenarioPath": "/military/supplyLinks/119",
-      "valueChecksum": "sha256:a4148fe4b576dce52939aa41cd72fb5fb88a8cb963504c219ea5c904804ea5e0",
+      "valueChecksum": "sha256:a9b1ff4d303ea22b16c294adb6d125e289ecb14624928267a0486a9f97ed588a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3935,7 +3949,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-120",
       "scenarioPath": "/military/supplyLinks/120",
-      "valueChecksum": "sha256:0e14caef722188efa3f3df91abf7844b32f22de22d12941dfb372cdc181eafdc",
+      "valueChecksum": "sha256:f0cfb30d6df4841140702a628d63e8710b40e4cfbb27e5200cfeaebd2a217bc8",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3947,7 +3961,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-121",
       "scenarioPath": "/military/supplyLinks/121",
-      "valueChecksum": "sha256:77a1ff6cb3b54e3c0d7fcc2dd507f58b6a95a69e71b73ed2b3bb557908b23f2b",
+      "valueChecksum": "sha256:e9a0d18f0c86199a83d5580b1f0741270f4606998fcd0283e98c1222a333d096",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3959,7 +3973,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-122",
       "scenarioPath": "/military/supplyLinks/122",
-      "valueChecksum": "sha256:5ffc9385247aafdad8c31b2d18dfbeb75a393cebf498a25f7d4f50b79ff86b27",
+      "valueChecksum": "sha256:b729d2064a6c8a0e97c10fe8f1488e33fdf16b8e70b762b1c1009156f593fa9b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3971,7 +3985,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-123",
       "scenarioPath": "/military/supplyLinks/123",
-      "valueChecksum": "sha256:fed9090cc034340d74739bb9f553e55d5e2696201c44fdbf93b47fd7510d6ba3",
+      "valueChecksum": "sha256:516c8eafb2865d80d21c2c626d65d5ceef98164409b555d68a892a7d0ce16c56",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3983,7 +3997,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-124",
       "scenarioPath": "/military/supplyLinks/124",
-      "valueChecksum": "sha256:b06a50fd6aaa60036871842e2010ee6a68f4cbfeffdf9f3c08f7c282bb9f2835",
+      "valueChecksum": "sha256:a4148fe4b576dce52939aa41cd72fb5fb88a8cb963504c219ea5c904804ea5e0",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -3995,7 +4009,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-125",
       "scenarioPath": "/military/supplyLinks/125",
-      "valueChecksum": "sha256:222dc2ead6e91880281843a4a29b57bf9c960fcf304104a0ee394ad9270a6e7e",
+      "valueChecksum": "sha256:0e14caef722188efa3f3df91abf7844b32f22de22d12941dfb372cdc181eafdc",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4007,7 +4021,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-126",
       "scenarioPath": "/military/supplyLinks/126",
-      "valueChecksum": "sha256:24d8cc571cbf82224e93ea7810cfa9252d41d8b89ac87182bd0e337ee5a36f5a",
+      "valueChecksum": "sha256:77a1ff6cb3b54e3c0d7fcc2dd507f58b6a95a69e71b73ed2b3bb557908b23f2b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4019,7 +4033,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-127",
       "scenarioPath": "/military/supplyLinks/127",
-      "valueChecksum": "sha256:c511fb29f18d2e1f422cc201a4639423f3f71bf2062044972279ba36de6974aa",
+      "valueChecksum": "sha256:5ffc9385247aafdad8c31b2d18dfbeb75a393cebf498a25f7d4f50b79ff86b27",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4031,7 +4045,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-128",
       "scenarioPath": "/military/supplyLinks/128",
-      "valueChecksum": "sha256:68bd090096b16327bd65956bb71c7c761ef178a9eb5d3f2972b5eb4c62aa4be0",
+      "valueChecksum": "sha256:fed9090cc034340d74739bb9f553e55d5e2696201c44fdbf93b47fd7510d6ba3",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4043,7 +4057,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-129",
       "scenarioPath": "/military/supplyLinks/129",
-      "valueChecksum": "sha256:b1e67a6a801d48e6e1b02e0dae88c77a6eb6cb9e3856178f2fcc618b68eedc6b",
+      "valueChecksum": "sha256:b06a50fd6aaa60036871842e2010ee6a68f4cbfeffdf9f3c08f7c282bb9f2835",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4055,7 +4069,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-130",
       "scenarioPath": "/military/supplyLinks/130",
-      "valueChecksum": "sha256:227fc317a043ab6d78f13ed6e6c71cb3480c633c9723015de9aa13aa9e94bf49",
+      "valueChecksum": "sha256:222dc2ead6e91880281843a4a29b57bf9c960fcf304104a0ee394ad9270a6e7e",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4067,7 +4081,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-131",
       "scenarioPath": "/military/supplyLinks/131",
-      "valueChecksum": "sha256:4a705ce8f4e5d87f7919659a7073d74476b9ad6409be2b25262c16ebc1841b46",
+      "valueChecksum": "sha256:24d8cc571cbf82224e93ea7810cfa9252d41d8b89ac87182bd0e337ee5a36f5a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4079,7 +4093,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-132",
       "scenarioPath": "/military/supplyLinks/132",
-      "valueChecksum": "sha256:2fbf55e33485665a84be56969ec8661831fa5e3601ae8c5f30d702d322b70581",
+      "valueChecksum": "sha256:c511fb29f18d2e1f422cc201a4639423f3f71bf2062044972279ba36de6974aa",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4091,7 +4105,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-133",
       "scenarioPath": "/military/supplyLinks/133",
-      "valueChecksum": "sha256:f0cd3e2845fbe93fb87e61c9dba2dbe2f27e0135a7ec4239ae694c628428db7a",
+      "valueChecksum": "sha256:68bd090096b16327bd65956bb71c7c761ef178a9eb5d3f2972b5eb4c62aa4be0",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4103,7 +4117,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-134",
       "scenarioPath": "/military/supplyLinks/134",
-      "valueChecksum": "sha256:43adfdd54c1a09bcde7eb3f9f0cd9b9a232c005975976dd6e138b2043e01678c",
+      "valueChecksum": "sha256:b1e67a6a801d48e6e1b02e0dae88c77a6eb6cb9e3856178f2fcc618b68eedc6b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4115,7 +4129,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-135",
       "scenarioPath": "/military/supplyLinks/135",
-      "valueChecksum": "sha256:b628cfe819a35fdaa582c46a7d4ecbee6c8fbbb088325b9c74fbdecc12d3af73",
+      "valueChecksum": "sha256:227fc317a043ab6d78f13ed6e6c71cb3480c633c9723015de9aa13aa9e94bf49",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4127,7 +4141,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-136",
       "scenarioPath": "/military/supplyLinks/136",
-      "valueChecksum": "sha256:9b47423d3798b76a165922c408de31011a4f435f054cadfb3b0d02e24ef74fb8",
+      "valueChecksum": "sha256:4a705ce8f4e5d87f7919659a7073d74476b9ad6409be2b25262c16ebc1841b46",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4139,7 +4153,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-137",
       "scenarioPath": "/military/supplyLinks/137",
-      "valueChecksum": "sha256:e2440fd3f8ecbad969d08e8e7173bea328ceded2e13e307c9c9704454790d36f",
+      "valueChecksum": "sha256:2fbf55e33485665a84be56969ec8661831fa5e3601ae8c5f30d702d322b70581",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4151,7 +4165,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-138",
       "scenarioPath": "/military/supplyLinks/138",
-      "valueChecksum": "sha256:17e3db79be90474728bb03c91e08754ea21eea8b21deb6d943780b79415f2f31",
+      "valueChecksum": "sha256:f0cd3e2845fbe93fb87e61c9dba2dbe2f27e0135a7ec4239ae694c628428db7a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4163,7 +4177,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-139",
       "scenarioPath": "/military/supplyLinks/139",
-      "valueChecksum": "sha256:7d5a1b388b3075d06aa589d4d4d715101db1165270c38c4d9a17a076733986a7",
+      "valueChecksum": "sha256:43adfdd54c1a09bcde7eb3f9f0cd9b9a232c005975976dd6e138b2043e01678c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4175,7 +4189,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-140",
       "scenarioPath": "/military/supplyLinks/140",
-      "valueChecksum": "sha256:af7d58981245a8bc22548a0f0361f78c7173c34781d641e5a4aa172240b475c0",
+      "valueChecksum": "sha256:b628cfe819a35fdaa582c46a7d4ecbee6c8fbbb088325b9c74fbdecc12d3af73",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4187,7 +4201,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-141",
       "scenarioPath": "/military/supplyLinks/141",
-      "valueChecksum": "sha256:a1194d11863bb97eecdab1400ca1d687aeb700e09e2ea9a1745a1640cd6d1459",
+      "valueChecksum": "sha256:9b47423d3798b76a165922c408de31011a4f435f054cadfb3b0d02e24ef74fb8",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4199,7 +4213,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-142",
       "scenarioPath": "/military/supplyLinks/142",
-      "valueChecksum": "sha256:3e7f504c223e7eed35681f6093a5e7d1c5579a4d5cb68af97d0dc42ba2316f39",
+      "valueChecksum": "sha256:e2440fd3f8ecbad969d08e8e7173bea328ceded2e13e307c9c9704454790d36f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4211,7 +4225,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-143",
       "scenarioPath": "/military/supplyLinks/143",
-      "valueChecksum": "sha256:ace20949d4d93636166e7576f041310e465627f651316f56db97c9426cb9669b",
+      "valueChecksum": "sha256:17e3db79be90474728bb03c91e08754ea21eea8b21deb6d943780b79415f2f31",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4223,7 +4237,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-144",
       "scenarioPath": "/military/supplyLinks/144",
-      "valueChecksum": "sha256:36e55fe3473666b792da5f22a8d02ba370489b01e47f913c2621955d33dc9929",
+      "valueChecksum": "sha256:7d5a1b388b3075d06aa589d4d4d715101db1165270c38c4d9a17a076733986a7",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4235,7 +4249,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-145",
       "scenarioPath": "/military/supplyLinks/145",
-      "valueChecksum": "sha256:1449730eb7330c644a59172bddd9462cb869012d1ce1a16d0d2bd9f723457ee5",
+      "valueChecksum": "sha256:af7d58981245a8bc22548a0f0361f78c7173c34781d641e5a4aa172240b475c0",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4247,7 +4261,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-146",
       "scenarioPath": "/military/supplyLinks/146",
-      "valueChecksum": "sha256:27e00dfc3bea8c72bf1e7cdf04c6face3840dba2163823041806fec6564502d7",
+      "valueChecksum": "sha256:a1194d11863bb97eecdab1400ca1d687aeb700e09e2ea9a1745a1640cd6d1459",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4259,7 +4273,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-147",
       "scenarioPath": "/military/supplyLinks/147",
-      "valueChecksum": "sha256:57edc35bac3af8bd90eb443e057545cf0390eab5bd6279fd8aa1e326ba286138",
+      "valueChecksum": "sha256:3e7f504c223e7eed35681f6093a5e7d1c5579a4d5cb68af97d0dc42ba2316f39",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4271,7 +4285,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-148",
       "scenarioPath": "/military/supplyLinks/148",
-      "valueChecksum": "sha256:ce8bb911d30eda7d1515a627eac7f9b3e19ed47f1bbde1a0d222719419ac590d",
+      "valueChecksum": "sha256:ace20949d4d93636166e7576f041310e465627f651316f56db97c9426cb9669b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4283,7 +4297,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-149",
       "scenarioPath": "/military/supplyLinks/149",
-      "valueChecksum": "sha256:6d688ad6b78e22af997658c3aab85d64a65bdaac76f4d874604c5282b91fdc5c",
+      "valueChecksum": "sha256:36e55fe3473666b792da5f22a8d02ba370489b01e47f913c2621955d33dc9929",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4295,7 +4309,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-150",
       "scenarioPath": "/military/supplyLinks/150",
-      "valueChecksum": "sha256:faa838977260267f2ac128c3f52ec57d35de892d5817f824d933a7a002c867e6",
+      "valueChecksum": "sha256:1449730eb7330c644a59172bddd9462cb869012d1ce1a16d0d2bd9f723457ee5",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4307,7 +4321,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-151",
       "scenarioPath": "/military/supplyLinks/151",
-      "valueChecksum": "sha256:6b4a00204a8b74b9fe288e0a03eeac75df6723a04ec5676f51c5b9bc6a02cc20",
+      "valueChecksum": "sha256:27e00dfc3bea8c72bf1e7cdf04c6face3840dba2163823041806fec6564502d7",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4319,7 +4333,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-152",
       "scenarioPath": "/military/supplyLinks/152",
-      "valueChecksum": "sha256:6f4841201ca49a0cd66cdae5d78063bd373f623e12f21ee8830c158ea5a92d22",
+      "valueChecksum": "sha256:57edc35bac3af8bd90eb443e057545cf0390eab5bd6279fd8aa1e326ba286138",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4331,7 +4345,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-153",
       "scenarioPath": "/military/supplyLinks/153",
-      "valueChecksum": "sha256:809cb582f06585c6d37ffe012b4a14ba0636a3a5fdaf8be2e36051f6b39c8b47",
+      "valueChecksum": "sha256:ce8bb911d30eda7d1515a627eac7f9b3e19ed47f1bbde1a0d222719419ac590d",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4343,7 +4357,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-154",
       "scenarioPath": "/military/supplyLinks/154",
-      "valueChecksum": "sha256:2f2ca1b37f252fe37db3f4e4e82001696c34a143b537167d26ffbaf6e13553c3",
+      "valueChecksum": "sha256:6d688ad6b78e22af997658c3aab85d64a65bdaac76f4d874604c5282b91fdc5c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4355,7 +4369,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-155",
       "scenarioPath": "/military/supplyLinks/155",
-      "valueChecksum": "sha256:c7985b28a3cb8af993a63e607c2998bb085e5fd78c8d4ecc634fef169aa8383a",
+      "valueChecksum": "sha256:faa838977260267f2ac128c3f52ec57d35de892d5817f824d933a7a002c867e6",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4367,7 +4381,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-156",
       "scenarioPath": "/military/supplyLinks/156",
-      "valueChecksum": "sha256:3175e1ec8a49b59a8ba63032bf7ae3b79ec30f7c5a1cd655ec1772f1f27702a5",
+      "valueChecksum": "sha256:6b4a00204a8b74b9fe288e0a03eeac75df6723a04ec5676f51c5b9bc6a02cc20",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4379,7 +4393,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-157",
       "scenarioPath": "/military/supplyLinks/157",
-      "valueChecksum": "sha256:a4b7d251147d9840d53c88d5e5fecbd9fb9e527cde2f80f399c2575a2de27e98",
+      "valueChecksum": "sha256:6f4841201ca49a0cd66cdae5d78063bd373f623e12f21ee8830c158ea5a92d22",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4391,7 +4405,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-158",
       "scenarioPath": "/military/supplyLinks/158",
-      "valueChecksum": "sha256:60c942ce6d2b8bbb89c8e37697891f4e2263eda77006b81b5aa323c59de406ef",
+      "valueChecksum": "sha256:809cb582f06585c6d37ffe012b4a14ba0636a3a5fdaf8be2e36051f6b39c8b47",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4403,7 +4417,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-159",
       "scenarioPath": "/military/supplyLinks/159",
-      "valueChecksum": "sha256:18f09a5f29a317d5633ebaa9059c5e132e29f4bde643b06b6638262a21f731e3",
+      "valueChecksum": "sha256:2f2ca1b37f252fe37db3f4e4e82001696c34a143b537167d26ffbaf6e13553c3",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4415,7 +4429,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-160",
       "scenarioPath": "/military/supplyLinks/160",
-      "valueChecksum": "sha256:5739eae036c374cd62f522bbe9a4389dc3e96503f4e952821f3a20b1dfecd5f7",
+      "valueChecksum": "sha256:c7985b28a3cb8af993a63e607c2998bb085e5fd78c8d4ecc634fef169aa8383a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4427,7 +4441,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-161",
       "scenarioPath": "/military/supplyLinks/161",
-      "valueChecksum": "sha256:ea55b3b6ccf0dbdfff79c1251913d0e3e9c8106a46121e55de0d8b6cc44c5b1f",
+      "valueChecksum": "sha256:3175e1ec8a49b59a8ba63032bf7ae3b79ec30f7c5a1cd655ec1772f1f27702a5",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4439,7 +4453,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-162",
       "scenarioPath": "/military/supplyLinks/162",
-      "valueChecksum": "sha256:c7ba06926ed592e5adc050221a7e0e06e3850c94b98f92553d25e4f587a20328",
+      "valueChecksum": "sha256:a4b7d251147d9840d53c88d5e5fecbd9fb9e527cde2f80f399c2575a2de27e98",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4451,7 +4465,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-163",
       "scenarioPath": "/military/supplyLinks/163",
-      "valueChecksum": "sha256:0ff8f38a218326eef638de9d37f95da2c351989ef7ba5a16ae391f10b26d26b4",
+      "valueChecksum": "sha256:60c942ce6d2b8bbb89c8e37697891f4e2263eda77006b81b5aa323c59de406ef",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4463,7 +4477,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-164",
       "scenarioPath": "/military/supplyLinks/164",
-      "valueChecksum": "sha256:40529fc901ed65ca1ad3ab91d135c96f935f5ef167886b8b1ce52f52afe9ce8a",
+      "valueChecksum": "sha256:18f09a5f29a317d5633ebaa9059c5e132e29f4bde643b06b6638262a21f731e3",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4475,7 +4489,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-165",
       "scenarioPath": "/military/supplyLinks/165",
-      "valueChecksum": "sha256:707231c34dc2d3d379396945758a2ea17c892fc02ac985077a84135eaf9d0e69",
+      "valueChecksum": "sha256:5739eae036c374cd62f522bbe9a4389dc3e96503f4e952821f3a20b1dfecd5f7",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4487,7 +4501,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-166",
       "scenarioPath": "/military/supplyLinks/166",
-      "valueChecksum": "sha256:501a7ea600c6e5cd280d6361a71122f1784bccf3f7683089ea01bf87bc966536",
+      "valueChecksum": "sha256:ea55b3b6ccf0dbdfff79c1251913d0e3e9c8106a46121e55de0d8b6cc44c5b1f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4499,7 +4513,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-167",
       "scenarioPath": "/military/supplyLinks/167",
-      "valueChecksum": "sha256:380bec18982f36a5ccb26b04f2bf7ed78be9962b99a6bb058479b631098cc707",
+      "valueChecksum": "sha256:c7ba06926ed592e5adc050221a7e0e06e3850c94b98f92553d25e4f587a20328",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4511,7 +4525,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-168",
       "scenarioPath": "/military/supplyLinks/168",
-      "valueChecksum": "sha256:4f0c1cbf090d15e1e7c1c3cff3d8aaeacc2944e16bf40c9fa52cab7ae7639e62",
+      "valueChecksum": "sha256:0ff8f38a218326eef638de9d37f95da2c351989ef7ba5a16ae391f10b26d26b4",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4523,7 +4537,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-169",
       "scenarioPath": "/military/supplyLinks/169",
-      "valueChecksum": "sha256:a978c8d5cdeafdd08c321e098a43b3b5d492253680c0c0138426d66ed38ed016",
+      "valueChecksum": "sha256:40529fc901ed65ca1ad3ab91d135c96f935f5ef167886b8b1ce52f52afe9ce8a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4535,7 +4549,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-170",
       "scenarioPath": "/military/supplyLinks/170",
-      "valueChecksum": "sha256:098388e5107f9655316c5b5215033759174dc24cbedb9a1b7b735739dcd60f40",
+      "valueChecksum": "sha256:707231c34dc2d3d379396945758a2ea17c892fc02ac985077a84135eaf9d0e69",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4547,7 +4561,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-171",
       "scenarioPath": "/military/supplyLinks/171",
-      "valueChecksum": "sha256:13a64fb4dd4322f19aaa21994cd0f9c184414f26d25bdb8b8a60a671f4f43d2b",
+      "valueChecksum": "sha256:501a7ea600c6e5cd280d6361a71122f1784bccf3f7683089ea01bf87bc966536",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4559,7 +4573,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-172",
       "scenarioPath": "/military/supplyLinks/172",
-      "valueChecksum": "sha256:7a19ff1d80a296526be39308854a427b389321de7940de132ea28858b2011cb3",
+      "valueChecksum": "sha256:380bec18982f36a5ccb26b04f2bf7ed78be9962b99a6bb058479b631098cc707",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4571,7 +4585,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-173",
       "scenarioPath": "/military/supplyLinks/173",
-      "valueChecksum": "sha256:094eb8ae86859d3c35ebc96c6cc535b3937f6dbe00fa0ab554a53113cf8bd9da",
+      "valueChecksum": "sha256:4f0c1cbf090d15e1e7c1c3cff3d8aaeacc2944e16bf40c9fa52cab7ae7639e62",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4583,7 +4597,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-174",
       "scenarioPath": "/military/supplyLinks/174",
-      "valueChecksum": "sha256:beabad364e2378f5acfe61fa45753f1028099144dee7b2086405ab74421e8233",
+      "valueChecksum": "sha256:a978c8d5cdeafdd08c321e098a43b3b5d492253680c0c0138426d66ed38ed016",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4595,7 +4609,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-175",
       "scenarioPath": "/military/supplyLinks/175",
-      "valueChecksum": "sha256:6eff9009ee1b9d549a3afddd831dbc75d3efcc6d531f1178738ce79c08ad39c4",
+      "valueChecksum": "sha256:098388e5107f9655316c5b5215033759174dc24cbedb9a1b7b735739dcd60f40",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4607,7 +4621,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-176",
       "scenarioPath": "/military/supplyLinks/176",
-      "valueChecksum": "sha256:9d037395cb017863207134f4eff81b2dc6ff1580150755cb74825eb95e5464e6",
+      "valueChecksum": "sha256:13a64fb4dd4322f19aaa21994cd0f9c184414f26d25bdb8b8a60a671f4f43d2b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4619,7 +4633,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-177",
       "scenarioPath": "/military/supplyLinks/177",
-      "valueChecksum": "sha256:1e4e94a98b7285a350926cc5104f34b1287e9a6e0342a02f0d83cff49a7d43a1",
+      "valueChecksum": "sha256:7a19ff1d80a296526be39308854a427b389321de7940de132ea28858b2011cb3",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4631,7 +4645,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-178",
       "scenarioPath": "/military/supplyLinks/178",
-      "valueChecksum": "sha256:de84c26bacf7d9da0c32e9025a6b452f692a270f6d478b06b428b68959d65aef",
+      "valueChecksum": "sha256:094eb8ae86859d3c35ebc96c6cc535b3937f6dbe00fa0ab554a53113cf8bd9da",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4643,7 +4657,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-179",
       "scenarioPath": "/military/supplyLinks/179",
-      "valueChecksum": "sha256:dd2dbc6c38b13bf0c66c2e308d04645c3bb561abd73678c379bb64396400b37a",
+      "valueChecksum": "sha256:beabad364e2378f5acfe61fa45753f1028099144dee7b2086405ab74421e8233",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4655,7 +4669,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-180",
       "scenarioPath": "/military/supplyLinks/180",
-      "valueChecksum": "sha256:317d469bfc2f1e7b48538e43641297669eb635d958f553aca10f126423f0f1e1",
+      "valueChecksum": "sha256:6eff9009ee1b9d549a3afddd831dbc75d3efcc6d531f1178738ce79c08ad39c4",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4667,7 +4681,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-181",
       "scenarioPath": "/military/supplyLinks/181",
-      "valueChecksum": "sha256:6628ec03ac3a132263752fcc8c7662ec5761a23bf0dc5b262dd5eff26d298ffc",
+      "valueChecksum": "sha256:9d037395cb017863207134f4eff81b2dc6ff1580150755cb74825eb95e5464e6",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4679,7 +4693,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-182",
       "scenarioPath": "/military/supplyLinks/182",
-      "valueChecksum": "sha256:0c799db8a2575bcd21a48d6d4e3b67adae226550ebffe56ff043d564b019bd22",
+      "valueChecksum": "sha256:1e4e94a98b7285a350926cc5104f34b1287e9a6e0342a02f0d83cff49a7d43a1",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4691,7 +4705,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-183",
       "scenarioPath": "/military/supplyLinks/183",
-      "valueChecksum": "sha256:b2062bef26d3fd5bb01959992ae293fd590053bbbcf4c0270abc099c05de841d",
+      "valueChecksum": "sha256:de84c26bacf7d9da0c32e9025a6b452f692a270f6d478b06b428b68959d65aef",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4703,7 +4717,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-184",
       "scenarioPath": "/military/supplyLinks/184",
-      "valueChecksum": "sha256:1c78b72e9115ae94d98f389dc8fb36c3f367d0da1bb7c31398e63ef14d5f4de9",
+      "valueChecksum": "sha256:dd2dbc6c38b13bf0c66c2e308d04645c3bb561abd73678c379bb64396400b37a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4715,7 +4729,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-185",
       "scenarioPath": "/military/supplyLinks/185",
-      "valueChecksum": "sha256:05bb39e5453c430ca7cd60afa3e551f0c0c06857fb6786669552e675710c6ed9",
+      "valueChecksum": "sha256:317d469bfc2f1e7b48538e43641297669eb635d958f553aca10f126423f0f1e1",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4727,7 +4741,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-186",
       "scenarioPath": "/military/supplyLinks/186",
-      "valueChecksum": "sha256:2e87132f5a614d1e76d2b6b162f71a420d61f9f76e899fbe7848f3d91aeff422",
+      "valueChecksum": "sha256:6628ec03ac3a132263752fcc8c7662ec5761a23bf0dc5b262dd5eff26d298ffc",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4739,7 +4753,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-187",
       "scenarioPath": "/military/supplyLinks/187",
-      "valueChecksum": "sha256:3332756027b64c3ce0d628ea5b150baaf98b427b771ee249a4cd7033938db115",
+      "valueChecksum": "sha256:0c799db8a2575bcd21a48d6d4e3b67adae226550ebffe56ff043d564b019bd22",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4751,7 +4765,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-188",
       "scenarioPath": "/military/supplyLinks/188",
-      "valueChecksum": "sha256:24da45774cc2a2e042ff1b3a43e9dab3de4fddb9a99f40dcb604fc261da6db29",
+      "valueChecksum": "sha256:b2062bef26d3fd5bb01959992ae293fd590053bbbcf4c0270abc099c05de841d",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4763,7 +4777,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-189",
       "scenarioPath": "/military/supplyLinks/189",
-      "valueChecksum": "sha256:527dd158b2a1ea39cad4635453e089b459e7829cb1dc146251137bcaff5a12ca",
+      "valueChecksum": "sha256:1c78b72e9115ae94d98f389dc8fb36c3f367d0da1bb7c31398e63ef14d5f4de9",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4775,7 +4789,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-190",
       "scenarioPath": "/military/supplyLinks/190",
-      "valueChecksum": "sha256:756ee295f6c008cec0060f720be086e71c82f132fe51048a7f22f974c44b8e48",
+      "valueChecksum": "sha256:05bb39e5453c430ca7cd60afa3e551f0c0c06857fb6786669552e675710c6ed9",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4787,7 +4801,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-191",
       "scenarioPath": "/military/supplyLinks/191",
-      "valueChecksum": "sha256:edcdca6cbbfd1c2e298c2dd16aa61043a96f36856be86694c5f384085231b3e4",
+      "valueChecksum": "sha256:2e87132f5a614d1e76d2b6b162f71a420d61f9f76e899fbe7848f3d91aeff422",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4799,7 +4813,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-192",
       "scenarioPath": "/military/supplyLinks/192",
-      "valueChecksum": "sha256:b782defde5d8a9253676f990fa4720ad9b0453ed15e15d8318ca6d9f1b0e7b35",
+      "valueChecksum": "sha256:3332756027b64c3ce0d628ea5b150baaf98b427b771ee249a4cd7033938db115",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4811,7 +4825,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-193",
       "scenarioPath": "/military/supplyLinks/193",
-      "valueChecksum": "sha256:d9c8d3cf3800e2167adedb01c8955f3cad4549a058c17f3241cd227f7f211f6e",
+      "valueChecksum": "sha256:24da45774cc2a2e042ff1b3a43e9dab3de4fddb9a99f40dcb604fc261da6db29",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4823,7 +4837,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-194",
       "scenarioPath": "/military/supplyLinks/194",
-      "valueChecksum": "sha256:5b2c00b8fdf059b6a924da8353f8642bf61e08f3f4e00a26a40ef756922a60a1",
+      "valueChecksum": "sha256:527dd158b2a1ea39cad4635453e089b459e7829cb1dc146251137bcaff5a12ca",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4835,7 +4849,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-195",
       "scenarioPath": "/military/supplyLinks/195",
-      "valueChecksum": "sha256:83bf3fafa20e7247b3140a259fddc66274b4960cef1f0719210dfab7717d50a2",
+      "valueChecksum": "sha256:756ee295f6c008cec0060f720be086e71c82f132fe51048a7f22f974c44b8e48",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4847,7 +4861,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-196",
       "scenarioPath": "/military/supplyLinks/196",
-      "valueChecksum": "sha256:5a98dbd4d4a2c0ba66990b221999f6e8eb4f5b014ada79881a1e97e0f82b443f",
+      "valueChecksum": "sha256:edcdca6cbbfd1c2e298c2dd16aa61043a96f36856be86694c5f384085231b3e4",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4859,7 +4873,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-197",
       "scenarioPath": "/military/supplyLinks/197",
-      "valueChecksum": "sha256:ced77d57ec2435aed5a153eb8dcdad1ce5f7516868a99095ff42f6618ca497df",
+      "valueChecksum": "sha256:b782defde5d8a9253676f990fa4720ad9b0453ed15e15d8318ca6d9f1b0e7b35",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4871,7 +4885,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-198",
       "scenarioPath": "/military/supplyLinks/198",
-      "valueChecksum": "sha256:78e7aa298fdc1644a7a9d9db1cc91e0a87fc468ffc57185605829e5e3184cfc1",
+      "valueChecksum": "sha256:d9c8d3cf3800e2167adedb01c8955f3cad4549a058c17f3241cd227f7f211f6e",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4883,7 +4897,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-199",
       "scenarioPath": "/military/supplyLinks/199",
-      "valueChecksum": "sha256:6e637c6aa8d9c582f7fd7d270a8b51b9e3ee2a5f49add6325b44616c5673c4b1",
+      "valueChecksum": "sha256:5b2c00b8fdf059b6a924da8353f8642bf61e08f3f4e00a26a40ef756922a60a1",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4895,7 +4909,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-200",
       "scenarioPath": "/military/supplyLinks/200",
-      "valueChecksum": "sha256:e594e85805fec45ad0c8ba7ded5576bddfae5809c48c8c6539f23c3534236d64",
+      "valueChecksum": "sha256:83bf3fafa20e7247b3140a259fddc66274b4960cef1f0719210dfab7717d50a2",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4907,7 +4921,7 @@
     {
       "claimId": "starting-state-claim:military-supply-links-201",
       "scenarioPath": "/military/supplyLinks/201",
-      "valueChecksum": "sha256:2283948c4aa65c4d28386bbcc874787c307fd958f86761e1feeb8fd4e7be43e1",
+      "valueChecksum": "sha256:5a98dbd4d4a2c0ba66990b221999f6e8eb4f5b014ada79881a1e97e0f82b443f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:openhistoricalmap"
@@ -4919,6 +4933,66 @@
     {
       "claimId": "starting-state-claim:military-supply-links-202",
       "scenarioPath": "/military/supplyLinks/202",
+      "valueChecksum": "sha256:ced77d57ec2435aed5a153eb8dcdad1ce5f7516868a99095ff42f6618ca497df",
+      "basis": "authored-estimate",
+      "sourceRefs": [
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Encode a conservative bounded starting value from the cited scenario references; engine-only ordinal values are estimates, not measured historical quantities.",
+      "confidence": "low",
+      "todo": "Owner-review this exact checksum-bound row and replace the estimate when a more specific table-level source is available."
+    },
+    {
+      "claimId": "starting-state-claim:military-supply-links-203",
+      "scenarioPath": "/military/supplyLinks/203",
+      "valueChecksum": "sha256:78e7aa298fdc1644a7a9d9db1cc91e0a87fc468ffc57185605829e5e3184cfc1",
+      "basis": "authored-estimate",
+      "sourceRefs": [
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Encode a conservative bounded starting value from the cited scenario references; engine-only ordinal values are estimates, not measured historical quantities.",
+      "confidence": "low",
+      "todo": "Owner-review this exact checksum-bound row and replace the estimate when a more specific table-level source is available."
+    },
+    {
+      "claimId": "starting-state-claim:military-supply-links-204",
+      "scenarioPath": "/military/supplyLinks/204",
+      "valueChecksum": "sha256:6e637c6aa8d9c582f7fd7d270a8b51b9e3ee2a5f49add6325b44616c5673c4b1",
+      "basis": "authored-estimate",
+      "sourceRefs": [
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Encode a conservative bounded starting value from the cited scenario references; engine-only ordinal values are estimates, not measured historical quantities.",
+      "confidence": "low",
+      "todo": "Owner-review this exact checksum-bound row and replace the estimate when a more specific table-level source is available."
+    },
+    {
+      "claimId": "starting-state-claim:military-supply-links-205",
+      "scenarioPath": "/military/supplyLinks/205",
+      "valueChecksum": "sha256:e594e85805fec45ad0c8ba7ded5576bddfae5809c48c8c6539f23c3534236d64",
+      "basis": "authored-estimate",
+      "sourceRefs": [
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Encode a conservative bounded starting value from the cited scenario references; engine-only ordinal values are estimates, not measured historical quantities.",
+      "confidence": "low",
+      "todo": "Owner-review this exact checksum-bound row and replace the estimate when a more specific table-level source is available."
+    },
+    {
+      "claimId": "starting-state-claim:military-supply-links-206",
+      "scenarioPath": "/military/supplyLinks/206",
+      "valueChecksum": "sha256:2283948c4aa65c4d28386bbcc874787c307fd958f86761e1feeb8fd4e7be43e1",
+      "basis": "authored-estimate",
+      "sourceRefs": [
+        "source:europe-1935-benchmark:openhistoricalmap"
+      ],
+      "method": "Encode a conservative bounded starting value from the cited scenario references; engine-only ordinal values are estimates, not measured historical quantities.",
+      "confidence": "low",
+      "todo": "Owner-review this exact checksum-bound row and replace the estimate when a more specific table-level source is available."
+    },
+    {
+      "claimId": "starting-state-claim:military-supply-links-207",
+      "scenarioPath": "/military/supplyLinks/207",
       "valueChecksum": "sha256:65711518a3f56ba87cab3cb48164a8f9af53b2548debd724308e3791fd23c837",
       "basis": "authored-estimate",
       "sourceRefs": [
@@ -7355,7 +7429,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-14",
       "scenarioPath": "/identity/regions/14",
-      "valueChecksum": "sha256:422685f935da798c5b5dfcf0ff6bb9a584eae1b8fd27866f5c119158410c13f0",
+      "valueChecksum": "sha256:076b79b9860bc333c576f489ef7fdd1e83dbc6360493eb10e8d60348fc2fbb3f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7403,7 +7477,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-18",
       "scenarioPath": "/identity/regions/18",
-      "valueChecksum": "sha256:3841c8239d9942679357e086c7f3889d71e91af7852597164e6f94b62b65618b",
+      "valueChecksum": "sha256:d953841efc3e01464aad8c55e1cc29ddc4c894b00943f4df95a53da6fb8b0e32",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7415,7 +7489,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-19",
       "scenarioPath": "/identity/regions/19",
-      "valueChecksum": "sha256:163f728846d569b054548db506cd8153d230dcd16ad7f7c5352e0f7f78801345",
+      "valueChecksum": "sha256:3841c8239d9942679357e086c7f3889d71e91af7852597164e6f94b62b65618b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7427,7 +7501,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-20",
       "scenarioPath": "/identity/regions/20",
-      "valueChecksum": "sha256:fb91461a7f2a664df2b83583d4b68887ade2ee410d7846ccdcfdc2fc57b45ea8",
+      "valueChecksum": "sha256:2cf61389579bc5a21518e27ddc0e940f5247da389e1b9e3771dd5f083bbd8b95",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7439,7 +7513,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-21",
       "scenarioPath": "/identity/regions/21",
-      "valueChecksum": "sha256:6c1768158429a3af27234bd8136170262e246af7a2cc2a6af507d8315c18883c",
+      "valueChecksum": "sha256:fb91461a7f2a664df2b83583d4b68887ade2ee410d7846ccdcfdc2fc57b45ea8",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7451,7 +7525,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-22",
       "scenarioPath": "/identity/regions/22",
-      "valueChecksum": "sha256:cb106817a87202f08eb9ac6068328c2a0d4f8208fdf389c939803a8f8b39e5c2",
+      "valueChecksum": "sha256:6c1768158429a3af27234bd8136170262e246af7a2cc2a6af507d8315c18883c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7463,7 +7537,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-23",
       "scenarioPath": "/identity/regions/23",
-      "valueChecksum": "sha256:d35aa8e450272cb7309f75fd615cd7d404cbea1bc1297d8a62c8123f38e04a0a",
+      "valueChecksum": "sha256:cb106817a87202f08eb9ac6068328c2a0d4f8208fdf389c939803a8f8b39e5c2",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7475,7 +7549,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-24",
       "scenarioPath": "/identity/regions/24",
-      "valueChecksum": "sha256:fdabf5e9d74d1bea6d383e6629406f59b81655c7869ae8e7ba2e2ddc0a0aaf30",
+      "valueChecksum": "sha256:d35aa8e450272cb7309f75fd615cd7d404cbea1bc1297d8a62c8123f38e04a0a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7487,7 +7561,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-25",
       "scenarioPath": "/identity/regions/25",
-      "valueChecksum": "sha256:7eeded8d0f57b16d37bfaedb255b9237a19fa3a908931cbbd474abcfda455cd2",
+      "valueChecksum": "sha256:fdabf5e9d74d1bea6d383e6629406f59b81655c7869ae8e7ba2e2ddc0a0aaf30",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7499,7 +7573,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-26",
       "scenarioPath": "/identity/regions/26",
-      "valueChecksum": "sha256:ba7965afc410b4fdebd706c160dc3307ce7638bc49ffb17510fde386d219d065",
+      "valueChecksum": "sha256:7eeded8d0f57b16d37bfaedb255b9237a19fa3a908931cbbd474abcfda455cd2",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7511,7 +7585,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-27",
       "scenarioPath": "/identity/regions/27",
-      "valueChecksum": "sha256:a0fb16883fcd8452d8d788f2580473a023aafc97d4facea6fc49f7f75914489a",
+      "valueChecksum": "sha256:ba7965afc410b4fdebd706c160dc3307ce7638bc49ffb17510fde386d219d065",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7523,7 +7597,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-28",
       "scenarioPath": "/identity/regions/28",
-      "valueChecksum": "sha256:07a78eb4e8b48c1edb7b854fb72c9edf12eab0e1cf14c44fa87c6a1f8f99aaf9",
+      "valueChecksum": "sha256:a0fb16883fcd8452d8d788f2580473a023aafc97d4facea6fc49f7f75914489a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7535,7 +7609,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-29",
       "scenarioPath": "/identity/regions/29",
-      "valueChecksum": "sha256:c59be08839bdb333e008ff64e87e4f2adda6fd3803fe191d15a20164d458b5c8",
+      "valueChecksum": "sha256:07a78eb4e8b48c1edb7b854fb72c9edf12eab0e1cf14c44fa87c6a1f8f99aaf9",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7547,7 +7621,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-30",
       "scenarioPath": "/identity/regions/30",
-      "valueChecksum": "sha256:b586618fa2d3857069a2b88e895e8ecd1db4aa44b43a672cf09fa65086c60b9e",
+      "valueChecksum": "sha256:c59be08839bdb333e008ff64e87e4f2adda6fd3803fe191d15a20164d458b5c8",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7559,7 +7633,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-31",
       "scenarioPath": "/identity/regions/31",
-      "valueChecksum": "sha256:c79799eb8832e3287719f7c2ed162cedd8cdbff4fbd86639fe5b6684bba0c932",
+      "valueChecksum": "sha256:b586618fa2d3857069a2b88e895e8ecd1db4aa44b43a672cf09fa65086c60b9e",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7571,7 +7645,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-32",
       "scenarioPath": "/identity/regions/32",
-      "valueChecksum": "sha256:ad20d9ac786ae50967a330e431c162968594db4225fe7d2e19b84b1365d0ec36",
+      "valueChecksum": "sha256:c79799eb8832e3287719f7c2ed162cedd8cdbff4fbd86639fe5b6684bba0c932",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7583,7 +7657,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-33",
       "scenarioPath": "/identity/regions/33",
-      "valueChecksum": "sha256:0052d99f2f48490fb284bff2ade8b3c7dcff994eb7af1d413d075a6853a786a6",
+      "valueChecksum": "sha256:ad20d9ac786ae50967a330e431c162968594db4225fe7d2e19b84b1365d0ec36",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7595,7 +7669,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-34",
       "scenarioPath": "/identity/regions/34",
-      "valueChecksum": "sha256:713f3762d5d09b2ea1095999b86bc6f78108241cf087126ab792a9e5eecb0d9a",
+      "valueChecksum": "sha256:0052d99f2f48490fb284bff2ade8b3c7dcff994eb7af1d413d075a6853a786a6",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7607,7 +7681,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-35",
       "scenarioPath": "/identity/regions/35",
-      "valueChecksum": "sha256:d068f9ae6651cecacde658fc90ddeb8d1a03f053b43926e123b3a76929379eb5",
+      "valueChecksum": "sha256:713f3762d5d09b2ea1095999b86bc6f78108241cf087126ab792a9e5eecb0d9a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7619,7 +7693,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-36",
       "scenarioPath": "/identity/regions/36",
-      "valueChecksum": "sha256:4defce0fd282afb19e1f4df6aea687512a222932019156d200871e7189755097",
+      "valueChecksum": "sha256:d068f9ae6651cecacde658fc90ddeb8d1a03f053b43926e123b3a76929379eb5",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7631,7 +7705,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-37",
       "scenarioPath": "/identity/regions/37",
-      "valueChecksum": "sha256:3f706f4f3e7183a40aaab53344d553e9b1b4118106e5b9f4579be47453d8b497",
+      "valueChecksum": "sha256:4defce0fd282afb19e1f4df6aea687512a222932019156d200871e7189755097",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7643,7 +7717,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-38",
       "scenarioPath": "/identity/regions/38",
-      "valueChecksum": "sha256:ff26e3b33530adafdd0f6b07e139fb700d9d4c4939865e0375ea397f5622ae6c",
+      "valueChecksum": "sha256:3f706f4f3e7183a40aaab53344d553e9b1b4118106e5b9f4579be47453d8b497",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7655,7 +7729,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-39",
       "scenarioPath": "/identity/regions/39",
-      "valueChecksum": "sha256:756111830af22636c77a842c313e5400ec5237d6060b2c10b14e788ad46569d4",
+      "valueChecksum": "sha256:ff26e3b33530adafdd0f6b07e139fb700d9d4c4939865e0375ea397f5622ae6c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7667,7 +7741,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-40",
       "scenarioPath": "/identity/regions/40",
-      "valueChecksum": "sha256:890518304a3c71726ffcf70d12062e63f1be728cd645c04f0980452d5047db68",
+      "valueChecksum": "sha256:756111830af22636c77a842c313e5400ec5237d6060b2c10b14e788ad46569d4",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7679,7 +7753,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-41",
       "scenarioPath": "/identity/regions/41",
-      "valueChecksum": "sha256:f7d78ad6b7923206145679e1a2e5e36da6862f8a81e34d391b2dc83b0e478fee",
+      "valueChecksum": "sha256:890518304a3c71726ffcf70d12062e63f1be728cd645c04f0980452d5047db68",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7691,7 +7765,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-42",
       "scenarioPath": "/identity/regions/42",
-      "valueChecksum": "sha256:59b17a46ec040e6b80a2f62ee57fc5f92c0f1c4b85b04ae0aa6d463b5ba8061f",
+      "valueChecksum": "sha256:f7d78ad6b7923206145679e1a2e5e36da6862f8a81e34d391b2dc83b0e478fee",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7703,7 +7777,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-43",
       "scenarioPath": "/identity/regions/43",
-      "valueChecksum": "sha256:bad92368cb0bacab5123058418a894df8cd38e56da3e9532a591293211257c8e",
+      "valueChecksum": "sha256:59b17a46ec040e6b80a2f62ee57fc5f92c0f1c4b85b04ae0aa6d463b5ba8061f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7715,7 +7789,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-44",
       "scenarioPath": "/identity/regions/44",
-      "valueChecksum": "sha256:ad825d6f9254842ad08c283c01704723b272931d8cfcfdf009f9ffc89f9fb5ac",
+      "valueChecksum": "sha256:bad92368cb0bacab5123058418a894df8cd38e56da3e9532a591293211257c8e",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7727,7 +7801,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-45",
       "scenarioPath": "/identity/regions/45",
-      "valueChecksum": "sha256:82e0b81328f844233124b728ed6f726c4f0425261f74c178a8b57ea98a67208f",
+      "valueChecksum": "sha256:ad825d6f9254842ad08c283c01704723b272931d8cfcfdf009f9ffc89f9fb5ac",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7739,7 +7813,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-46",
       "scenarioPath": "/identity/regions/46",
-      "valueChecksum": "sha256:c93ac44b901545f077e505ce5a4f0e940b66388f52e56db67cb578a8ee2b1f50",
+      "valueChecksum": "sha256:82e0b81328f844233124b728ed6f726c4f0425261f74c178a8b57ea98a67208f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7751,7 +7825,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-47",
       "scenarioPath": "/identity/regions/47",
-      "valueChecksum": "sha256:ca5077741be0052ebb7c8e7c6cd9bdc4f66ceef377eb69a1f81a3bf433a0d472",
+      "valueChecksum": "sha256:c93ac44b901545f077e505ce5a4f0e940b66388f52e56db67cb578a8ee2b1f50",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7763,7 +7837,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-48",
       "scenarioPath": "/identity/regions/48",
-      "valueChecksum": "sha256:3475d5fd1b3aa1ee262731942f6a232b957f9a2dcd24b86f1b3504985b6e70d9",
+      "valueChecksum": "sha256:ca5077741be0052ebb7c8e7c6cd9bdc4f66ceef377eb69a1f81a3bf433a0d472",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7775,7 +7849,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-49",
       "scenarioPath": "/identity/regions/49",
-      "valueChecksum": "sha256:0ec0a3b94560f042b29b89d1ded957f19b7c20c7cf92dce5c8f0b4765fe3be76",
+      "valueChecksum": "sha256:3475d5fd1b3aa1ee262731942f6a232b957f9a2dcd24b86f1b3504985b6e70d9",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7787,7 +7861,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-50",
       "scenarioPath": "/identity/regions/50",
-      "valueChecksum": "sha256:105cafcf70e12485b0a159e604321ddf500369c253179980de457bc97a72f4f5",
+      "valueChecksum": "sha256:0ec0a3b94560f042b29b89d1ded957f19b7c20c7cf92dce5c8f0b4765fe3be76",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7799,7 +7873,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-51",
       "scenarioPath": "/identity/regions/51",
-      "valueChecksum": "sha256:8eb1581663f26bc2531ed30fa44074ee768663d4645b2fb8d7e3211319d8948b",
+      "valueChecksum": "sha256:105cafcf70e12485b0a159e604321ddf500369c253179980de457bc97a72f4f5",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7811,7 +7885,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-52",
       "scenarioPath": "/identity/regions/52",
-      "valueChecksum": "sha256:d156888dadf9ec0d9ba9aa3d8cc29e07e55287a12394908f290043b2d48f828e",
+      "valueChecksum": "sha256:8eb1581663f26bc2531ed30fa44074ee768663d4645b2fb8d7e3211319d8948b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7823,7 +7897,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-53",
       "scenarioPath": "/identity/regions/53",
-      "valueChecksum": "sha256:ed7af14bfcd01197f92bf3314e35eaf190f2fb53c3eeb5befae1f3aeb359efaf",
+      "valueChecksum": "sha256:d156888dadf9ec0d9ba9aa3d8cc29e07e55287a12394908f290043b2d48f828e",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7835,7 +7909,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-54",
       "scenarioPath": "/identity/regions/54",
-      "valueChecksum": "sha256:7b287b074a376a800a8f6878cdf50ff56df0e2e21b11649f126e67d2a7e2b644",
+      "valueChecksum": "sha256:ed7af14bfcd01197f92bf3314e35eaf190f2fb53c3eeb5befae1f3aeb359efaf",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7847,7 +7921,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-55",
       "scenarioPath": "/identity/regions/55",
-      "valueChecksum": "sha256:fb8dfe83947d233ff538cedc9e7feabe688e6a784912971ffb113134b66695de",
+      "valueChecksum": "sha256:7b287b074a376a800a8f6878cdf50ff56df0e2e21b11649f126e67d2a7e2b644",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7859,7 +7933,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-56",
       "scenarioPath": "/identity/regions/56",
-      "valueChecksum": "sha256:006d8b54770af3fad5d8557d1134b2db9d82ce628112fc7dec2989183b5a2bc5",
+      "valueChecksum": "sha256:fb8dfe83947d233ff538cedc9e7feabe688e6a784912971ffb113134b66695de",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7871,7 +7945,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-57",
       "scenarioPath": "/identity/regions/57",
-      "valueChecksum": "sha256:c68557a73d05027f57e703cb4d6de2d84a0e1111d6646bcb060d4ad41ecdb365",
+      "valueChecksum": "sha256:006d8b54770af3fad5d8557d1134b2db9d82ce628112fc7dec2989183b5a2bc5",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7883,7 +7957,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-58",
       "scenarioPath": "/identity/regions/58",
-      "valueChecksum": "sha256:1384d2f194ed8a10370ee0ee51124fc0df7b292556f55ae4796adaf63196bd8a",
+      "valueChecksum": "sha256:c68557a73d05027f57e703cb4d6de2d84a0e1111d6646bcb060d4ad41ecdb365",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7895,7 +7969,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-59",
       "scenarioPath": "/identity/regions/59",
-      "valueChecksum": "sha256:52fd45db700dc36b4602c2f7fe5cd321e097b861294f6660394a44359cb98518",
+      "valueChecksum": "sha256:1384d2f194ed8a10370ee0ee51124fc0df7b292556f55ae4796adaf63196bd8a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7907,7 +7981,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-60",
       "scenarioPath": "/identity/regions/60",
-      "valueChecksum": "sha256:ea4066b18c143d254ea612e6a21c9d1b121bb88f67d3c7296c3a337501b53b49",
+      "valueChecksum": "sha256:52fd45db700dc36b4602c2f7fe5cd321e097b861294f6660394a44359cb98518",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7919,7 +7993,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-61",
       "scenarioPath": "/identity/regions/61",
-      "valueChecksum": "sha256:249eb3bb0133025b9d88ac857f533df8e5904f6fb5deb7b4cd535f199768814a",
+      "valueChecksum": "sha256:ea4066b18c143d254ea612e6a21c9d1b121bb88f67d3c7296c3a337501b53b49",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7931,7 +8005,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-62",
       "scenarioPath": "/identity/regions/62",
-      "valueChecksum": "sha256:c6588225e03d0464a901fb7e2805968cf297f3b390a2653ac785d8a75074d686",
+      "valueChecksum": "sha256:249eb3bb0133025b9d88ac857f533df8e5904f6fb5deb7b4cd535f199768814a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7943,7 +8017,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-63",
       "scenarioPath": "/identity/regions/63",
-      "valueChecksum": "sha256:636daa425e844155f137607944bdfcfc173768f466a1a3ef5ea6bb5b198fbbd6",
+      "valueChecksum": "sha256:c6588225e03d0464a901fb7e2805968cf297f3b390a2653ac785d8a75074d686",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7955,7 +8029,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-64",
       "scenarioPath": "/identity/regions/64",
-      "valueChecksum": "sha256:c3a2c00baac197373a2bd2f5b5487421a8accb317eac13b2bb80e74e17cb4cc0",
+      "valueChecksum": "sha256:636daa425e844155f137607944bdfcfc173768f466a1a3ef5ea6bb5b198fbbd6",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7967,7 +8041,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-65",
       "scenarioPath": "/identity/regions/65",
-      "valueChecksum": "sha256:e8cd2f1de65f2323f339190a26798f2addfd613de21ba48292adca305d0974df",
+      "valueChecksum": "sha256:c3a2c00baac197373a2bd2f5b5487421a8accb317eac13b2bb80e74e17cb4cc0",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7979,7 +8053,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-66",
       "scenarioPath": "/identity/regions/66",
-      "valueChecksum": "sha256:ebd2e01b3f9e704dab656e89f9995516afb2ef4205f97693e30375959780f72e",
+      "valueChecksum": "sha256:e8cd2f1de65f2323f339190a26798f2addfd613de21ba48292adca305d0974df",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -7991,7 +8065,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-67",
       "scenarioPath": "/identity/regions/67",
-      "valueChecksum": "sha256:b39604806f4e3953e4605fcf68da2eb9e40d59ee478ba99eb2898c388ae5af6f",
+      "valueChecksum": "sha256:ebd2e01b3f9e704dab656e89f9995516afb2ef4205f97693e30375959780f72e",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8003,7 +8077,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-68",
       "scenarioPath": "/identity/regions/68",
-      "valueChecksum": "sha256:fc7b54e423a42a9db198ff8ae5c2ab3b4882b25bdc3869f5e9c0cf32925b36c2",
+      "valueChecksum": "sha256:b39604806f4e3953e4605fcf68da2eb9e40d59ee478ba99eb2898c388ae5af6f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8015,7 +8089,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-69",
       "scenarioPath": "/identity/regions/69",
-      "valueChecksum": "sha256:2de1ce98e428c2d329c9701ed3c7688cf8e350fbaaa7fca5f623d918f70902c5",
+      "valueChecksum": "sha256:fc7b54e423a42a9db198ff8ae5c2ab3b4882b25bdc3869f5e9c0cf32925b36c2",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8027,7 +8101,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-70",
       "scenarioPath": "/identity/regions/70",
-      "valueChecksum": "sha256:9e22ddbbc534a7dfdf1e13d8172c0dd6bfc8376c2f43ddd3054792dc0996cc30",
+      "valueChecksum": "sha256:2de1ce98e428c2d329c9701ed3c7688cf8e350fbaaa7fca5f623d918f70902c5",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8039,7 +8113,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-71",
       "scenarioPath": "/identity/regions/71",
-      "valueChecksum": "sha256:3139a9bbd416405f692438f091bb153b39a050e341335b02cf40f09e06d2aecc",
+      "valueChecksum": "sha256:9e22ddbbc534a7dfdf1e13d8172c0dd6bfc8376c2f43ddd3054792dc0996cc30",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8051,7 +8125,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-72",
       "scenarioPath": "/identity/regions/72",
-      "valueChecksum": "sha256:bab2ac32441ff9527812d797a4512baabf07e71e7257ac95a70870a95d4d7dcf",
+      "valueChecksum": "sha256:3139a9bbd416405f692438f091bb153b39a050e341335b02cf40f09e06d2aecc",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8063,7 +8137,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-73",
       "scenarioPath": "/identity/regions/73",
-      "valueChecksum": "sha256:f8d72c7b66b663c74a3a1757d32b9da16ddc74634253a6a3cf0db60709757c9f",
+      "valueChecksum": "sha256:bab2ac32441ff9527812d797a4512baabf07e71e7257ac95a70870a95d4d7dcf",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8075,7 +8149,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-74",
       "scenarioPath": "/identity/regions/74",
-      "valueChecksum": "sha256:608342c8f9717f2211ead23b2fd27b63dcd584ccca9992690b51ff90258fda04",
+      "valueChecksum": "sha256:f8d72c7b66b663c74a3a1757d32b9da16ddc74634253a6a3cf0db60709757c9f",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8087,7 +8161,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-75",
       "scenarioPath": "/identity/regions/75",
-      "valueChecksum": "sha256:f6e6ee3e29e5289da91a2c4c1026724c8c22c177bee72649d3ff2969272da53a",
+      "valueChecksum": "sha256:608342c8f9717f2211ead23b2fd27b63dcd584ccca9992690b51ff90258fda04",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8099,7 +8173,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-76",
       "scenarioPath": "/identity/regions/76",
-      "valueChecksum": "sha256:62101282df2c01f3d632b21829e779211f1cc49f458f65d3fbbb293e598b4c8a",
+      "valueChecksum": "sha256:f6e6ee3e29e5289da91a2c4c1026724c8c22c177bee72649d3ff2969272da53a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8111,7 +8185,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-77",
       "scenarioPath": "/identity/regions/77",
-      "valueChecksum": "sha256:e3940ea58dbf04c9560f53f34388804c700163b066d5b01b47a07a58346efee9",
+      "valueChecksum": "sha256:62101282df2c01f3d632b21829e779211f1cc49f458f65d3fbbb293e598b4c8a",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8123,7 +8197,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-78",
       "scenarioPath": "/identity/regions/78",
-      "valueChecksum": "sha256:08c2612e3ca15f7ee380d56169e2d516e73fd42e62a923e2a7f5425b83ce5a53",
+      "valueChecksum": "sha256:e3940ea58dbf04c9560f53f34388804c700163b066d5b01b47a07a58346efee9",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8135,7 +8209,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-79",
       "scenarioPath": "/identity/regions/79",
-      "valueChecksum": "sha256:e820196087edca4594807b8a68517101ac63f809c274685dd8deeddaa85f9075",
+      "valueChecksum": "sha256:08c2612e3ca15f7ee380d56169e2d516e73fd42e62a923e2a7f5425b83ce5a53",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8147,7 +8221,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-80",
       "scenarioPath": "/identity/regions/80",
-      "valueChecksum": "sha256:5bb6256585d5d559e3130115bc190c0a3b1cfde3010d4b75925781ca286f5c95",
+      "valueChecksum": "sha256:e820196087edca4594807b8a68517101ac63f809c274685dd8deeddaa85f9075",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8159,7 +8233,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-81",
       "scenarioPath": "/identity/regions/81",
-      "valueChecksum": "sha256:c5662a8e0b2568c50025125c6e49282a5f40b7034d92465c8e37fbfa95ff1921",
+      "valueChecksum": "sha256:5bb6256585d5d559e3130115bc190c0a3b1cfde3010d4b75925781ca286f5c95",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8171,7 +8245,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-82",
       "scenarioPath": "/identity/regions/82",
-      "valueChecksum": "sha256:a28af4381569ac2ab04dd794552f70014a0a3766cf19e36f8146177f20a42797",
+      "valueChecksum": "sha256:c5662a8e0b2568c50025125c6e49282a5f40b7034d92465c8e37fbfa95ff1921",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8183,7 +8257,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-83",
       "scenarioPath": "/identity/regions/83",
-      "valueChecksum": "sha256:0038f5ff91fc89926a90c6828bf75e40552a71414b18f496cd7c6ecc071f4aac",
+      "valueChecksum": "sha256:a28af4381569ac2ab04dd794552f70014a0a3766cf19e36f8146177f20a42797",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8195,7 +8269,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-84",
       "scenarioPath": "/identity/regions/84",
-      "valueChecksum": "sha256:7fe6ff2f4377ec52506a1346a6b4fc8c3dc2ed25aac631c345f7080737ad7944",
+      "valueChecksum": "sha256:0038f5ff91fc89926a90c6828bf75e40552a71414b18f496cd7c6ecc071f4aac",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8207,7 +8281,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-85",
       "scenarioPath": "/identity/regions/85",
-      "valueChecksum": "sha256:3f5b61426561d4cf96faf32352a379ff4419960b63257df48bca9f04ee817620",
+      "valueChecksum": "sha256:7fe6ff2f4377ec52506a1346a6b4fc8c3dc2ed25aac631c345f7080737ad7944",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8219,7 +8293,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-86",
       "scenarioPath": "/identity/regions/86",
-      "valueChecksum": "sha256:8eab5ad520af7a27385a57d48631309d4a51eb5685d52f65e1f6ac96aacbe310",
+      "valueChecksum": "sha256:3f5b61426561d4cf96faf32352a379ff4419960b63257df48bca9f04ee817620",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8231,7 +8305,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-87",
       "scenarioPath": "/identity/regions/87",
-      "valueChecksum": "sha256:8e6882dc0a8e0667af42196423615f035b35338ac4b4d58aeb2c97a57d91d6b4",
+      "valueChecksum": "sha256:8eab5ad520af7a27385a57d48631309d4a51eb5685d52f65e1f6ac96aacbe310",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8243,7 +8317,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-88",
       "scenarioPath": "/identity/regions/88",
-      "valueChecksum": "sha256:44817735d962abf09b3a39996681f3e05181dfc68cea827c1e373d218cacfbb1",
+      "valueChecksum": "sha256:8e6882dc0a8e0667af42196423615f035b35338ac4b4d58aeb2c97a57d91d6b4",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8255,7 +8329,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-89",
       "scenarioPath": "/identity/regions/89",
-      "valueChecksum": "sha256:9ae2877138e2ad3739acb230a760b22711fe679b20e3fb07676c17b801c7bb18",
+      "valueChecksum": "sha256:44817735d962abf09b3a39996681f3e05181dfc68cea827c1e373d218cacfbb1",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8267,7 +8341,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-90",
       "scenarioPath": "/identity/regions/90",
-      "valueChecksum": "sha256:850cf6dbc2a2fe1de9c44be6545fe03e853c3f73f4e442cf816ea7447f0c4b93",
+      "valueChecksum": "sha256:9ae2877138e2ad3739acb230a760b22711fe679b20e3fb07676c17b801c7bb18",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8279,7 +8353,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-91",
       "scenarioPath": "/identity/regions/91",
-      "valueChecksum": "sha256:3b8a5b2dedc88453330ea7cfe5723d045fd021e0128bb23e0c037b889c05ff80",
+      "valueChecksum": "sha256:850cf6dbc2a2fe1de9c44be6545fe03e853c3f73f4e442cf816ea7447f0c4b93",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8291,7 +8365,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-92",
       "scenarioPath": "/identity/regions/92",
-      "valueChecksum": "sha256:97a1f63b30bdf0b9dc82292a80d73ab05dcd11f2174c014ceb66d4bfe7ce5147",
+      "valueChecksum": "sha256:3b8a5b2dedc88453330ea7cfe5723d045fd021e0128bb23e0c037b889c05ff80",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8303,7 +8377,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-93",
       "scenarioPath": "/identity/regions/93",
-      "valueChecksum": "sha256:e811efaed7bdef8767a33606753a640085831dc85e022293f08c5726105dac13",
+      "valueChecksum": "sha256:97a1f63b30bdf0b9dc82292a80d73ab05dcd11f2174c014ceb66d4bfe7ce5147",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8315,7 +8389,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-94",
       "scenarioPath": "/identity/regions/94",
-      "valueChecksum": "sha256:ef5237a640db969d665f43257c5f4252ad2f7982c2648768fb810f2ae1ef445d",
+      "valueChecksum": "sha256:e811efaed7bdef8767a33606753a640085831dc85e022293f08c5726105dac13",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8327,7 +8401,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-95",
       "scenarioPath": "/identity/regions/95",
-      "valueChecksum": "sha256:070ce334a64f1dc30b9ccbdce3fcdc20bd0e47a0c36098c824ae4b70901199e0",
+      "valueChecksum": "sha256:ef5237a640db969d665f43257c5f4252ad2f7982c2648768fb810f2ae1ef445d",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8339,7 +8413,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-96",
       "scenarioPath": "/identity/regions/96",
-      "valueChecksum": "sha256:a888325da09627c4f01c14318f9dd8a8bdeb825ef753e9f0a2ff7ab0ef2d44e6",
+      "valueChecksum": "sha256:070ce334a64f1dc30b9ccbdce3fcdc20bd0e47a0c36098c824ae4b70901199e0",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8351,7 +8425,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-97",
       "scenarioPath": "/identity/regions/97",
-      "valueChecksum": "sha256:ee8e2f4daf16328c6b4ec0468840e7576e54ee61c6908f37bb8e35987cd5a0da",
+      "valueChecksum": "sha256:a888325da09627c4f01c14318f9dd8a8bdeb825ef753e9f0a2ff7ab0ef2d44e6",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8363,7 +8437,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-98",
       "scenarioPath": "/identity/regions/98",
-      "valueChecksum": "sha256:8a693cda0efc8724f48c6441590ac5ef827ecdb86b01592b7e88b7aba7657e6b",
+      "valueChecksum": "sha256:ee8e2f4daf16328c6b4ec0468840e7576e54ee61c6908f37bb8e35987cd5a0da",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8375,7 +8449,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-99",
       "scenarioPath": "/identity/regions/99",
-      "valueChecksum": "sha256:db774176fc4eeacc970fee249aa4b2d2527845a4720878ac1016247ba8bb1b00",
+      "valueChecksum": "sha256:8a693cda0efc8724f48c6441590ac5ef827ecdb86b01592b7e88b7aba7657e6b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8387,7 +8461,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-100",
       "scenarioPath": "/identity/regions/100",
-      "valueChecksum": "sha256:18bf4b4096d01af35434a2ee4db8e420b75abbea6cae966ff7c2e670f704fd0e",
+      "valueChecksum": "sha256:db774176fc4eeacc970fee249aa4b2d2527845a4720878ac1016247ba8bb1b00",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8399,7 +8473,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-101",
       "scenarioPath": "/identity/regions/101",
-      "valueChecksum": "sha256:d3ae6b5acc2cbe30e247d952af6ebb8229bba42236f0e9c035c1be94fe72b74b",
+      "valueChecksum": "sha256:18bf4b4096d01af35434a2ee4db8e420b75abbea6cae966ff7c2e670f704fd0e",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8411,7 +8485,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-102",
       "scenarioPath": "/identity/regions/102",
-      "valueChecksum": "sha256:033eb021efbb7954dfeb60367e43b1d11f20b764c88bb59a8774bbeb000afba0",
+      "valueChecksum": "sha256:d3ae6b5acc2cbe30e247d952af6ebb8229bba42236f0e9c035c1be94fe72b74b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8423,7 +8497,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-103",
       "scenarioPath": "/identity/regions/103",
-      "valueChecksum": "sha256:4ccbc765a6555d0facbcddcaab94deb00174b2656f933734ca8718a482e446aa",
+      "valueChecksum": "sha256:033eb021efbb7954dfeb60367e43b1d11f20b764c88bb59a8774bbeb000afba0",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8435,7 +8509,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-104",
       "scenarioPath": "/identity/regions/104",
-      "valueChecksum": "sha256:130822d232b8ae38e6bfaa1292d1538368adb13de095074fdb2a4cc06b007304",
+      "valueChecksum": "sha256:4ccbc765a6555d0facbcddcaab94deb00174b2656f933734ca8718a482e446aa",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8447,7 +8521,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-105",
       "scenarioPath": "/identity/regions/105",
-      "valueChecksum": "sha256:61fd09401fb320fd70792e685abab09872d2ecea8b7b252696b45f6b9325ca91",
+      "valueChecksum": "sha256:130822d232b8ae38e6bfaa1292d1538368adb13de095074fdb2a4cc06b007304",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8459,7 +8533,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-106",
       "scenarioPath": "/identity/regions/106",
-      "valueChecksum": "sha256:06102f653a29accbe9c26de9a43bcdfe252c8c154663b2531b604bb996c15d1b",
+      "valueChecksum": "sha256:61fd09401fb320fd70792e685abab09872d2ecea8b7b252696b45f6b9325ca91",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8471,7 +8545,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-107",
       "scenarioPath": "/identity/regions/107",
-      "valueChecksum": "sha256:9d3afc65f95e8f0a5495b2999500828a9f49ca18196d4c17edb772c0126eb1fb",
+      "valueChecksum": "sha256:06102f653a29accbe9c26de9a43bcdfe252c8c154663b2531b604bb996c15d1b",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8483,7 +8557,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-108",
       "scenarioPath": "/identity/regions/108",
-      "valueChecksum": "sha256:a2108714419ae87db52c92eae424b5c380eded8d510a2c1e8678cfe3b679c921",
+      "valueChecksum": "sha256:9d3afc65f95e8f0a5495b2999500828a9f49ca18196d4c17edb772c0126eb1fb",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8495,7 +8569,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-109",
       "scenarioPath": "/identity/regions/109",
-      "valueChecksum": "sha256:cf0c254fa9b93a4291f74a63a9d8a31a46cf6decb314be2ed3c65fe39909f699",
+      "valueChecksum": "sha256:a2108714419ae87db52c92eae424b5c380eded8d510a2c1e8678cfe3b679c921",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8507,7 +8581,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-110",
       "scenarioPath": "/identity/regions/110",
-      "valueChecksum": "sha256:ba7bb06a80d8388bc3c16eeb053c10157ac469c0e5c28a89b462b3e2a0457826",
+      "valueChecksum": "sha256:cf0c254fa9b93a4291f74a63a9d8a31a46cf6decb314be2ed3c65fe39909f699",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8519,7 +8593,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-111",
       "scenarioPath": "/identity/regions/111",
-      "valueChecksum": "sha256:055b2e3229c24424b222fe7684ccc27181ad25e7410420258ea22bcb7128a92c",
+      "valueChecksum": "sha256:ba7bb06a80d8388bc3c16eeb053c10157ac469c0e5c28a89b462b3e2a0457826",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8531,7 +8605,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-112",
       "scenarioPath": "/identity/regions/112",
-      "valueChecksum": "sha256:4b1a2d86919af0766491b208820bac93f06a5e5cb3aeba784db555f9a5168de2",
+      "valueChecksum": "sha256:055b2e3229c24424b222fe7684ccc27181ad25e7410420258ea22bcb7128a92c",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8543,7 +8617,7 @@
     {
       "claimId": "starting-state-claim:identity-regions-113",
       "scenarioPath": "/identity/regions/113",
-      "valueChecksum": "sha256:1fcd37e49dbaf9320e35ea030f8b9d0117dc58dd3f080be86adb74b675c6fb2b",
+      "valueChecksum": "sha256:4b1a2d86919af0766491b208820bac93f06a5e5cb3aeba784db555f9a5168de2",
       "basis": "authored-estimate",
       "sourceRefs": [
         "source:europe-1935-benchmark:league-yearbook"
@@ -8555,6 +8629,18 @@
     {
       "claimId": "starting-state-claim:identity-regions-114",
       "scenarioPath": "/identity/regions/114",
+      "valueChecksum": "sha256:1fcd37e49dbaf9320e35ea030f8b9d0117dc58dd3f080be86adb74b675c6fb2b",
+      "basis": "authored-estimate",
+      "sourceRefs": [
+        "source:europe-1935-benchmark:league-yearbook"
+      ],
+      "method": "Encode a conservative bounded starting value from the cited scenario references; engine-only ordinal values are estimates, not measured historical quantities.",
+      "confidence": "low",
+      "todo": "Owner-review this exact checksum-bound row and replace the estimate when a more specific table-level source is available."
+    },
+    {
+      "claimId": "starting-state-claim:identity-regions-115",
+      "scenarioPath": "/identity/regions/115",
       "valueChecksum": "sha256:0b24399b3c8f7bc348114fba1616d0f4ccfb4a159f8708fe2c9db726a4c44bc4",
       "basis": "authored-estimate",
       "sourceRefs": [

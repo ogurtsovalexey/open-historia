@@ -101,10 +101,10 @@
     },
     {
       "polityId": "polity:czechoslovakia",
-      "regionCount": 10,
+      "regionCount": 11,
       "topology": {
         "status": "topology-clean",
-        "regionCount": 10,
+        "regionCount": 11,
         "coveredRatio": 1,
         "gapRatio": 0,
         "outsideRatio": 0,
@@ -112,8 +112,8 @@
       },
       "adjacency": {
         "method": "exact-shared-source-segments-7dp",
-        "edgeCount": 16,
-        "checksum": "sha256:72814f8bb363d1261d1cf574776649e6fa43278e091894730168db1c7a0ca60e",
+        "edgeCount": 21,
+        "checksum": "sha256:bb494c69e30a3aabac98e05eae21af3fd7af6d51ce4b680ed539112b6a6ac771",
         "nonManifoldSegmentCount": 0
       },
       "expectedDisconnectedRegionIds": [],
@@ -551,10 +551,24 @@
     },
     {
       "polityId": "polity:czechoslovakia",
-      "regionId": "zapadni-cechy",
-      "nativeName": "Západní Čechy",
+      "regionId": "sudety",
+      "nativeName": "Sudety",
       "effectiveAt": "1935-01-01",
       "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
         "CC0 (OHM default)",
         "CC0 (OHM default)",
         "CC0 (OHM default)",
@@ -602,270 +616,6 @@
           }
         },
         {
-          "relationId": 2683697,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2684440,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2685458,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2686023,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2686361,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2686533,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2686819,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2687557,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2688016,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2689449,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2689718,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2691732,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2692335,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2699525,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2703603,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2716177,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2735168,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2737746,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2737923,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2853225,
-          "startDate": "1902-10-01",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2853226,
-          "startDate": "1902-10-01",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2856861,
-          "startDate": "1878-07-13",
-          "endDate": "1936-07-03",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        }
-      ],
-      "method": "union-of-dated-source-polygons",
-      "confidence": "high",
-      "todo": null,
-      "valueChecksum": "sha256:cf654fe3c2e30d994931660f86d180a92bebcbb0f5d9914c8326f23446737215"
-    },
-    {
-      "polityId": "polity:czechoslovakia",
-      "regionId": "severni-cechy",
-      "nativeName": "Severní Čechy",
-      "effectiveAt": "1935-01-01",
-      "license": [
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)"
-      ],
-      "sourceObjects": [
-        {
           "relationId": 2665922,
           "startDate": "1868-08-31",
           "endDate": "1938-11-20",
@@ -896,9 +646,29 @@
           }
         },
         {
-          "relationId": 2684013,
-          "startDate": "1877-10-01",
+          "relationId": 2683697,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2684312,
+          "startDate": "1868-08-31",
           "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2684440,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
           "license": {
             "class": "ohm-default-cc0",
             "value": "CC0 (OHM default)",
@@ -929,6 +699,395 @@
           "relationId": 2685415,
           "startDate": "1868-08-31",
           "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685458,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2685491,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686023,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686361,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686418,
+          "startDate": "1868-08-31",
+          "endDate": "1949",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2686533,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2687557,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2688150,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2689138,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2689449,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2689718,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2692335,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2699525,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2705150,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2705209,
+          "startDate": "1850",
+          "endDate": "1939-04-30",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2716177,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2735117,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2737746,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2738494,
+          "startDate": "1896-09-01",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2738670,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2738914,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2851955,
+          "startDate": "1896-09-01",
+          "endDate": "1939-05-01",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2853225,
+          "startDate": "1902-10-01",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2853226,
+          "startDate": "1902-10-01",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2854899,
+          "startDate": "1908-10-01",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2854900,
+          "startDate": "1908-10-01",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2856861,
+          "startDate": "1878-07-13",
+          "endDate": "1936-07-03",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-border-district-polygons",
+      "confidence": "medium",
+      "todo": "Refine the strategic Sudeten border-region approximation against a permissively licensed 1938 language-majority or Munich cession line.",
+      "valueChecksum": "sha256:7e42fbb0ce91a0f4f80d2303576bccf1a39eac30a3d6a1441c64a9959c1a1d11"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "zapadni-cechy",
+      "nativeName": "Západní Čechy",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2686819,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2688016,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2691732,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2703603,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2735168,
+          "startDate": "1868-08-31",
+          "endDate": "1938",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        },
+        {
+          "relationId": 2737923,
+          "startDate": "1868-08-31",
+          "endDate": "1938-11-20",
+          "license": {
+            "class": "ohm-default-cc0",
+            "value": "CC0 (OHM default)",
+            "allowed": true
+          }
+        }
+      ],
+      "method": "union-of-dated-source-polygons",
+      "confidence": "high",
+      "todo": null,
+      "valueChecksum": "sha256:4445f160d908ce22cbaec41ad4ab0fb04999ec2569a5632a08086d7ced6ed57d"
+    },
+    {
+      "polityId": "polity:czechoslovakia",
+      "regionId": "severni-cechy",
+      "nativeName": "Severní Čechy",
+      "effectiveAt": "1935-01-01",
+      "license": [
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)",
+        "CC0 (OHM default)"
+      ],
+      "sourceObjects": [
+        {
+          "relationId": 2684013,
+          "startDate": "1877-10-01",
+          "endDate": "1938",
           "license": {
             "class": "ohm-default-cc0",
             "value": "CC0 (OHM default)",
@@ -996,16 +1155,6 @@
           }
         },
         {
-          "relationId": 2689138,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
           "relationId": 2689584,
           "startDate": "1868-08-31",
           "endDate": "1938",
@@ -1056,39 +1205,9 @@
           }
         },
         {
-          "relationId": 2705150,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2705209,
-          "startDate": "1850",
-          "endDate": "1939-04-30",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
           "relationId": 2734875,
           "startDate": "1868-08-31",
           "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2735117,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
           "license": {
             "class": "ohm-default-cc0",
             "value": "CC0 (OHM default)",
@@ -1106,59 +1225,9 @@
           }
         },
         {
-          "relationId": 2738494,
-          "startDate": "1896-09-01",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2738670,
-          "startDate": "1868-08-31",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
           "relationId": 2739124,
           "startDate": "1868-08-31",
           "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2851955,
-          "startDate": "1896-09-01",
-          "endDate": "1939-05-01",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2854899,
-          "startDate": "1908-10-01",
-          "endDate": "1938-11-20",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2854900,
-          "startDate": "1908-10-01",
-          "endDate": "1938-11-20",
           "license": {
             "class": "ohm-default-cc0",
             "value": "CC0 (OHM default)",
@@ -1169,7 +1238,7 @@
       "method": "union-of-dated-source-polygons",
       "confidence": "high",
       "todo": null,
-      "valueChecksum": "sha256:44399a495ea873fe31b1d97916c58a6fe1820f980ed82b05ff8db8282304d0c2"
+      "valueChecksum": "sha256:66c704ffec05625a24b6f0e2baccd41d8dec9188827b62d7413b059354d2566a"
     },
     {
       "polityId": "polity:czechoslovakia",
@@ -1183,33 +1252,11 @@
         "CC0 (OHM default)",
         "CC0 (OHM default)",
         "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
         "CC0 (OHM default)"
       ],
       "sourceObjects": [
         {
           "relationId": 2684672,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2686418,
-          "startDate": "1868-08-31",
-          "endDate": "1949",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2688150,
           "startDate": "1868-08-31",
           "endDate": "1938",
           "license": {
@@ -1282,7 +1329,7 @@
       "method": "union-of-dated-source-polygons",
       "confidence": "high",
       "todo": null,
-      "valueChecksum": "sha256:9730b8c69575d83b39ae6f7b44353cf32ff9b8cf31fa3685719566cabc24f146"
+      "valueChecksum": "sha256:eaa88d12bfd40d1c3fe45dcd6d75d203c4bd51bbba8e799e6e15e688d5674fd9"
     },
     {
       "polityId": "polity:czechoslovakia",
@@ -1303,22 +1350,9 @@
         "CC0 (OHM default)",
         "CC0 (OHM default)",
         "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
-        "CC0 (OHM default)",
         "CC0 (OHM default)"
       ],
       "sourceObjects": [
-        {
-          "relationId": 2684312,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
         {
           "relationId": 2684805,
           "startDate": "1868-08-31",
@@ -1351,16 +1385,6 @@
         },
         {
           "relationId": 2685253,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
-        },
-        {
-          "relationId": 2685491,
           "startDate": "1868-08-31",
           "endDate": "1938",
           "license": {
@@ -1468,22 +1492,12 @@
             "value": "CC0 (OHM default)",
             "allowed": true
           }
-        },
-        {
-          "relationId": 2738914,
-          "startDate": "1868-08-31",
-          "endDate": "1938",
-          "license": {
-            "class": "ohm-default-cc0",
-            "value": "CC0 (OHM default)",
-            "allowed": true
-          }
         }
       ],
       "method": "union-of-dated-source-polygons",
       "confidence": "high",
       "todo": null,
-      "valueChecksum": "sha256:d1a482971284307f4e3a1c757f2889ea3d267fe522fd1639d7ff2e9b5977cf08"
+      "valueChecksum": "sha256:59fb3ef28e8ce65da0140f1a35944d948a1defc9688702598abfabe850d34b0b"
     },
     {
       "polityId": "polity:czechoslovakia",
@@ -1646,7 +1660,7 @@
       "method": "union-of-dated-source-polygons",
       "confidence": "high",
       "todo": null,
-      "valueChecksum": "sha256:29da0f1dc8d9074ebf459b838fc4f6be30e6809eedb65f2fa731f2f9b83ca003"
+      "valueChecksum": "sha256:57e3dba8d313d0ffa521e2af22e3cd75ebc8350e8fea9c712bdeb262b837b873"
     },
     {
       "polityId": "polity:czechoslovakia",
@@ -3936,24 +3950,24 @@
       "valueChecksum": "sha256:feae270943e7b81e2ad68dc6b9f1389f273c85717360852de192f2a1350a1758"
     }
   ],
-  "collectionChecksum": "sha256:8571a3054bd50d557e6c33107b673764aefb9dfa992785c8894f7cd6feea3292",
-  "adjacencyChecksum": "sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d",
-  "candidatePlanChecksum": "sha256:43bb6a90bf657a94193e335eade289ccb94fb5bb764eda45e9ef164243f8e847",
+  "collectionChecksum": "sha256:43ec6e5cdccfef0cd351c2849f0d1bbf2866d479b07cfcf5d42eabc9a636ab87",
+  "adjacencyChecksum": "sha256:153536f3858af53d07dd4063c0337b3bddc5afe8ac89bef3d9d2e2d0db4f5bea",
+  "candidatePlanChecksum": "sha256:dc59c589aecedafa63f32ad4c97fdb417062786a59f629f057f5e566bf47c628",
   "approvedCheckpoint": {
-    "collectionChecksum": "sha256:8571a3054bd50d557e6c33107b673764aefb9dfa992785c8894f7cd6feea3292",
-    "adjacencyChecksum": "sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d",
-    "candidatePlanChecksum": "sha256:43bb6a90bf657a94193e335eade289ccb94fb5bb764eda45e9ef164243f8e847"
+    "collectionChecksum": "sha256:43ec6e5cdccfef0cd351c2849f0d1bbf2866d479b07cfcf5d42eabc9a636ab87",
+    "adjacencyChecksum": "sha256:153536f3858af53d07dd4063c0337b3bddc5afe8ac89bef3d9d2e2d0db4f5bea",
+    "candidatePlanChecksum": "sha256:dc59c589aecedafa63f32ad4c97fdb417062786a59f629f057f5e566bf47c628"
   },
   "runtime": {
-    "regionCount": 115,
+    "regionCount": 116,
     "polityCount": 11,
     "activeStrategicPolities": 9,
     "inertPolities": [
       "polity:free-city-of-danzig",
       "polity:saargebiet"
     ],
-    "regionsAssetChecksum": "sha256:68d2a14f95f95b505c2845b68e5ebd02a25fb42dd8f2e26cef3feb979f16e2ad",
-    "adjacencyAssetChecksum": "sha256:1ac6a5853de358d241cc556c33f15f4f2868ebd96e9ed9f2cce21321561d5711",
+    "regionsAssetChecksum": "sha256:bfffbdbebdab8a8dce2245120d965b616b6e0d1d73b16b9c03c9f513d7a44eaa",
+    "adjacencyAssetChecksum": "sha256:fcf05bdc1e66965319d953e029851396a5c00becfeb9cc09367ce47e90f1d187",
     "firstMonthChecksum": "sha256:209d64e8a4e25fac211aa5343f276f4da1f3fa7fb4c19e5f1fad6cff9b09d9a1"
   }
 }

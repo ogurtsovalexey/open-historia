@@ -65,7 +65,7 @@ test('Poland regional economy candidate preserves national controls and the comp
   const first = buildPolandRegionalProjectionCandidate(fixture.engineScenario);
   const second = buildPolandRegionalProjectionCandidate(fixture.engineScenario);
   assert.deepEqual(first, second);
-  assert.equal(first.checksum, 'sha256:7b8ecfcb9834949993e28b8850250b398ff19dbc4ba2ec95179e3649c99b99c0');
+  assert.equal(first.checksum, 'sha256:00946a14b3ecbbf05138614b5b47a09c28739045934aaab29081a866f7d1c910');
   assert.equal(first.status, 'owner-approved-runtime');
   assert.equal(first.rows.length, 16);
   assert.deepEqual(first.nationalControls, {
@@ -145,7 +145,7 @@ test('Europe 1935 complete starting-state gate is deterministic and ready for ow
   assert.equal(audit.issues.filter((entry) => entry.code === 'executable-agreement-missing').length, 0);
   assert(STARTING_STATE_PROVENANCE_COLLECTIONS.includes('/politics/characters'));
   assert.equal(audit.provenance.totalRows > 0, true);
-  assert.equal(audit.provenance.totalRows, 565);
+  assert.equal(audit.provenance.totalRows, 571);
   assert.equal(audit.provenance.coveredRows, audit.provenance.totalRows);
   assert.equal(audit.provenance.missingRows, 0);
   assert.equal(audit.provenance.checksumMismatches, 0);
@@ -155,7 +155,7 @@ test('Europe 1935 complete starting-state gate is deterministic and ready for ow
   assert.equal(audit.politicsCandidates[0].decisionAuthority.characterId, 'character:poland-pilsudski');
   assert.equal(audit.issues.filter((entry) => entry.code === 'starting-state-provenance-missing').length,
     audit.provenance.missingRows);
-  assert.match(renderOwnerTable(audit), /Starting-state provenance: \*\*565\/565\*\*/);
+  assert.match(renderOwnerTable(audit), /Starting-state provenance: \*\*571\/571\*\*/);
   assert.match(renderOwnerTable(audit), /31,915,779 source persons apportioned to exact target 34,000,000/);
   assert.match(renderOwnerTable(audit), /economy candidate: 16 regions, 1 processing region/);
   assert.match(renderOwnerTable(audit), /decision authority Józef Piłsudski; 4 factions/);
@@ -209,7 +209,7 @@ test('complete starting-state publication is atomic, idempotent and includes a s
   assert.equal(Object.values(first.scenario.modules).every(Boolean), true);
   assert.equal(first.scenario.politics.polities.length, 11);
   assert.equal(first.scenario.statecraft.finance.length, 11);
-  assert.equal(first.scenario.identity.regions.length, 115);
+  assert.equal(first.scenario.identity.regions.length, 116);
   assert.equal(first.scenario.identity.polities.length, 11);
   for (const polity of first.scenario.identity.polities) {
     const accepted = new Set([polity.officialCultureId, ...polity.acceptedCultureIds]);
@@ -222,6 +222,9 @@ test('complete starting-state publication is atomic, idempotent and includes a s
   }
   assert.equal(first.scenario.identity.regions.find((entry) => entry.regionId === 'region:europe-1935:cs-slovensko')
     .culture.primaryId, 'culture:slovak');
+  const sudety = first.scenario.identity.regions.find((entry) => entry.regionId === 'region:europe-1935:cs-sudety');
+  assert.equal(sudety.culture.primaryId, 'culture:german');
+  assert.deepEqual(sudety.culture.minorities, [{ identityId: 'culture:czech', shareBp: 1800 }]);
   assert.equal(first.scenario.identity.regions.find((entry) => entry.regionId === 'region:europe-1935:gb-northern-ireland')
     .culture.primaryId, 'culture:irish');
   assert.equal(first.scenario.military.formations.length, 7);

@@ -2,7 +2,7 @@
   "schemaVersion": "open-historia-runtime-land-adjacency/1",
   "scenarioId": "scenario:europe-1935-benchmark",
   "snapshotDate": "1935-01-01",
-  "approvedAdjacencyChecksum": "sha256:206ffb2c3f8098ef05a276b729b41edfeff946ba2e0ee593ccf1fdafa906040d",
+  "approvedAdjacencyChecksum": "sha256:153536f3858af53d07dd4063c0337b3bddc5afe8ac89bef3d9d2e2d0db4f5bea",
   "polities": [
     {
       "polityId": "polity:austria",
@@ -176,6 +176,7 @@
           "adjacentRegionIds": [
             "region:europe-1935:cs-morava",
             "region:europe-1935:cs-stredni-cechy",
+            "region:europe-1935:cs-sudety",
             "region:europe-1935:cs-zapadni-cechy"
           ]
         },
@@ -186,6 +187,7 @@
             "region:europe-1935:cs-slezsko",
             "region:europe-1935:cs-slovensko",
             "region:europe-1935:cs-stredni-cechy",
+            "region:europe-1935:cs-sudety",
             "region:europe-1935:cs-vychodni-cechy"
           ]
         },
@@ -207,6 +209,7 @@
           "adjacentRegionIds": [
             "region:europe-1935:cs-praha",
             "region:europe-1935:cs-stredni-cechy",
+            "region:europe-1935:cs-sudety",
             "region:europe-1935:cs-vychodni-cechy",
             "region:europe-1935:cs-zapadni-cechy"
           ]
@@ -238,11 +241,22 @@
           ]
         },
         {
+          "regionId": "region:europe-1935:cs-sudety",
+          "adjacentRegionIds": [
+            "region:europe-1935:cs-jizni-cechy",
+            "region:europe-1935:cs-morava",
+            "region:europe-1935:cs-severni-cechy",
+            "region:europe-1935:cs-vychodni-cechy",
+            "region:europe-1935:cs-zapadni-cechy"
+          ]
+        },
+        {
           "regionId": "region:europe-1935:cs-vychodni-cechy",
           "adjacentRegionIds": [
             "region:europe-1935:cs-morava",
             "region:europe-1935:cs-severni-cechy",
-            "region:europe-1935:cs-stredni-cechy"
+            "region:europe-1935:cs-stredni-cechy",
+            "region:europe-1935:cs-sudety"
           ]
         },
         {
@@ -250,7 +264,8 @@
           "adjacentRegionIds": [
             "region:europe-1935:cs-jizni-cechy",
             "region:europe-1935:cs-severni-cechy",
-            "region:europe-1935:cs-stredni-cechy"
+            "region:europe-1935:cs-stredni-cechy",
+            "region:europe-1935:cs-sudety"
           ]
         }
       ],
@@ -264,6 +279,11 @@
           "fromRegionId": "region:europe-1935:cs-jizni-cechy",
           "toRegionId": "region:europe-1935:cs-stredni-cechy",
           "sharedSegmentCount": 9937
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-jizni-cechy",
+          "toRegionId": "region:europe-1935:cs-sudety",
+          "sharedSegmentCount": 6225
         },
         {
           "fromRegionId": "region:europe-1935:cs-jizni-cechy",
@@ -287,8 +307,13 @@
         },
         {
           "fromRegionId": "region:europe-1935:cs-morava",
+          "toRegionId": "region:europe-1935:cs-sudety",
+          "sharedSegmentCount": 7157
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-morava",
           "toRegionId": "region:europe-1935:cs-vychodni-cechy",
-          "sharedSegmentCount": 10698
+          "sharedSegmentCount": 3541
         },
         {
           "fromRegionId": "region:europe-1935:cs-podkarpatska-rus",
@@ -312,13 +337,18 @@
         },
         {
           "fromRegionId": "region:europe-1935:cs-severni-cechy",
+          "toRegionId": "region:europe-1935:cs-sudety",
+          "sharedSegmentCount": 8993
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-severni-cechy",
           "toRegionId": "region:europe-1935:cs-vychodni-cechy",
-          "sharedSegmentCount": 9749
+          "sharedSegmentCount": 8396
         },
         {
           "fromRegionId": "region:europe-1935:cs-severni-cechy",
           "toRegionId": "region:europe-1935:cs-zapadni-cechy",
-          "sharedSegmentCount": 6052
+          "sharedSegmentCount": 2566
         },
         {
           "fromRegionId": "region:europe-1935:cs-slezsko",
@@ -334,6 +364,16 @@
           "fromRegionId": "region:europe-1935:cs-stredni-cechy",
           "toRegionId": "region:europe-1935:cs-zapadni-cechy",
           "sharedSegmentCount": 1372
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-sudety",
+          "toRegionId": "region:europe-1935:cs-vychodni-cechy",
+          "sharedSegmentCount": 10923
+        },
+        {
+          "fromRegionId": "region:europe-1935:cs-sudety",
+          "toRegionId": "region:europe-1935:cs-zapadni-cechy",
+          "sharedSegmentCount": 7268
         }
       ]
     },

@@ -11,7 +11,7 @@
       "id": "asset:europe-1935-benchmark:geography-manifest",
       "kind": "other",
       "path": "geography/runtime-geography-manifest.json",
-      "contentAddress": "sha256:e4ba957fa2cab9269a741381b0a0359a9d04bb8ec657c71d6d8c362c0310dd45",
+      "contentAddress": "sha256:143cb3f735387240750bcbaed6dd15a2de55b422d2e1bbecdf4efe7357424cd1",
       "mediaType": "application/json",
       "required": true
     },
@@ -19,7 +19,7 @@
       "id": "asset:europe-1935-benchmark:land-adjacency",
       "kind": "other",
       "path": "geography/runtime-land-adjacency.json",
-      "contentAddress": "sha256:1ac6a5853de358d241cc556c33f15f4f2868ebd96e9ed9f2cce21321561d5711",
+      "contentAddress": "sha256:fcf05bdc1e66965319d953e029851396a5c00becfeb9cc09367ce47e90f1d187",
       "mediaType": "application/json",
       "required": true
     },
@@ -35,7 +35,7 @@
       "id": "asset:europe-1935-benchmark:regions",
       "kind": "regions",
       "path": "geography/runtime-regions.geojson",
-      "contentAddress": "sha256:68d2a14f95f95b505c2845b68e5ebd02a25fb42dd8f2e26cef3feb979f16e2ad",
+      "contentAddress": "sha256:bfffbdbebdab8a8dce2245120d965b616b6e0d1d73b16b9c03c9f513d7a44eaa",
       "mediaType": "application/geo+json",
       "required": true
     },
@@ -43,7 +43,7 @@
       "id": "asset:europe-1935-benchmark:starting-state-manifest",
       "kind": "other",
       "path": "starting-state/starting-state-manifest.json",
-      "contentAddress": "sha256:a1db88fa987c491a4fd8784c329f919027f9969b129ec1a11ed0cf106edde3e0",
+      "contentAddress": "sha256:501e4416422b0d4a467c93b86db514660dd34b7c73a87ae1e8aaa9afe2b42142",
       "mediaType": "application/json",
       "required": true
     }

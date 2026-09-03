@@ -198,6 +198,12 @@
       "nativeId": "cs-stredni-cechy"
     },
     {
+      "id": "region:europe-1935:cs-sudety",
+      "dataset": "europe",
+      "datasetVersion": "1935",
+      "nativeId": "cs-sudety"
+    },
+    {
       "id": "region:europe-1935:cs-vychodni-cechy",
       "dataset": "europe",
       "datasetVersion": "1935",
@@ -799,6 +805,7 @@
     "region:europe-1935:cs-slezsko": "polity:czechoslovakia",
     "region:europe-1935:cs-slovensko": "polity:czechoslovakia",
     "region:europe-1935:cs-stredni-cechy": "polity:czechoslovakia",
+    "region:europe-1935:cs-sudety": "polity:czechoslovakia",
     "region:europe-1935:cs-vychodni-cechy": "polity:czechoslovakia",
     "region:europe-1935:cs-zapadni-cechy": "polity:czechoslovakia",
     "region:europe-1935:danzig-freie-stadt-danzig": "polity:free-city-of-danzig",
@@ -1010,6 +1017,7 @@
         "region:europe-1935:cs-slezsko",
         "region:europe-1935:cs-slovensko",
         "region:europe-1935:cs-stredni-cechy",
+        "region:europe-1935:cs-sudety",
         "region:europe-1935:cs-vychodni-cechy",
         "region:europe-1935:cs-zapadni-cechy"
       ],

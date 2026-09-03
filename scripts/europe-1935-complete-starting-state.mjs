@@ -243,8 +243,7 @@ const IDENTITY_BY_POLITY = Object.freeze({
 const REGIONAL_CULTURES = Object.freeze({
   'region:europe-1935:cs-slovensko': ['slovak', []],
   'region:europe-1935:cs-podkarpatska-rus': ['rusyn', [{ identityId: 'culture:ukrainian', shareBp: 1800 }]],
-  'region:europe-1935:cs-severni-cechy': ['czech', [{ identityId: 'culture:german', shareBp: 3500 }]],
-  'region:europe-1935:cs-zapadni-cechy': ['czech', [{ identityId: 'culture:german', shareBp: 3500 }]],
+  'region:europe-1935:cs-sudety': ['german', [{ identityId: 'culture:czech', shareBp: 1800 }]],
   'region:europe-1935:cs-slezsko': ['czech', [{ identityId: 'culture:german', shareBp: 2800 }]],
   'region:europe-1935:fr-corse': ['corsican', [{ identityId: 'culture:french', shareBp: 2200 }]],
   'region:europe-1935:it-sardegna': ['sardinian', [{ identityId: 'culture:italian', shareBp: 2200 }]],
@@ -273,7 +272,7 @@ const ACCEPTED_CULTURES = Object.freeze({
   'polity:united-kingdom': ['irish', 'scottish', 'welsh'],
 });
 
-function buildIdentity(scenario) {
+export function buildIdentity(scenario) {
   const cultureNames = { american: 'American', austrian: 'Austrian', belarusian: 'Belarusian', british: 'British', corsican: 'Corsican', czech: 'Czech', french: 'French', german: 'German', irish: 'Irish', italian: 'Italian', jewish: 'Jewish', polish: 'Polish', rusyn: 'Rusyn', sardinian: 'Sardinian', scottish: 'Scottish', sicilian: 'Sicilian', slovak: 'Slovak', soviet: 'Soviet', ukrainian: 'Ukrainian', welsh: 'Welsh' };
   const religionNames = { catholic: 'Catholic', christian: 'Christian', secular: 'State secularism' };
   const cultures = Object.entries(cultureNames).map(([id, name]) => ({ cultureId: `culture:${id}`, displayName: display(name) }));
