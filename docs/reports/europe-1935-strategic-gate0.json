@@ -6,10 +6,10 @@
   "packageChecksum": "sha256:a62a01c0ee94f040871081c8213cb6d586d0213f973a377fde9146bbe67e3af4",
   "status": "blocked",
   "budget": {
-    "completedTurns": 40,
-    "maximumTurns": 40,
-    "decisionTurns": 36,
-    "schemaPreflightTurns": 4,
+    "completedTurns": 44,
+    "maximumTurns": 44,
+    "decisionTurns": 39,
+    "schemaPreflightTurns": 5,
     "remainingTurns": 0
   },
   "canonicalAutomatedCoverage": {
@@ -134,7 +134,7 @@
     ]
   },
   "postBudgetDeterministicCorrections": {
-    "status": "deterministic-pass-live-revalidation-unavailable",
+    "status": "terra-live-revalidated",
     "modelTurns": 0,
     "mockProbeCount": 13,
     "maximumApplicationInputTokens": 7581,
@@ -148,9 +148,43 @@
       "Mobilization readiness varies deterministically with scale, infrastructure and organizer assignment."
     ]
   },
+  "terraPostFixValidation": {
+    "status": "automated-pass-awaiting-owner-score",
+    "ownerApprovedAdditionalTurns": 4,
+    "provider": "codex-subscription",
+    "model": "gpt-5.6-terra",
+    "effort": "medium",
+    "schemaPreflightTurns": 1,
+    "decisionTurns": 3,
+    "maximumApplicationInputTokens": 7581,
+    "structuredOutputRate": 1,
+    "actorAndTriggerCoverageRate": 1,
+    "legalMaterializationRate": 1,
+    "groundedReferenceRate": 1,
+    "evaluatorMutationCount": 0,
+    "probes": [
+      {
+        "probeId": "czech-strategic",
+        "selectedFamilies": ["respond-proposal", "change-policy"],
+        "result": "rejected the German demand for Sudety and additionally prioritized administration"
+      },
+      {
+        "probeId": "poland-real-threat",
+        "selectedFamilies": ["mobilize", "issue-order"],
+        "result": "mobilized 308000 fully equipped personnel in Poznan and ordered the home theatre to defend"
+      },
+      {
+        "probeId": "poland-mobilization",
+        "selectedFamilies": ["mobilize"],
+        "result": "selected the two-region medium plan: 350000 personnel in Poznan and 210000 in Warsaw at 7500 bp aggregate equipment coverage"
+      }
+    ],
+    "manualReviewFlags": [
+      "The Czech rejection is relevant and coherent; its additional administration reallocation is legal but only weakly connected to the immediate territorial demand."
+    ]
+  },
   "unmetAcceptanceCriteria": [
-    "The frozen 40-turn budget ended before a dedicated reversed-affordance-order live pair could be completed.",
-    "The corrected Czech strategic and multi-region mobilization prompts have deterministic coverage but cannot receive a new live model turn after the 40-turn cap.",
+    "The original 40-turn budget and owner-approved four-turn Terra extension did not include a dedicated reversed-affordance-order live pair.",
     "Blind owner scoring has not yet established 100% mandatory triage and at least 90% relevance/coherence scores of 4/5 or higher."
   ],
   "ownerAssessment": {

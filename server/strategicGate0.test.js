@@ -119,9 +119,15 @@ test('committed Gate 0 evidence is redacted and cannot claim owner acceptance wh
   assert.equal(report.redaction.threadIdsIncluded, false);
   assert.equal(report.ownerAssessment.status, 'pending');
   assert.equal(report.status, 'blocked');
-  assert.equal(report.postBudgetDeterministicCorrections.status, 'deterministic-pass-live-revalidation-unavailable');
+  assert.equal(report.postBudgetDeterministicCorrections.status, 'terra-live-revalidated');
   assert.equal(report.postBudgetDeterministicCorrections.modelTurns, 0);
   assert.equal(report.postBudgetDeterministicCorrections.mockProbeCount, 13);
   assert.ok(report.postBudgetDeterministicCorrections.maximumApplicationInputTokens <= 8000);
+  assert.equal(report.terraPostFixValidation.model, 'gpt-5.6-terra');
+  assert.equal(report.terraPostFixValidation.effort, 'medium');
+  assert.equal(report.terraPostFixValidation.schemaPreflightTurns + report.terraPostFixValidation.decisionTurns, 4);
+  assert.equal(report.terraPostFixValidation.structuredOutputRate, 1);
+  assert.equal(report.terraPostFixValidation.legalMaterializationRate, 1);
+  assert.equal(report.terraPostFixValidation.evaluatorMutationCount, 0);
   assert.ok(report.unmetAcceptanceCriteria.length > 0);
 });
