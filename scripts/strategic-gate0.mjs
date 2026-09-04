@@ -174,12 +174,13 @@ const buildProbes = () => {
     preferred: ['negotiate-trade', 'external-import', 'reallocate-production'],
     expect: (actions) => actions.some((entry) => ['negotiate-trade', 'external-import', 'reallocate-production'].includes(entry.tool)) }));
 
-  const germanRegion = base.regions.find((entry) => entry.controllerId === 'polity:germany');
+  const sudety = base.regions.find((entry) => entry.regionId === 'region:europe-1935:cs-sudety');
+  if (!sudety || sudety.controllerId !== 'polity:czechoslovakia') throw new Error('canonical Czech Sudety region is missing');
   const proposal = runTurn(base, { commands: [{ kind: 'diplomacy.propose', ...commandBase(base, 'polity:germany', 1),
     proposalId: 'proposal:gate0-czech-territory', recipientPolityId: 'polity:czechoslovakia',
-    terms: { kind: 'territorial-settlement', fromPolityId: 'polity:germany', toPolityId: 'polity:czechoslovakia', regionIds: [germanRegion.regionId] } }] }).result;
+    terms: { kind: 'territorial-settlement', fromPolityId: 'polity:czechoslovakia', toPolityId: 'polity:germany', regionIds: [sudety.regionId] } }] }).result;
   if (proposal.rejections.length) throw new Error(`Czech proposal setup rejected: ${proposal.rejections[0].detail}`);
-  const proposalTrigger = { triggerId: 'trigger:czech-proposal', kind: 'proposal', summary: 'Answer the pending German territorial proposal.',
+  const proposalTrigger = { triggerId: 'trigger:czech-proposal', kind: 'proposal', summary: 'Germany demands transfer of Sudety from Czechoslovakia to Germany.',
     mandatory: true, compatibleTools: ['respond-proposal'], evidenceIds: [] };
   probes.push(makeProbe({ id: 'czech-accept', state: proposal.state, polityId: 'polity:czechoslovakia', reason: 'proposal',
     detail: 'Evaluate the legal accept path.', tools: ['respond-proposal', 'conserve'], trigger: proposalTrigger,
@@ -191,6 +192,10 @@ const buildProbes = () => {
     preferred: ['respond-proposal'], choiceFilter: (action) => action.response === 'reject',
     instruction: 'This is a reject-path contract micro-probe: select the published choice whose response is reject.',
     expect: (actions) => actions.some((entry) => entry.tool === 'respond-proposal' && entry.response === 'reject') }));
+  probes.push(makeProbe({ id: 'czech-strategic', state: proposal.state, polityId: 'polity:czechoslovakia', reason: 'proposal',
+    detail: 'Choose freely whether to accept or reject the bounded Sudeten settlement.', tools: ['respond-proposal', 'conserve'],
+    trigger: proposalTrigger, preferred: ['respond-proposal'],
+    expect: (actions) => actions.some((entry) => entry.tool === 'respond-proposal') }));
 
   const war = runTurn(base, { commands: [{ kind: 'war.declare', ...commandBase(base, 'polity:germany', 2),
     warId: 'war:gate0-germany-poland', defenderPolityId: 'polity:poland', reason: 'rivalry' }] }).result;
@@ -205,6 +210,7 @@ const buildProbes = () => {
   probes.push(makeProbe({ id: 'poland-mobilization', state: war.state, polityId: 'polity:poland', reason: 'war',
     detail: 'Mobilization micro-probe: select a legal mobilization response.', tools: ['mobilize', 'conserve'],
     trigger: { ...warTrigger, triggerId: 'trigger:poland-mobilize', compatibleTools: ['mobilize'] }, preferred: ['mobilize'],
+    choiceFilter: (action) => action.deployments?.length > 1,
     instruction: 'This is a mobilization contract micro-probe: select exactly one published mobilize choice.',
     expect: (actions) => actions.length === 1 && actions[0].tool === 'mobilize' }));
   return { probes, contentVersion, packageChecksum: stateChecksum(base) };

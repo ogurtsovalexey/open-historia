@@ -315,9 +315,10 @@ test('Strategic V3 zero treasury and current control remove unaffordable or inva
   const factions = brief.affordances.find((entry) => entry.tool === 'respond-faction');
   if (factions?.tool === 'respond-faction') assert.ok(factions.factions.every((entry) => entry.choices.every((choice) => choice.action.response !== 'concede')));
   const mobilize = brief.affordances.find((entry) => entry.tool === 'mobilize');
-  if (mobilize?.tool === 'mobilize') assert.ok(mobilize.regions.every((entry) => entry.choices.every((choice) => {
-    const command = materializeStrategicDecisionV3(clone, { ...holdV2('polity:austria'), actions: [choice.action], hold: null }, brief).commands[0];
-    return command?.kind === 'military.mobilize' && command.manpower > 0 && command.equipment > 0;
+  if (mobilize?.tool === 'mobilize') assert.ok(mobilize.plans.every((entry) => entry.choices.every((choice) => {
+    const commands = materializeStrategicDecisionV3(clone, { ...holdV2('polity:austria'), actions: [choice.action], hold: null }, brief).commands;
+    return commands.length === choice.action.deployments?.length && commands.every((command) => command.kind === 'military.mobilize'
+      && command.manpower > 0 && command.equipment > 0);
   })));
 });
 

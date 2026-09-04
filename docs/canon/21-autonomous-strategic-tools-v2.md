@@ -36,6 +36,15 @@ cannot resume or validate a V4 run.
 - Preview evidence is the delta between an action run and a no-op run from the
   same snapshot over the same month. Ordinary tick effects are not attributed
   to the action.
+- Incoming proposal choices retain bounded, named terms, including transfer
+  direction and regions, alongside the engine preview. Mobilization is offered
+  as three application-built plans over at most three controlled regions,
+  ranked by active-war adjacency, friendly supply distance, existing forces,
+  infrastructure and stable ids. The model chooses a plan; the application
+  derives exact manpower from the authored ceiling and identity-adjusted pool,
+  enforces scale-specific equipment coverage, apportions formations, and
+  computes readiness. A bounded front summary exposes supply capacity and
+  qualitative local force bands, never geometry or the full supply graph.
 - The complete prompt is limited to 8,000 input tokens. Missing choices are
   never silently truncated. Schema/normalization/semantic failures terminalize
   the attempt; provider failure or staleness produces a visible hold and keeps
@@ -90,7 +99,7 @@ never inferred from names. Policy-change pressure is unavailable until an
 engine command supports it. No hidden fact ids, private characters, geometry,
 full region catalog, or player doctrine enters opponent briefs (Principles 1–3).
 
-Regional candidates are capped at eight, diplomatic/trade partners at twelve,
+Regional and foreign project-target candidates are capped at eight, diplomatic/trade partners at twelve,
 proposals/factions/projects/wars at eight, and formations/advance targets at
 six. Ranking and serialization are deterministic. Batch sizing measures the
 complete application system text plus serialized payload and stays strictly

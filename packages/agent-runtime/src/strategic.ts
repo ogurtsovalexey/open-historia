@@ -50,9 +50,29 @@ const factionActionSchema = z.object({
 const projectActionSchema = z.object({
   tool: z.literal('start-project'), templateId: z.string(), scale: scaleSchema, targetRegionId: z.string().optional(), targetPolityId: z.string().optional(),
 }).strict();
-const mobilizeActionSchema = z.object({
-  tool: z.literal('mobilize'), locationRegionId: z.string(), scale: scaleSchema, commanderId: z.string().nullable().optional(),
+const mobilizeDeploymentSchema = z.object({
+  locationRegionId: z.string(), role: z.enum(['main', 'support', 'reserve']), commanderId: z.string().nullable().optional(),
 }).strict();
+const mobilizeActionSchema = z.object({
+  tool: z.literal('mobilize'), scale: scaleSchema,
+  // locationRegionId/commanderId keep frozen V2/V3 diagnostics readable.
+  // Production V4 publishes deployments so one strategic plan may stage
+  // several formations without asking the model to invent engine commands.
+  locationRegionId: z.string().optional(), commanderId: z.string().nullable().optional(),
+  deployments: z.array(mobilizeDeploymentSchema).min(1).max(3).optional(),
+}).strict().superRefine((action, ctx) => {
+  if ((action.locationRegionId === undefined) === (action.deployments === undefined)) {
+    ctx.addIssue({ code: 'custom', message: 'mobilization requires exactly one legacy location or a bounded deployment plan' });
+  }
+  if (action.deployments) {
+    if (new Set(action.deployments.map((entry) => entry.locationRegionId)).size !== action.deployments.length) {
+      ctx.addIssue({ code: 'custom', path: ['deployments'], message: 'mobilization deployment regions must be unique' });
+    }
+    if (action.deployments.filter((entry) => entry.role === 'main').length !== 1) {
+      ctx.addIssue({ code: 'custom', path: ['deployments'], message: 'mobilization plan requires exactly one main deployment' });
+    }
+  }
+});
 const warActionSchema = z.object({
   tool: z.literal('declare-war'), defender: z.string(), reason: z.enum(['claim', 'defense', 'guarantee', 'rivalry', 'none']),
 }).strict();
@@ -120,7 +140,7 @@ export type StrategicAffordanceV3 =
   | { tool: 'change-policy'; current: { taxBurdenBp: number; exemptionBp: number; priorities: Record<string, number> }; choices: Array<StrategicChoiceV3<ActionOf<'change-policy'>>> }
   | { tool: 'respond-faction'; factions: Array<{ faction: StrategicEntityRefV3; escalation: string; supportBp: number; powerBp: number; preferredPolicy: Record<string, unknown>; foreignPolicy: string; choices: Array<StrategicChoiceV3<ActionOf<'respond-faction'>>> }> }
   | { tool: 'start-project'; projects: Array<{ template: StrategicEntityRefV3; kind: string; cost: number; durationMonths: number; capacity: Record<string, unknown>; effectSummary: string; familiarityBp: number; targetMode: 'none' | 'owned-region' | 'foreign-polity'; targets: StrategicEntityRefV3[]; choices: Array<StrategicChoiceV3<ActionOf<'start-project'>>> }> }
-  | { tool: 'mobilize'; regions: Array<{ region: StrategicEntityRefV3; availableManpower: number; availableEquipment: number; commanders: Array<StrategicEntityRefV3 | null>; choices: Array<StrategicChoiceV3<ActionOf<'mobilize'>>> }> }
+  | { tool: 'mobilize'; plans: Array<{ label: string; scale: 'small' | 'medium' | 'large'; deployments: Array<{ region: StrategicEntityRefV3; role: 'main' | 'support' | 'reserve'; frontDistance: number | null; infrastructureBp: number; adjacentHostiles: StrategicEntityRefV3[] }>; choices: Array<StrategicChoiceV3<ActionOf<'mobilize'>>> }> }
   | { tool: 'declare-war'; defenders: Array<{ defender: StrategicEntityRefV3; reasons: Array<{ reason: ActionOf<'declare-war'>['reason']; evidenceRef: string | null; choice: StrategicChoiceV3<ActionOf<'declare-war'>> }> }> }
   | { tool: 'issue-order'; formations: Array<{ formation: StrategicEntityRefV3; status: string; location: StrategicEntityRefV3; home: StrategicEntityRefV3; posture: string; forceBand: string; choices: Array<StrategicChoiceV3<ActionOf<'issue-order'>>> }> }
   | { tool: 'negotiate-peace'; wars: Array<{ war: StrategicEntityRefV3; opposingLeader: StrategicEntityRefV3; occupations: StrategicEntityRefV3[]; pendingOffer: boolean; choices: Array<StrategicChoiceV3<ActionOf<'negotiate-peace'>>> }> };
@@ -371,6 +391,7 @@ export function materializeStrategicDecisionV2(state: EconWorldState, raw: unkno
     } else if (action.tool === 'mobilize') {
       const military = state.military?.polities.find((entry) => entry.polityId === decision.polityId);
       if (!military) { rejected.push({ actionIndex: index, reason: 'military state unavailable' }); continue; }
+      if (!action.locationRegionId) { rejected.push({ actionIndex: index, reason: 'multi-region mobilization requires the V3/V4 materializer' }); continue; }
       const divisor = scaleValue(action.scale, [10, 4, 2]);
       const manpower = Math.floor(military.manpowerPool / divisor); const equipment = Math.min(military.equipmentReserve, manpower);
       add({ kind: 'military.mobilize', ...ids, formationId: `formation:${stableToken(`${state.revision}|${decision.polityId}|${index}`)}`,
@@ -495,6 +516,70 @@ const equivalentAgreement = (state: EconWorldState, left: string, right: string,
   || (state.diplomacy?.proposals ?? []).some((entry) => entry.terms.kind === 'agreement' && entry.terms.agreementType === agreementType
     && partiesMatch(entry.terms, left, right));
 
+type StrategicRegionV3 = EconWorldState['regions'][number];
+type MobilizationRegionV3 = {
+  region: StrategicRegionV3;
+  frontDistance: number | null;
+  adjacentHostiles: StrategicEntityRefV3[];
+};
+
+/**
+ * Produces a small application-owned military summary instead of exposing the
+ * map to the model. Active-war border regions come first, followed by friendly
+ * supply distance, existing formations, infrastructure, and a stable ID tie
+ * break. No enemy formation strength or hidden state is consulted.
+ */
+const rankMobilizationRegions = (state: EconWorldState, polityId: string,
+  actuallyControlled: StrategicRegionV3[]): MobilizationRegionV3[] => {
+  if (!state.military) return [];
+  const controlledIds = new Set(actuallyControlled.map((entry) => entry.regionId));
+  const opponents = new Set<string>();
+  for (const war of state.military.wars.filter((entry) => entry.status === 'active')) {
+    if (war.attackers.includes(polityId as never)) war.defenders.forEach((entry) => opponents.add(entry));
+    if (war.defenders.includes(polityId as never)) war.attackers.forEach((entry) => opponents.add(entry));
+  }
+  const friendlyNeighbours = new Map<string, Set<string>>();
+  const hostileByRegion = new Map<string, Set<string>>();
+  for (const link of state.military.supplyLinks) {
+    const [left, right] = link.regions;
+    const leftControlled = controlledIds.has(left);
+    const rightControlled = controlledIds.has(right);
+    if (leftControlled && rightControlled) {
+      const leftRows = friendlyNeighbours.get(left) ?? new Set<string>();
+      const rightRows = friendlyNeighbours.get(right) ?? new Set<string>();
+      leftRows.add(right); rightRows.add(left);
+      friendlyNeighbours.set(left, leftRows); friendlyNeighbours.set(right, rightRows);
+      continue;
+    }
+    const own = leftControlled ? left : rightControlled ? right : null;
+    const other = own === left ? right : own === right ? left : null;
+    if (!own || !other) continue;
+    const controller = actualControllerV3(state, other);
+    if (!controller || !opponents.has(controller)) continue;
+    const rows = hostileByRegion.get(own) ?? new Set<string>();
+    rows.add(other); hostileByRegion.set(own, rows);
+  }
+  const distances = new Map<string, number>();
+  const queue = [...hostileByRegion.keys()].sort();
+  queue.forEach((entry) => distances.set(entry, 0));
+  for (let index = 0; index < queue.length; index += 1) {
+    const current = queue[index]!;
+    const nextDistance = distances.get(current)! + 1;
+    for (const neighbour of [...(friendlyNeighbours.get(current) ?? [])].sort()) {
+      if (distances.has(neighbour)) continue;
+      distances.set(neighbour, nextDistance); queue.push(neighbour);
+    }
+  }
+  const formationLocations = new Set(state.military.formations.filter((entry) => entry.polityId === polityId
+    && !['demobilized', 'destroyed'].includes(entry.status)).map((entry) => entry.locationRegionId));
+  return actuallyControlled.map((region) => ({ region, frontDistance: distances.get(region.regionId) ?? null,
+    adjacentHostiles: [...(hostileByRegion.get(region.regionId) ?? [])].sort().map((entry) => regionRef(state, entry)) }))
+    .sort((left, right) => (left.frontDistance ?? Number.MAX_SAFE_INTEGER) - (right.frontDistance ?? Number.MAX_SAFE_INTEGER)
+      || Number(formationLocations.has(right.region.regionId)) - Number(formationLocations.has(left.region.regionId))
+      || right.region.infrastructureBp - left.region.infrastructureBp
+      || left.region.regionId.localeCompare(right.region.regionId));
+};
+
 const reallocationFor = (state: EconWorldState, action: ActionOf<'reallocate-production'>) => {
   const target = state.regions.find((entry) => entry.regionId === action.targetRegionId);
   if (!target?.activities || target.activities.length < 2) return null;
@@ -538,6 +623,62 @@ const redistributedPriorities = (current: Record<BudgetCategory, number>, emphas
   for (const share of shares) result[share.entry] -= share.amount;
   result[emphasized] += assigned;
   return result;
+};
+
+const MOBILIZATION_TARGET_CEILING_SHARE_BP = Object.freeze({ small: 1000, medium: 2500, large: 5000 });
+const MOBILIZATION_MIN_EQUIPMENT_COVERAGE_BP = Object.freeze({ small: 10000, medium: 7500, large: 5000 });
+
+const apportionPositive = (total: number, weights: number[]): number[] => {
+  if (weights.length === 0 || total < weights.length) return [];
+  const remaining = total - weights.length;
+  const weightTotal = weights.reduce((sum, value) => sum + value, 0);
+  const rows = weights.map((weight, index) => {
+    const numerator = remaining * weight;
+    return { index, value: 1 + Math.floor(numerator / weightTotal), remainder: numerator % weightTotal };
+  });
+  let assigned = rows.reduce((sum, row) => sum + row.value, 0);
+  for (const row of [...rows].sort((left, right) => right.remainder - left.remainder || left.index - right.index)) {
+    if (assigned >= total) break;
+    row.value += 1;
+    assigned += 1;
+  }
+  return rows.sort((left, right) => left.index - right.index).map((row) => row.value);
+};
+
+const mobilizationTotals = (state: EconWorldState, actorId: string, scale: z.infer<typeof scaleSchema>) => {
+  const military = state.military?.polities.find((entry) => entry.polityId === actorId);
+  if (!military) return null;
+  const identityAvailable = Math.max(0, Math.floor(military.manpowerCeiling
+    * polityIdentityEffects(state.identity, state.regions, actorId).recruitmentMultiplierBp / 10000)
+    - military.mobilized - military.casualties);
+  const available = Math.min(military.manpowerPool, identityAvailable);
+  const targetMobilized = Math.floor(military.manpowerCeiling * MOBILIZATION_TARGET_CEILING_SHARE_BP[scale] / 10000);
+  const desiredIncrement = Math.max(0, targetMobilized - military.mobilized);
+  const minimumCoverageBp = MOBILIZATION_MIN_EQUIPMENT_COVERAGE_BP[scale];
+  const equipmentSupported = Math.floor(military.equipmentReserve * 10000 / minimumCoverageBp);
+  const manpower = Math.min(available, desiredIncrement, equipmentSupported);
+  const equipment = Math.min(military.equipmentReserve, manpower);
+  return { manpower, equipment, minimumCoverageBp,
+    equipmentCoverageBp: manpower > 0 ? Math.floor(equipment * 10000 / manpower) : 0 };
+};
+
+const mobilizationCommands = (state: EconWorldState, actorId: string, action: ActionOf<'mobilize'>): EconCommand[] => {
+  const totals = mobilizationTotals(state, actorId, action.scale);
+  const deployments = action.deployments ?? (action.locationRegionId ? [{ locationRegionId: action.locationRegionId,
+    role: 'main' as const, commanderId: action.commanderId ?? null }] : []);
+  if (!totals || totals.manpower <= 0 || totals.equipment <= 0 || deployments.length === 0) return [];
+  const weights = deployments.map((entry) => entry.role === 'main' ? 5 : entry.role === 'support' ? 3 : 2);
+  const manpower = apportionPositive(totals.manpower, weights);
+  const equipment = apportionPositive(totals.equipment, weights);
+  if (manpower.length !== deployments.length || equipment.length !== deployments.length) return [];
+  return econCommandSchema.array().parse(deployments.map((deployment, index) => ({
+    kind: 'military.mobilize',
+    commandId: uuid(`${state.revision}|v3|${actorId}|${optionKey(action)}|${index}`),
+    actorPolityId: actorId, expectedRevision: state.revision, effectiveMonth: state.month,
+    formationId: `formation:${stableToken(`${state.revision}|v3|${actorId}|${optionKey(action)}|${index}`)}`,
+    locationRegionId: deployment.locationRegionId, manpower: manpower[index], equipment: equipment[index],
+    commanderId: deployment.commanderId ?? null,
+  })));
 };
 
 /** Pure structural mapper. It deliberately performs no affordance matching or engine legality checks. */
@@ -604,17 +745,7 @@ export function mapStrategicActionToCommandsUncheckedV3(state: EconWorldState, a
       monthlyFunding, priority: scaleValue(action.scale, [2, 3, 5]) }]);
   }
   if (action.tool === 'mobilize') {
-    const military = state.military?.polities.find((entry) => entry.polityId === actorId);
-    if (!military) return [];
-    const identityAvailable = Math.max(0, Math.floor(military.manpowerCeiling * polityIdentityEffects(state.identity, state.regions, actorId).recruitmentMultiplierBp / 10000)
-      - military.mobilized - military.casualties);
-    const available = Math.min(military.manpowerPool, identityAvailable);
-    const manpower = Math.floor(available / scaleValue(action.scale, [10, 4, 2]));
-    const equipment = Math.min(military.equipmentReserve, manpower);
-    if (manpower <= 0 || equipment <= 0) return [];
-    return econCommandSchema.array().parse([{ kind: 'military.mobilize', ...ids,
-      formationId: `formation:${stableToken(`${state.revision}|v3|${actorId}|${optionKey(action)}`)}`, locationRegionId: action.locationRegionId,
-      manpower, equipment, commanderId: action.commanderId ?? null }]);
+    return mobilizationCommands(state, actorId, action);
   }
   if (action.tool === 'declare-war') return econCommandSchema.array().parse([{ kind: 'war.declare', ...ids,
     warId: `war:${stableToken(`${state.revision}|v3|${actorId}|${optionKey(action)}`)}`, defenderPolityId: action.defender, reason: action.reason }]);
@@ -664,7 +795,17 @@ const previewFor = (noOp: EconWorldState, actorId: string, action: StrategicActi
   const afterPolity = after.polities.find((entry) => entry.id === actorId)!;
   if (beforePolity.treasury !== afterPolity.treasury) deltas.push({ path: `polities.${actorId}.treasury`, before: beforePolity.treasury, after: afterPolity.treasury });
   const command = commands[0];
-  if (command?.kind === 'economy.invest-region') {
+  if (action.tool === 'mobilize') {
+    const mobilization = commands.filter((entry): entry is Extract<EconCommand, { kind: 'military.mobilize' }> => entry.kind === 'military.mobilize');
+    const formations = mobilization.map((entry) => ({ locationRegionId: entry.locationRegionId, manpower: entry.manpower,
+      equipment: entry.equipment, readyMonth: after.military?.formations.find((formation) => formation.formationId === entry.formationId)?.readyMonth ?? null,
+      commanderId: entry.commanderId }));
+    const totalManpower = formations.reduce((sum, entry) => sum + entry.manpower, 0);
+    const totalEquipment = formations.reduce((sum, entry) => sum + entry.equipment, 0);
+    deltas.push({ path: 'military.mobilizationPlan', before: null, after: { totalManpower, totalEquipment,
+      equipmentCoverageBp: totalManpower > 0 ? Math.floor(totalEquipment * 10000 / totalManpower) : 0,
+      readyMonths: [...new Set(formations.flatMap((entry) => entry.readyMonth ? [entry.readyMonth] : []))] } });
+  } else if (command?.kind === 'economy.invest-region') {
     const before = noOp.regions.find((entry) => entry.regionId === command.targetRegionId)!.infrastructureBp;
     const value = after.regions.find((entry) => entry.regionId === command.targetRegionId)!.infrastructureBp;
     deltas.push({ path: `regions.${command.targetRegionId}.infrastructureBp`, before, after: value });
@@ -681,13 +822,18 @@ const previewFor = (noOp: EconWorldState, actorId: string, action: StrategicActi
   } else if (command?.kind === 'diplomacy.propose') {
     deltas.push({ path: 'diplomacy.pendingProposal', before: null, after: command.terms });
     if (action.tool === 'apply-diplomatic-pressure') deltas.push({ path: 'diplomacy.pressureRiskBand', before: null, after: action.pressure });
-  } else if (command?.kind === 'military.mobilize') {
-    deltas.push({ path: 'military.newFormation', before: null, after: { manpower: command.manpower, equipment: command.equipment,
-      readyMonth: after.military?.formations.find((entry) => entry.formationId === command.formationId)?.readyMonth ?? null } });
+  } else if (action.tool === 'respond-proposal') {
+    for (const beforeRegion of noOp.regions) {
+      const afterRegion = after.regions.find((entry) => entry.regionId === beforeRegion.regionId);
+      if (afterRegion && beforeRegion.controllerId !== afterRegion.controllerId) deltas.push({
+        path: `regions.${beforeRegion.regionId}.controllerId`, before: beforeRegion.controllerId, after: afterRegion.controllerId,
+      });
+    }
+    deltas.push({ path: 'respond-proposal.engineResult', before: null, after: 'accepted in isolated dry run' });
   } else if (command?.kind === 'peace.propose') deltas.push({ path: 'military.pendingPeacePackage', before: null, after: command.regionTransfers });
   else deltas.push({ path: `${action.tool}.engineResult`, before: null, after: 'accepted in isolated dry run' });
   return { summary: 'Accepted by isolated engine dry run.',
-    commandKinds: commands.map((entry) => entry.kind), deltas };
+    commandKinds: [...new Set(commands.map((entry) => entry.kind))], deltas };
 };
 
 const compileChoice = <A extends StrategicActionV2>(state: EconWorldState, actorId: string, action: A): StrategicChoiceV3<A> | null => {
@@ -714,7 +860,7 @@ export function expandStrategicAffordancesV3(brief: StrategicBriefV3): Strategic
     else if (affordance.tool === 'change-policy') actions.push(...affordance.choices.map((choice) => choice.action));
     else if (affordance.tool === 'respond-faction') actions.push(...affordance.factions.flatMap((entry) => entry.choices.map((choice) => choice.action)));
     else if (affordance.tool === 'start-project') actions.push(...affordance.projects.flatMap((entry) => entry.choices.map((choice) => choice.action)));
-    else if (affordance.tool === 'mobilize') actions.push(...affordance.regions.flatMap((entry) => entry.choices.map((choice) => choice.action)));
+    else if (affordance.tool === 'mobilize') actions.push(...affordance.plans.flatMap((entry) => entry.choices.map((choice) => choice.action)));
     else if (affordance.tool === 'declare-war') actions.push(...affordance.defenders.flatMap((entry) => entry.reasons.map((reason) => reason.choice.action)));
     else if (affordance.tool === 'issue-order') actions.push(...affordance.formations.flatMap((entry) => entry.choices.map((choice) => choice.action)));
     else if (affordance.tool === 'negotiate-peace') actions.push(...affordance.wars.flatMap((entry) => entry.choices.map((choice) => choice.action)));
@@ -855,7 +1001,7 @@ export function buildStrategicBriefV3(state: EconWorldState, polityId: string, o
       const targets = targetMode === 'owned-region' ? controlled.slice(0, 8).map((entry) => regionRef(state, entry.regionId))
         : targetMode === 'foreign-polity' && state.modules?.intelligence ? state.polities.filter((entry) => entry.id !== polityId
           && (state.intelligence?.truths ?? []).some((fact) => fact.subjectPolityId === entry.id && !known.has(fact.factId)))
-          .sort((a, b) => a.id.localeCompare(b.id)).slice(0, 12).map((entry) => polityRef(state, entry.id)) : [];
+          .sort((a, b) => a.id.localeCompare(b.id)).slice(0, 8).map((entry) => polityRef(state, entry.id)) : [];
       const targetRows: Array<StrategicEntityRefV3 | null> = targetMode === 'none' ? [null] : targets;
       const choices = targetRows.flatMap((target) => scales.map((scale) => compileChoice(state, polityId, {
         tool: 'start-project', templateId: template.templateId, scale,
@@ -873,18 +1019,28 @@ export function buildStrategicBriefV3(state: EconWorldState, polityId: string, o
   if (state.modules?.armedForces && state.military) {
     const military = state.military.polities.find((entry) => entry.polityId === polityId);
     if (military) {
-      const identityAvailable = Math.max(0, Math.floor(military.manpowerCeiling * polityIdentityEffects(state.identity, state.regions, polityId).recruitmentMultiplierBp / 10000)
-        - military.mobilized - military.casualties);
-      const availableManpower = Math.min(military.manpowerPool, identityAvailable);
-      const commanders: Array<StrategicEntityRefV3 | null> = [null, ...state.military.commanders.filter((entry) => entry.polityId === polityId)
-        .sort((a, b) => a.commanderId.localeCompare(b.commanderId)).slice(0, 1).map((entry) => ref(entry.commanderId, entry.displayName.en))];
-      const regions = actuallyControlled.slice(0, 1).map((region) => ({ region: regionRef(state, region.regionId), availableManpower,
-        availableEquipment: military.equipmentReserve, commanders,
-        choices: commanders.flatMap((commander) => scales.map((scale) => compileChoice(state, polityId,
-          { tool: 'mobilize', locationRegionId: region.regionId, scale, commanderId: commander?.id ?? null })))
-          .filter((entry): entry is NonNullable<typeof entry> => entry !== null),
-      })).filter((entry) => entry.choices.length);
-      if (regions.length) affordances.push({ tool: 'mobilize', regions });
+      const candidates = rankMobilizationRegions(state, polityId, actuallyControlled).slice(0, 3);
+      const commanderId = state.military.commanders.filter((entry) => entry.polityId === polityId)
+        .sort((a, b) => b.skill - a.skill || a.commanderId.localeCompare(b.commanderId))[0]?.commanderId ?? null;
+      const definitions = [
+        { label: 'Front concentration', scale: 'medium' as const, regions: candidates.slice(0, 2) },
+        { label: 'Limited mobilization', scale: 'small' as const, regions: candidates.slice(0, 1) },
+        { label: 'Strategic reserve', scale: 'large' as const, regions: candidates.slice(0, 3) },
+      ];
+      const plans = definitions.flatMap((definition) => {
+        if (!definition.regions.length) return [];
+        const deployments = definition.regions.map((entry, index) => ({ locationRegionId: entry.region.regionId,
+          role: index === 0 ? 'main' as const : index === 1 ? 'support' as const : 'reserve' as const,
+          ...(index === 0 && commanderId ? { commanderId } : {}) }));
+        const choice = compileChoice(state, polityId, { tool: 'mobilize', scale: definition.scale, deployments });
+        if (!choice) return [];
+        return [{ label: definition.label, scale: definition.scale,
+          deployments: definition.regions.map((entry, index) => ({ region: regionRef(state, entry.region.regionId),
+            role: index === 0 ? 'main' as const : index === 1 ? 'support' as const : 'reserve' as const,
+            frontDistance: entry.frontDistance, infrastructureBp: entry.region.infrastructureBp,
+            adjacentHostiles: entry.adjacentHostiles })), choices: [choice] }];
+      });
+      if (plans.length) affordances.push({ tool: 'mobilize', plans });
     }
 
     const defenders = state.polities.filter((entry) => entry.id !== polityId && !activeWarBetween(state, polityId, entry.id)

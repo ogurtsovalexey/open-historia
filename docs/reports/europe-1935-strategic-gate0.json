@@ -127,10 +127,30 @@
       "published-choice evidence scope",
       "micro-probe intent binding",
       "rejected-choice audit minimum"
+    ],
+    "defectsDiscoveredAfterBudget": [
+      "The Czech territorial micro-probes reversed the intended transfer direction and flattened the proposal terms before prompting.",
+      "The legacy mobilization catalog exposed one lexicographically selected region and pool-divisor troop counts instead of bounded strategic plans."
+    ]
+  },
+  "postBudgetDeterministicCorrections": {
+    "status": "deterministic-pass-live-revalidation-unavailable",
+    "modelTurns": 0,
+    "mockProbeCount": 13,
+    "maximumApplicationInputTokens": 7581,
+    "applicationInputTokenLimit": 8000,
+    "checks": [
+      "Sudety is proposed from Czechoslovakia to Germany and accept preview transfers that exact controller.",
+      "A separate unforced Czech strategic probe publishes both legal responses with named terms.",
+      "Poland receives three front-ranked one-to-three-region mobilization plans with deterministic manpower and equipment totals.",
+      "One selected mobilization plan expands atomically to multiple engine formations.",
+      "Front context includes bounded supply and qualitative local force bands without geometry or the full supply graph.",
+      "Mobilization readiness varies deterministically with scale, infrastructure and organizer assignment."
     ]
   },
   "unmetAcceptanceCriteria": [
     "The frozen 40-turn budget ended before a dedicated reversed-affordance-order live pair could be completed.",
+    "The corrected Czech strategic and multi-region mobilization prompts have deterministic coverage but cannot receive a new live model turn after the 40-turn cap.",
     "Blind owner scoring has not yet established 100% mandatory triage and at least 90% relevance/coherence scores of 4/5 or higher."
   ],
   "ownerAssessment": {

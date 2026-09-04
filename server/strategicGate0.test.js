@@ -15,12 +15,12 @@ const run = (...args) => JSON.parse(execFileSync(process.execPath, [script, ...a
 before(() => { temp = fs.mkdtempSync(path.join(os.tmpdir(), 'open-historia-gate0-')); });
 after(() => { fs.rmSync(temp, { recursive: true, force: true }); });
 
-test('production Gate 0 mock freezes twelve single-actor V4 packages without model calls', () => {
+test('production Gate 0 mock freezes bounded single-actor V4 packages without model calls', () => {
   const result = run('run', '--mode', 'mock', '--run', 'gate0-mock');
   assert.equal(result.status, 'mock-pass');
   assert.equal(result.completedModelTurns, 0);
-  assert.equal(result.probes.length, 12);
-  assert.equal(new Set(result.probes.map((entry) => entry.probeId)).size, 12);
+  assert.equal(result.probes.length, 13);
+  assert.equal(new Set(result.probes.map((entry) => entry.probeId)).size, 13);
 
   for (const [index, probe] of result.probes.entries()) {
     const directory = path.join(temp, 'gate0-mock', `${String(index + 1).padStart(2, '0')}-${probe.probeId}`);
@@ -41,10 +41,45 @@ test('production Gate 0 mock freezes twelve single-actor V4 packages without mod
     assert.equal(validation.stateMutated, false);
   }
 
-  const polandThreat = JSON.parse(fs.readFileSync(path.join(temp, 'gate0-mock', '11-poland-real-threat', 'validation.json'), 'utf8'));
+  const czechBrief = JSON.parse(fs.readFileSync(path.join(temp, 'gate0-mock', '09-czech-accept', 'brief.json'), 'utf8'));
+  const czechAccept = czechBrief.choices.find((entry) => entry.family === 'respond-proposal' && entry.action.response === 'accept');
+  assert.deepEqual(czechAccept.context.terms, {
+    kind: 'territorial-settlement',
+    fromPolity: { id: 'polity:czechoslovakia', name: 'Czechoslovakia' },
+    toPolity: { id: 'polity:germany', name: 'Germany' },
+    regions: [{ id: 'region:europe-1935:cs-sudety', name: 'Sudety' }],
+  });
+  assert.ok(czechAccept.preview.deltas.some((entry) => entry.path === 'regions.region:europe-1935:cs-sudety.controllerId'
+    && entry.before === 'polity:czechoslovakia' && entry.after === 'polity:germany'));
+
+  const strategicCzech = JSON.parse(fs.readFileSync(path.join(temp, 'gate0-mock', '11-czech-strategic', 'brief.json'), 'utf8'));
+  assert.equal(strategicCzech.invocation.detail, 'Choose freely whether to accept or reject the bounded Sudeten settlement.');
+
+  const polandThreat = JSON.parse(fs.readFileSync(path.join(temp, 'gate0-mock', '12-poland-real-threat', 'validation.json'), 'utf8'));
   assert.ok(polandThreat.selectedFamilies.some((family) => ['mobilize', 'issue-order', 'negotiate-peace'].includes(family)));
-  const mobilization = JSON.parse(fs.readFileSync(path.join(temp, 'gate0-mock', '12-poland-mobilization', 'validation.json'), 'utf8'));
+  const mobilizationDirectory = path.join(temp, 'gate0-mock', '13-poland-mobilization');
+  const mobilizationBrief = JSON.parse(fs.readFileSync(path.join(mobilizationDirectory, 'brief.json'), 'utf8'));
+  const mobilizationChoices = mobilizationBrief.choices.filter((entry) => entry.family === 'mobilize');
+  assert.ok(mobilizationChoices.length >= 3 && mobilizationChoices.length <= 8);
+  assert.ok(mobilizationChoices.every((entry) => entry.action.deployments.length >= 1 && entry.action.deployments.length <= 3));
+  assert.ok(mobilizationChoices.some((entry) => entry.action.deployments.length > 1));
+  assert.ok(mobilizationChoices.some((entry) => entry.action.deployments[0].locationRegionId === 'region:ohm-1935:2741476'),
+    'the supplied Poznań front must outrank lexicographic Wilno');
+  assert.ok(mobilizationChoices.every((entry) => entry.context.kind === 'mobilization-plan'
+    && entry.context.equipmentCoverageBp >= 5000));
+  assert.deepEqual(mobilizationChoices.map((entry) => entry.preview.deltas.find((delta) => delta.path === 'military.mobilizationPlan').after)
+    .map((entry) => ({ manpower: entry.totalManpower, equipment: entry.totalEquipment, coverage: entry.equipmentCoverageBp }))
+    .sort((left, right) => left.manpower - right.manpower), [
+    { manpower: 308000, equipment: 308000, coverage: 10000 },
+    { manpower: 560000, equipment: 420000, coverage: 7500 },
+    { manpower: 840000, equipment: 420000, coverage: 5000 },
+  ]);
+  assert.ok(mobilizationBrief.publicData.fronts.some((entry) => entry.ownRegion.id === 'region:ohm-1935:2741476'
+    && entry.hostileRegion.id === 'region:europe-1935:de-pommern'
+    && entry.ownForceBand === 'substantial' && entry.hostileForceBand === 'substantial'));
+  const mobilization = JSON.parse(fs.readFileSync(path.join(mobilizationDirectory, 'validation.json'), 'utf8'));
   assert.deepEqual(mobilization.selectedFamilies, ['mobilize']);
+  assert.ok(mobilization.resolution.commands.length > 1, 'one bounded plan may create several formations atomically');
 });
 
 test('production Gate 0 rejects old manifests and prompt snapshots are reproducible', () => {
@@ -81,5 +116,9 @@ test('committed Gate 0 evidence is redacted and cannot claim owner acceptance wh
   assert.equal(report.redaction.threadIdsIncluded, false);
   assert.equal(report.ownerAssessment.status, 'pending');
   assert.equal(report.status, 'blocked');
+  assert.equal(report.postBudgetDeterministicCorrections.status, 'deterministic-pass-live-revalidation-unavailable');
+  assert.equal(report.postBudgetDeterministicCorrections.modelTurns, 0);
+  assert.equal(report.postBudgetDeterministicCorrections.mockProbeCount, 13);
+  assert.ok(report.postBudgetDeterministicCorrections.maximumApplicationInputTokens <= 8000);
   assert.ok(report.unmetAcceptanceCriteria.length > 0);
 });
