@@ -16,7 +16,7 @@ const stringArraySchema = (description) => ({
 
 const campaignMemoryOperationSchema = {
   type: "object",
-  description: "One evidence-backed update to the durable campaign canon.",
+  description: "One evidence-linked update to the campaign retrieval index; it never outranks current state or events.",
   properties: {
     op: {
       type: "string",
@@ -32,7 +32,7 @@ const campaignMemoryOperationSchema = {
         "territorial", "trade", "treaty", "war", "other",
       ],
     },
-    statement: textSchema("Self-contained statement of the durable fact and its consequences."),
+    statement: textSchema("Self-contained retrieval summary of an evidenced consequence; player or model prose alone is not evidence."),
     parties: stringArraySchema("Exact polity/person names materially involved in the fact."),
     status: {
       type: "string",
@@ -659,7 +659,7 @@ export const EVENT_CONSOLIDATOR_SCHEMA = {
     summary: textSchema("Concise campaign history preserving major events, map changes, and diplomatic commitments."),
     memoryOps: {
       type: "array",
-      description: "Evidence-backed durable facts created, refreshed, or resolved by this batch. Empty when the batch changes no lasting fact.",
+      description: "Evidence-linked retrieval entries created, refreshed, or resolved by this batch. Empty without revision-stamped engine evidence.",
       items: campaignMemoryOperationSchema,
     },
   },
