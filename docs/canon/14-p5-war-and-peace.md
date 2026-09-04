@@ -17,9 +17,12 @@ of canon 10 after the accepted P4 slice.
 - Each polity has a population-derived recruitable manpower pool, mobilized and
   casualty totals, an equipment reserve, formations and commanders. Formation
   split/merge and mobilization conserve manpower and equipment exactly.
-- Mobilization creates a delayed reserve formation at a controlled region.
-  Era-authored ceilings bound recruitable manpower. Formations have location,
-  posture, morale, equipment, commander and accumulated familiarity.
+- Mobilization creates delayed reserve formations at controlled regions.
+  Era-authored ceilings bound recruitable manpower. Readiness is calculated by
+  the engine from each formation's share of the ceiling, regional
+  infrastructure and an assigned `organizer`; it is never a model-authored
+  date. Formations have location, posture, morale, equipment, commander and
+  accumulated familiarity.
 - Wars have stable ids, belligerents, a declared reason, fronts, occupations
   and peace offers. A `none` reason is legal but applies explicit diplomatic,
   legitimacy and stability penalties.
@@ -51,6 +54,9 @@ of canon 10 after the accepted P4 slice.
 
 - Mobilize, split, merge, combat losses and demobilization never create or
   destroy unexplained manpower/equipment. Same inputs replay byte-identically.
+- Small, large, high/low-infrastructure and organizer-assisted mobilizations
+  receive deterministic readiness dates, and a multi-region package remains
+  atomic and exactly conserves its aggregate manpower and equipment.
 - A reasonless war records penalties. Invalid enemy/ally, stale revision,
   disconnected target, illegal peace region and unaffordable reparations reject
   without partial mutation.

@@ -54,6 +54,25 @@ describe('P5 war, occupation and peace (canon 14)', () => {
     assert.equal(row.equipmentReserve + reorganized.state.military!.formations.filter((entry) => entry.polityId === row.polityId && ['active', 'mobilizing'].includes(entry.status)).reduce((sum, entry) => sum + entry.equipment, 0) + row.equipmentLost, row.equipmentTotal);
   });
 
+  it('derives mobilization readiness from scale, infrastructure, and organizer assignment', () => {
+    const draft = structuredClone(initial());
+    const military = draft.military!.polities.find((entry) => entry.polityId === 'polity:austria')!;
+    military.equipmentReserve += 70000;
+    military.equipmentTotal += 70000;
+    const commander = draft.military!.commanders.find((entry) => entry.polityId === 'polity:austria')!;
+    commander.traits = [...new Set([...commander.traits, 'organizer' as const])];
+    const start = rehash(draft);
+    const result = tick(start, [
+      { kind: 'military.mobilize', ...common(start, 'polity:austria', 40), formationId: 'formation:austria-slow-reserve',
+        locationRegionId: 'region:gadm:AUT.9_1', manpower: 70000, equipment: 70000, commanderId: null },
+      { kind: 'military.mobilize', ...common(start, 'polity:austria', 41), formationId: 'formation:austria-fast-reserve',
+        locationRegionId: 'region:gadm:AUT.6_1', manpower: 4000, equipment: 4000, commanderId: commander.commanderId },
+    ]);
+    assert.equal(result.rejections.length, 0);
+    assert.equal(result.state.military!.formations.find((entry) => entry.formationId === 'formation:austria-slow-reserve')!.readyMonth, '1938-04-01');
+    assert.equal(result.state.military!.formations.find((entry) => entry.formationId === 'formation:austria-fast-reserve')!.readyMonth, '1938-02-01');
+  });
+
   it('records reasonless-war diplomatic and political penalties', () => {
     const start = initial();
     const beforeRelation = start.diplomacy!.relations.find((entry) => entry.polities.map(String).includes('polity:austria') && entry.polities.map(String).includes('polity:france'))!;

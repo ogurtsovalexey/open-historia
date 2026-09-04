@@ -68,6 +68,21 @@ const warLeaders = (war: MilitaryState['wars'][number]): [PolityId, PolityId] =>
 const linkFor = (military: MilitaryState, left: string, right: string) => military.supplyLinks.find((entry) =>
   (entry.regions[0] === left && entry.regions[1] === right) || (entry.regions[0] === right && entry.regions[1] === left));
 
+const addMonths = (month: string, count: number): string => {
+  let result = month;
+  for (let index = 0; index < count; index += 1) result = addMonth(result);
+  return result;
+};
+
+const mobilizationDelayMonths = (region: EconRegionState, manpower: number, manpowerCeiling: number,
+  commander: MilitaryState['commanders'][number] | null): number => {
+  const scaleBp = Math.floor(manpower * 10000 / Math.max(1, manpowerCeiling));
+  const scaleDelay = scaleBp >= 1000 ? 1 : 0;
+  const infrastructureDelay = region.infrastructureBp < 5000 ? 1 : 0;
+  const organizerReduction = commander?.traits.includes('organizer') ? 1 : 0;
+  return Math.max(1, Math.min(4, 1 + scaleDelay + infrastructureDelay - organizerReduction));
+};
+
 export function applyMilitaryCommands(
   state: EconWorldState,
   commands: MilitaryCommand[],
@@ -182,7 +197,8 @@ export function applyMilitaryCommands(
       if (command.equipment > militaryPolity.equipmentReserve) { reject(command, 'invalid-amount', `equipment ${command.equipment} exceeds reserve ${militaryPolity.equipmentReserve}`); continue; }
       militaryPolity.manpowerPool -= command.manpower; militaryPolity.mobilized += command.manpower;
       militaryPolity.equipmentReserve -= command.equipment;
-      const readyMonth = addMonth(state.month);
+      const readyMonth = addMonths(state.month, mobilizationDelayMonths(region, command.manpower,
+        militaryPolity.manpowerCeiling, commander ?? null));
       military.formations.push({ formationId: command.formationId, polityId: actor.id,
         displayName: { en: `Reserve ${command.formationId.slice('formation:'.length)}`, ru: `Резерв ${command.formationId.slice('formation:'.length)}` },
         manpower: command.manpower, equipment: command.equipment, homeRegionId: region.regionId,
