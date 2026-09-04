@@ -28,6 +28,7 @@ import type { CampaignCommand } from '@open-historia/engine';
 
 export * from './strategic.js';
 export * from './strategicV4.js';
+export * from './strategicV5.js';
 export * from './playerInputV2.js';
 
 export const MAX_POLITIES_PER_BATCH = 6;

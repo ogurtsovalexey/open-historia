@@ -202,7 +202,7 @@ function domesticScopeIsProven(state: worldV2.WorldStateV2, actorPolityId: strin
   const institution = state.institutions.find((entry) => entry.institutionId === entityId);
   if (institution) return institution.polityId === actorPolityId;
   const process = state.processes.find((entry) => entry.processId === entityId);
-  if (process) return process.sponsorPolityIds.some((polityId) => polityId === actorPolityId);
+  if (process) return process.sponsorEntityRefs.some((entityRef) => entityRef === actorPolityId);
   return false;
 }
 
