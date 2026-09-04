@@ -52,6 +52,9 @@ const LazyAdvisorPanel = lazy(() =>
 const LazyCheatsPanel = lazy(() =>
   import("./cheats").then((module) => ({ default: module.CheatsPanel })),
 );
+const LazyIntentFirstShell = lazy(() =>
+  import("./intentFirstShell").then((module) => ({ default: module.IntentFirstShell })),
+);
 
 const checkWebGL = () => {
   try {
@@ -132,6 +135,8 @@ const Main = ({
   isTerrainEnabled,
   setIsGlobeEnabled,
   setIsTerrainEnabled,
+  intentFirstProjection = null,
+  intentFirstCommands = null,
 }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCheatsOpen, setIsCheatsOpen] = useState(false);
@@ -149,6 +154,7 @@ const Main = ({
   const [utilityProvider, setUtilityProvider] = useState(() => getStoredProvider("utility"));
   const [utilityProviderSettings, setUtilityProviderSettings] = useState(() => loadProviderSettingsFormState("utility"));
   const { games, loaded } = useLibraryState();
+  const hasIntentFirstUi = Boolean(intentFirstProjection && intentFirstCommands);
   // No games -> nothing to simulate (the main menu covers the empty world).
   const hasNoGames = loaded && (games?.length ?? 0) === 0;
 
@@ -275,34 +281,46 @@ const Main = ({
     <>
       {showWebGLWarning && <WebGLWarningPopup />}
       <LibraryTopBar />
-      <DateWidget
-        activePanel={activeBottomPanel}
-        mapRef={mapRef}
-        onSetPanel={setActiveBottomPanel}
-        onTogglePanel={toggleBottomPanel}
-        rightShift={rightShift}
-        topOffset={TOP_BAR_OFFSET}
-      />
-      <Toolbar
-        onOpenAdvisor={openAdvisor}
-        activePanel={activeBottomPanel}
-        onTogglePanel={toggleBottomPanel}
-      />
-      <Other rightShift={rightShift} />
-      <Search mapRef={mapRef} />
-      <ForcesPanel
-        mapRef={mapRef}
-        topOffset={TOP_BAR_OFFSET}
-        open={isForcesOpen}
-        onToggle={() => setIsForcesOpen((v) => !v)}
-      />
-      <AdvisorButton
-        isAdvisorOpen={isAdvisorOpen}
-        rightShift={rightShift}
-        onToggle={() => setIsAdvisorOpen(!isAdvisorOpen)}
-      />
       <Suspense fallback={null}>
-        {shouldLoadAdvisor && (
+        {hasIntentFirstUi && (
+          <LazyIntentFirstShell
+            projection={intentFirstProjection}
+            commands={intentFirstCommands}
+          />
+        )}
+      </Suspense>
+      {!hasIntentFirstUi && (
+        <>
+          <DateWidget
+            activePanel={activeBottomPanel}
+            mapRef={mapRef}
+            onSetPanel={setActiveBottomPanel}
+            onTogglePanel={toggleBottomPanel}
+            rightShift={rightShift}
+            topOffset={TOP_BAR_OFFSET}
+          />
+          <Toolbar
+            onOpenAdvisor={openAdvisor}
+            activePanel={activeBottomPanel}
+            onTogglePanel={toggleBottomPanel}
+          />
+          <Other rightShift={rightShift} />
+          <ForcesPanel
+            mapRef={mapRef}
+            topOffset={TOP_BAR_OFFSET}
+            open={isForcesOpen}
+            onToggle={() => setIsForcesOpen((v) => !v)}
+          />
+          <AdvisorButton
+            isAdvisorOpen={isAdvisorOpen}
+            rightShift={rightShift}
+            onToggle={() => setIsAdvisorOpen(!isAdvisorOpen)}
+          />
+        </>
+      )}
+      <Search mapRef={mapRef} />
+      <Suspense fallback={null}>
+        {!hasIntentFirstUi && shouldLoadAdvisor && (
           <LazyAdvisorPanel isAdvisorOpen={isAdvisorOpen} onClose={() => setIsAdvisorOpen(false)} width={advisorWidth} onResize={handleAdvisorResize} />
         )}
       </Suspense>

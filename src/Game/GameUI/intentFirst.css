@@ -1,0 +1,100 @@
+.oh-intent-shell {
+  --intent-accent: #f0c36a;
+  --intent-bg: rgba(10, 16, 27, 0.94);
+  position: fixed;
+  inset: max(4.75rem, env(safe-area-inset-top)) auto max(0.75rem, env(safe-area-inset-bottom)) 0.75rem;
+  z-index: 9996;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(32rem, calc(100vw - 1.5rem));
+  max-height: calc(100dvh - 5.5rem);
+  overflow: hidden;
+  color: #f8fafc;
+  background: linear-gradient(155deg, var(--intent-bg), rgba(20, 29, 45, 0.96));
+  border: 1px solid rgba(240, 195, 106, 0.28);
+  border-radius: 18px;
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(14px);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.oh-intent-nav {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0.65rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.oh-intent-nav button {
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.2rem;
+  color: #b8c2d1;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+}
+
+.oh-intent-nav button[aria-selected="true"] {
+  color: #fff8e8;
+  background: rgba(240, 195, 106, 0.14);
+  border-color: rgba(240, 195, 106, 0.35);
+}
+
+.oh-intent-nav-icon { display: block; font-size: 1rem; margin-bottom: 0.15rem; }
+.oh-intent-body { min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 1rem; }
+.oh-intent-section { display: grid; gap: 0.9rem; }
+.oh-intent-section h2, .oh-intent-section h3, .oh-intent-section p { margin: 0; }
+.oh-intent-eyebrow { color: var(--intent-accent); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.oh-intent-muted { color: #aeb9c9; line-height: 1.45; }
+.oh-intent-card { padding: 0.85rem; background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 13px; }
+.oh-intent-card-grid { display: grid; gap: 0.65rem; }
+.oh-intent-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
+.oh-intent-value { color: #fff8e8; font-weight: 650; text-align: right; }
+.oh-intent-tag { display: inline-flex; width: max-content; padding: 0.2rem 0.45rem; border-radius: 999px; color: #dbe6f5; background: rgba(148, 163, 184, 0.16); font-size: 0.7rem; }
+.oh-intent-tag[data-tone="positive"] { color: #a7f3d0; background: rgba(16, 185, 129, 0.14); }
+.oh-intent-tag[data-tone="warning"] { color: #fde68a; background: rgba(245, 158, 11, 0.15); }
+.oh-intent-tag[data-tone="danger"] { color: #fecaca; background: rgba(239, 68, 68, 0.15); }
+.oh-intent-tag[data-tone="unknown"] { color: #cbd5e1; border: 1px dashed #64748b; background: transparent; }
+.oh-intent-list { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; color: #d8e0eb; }
+.oh-intent-why { margin-top: 0.5rem; }
+.oh-intent-why summary { width: max-content; color: #f5cf84; cursor: pointer; font-size: 0.8rem; }
+.oh-intent-why-body { display: grid; gap: 0.45rem; margin-top: 0.55rem; padding-left: 0.65rem; border-left: 2px solid rgba(240, 195, 106, 0.35); color: #cbd5e1; font-size: 0.8rem; line-height: 1.4; }
+.oh-intent-source { color: #91a4bd; font-size: 0.72rem; }
+.oh-intent-cause-category { color: #f0c36a; font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.oh-intent-textarea { box-sizing: border-box; width: 100%; min-height: 7.5rem; resize: vertical; padding: 0.8rem; color: #f8fafc; background: rgba(3, 8, 17, 0.72); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 11px; font: inherit; line-height: 1.45; }
+.oh-intent-textarea:focus, .oh-intent-button:focus-visible, .oh-intent-nav button:focus-visible { outline: 3px solid rgba(240, 195, 106, 0.48); outline-offset: 2px; }
+.oh-intent-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+.oh-intent-button { min-height: 2.75rem; padding: 0.65rem 0.9rem; color: #f8fafc; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 10px; cursor: pointer; font: inherit; font-weight: 620; }
+.oh-intent-button[data-primary="true"] { color: #1c1608; background: var(--intent-accent); border-color: transparent; }
+.oh-intent-button:disabled { opacity: 0.48; cursor: not-allowed; }
+.oh-intent-status { min-height: 1.25rem; color: #f7d99b; font-size: 0.8rem; }
+.oh-intent-footer { display: flex; align-items: center; justify-content: space-between; gap: 0.7rem; padding: 0.7rem; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(1, 5, 12, 0.32); }
+.oh-intent-footer-meta { min-width: 0; color: #aeb9c9; font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.oh-intent-progress { height: 0.38rem; overflow: hidden; background: rgba(255, 255, 255, 0.09); border-radius: 999px; }
+.oh-intent-progress > span { display: block; height: 100%; background: linear-gradient(90deg, #d59b43, #f4d28e); }
+.oh-intent-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; }
+.oh-intent-claim { border-left: 3px solid #64748b; }
+.oh-intent-claim[data-status="contradicted"] { border-left-color: #f87171; }
+.oh-intent-claim[data-status="supported"] { border-left-color: #34d399; }
+.oh-intent-claim[data-status="unknown"] { border-left-color: #fbbf24; }
+.oh-intent-empty { padding: 1.1rem; color: #aeb9c9; text-align: center; border: 1px dashed rgba(255, 255, 255, 0.17); border-radius: 12px; }
+
+@media (max-width: 700px) {
+  .oh-intent-shell { inset: max(4.25rem, env(safe-area-inset-top)) 0.4rem max(0.4rem, env(safe-area-inset-bottom)); width: auto; max-height: calc(100dvh - 4.65rem); border-radius: 15px; }
+  .oh-intent-nav { order: 2; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 0; padding: 0.45rem 0.35rem; }
+  .oh-intent-body { order: 1; padding: 0.85rem; }
+  .oh-intent-footer { order: 3; }
+  .oh-intent-nav button { min-height: 3rem; font-size: 0.58rem; }
+  .oh-intent-split { grid-template-columns: 1fr; }
+  .oh-intent-footer { align-items: stretch; flex-direction: column; }
+  .oh-intent-footer .oh-intent-button { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oh-intent-shell * { scroll-behavior: auto !important; transition: none !important; }
+}
