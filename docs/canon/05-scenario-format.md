@@ -2,6 +2,11 @@
 
 Sources: `docs/spec/scenario-v2-integrity.md`, `docs/product/05-territories-and-scenarios.md`.
 
+> **Supersession note (2026-09-04):** canon 22 replaces the two-runtime-format
+> target with one compiled Scenario V3 contract and historical, fictional and
+> development authoring profiles. The existing formats remain readable only
+> for migration and frozen replay until that phase lands.
+
 ## Two formats, two purposes
 
 | Format | Schema | Purpose |

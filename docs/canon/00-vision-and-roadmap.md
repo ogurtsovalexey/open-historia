@@ -4,6 +4,13 @@ Status: accepted by the owner 2026-08-30. Supersedes the scope and ordering of
 `docs/product/07-roadmap.md` (archived), whose dependency logic is kept and
 whose ambition is deliberately cut. Read this before any planning.
 
+> **2026-09-04 owner amendment:**
+> [`22-living-world-program.md`](22-living-world-program.md) is the binding
+> post-Strategic-V4 target and delivery sequence. This document remains the
+> record of the completed P0–P8 path and its scope discipline, but canon 22
+> supersedes its authored-only future catalogs, remaining roadmap and final
+> playability gate where they conflict.
+
 ## What the finished game is
 
 A **personal single-player grand strategy** game, played by its author, where a

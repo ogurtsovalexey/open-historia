@@ -3,6 +3,11 @@
 Status: implemented and verified, 2026-09-01. This implements stage 6
 of canon 10 after the accepted P5 slice.
 
+> **Supersession note (2026-09-04):** the implemented P6 contract remains a
+> frozen regression, but its authored-only capability catalog is not the
+> product target. Canon 22 replaces it with starting concepts plus validated
+> runtime concept creation, staged processes and engine-compiled effects.
+
 ## Preconditions
 
 - Canon 00–14 remain binding. `technology` and `societyAndIdentity` are

@@ -7,7 +7,11 @@
 
 1. **Read `docs/principles.md`.** It is the source of truth for architecture
    and design constraints.
-2. **Read the relevant doc in [`docs/canon/`](docs/canon/README.md)** — the
+2. **Read [`docs/canon/22-living-world-program.md`](docs/canon/22-living-world-program.md)**
+   for all post-Strategic-V4 product work and
+   [`docs/canon/23-living-world-execution-backlog.md`](docs/canon/23-living-world-execution-backlog.md)
+   for its required implementation order, then read the relevant doc in
+   [`docs/canon/`](docs/canon/README.md) — the
    compressed, binding spec set (the old `docs/spec/` + `docs/product/` corpus
    is archived reference). Never guess schemas, formulas or contracts.
 3. For parallel work, claim a ready GitHub Issue and follow
@@ -40,6 +44,8 @@ Each phase follows this sequence:
 
 ### Scenario is Law
 - Authored scenario facts are immutable starting truth.
+- A scenario is not a closed catalog of the future: canon 22 permits validated
+  runtime concepts and processes grounded in current state and evidence.
 - AI authoring output remains Draft until reviewed.
 - QA tests overwrites, provenance gaps and `factsUsed[]` references.
 
@@ -50,7 +56,8 @@ Each phase follows this sequence:
 
 ### Application = Engine, AI = Brain
 - Formulas, storage, recalculation → application code
-- Strategy/explanations/bounded proposals → AI; final effects → engine
+- Strategy, semantic direction, qualitative process pace and explanations →
+  AI; feasibility, exact quantities and final effects → engine
 - Developer + AI Engineer MUST agree on the engine/modifier contract
 
 ### Consensus or Escalate

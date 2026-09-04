@@ -3,6 +3,11 @@
 Sources: `docs/spec/ai-call-registry.md`, `docs/product/04-ai-orchestration-spec.md`,
 `docs/principles.md` §2–3, owner decisions 2026-08-30.
 
+> **Supersession note (2026-09-04):** canon 22 keeps the bounded-context,
+> evidence, validation and numeric-authority rules, while expanding AI
+> authority to semantic direction, qualitative process pace and staged open
+> initiatives. Exact quantities and committed effects remain engine-owned.
+
 ## Roles the LLM plays (target)
 
 1. **Order interpreter** — free-text player orders → typed `EconCommand[]`

@@ -2,6 +2,11 @@
 
 Status: V2/V3 retained only for frozen diagnostics; V4 boundary owner-approved 2026-09-02.
 
+> **Supersession note (2026-09-04):** Strategic V4 remains the frozen Europe
+> 1935 diagnostic/production baseline. Canon 22 defines the next V5 boundary:
+> frozen legal choices for existing entities plus separately validated open
+> initiatives and qualitative process decisions. No V4 run resumes under V5.
+
 ## 2026-09-02 V4 replacement
 
 The production boundary is `StrategicBriefV4+StrategicDecisionV3`. V3 briefs

@@ -3,6 +3,12 @@
 Sources: `docs/product/README.md`, `docs/product/03-product-and-domain-spec.md`,
 `docs/product/02-current-architecture-audit.md`. Owner decisions 2026-08-30.
 
+> **Supersession note (2026-09-04):** canon 22 authorizes the hard cut from the
+> parallel `EconWorldState`/sim-core/live-world arrangement to one
+> `WorldStateV2`, after the named invariants and tests are ported. The audit
+> below remains accurate historical context; it is no longer the target end
+> state.
+
 ## Direction (owner-accepted)
 
 The deterministic numeric engine is the base of the game. The LLM interprets

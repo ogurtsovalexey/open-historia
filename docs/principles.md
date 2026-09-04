@@ -5,6 +5,39 @@ and constraints. Detailed product decisions live in `docs/product/`; accepted
 phase contracts live in `docs/spec/`. If documents disagree, precedence is:
 principles → accepted phase contract → product roadmap → recovered agent notes.
 
+## 0. Living-world amendment (2026-09-04)
+
+[`docs/canon/22-living-world-program.md`](canon/22-living-world-program.md) is
+the owner-directed target after the Europe 1935 Strategic V4 work. The
+following amendments are binding and supersede narrower statements later in
+this file and in canon 00–21 where they conflict:
+
+- **Scenario is starting law, not a closed future catalog.** Authored starting
+  facts and world rules remain immutable provenance. Validated technologies,
+  ideologies, institutions, movements and other concepts may emerge during
+  play without having been enumerated at scenario start.
+- **AI owns semantic direction and qualitative pace; the engine owns numeric
+  truth.** AI may propose what changes, choose an allowed qualitative pace and
+  identify affected domains. The engine checks feasibility, computes exact
+  quantities, applies effects and commits the revision.
+- **Primary territorial/entity state owns aggregates.** Population, workforce,
+  tax base, output, resource access and recruitable manpower are derived from
+  regions, control and other conserved primary entities. Territorial change
+  recalculates every affected domain in the same revision.
+- **Player and model prose is untrusted.** It is intent, dialogue or a claim,
+  never historical truth. Claims require canonical evidence; prompt wording
+  cannot create past events, resources, territory, population or armies.
+- **Scenario catalogs replace hidden era assumptions.** Resources, recipes,
+  offices, institutions, finance forms and era terminology are declared by the
+  scenario. The engine supplies universal conservation and effect primitives,
+  not an implicit modern-European world.
+- **Campaign memory is retrieval only.** Canonical state and the causal ledger
+  always outrank summaries or narrative text.
+
+Until the program is implemented, existing frozen scenarios and replays keep
+their accepted contracts. New implementation work must follow canon 22 rather
+than extend a conflicting authored-only future catalog.
+
 ---
 
 ## 1. Scenario is Law (Сценарий — Закон)
