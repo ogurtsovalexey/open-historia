@@ -192,6 +192,15 @@
     "mandatoryTriageRate": null,
     "relevanceCoherenceAtLeastFourRate": null
   },
+  "ownerAuthorization": {
+    "status": "push-authorized-with-open-gate-items",
+    "date": "2026-09-04",
+    "authorizedRemote": "private/feature/campaign-memory",
+    "openItemsAcknowledged": [
+      "dedicated reversed-affordance-order live pair",
+      "formal blind owner score"
+    ]
+  },
   "protocolDeviation": {
     "legacyUiProviderRequestsBeforeOwnerApprovals": 10,
     "provider": "gemini",
