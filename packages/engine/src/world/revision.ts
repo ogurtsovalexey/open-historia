@@ -42,6 +42,12 @@ export function canonicalWorldState(state: WorldStateV2): WorldStateV2 {
       worldModels: [...state.catalogs.worldModels].sort((a, b) => compareId(`${a.kind}|${a.modelId}`, `${b.kind}|${b.modelId}`)),
       commodities: [...state.catalogs.commodities].sort((a, b) => compareId(a.commodityId, b.commodityId)),
       controlProfiles: [...state.catalogs.controlProfiles].sort((a, b) => compareId(a.controlProfileId, b.controlProfileId)),
+      formationArchetypes: state.catalogs.formationArchetypes.map((entry) => ({
+        ...entry,
+        equipmentClassIds: sortedStrings(entry.equipmentClassIds),
+      })).sort((a, b) => compareId(a.formationArchetypeId, b.formationArchetypeId)),
+      equipmentClasses: [...state.catalogs.equipmentClasses].sort((a, b) => compareId(a.equipmentClassId, b.equipmentClassId)),
+      routeClasses: [...state.catalogs.routeClasses].sort((a, b) => compareId(a.routeClassId, b.routeClassId)),
     },
     polities: state.polities.map((entry) => ({
       ...sortedEvidence(entry),
@@ -55,7 +61,13 @@ export function canonicalWorldState(state: WorldStateV2): WorldStateV2 {
     formations: state.formations.map((entry) => ({
       ...sortedEvidence(entry),
       personnelOrigins: [...entry.personnelOrigins].sort((a, b) => compareId(a.regionId, b.regionId)),
+      equipment: [...entry.equipment].sort((a, b) => compareId(a.equipmentClassId, b.equipmentClassId)),
     })).sort((a, b) => compareId(a.formationId, b.formationId)),
+    routes: state.routes.map((entry) => ({
+      ...sortedEvidence(entry),
+      regionIds: sortedStrings(entry.regionIds),
+      allowedCommodityIds: sortedStrings(entry.allowedCommodityIds),
+    })).sort((a, b) => compareId(a.routeId, b.routeId)),
     characters: state.characters.map(sortedEvidence).sort((a, b) => compareId(a.characterId, b.characterId)),
     groups: state.groups.map(sortedEvidence).sort((a, b) => compareId(a.groupId, b.groupId)),
     institutions: state.institutions.map(sortedEvidence).sort((a, b) => compareId(a.institutionId, b.institutionId)),

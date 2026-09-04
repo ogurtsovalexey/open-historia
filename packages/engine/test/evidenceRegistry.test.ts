@@ -38,6 +38,7 @@ function input(): WorldStateV2Input {
         administrationAccessBp: 10000, extractionAccessBp: 10000,
         recruitmentAccessBp: 10000, integrationBp: 10000,
       }],
+      formationArchetypes: [], equipmentClasses: [], routeClasses: [],
     },
     polities: [
       { id: 'polity:beta', displayName: { en: 'Beta' }, treasury: 0, stockpiles: [], evidenceIds: ['evidence:beta'] },
@@ -53,7 +54,7 @@ function input(): WorldStateV2Input {
       fiscalBase: 0, productiveCapacity: 0, supplyCapacity: 0, resourceDeposits: [],
       evidenceIds: ['evidence:public'],
     }],
-    populationCohorts: [], formations: [], characters: [], groups: [], institutions: [], concepts: [],
+    populationCohorts: [], formations: [], routes: [], characters: [], groups: [], institutions: [], concepts: [],
     processes: [], relationships: [], knowledge: { records: [] },
     events: [
       { eventId: 'event:beta', revision: ANCESTOR, kind: 'beta-only', entityRefs: ['polity:beta'], evidenceIds: ['evidence:beta'] },

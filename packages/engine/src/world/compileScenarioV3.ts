@@ -38,24 +38,47 @@ function sortedValues<T extends { id: string }>(record: Record<string, T>): T[] 
   return Object.values(record).map((entry) => canonicalJson(entry)).sort((a, b) => compareIds(a.id, b.id));
 }
 
-function unsupportedLiveDiagnostics(scenario: ValidatedScenarioV3): ScenarioV3CompilationDiagnostic[] {
+function canonicalScenario(scenario: ValidatedScenarioV3): ValidatedScenarioV3 {
+  const result = canonicalJson(scenario);
+  result.game.playerEligiblePolityIds.sort(compareIds);
+  result.worldRules.knowledgeBaseline.sort(compareIds);
+  result.worldRules.hardProhibitions.sort(compareIds);
+  result.worldRules.plausibilityContext.sort(compareIds);
+  result.modules.enabled.sort(compareIds);
+  for (const archetype of Object.values(result.catalogs.formationArchetypes)) archetype.equipmentClassIds.sort(compareIds);
+  for (const activity of Object.values(result.catalogs.activities)) {
+    activity.inputCommodityIds.sort(compareIds);
+    activity.outputCommodityIds.sort(compareIds);
+  }
+  for (const profile of Object.values(result.catalogs.financeProfiles)) {
+    profile.revenueChannelIds.sort(compareIds);
+    profile.instrumentIds.sort(compareIds);
+  }
+  for (const region of Object.values(result.geography.regions)) region.adjacentRegionIds.sort(compareIds);
+  for (const relationship of Object.values(result.startingState.relationships)) relationship.participantPolityIds.sort(compareIds);
+  for (const route of Object.values(result.startingState.routes)) {
+    route.regionIds.sort(compareIds);
+    route.allowedCommodityIds.sort(compareIds);
+    route.evidenceIds.sort(compareIds);
+  }
+  for (const evidence of Object.values(result.provenance.evidence)) evidence.visibleToPolityIds?.sort(compareIds);
+  return result;
+}
+
+function liveCompatibilityDiagnostics(scenario: ValidatedScenarioV3): ScenarioV3CompilationDiagnostic[] {
   const diagnostics: ScenarioV3CompilationDiagnostic[] = [];
   for (const formation of sortedValues(scenario.startingState.formations)) {
-    const equipmentIds = Object.keys(formation.equipment).sort(compareIds);
-    if (equipmentIds.length > 0) diagnostics.push({
-      code: 'unsupported-live-projection',
-      path: `/startingState/formations/${formation.id}/equipment`,
-      message: `formation equipment is material live state not yet represented by WorldStateV2: ${equipmentIds.join(', ')}`,
-      refs: equipmentIds,
-    });
+    const allowed = new Set(scenario.catalogs.formationArchetypes[formation.archetypeId]?.equipmentClassIds ?? []);
+    for (const equipmentClassId of Object.keys(formation.equipment).sort(compareIds)) {
+      if (!allowed.has(equipmentClassId)) diagnostics.push({
+        code: 'integrity.equipment-not-allowed-by-archetype',
+        path: `/startingState/formations/${formation.id}/equipment/${equipmentClassId}`,
+        message: `equipment class ${equipmentClassId} is not allowed by formation archetype ${formation.archetypeId}`,
+        refs: [formation.archetypeId, equipmentClassId],
+      });
+    }
   }
-  for (const route of sortedValues(scenario.startingState.routes)) diagnostics.push({
-    code: 'unsupported-live-projection',
-    path: `/startingState/routes/${route.id}`,
-    message: 'routes are material live state not yet represented by WorldStateV2',
-    refs: [route.id],
-  });
-  return diagnostics.sort((a, b) => compareIds(a.path, b.path) || compareIds(a.code, b.code));
+  return diagnostics;
 }
 
 function buildSeed(scenario: ValidatedScenarioV3): WorldSeedV2 {
@@ -150,11 +173,22 @@ function buildInitialState(
     return {
       formationId: formation.id,
       polityId: formation.polityId,
+      archetypeId: formation.archetypeId,
       manpower: personnelOrigins.reduce((sum, origin) => sum + origin.personnel, 0),
       personnelOrigins,
+      equipment: Object.entries(formation.equipment)
+        .map(([equipmentClassId, quantity]) => ({ equipmentClassId, quantity }))
+        .sort((a, b) => compareIds(a.equipmentClassId, b.equipmentClassId)),
       evidenceIds: [...formation.evidenceIds].sort(compareIds),
     };
   });
+  const routes = sortedValues(scenario.startingState.routes).map((route) => ({
+    routeId: route.id,
+    classId: route.classId,
+    regionIds: [...route.regionIds].sort(compareIds),
+    allowedCommodityIds: [...route.allowedCommodityIds].sort(compareIds),
+    evidenceIds: [...route.evidenceIds].sort(compareIds),
+  }));
   const institutions = sortedValues(scenario.startingState.institutions).map((institution) => ({
     institutionId: institution.id,
     kind: institution.typeId,
@@ -192,6 +226,7 @@ function buildInitialState(
   regions.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.regionId], `/regions/${index}`));
   populationCohorts.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.cohortId], `/populationCohorts/${index}`));
   formations.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.formationId], `/formations/${index}`));
+  routes.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.routeId], `/routes/${index}`));
   institutions.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.institutionId], `/institutions/${index}`));
   concepts.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.conceptId], `/concepts/${index}`));
   relationships.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.relationshipId], `/relationships/${index}`));
@@ -221,11 +256,18 @@ function buildInitialState(
         recruitmentAccessBp: entry.recruitmentAccessBp,
         integrationBp: entry.integrationBp,
       })),
+      formationArchetypes: sortedValues(scenario.catalogs.formationArchetypes).map((entry) => ({
+        formationArchetypeId: entry.id,
+        equipmentClassIds: [...entry.equipmentClassIds].sort(compareIds),
+      })),
+      equipmentClasses: sortedValues(scenario.catalogs.equipmentClasses).map((entry) => ({ equipmentClassId: entry.id })),
+      routeClasses: sortedValues(scenario.catalogs.routeClasses).map((entry) => ({ routeClassId: entry.id })),
     },
     polities,
     regions,
     populationCohorts,
     formations,
+    routes,
     characters: [],
     groups: [],
     institutions,
@@ -259,10 +301,9 @@ export function compileScenarioV3(input: unknown): CompiledScenarioV3 {
   if (!validation.valid || !validation.scenario) {
     throw new ScenarioV3CompilationError(validation.errors);
   }
-  const unsupported = unsupportedLiveDiagnostics(validation.scenario);
-  if (unsupported.length > 0) throw new ScenarioV3CompilationError(unsupported);
-
-  const scenario = canonicalJson(validation.scenario);
+  const liveCompatibility = liveCompatibilityDiagnostics(validation.scenario);
+  if (liveCompatibility.length > 0) throw new ScenarioV3CompilationError(liveCompatibility);
+  const scenario = canonicalScenario(validation.scenario);
   const bundleChecksum = checksum(scenario);
   const seed = buildSeed(scenario);
   const seedChecksum = checksum(seed);

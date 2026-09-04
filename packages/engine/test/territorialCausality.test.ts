@@ -50,6 +50,8 @@ function fixtureInput(): WorldStateV2Input {
           recruitmentAccessBp: 8000, integrationBp: 10000,
         },
       ],
+      formationArchetypes: [{ formationArchetypeId: 'formation-archetype:generic', equipmentClassIds: [] }],
+      equipmentClasses: [], routeClasses: [],
     },
     polities: [
       { id: 'polity:alpha', displayName: { en: 'Alpha' }, treasury: 100, stockpiles: [], evidenceIds: [] },
@@ -81,9 +83,10 @@ function fixtureInput(): WorldStateV2Input {
       },
     ],
     formations: [{
-      formationId: 'formation:alpha-field', polityId: 'polity:alpha', manpower: 100_000,
-      personnelOrigins: [{ regionId: 'region:test:A', personnel: 100_000 }], evidenceIds: [],
+      formationId: 'formation:alpha-field', polityId: 'polity:alpha', archetypeId: 'formation-archetype:generic', manpower: 100_000,
+      personnelOrigins: [{ regionId: 'region:test:A', personnel: 100_000 }], equipment: [], evidenceIds: [],
     }],
+    routes: [],
     characters: [], groups: [], institutions: [], concepts: [], processes: [], relationships: [],
     knowledge: { records: [] }, events: [], evidence: [],
   };

@@ -24,6 +24,10 @@ const prefixedIdSchema = (prefix: string) => z.string().max(160).regex(
 
 export const populationCohortIdSchema = prefixedIdSchema('cohort').brand<'PopulationCohortId'>();
 export const formationIdSchema = prefixedIdSchema('formation').brand<'FormationId'>();
+export const formationArchetypeIdSchema = prefixedIdSchema('formation-archetype').brand<'FormationArchetypeId'>();
+export const equipmentClassIdSchema = prefixedIdSchema('equipment-class').brand<'EquipmentClassId'>();
+export const routeClassIdSchema = prefixedIdSchema('route-class').brand<'RouteClassId'>();
+export const routeIdSchema = prefixedIdSchema('route').brand<'RouteId'>();
 export const characterIdSchema = prefixedIdSchema('character').brand<'CharacterId'>();
 export const groupIdSchema = prefixedIdSchema('group').brand<'GroupId'>();
 export const institutionIdSchema = prefixedIdSchema('institution').brand<'InstitutionId'>();
@@ -40,6 +44,10 @@ const nonzeroWorldRevisionHashSchema = worldRevisionHashSchema.refine(
 
 export type PopulationCohortId = z.infer<typeof populationCohortIdSchema>;
 export type FormationId = z.infer<typeof formationIdSchema>;
+export type FormationArchetypeId = z.infer<typeof formationArchetypeIdSchema>;
+export type EquipmentClassId = z.infer<typeof equipmentClassIdSchema>;
+export type RouteClassId = z.infer<typeof routeClassIdSchema>;
+export type RouteId = z.infer<typeof routeIdSchema>;
 export type EvidenceId = z.infer<typeof evidenceIdSchema>;
 export type WorldEventId = z.infer<typeof worldEventIdSchema>;
 
@@ -109,11 +117,25 @@ export type FormationPersonnelOrigin = z.infer<typeof formationPersonnelOriginSc
 export const formationStateV2Schema = z.object({
   formationId: formationIdSchema,
   polityId: polityIdSchema,
+  archetypeId: formationArchetypeIdSchema,
   manpower: safeNonNegativeIntegerSchema,
   personnelOrigins: z.array(formationPersonnelOriginSchema).min(1),
+  equipment: z.array(z.object({
+    equipmentClassId: equipmentClassIdSchema,
+    quantity: safeNonNegativeIntegerSchema,
+  }).strict()),
   evidenceIds: evidenceIdsSchema,
 }).strict();
 export type FormationStateV2 = z.infer<typeof formationStateV2Schema>;
+
+export const routeStateV2Schema = z.object({
+  routeId: routeIdSchema,
+  classId: routeClassIdSchema,
+  regionIds: z.array(regionIdSchema).min(1),
+  allowedCommodityIds: z.array(stableIdSchema),
+  evidenceIds: evidenceIdsSchema,
+}).strict();
+export type RouteStateV2 = z.infer<typeof routeStateV2Schema>;
 
 export const characterStateSchema = z.object({
   characterId: characterIdSchema,
@@ -170,6 +192,7 @@ const entityRefSchema = z.union([
   regionIdSchema,
   populationCohortIdSchema,
   formationIdSchema,
+  routeIdSchema,
   characterIdSchema,
   groupIdSchema,
   institutionIdSchema,
@@ -241,6 +264,16 @@ export const catalogManifestSchema = z.object({
     recruitmentAccessBp: basisPointsSchema,
     integrationBp: basisPointsSchema,
   }).strict()),
+  formationArchetypes: z.array(z.object({
+    formationArchetypeId: formationArchetypeIdSchema,
+    equipmentClassIds: z.array(equipmentClassIdSchema),
+  }).strict()),
+  equipmentClasses: z.array(z.object({
+    equipmentClassId: equipmentClassIdSchema,
+  }).strict()),
+  routeClasses: z.array(z.object({
+    routeClassId: routeClassIdSchema,
+  }).strict()),
 }).strict();
 
 export const worldStateV2ContentSchema = z.object({
@@ -260,6 +293,7 @@ export const worldStateV2ContentSchema = z.object({
   regions: z.array(regionStateV2Schema).min(1),
   populationCohorts: z.array(populationCohortStateSchema),
   formations: z.array(formationStateV2Schema),
+  routes: z.array(routeStateV2Schema),
   characters: z.array(characterStateSchema),
   groups: z.array(groupStateSchema),
   institutions: z.array(institutionStateSchema),

@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { compileScenarioV3 } from '../src/world/compileScenarioV3.js';
 import { ScenarioV3CompilationError, worldSeedV2Schema } from '../src/world/seed.js';
-import { derivePolitySnapshot, deriveRegionSnapshot } from '../src/world/selectors.js';
+import { derivePolitySnapshot, deriveRegionSnapshot, deriveRouteSnapshot } from '../src/world/selectors.js';
 
 const SHA_A = `sha256:${'a'.repeat(64)}`;
 
@@ -248,34 +248,42 @@ describe('ScenarioV3 engine compiler', () => {
     };
     const compiled = compileScenarioV3(withFormation);
     assert.deepStrictEqual(compiled.initialState.formations, [{
-      formationId: 'formation:alpha', polityId: 'polity:alpha', manpower: 7,
+      formationId: 'formation:alpha', polityId: 'polity:alpha', archetypeId: 'formation-archetype:levy', manpower: 7,
       personnelOrigins: [{ regionId: 'region:test:A', personnel: 7 }],
+      equipment: [],
       evidenceIds: ['evidence:formation-alpha'],
     }]);
     assert.strictEqual(derivePolitySnapshot(compiled.initialState, 'polity:alpha').value.fieldedPersonnel, 7);
   });
 
-  it('rejects nonempty routes and formation equipment until live WorldStateV2 can represent them', () => {
+  it('losslessly compiles nonempty formation equipment and routes into live WorldStateV2', () => {
     const input = minimalScenario();
     const unsupported = {
       ...input,
       catalogs: {
         ...input.catalogs,
+        commodities: {
+          ...input.catalogs.commodities,
+          'commodity:fuel': { id: 'commodity:fuel', unitId: 'unit:tonne', usage: 'both' },
+        },
         routeClasses: { 'route-class:land': { id: 'route-class:land' } },
-        equipmentClasses: { 'equipment-class:arms': { id: 'equipment-class:arms' } },
+        equipmentClasses: {
+          'equipment-class:arms': { id: 'equipment-class:arms' },
+          'equipment-class:transport': { id: 'equipment-class:transport' },
+        },
         formationArchetypes: { 'formation-archetype:levy': {
-          id: 'formation-archetype:levy', equipmentClassIds: ['equipment-class:arms'],
+          id: 'formation-archetype:levy', equipmentClassIds: ['equipment-class:transport', 'equipment-class:arms'],
         } },
       },
       startingState: {
         ...input.startingState,
         routes: { 'route:test': {
           id: 'route:test', classId: 'route-class:land', regionIds: ['region:test:A'],
-          allowedCommodityIds: ['commodity:food'], evidenceIds: ['evidence:route-test'],
+          allowedCommodityIds: ['commodity:food', 'commodity:fuel'], evidenceIds: ['evidence:route-test'],
         } },
         formations: { 'formation:alpha': {
           id: 'formation:alpha', polityId: 'polity:alpha', archetypeId: 'formation-archetype:levy',
-          personnelOrigins: { 'region:test:A': 7 }, equipment: { 'equipment-class:arms': 3 },
+          personnelOrigins: { 'region:test:A': 7 }, equipment: { 'equipment-class:transport': 2, 'equipment-class:arms': 3 },
           evidenceIds: ['evidence:formation-alpha'],
         } },
       },
@@ -291,11 +299,44 @@ describe('ScenarioV3 engine compiler', () => {
         },
       } },
     };
-    assert.throws(() => compileScenarioV3(unsupported), (error: unknown) => {
+    const compiled = compileScenarioV3(unsupported);
+    assert.deepStrictEqual(compiled.diagnostics, []);
+    assert.deepStrictEqual(compiled.initialState.formations, [{
+      formationId: 'formation:alpha', polityId: 'polity:alpha', archetypeId: 'formation-archetype:levy',
+      manpower: 7, personnelOrigins: [{ regionId: 'region:test:A', personnel: 7 }],
+      equipment: [
+        { equipmentClassId: 'equipment-class:arms', quantity: 3 },
+        { equipmentClassId: 'equipment-class:transport', quantity: 2 },
+      ],
+      evidenceIds: ['evidence:formation-alpha'],
+    }]);
+    assert.deepStrictEqual(compiled.initialState.routes, [{
+      routeId: 'route:test', classId: 'route-class:land', regionIds: ['region:test:A'],
+      allowedCommodityIds: ['commodity:food', 'commodity:fuel'], evidenceIds: ['evidence:route-test'],
+    }]);
+    assert.deepStrictEqual(derivePolitySnapshot(compiled.initialState, 'polity:alpha').value.equipment, [
+      { equipmentClassId: 'equipment-class:arms', quantity: 3 },
+      { equipmentClassId: 'equipment-class:transport', quantity: 2 },
+    ]);
+    assert.deepStrictEqual(deriveRouteSnapshot(compiled.initialState, 'route:test').value, {
+      routeId: 'route:test', classId: 'route-class:land', regionIds: ['region:test:A'],
+      allowedCommodityIds: ['commodity:food', 'commodity:fuel'],
+    });
+
+    const permuted = structuredClone(unsupported);
+    permuted.catalogs.formationArchetypes['formation-archetype:levy']!.equipmentClassIds.reverse();
+    permuted.startingState.routes['route:test']!.allowedCommodityIds.reverse();
+    const recompiled = compileScenarioV3(permuted);
+    assert.strictEqual(recompiled.seedChecksum, compiled.seedChecksum);
+    assert.strictEqual(recompiled.initialState.revision, compiled.initialState.revision);
+
+    const disallowed = structuredClone(unsupported);
+    disallowed.catalogs.formationArchetypes['formation-archetype:levy']!.equipmentClassIds = [];
+    assert.throws(() => compileScenarioV3(disallowed), (error: unknown) => {
       assert.ok(error instanceof ScenarioV3CompilationError);
-      assert.deepStrictEqual(error.diagnostics.map((entry) => [entry.code, entry.path]), [
-        ['unsupported-live-projection', '/startingState/formations/formation:alpha/equipment'],
-        ['unsupported-live-projection', '/startingState/routes/route:test'],
+      assert.deepStrictEqual(error.diagnostics.map((entry) => entry.path), [
+        '/startingState/formations/formation:alpha/equipment/equipment-class:arms',
+        '/startingState/formations/formation:alpha/equipment/equipment-class:transport',
       ]);
       return true;
     });

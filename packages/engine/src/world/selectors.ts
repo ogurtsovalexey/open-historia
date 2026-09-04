@@ -3,6 +3,7 @@ import type {
   EvidenceId,
   RegionalControl,
   RegionStateV2,
+  RouteId,
   WorldStateV2,
 } from './schema.js';
 
@@ -16,6 +17,18 @@ export interface GroundedProjection<T> {
 export interface ResourceQuantity {
   resourceId: string;
   amount: number;
+}
+
+export interface EquipmentQuantity {
+  equipmentClassId: string;
+  quantity: number;
+}
+
+export interface RouteSnapshot {
+  routeId: RouteId;
+  classId: string;
+  regionIds: RegionId[];
+  allowedCommodityIds: string[];
 }
 
 export interface UnavailableMetric {
@@ -81,6 +94,7 @@ export interface PolitySnapshot {
   availableManpower: UnavailableMetric;
   overmobilizedBy: UnavailableMetric;
   fieldedPersonnel: number;
+  equipment: EquipmentQuantity[];
   regionalOutput: number;
   resourceAccess: ResourceQuantity[];
   supplyCapacity: number;
@@ -178,6 +192,15 @@ function addResources(rows: readonly ResourceQuantity[]): ResourceQuantity[] {
   const totals = new Map<string, number>();
   for (const row of rows) totals.set(row.resourceId, addSafe(totals.get(row.resourceId) ?? 0, row.amount, `resource ${row.resourceId}`));
   return [...totals].map(([resourceId, amount]) => ({ resourceId, amount })).sort((a, b) => compareIds(a.resourceId, b.resourceId));
+}
+
+function addEquipment(rows: readonly EquipmentQuantity[]): EquipmentQuantity[] {
+  const totals = new Map<string, number>();
+  for (const row of rows) {
+    totals.set(row.equipmentClassId, addSafe(totals.get(row.equipmentClassId) ?? 0, row.quantity, `equipment ${row.equipmentClassId}`));
+  }
+  return [...totals].map(([equipmentClassId, quantity]) => ({ equipmentClassId, quantity }))
+    .sort((a, b) => compareIds(a.equipmentClassId, b.equipmentClassId));
 }
 
 export function controlOf(state: WorldStateV2, regionId: string): RegionalControl {
@@ -307,6 +330,9 @@ export function derivePolitySnapshot(state: WorldStateV2, polityId: string): Gro
     state.formations.filter((formation) => formation.polityId === polity.id).map((formation) => formation.manpower),
     `${polity.id} fielded personnel`,
   );
+  const equipment = addEquipment(state.formations
+    .filter((formation) => formation.polityId === polity.id)
+    .flatMap((formation) => formation.equipment));
   const regionEvidence = relevantRegions.flatMap((regionId) => deriveRegionSnapshot(state, regionId).evidenceIds);
   const formationEvidence = state.formations
     .filter((formation) => formation.polityId === polity.id)
@@ -326,12 +352,31 @@ export function derivePolitySnapshot(state: WorldStateV2, polityId: string): Gro
     availableManpower: unavailableMobilizationCeiling(),
     overmobilizedBy: unavailableMobilizationCeiling(),
     fieldedPersonnel,
+    equipment,
     regionalOutput: total('regionalOutput'),
     resourceAccess: addResources(contributions.flatMap((row) => row.resourceAccess)),
     supplyCapacity: total('supplyCapacity'),
     identityPressure: unavailableIdentityPressure(),
     contributions,
   }, entityEvidence(state, [polity.id, ...relevantRegions], [...polity.evidenceIds, ...regionEvidence, ...formationEvidence]));
+}
+
+export function deriveRouteSnapshot(state: WorldStateV2, routeId: string): GroundedProjection<RouteSnapshot> {
+  const route = state.routes.find((entry) => entry.routeId === routeId);
+  if (!route) throw new Error(`unknown route ${routeId}`);
+  return projection(state, {
+    routeId: route.routeId,
+    classId: route.classId,
+    regionIds: [...route.regionIds],
+    allowedCommodityIds: [...route.allowedCommodityIds],
+  }, entityEvidence(state, [route.routeId, ...route.regionIds], route.evidenceIds));
+}
+
+export function routesThroughRegion(state: WorldStateV2, regionId: string): RouteId[] {
+  requireRegion(state, regionId);
+  return state.routes.filter((route) => route.regionIds.includes(regionId as RegionId))
+    .map((route) => route.routeId)
+    .sort(compareIds);
 }
 
 export function deriveWorldPopulationIdentity(state: WorldStateV2): GroundedProjection<PopulationIdentity> {

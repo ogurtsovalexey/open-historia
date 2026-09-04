@@ -70,6 +70,9 @@ function fixtureInput(): WorldStateV2Input {
           recruitmentAccessBp: 2000, integrationBp: 2500,
         },
       ],
+      formationArchetypes: [{ formationArchetypeId: 'formation-archetype:generic', equipmentClassIds: [] }],
+      equipmentClasses: [],
+      routeClasses: [],
     },
     polities: [
       {
@@ -130,9 +133,10 @@ function fixtureInput(): WorldStateV2Input {
       { cohortId: 'cohort:c', regionId: 'region:test:C', population: 3000, workforceParticipationBp: 5000, recruitmentEligibilityBp: 2000, evidenceIds: ['evidence:cohort-c'] },
     ],
     formations: [
-      { formationId: 'formation:beta', polityId: 'polity:beta', manpower: 200, personnelOrigins: [{ regionId: 'region:test:B', personnel: 200 }], evidenceIds: ['evidence:formation-beta'] },
-      { formationId: 'formation:alpha', polityId: 'polity:alpha', manpower: 100, personnelOrigins: [{ regionId: 'region:test:A', personnel: 100 }], evidenceIds: ['evidence:formation-alpha'] },
+      { formationId: 'formation:beta', polityId: 'polity:beta', archetypeId: 'formation-archetype:generic', manpower: 200, personnelOrigins: [{ regionId: 'region:test:B', personnel: 200 }], equipment: [], evidenceIds: ['evidence:formation-beta'] },
+      { formationId: 'formation:alpha', polityId: 'polity:alpha', archetypeId: 'formation-archetype:generic', manpower: 100, personnelOrigins: [{ regionId: 'region:test:A', personnel: 100 }], equipment: [], evidenceIds: ['evidence:formation-alpha'] },
     ],
+    routes: [],
     characters: [], groups: [], institutions: [], concepts: [], processes: [], relationships: [],
     knowledge: { records: [] }, events: [],
     evidence: evidenceNames.map((name) => ({

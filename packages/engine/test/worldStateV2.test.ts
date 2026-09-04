@@ -45,6 +45,9 @@ function worldInput(): WorldStateV2Input {
           recruitmentAccessBp: 10000, integrationBp: 10000,
         },
       ],
+      formationArchetypes: [{ formationArchetypeId: 'formation-archetype:generic', equipmentClassIds: [] }],
+      equipmentClasses: [],
+      routeClasses: [],
     },
     polities: [
       {
@@ -106,7 +109,8 @@ function worldInput(): WorldStateV2Input {
       { cohortId: 'cohort:b-workers', regionId: 'region:test:B', population: 2000, workforceParticipationBp: 5000, recruitmentEligibilityBp: 1000, evidenceIds: ['evidence:cohort-b'] },
       { cohortId: 'cohort:a-workers', regionId: 'region:test:A', population: 1000, workforceParticipationBp: 5000, recruitmentEligibilityBp: 1000, evidenceIds: ['evidence:cohort-a'] },
     ],
-    formations: [{ formationId: 'formation:alpha-first', polityId: 'polity:alpha', manpower: 100, personnelOrigins: [{ regionId: 'region:test:A', personnel: 100 }], evidenceIds: ['evidence:formation-alpha'] }],
+    formations: [{ formationId: 'formation:alpha-first', polityId: 'polity:alpha', archetypeId: 'formation-archetype:generic', manpower: 100, personnelOrigins: [{ regionId: 'region:test:A', personnel: 100 }], equipment: [], evidenceIds: ['evidence:formation-alpha'] }],
+    routes: [],
     characters: [],
     groups: [],
     institutions: [],
@@ -282,8 +286,10 @@ describe('WorldStateV2 shell', () => {
     input.formations.push({
       formationId: 'formation:alpha-second',
       polityId: 'polity:alpha',
+      archetypeId: 'formation-archetype:generic',
       manpower: 60,
       personnelOrigins: [{ regionId: 'region:test:A', personnel: 60 }],
+      equipment: [],
       evidenceIds: ['evidence:formation-alpha'],
     });
     assert.throws(() => stampWorldStateRevision(input), /personnel origins 120 exceed population 100/i);

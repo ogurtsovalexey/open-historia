@@ -27,6 +27,9 @@ function state(): worldV2.WorldStateV2 {
         { modelId: 'military-model:test', kind: 'military' },
       ],
       commodities: [],
+      formationArchetypes: [],
+      equipmentClasses: [],
+      routeClasses: [],
       controlProfiles: [{
         controlProfileId: 'control-profile:sovereign', kind: 'sovereign', administrationAccessBp: 10000,
         extractionAccessBp: 10000, recruitmentAccessBp: 10000, integrationBp: 10000,
@@ -56,7 +59,7 @@ function state(): worldV2.WorldStateV2 {
         fiscalBase: 10, productiveCapacity: 10, supplyCapacity: 10, resourceDeposits: [], evidenceIds: ['evidence:beta'],
       },
     ],
-    populationCohorts: [], formations: [], characters: [], groups: [], institutions: [], concepts: [], processes: [],
+    populationCohorts: [], formations: [], routes: [], characters: [], groups: [], institutions: [], concepts: [], processes: [],
     relationships: [], knowledge: { records: [] }, events: [],
     evidence: [
       {

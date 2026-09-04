@@ -64,11 +64,18 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
   const catalogModules = new Set(state.catalogs.modules.map((entry) => entry.moduleId as string));
   const catalogCommodities = new Map(state.catalogs.commodities.map((entry) => [entry.commodityId as string, entry.usage]));
   const controlProfiles = new Map(state.catalogs.controlProfiles.map((entry) => [entry.controlProfileId as string, entry]));
+  const equipmentClasses = new Set(state.catalogs.equipmentClasses.map((entry) => entry.equipmentClassId as string));
+  const formationArchetypes = new Map(state.catalogs.formationArchetypes.map((entry) => [
+    entry.formationArchetypeId as string,
+    new Set(entry.equipmentClassIds as string[]),
+  ]));
+  const routeClasses = new Set(state.catalogs.routeClasses.map((entry) => entry.routeClassId as string));
   const entityIds = new Set<string>([
     ...polityIds,
     ...regionIds,
     ...state.populationCohorts.map((entry) => entry.cohortId as string),
     ...state.formations.map((entry) => entry.formationId as string),
+    ...state.routes.map((entry) => entry.routeId as string),
     ...state.characters.map((entry) => entry.characterId as string),
     ...state.groups.map((entry) => entry.groupId as string),
     ...state.institutions.map((entry) => entry.institutionId as string),
@@ -81,6 +88,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
   checkUnique(violations, 'region', state.regions.map((entry) => entry.regionId));
   checkUnique(violations, 'population cohort', state.populationCohorts.map((entry) => entry.cohortId));
   checkUnique(violations, 'formation', state.formations.map((entry) => entry.formationId));
+  checkUnique(violations, 'route', state.routes.map((entry) => entry.routeId));
   checkUnique(violations, 'character', state.characters.map((entry) => entry.characterId));
   checkUnique(violations, 'group', state.groups.map((entry) => entry.groupId));
   checkUnique(violations, 'institution', state.institutions.map((entry) => entry.institutionId));
@@ -94,6 +102,9 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
   checkUnique(violations, 'catalog world model', state.catalogs.worldModels.map((entry) => entry.modelId));
   checkUnique(violations, 'catalog commodity', state.catalogs.commodities.map((entry) => entry.commodityId));
   checkUnique(violations, 'catalog control profile', state.catalogs.controlProfiles.map((entry) => entry.controlProfileId));
+  checkUnique(violations, 'catalog formation archetype', state.catalogs.formationArchetypes.map((entry) => entry.formationArchetypeId));
+  checkUnique(violations, 'catalog equipment class', state.catalogs.equipmentClasses.map((entry) => entry.equipmentClassId));
+  checkUnique(violations, 'catalog route class', state.catalogs.routeClasses.map((entry) => entry.routeClassId));
   checkUnique(violations, 'knowledge baseline concept', state.worldRules.knowledgeBaseline);
   checkUnique(violations, 'knowledge record', state.knowledge.records.map((entry) => `${entry.polityId}|${entry.conceptId}`));
   checkUnique(violations, 'ancestor revision', state.revisionLineage.ancestorRevisions);
@@ -106,6 +117,14 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
 
   for (const moduleId of state.modules.enabled) {
     if (!catalogModules.has(moduleId)) violations.push(`enabled manifest references unknown module ${moduleId}`);
+  }
+  for (const archetype of state.catalogs.formationArchetypes) {
+    checkUnique(violations, `equipment class in archetype ${archetype.formationArchetypeId}`, archetype.equipmentClassIds);
+    for (const equipmentClassId of archetype.equipmentClassIds) {
+      if (!equipmentClasses.has(equipmentClassId)) {
+        violations.push(`formation archetype ${archetype.formationArchetypeId} references unknown equipment class ${equipmentClassId}`);
+      }
+    }
   }
   const requiredModels = [
     ['physical', state.worldRules.physicalModel],
@@ -171,7 +190,20 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
   for (const cohort of state.populationCohorts) assertRegion(cohort.regionId, `cohort ${cohort.cohortId}`);
   for (const formation of state.formations) {
     assertPolity(formation.polityId, `formation ${formation.formationId}`);
+    const allowedEquipment = formationArchetypes.get(formation.archetypeId);
+    if (!allowedEquipment) violations.push(`formation ${formation.formationId} references unknown archetype ${formation.archetypeId}`);
     checkUnique(violations, `personnel origin region in ${formation.formationId}`, formation.personnelOrigins.map((entry) => entry.regionId));
+    checkUnique(violations, `equipment class in ${formation.formationId}`, formation.equipment.map((entry) => entry.equipmentClassId));
+    let equipmentTotal = 0n;
+    for (const equipment of formation.equipment) {
+      equipmentTotal += BigInt(equipment.quantity);
+      if (!equipmentClasses.has(equipment.equipmentClassId)) {
+        violations.push(`formation ${formation.formationId} references unknown equipment class ${equipment.equipmentClassId}`);
+      } else if (allowedEquipment && !allowedEquipment.has(equipment.equipmentClassId)) {
+        violations.push(`formation ${formation.formationId} equipment class ${equipment.equipmentClassId} is not allowed by archetype ${formation.archetypeId}`);
+      }
+    }
+    checkSafeAggregate(violations, `formation ${formation.formationId} equipment aggregate`, equipmentTotal);
     let originTotal = 0n;
     for (const origin of formation.personnelOrigins) {
       assertRegion(origin.regionId, `formation ${formation.formationId} personnel origin`);
@@ -180,6 +212,15 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     checkSafeAggregate(violations, `formation ${formation.formationId} personnel origin sum`, originTotal);
     if (originTotal !== BigInt(formation.manpower)) {
       violations.push(`formation ${formation.formationId} personnel origins sum ${originTotal} does not equal manpower ${formation.manpower}`);
+    }
+  }
+  for (const route of state.routes) {
+    if (!routeClasses.has(route.classId)) violations.push(`route ${route.routeId} references unknown route class ${route.classId}`);
+    checkUnique(violations, `region in route ${route.routeId}`, route.regionIds);
+    checkUnique(violations, `commodity in route ${route.routeId}`, route.allowedCommodityIds);
+    for (const regionId of route.regionIds) assertRegion(regionId, `route ${route.routeId}`);
+    for (const commodityId of route.allowedCommodityIds) {
+      if (!catalogCommodities.has(commodityId)) violations.push(`route ${route.routeId} references unknown commodity ${commodityId}`);
     }
   }
   for (const character of state.characters) if (character.polityId) assertPolity(character.polityId, `character ${character.characterId}`);
@@ -216,6 +257,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     ...state.regions.map((entry) => ({ label: `region ${entry.regionId}`, evidenceIds: entry.evidenceIds })),
     ...state.populationCohorts.map((entry) => ({ label: `cohort ${entry.cohortId}`, evidenceIds: entry.evidenceIds })),
     ...state.formations.map((entry) => ({ label: `formation ${entry.formationId}`, evidenceIds: entry.evidenceIds })),
+    ...state.routes.map((entry) => ({ label: `route ${entry.routeId}`, evidenceIds: entry.evidenceIds })),
     ...state.characters.map((entry) => ({ label: `character ${entry.characterId}`, evidenceIds: entry.evidenceIds })),
     ...state.groups.map((entry) => ({ label: `group ${entry.groupId}`, evidenceIds: entry.evidenceIds })),
     ...state.institutions.map((entry) => ({ label: `institution ${entry.institutionId}`, evidenceIds: entry.evidenceIds })),
@@ -272,10 +314,12 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
   for (const [regionId, population] of regionPopulation) checkSafeAggregate(violations, `region ${regionId} population aggregate`, population);
 
   const regionalOrigins = new Map<string, bigint>();
+  const equipmentTotals = new Map<string, bigint>();
   let worldFielded = 0n;
   for (const formation of state.formations) {
     worldFielded += BigInt(formation.manpower);
     for (const origin of formation.personnelOrigins) addToBigIntMap(regionalOrigins, origin.regionId, origin.personnel);
+    for (const equipment of formation.equipment) addToBigIntMap(equipmentTotals, equipment.equipmentClassId, equipment.quantity);
   }
   checkSafeAggregate(violations, 'world fielded personnel aggregate', worldFielded);
   for (const [regionId, personnel] of regionalOrigins) {
@@ -283,6 +327,9 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     if (personnel > (regionPopulation.get(regionId) ?? 0n)) {
       violations.push(`region ${regionId} personnel origins ${personnel} exceed population ${regionPopulation.get(regionId) ?? 0n}`);
     }
+  }
+  for (const [equipmentClassId, total] of equipmentTotals) {
+    checkSafeAggregate(violations, `world equipment ${equipmentClassId} aggregate`, total);
   }
 
   const capacityFields = ['fiscalBase', 'productiveCapacity', 'supplyCapacity'] as const;
