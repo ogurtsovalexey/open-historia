@@ -98,6 +98,25 @@ test("Europe 1935 starts with all engine modules and runs private Terra-medium V
   await expect(pane).toHaveAttribute("data-game-id", gameId, { timeout: 45_000 });
   await expect(pane).not.toContainText("не использует детерминированный экономический движок");
   await expect(pane).toContainText("1935-01-01");
+  await expect(page.getByRole("button", { name: /Экономика$/ })).toBeVisible();
+  for (const tab of ["Дипломатия", "Государство", "Политика", "Армия", "Общество", "Кампания", "Советник", "Статистика"]) {
+    await expect(page.getByRole("button", { name: new RegExp(`${tab}$`) })).toBeVisible();
+  }
+  await expect(page.getByTestId("economy-country-overview")).toContainText("Польша");
+  await expect(pane).toContainText("Общая численность населения");
+  await page.getByRole("button", { name: /Дипломатия$/ }).click();
+  await expect(page.getByTestId("diplomacy-pane")).toContainText("Внешняя политика");
+  await page.getByRole("button", { name: /Государство$/ }).click();
+  await expect(page.getByTestId("statecraft-pane")).toContainText("Финансы");
+  await page.getByRole("button", { name: /Политика$/ }).click();
+  await expect(page.getByTestId("politics-pane")).toContainText("Игнаций Мосцицкий");
+  await page.getByRole("button", { name: /Армия$/ }).click();
+  await expect(page.getByTestId("military-pane")).toContainText("Военное министерство");
+  await page.getByRole("button", { name: /Общество$/ }).click();
+  await expect(page.getByTestId("society-pane")).toContainText("Общество и возможности");
+  await page.getByRole("button", { name: /Кампания$/ }).click();
+  await expect(page.getByTestId("campaign-pane")).toContainText("Горизонт кампании");
+  await page.getByRole("button", { name: /Экономика$/ }).click();
   const initial = await (await request.get(`/api/games/${gameId}/economy/state`)).json();
   expect(Object.values(initial.modules).every(Boolean)).toBe(true);
   expect(initial.playerPolityId).toBe("polity:poland");

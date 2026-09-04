@@ -9,6 +9,7 @@ import COUNTRY_NAMES from "../../runtime/generated/countryNames.js";
 import { setRegionClickObserver } from "../Selection/Regions.jsx";
 import { generateCountryStatSheet } from "../AI/gameplay.js";
 import { validateGameplayPayload } from "../AI/gameplaySchemas.js";
+import { engineLocale, engineText } from "./engineI18n.js";
 
 // Sheets are regenerated when the game date moves; within a date they persist
 // across reloads so flipping between countries stays instant.
@@ -137,6 +138,8 @@ const StatsPane = ({ active }) => {
     // this is one fetch per scenario; {} for every scenario that sets none.
     const [customFlags, setCustomFlags] = useState({});
     const displayName = useCountryDisplayName(targetCountry);
+    const locale = engineLocale();
+    const t = (value) => engineText(value, locale);
 
     // Which game and which date are we in? Also seeds the target: your country.
     useEffect(() => {
@@ -245,7 +248,7 @@ const StatsPane = ({ active }) => {
         } catch (error) {
             setState((current) =>
                 targetCountry === code
-                    ? { status: "error", sheet: null, error: error?.message || "The stat sheet failed." }
+                    ? { status: "error", sheet: null, error: error?.message || t("The stat sheet failed.") }
                     : current);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -278,13 +281,13 @@ const StatsPane = ({ active }) => {
     const breakdown = useMemo(() => {
         const raw = sheet?.gdpBreakdown ?? {};
         const parts = [
-            { key: "agriculture", label: "Agriculture", color: "#22c55e", value: clamp01(raw.agriculture) },
-            { key: "industry", label: "Industry", color: "#3b82f6", value: clamp01(raw.industry) },
-            { key: "services", label: "Services", color: "#8b5cf6", value: clamp01(raw.services) },
+            { key: "agriculture", label: t("Agriculture"), color: "#22c55e", value: clamp01(raw.agriculture) },
+            { key: "industry", label: t("Industry"), color: "#3b82f6", value: clamp01(raw.industry) },
+            { key: "services", label: t("Services"), color: "#8b5cf6", value: clamp01(raw.services) },
         ];
         const total = parts.reduce((sum, part) => sum + part.value, 0) || 1;
         return parts.map((part) => ({ ...part, share: (part.value / total) * 100 }));
-    }, [sheet]);
+    }, [sheet, locale]);
 
     const budgetNegative = String(sheet?.economy?.budgetBalance ?? "").trim().startsWith("-");
 
@@ -294,7 +297,7 @@ const StatsPane = ({ active }) => {
 
         {!targetCountry && (
             <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.85rem" }}>
-            No active game. Start one to see national statistics.
+            {t("No active game. Start one to see national statistics.")}
             </p>
         )}
 
@@ -319,23 +322,23 @@ const StatsPane = ({ active }) => {
             </span>
             {isPlayer && (
                 <span style={{ backgroundColor: "rgba(245,158,11,0.18)", border: "1px solid rgba(245,158,11,0.5)", borderRadius: "999px", color: "#fbbf24", flexShrink: 0, fontSize: "0.62rem", fontWeight: 700, padding: "0.14rem 0.5rem" }}>
-                Your country
+                {t("Your country")}
                 </span>
             )}
             </div>
             {sheet && (
                 <>
                 <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.76rem", marginTop: "0.15rem" }}>
-                {[sheet.capital, sheet.continent].filter(Boolean).join(" · ")}
+                {[sheet.capital, sheet.continent].filter(Boolean).map((entry) => t(entry)).join(" · ")}
                 </div>
                 {sheet.government && (
                     <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.72rem", marginTop: "0.1rem" }}>
-                    {sheet.government}
+                    {t(sheet.government)}
                     </div>
                 )}
                 {sheet.leader && (
                     <div style={{ color: "#fbbf24", fontSize: "0.72rem", marginTop: "0.1rem" }}>
-                    Leader: {sheet.leader}
+                    {t("Leader")}: {t(sheet.leader)}
                     </div>
                 )}
                 </>
@@ -344,7 +347,7 @@ const StatsPane = ({ active }) => {
             {state.status !== "loading" && (
                 <button
                 onClick={() => loadSheet({ force: true })}
-                title="Regenerate this stat sheet"
+                title={t("Regenerate this stat sheet")}
                 style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: "1rem", padding: 0 }}
                 >↻</button>
             )}
@@ -352,7 +355,7 @@ const StatsPane = ({ active }) => {
 
             {state.status === "loading" && (
                 <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", marginTop: "1rem" }}>
-                Compiling the stat sheet…
+                {t("Compiling the stat sheet…")}
                 </p>
             )}
 
@@ -362,7 +365,7 @@ const StatsPane = ({ active }) => {
                 <button
                 onClick={() => loadSheet({ force: true })}
                 style={{ background: "none", border: "none", color: "#93c5fd", cursor: "pointer", display: "block", fontSize: "0.8rem", fontWeight: 700, marginTop: "0.4rem", padding: 0 }}
-                >Try again</button>
+                >{t("Try again")}</button>
                 </div>
             )}
 
@@ -372,7 +375,7 @@ const StatsPane = ({ active }) => {
                 <div style={{ ...cardStyle, marginTop: "1rem" }}>
                 <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: "0.45rem" }}>
                 <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                ⚠ National stability
+                ⚠ {t("National stability")}
                 </span>
                 <span data-no-translate style={{ fontSize: "0.85rem", fontWeight: 800 }}>
                 {clamp01(sheet.stability)}/100
@@ -382,7 +385,7 @@ const StatsPane = ({ active }) => {
                 </div>
 
                 {/* Strategic indices */}
-                <div style={sectionTitleStyle}>⚑ Strategic indices</div>
+                <div style={sectionTitleStyle}>⚑ {t("Strategic indices")}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
                 {INDEX_ROWS.map((row) => {
                     const value = clamp01(sheet.indices?.[row.key]);
@@ -390,7 +393,7 @@ const StatsPane = ({ active }) => {
                         <div key={row.key} style={cardStyle}>
                         <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
                         <span style={{ color: "rgba(255,255,255,0.8)", fontSize: "0.76rem" }}>
-                        {row.icon} {row.label}
+                        {row.icon} {t(row.label)}
                         </span>
                         <span data-no-translate style={{ fontSize: "0.78rem", fontWeight: 800 }}>{value}%</span>
                         </div>
@@ -401,17 +404,17 @@ const StatsPane = ({ active }) => {
                 </div>
 
                 {/* Economy */}
-                <div style={sectionTitleStyle}>📈 Economy</div>
+                <div style={sectionTitleStyle}>📈 {t("Economy")}</div>
                 <div style={{ display: "grid", gap: "0.55rem", gridTemplateColumns: "1fr 1fr" }}>
-                <EconomyCard label="GDP" value={sheet.economy?.gdp} sub={sheet.economy?.gdpGrowth} tone="#34d399" />
-                <EconomyCard label="GDP/capita" value={sheet.economy?.gdpPerCapita} sub={sheet.economy?.currency} tone="#e5e7eb" />
-                <EconomyCard label="Inflation" value={sheet.economy?.inflation} tone="#34d399" />
-                <EconomyCard label="Unemployment" value={sheet.economy?.unemployment} tone="#34d399" />
-                <EconomyCard label="Public debt" value={sheet.economy?.publicDebt} tone="#34d399" />
+                <EconomyCard label={t("GDP")} value={sheet.economy?.gdp} sub={sheet.economy?.gdpGrowth} tone="#34d399" />
+                <EconomyCard label={t("GDP/capita")} value={sheet.economy?.gdpPerCapita} sub={sheet.economy?.currency} tone="#e5e7eb" />
+                <EconomyCard label={t("Inflation")} value={sheet.economy?.inflation} tone="#34d399" />
+                <EconomyCard label={t("Unemployment")} value={sheet.economy?.unemployment} tone="#34d399" />
+                <EconomyCard label={t("Public debt")} value={sheet.economy?.publicDebt} tone="#34d399" />
                 <EconomyCard
-                label="Budget balance"
+                label={t("Budget balance")}
                 value={sheet.economy?.budgetBalance}
-                sub={budgetNegative ? "Deficit" : "Surplus"}
+                sub={t(budgetNegative ? "Deficit" : "Surplus")}
                 tone={budgetNegative ? "#f87171" : "#34d399"}
                 />
                 </div>
@@ -419,7 +422,7 @@ const StatsPane = ({ active }) => {
                 {/* GDP breakdown */}
                 <div style={{ ...cardStyle, marginTop: "0.9rem" }}>
                 <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.74rem", marginBottom: "0.5rem" }}>
-                GDP breakdown
+                {t("GDP breakdown")}
                 </div>
                 <div style={{ borderRadius: "999px", display: "flex", height: "10px", overflow: "hidden" }}>
                 {breakdown.map((part) => (
@@ -439,7 +442,7 @@ const StatsPane = ({ active }) => {
             )}
 
             <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.7rem", marginTop: "1rem" }}>
-            Click any country on the map to inspect it.
+            {t("Click any country on the map to inspect it.")}
             </p>
             </>
         )}

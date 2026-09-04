@@ -22,7 +22,10 @@ const COPY = {
     outputPerWorker: "output per worker", taxRevenue: "tax revenue", spending: "spending", tax: "tax",
     shortfall: "shortfall", surplus: "surplus", of: "of", limitedBy: "limited by", capacityLimited: "capacity limited",
     invalidSpend: "Spend must be a positive whole number.", basicGoods: "basic goods",
-    resources: { coal: "coal", food: "food", goods: "goods", iron: "iron", wood: "wood" },
+    countryOverview: "Country overview", countrySummaryHint: "national totals across all controlled regions",
+    regionsCount: "Controlled regions", totalPopulation: "Total population", averageInfrastructure: "Average infrastructure",
+    monthlyCapacity: "Total monthly capacity", productionProfile: "Regional production profile", regionDetails: "Region details",
+    resources: { coal: "coal", food: "food", goods: "goods", iron: "iron", oil: "oil", wood: "wood" },
   },
   ru: {
     date: "Дата", round: "Ход", revision: "Ревизия сессии", selected: "Выбранный регион",
@@ -37,7 +40,10 @@ const COPY = {
     outputPerWorker: "выпуск на работника", taxRevenue: "налоговые поступления", spending: "расходы", tax: "налог",
     shortfall: "дефицит", surplus: "излишек", of: "из", limitedBy: "ограничено ресурсами", capacityLimited: "ограничено мощностью",
     invalidSpend: "Сумма должна быть положительным целым числом.", basicGoods: "базовые товары",
-    resources: { coal: "уголь", food: "продовольствие", goods: "товары", iron: "железо", wood: "древесина" },
+    countryOverview: "Обзор страны", countrySummaryHint: "общие показатели всех контролируемых регионов",
+    regionsCount: "Контролируемые регионы", totalPopulation: "Общая численность населения", averageInfrastructure: "Средняя инфраструктура",
+    monthlyCapacity: "Общая месячная мощность", productionProfile: "Региональная структура производства", regionDetails: "Сведения о регионе",
+    resources: { coal: "уголь", food: "продовольствие", goods: "товары", iron: "железо", oil: "нефть", wood: "древесина" },
   },
 };
 
@@ -207,6 +213,23 @@ const EconomyPane = ({ active }) => {
     return snapshot.lastTurn.ledger.polities.find((entry) => entry.polityId === controller.id) ?? null;
   }, [snapshot, controller]);
 
+  const playerPolity = useMemo(() => snapshot?.polities.find((polity) => polity.id === snapshot.playerPolityId) ?? null, [snapshot]);
+  const playerRegions = useMemo(() => snapshot?.regions.filter((region) => region.controllerId === snapshot.playerPolityId) ?? [], [snapshot]);
+  const playerLedger = useMemo(() => snapshot?.lastTurn?.ledger?.polities.find((entry) => entry.polityId === snapshot.playerPolityId) ?? null, [snapshot]);
+  const countryTotals = useMemo(() => {
+    const population = playerLedger?.populationClosing ?? playerRegions.reduce((sum, region) => sum + region.population, 0);
+    const capacity = playerRegions.reduce((sum, region) => sum + region.baseMonthlyCapacity, 0);
+    const infrastructure = playerRegions.length
+      ? Math.round(playerRegions.reduce((sum, region) => sum + region.infrastructureBp, 0) / playerRegions.length)
+      : 0;
+    const activities = new Map();
+    for (const region of playerRegions) {
+      const key = region.activity.kind === "extraction" ? region.activity.resource : (region.activity.activity ?? region.activity.kind);
+      activities.set(key, (activities.get(key) ?? 0) + region.baseMonthlyCapacity);
+    }
+    return { population, capacity, infrastructure, activities: [...activities.entries()].sort(([left], [right]) => left.localeCompare(right)) };
+  }, [playerLedger, playerRegions]);
+
   const regionProduction = useMemo(() => {
     if (!controllerLedger || !selectedRegion) return null;
     for (const entry of controllerLedger.production) {
@@ -321,9 +344,36 @@ const EconomyPane = ({ active }) => {
         </div>
       ))}
 
+      {playerPolity ? (
+        <Section title={text.countryOverview} right={text.countrySummaryHint}>
+          <div data-testid="economy-country-overview" style={{ fontSize: 15, fontWeight: 650, marginBottom: 4 }}>
+            {localizedName(playerPolity, locale, playerPolity.id)}
+          </div>
+          <Row label={text.regionsCount} value={fmt(playerRegions.length)} />
+          <Row label={text.totalPopulation} value={fmt(countryTotals.population)} />
+          <Row label={text.treasury} value={fmt(playerPolity.treasury)} />
+          {playerLedger ? (
+            <Row
+              label={text.changeLastMonth}
+              value={signed(playerLedger.treasuryClosing - playerLedger.treasuryOpening)}
+              tone={playerLedger.treasuryClosing - playerLedger.treasuryOpening >= 0 ? COLORS.good : COLORS.bad}
+            />
+          ) : null}
+          <Row label={text.monthlyCapacity} value={fmt(countryTotals.capacity)} />
+          <Row label={text.averageInfrastructure} value={bp(countryTotals.infrastructure)} />
+          <Row
+            label={text.productionProfile}
+            value={countryTotals.activities.map(([activity, amount]) => `${activity === "basic_goods" ? text.basicGoods : localizedResource(activity, text)}: ${fmt(amount)}`).join(" · ") || "—"}
+          />
+          <div style={{ marginTop: 7, color: COLORS.dim, fontSize: 12 }}>
+            {text.stockpile}: {playerPolity.stockpile.map((entry) => `${localizedResource(entry.resource, text)} ${fmt(entry.amount)}`).join(" · ")}
+          </div>
+        </Section>
+      ) : null}
+
       {selectedRegion ? (
         <Section
-          title={text.selected}
+          title={`${text.regionDetails} · ${text.selected}`}
           right={selectedMapRegion ? mapIdByEngineId.get(selectedRegion.regionId) : text.click}
         >
           <div data-testid="economy-selected-region" style={{ fontSize: 15, fontWeight: 650, marginBottom: 4 }}>

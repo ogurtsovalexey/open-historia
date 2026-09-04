@@ -1,6 +1,7 @@
 /*! P3c deterministic finance/projects/intelligence pane. */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchEconomyState, getActiveEngineGame, queueEconomyCommand } from '../../runtime/economy.js';
+import { engineLocale, engineLocalized, engineName, engineText } from './engineI18n.js';
 
 const dim = 'rgba(255,255,255,0.58)';
 const line = 'rgba(255,255,255,0.12)';
@@ -32,6 +33,8 @@ const StatecraftPane = ({ active }) => {
   const [targetRegionId, setTargetRegionId] = useState('');
   const [funding, setFunding] = useState(250);
   const [priority, setPriority] = useState(3);
+  const locale = engineLocale();
+  const t = (value) => engineText(value, locale);
 
   const load = useCallback(async () => {
     try {
@@ -60,83 +63,83 @@ const StatecraftPane = ({ active }) => {
   const queuePolicy = () => queue({
     kind: 'finance.set-policy', ...base(), taxBurdenBp: Number(taxBurden), exemptionBp: Number(exemption),
     priorities: budgetStances[budgetStance],
-  }, 'Finance policy queued for the next monthly boundary.');
-  const queueBonds = () => queue({ kind: 'finance.issue-bonds', ...base(), amount: Math.max(1, Math.trunc(Number(bondAmount) || 1)) }, 'Bond issuance queued.');
+  }, t('Finance policy queued for the next monthly boundary.'));
+  const queueBonds = () => queue({ kind: 'finance.issue-bonds', ...base(), amount: Math.max(1, Math.trunc(Number(bondAmount) || 1)) }, t('Bond issuance queued.'));
   const queueProject = () => {
     const target = selectedTemplate?.effect?.kind === 'infrastructure' ? { targetRegionId }
       : selectedTemplate?.effect?.kind === 'reveal-intelligence' ? { targetPolityId } : {};
     queue({
       kind: 'project.start', ...base(), projectId: `project:${crypto.randomUUID()}`, templateId,
       ...target, monthlyFunding: Math.max(1, Math.trunc(Number(funding) || 1)), priority: Math.max(1, Math.min(5, Math.trunc(Number(priority) || 1))),
-    }, 'Project queued for the next monthly boundary.');
+    }, t('Project queued for the next monthly boundary.'));
   };
 
-  if (!snapshot?.revision) return <div style={{ padding: 14, color: dim }}>{error || 'Loading statecraft…'}</div>;
-  if (!statecraft) return <div style={{ padding: 14, color: dim }}>Statecraft modules are disabled in this scenario.</div>;
+  if (!snapshot?.revision) return <div style={{ padding: 14, color: dim }}>{error || t('Loading statecraft…')}</div>;
+  if (!statecraft) return <div style={{ padding: 14, color: dim }}>{t('Statecraft modules are disabled in this scenario.')}</div>;
   return <div data-testid="statecraft-pane" style={{ padding: 12, overflowY: 'auto', fontSize: 12 }}>
-    <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 9 }}>Statecraft</div>
+    <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 9 }}>{t('Statecraft')}</div>
     {queued && <div data-testid="statecraft-queued" style={{ ...card, color: '#a5b4fc' }}>{queued}</div>}
     {error && <div style={{ ...card, color: '#f2777a' }}>{error}</div>}
 
     {finance && <>
-      <div style={{ color: dim, marginBottom: 5 }}>Finance</div>
+      <div style={{ color: dim, marginBottom: 5 }}>{t('Finance')}</div>
       <div style={card}>
-        <div>Treasury {snapshot.polities.find((entry) => entry.id === snapshot.playerPolityId)?.treasury ?? 0} · Debt {finance.debtPrincipal} / {finance.creditLimit}</div>
-        <div style={{ color: dim, marginTop: 3 }}>Interest {(finance.annualInterestBp / 100).toFixed(2)}% · Defaults {finance.defaultCount}</div>
+        <div>{t('Treasury')} {snapshot.polities.find((entry) => entry.id === snapshot.playerPolityId)?.treasury ?? 0} · {t('Debt')} {finance.debtPrincipal} / {finance.creditLimit}</div>
+        <div style={{ color: dim, marginTop: 3 }}>{t('Interest')} {(finance.annualInterestBp / 100).toFixed(2)}% · {t('Defaults')} {finance.defaultCount}</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5, marginTop: 7 }}>
-          <input aria-label="Tax burden bp" style={input} type="number" min="5000" max="15000" value={taxBurden} onChange={(event) => setTaxBurden(event.target.value)} />
-          <input aria-label="Tax exemption bp" style={input} type="number" min="0" max="5000" value={exemption} onChange={(event) => setExemption(event.target.value)} />
+          <input aria-label={t('Tax burden bp')} style={input} type="number" min="5000" max="15000" value={taxBurden} onChange={(event) => setTaxBurden(event.target.value)} />
+          <input aria-label={t('Tax exemption bp')} style={input} type="number" min="0" max="5000" value={exemption} onChange={(event) => setExemption(event.target.value)} />
         </div>
-        <select aria-label="Budget stance" style={{ ...input, marginTop: 5 }} value={budgetStance} onChange={(event) => setBudgetStance(event.target.value)}>
-          <option value="balanced">Balanced budget</option>
-          <option value="industry">Industrial investment</option>
-          <option value="science">Science investment</option>
-          <option value="security">Security and military</option>
+        <select aria-label={t('Budget stance')} style={{ ...input, marginTop: 5 }} value={budgetStance} onChange={(event) => setBudgetStance(event.target.value)}>
+          <option value="balanced">{t('Balanced budget')}</option>
+          <option value="industry">{t('Industrial investment')}</option>
+          <option value="science">{t('Science investment')}</option>
+          <option value="security">{t('Security and military')}</option>
         </select>
-        <div style={{ color: dim, marginTop: 4 }}>{Object.entries(budgetStances[budgetStance]).map(([name, value]) => `${name} ${value / 100}%`).join(' · ')}</div>
-        <button data-testid="queue-finance-policy" style={{ ...button, marginTop: 6 }} onClick={queuePolicy}>Queue finance policy</button>
+        <div style={{ color: dim, marginTop: 4 }}>{Object.entries(budgetStances[budgetStance]).map(([name, value]) => `${t(name)} ${value / 100}%`).join(' · ')}</div>
+        <button data-testid="queue-finance-policy" style={{ ...button, marginTop: 6 }} onClick={queuePolicy}>{t('Queue finance policy')}</button>
         <div style={{ display: 'flex', gap: 5, marginTop: 7 }}>
-          <input aria-label="Bond amount" style={input} type="number" min="1" value={bondAmount} onChange={(event) => setBondAmount(event.target.value)} />
-          <button data-testid="queue-bonds" style={button} onClick={queueBonds}>Issue bonds</button>
-          {finance.debtPrincipal > 0 && <button style={button} onClick={() => queue({ kind: 'finance.restructure', ...base() }, 'Debt restructuring queued.')}>Restructure</button>}
+          <input aria-label={t('Bond amount')} style={input} type="number" min="1" value={bondAmount} onChange={(event) => setBondAmount(event.target.value)} />
+          <button data-testid="queue-bonds" style={button} onClick={queueBonds}>{t('Issue bonds')}</button>
+          {finance.debtPrincipal > 0 && <button style={button} onClick={() => queue({ kind: 'finance.restructure', ...base() }, t('Debt restructuring queued.'))}>{t('Restructure')}</button>}
         </div>
       </div>
     </>}
 
-    <div style={{ color: dim, margin: '12px 0 5px' }}>Capacity & projects</div>
-    <div style={card}>Administration {statecraft.capacities?.administration ?? 0} · Science {statecraft.capacities?.science ?? 0} · Industry {statecraft.capacities?.industry ?? 0}</div>
-    {activeProjects.length === 0 && <div style={{ color: dim, marginBottom: 7 }}>No active projects</div>}
+    <div style={{ color: dim, margin: '12px 0 5px' }}>{t('Capacity & projects')}</div>
+    <div style={card}>{t('Administration')} {statecraft.capacities?.administration ?? 0} · {t('Science')} {statecraft.capacities?.science ?? 0} · {t('Industry')} {statecraft.capacities?.industry ?? 0}</div>
+    {activeProjects.length === 0 && <div style={{ color: dim, marginBottom: 7 }}>{t('No active projects')}</div>}
     {activeProjects.map((project) => {
       const template = statecraft.templates.find((entry) => entry.templateId === project.templateId);
       return <div key={project.projectId} style={card}>
-        <strong>{template?.displayName?.en ?? project.templateId}</strong>
-        <div style={{ color: dim, margin: '3px 0' }}>{project.progressCost}/{project.effectiveTotalCost} · month {project.progressMonths}/{template?.durationMonths}</div>
+        <strong>{engineName(template, locale, project.templateId)}</strong>
+        <div style={{ color: dim, margin: '3px 0' }}>{project.progressCost}/{project.effectiveTotalCost} · {t('month')} {project.progressMonths}/{template?.durationMonths}</div>
         <button style={{ ...button, marginRight: 5 }} onClick={() => queue({
           kind: 'project.update', ...base(), projectId: project.projectId,
           monthlyFunding: project.monthlyFunding + 100, priority: Math.min(5, project.priority + 1),
-        }, 'Higher project funding and priority queued.')}>Prioritise</button>
-        <button style={button} onClick={() => queue({ kind: 'project.cancel', ...base(), projectId: project.projectId }, 'Project cancellation queued.')}>Cancel</button>
+        }, t('Higher project funding and priority queued.'))}>{t('Prioritise')}</button>
+        <button style={button} onClick={() => queue({ kind: 'project.cancel', ...base(), projectId: project.projectId }, t('Project cancellation queued.'))}>{t('Cancel')}</button>
       </div>;
     })}
-    <select aria-label="Project template" style={input} value={templateId} onChange={(event) => setTemplateId(event.target.value)}>
-      {(statecraft.templates ?? []).map((entry) => <option key={entry.templateId} value={entry.templateId}>{entry.displayName.en}</option>)}
+    <select aria-label={t('Project template')} style={input} value={templateId} onChange={(event) => setTemplateId(event.target.value)}>
+      {(statecraft.templates ?? []).map((entry) => <option key={entry.templateId} value={entry.templateId}>{engineName(entry, locale, entry.templateId)}</option>)}
     </select>
-    {selectedTemplate?.effect?.kind === 'infrastructure' && <select aria-label="Project region" style={{ ...input, marginTop: 5 }} value={targetRegionId} onChange={(event) => setTargetRegionId(event.target.value)}>
-      {snapshot.regions.filter((entry) => entry.controllerId === snapshot.playerPolityId).map((entry) => <option key={entry.regionId} value={entry.regionId}>{entry.displayName.en}</option>)}
+    {selectedTemplate?.effect?.kind === 'infrastructure' && <select aria-label={t('Project region')} style={{ ...input, marginTop: 5 }} value={targetRegionId} onChange={(event) => setTargetRegionId(event.target.value)}>
+      {snapshot.regions.filter((entry) => entry.controllerId === snapshot.playerPolityId).map((entry) => <option key={entry.regionId} value={entry.regionId}>{engineName(entry, locale, entry.regionId)}</option>)}
     </select>}
-    {selectedTemplate?.effect?.kind === 'reveal-intelligence' && <select aria-label="Intelligence target" style={{ ...input, marginTop: 5 }} value={targetPolityId} onChange={(event) => setTargetPolityId(event.target.value)}>
-      {snapshot.polities.filter((entry) => entry.id !== snapshot.playerPolityId).map((entry) => <option key={entry.id} value={entry.id}>{entry.displayName.en}</option>)}
+    {selectedTemplate?.effect?.kind === 'reveal-intelligence' && <select aria-label={t('Intelligence target')} style={{ ...input, marginTop: 5 }} value={targetPolityId} onChange={(event) => setTargetPolityId(event.target.value)}>
+      {snapshot.polities.filter((entry) => entry.id !== snapshot.playerPolityId).map((entry) => <option key={entry.id} value={entry.id}>{engineName(entry, locale, entry.id)}</option>)}
     </select>}
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5, marginTop: 5 }}>
-      <input aria-label="Monthly project funding" style={input} type="number" min="1" value={funding} onChange={(event) => setFunding(event.target.value)} />
-      <input aria-label="Project priority" style={input} type="number" min="1" max="5" value={priority} onChange={(event) => setPriority(event.target.value)} />
+      <input aria-label={t('Monthly project funding')} style={input} type="number" min="1" value={funding} onChange={(event) => setFunding(event.target.value)} />
+      <input aria-label={t('Project priority')} style={input} type="number" min="1" max="5" value={priority} onChange={(event) => setPriority(event.target.value)} />
     </div>
-    <button data-testid="queue-project" style={{ ...button, width: '100%', marginTop: 6 }} disabled={!templateId} onClick={queueProject}>Queue project</button>
+    <button data-testid="queue-project" style={{ ...button, width: '100%', marginTop: 6 }} disabled={!templateId} onClick={queueProject}>{t('Queue project')}</button>
 
-    <div style={{ color: dim, margin: '12px 0 5px' }}>Known facts</div>
+    <div style={{ color: dim, margin: '12px 0 5px' }}>{t('Known facts')}</div>
     {(statecraft.knownFacts ?? []).map((fact) => <div key={fact.factId} style={card}>
-      <strong>{fact.summary?.en ?? fact.factId}</strong>
-      <div style={{ color: dim, marginTop: 3 }}>{fact.domain} · {fact.confidence} confidence · {monthsBetween(fact.observedMonth, snapshot.month) >= fact.staleAfterMonths ? 'stale' : 'current'} · {fact.evidenceId}</div>
+      <strong>{engineLocalized(fact.summary, locale, fact.factId)}</strong>
+      <div style={{ color: dim, marginTop: 3 }}>{t(fact.domain)} · {t(fact.confidence)} {t('confidence')} · {t(monthsBetween(fact.observedMonth, snapshot.month) >= fact.staleAfterMonths ? 'stale' : 'current')} · {fact.evidenceId}</div>
     </div>)}
   </div>;
 };

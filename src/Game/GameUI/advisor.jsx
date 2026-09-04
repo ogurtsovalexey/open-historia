@@ -13,6 +13,7 @@ import PoliticsPane from "./politics.jsx";
 import MilitaryPane from "./military.jsx";
 import SocietyPane from "./society.jsx";
 import CampaignPane from "./campaign.jsx";
+import { engineLocale, engineText } from "./engineI18n.js";
 
 Chart.register(...registerables);
 
@@ -33,13 +34,13 @@ const baseStyle = {
     boxShadow: "0 4px 6px -1px rgba(0,0,0,0.2)",
 };
 
-const ThinkingDots = () => {
+const ThinkingDots = ({ label = "Thinking" }) => {
     const [dots, setDots] = React.useState(0);
     useEffect(() => {
         const interval = setInterval(() => setDots(d => (d + 1) % 4), 500);
         return () => clearInterval(interval);
     }, []);
-    return <span style={{ opacity: 0.6 }}>Thinking{".".repeat(dots)}&nbsp;</span>;
+    return <span style={{ opacity: 0.6 }}>{label}{".".repeat(dots)}&nbsp;</span>;
 };
 
 const parseMessage = (rawText) => {
@@ -203,6 +204,8 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
     const inputRef = useRef(null);
     const [isResizing, setIsResizing] = useState(false);
     const [handleHover, setHandleHover] = useState(false);
+    const locale = engineLocale();
+    const t = (value) => engineText(value, locale);
 
     // Drag the drawer's left edge to resize it. The panel is docked right, so the
     // new width is simply (viewport width − pointer x); the parent (main.jsx) clamps
@@ -364,7 +367,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
                 onPointerDown={handleResizeStart}
                 onPointerEnter={() => setHandleHover(true)}
                 onPointerLeave={() => setHandleHover(false)}
-                title="Drag to resize"
+                title={t("Drag to resize")}
                 style={{
                     position: "absolute", left: 0, top: 0, bottom: 0, width: "10px",
                     cursor: "ew-resize", zIndex: 30, touchAction: "none",
@@ -382,20 +385,20 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
         )}
         {/* Header: tabs to flip between the advisor chat and national stats. */}
         <div style={{ alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", display: "flex", overflowX: "auto", padding: "0 0.75rem 0 0.35rem" }}>
-        <TabButton icon="🏭" label="Economy" active={activeTab === "economy"} onClick={() => setActiveTab("economy")} />
-        <TabButton icon="🤝" label="Diplomacy" active={activeTab === "diplomacy"} onClick={() => setActiveTab("diplomacy")} />
-        <TabButton icon="🏛" label="Statecraft" active={activeTab === "statecraft"} onClick={() => setActiveTab("statecraft")} />
-        <TabButton icon="⚖" label="Politics" active={activeTab === "politics"} onClick={() => setActiveTab("politics")} />
-        <TabButton icon="⚔" label="War" active={activeTab === "military"} onClick={() => setActiveTab("military")} />
-        <TabButton icon="🧬" label="Society" active={activeTab === "society"} onClick={() => setActiveTab("society")} />
-        <TabButton icon="🏁" label="Campaign" active={activeTab === "campaign"} onClick={() => setActiveTab("campaign")} />
-        <TabButton icon="🧭" label="Advisor" active={activeTab === "advisor"} onClick={() => setActiveTab("advisor")} />
-        <TabButton icon="📊" label="Stats" active={activeTab === "stats"} onClick={() => setActiveTab("stats")} />
+        <TabButton icon="🏭" label={t("Economy")} active={activeTab === "economy"} onClick={() => setActiveTab("economy")} />
+        <TabButton icon="🤝" label={t("Diplomacy")} active={activeTab === "diplomacy"} onClick={() => setActiveTab("diplomacy")} />
+        <TabButton icon="🏛" label={t("Statecraft")} active={activeTab === "statecraft"} onClick={() => setActiveTab("statecraft")} />
+        <TabButton icon="⚖" label={t("Politics")} active={activeTab === "politics"} onClick={() => setActiveTab("politics")} />
+        <TabButton icon="⚔" label={t("War")} active={activeTab === "military"} onClick={() => setActiveTab("military")} />
+        <TabButton icon="🧬" label={t("Society")} active={activeTab === "society"} onClick={() => setActiveTab("society")} />
+        <TabButton icon="🏁" label={t("Campaign")} active={activeTab === "campaign"} onClick={() => setActiveTab("campaign")} />
+        <TabButton icon="🧭" label={t("Advisor")} active={activeTab === "advisor"} onClick={() => setActiveTab("advisor")} />
+        <TabButton icon="📊" label={t("Stats")} active={activeTab === "stats"} onClick={() => setActiveTab("stats")} />
         <div style={{ flex: 1 }} />
         {activeTab === "advisor" && (
             <button
             onClick={async () => { setMessages([]); startChat(); await saveMessages([]); }}
-            title="Clear chat"
+            title={t("Clear chat")}
             style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: "1.35rem", lineHeight: 1, padding: 0, display: "flex", alignItems: "center" }}
             >🗑</button>
         )}
@@ -404,7 +407,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
         {onClose && (
             <button
             onClick={onClose}
-            title="Close advisor"
+            title={t("Close advisor")}
             style={{ background: "none", border: "none", color: "rgba(255,255,255,0.55)", cursor: "pointer", fontSize: "1.35rem", lineHeight: 1, padding: "0 0 0 0.5rem", display: "flex", alignItems: "center" }}
             >✕</button>
         )}
@@ -449,7 +452,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
         <div style={{ padding: "0.75rem", flex: 1, minHeight: 0, overflowY: "auto", display: "flex", flexDirection: "column", gap: "1rem", scrollbarWidth: "none" }}>
         {messages.length === 0 && (
             <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.5)", marginTop: 0 }}>
-            No messages yet. Ask your advisor something!
+            {t("No messages yet. Ask your advisor something!")}
             </p>
         )}
 
@@ -462,7 +465,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
                 <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: msg.role === "user" ? "flex-end" : "flex-start" }}>
                 {msg.role !== "user" && (
                     <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.4)", marginBottom: "0.25rem" }}>
-                    {msg.role === "error" ? "⚠️ Error" : "🧭 Advisor"}
+                    {msg.role === "error" ? `⚠️ ${t("Error")}` : `🧭 ${t("Advisor")}`}
                     </span>
                 )}
                 {/* Player-typed text stays verbatim under UI translation. */}
@@ -491,9 +494,9 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
 
         {isLoading && !(messages[messages.length - 1]?.role === "advisor" && messages[messages.length - 1]?.streaming) && (
             <div style={{ display: "flex", alignItems: "flex-start", flexDirection: "column", gap: "0.25rem" }}>
-            <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.4)" }}>🧭 Advisor</span>
+            <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.4)" }}>🧭 {t("Advisor")}</span>
             <div style={{ padding: "0.6rem 0.85rem", borderRadius: "12px 12px 12px 4px", backgroundColor: "rgba(255,255,255,0.08)", fontSize: "0.85rem" }}>
-            <ThinkingDots />
+            <ThinkingDots label={t("Thinking")} />
             </div>
             </div>
         )}
@@ -504,7 +507,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
         <div style={{ padding: "1rem", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
         <textarea
         ref={inputRef}
-        placeholder="Ask your advisor…  (Shift+Enter for a new line)"
+        placeholder={t("Ask your advisor…  (Shift+Enter for a new line)")}
         rows={1} value={input}
         onChange={e => {
             setInput(e.target.value);
