@@ -1,11 +1,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { validateScenarioV3 } from '../src/v3/validator.js';
-import { minimalScenarioV3 } from './scenarioV3Fixtures.js';
+import { minimalScenarioV3, refreshScenarioV3EvidenceChecksums } from './scenarioV3Fixtures.js';
 
 describe('ScenarioV3 → WorldStateV2 seed completeness', () => {
   it('sources every primary seed field or derives it without invented inputs', () => {
     const input = minimalScenarioV3();
+    refreshScenarioV3EvidenceChecksums(input);
     const validated = validateScenarioV3(input);
     assert.strictEqual(validated.valid, true, JSON.stringify(validated.errors));
     const scenario = validated.scenario!;
@@ -94,6 +95,7 @@ describe('ScenarioV3 → WorldStateV2 seed completeness', () => {
       id: 'evidence:formation-alpha', binding: { path: '/startingState/formations/formation:alpha', valueChecksum: `sha256:${'a'.repeat(64)}` },
       basis: { kind: 'development', synthetic: true }, visibility: 'public',
     };
+    refreshScenarioV3EvidenceChecksums(input);
     const validated = validateScenarioV3(input);
     assert.strictEqual(validated.valid, true, JSON.stringify(validated.errors));
     const scenario = validated.scenario!;
@@ -128,6 +130,7 @@ describe('ScenarioV3 → WorldStateV2 seed completeness', () => {
         basis: { kind: 'development', synthetic: true }, visibility: 'public',
       };
     }
+    refreshScenarioV3EvidenceChecksums(input);
     const validated = validateScenarioV3(input);
     assert.strictEqual(validated.valid, true, JSON.stringify(validated.errors));
     const scenario = validated.scenario!;

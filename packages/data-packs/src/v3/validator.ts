@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+import { canonicalStringify } from '../builder.js';
 import { scenarioV3Schema, type ScenarioV3 } from './schemas.js';
 import { PROFILE_EVIDENCE_KIND } from './profiles.js';
 
@@ -40,21 +42,44 @@ function recordIdentityErrors(record: Record<string, { id: string }>, path: stri
   return errors;
 }
 
-function resolvesJsonPointer(root: unknown, pointer: string): boolean {
+function resolveJsonPointer(root: unknown, pointer: string): { resolved: true; value: unknown } | { resolved: false } {
   let current: unknown = root;
   for (const encoded of pointer.slice(1).split('/')) {
     const token = encoded.replace(/~1/g, '/').replace(/~0/g, '~');
     if (Array.isArray(current)) {
-      if (!/^(?:0|[1-9]\d*)$/.test(token)) return false;
+      if (!/^(?:0|[1-9]\d*)$/.test(token)) return { resolved: false };
       const index = Number(token);
-      if (index >= current.length) return false;
+      if (index >= current.length) return { resolved: false };
       current = current[index];
     } else if (current !== null && typeof current === 'object' && Object.prototype.hasOwnProperty.call(current, token)) {
       current = (current as Record<string, unknown>)[token];
-    } else return false;
-    if (current === undefined) return false;
+    } else return { resolved: false };
+    if (current === undefined) return { resolved: false };
   }
-  return true;
+  return { resolved: true, value: current };
+}
+
+export function scenarioV3ValueChecksum(value: unknown): `sha256:${string}` {
+  const normalize = (entry: unknown): unknown => {
+    if (Array.isArray(entry)) {
+      return entry.map(normalize).sort((left, right) => {
+        const leftText = canonicalStringify(left);
+        const rightText = canonicalStringify(right);
+        return leftText < rightText ? -1 : leftText > rightText ? 1 : 0;
+      });
+    }
+    if (entry !== null && typeof entry === 'object') {
+      return Object.fromEntries(Object.entries(entry as Record<string, unknown>).map(([key, nested]) => [key, normalize(nested)]));
+    }
+    return entry;
+  };
+  return `sha256:${createHash('sha256').update(canonicalStringify(normalize(value)), 'utf8').digest('hex')}`;
+}
+
+export function scenarioV3ValueChecksumAtPointer(root: unknown, pointer: string): `sha256:${string}` {
+  const resolved = resolveJsonPointer(root, pointer);
+  if (!resolved.resolved) throw new Error(`ScenarioV3 provenance pointer does not resolve: ${pointer}`);
+  return scenarioV3ValueChecksum(resolved.value);
 }
 
 export function validateScenarioV3(input: unknown): ScenarioV3ValidationResult {
@@ -273,7 +298,20 @@ export function validateScenarioV3(input: unknown): ScenarioV3ValidationResult {
     visibleTo.forEach((polityId, index) => requireRef(polityIds, polityId, `${base}/visibleToPolityIds/${index}`, 'polity'));
     if (evidence.visibility === 'public' && visibleTo.length > 0) errors.push({ code: 'provenance.ambiguous-public-visibility', path: `${base}/visibleToPolityIds`, message: 'public evidence must not declare polity visibility' });
     if (evidence.visibility === 'polity' && visibleTo.length === 0) errors.push({ code: 'provenance.missing-polity-visibility', path: `${base}/visibleToPolityIds`, message: 'polity evidence must declare at least one visible polity' });
-    if (!resolvesJsonPointer(scenario, evidence.binding.path)) errors.push(refError('provenance.unresolved-binding', `${base}/binding/path`, `binding path "${evidence.binding.path}" does not resolve`, [evidence.binding.path]));
+    const bound = resolveJsonPointer(scenario, evidence.binding.path);
+    if (!bound.resolved) {
+      errors.push(refError('provenance.unresolved-binding', `${base}/binding/path`, `binding path "${evidence.binding.path}" does not resolve`, [evidence.binding.path]));
+    } else {
+      const actualChecksum = scenarioV3ValueChecksum(bound.value);
+      if (actualChecksum !== evidence.binding.valueChecksum) {
+        errors.push(refError(
+          'provenance.value-checksum-mismatch',
+          `${base}/binding/valueChecksum`,
+          `bound value checksum is ${actualChecksum}, not ${evidence.binding.valueChecksum}`,
+          [evidence.binding.path, actualChecksum, evidence.binding.valueChecksum],
+        ));
+      }
+    }
   }
 
   const resultErrors = sorted(errors);

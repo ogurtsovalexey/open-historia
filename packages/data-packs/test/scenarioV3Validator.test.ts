@@ -76,4 +76,15 @@ describe('ScenarioV3 reference closure', () => {
     const result = validateScenarioV3(input);
     assert.ok(result.errors.some((error) => error.path === '/provenance/evidence/evidence:polity-alpha/binding/path'));
   });
+
+  it('rejects a provenance checksum that no longer matches its bound canonical value', () => {
+    const input = minimalScenarioV3();
+    input.startingState.regions['region:test:A']!.fiscalBase += 1;
+    const result = validateScenarioV3(input);
+    assert.ok(result.errors.some((error) => (
+      error.code === 'provenance.value-checksum-mismatch'
+      && error.path === '/provenance/evidence/evidence:region-a/binding/valueChecksum'
+      && error.refs?.includes('/startingState/regions/region:test:A')
+    )), JSON.stringify(result.errors));
+  });
 });

@@ -1,4 +1,5 @@
 import type { ScenarioV3Input } from '../src/v3/schemas.js';
+import { scenarioV3ValueChecksumAtPointer } from '../src/v3/validator.js';
 
 const SHA_A = `sha256:${'a'.repeat(64)}`;
 const SHA_B = `sha256:${'b'.repeat(64)}`;
@@ -9,7 +10,7 @@ export function minimalScenarioV3(profile: 'historical' | 'fictional' | 'develop
     : profile === 'fictional'
       ? { kind: 'fictional' as const, premise: 'Authored test-world premise.' }
       : { kind: 'development' as const, synthetic: true as const };
-  return {
+  const scenario: ScenarioV3Input = {
     schemaVersion: 'open-historia-scenario/3',
     id: 'scenario:v3-minimal',
     profile,
@@ -116,4 +117,13 @@ export function minimalScenarioV3(profile: 'historical' | 'fictional' | 'develop
       },
     },
   };
+  refreshScenarioV3EvidenceChecksums(scenario);
+  return scenario;
+}
+
+export function refreshScenarioV3EvidenceChecksums(scenario: ScenarioV3Input): ScenarioV3Input {
+  for (const evidence of Object.values(scenario.provenance.evidence)) {
+    evidence.binding.valueChecksum = scenarioV3ValueChecksumAtPointer(scenario, evidence.binding.path);
+  }
+  return scenario;
 }
