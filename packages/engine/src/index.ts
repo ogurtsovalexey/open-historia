@@ -30,3 +30,4 @@ export * from './historicalScenario.js';
  * during the migration and gives callers an explicit version boundary.
  */
 export * as worldV2 from './world/index.js';
+export * as processes from './processes/index.js';

@@ -60,8 +60,8 @@ export interface RecruitmentAccess {
   mobilizedPersonnel: number;
   recruitablePopulation: number;
   unmobilizedRecruitablePopulation: number;
-  mobilizationCeiling: UnavailableMetric;
-  availableManpower: UnavailableMetric;
+  mobilizationCeiling: number;
+  availableManpower: number;
 }
 
 export interface PolityRegionContribution {
@@ -89,10 +89,10 @@ export interface PolitySnapshot {
   workforce: number;
   taxBase: number;
   recruitablePopulation: number;
-  mobilizationCeiling: UnavailableMetric;
+  mobilizationCeiling: number;
   unmobilizedRecruitablePopulation: number;
-  availableManpower: UnavailableMetric;
-  overmobilizedBy: UnavailableMetric;
+  availableManpower: number;
+  overmobilizedBy: number;
   fieldedPersonnel: number;
   equipment: EquipmentQuantity[];
   regionalOutput: number;
@@ -121,11 +121,6 @@ export interface PopulationIdentity {
 }
 
 const compareIds = (left: string, right: string): number => left < right ? -1 : left > right ? 1 : 0;
-
-const unavailableMobilizationCeiling = (): UnavailableMetric => ({
-  status: 'unavailable',
-  reason: 'requires a scenario or policy mobilization ceiling not present in WorldStateV2',
-});
 
 const unavailableIdentityPressure = (): UnavailableMetric => ({
   status: 'unavailable',
@@ -285,8 +280,8 @@ export function deriveRegionalRecruitmentAvailability(
     mobilizedPersonnel: region.mobilizedPersonnel,
     recruitablePopulation,
     unmobilizedRecruitablePopulation: Math.max(0, recruitablePopulation - region.mobilizedPersonnel),
-    mobilizationCeiling: unavailableMobilizationCeiling(),
-    availableManpower: unavailableMobilizationCeiling(),
+    mobilizationCeiling: recruitablePopulation,
+    availableManpower: Math.max(0, recruitablePopulation - region.mobilizedPersonnel),
   }, [...polity.evidenceIds, ...regionProjection.evidenceIds]);
 }
 
@@ -337,6 +332,8 @@ export function derivePolitySnapshot(state: WorldStateV2, polityId: string): Gro
   const formationEvidence = state.formations
     .filter((formation) => formation.polityId === polity.id)
     .flatMap((formation) => formation.evidenceIds);
+  const mobilizationCeiling = total('recruitablePopulation');
+  const availableManpower = total('unmobilizedRecruitablePopulation');
   return projection(state, {
     polityId: polity.id,
     treasury: polity.treasury,
@@ -347,10 +344,10 @@ export function derivePolitySnapshot(state: WorldStateV2, polityId: string): Gro
     workforce: total('workforce'),
     taxBase: total('taxBase'),
     recruitablePopulation: total('recruitablePopulation'),
-    mobilizationCeiling: unavailableMobilizationCeiling(),
+    mobilizationCeiling,
     unmobilizedRecruitablePopulation: total('unmobilizedRecruitablePopulation'),
-    availableManpower: unavailableMobilizationCeiling(),
-    overmobilizedBy: unavailableMobilizationCeiling(),
+    availableManpower,
+    overmobilizedBy: Math.max(0, fieldedPersonnel - mobilizationCeiling),
     fieldedPersonnel,
     equipment,
     regionalOutput: total('regionalOutput'),

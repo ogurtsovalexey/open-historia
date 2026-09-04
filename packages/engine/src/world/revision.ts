@@ -71,11 +71,39 @@ export function canonicalWorldState(state: WorldStateV2): WorldStateV2 {
     characters: state.characters.map(sortedEvidence).sort((a, b) => compareId(a.characterId, b.characterId)),
     groups: state.groups.map(sortedEvidence).sort((a, b) => compareId(a.groupId, b.groupId)),
     institutions: state.institutions.map(sortedEvidence).sort((a, b) => compareId(a.institutionId, b.institutionId)),
-    concepts: state.concepts.map(sortedEvidence).sort((a, b) => compareId(a.conceptId, b.conceptId)),
+    concepts: state.concepts.map((entry) => ({
+      ...sortedEvidence(entry),
+      origin: { ...entry.origin, originEntityRefs: sortedStrings(entry.origin.originEntityRefs) },
+      parentConceptIds: sortedStrings(entry.parentConceptIds),
+      supportingEvidenceIds: sortedStrings(entry.supportingEvidenceIds),
+      domains: sortedStrings(entry.domains),
+      diffusion: [...entry.diffusion].sort((a, b) => compareId(a.regionId, b.regionId)),
+      adoption: [...entry.adoption].sort((a, b) => compareId(
+        a.scope === 'polity' ? `polity|${a.polityId}` : `region|${a.regionId}`,
+        b.scope === 'polity' ? `polity|${b.polityId}` : `region|${b.regionId}`,
+      )),
+    })).sort((a, b) => compareId(a.conceptId, b.conceptId)),
     processes: state.processes.map((entry) => ({
       ...sortedEvidence(entry),
-      sponsorPolityIds: sortedStrings(entry.sponsorPolityIds),
+      sponsorEntityRefs: sortedStrings(entry.sponsorEntityRefs),
       affectedEntityRefs: sortedStrings(entry.affectedEntityRefs),
+      capacityUse: [...entry.capacityUse].sort((a, b) => compareId(`${a.capacityId}|${a.entityRef}`, `${b.capacityId}|${b.entityRef}`)),
+      investments: [...entry.investments].sort((a, b) => compareId(a.investorEntityRef, b.investorEntityRef)),
+      blockers: sortedStrings(entry.blockers),
+      accelerators: sortedStrings(entry.accelerators),
+      prerequisites: {
+        ...entry.prerequisites,
+        conceptIds: sortedStrings(entry.prerequisites.conceptIds),
+        material: [...entry.prerequisites.material].sort((a, b) => compareId(a.resourceId, b.resourceId)),
+        knowledgeEvidenceIds: sortedStrings(entry.prerequisites.knowledgeEvidenceIds),
+        institutionIds: sortedStrings(entry.prerequisites.institutionIds),
+        communicationEvidenceIds: sortedStrings(entry.prerequisites.communicationEvidenceIds),
+        oppositionEvidenceIds: sortedStrings(entry.prerequisites.oppositionEvidenceIds),
+        capacity: [...entry.prerequisites.capacity].sort((a, b) => compareId(`${a.capacityId}|${a.entityRef}`, `${b.capacityId}|${b.entityRef}`)),
+      },
+      compatibleEffectFamilies: sortedStrings(entry.compatibleEffectFamilies),
+      selectedEffectFamilies: sortedStrings(entry.selectedEffectFamilies),
+      selectedEffects: [...entry.selectedEffects].sort((a, b) => compareId(`${a.kind}|${a.targetEntityRef}`, `${b.kind}|${b.targetEntityRef}`)),
     })).sort((a, b) => compareId(a.processId, b.processId)),
     relationships: state.relationships.map((entry) => ({
       ...sortedEvidence(entry),
@@ -87,6 +115,15 @@ export function canonicalWorldState(state: WorldStateV2): WorldStateV2 {
     events: state.events.map((entry) => ({
       ...sortedEvidence(entry),
       entityRefs: sortedStrings(entry.entityRefs),
+      ...(entry.populationCausality ? {
+        populationCausality: {
+          ...entry.populationCausality,
+          regions: entry.populationCausality.regions.map((region) => ({
+            ...region,
+            cohorts: [...region.cohorts].sort((a, b) => compareId(a.cohortId, b.cohortId)),
+          })).sort((a, b) => compareId(a.regionId, b.regionId)),
+        },
+      } : {}),
     })).sort((a, b) => compareId(a.eventId, b.eventId)),
     evidence: state.evidence.map((entry) => ({
       ...entry,

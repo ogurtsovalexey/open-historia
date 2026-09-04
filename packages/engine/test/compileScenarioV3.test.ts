@@ -1,5 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
+import { scenarioV3 } from '@open-historia/data-packs';
 import { compileScenarioV3 } from '../src/world/compileScenarioV3.js';
 import { ScenarioV3CompilationError, worldSeedV2Schema } from '../src/world/seed.js';
 import { derivePolitySnapshot, deriveRegionSnapshot, deriveRouteSnapshot } from '../src/world/selectors.js';
@@ -14,7 +15,7 @@ function minimalScenario() {
     visibility,
     ...(visibility === 'polity' ? { visibleToPolityIds: ['polity:alpha'] } : {}),
   });
-  return {
+  const scenario = {
     schemaVersion: 'open-historia-scenario/3',
     id: 'scenario:compiler-minimal',
     profile: 'development',
@@ -83,7 +84,21 @@ function minimalScenario() {
         },
       },
       formations: {}, institutions: {}, relationships: {}, routes: {},
-      concepts: { 'concept:writing': { id: 'concept:writing', kind: 'practice', evidenceIds: ['evidence:concept-writing'] } },
+      concepts: {
+        'concept:writing': {
+          id: 'concept:writing', type: 'technology', semanticKey: 'writing',
+          displayName: { en: 'Writing' }, description: { en: 'Durable symbolic records.' },
+          origin: {
+            originEntityRefs: ['polity:alpha'], originMonth: '1900-01-01',
+            discovererEntityRef: 'polity:alpha',
+          },
+          parentConceptIds: [], supportingEvidenceIds: ['evidence:concept-writing'],
+          domains: ['domain:communication'], status: 'institutionalized', maturityBp: 10000,
+          diffusion: { 'region:test:A': 10000 },
+          adoption: { polities: { 'polity:alpha': 10000 }, regions: { 'region:test:A': 10000 } },
+          sourceEvidenceId: 'evidence:concept-writing', evidenceIds: ['evidence:concept-writing'],
+        },
+      },
       knowledge: {
         'knowledge:alpha-writing': {
           id: 'knowledge:alpha-writing', polityId: 'polity:alpha', conceptId: 'concept:writing',
@@ -106,6 +121,17 @@ function minimalScenario() {
       },
     },
   };
+  refreshEvidenceChecksums(scenario);
+  return scenario;
+}
+
+function refreshEvidenceChecksums<T extends {
+  provenance: { evidence: Record<string, { binding: { path: string; valueChecksum: string } }> };
+}>(scenario: T): T {
+  for (const evidence of Object.values(scenario.provenance.evidence)) {
+    evidence.binding.valueChecksum = scenarioV3.scenarioV3ValueChecksumAtPointer(scenario, evidence.binding.path);
+  }
+  return scenario;
 }
 
 function reverseRecord<T>(record: Record<string, T>): Record<string, T> {
@@ -246,7 +272,7 @@ describe('ScenarioV3 engine compiler', () => {
         },
       } },
     };
-    const compiled = compileScenarioV3(withFormation);
+    const compiled = compileScenarioV3(refreshEvidenceChecksums(withFormation));
     assert.deepStrictEqual(compiled.initialState.formations, [{
       formationId: 'formation:alpha', polityId: 'polity:alpha', archetypeId: 'formation-archetype:levy', manpower: 7,
       personnelOrigins: [{ regionId: 'region:test:A', personnel: 7 }],
@@ -299,7 +325,7 @@ describe('ScenarioV3 engine compiler', () => {
         },
       } },
     };
-    const compiled = compileScenarioV3(unsupported);
+    const compiled = compileScenarioV3(refreshEvidenceChecksums(unsupported));
     assert.deepStrictEqual(compiled.diagnostics, []);
     assert.deepStrictEqual(compiled.initialState.formations, [{
       formationId: 'formation:alpha', polityId: 'polity:alpha', archetypeId: 'formation-archetype:levy',

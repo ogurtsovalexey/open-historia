@@ -232,14 +232,114 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     if (institution.polityId) assertPolity(institution.polityId, `institution ${institution.institutionId}`);
     if (institution.regionId) assertRegion(institution.regionId, `institution ${institution.institutionId}`);
   }
-  for (const process of state.processes) {
-    checkUnique(violations, `process sponsor in ${process.processId}`, process.sponsorPolityIds);
-    checkUnique(violations, `affected entity in ${process.processId}`, process.affectedEntityRefs);
-    for (const polityId of process.sponsorPolityIds) assertPolity(polityId, `process ${process.processId}`);
-    for (const entityId of process.affectedEntityRefs) {
-      if (!entityIds.has(entityId)) violations.push(`process ${process.processId} references unknown entity ${entityId}`);
+  checkUnique(violations, 'concept semantic key', state.concepts.map((entry) => entry.semanticKey));
+  const conceptDependencies = new Map<string, string[]>();
+  for (const concept of state.concepts) {
+    checkUnique(violations, `parent concept in ${concept.conceptId}`, concept.parentConceptIds);
+    checkUnique(violations, `supporting evidence in ${concept.conceptId}`, concept.supportingEvidenceIds);
+    checkUnique(violations, `domain in ${concept.conceptId}`, concept.domains);
+    checkUnique(violations, `origin entity in ${concept.conceptId}`, concept.origin.originEntityRefs);
+    checkUnique(violations, `diffusion region in ${concept.conceptId}`, concept.diffusion.map((entry) => entry.regionId));
+    checkUnique(violations, `adoption scope in ${concept.conceptId}`, concept.adoption.map((entry) => (
+      entry.scope === 'polity' ? `polity|${entry.polityId}` : `region|${entry.regionId}`
+    )));
+    for (const parentId of concept.parentConceptIds) {
+      if (!conceptIds.has(parentId)) violations.push(`concept ${concept.conceptId} references unknown parent concept ${parentId}`);
+    }
+    conceptDependencies.set(concept.conceptId, [...concept.parentConceptIds]);
+    for (const entityId of concept.origin.originEntityRefs) {
+      if (!entityIds.has(entityId)) violations.push(`concept ${concept.conceptId} origin references unknown entity ${entityId}`);
+    }
+    if (concept.origin.discovererEntityRef && !entityIds.has(concept.origin.discovererEntityRef)) {
+      violations.push(`concept ${concept.conceptId} discoverer references unknown entity ${concept.origin.discovererEntityRef}`);
+    }
+    for (const entry of concept.diffusion) assertRegion(entry.regionId, `concept ${concept.conceptId} diffusion`);
+    for (const entry of concept.adoption) {
+      if (entry.scope === 'polity') assertPolity(entry.polityId, `concept ${concept.conceptId} adoption`);
+      else assertRegion(entry.regionId, `concept ${concept.conceptId} adoption`);
+    }
+    for (const evidenceId of [...concept.supportingEvidenceIds, concept.provenance.sourceEvidenceId]) {
+      assertEvidence(evidenceId, `concept ${concept.conceptId}`);
+    }
+    if (!lineageRevisions.has(concept.provenance.createdRevision)) {
+      violations.push(`concept ${concept.conceptId} provenance revision is not in world lineage: ${concept.provenance.createdRevision}`);
     }
   }
+  for (const process of state.processes) {
+    checkUnique(violations, `process sponsor in ${process.processId}`, process.sponsorEntityRefs);
+    checkUnique(violations, `affected entity in ${process.processId}`, process.affectedEntityRefs);
+    checkUnique(violations, `capacity use in ${process.processId}`, process.capacityUse.map((entry) => `${entry.capacityId}|${entry.entityRef}`));
+    checkUnique(violations, `investment in ${process.processId}`, process.investments.map((entry) => entry.investorEntityRef));
+    checkUnique(violations, `blocker in ${process.processId}`, process.blockers);
+    checkUnique(violations, `accelerator in ${process.processId}`, process.accelerators);
+    checkUnique(violations, `prerequisite concept in ${process.processId}`, process.prerequisites.conceptIds);
+    checkUnique(violations, `prerequisite material in ${process.processId}`, process.prerequisites.material.map((entry) => entry.resourceId));
+    checkUnique(violations, `prerequisite institution in ${process.processId}`, process.prerequisites.institutionIds);
+    checkUnique(violations, `prerequisite capacity in ${process.processId}`, process.prerequisites.capacity.map((entry) => `${entry.capacityId}|${entry.entityRef}`));
+    checkUnique(violations, `compatible effect family in ${process.processId}`, process.compatibleEffectFamilies);
+    checkUnique(violations, `selected effect family in ${process.processId}`, process.selectedEffectFamilies);
+    checkUnique(violations, `selected effect in ${process.processId}`, process.selectedEffects.map((entry) => `${entry.kind}|${entry.targetEntityRef}`));
+    for (const kind of process.selectedEffectFamilies) {
+      if (!process.compatibleEffectFamilies.includes(kind)) violations.push(`process ${process.processId} selects incompatible effect family ${kind}`);
+    }
+    for (const selection of process.selectedEffects) {
+      if (!process.selectedEffectFamilies.includes(selection.kind)) violations.push(`process ${process.processId} has unselected effect target for ${selection.kind}`);
+      if (!process.affectedEntityRefs.includes(selection.targetEntityRef)) violations.push(`process ${process.processId} effect target ${selection.targetEntityRef} is outside affected entities`);
+    }
+    for (const entityId of [...process.sponsorEntityRefs, ...process.affectedEntityRefs]) {
+      if (!entityIds.has(entityId)) violations.push(`process ${process.processId} references unknown entity ${entityId}`);
+    }
+    if (process.conceptId && !conceptIds.has(process.conceptId)) violations.push(`process ${process.processId} references unknown concept ${process.conceptId}`);
+    if (process.conceptId) {
+      conceptDependencies.set(process.conceptId, [
+        ...(conceptDependencies.get(process.conceptId) ?? []),
+        ...process.prerequisites.conceptIds,
+      ]);
+    }
+    for (const conceptId of process.prerequisites.conceptIds) {
+      if (!conceptIds.has(conceptId)) violations.push(`process ${process.processId} prerequisite references unknown concept ${conceptId}`);
+    }
+    for (const institutionId of process.prerequisites.institutionIds) {
+      if (!state.institutions.some((entry) => entry.institutionId === institutionId)) {
+        violations.push(`process ${process.processId} prerequisite references unknown institution ${institutionId}`);
+      }
+    }
+    for (const material of process.prerequisites.material) {
+      if (!catalogCommodities.has(material.resourceId)) violations.push(`process ${process.processId} prerequisite references unknown commodity ${material.resourceId}`);
+    }
+    for (const capacity of [...process.capacityUse, ...process.prerequisites.capacity]) {
+      if (!entityIds.has(capacity.entityRef)) violations.push(`process ${process.processId} capacity references unknown entity ${capacity.entityRef}`);
+    }
+    let investmentTotal = 0n;
+    for (const investment of process.investments) {
+      if (!entityIds.has(investment.investorEntityRef)) violations.push(`process ${process.processId} investment references unknown entity ${investment.investorEntityRef}`);
+      investmentTotal += BigInt(investment.amount);
+    }
+    if (investmentTotal !== BigInt(process.funding)) {
+      violations.push(`process ${process.processId} investments sum ${investmentTotal} does not equal funding ${process.funding}`);
+    }
+    for (const evidenceId of [
+      ...process.blockers,
+      ...process.accelerators,
+      ...process.prerequisites.knowledgeEvidenceIds,
+      ...process.prerequisites.communicationEvidenceIds,
+      ...process.prerequisites.oppositionEvidenceIds,
+    ]) assertEvidence(evidenceId, `process ${process.processId}`);
+  }
+  const visitingConcepts = new Set<string>();
+  const visitedConcepts = new Set<string>();
+  const visitConcept = (conceptId: string, path: string[]): void => {
+    if (visitingConcepts.has(conceptId)) {
+      violations.push(`cyclic concept dependency: ${[...path, conceptId].join(' -> ')}`);
+      return;
+    }
+    if (visitedConcepts.has(conceptId) || !conceptIds.has(conceptId)) return;
+    visitingConcepts.add(conceptId);
+    for (const dependency of conceptDependencies.get(conceptId) ?? []) visitConcept(dependency, [...path, conceptId]);
+    visitingConcepts.delete(conceptId);
+    visitedConcepts.add(conceptId);
+  };
+  for (const conceptId of [...conceptIds].sort()) visitConcept(conceptId, []);
   for (const relationship of state.relationships) {
     checkUnique(violations, `relationship participant in ${relationship.relationshipId}`, relationship.participantPolityIds);
     for (const polityId of relationship.participantPolityIds) assertPolity(polityId, `relationship ${relationship.relationshipId}`);
@@ -301,6 +401,41 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     }
     if (!lineageRevisions.has(event.revision)) {
       violations.push(`event ${event.eventId} revision is not in world lineage: ${event.revision}`);
+    }
+    if (event.populationCausality) {
+      const causality = event.populationCausality;
+      checkUnique(violations, `population causality region in ${event.eventId}`, causality.regions.map((row) => row.regionId));
+      const fields = ['births', 'naturalDeaths', 'combatDeaths', 'migrationNet', 'populationDelta'] as const;
+      for (const region of causality.regions) {
+        assertRegion(region.regionId, `population causality ${event.eventId}`);
+        checkUnique(violations, `population causality cohort in ${event.eventId}/${region.regionId}`, region.cohorts.map((row) => row.cohortId));
+        for (const cohort of region.cohorts) {
+          if (!state.populationCohorts.some((candidate) => candidate.cohortId === cohort.cohortId && candidate.regionId === region.regionId)) {
+            violations.push(`population causality ${event.eventId} cohort ${cohort.cohortId} is not in region ${region.regionId}`);
+          }
+          if (BigInt(cohort.populationDelta) !== BigInt(cohort.births) - BigInt(cohort.naturalDeaths) - BigInt(cohort.combatDeaths) + BigInt(cohort.migrationNet)) {
+            violations.push(`population causality ${event.eventId} cohort ${cohort.cohortId} has inconsistent populationDelta`);
+          }
+        }
+        for (const field of fields) {
+          const cohortSum = region.cohorts.reduce((sum, cohort) => sum + BigInt(cohort[field]), 0n);
+          if (cohortSum !== BigInt(region.totals[field])) {
+            violations.push(`population causality ${event.eventId} region ${region.regionId} ${field} does not equal cohort rows`);
+          }
+        }
+        if (BigInt(region.totals.populationDelta) !== BigInt(region.totals.births) - BigInt(region.totals.naturalDeaths) - BigInt(region.totals.combatDeaths) + BigInt(region.totals.migrationNet)) {
+          violations.push(`population causality ${event.eventId} region ${region.regionId} has inconsistent populationDelta`);
+        }
+      }
+      for (const field of fields) {
+        const regionSum = causality.regions.reduce((sum, region) => sum + BigInt(region.totals[field]), 0n);
+        if (regionSum !== BigInt(causality.totals[field])) {
+          violations.push(`population causality ${event.eventId} total ${field} does not equal region rows`);
+        }
+      }
+      if (BigInt(causality.totals.populationDelta) !== BigInt(causality.totals.births) - BigInt(causality.totals.naturalDeaths) - BigInt(causality.totals.combatDeaths) + BigInt(causality.totals.migrationNet)) {
+        violations.push(`population causality ${event.eventId} totals have inconsistent populationDelta`);
+      }
     }
   }
 

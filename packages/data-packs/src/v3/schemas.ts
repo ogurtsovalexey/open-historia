@@ -48,6 +48,28 @@ const conceptIdSchema = stableId('concept');
 const knowledgeIdSchema = stableId('knowledge');
 const unitIdSchema = stableId('unit');
 
+export const scenarioConceptTypeSchema = z.enum([
+  'technology',
+  'ideology',
+  'religious-movement',
+  'institution',
+  'doctrine',
+  'economic-practice',
+  'scientific-theory',
+]);
+export const scenarioProcessStageSchema = z.enum([
+  'proposed',
+  'emerging',
+  'organized',
+  'demonstrated',
+  'adopted',
+  'institutionalized',
+]);
+const semanticKeySchema = z.string().min(1).max(120).regex(
+  /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+  'Semantic key must be normalized lower-kebab-case',
+);
+
 const localizedTextSchema = z.object({ en: nonEmptyText, ru: nonEmptyText.optional() }).strict();
 const evidenceIdsSchema = z.array(evidenceIdSchema).min(1);
 
@@ -206,7 +228,26 @@ export const scenarioV3Schema = z.object({
     }).strict()),
     concepts: z.record(conceptIdSchema, z.object({
       id: conceptIdSchema,
-      kind: nonEmptyText,
+      type: scenarioConceptTypeSchema,
+      semanticKey: semanticKeySchema,
+      displayName: localizedTextSchema,
+      description: localizedTextSchema,
+      origin: z.object({
+        originEntityRefs: z.array(genericStableId).min(1),
+        originMonth: gameDateSchema,
+        discovererEntityRef: genericStableId.optional(),
+      }).strict(),
+      parentConceptIds: z.array(conceptIdSchema),
+      supportingEvidenceIds: evidenceIdsSchema,
+      domains: z.array(genericStableId).min(1),
+      status: scenarioProcessStageSchema,
+      maturityBp: basisPoints,
+      diffusion: z.record(regionIdSchema, basisPoints),
+      adoption: z.object({
+        polities: z.record(polityIdSchema, basisPoints),
+        regions: z.record(regionIdSchema, basisPoints),
+      }).strict(),
+      sourceEvidenceId: evidenceIdSchema,
       evidenceIds: evidenceIdsSchema,
     }).strict()),
     knowledge: z.record(knowledgeIdSchema, z.object({

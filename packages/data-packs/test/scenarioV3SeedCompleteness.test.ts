@@ -63,7 +63,23 @@ describe('ScenarioV3 → WorldStateV2 seed completeness', () => {
       characters: [],
       groups: [],
       institutions: [],
-      concepts: [{ conceptId: concept.id, kind: concept.kind, evidenceIds: concept.evidenceIds }],
+      concepts: [{
+        conceptId: concept.id,
+        type: concept.type,
+        semanticKey: concept.semanticKey,
+        displayName: concept.displayName,
+        description: concept.description,
+        origin: concept.origin,
+        parentConceptIds: concept.parentConceptIds,
+        supportingEvidenceIds: concept.supportingEvidenceIds,
+        domains: concept.domains,
+        status: concept.status,
+        maturityBp: concept.maturityBp,
+        diffusion: concept.diffusion,
+        adoption: concept.adoption,
+        sourceEvidenceId: concept.sourceEvidenceId,
+        evidenceIds: concept.evidenceIds,
+      }],
       processes: [],
       relationships: [],
       knowledge: { records: [{ polityId: knowledge.polityId, conceptId: knowledge.conceptId, evidenceIds: knowledge.evidenceIds }] },
@@ -79,7 +95,8 @@ describe('ScenarioV3 → WorldStateV2 seed completeness', () => {
     assert.deepStrictEqual(worldSeedFields.regions[0]!.control.kind, 'sovereign');
     assert.deepStrictEqual(worldSeedFields.regions[0]!.fiscalBase, 10);
     assert.deepStrictEqual(worldSeedFields.populationCohorts[0]!.workforceParticipationBp, 5000);
-    assert.deepStrictEqual(worldSeedFields.concepts[0]!.kind, 'practice');
+    assert.deepStrictEqual(worldSeedFields.concepts[0]!.type, 'technology');
+    assert.deepStrictEqual(worldSeedFields.concepts[0]!.status, 'institutionalized');
     assert.deepStrictEqual(worldSeedFields.knowledge.records[0]!.polityId, 'polity:alpha');
     assert.deepStrictEqual(worldSeedFields.evidence[0], { visibility: 'polity', visibleToPolityIds: ['polity:alpha'] });
   });

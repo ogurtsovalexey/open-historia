@@ -206,14 +206,8 @@ describe('WorldStateV2 authoritative selectors', () => {
       hasControl: true, recruitmentAccessBp: 1000, eligiblePopulation: 400,
       mobilizedPersonnel: 200, recruitablePopulation: 40,
       unmobilizedRecruitablePopulation: 0,
-      mobilizationCeiling: {
-        status: 'unavailable',
-        reason: 'requires a scenario or policy mobilization ceiling not present in WorldStateV2',
-      },
-      availableManpower: {
-        status: 'unavailable',
-        reason: 'requires a scenario or policy mobilization ceiling not present in WorldStateV2',
-      },
+      mobilizationCeiling: 40,
+      availableManpower: 0,
     });
     const occupiedForLegalOwner = deriveRegionalRecruitmentAvailability(state, 'region:test:B', 'polity:beta').value;
     assert.strictEqual(occupiedForLegalOwner.hasControl, false);
@@ -233,17 +227,14 @@ describe('WorldStateV2 authoritative selectors', () => {
     ]);
   });
 
-  it('does not invent identity pressure or equate recruitment access with a policy mobilization ceiling', () => {
+  it('derives current recruitment capacity while leaving unavailable identity pressure explicit', () => {
     const state = stampWorldStateRevision(fixtureInput());
     const alpha = derivePolitySnapshot(state, 'polity:alpha').value;
     assert.strictEqual(alpha.recruitablePopulation, 240);
     assert.strictEqual(alpha.unmobilizedRecruitablePopulation, 100);
-    assert.deepStrictEqual(alpha.mobilizationCeiling, {
-      status: 'unavailable',
-      reason: 'requires a scenario or policy mobilization ceiling not present in WorldStateV2',
-    });
-    assert.deepStrictEqual(alpha.availableManpower, alpha.mobilizationCeiling);
-    assert.deepStrictEqual(alpha.overmobilizedBy, alpha.mobilizationCeiling);
+    assert.strictEqual(alpha.mobilizationCeiling, 240); // sum of current access-adjusted regional eligibility
+    assert.strictEqual(alpha.availableManpower, 100); // regional capacity after all living mobilized origins
+    assert.strictEqual(alpha.overmobilizedBy, 0); // Alpha fields 100 personnel against current capacity 240
     assert.deepStrictEqual(alpha.identityPressure, {
       status: 'unavailable',
       reason: 'requires identity-model inputs not present in WorldStateV2',

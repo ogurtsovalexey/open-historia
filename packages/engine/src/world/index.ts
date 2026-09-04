@@ -3,6 +3,7 @@ export * from './revision.js';
 export * from './invariants.js';
 export * from './selectors.js';
 export * from './control.js';
+export * from './personnel.js';
 export * from './evidence.js';
 export * from './seed.js';
 export * from './compileScenarioV3.js';

@@ -106,6 +106,15 @@ export function validateScenarioV3(input: unknown): ScenarioV3ValidationResult {
   const conceptIds = new Set(Object.keys(startingState.concepts));
   const controlProfileIds = new Set(Object.keys(catalogs.controlProfiles));
   const equipmentClassIds = new Set(Object.keys(catalogs.equipmentClasses));
+  const startingEntityIds = new Set<string>([
+    ...polityIds,
+    ...regionIds,
+    ...Object.keys(startingState.populationCohorts),
+    ...Object.keys(startingState.formations),
+    ...Object.keys(startingState.institutions),
+    ...Object.keys(startingState.relationships),
+    ...conceptIds,
+  ]);
 
   const records: Array<[Record<string, { id: string }>, string]> = [
     [catalogs.modules, '/catalogs/modules'],
@@ -255,7 +264,55 @@ export function validateScenarioV3(input: unknown): ScenarioV3ValidationResult {
     route.allowedCommodityIds.forEach((ref, index) => requireRef(commodityIds, ref, `${base}/allowedCommodityIds/${index}`, 'commodity'));
     requireEvidence(route.evidenceIds, `${base}/evidenceIds`);
   }
-  for (const [id, concept] of Object.entries(startingState.concepts)) requireEvidence(concept.evidenceIds, `${childPath('/startingState/concepts', id)}/evidenceIds`);
+  const conceptSemanticKeys = new Map<string, string>();
+  for (const [id, concept] of Object.entries(startingState.concepts)) {
+    const base = childPath('/startingState/concepts', id);
+    requireEvidence(concept.evidenceIds, `${base}/evidenceIds`);
+    requireEvidence(concept.supportingEvidenceIds, `${base}/supportingEvidenceIds`);
+    requireRef(evidenceIds, concept.sourceEvidenceId, `${base}/sourceEvidenceId`, 'evidence');
+    if (!concept.evidenceIds.includes(concept.sourceEvidenceId)) {
+      errors.push(refError(
+        'integrity.concept-source-not-attached',
+        `${base}/sourceEvidenceId`,
+        'concept source evidence must also be attached to evidenceIds',
+        [concept.sourceEvidenceId],
+      ));
+    }
+    if (!concept.supportingEvidenceIds.includes(concept.sourceEvidenceId)) {
+      errors.push(refError(
+        'integrity.concept-source-not-supporting',
+        `${base}/sourceEvidenceId`,
+        'concept source evidence must also be supporting evidence',
+        [concept.sourceEvidenceId],
+      ));
+    }
+    errors.push(...duplicateErrors(concept.parentConceptIds, `${base}/parentConceptIds`));
+    concept.parentConceptIds.forEach((ref, index) => requireRef(conceptIds, ref, `${base}/parentConceptIds/${index}`, 'concept'));
+    errors.push(...duplicateErrors(concept.origin.originEntityRefs, `${base}/origin/originEntityRefs`));
+    concept.origin.originEntityRefs.forEach((ref, index) => requireRef(startingEntityIds, ref, `${base}/origin/originEntityRefs/${index}`, 'entity'));
+    if (concept.origin.discovererEntityRef) {
+      requireRef(startingEntityIds, concept.origin.discovererEntityRef, `${base}/origin/discovererEntityRef`, 'entity');
+    }
+    for (const regionId of Object.keys(concept.diffusion)) {
+      requireRef(regionIds, regionId, childPath(`${base}/diffusion`, regionId), 'region');
+    }
+    for (const polityId of Object.keys(concept.adoption.polities)) {
+      requireRef(polityIds, polityId, childPath(`${base}/adoption/polities`, polityId), 'polity');
+    }
+    for (const regionId of Object.keys(concept.adoption.regions)) {
+      requireRef(regionIds, regionId, childPath(`${base}/adoption/regions`, regionId), 'region');
+    }
+    errors.push(...duplicateErrors(concept.domains, `${base}/domains`));
+    const earlier = conceptSemanticKeys.get(concept.semanticKey);
+    if (earlier) {
+      errors.push(refError(
+        'integrity.duplicate-concept-semantic-key',
+        `${base}/semanticKey`,
+        `semantic key duplicates concept "${earlier}"`,
+        [earlier, id],
+      ));
+    } else conceptSemanticKeys.set(concept.semanticKey, id);
+  }
   const knowledgePairs = new Map<string, string>();
   for (const [id, knowledge] of Object.entries(startingState.knowledge)) {
     const base = childPath('/startingState/knowledge', id);

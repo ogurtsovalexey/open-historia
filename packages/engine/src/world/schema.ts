@@ -5,12 +5,17 @@ import {
   regionIdSchema,
   scenarioIdSchema,
 } from '@open-historia/domain';
+import {
+  conceptStateSchema,
+  worldProcessStateSchema,
+} from '../processes/schema.js';
 import { assertWorldStateV2Invariants } from './invariants.js';
 import { canonicalWorldState, worldStateChecksum } from './revision.js';
 
 export const WORLD_STATE_V2_SCHEMA_VERSION = 'open-historia-world/2' as const;
 
 const safeNonNegativeIntegerSchema = z.number().int().min(0).max(Number.MAX_SAFE_INTEGER);
+const safeIntegerSchema = z.number().int().min(Number.MIN_SAFE_INTEGER).max(Number.MAX_SAFE_INTEGER);
 export const basisPointsSchema = z.number().int().min(0).max(10000);
 const nonEmptyTextSchema = z.string().trim().min(1);
 const stableIdSchema = z.string().max(160).regex(
@@ -114,6 +119,35 @@ export const formationPersonnelOriginSchema = z.object({
 }).strict();
 export type FormationPersonnelOrigin = z.infer<typeof formationPersonnelOriginSchema>;
 
+export const populationCausalityTotalsSchema = z.object({
+  births: safeNonNegativeIntegerSchema,
+  naturalDeaths: safeNonNegativeIntegerSchema,
+  combatDeaths: safeNonNegativeIntegerSchema,
+  migrationNet: safeIntegerSchema,
+  populationDelta: safeIntegerSchema,
+}).strict();
+
+export const populationCausalityCohortRowSchema = z.object({
+  cohortId: populationCohortIdSchema,
+  births: safeNonNegativeIntegerSchema,
+  naturalDeaths: safeNonNegativeIntegerSchema,
+  combatDeaths: safeNonNegativeIntegerSchema,
+  migrationNet: safeIntegerSchema,
+  populationDelta: safeIntegerSchema,
+}).strict();
+
+export const populationCausalityRegionRowSchema = z.object({
+  regionId: regionIdSchema,
+  totals: populationCausalityTotalsSchema,
+  cohorts: z.array(populationCausalityCohortRowSchema),
+}).strict();
+
+export const populationCausalitySchema = z.object({
+  totals: populationCausalityTotalsSchema,
+  regions: z.array(populationCausalityRegionRowSchema).min(1),
+}).strict();
+export type PopulationCausality = z.infer<typeof populationCausalitySchema>;
+
 export const formationStateV2Schema = z.object({
   formationId: formationIdSchema,
   polityId: polityIdSchema,
@@ -158,20 +192,6 @@ export const institutionStateSchema = z.object({
   evidenceIds: evidenceIdsSchema,
 }).strict();
 
-export const conceptStateSchema = z.object({
-  conceptId: conceptIdSchema,
-  kind: nonEmptyTextSchema,
-  evidenceIds: evidenceIdsSchema,
-}).strict();
-
-export const worldProcessStateSchema = z.object({
-  processId: processIdSchema,
-  kind: nonEmptyTextSchema,
-  sponsorPolityIds: z.array(polityIdSchema),
-  affectedEntityRefs: z.array(stableIdSchema),
-  evidenceIds: evidenceIdsSchema,
-}).strict();
-
 export const relationshipStateSchema = z.object({
   relationshipId: relationshipIdSchema,
   kind: nonEmptyTextSchema,
@@ -208,6 +228,8 @@ export const worldEventSchema = z.object({
   kind: nonEmptyTextSchema,
   entityRefs: z.array(entityRefSchema),
   evidenceIds: evidenceIdsSchema,
+  /** Present only when this event changes living population. */
+  populationCausality: populationCausalitySchema.optional(),
 }).strict();
 
 export const evidenceRecordSchema = z.object({
@@ -311,6 +333,8 @@ export const worldStateV2Schema = worldStateV2ContentSchema.extend({
 
 export type WorldStateV2Input = z.input<typeof worldStateV2ContentSchema>;
 export type WorldStateV2 = z.output<typeof worldStateV2Schema>;
+
+export { conceptStateSchema, worldProcessStateSchema } from '../processes/schema.js';
 
 /** Parse at a persistence/commit boundary: structure, references and revision all fail closed. */
 export function parseWorldStateV2(input: unknown): WorldStateV2 {

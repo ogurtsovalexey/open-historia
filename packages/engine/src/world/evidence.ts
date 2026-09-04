@@ -145,7 +145,7 @@ function scopedEntityRefs(state: WorldStateV2, polityId: PolityId): Set<string> 
   for (const character of state.characters) if (character.polityId === polityId) refs.add(character.characterId);
   for (const group of state.groups) if (group.polityId === polityId) refs.add(group.groupId);
   for (const institution of state.institutions) if (institution.polityId === polityId) refs.add(institution.institutionId);
-  for (const process of state.processes) if (process.sponsorPolityIds.includes(polityId)) refs.add(process.processId);
+  for (const process of state.processes) if (process.sponsorEntityRefs.includes(polityId)) refs.add(process.processId);
   for (const relationship of state.relationships) if (relationship.participantPolityIds.includes(polityId)) refs.add(relationship.relationshipId);
   for (const knowledge of state.knowledge.records) if (knowledge.polityId === polityId) refs.add(knowledge.conceptId);
   return refs;

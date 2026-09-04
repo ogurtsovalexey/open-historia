@@ -87,4 +87,24 @@ describe('ScenarioV3 reference closure', () => {
       && error.refs?.includes('/startingState/regions/region:test:A')
     )), JSON.stringify(result.errors));
   });
+
+  it('validates authored concept origins, parents, diffusion and adoption references', () => {
+    const input = minimalScenarioV3();
+    const concept = input.startingState.concepts['concept:writing']!;
+    concept.origin.originEntityRefs = ['polity:missing'];
+    concept.parentConceptIds = ['concept:missing'];
+    concept.diffusion = { 'region:test:missing': 5000 };
+    concept.adoption.polities = { 'polity:missing': 5000 };
+    concept.adoption.regions = { 'region:test:missing': 5000 };
+    const result = validateScenarioV3(input);
+    for (const expectedPath of [
+      '/startingState/concepts/concept:writing/origin/originEntityRefs/0',
+      '/startingState/concepts/concept:writing/parentConceptIds/0',
+      '/startingState/concepts/concept:writing/diffusion/region:test:missing',
+      '/startingState/concepts/concept:writing/adoption/polities/polity:missing',
+      '/startingState/concepts/concept:writing/adoption/regions/region:test:missing',
+    ]) {
+      assert.ok(result.errors.some((error) => error.path === expectedPath), `${expectedPath}: ${JSON.stringify(result.errors)}`);
+    }
+  });
 });

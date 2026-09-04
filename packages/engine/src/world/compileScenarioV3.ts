@@ -198,7 +198,41 @@ function buildInitialState(
   }));
   const concepts = sortedValues(scenario.startingState.concepts).map((concept) => ({
     conceptId: concept.id,
-    kind: concept.kind,
+    type: concept.type,
+    semanticKey: concept.semanticKey,
+    displayName: concept.displayName,
+    description: concept.description,
+    origin: {
+      kind: 'scenario' as const,
+      originEntityRefs: [...concept.origin.originEntityRefs].sort(compareIds),
+      originMonth: concept.origin.originMonth,
+      ...(concept.origin.discovererEntityRef
+        ? { discovererEntityRef: concept.origin.discovererEntityRef }
+        : {}),
+    },
+    parentConceptIds: [...concept.parentConceptIds].sort(compareIds),
+    supportingEvidenceIds: [...concept.supportingEvidenceIds].sort(compareIds),
+    domains: [...concept.domains].sort(compareIds),
+    status: concept.status,
+    maturityBp: concept.maturityBp,
+    diffusion: Object.entries(concept.diffusion)
+      .map(([regionId, awarenessBp]) => ({ regionId, awarenessBp }))
+      .sort((a, b) => compareIds(a.regionId, b.regionId)),
+    adoption: [
+      ...Object.entries(concept.adoption.polities)
+        .map(([polityId, adoptionBp]) => ({ scope: 'polity' as const, polityId, adoptionBp })),
+      ...Object.entries(concept.adoption.regions)
+        .map(([regionId, adoptionBp]) => ({ scope: 'region' as const, regionId, adoptionBp })),
+    ].sort((a, b) => compareIds(
+      a.scope === 'polity' ? `polity|${a.polityId}` : `region|${a.regionId}`,
+      b.scope === 'polity' ? `polity|${b.polityId}` : `region|${b.regionId}`,
+    )),
+    provenance: {
+      kind: 'scenario' as const,
+      sourceEvidenceId: concept.sourceEvidenceId,
+      createdRevision: seedChecksum,
+      createdMonth: scenario.game.startDate,
+    },
     evidenceIds: [...concept.evidenceIds].sort(compareIds),
   }));
   const relationships = sortedValues(scenario.startingState.relationships).map((relationship) => ({
@@ -228,7 +262,11 @@ function buildInitialState(
   formations.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.formationId], `/formations/${index}`));
   routes.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.routeId], `/routes/${index}`));
   institutions.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.institutionId], `/institutions/${index}`));
-  concepts.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.conceptId], `/concepts/${index}`));
+  concepts.forEach((entry, index) => linkEvidence(
+    [...entry.evidenceIds, ...entry.supportingEvidenceIds, entry.provenance.sourceEvidenceId],
+    [entry.conceptId],
+    `/concepts/${index}`,
+  ));
   relationships.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.relationshipId], `/relationships/${index}`));
   knowledgeRecords.forEach((entry, index) => linkEvidence(
     entry.evidenceIds,

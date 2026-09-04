@@ -96,7 +96,29 @@ export function minimalScenarioV3(profile: 'historical' | 'fictional' | 'develop
         },
       },
       formations: {}, institutions: {}, relationships: {}, routes: {},
-      concepts: { 'concept:writing': { id: 'concept:writing', kind: 'practice', evidenceIds: ['evidence:concept-writing'] } },
+      concepts: {
+        'concept:writing': {
+          id: 'concept:writing',
+          type: 'technology',
+          semanticKey: 'writing',
+          displayName: { en: 'Writing' },
+          description: { en: 'Durable symbolic recording and transmission of information.' },
+          origin: {
+            originEntityRefs: ['polity:alpha'],
+            originMonth: '1900-01-01',
+            discovererEntityRef: 'polity:alpha',
+          },
+          parentConceptIds: [],
+          supportingEvidenceIds: ['evidence:concept-writing'],
+          domains: ['domain:communication'],
+          status: 'institutionalized',
+          maturityBp: 10000,
+          diffusion: { 'region:test:A': 10000 },
+          adoption: { polities: { 'polity:alpha': 10000 }, regions: { 'region:test:A': 10000 } },
+          sourceEvidenceId: 'evidence:concept-writing',
+          evidenceIds: ['evidence:concept-writing'],
+        },
+      },
       knowledge: {
         'knowledge:alpha-writing': {
           id: 'knowledge:alpha-writing', polityId: 'polity:alpha', conceptId: 'concept:writing',

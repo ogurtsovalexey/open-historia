@@ -27,6 +27,16 @@ describe('ScenarioV3 authoring schema', () => {
     input.startingState.polities['polity:alpha']!.id = 'polity:beta';
     assert.strictEqual(scenarioV3Schema.safeParse(input).success, true, 'shape parsing precedes semantic key equality validation');
   });
+
+  it('requires a lossless authored concept instead of a skeletal era label', () => {
+    const input = minimalScenarioV3();
+    input.startingState.concepts['concept:writing'] = {
+      id: 'concept:writing',
+      kind: 'practice',
+      evidenceIds: ['evidence:concept-writing'],
+    } as never;
+    assert.strictEqual(scenarioV3Schema.safeParse(input).success, false);
+  });
 });
 
 type ScenarioV3Mutable = ReturnType<typeof minimalScenarioV3> & {
