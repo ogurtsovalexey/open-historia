@@ -1495,7 +1495,9 @@ const DateWidget = ({
         if (draft.phase === "confirm-player") {
             draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "confirm-player" });
         }
-        while (draft.phase === "plan-strategy" || draft.phase === "plan-opponents" || draft.phase === "resolve-empty-month" || draft.phase === "report-player") {
+        while (draft.phase === "plan-strategy" || draft.phase === "plan-strategy-v4"
+            || draft.phase === "resolve-strategy-v4-empty" || draft.phase === "plan-opponents"
+            || draft.phase === "resolve-empty-month" || draft.phase === "report-player") {
             if (controller.signal.aborted) throw controller.signal.reason;
             if (draft.phase === "report-player") {
                 let outputs = [];
@@ -1510,6 +1512,18 @@ const DateWidget = ({
             }
             if (draft.phase === "resolve-empty-month") {
                 draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "resolve-empty-month" });
+                continue;
+            }
+            if (draft.phase === "resolve-strategy-v4-empty") {
+                draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "resolve-strategy-v4-empty" });
+                continue;
+            }
+            if (draft.phase === "plan-strategy-v4") {
+                const outcomes = await Promise.all(draft.tasks.map(async (task) => {
+                    try { return await dispatchAgentTask(task, { signal: controller.signal }); }
+                    catch (taskError) { return { taskKey: task.taskKey, failureCode: taskError?.message || "request-failed" }; }
+                }));
+                draft = await stepAgentTurn({ gameId, turnToken: draft.turnToken, action: "submit-strategy-v4", outcomes });
                 continue;
             }
             if (draft.phase === "plan-strategy") {
@@ -1530,7 +1544,13 @@ const DateWidget = ({
             .flatMap((month) => month.batchOutcomes ?? [])
             .filter((batch) => batch.source === "fallback")
             .map((batch) => batch.failureCode || "unknown provider failure");
-        if (fallbackFailures.length) {
+        const strategicHolds = (committed.agentTurn?.months ?? [])
+            .flatMap((month) => month.strategicDecisions ?? [])
+            .filter((decision) => decision.status && decision.status !== "accepted")
+            .map((decision) => `${decision.polityId}: ${decision.reason || decision.status}`);
+        if (strategicHolds.length) {
+            setFallbackWarning(`Strategic AI hold (no fallback was used): ${[...new Set(strategicHolds)].join("; ")}`);
+        } else if (fallbackFailures.length) {
             setFallbackWarning(`Opponent AI used deterministic fallback: ${[...new Set(fallbackFailures)].join("; ")}`);
         } else {
             setFallbackWarning("");

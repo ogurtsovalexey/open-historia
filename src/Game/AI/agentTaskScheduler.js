@@ -22,11 +22,14 @@ export const utilityTaskCacheKey = (task, profile) => canonical({
   },
 });
 
-export function createAgentTaskScheduler({ maxUtilityConcurrency = 6, maxCacheEntries = 128 } = {}) {
+export function createAgentTaskScheduler({ maxUtilityConcurrency = 6, maxStrategicConcurrency = 4, maxCacheEntries = 128 } = {}) {
   if (!Number.isInteger(maxUtilityConcurrency) || maxUtilityConcurrency < 1) throw new Error('maxUtilityConcurrency must be a positive integer');
+  if (!Number.isInteger(maxStrategicConcurrency) || maxStrategicConcurrency < 1) throw new Error('maxStrategicConcurrency must be a positive integer');
   if (!Number.isInteger(maxCacheEntries) || maxCacheEntries < 1) throw new Error('maxCacheEntries must be a positive integer');
   let activeUtility = 0;
+  let activeStrategic = 0;
   const queue = [];
+  const strategicQueue = [];
   const cache = new Map();
 
   const pump = () => {
@@ -49,6 +52,26 @@ export function createAgentTaskScheduler({ maxUtilityConcurrency = 6, maxCacheEn
     pump();
   });
 
+  const pumpStrategic = () => {
+    while (activeStrategic < maxStrategicConcurrency && strategicQueue.length) {
+      const entry = strategicQueue.shift();
+      if (entry.signal?.aborted) {
+        entry.reject(entry.signal.reason ?? new Error('strategic task cancelled'));
+        continue;
+      }
+      activeStrategic += 1;
+      Promise.resolve().then(entry.execute).then(entry.resolve, entry.reject).finally(() => {
+        activeStrategic -= 1;
+        pumpStrategic();
+      });
+    }
+  };
+
+  const scheduleStrategic = (execute, signal) => new Promise((resolve, reject) => {
+    strategicQueue.push({ execute, signal, resolve, reject });
+    pumpStrategic();
+  });
+
   const remember = (key, promise) => {
     cache.set(key, promise);
     while (cache.size > maxCacheEntries) cache.delete(cache.keys().next().value);
@@ -56,7 +79,7 @@ export function createAgentTaskScheduler({ maxUtilityConcurrency = 6, maxCacheEn
 
   return Object.freeze({
     run({ task, role, profile, signal, execute }) {
-      if (role === 'strategic') return Promise.resolve().then(execute);
+      if (role === 'strategic') return scheduleStrategic(execute, signal);
       if (role !== 'utility') return Promise.reject(new Error(`unknown AI model role ${role}`));
       const key = utilityTaskCacheKey(task, profile);
       const cached = cache.get(key);
@@ -73,6 +96,7 @@ export function createAgentTaskScheduler({ maxUtilityConcurrency = 6, maxCacheEn
       return pending;
     },
     clearCache() { cache.clear(); },
-    snapshot() { return Object.freeze({ activeUtility, queuedUtility: queue.length, cachedUtility: cache.size }); },
+    snapshot() { return Object.freeze({ activeUtility, queuedUtility: queue.length, cachedUtility: cache.size,
+      activeStrategic, queuedStrategic: strategicQueue.length }); },
   });
 }

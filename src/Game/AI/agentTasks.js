@@ -33,7 +33,7 @@ async function executeAgentTask(task, { signal, definition, budget, profile }) {
   const started = ledger.startTransport(record.invocationId, 1, {
     transport: "direct",
     structuredMode: "tool",
-    reasoningMode: "off",
+    reasoningMode: profile.reasoningMode,
     requestedOutputTokens: budget.maxOutputTokens,
   });
   const startedAt = performance.now();
@@ -44,7 +44,7 @@ async function executeAgentTask(task, { signal, definition, budget, profile }) {
       retries: budget.maxTransportAttemptsPerGeneration,
       signal,
       languageMode: "none",
-      reasoningMode: "off",
+      reasoningMode: profile.reasoningMode,
       providerRole: definition.modelRole,
     });
     ledger.finishTransport(record.invocationId, 1, started.transportAttempt, {
@@ -56,7 +56,18 @@ async function executeAgentTask(task, { signal, definition, budget, profile }) {
       ? { status: "no-effect", reason: "advisory" }
       : { status: "failed", failure: { code: "parse" } });
     if (!result?.toolInput) throw new Error(`${task.taskId} returned no structured tool payload`);
-    return { taskKey: task.taskKey, output: result.toolInput, invocationId: record.invocationId };
+    const provenance = result.provenance ?? {
+      provider: profile.providerKind,
+      model: profile.model,
+      effort: profile.reasoningMode === "off" ? "off" : "configured",
+      preflightChecksum: "not-required",
+    };
+    return {
+      taskKey: task.taskKey,
+      output: result.toolInput,
+      invocationId: record.invocationId,
+      provenance,
+    };
   } catch (error) {
     const open = ledger.getOpenInvocation(record.invocationId);
     if (open) {

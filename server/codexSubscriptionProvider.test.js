@@ -12,6 +12,8 @@ import {
   codexStructuredExecArgs,
   hasChatGptLogin,
   inspectCodexSubscription,
+  invokePreflightedCodex,
+  matchingCodexPreflight,
   normalizeCodexModelCatalog,
   queryCodexModels,
   readCodexPreflights,
@@ -123,6 +125,33 @@ test("server preflight schema stays structurally identical to canonical Strategi
   const canonical = z.toJSONSchema(strategicDecisionV3Schema);
   delete canonical.$schema;
   assert.deepEqual(strategicDecisionV3JsonSchema(), canonical);
+});
+
+test("runtime invocation requires desktop and an exact model, effort and contract preflight", async () => {
+  const preflight = {
+    provider: "codex-subscription", contract: "StrategicBriefV4+StrategicDecisionV3",
+    model: "gpt-5.6-terra", effort: "medium", preflightChecksum: "sha256:ok",
+  };
+  assert.equal(matchingCodexPreflight([preflight], { model: "gpt-5.6-terra", effort: "medium" }), preflight);
+  assert.equal(matchingCodexPreflight([preflight], { model: "gpt-5.6-terra", effort: "low" }), null);
+  await assert.rejects(invokePreflightedCodex({ desktopRuntime: false }), /desktop app/);
+  await assert.rejects(invokePreflightedCodex({
+    desktopRuntime: true, preflights: [], prompt: "x", schema: { type: "object" },
+    model: "gpt-5.6-terra", effort: "medium",
+  }), /preflight/);
+  const called = [];
+  const result = await invokePreflightedCodex({
+    desktopRuntime: true, preflights: [preflight], prompt: "bounded", schema: { type: "object" },
+    model: "gpt-5.6-terra", effort: "medium",
+    invoke: async (input) => {
+      called.push(input);
+      return { response: { ok: true }, stdout: `${JSON.stringify({ type: "turn.completed", usage: { input_tokens: 5 } })}\n` };
+    },
+  });
+  assert.equal(called.length, 1);
+  assert.deepEqual(result.response, { ok: true });
+  assert.equal(result.provenance.preflightChecksum, "sha256:ok");
+  assert.equal(result.provenance.usage.input_tokens, 5);
 });
 
 test("structured Codex turns disable ambient config, plugins, apps and writable sandboxes", () => {

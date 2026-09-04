@@ -3,7 +3,8 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { exportJsonSchema } from "@open-historia/domain";
-import { parseTurnCommands, polityIdentityEffects, runTurn } from "@open-historia/engine";
+import { parseTurnCommands, polityIdentityEffects, runTurn, isStrategicActor } from "@open-historia/engine";
+import { countTokens } from "gpt-tokenizer";
 import {
   EMPTY_AGENT_STATE,
   agentStateSchema,
@@ -19,12 +20,24 @@ import {
   validateOpponentBatch,
   validateDiplomacyBatch,
   opponentDiplomacyBatchResultSchema,
+  buildStrategicBriefV4,
+  commitStrategicMemory,
+  isQuarterlyCheckpoint,
+  materializeStrategicDecisionV4,
+  pendingTriggerRetryMonth,
+  renderStrategicPromptV4,
+  stableStrategicCommitOrder,
+  strategicCallBudget,
 } from "@open-historia/agent-runtime";
 import { getGameDirectory, getScenarioAgentProfiles } from "./libraryStore.js";
 import { commitAgentEconomy, countMonthlyTicks, loadEconomyContext } from "./economyStore.js";
 import { EngineSessionError } from "./engineSessionStore.js";
+import { EUROPE_1935_ENGINE_SCENARIO } from "./europe1935Runtime.js";
+import { strategicDecisionSchemaForBrief } from "./codexSubscriptionProvider.js";
 
 const DRAFT_FILE = "agent-turn-draft.json";
+const STRATEGIC_V4_CONTRACT = "StrategicBriefV4+StrategicDecisionV3";
+const STRATEGIC_V4_SYSTEM = "Make one bounded strategic decision for this polity only. Mandatory triggers and sovereignty outrank optional goals. Select only frozen choice IDs and cite only evidence IDs from the brief. Do not invent facts, numeric effects, IDs, or completed outcomes.";
 const canonical = (value) => {
   if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
   if (value && typeof value === "object") return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`).join(",")}}`;
@@ -271,7 +284,159 @@ const makeOpponentTasks = (draft) => {
   return draft;
 };
 
+const strategicMemoryFor = (draft, polityId) => draft.agentState.strategicV4.memories
+  .find((entry) => entry.polityId === polityId) ?? {
+    polityId, durablePlan: null, lastDecisionRevision: null, lastDecisionMonth: null,
+    retryMonth: null, pendingTriggerIds: [], lastStatus: null, reason: "",
+  };
+
+const ownIntelligenceFor = (state, polityId) => (state.intelligence?.knownFacts ?? [])
+  .filter((entry) => entry.observerPolityId === polityId)
+  .sort((left, right) => left.evidenceId.localeCompare(right.evidenceId))
+  .slice(0, 12)
+  .map((entry) => ({
+    evidenceId: entry.evidenceId,
+    summary: state.intelligence.truths.find((truth) => truth.factId === entry.factId)?.summary ?? entry.factId,
+  }));
+
+const productionTriggersFor = (draft, polityId) => {
+  const triggers = [];
+  for (const proposal of (draft.state.diplomacy?.proposals ?? [])
+    .filter((entry) => entry.recipientId === polityId || entry.recipientPolityId === polityId)
+    .sort((left, right) => left.proposalId.localeCompare(right.proposalId))) {
+    triggers.push({
+      triggerId: `trigger:proposal:${proposal.proposalId}`,
+      kind: "proposal",
+      summary: `A pending diplomatic proposal requires a response: ${proposal.proposalId}.`,
+      mandatory: true,
+      compatibleTools: ["respond-proposal"],
+      evidenceIds: [],
+    });
+  }
+  for (const war of (draft.state.military?.wars ?? [])
+    .filter((entry) => entry.status === "active" && (entry.attackers.includes(polityId) || entry.defenders.includes(polityId)))
+    .sort((left, right) => left.warId.localeCompare(right.warId))) {
+    triggers.push({
+      triggerId: `trigger:war:${war.warId}`,
+      kind: "war",
+      summary: `Active war requires a strategic response: ${war.warId}.`,
+      mandatory: true,
+      compatibleTools: ["mobilize", "issue-order", "negotiate-peace"],
+      evidenceIds: [],
+    });
+  }
+  for (const crisis of (draft.state.campaign?.crises ?? [])
+    .filter((entry) => entry.status !== "resolved" && entry.participants.includes(polityId))
+    .sort((left, right) => left.crisisId.localeCompare(right.crisisId))) {
+    triggers.push({
+      triggerId: `trigger:crisis:${crisis.crisisId}`,
+      kind: "crisis",
+      summary: `An active public crisis requires review: ${crisis.displayName?.en ?? crisis.crisisId}.`,
+      mandatory: true,
+      compatibleTools: ["change-policy", "respond-faction", "mobilize"],
+      evidenceIds: [],
+    });
+  }
+  const ledger = draft.lastLedger?.polities?.find((entry) => entry.polityId === polityId);
+  if ((ledger?.food?.shortfall ?? 0) > 0 || (ledger?.goods?.limitingInputs ?? []).length > 0) {
+    triggers.push({
+      triggerId: `trigger:resource:${polityId}:${draft.state.month}`,
+      kind: "resource-emergency",
+      summary: "The previous monthly ledger records a material food or industrial input shortage.",
+      mandatory: true,
+      compatibleTools: ["invest", "reallocate-production", "negotiate-trade", "external-import"],
+      evidenceIds: [],
+    });
+  }
+  const finance = draft.state.finance?.polities.find((entry) => entry.polityId === polityId);
+  if (finance?.lastDefaultMonth === draft.state.month) {
+    triggers.push({
+      triggerId: `trigger:default:${polityId}:${draft.state.month}`,
+      kind: "default",
+      summary: "A sovereign default requires an immediate strategic review.",
+      mandatory: true,
+      compatibleTools: ["change-policy", "start-project", "negotiate-trade", "external-import"],
+      evidenceIds: [],
+    });
+  }
+  return triggers;
+};
+
+const strategicContextFor = (draft, polityId) => ({
+  interests: ["preserve sovereignty and productive capacity"],
+  threats: productionTriggersFor(draft, polityId).map((entry) => entry.summary).slice(0, 6),
+  obligations: (draft.state.diplomacy?.agreements ?? [])
+    .filter((entry) => [entry.terms?.fromPolityId, entry.terms?.toPolityId].includes(polityId))
+    .map((entry) => `Honour active agreement ${entry.agreementId}.`).slice(0, 8),
+  redLines: ["Do not rely on invented outcomes or hidden state."],
+  causalAnchors: [],
+  memory: strategicMemoryFor(draft, polityId).durablePlan?.futureSteps ?? [],
+});
+
+const invocationFor = (triggers, quarterly, pendingRetry) => {
+  const first = triggers[0];
+  if (first) return { reason: first.kind, detail: first.summary };
+  if (pendingRetry) return { reason: "pending-trigger", detail: "Retry a previously held mandatory checkpoint no earlier than this month." };
+  if (quarterly) return { reason: "scheduled-quarter", detail: "Scheduled quarterly strategic review." };
+  return null;
+};
+
+export const makeProductionStrategicTasks = (draft) => {
+  const quarterly = isQuarterlyCheckpoint(draft.startMonth, draft.state.month);
+  const externalSupplierPolityIds = ["polity:soviet-union", "polity:united-states"]
+    .filter((polityId) => draft.state.polities.some((entry) => entry.id === polityId));
+  const pendingBriefs = [];
+  const tasks = [];
+  const actors = draft.state.polities.filter((entry) => entry.id !== draft.playerPolityId && isStrategicActor(entry))
+    .map((entry) => entry.id).sort();
+  for (const polityId of actors) {
+    const memory = strategicMemoryFor(draft, polityId);
+    const triggers = productionTriggersFor(draft, polityId);
+    const pendingRetry = Boolean(memory.retryMonth && memory.retryMonth <= draft.state.month && memory.pendingTriggerIds.length);
+    const invocation = invocationFor(triggers, quarterly, pendingRetry);
+    if (!invocation) continue;
+    const relevantFamilies = triggers.length
+      ? [...new Set(["conserve", ...triggers.flatMap((entry) => entry.compatibleTools)])]
+      : ["invest", "conserve"];
+    const brief = buildStrategicBriefV4(draft.state, polityId, {
+      invocation,
+      triggers,
+      relevantFamilies,
+      strategicContext: strategicContextFor(draft, polityId),
+      externalSupplierPolityIds,
+      ownIntelligence: ownIntelligenceFor(draft.state, polityId),
+      durablePlan: memory.durablePlan,
+      changesSinceLastDecision: [invocation.detail],
+      systemText: STRATEGIC_V4_SYSTEM,
+      countTokens,
+    });
+    const taskKey = `strategic-v4:${draft.state.month}:${polityId}`;
+    pendingBriefs.push({ taskKey, brief });
+    tasks.push({
+      taskId: "opponents.plan-campaign",
+      taskVersion: 1,
+      taskKey,
+      contract: STRATEGIC_V4_CONTRACT,
+      systemPrompt: STRATEGIC_V4_SYSTEM,
+      userPrompt: renderStrategicPromptV4(brief),
+      tool: {
+        name: "submit_strategic_decision_v3",
+        description: "Submit one bounded strategic decision for this actor and revision.",
+        schema: strategicDecisionSchemaForBrief(brief),
+      },
+      context: { fullMapIncluded: false, characterCount: brief.inputTokenCount, polityCount: 1 },
+    });
+  }
+  draft.pendingStrategicV4 = pendingBriefs;
+  draft.tasks = tasks;
+  draft.phase = tasks.length ? "plan-strategy-v4" : "resolve-strategy-v4-empty";
+  draft.strategicCallsPlanned = (draft.strategicCallsPlanned ?? 0) + tasks.length;
+  if (draft.strategicCallsPlanned > draft.strategicCallBudget) throw new Error("strategic call budget exceeded");
+  return draft;
+};
+
 const makeStrategicTasks = (draft) => {
+  if (draft.strategicContract === STRATEGIC_V4_CONTRACT) return makeProductionStrategicTasks(draft);
   const batches = buildDiplomacyBatches(draft.state, draft.playerPolityId);
   if (!batches.length) return makeOpponentTasks(draft);
   draft.pendingStrategicBatches = batches;
@@ -303,6 +468,102 @@ export const resolveStrategicMonth = (draft, outputs) => {
   draft.pendingStrategicBatches = [];
   draft.tasks = [];
   makeOpponentTasks(draft);
+};
+
+export const resolveProductionStrategicMonth = (draft, outcomes = []) => {
+  const pending = draft.pendingStrategicV4 ?? [];
+  const byKey = new Map((Array.isArray(outcomes) ? outcomes : []).map((entry) => [entry.taskKey, entry]));
+  let resolved = pending.map(({ taskKey, brief }) => {
+    const outcome = byKey.get(taskKey);
+    if (!outcome?.output) {
+      const pendingTriggerIds = brief.triggers.filter((entry) => entry.mandatory).map((entry) => entry.triggerId);
+      if (!pendingTriggerIds.length) pendingTriggerIds.push(`trigger:provider:${brief.actor.id}:${brief.month}`);
+      return {
+        polityId: brief.actor.id,
+        brief,
+        provenance: outcome?.provenance ?? null,
+        source: "provider-hold",
+        resolution: {
+          status: "hold", commands: [], decision: null, pendingTriggerIds,
+          reason: diagnosticCode(outcome?.failureCode ?? "missing strategic provider output"),
+        },
+      };
+    }
+    return {
+      polityId: brief.actor.id,
+      brief,
+      provenance: outcome.provenance ?? null,
+      source: "model",
+      resolution: materializeStrategicDecisionV4(draft.state, outcome.output, brief),
+    };
+  });
+  resolved = stableStrategicCommitOrder(resolved);
+  const combinedCommands = resolved.flatMap((entry) => entry.resolution.status === "accepted" ? entry.resolution.commands : [])
+    .sort((left, right) => left.actorPolityId.localeCompare(right.actorPolityId) || left.kind.localeCompare(right.kind));
+  if (combinedCommands.length) {
+    const combinedDryRun = runTurn(draft.state, { commands: combinedCommands }).result;
+    if (combinedDryRun.rejections.length) {
+      const reason = `combined atomic package rejected: ${combinedDryRun.rejections.map((entry) => entry.reason).join(", ")}`;
+      resolved = resolved.map((entry) => entry.resolution.status === "accepted" ? {
+        ...entry,
+        source: "terminal",
+        resolution: { status: "terminal", commands: [], decision: null, pendingTriggerIds: [], reason },
+      } : entry);
+    }
+  }
+
+  const actorIds = new Set(resolved.map((entry) => entry.polityId));
+  const memories = [
+    ...draft.agentState.strategicV4.memories.filter((entry) => !actorIds.has(entry.polityId)),
+    ...resolved.map((entry) => {
+      const previous = strategicMemoryFor(draft, entry.polityId);
+      const committed = commitStrategicMemory(previous, entry.resolution);
+      const pendingTriggerIds = entry.resolution.pendingTriggerIds;
+      return {
+        polityId: entry.polityId,
+        durablePlan: committed.durablePlan,
+        lastDecisionRevision: committed.lastDecisionRevision,
+        lastDecisionMonth: entry.resolution.status === "accepted" ? draft.state.month : previous.lastDecisionMonth,
+        retryMonth: entry.resolution.status === "hold" && pendingTriggerIds.length
+          ? pendingTriggerRetryMonth(draft.state.month) : null,
+        pendingTriggerIds,
+        lastStatus: entry.resolution.status,
+        reason: entry.resolution.reason ?? "accepted",
+      };
+    }),
+  ].sort((left, right) => left.polityId.localeCompare(right.polityId));
+  const providerHistory = [
+    ...draft.agentState.strategicV4.providerHistory,
+    ...resolved.filter((entry) => entry.provenance).map((entry) => ({
+      month: draft.state.month,
+      polityId: entry.polityId,
+      provider: entry.provenance.provider,
+      model: entry.provenance.model,
+      effort: entry.provenance.effort,
+      preflightChecksum: entry.provenance.preflightChecksum ?? "not-required",
+    })),
+  ].slice(-2000);
+  draft.agentState = agentStateSchema.parse({
+    ...draft.agentState,
+    strategicV4: { memories, providerHistory },
+  });
+  draft.strategicCommands = resolved.flatMap((entry) => entry.resolution.status === "accepted" ? entry.resolution.commands : []);
+  draft.strategicDecisions = resolved.map((entry) => ({
+    polityId: entry.polityId,
+    status: entry.resolution.status,
+    reason: entry.resolution.reason ?? "accepted",
+    pendingTriggerIds: entry.resolution.pendingTriggerIds,
+    decision: entry.resolution.decision,
+    source: entry.source,
+    provider: entry.provenance ? {
+      provider: entry.provenance.provider, model: entry.provenance.model, effort: entry.provenance.effort,
+      preflightChecksum: entry.provenance.preflightChecksum ?? "not-required",
+    } : null,
+  }));
+  draft.pendingStrategicV4 = [];
+  draft.pendingBatches = [];
+  draft.tasks = [];
+  resolveOpponentMonth(draft, []);
 };
 
 const makePlayerReportTask = (draft) => {
@@ -532,6 +793,7 @@ const resolveOpponentMonth = (draft, outcomes) => {
   draft.agentState = agentStateSchema.parse({
     schemaVersion: "open-historia-agent-state/1",
     consumedActionIds: draft.agentState.consumedActionIds,
+    strategicV4: draft.agentState.strategicV4,
     polities: [
       ...draft.agentState.polities.filter((entry) => !selected.has(entry.polityId)),
       ...decisions.map((entry) => ({
@@ -551,7 +813,7 @@ const resolveOpponentMonth = (draft, outcomes) => {
     month: draft.state.month,
     baseRevision: draft.state.revision,
     batchOutcomes,
-    strategicDecisions: (draft.strategicDecisions ?? []).map((entry) => ({ ...entry, source: "model" })),
+    strategicDecisions: (draft.strategicDecisions ?? []).map((entry) => ({ ...entry, source: entry.source ?? "model" })),
     decisions: decisions.map((entry) => ({ ...entry, source: sourceById.get(entry.polityId) })),
   });
   draft.state = result.result.state;
@@ -565,7 +827,7 @@ const resolveOpponentMonth = (draft, outcomes) => {
 };
 
 export const prepareAgentTurn = (gameId, { targetDate, expectedSessionRevision, actions = [], commands = [], locale = "en" } = {}) => {
-  const { game, session, playerPolityId } = loadEconomyContext(gameId);
+  const { game, fixture, session, playerPolityId } = loadEconomyContext(gameId);
   if (session.manifest.revision !== expectedSessionRevision) throw new EngineSessionError("STALE_SESSION", "stale agent-turn preparation");
   if (!Array.isArray(actions)) throw new Error("actions must be an array");
   const agentState = session.agentState ? agentStateSchema.parse(session.agentState) : structuredClone(EMPTY_AGENT_STATE);
@@ -606,12 +868,20 @@ export const prepareAgentTurn = (gameId, { targetDate, expectedSessionRevision, 
     lastLedger: session.lastTurn?.ledger ?? null,
     agentState,
     profiles,
+    startMonth: fixture.scenario.startMonth,
+    strategicContract: game.engineScenario === EUROPE_1935_ENGINE_SCENARIO ? STRATEGIC_V4_CONTRACT : "legacy-v3",
+    strategicCallBudget: game.engineScenario === EUROPE_1935_ENGINE_SCENARIO
+      ? strategicCallBudget(session.state.polities.filter((entry) => entry.id !== playerPolityId && isStrategicActor(entry)).length,
+        fixture.scenario.startMonth, targetDate, 8)
+      : 0,
+    strategicCallsPlanned: 0,
     monthlyCommands: [],
     monthTraces: [],
     reports: [],
     readOnly: false,
     pendingBatches: [],
     pendingStrategicBatches: [],
+    pendingStrategicV4: [],
     strategicCommands: [],
     strategicDecisions: [],
     tasks: [],
@@ -650,6 +920,10 @@ export const stepAgentTurn = (gameId, { turnToken, action, outputs, outcomes } =
     else makeStrategicTasks(draft);
   } else if (action === "submit-strategy" && draft.phase === "plan-strategy") {
     resolveStrategicMonth(draft, outputs);
+  } else if (action === "submit-strategy-v4" && draft.phase === "plan-strategy-v4") {
+    resolveProductionStrategicMonth(draft, outcomes);
+  } else if (action === "resolve-strategy-v4-empty" && draft.phase === "resolve-strategy-v4-empty") {
+    resolveProductionStrategicMonth(draft, []);
   } else if (action === "submit-opponents" && draft.phase === "plan-opponents") resolveOpponentMonth(draft, outcomes);
   else if (action === "resolve-empty-month" && draft.phase === "resolve-empty-month") resolveOpponentMonth(draft, []);
   else if (action === "submit-reports" && draft.phase === "report-player") resolvePlayerReports(draft, outputs);

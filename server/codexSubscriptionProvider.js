@@ -97,6 +97,29 @@ export function strategicDecisionV3JsonSchema() {
   });
 }
 
+export function strategicDecisionSchemaForBrief(brief) {
+  const schema = strategicDecisionV3JsonSchema();
+  const choiceIds = brief.choices.map((entry) => entry.choiceId);
+  const evidenceIds = [...new Set([
+    ...brief.choices.map((entry) => entry.evidenceId),
+    ...brief.triggers.flatMap((entry) => [entry.triggerId, ...entry.evidenceIds]),
+    ...brief.ownIntelligence.map((entry) => entry.evidenceId),
+  ])];
+  schema.properties.polityId = { type: "string", enum: [brief.actor.id] };
+  schema.properties.revision = { type: "string", enum: [brief.revision] };
+  schema.properties.selectedChoices.items.properties.choiceId = { type: "string", enum: choiceIds };
+  schema.properties.selectedChoices.items.properties.evidenceIds.items = { type: "string", enum: evidenceIds };
+  schema.properties.rejectedChoices.items.properties.choiceId = { type: "string", enum: choiceIds };
+  schema.properties.rejectedChoices.minItems = brief.choices.length > 1 ? 1 : 0;
+  if (brief.triggers.length) {
+    schema.properties.triggerCoverage.items.properties.triggerId = {
+      type: "string", enum: brief.triggers.map((entry) => entry.triggerId),
+    };
+  }
+  schema.properties.triggerCoverage.items.properties.choiceIds.items = { type: "string", enum: choiceIds };
+  return schema;
+}
+
 const safeModel = (value) => {
   const model = String(value ?? "").trim();
   if (!/^[a-z0-9][a-z0-9._-]{0,119}$/i.test(model)) throw new Error("Invalid Codex model id");
@@ -208,6 +231,46 @@ export function readCodexPreflights(directory) {
   } catch {
     return [];
   }
+}
+
+export function matchingCodexPreflight(preflights, { model, effort, contract = CODEX_STRATEGIC_CONTRACT } = {}) {
+  return (Array.isArray(preflights) ? preflights : []).find((entry) => entry?.provider === CODEX_SUBSCRIPTION_PROVIDER
+    && entry.contract === contract && entry.model === model && entry.effort === effort && entry.preflightChecksum) ?? null;
+}
+
+export async function invokePreflightedCodex({
+  desktopRuntime = process.env.OH_DESKTOP_RUNTIME === "1",
+  preflights,
+  prompt,
+  schema,
+  model,
+  effort = "medium",
+  contract = CODEX_STRATEGIC_CONTRACT,
+  invoke = invokeCodexStructured,
+} = {}) {
+  if (!desktopRuntime) throw new Error("Codex subscription is available only in the desktop app.");
+  if (typeof prompt !== "string" || !prompt.trim() || prompt.length > 120_000) throw new Error("Codex runtime prompt is empty or too large.");
+  if (!schema || typeof schema !== "object" || Array.isArray(schema)) throw new Error("Codex runtime requires a JSON output schema.");
+  const selectedModel = safeModel(model);
+  const selectedEffort = safeEffort(effort);
+  const preflight = matchingCodexPreflight(preflights, { model: selectedModel, effort: selectedEffort, contract });
+  if (!preflight) throw new Error("Run the local model/contract schema preflight before this turn.");
+  const result = await invoke({ prompt, schema, model: selectedModel, effort: selectedEffort });
+  const completed = result.stdout.split(/\r?\n/).filter(Boolean).flatMap((line) => {
+    try { return [JSON.parse(line)]; } catch { return []; }
+  }).findLast((entry) => entry.type === "turn.completed");
+  return {
+    response: result.response,
+    provenance: {
+      provider: CODEX_SUBSCRIPTION_PROVIDER,
+      model: selectedModel,
+      effort: selectedEffort,
+      contract,
+      preflightChecksum: preflight.preflightChecksum,
+      usage: completed?.usage ?? null,
+      threadId: completed?.thread_id ?? null,
+    },
+  };
 }
 
 export async function runCodexSchemaPreflight({

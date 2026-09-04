@@ -456,14 +456,43 @@ export const agentPolityStateSchema = z.object({
   triggerFingerprint: z.string(),
 }).strict();
 
+const strategicDurablePlanStateSchema = z.object({
+  objective: z.string().min(1).max(320),
+  futureSteps: z.array(z.string().min(1).max(240)).max(8),
+  commitments: z.array(z.string().min(1).max(240)).max(8),
+}).strict();
+
+export const strategicRuntimeStateSchema = z.object({
+  memories: z.array(z.object({
+    polityId: polityIdSchema,
+    durablePlan: strategicDurablePlanStateSchema.nullable(),
+    lastDecisionRevision: z.string().min(1).nullable(),
+    lastDecisionMonth: z.string().min(1).nullable(),
+    retryMonth: z.string().min(1).nullable(),
+    pendingTriggerIds: z.array(z.string().min(1)),
+    lastStatus: z.enum(['accepted', 'hold', 'terminal']).nullable(),
+    reason: z.string().max(500),
+  }).strict()),
+  providerHistory: z.array(z.object({
+    month: z.string().min(1),
+    polityId: polityIdSchema,
+    provider: z.string().min(1),
+    model: z.string().min(1),
+    effort: z.string().min(1),
+    preflightChecksum: z.string().min(1),
+  }).strict()).max(2000),
+}).strict();
+
 export const agentStateSchema = z.object({
   schemaVersion: z.literal('open-historia-agent-state/1'),
   polities: z.array(agentPolityStateSchema),
   consumedActionIds: z.array(z.string().min(1).max(200)).default([]),
+  strategicV4: strategicRuntimeStateSchema.default({ memories: [], providerHistory: [] }),
 }).strict();
 export type AgentState = z.infer<typeof agentStateSchema>;
 export const EMPTY_AGENT_STATE: AgentState = {
   schemaVersion: 'open-historia-agent-state/1', polities: [], consumedActionIds: [],
+  strategicV4: { memories: [], providerHistory: [] },
 };
 
 export interface InvestmentPreview {

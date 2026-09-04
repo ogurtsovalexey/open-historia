@@ -55,10 +55,30 @@ test('utility execution never exceeds concurrency six', async () => {
   assert.equal(peak, 6);
 });
 
-test('strategic tasks bypass utility cache and concurrency queue', async () => {
-  const scheduler = createAgentTaskScheduler({ maxUtilityConcurrency: 1 });
+test('strategic tasks are uncached and never exceed concurrency four', async () => {
+  const scheduler = createAgentTaskScheduler({ maxStrategicConcurrency: 4 });
+  let active = 0;
+  let peak = 0;
   let calls = 0;
-  const input = { task: task('material'), role: 'strategic', profile, execute: async () => ({ output: ++calls }) };
+  const releases = [];
+  const runs = Array.from({ length: 9 }, (_, index) => scheduler.run({
+    task: task(`material-${index}`), role: 'strategic', profile,
+    execute: () => new Promise((resolve) => {
+      calls += 1; active += 1; peak = Math.max(peak, active);
+      releases.push(() => { active -= 1; resolve({ output: index }); });
+    }),
+  }));
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(scheduler.snapshot().activeStrategic, 4);
+  while (calls < 9) {
+    releases.splice(0).forEach((release) => release());
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+  releases.splice(0).forEach((release) => release());
+  await Promise.all(runs);
+  assert.equal(peak, 4);
+  let uncached = 0;
+  const input = { task: task('same-material'), role: 'strategic', profile, execute: async () => ({ output: ++uncached }) };
   assert.deepEqual(await scheduler.run(input), { output: 1 });
   assert.deepEqual(await scheduler.run(input), { output: 2 });
 });

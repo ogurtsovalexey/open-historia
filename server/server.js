@@ -69,7 +69,12 @@ import {
   RelayError,
   RELAY_ERROR_CODES,
 } from "./security.js";
-import { inspectCodexSubscription, readCodexPreflights, runCodexSchemaPreflight } from "./codexSubscriptionProvider.js";
+import {
+  inspectCodexSubscription,
+  invokePreflightedCodex,
+  readCodexPreflights,
+  runCodexSchemaPreflight,
+} from "./codexSubscriptionProvider.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 import { DATA_DIR } from "./dataDir.js";
@@ -105,6 +110,13 @@ app.use((req, res, next) => {
 });
 
 const codexPreflightDirectory = path.join(DATA_DIR, "codex-preflights");
+const codexWriteAllowed = (req) => crossOriginWriteAllowed({
+  method: req.method,
+  origin: req.headers.origin,
+  host: req.headers.host,
+  remoteAddress: req.socket?.remoteAddress,
+  allowAll: process.env.OH_ALLOW_CROSS_ORIGIN === "1",
+}).allowed;
 
 app.get("/api/codex-subscription/status", async (_req, res) => {
   try {
@@ -116,6 +128,7 @@ app.get("/api/codex-subscription/status", async (_req, res) => {
 });
 
 app.post("/api/codex-subscription/preflight", jsonParser, async (req, res) => {
+  if (!codexWriteAllowed(req)) return res.status(403).json({ error: "Cross-origin Codex request blocked." });
   try {
     const status = await inspectCodexSubscription();
     if (!status.available) return sendError(res, 400, status.message);
@@ -128,6 +141,22 @@ app.post("/api/codex-subscription/preflight", jsonParser, async (req, res) => {
     return res.json(record);
   } catch (error) {
     return sendError(res, 500, error);
+  }
+});
+
+app.post("/api/codex-subscription/invoke", jsonParser, async (req, res) => {
+  if (!codexWriteAllowed(req)) return res.status(403).json({ error: "Cross-origin Codex request blocked." });
+  try {
+    const result = await invokePreflightedCodex({
+      preflights: readCodexPreflights(codexPreflightDirectory),
+      prompt: req.body?.prompt,
+      schema: req.body?.schema,
+      model: req.body?.model,
+      effort: req.body?.effort,
+    });
+    return res.json(result);
+  } catch (error) {
+    return sendError(res, 400, error);
   }
 });
 

@@ -1109,6 +1109,46 @@ async function callAnthropicCompatible(systemPrompt, history, {
     }
 }
 
+async function callCodexSubscription(systemPrompt, history, opts = {}) {
+    const { tool, signal, providerRole = "strategic" } = opts;
+    const settings = getProviderSettings("codex-subscription", providerRole);
+    const schema = tool?.schema ?? {
+        type: "object",
+        properties: { reply: { type: "string", minLength: 1, maxLength: 12000 } },
+        required: ["reply"],
+        additionalProperties: false,
+    };
+    const transcript = (Array.isArray(history) ? history : []).map((entry) => {
+        const role = entry?.role === "model" || entry?.role === "assistant" ? "ASSISTANT" : "USER";
+        const text = (entry?.parts ?? []).map((part) => part?.text ?? "").join("\n");
+        return `[${role}]\n${text}`;
+    }).join("\n\n");
+    const response = await fetch("/api/codex-subscription/invoke", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            prompt: `[SYSTEM]\n${systemPrompt}\n\n${transcript}`,
+            schema,
+            model: settings.model,
+            effort: settings.effort || "medium",
+        }),
+        signal,
+    });
+    if (!response.ok) {
+        const payload = await readErrorPayload(response);
+        throw new Error(extractErrorMessage(payload, `Codex subscription request failed (${response.status})`));
+    }
+    const payload = await response.json();
+    if (tool) return {
+        rawText: JSON.stringify(payload.response),
+        toolInput: payload.response,
+        usage: payload.provenance?.usage,
+        provenance: payload.provenance,
+    };
+    if (typeof payload.response?.reply !== "string") throw new Error("Codex subscription response did not contain reply text.");
+    return payload.response.reply;
+}
+
 export async function callAI(systemPrompt, history, opts = {}) {
     // Non-English players get replies in their language at the source —
     // native answers beat post-translating them (see runtime/i18n.js).
@@ -1131,7 +1171,7 @@ export async function callAI(systemPrompt, history, opts = {}) {
     case "openai-compatible":
         return callOpenAICompatible(systemPrompt, history, providerOpts);
     case "codex-subscription":
-        throw new Error("Codex subscription requires a successful local model/contract schema preflight. No fallback provider was used.");
+        return callCodexSubscription(systemPrompt, history, providerOpts);
     case "gemini":
     default:
         return callGemini(systemPrompt, history, providerOpts);
