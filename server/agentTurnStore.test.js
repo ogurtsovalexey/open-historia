@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
-import { EMPTY_AGENT_STATE, buildDiplomacyBatches } from "@open-historia/agent-runtime";
+import { EMPTY_AGENT_STATE, STRATEGIC_INPUT_TOKEN_LIMIT, buildDiplomacyBatches } from "@open-historia/agent-runtime";
 import { initState, parseScenario } from "@open-historia/engine";
 import {
   makeProductionStrategicTasks,
@@ -101,7 +101,7 @@ describe("Europe 1935 production StrategicBriefV4 phase", () => {
     assert.equal(new Set(draft.tasks.map((task) => task.taskKey)).size, 8);
     assert.equal(draft.tasks.every((task) => task.contract === "StrategicBriefV4+StrategicDecisionV3"), true);
     assert.equal(draft.tasks.every((task) => task.context.polityCount === 1), true);
-    assert.equal(draft.pendingStrategicV4.every((entry) => entry.brief.inputTokenCount <= 8000), true);
+    assert.equal(draft.pendingStrategicV4.every((entry) => entry.brief.inputTokenCount <= STRATEGIC_INPUT_TOKEN_LIMIT), true);
     assert.equal(draft.tasks.some((task) => task.userPrompt.includes("coordinates")), false);
   });
 

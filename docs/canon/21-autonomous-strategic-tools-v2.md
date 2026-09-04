@@ -45,7 +45,7 @@ cannot resume or validate a V4 run.
   enforces scale-specific equipment coverage, apportions formations, and
   computes readiness. A bounded front summary exposes supply capacity and
   qualitative local force bands, never geometry or the full supply graph.
-- The complete prompt is limited to 8,000 input tokens. Missing choices are
+- The complete prompt is limited to 25,000 input tokens. Missing choices are
   never silently truncated. Schema/normalization/semantic failures terminalize
   the attempt; provider failure or staleness produces a visible hold and keeps
   its trigger pending.

@@ -1415,7 +1415,8 @@ const DateWidget = ({
                 setEvents(nextEvents);
                 setWorldState(world);
                 setEngineSnapshot(nextEngineSnapshot);
-                if (engineGame && savedDraft?.phase === "confirm-player"
+                if (engineGame && ["confirm-player", "plan-strategy", "plan-strategy-v4", "resolve-strategy-v4-empty",
+                    "plan-opponents", "resolve-empty-month", "report-player"].includes(savedDraft?.phase)
                     && restoredDraftTokenRef.current !== savedDraft.turnToken) {
                     restoredDraftTokenRef.current = savedDraft.turnToken;
                     setAgentConfirmation({ gameId: engineGame.id, draft: savedDraft, items: savedDraft.confirmation ?? [], canAdvance: true });

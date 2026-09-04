@@ -28,6 +28,7 @@ import {
   materializeStrategicDecisionV3,
   materializeStrategicBatchV3,
   buildStrategicBriefV4,
+  STRATEGIC_INPUT_TOKEN_LIMIT,
   renderStrategicPromptV4,
   materializeStrategicDecisionV4,
   strategicDecisionV3Schema,
@@ -385,7 +386,7 @@ test('StrategicBriefV4 is a single-actor bounded ID catalog with politics and co
   assert.equal(first.promptContract, 'StrategicBriefV4+StrategicDecisionV3');
   assert.match(first.role, /Germany/);
   assert.equal(first.political.decisionAuthority.knowledgePolicy, 'scenario-only');
-  assert.ok(first.inputTokenCount <= 8000);
+  assert.ok(first.inputTokenCount <= STRATEGIC_INPUT_TOKEN_LIMIT);
   assert.equal(first.tokenCountMethod, 'provider');
   assert.equal(first.candidateAudit.length, 15);
   assert.ok(first.choices.every((entry) => entry.choiceId.startsWith('choice:')));
@@ -503,14 +504,14 @@ test('political identity contract is era-neutral and V4 refuses an over-budget p
   }
   assert.throws(() => buildStrategicBriefV4(benchmarkInitial(), 'polity:germany', {
     invocation: { reason: 'scheduled-quarter', detail: 'Review.' }, relevantFamilies: ['invest'],
-    political: politicalV4('polity:germany'), countTokens: () => 8001,
-  }), /exceeds 8000 tokens/);
+    political: politicalV4('polity:germany'), countTokens: () => STRATEGIC_INPUT_TOKEN_LIMIT + 1,
+  }), new RegExp(`exceeds ${STRATEGIC_INPUT_TOKEN_LIMIT} tokens`));
   const fallbackCount = buildStrategicBriefV4(initial(), 'polity:austria', {
     invocation: { reason: 'scheduled-quarter', detail: 'Review.' }, relevantFamilies: ['conserve'],
     political: politicalV4('polity:austria'),
   });
   assert.equal(fallbackCount.tokenCountMethod, 'utf8-upper-bound');
-  assert.ok(fallbackCount.inputTokenCount <= 8000);
+  assert.ok(fallbackCount.inputTokenCount <= STRATEGIC_INPUT_TOKEN_LIMIT);
 });
 
 test('V4 run compatibility is explicit and durable plans commit only with accepted actions', () => {

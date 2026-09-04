@@ -18,7 +18,7 @@ import {
   type StrategicPreviewV3,
 } from './strategic.js';
 
-export const STRATEGIC_INPUT_TOKEN_LIMIT = 8_000;
+export const STRATEGIC_INPUT_TOKEN_LIMIT = 25_000;
 export const STRATEGIC_NORMAL_ACTION_LIMIT = 5;
 export const STRATEGIC_TRIGGER_ACTION_LIMIT = 10;
 export const STRATEGIC_MAX_CONCURRENCY = 4;

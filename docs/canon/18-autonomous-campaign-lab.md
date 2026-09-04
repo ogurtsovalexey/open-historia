@@ -15,7 +15,9 @@ old-vs-new one-shot A/B, then the Czech/Poland two-step and reversed-order
 probes, followed by bounded cross-model checks and the two final Gate 0 runs.
 One-shot is production default when it meets the same quality threshold as
 two-step. Every final prompt uses `StrategicBriefV4+StrategicDecisionV3`, is at
-most 8,000 input tokens and has one private country session.
+most 25,000 input tokens and has one private country session. The 25,000-token
+ceiling remains an application context-hygiene guard rather than a provider
+context-window limit; geometry and silent choice truncation remain forbidden.
 
 Provider/model failure never falls back automatically: it creates a hold,
 keeps triggers pending and asks the player to change configuration manually.
