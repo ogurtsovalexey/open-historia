@@ -19,6 +19,9 @@ test('production Gate 0 mock freezes bounded single-actor V4 packages without mo
   const result = run('run', '--mode', 'mock', '--run', 'gate0-mock');
   assert.equal(result.status, 'mock-pass');
   assert.equal(result.completedModelTurns, 0);
+  assert.equal(result.baseCompletedModelTurnCap, 40);
+  assert.equal(result.ownerApprovedExtraTurns, 0);
+  assert.equal(result.maxCompletedModelTurns, 40);
   assert.equal(result.probes.length, 13);
   assert.equal(new Set(result.probes.map((entry) => entry.probeId)).size, 13);
 

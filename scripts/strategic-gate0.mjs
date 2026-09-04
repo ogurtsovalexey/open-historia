@@ -32,6 +32,7 @@ const RUNS = process.env.CAMPAIGN_LAB_RUNS_DIR
 const FIXTURE = path.join(ROOT, 'packages/data-packs/fixtures/europe-1935-benchmark');
 const MODEL = 'gpt-5.6-luna';
 const EFFORT = 'low';
+const BASE_COMPLETED_TURN_CAP = 40;
 const SYSTEM_TEXT = 'Make a bounded strategic choice for this polity only. Mandatory triggers and sovereignty outrank optional goals. Select only frozen choice IDs and cite only evidence IDs from the brief. Do not invent facts, numeric effects, IDs, or completed outcomes.';
 
 const parseArgs = (values) => {
@@ -75,6 +76,13 @@ const completedTurnsOnDisk = () => {
   const preflightDirectory = path.join(RUNS, 'codex-preflights');
   if (fs.existsSync(preflightDirectory)) turns += fs.readdirSync(preflightDirectory)
     .filter((name) => /^[a-f0-9]{64}\.json$/.test(name)).length;
+  return turns;
+};
+const ownerApprovedExtraTurns = (value) => {
+  if (value === undefined) return 0;
+  if (!/^\d+$/.test(value)) throw new Error('--owner-approved-extra-turns must be a positive integer');
+  const turns = Number(value);
+  if (!Number.isSafeInteger(turns) || turns < 1 || turns > 20) throw new Error('--owner-approved-extra-turns must be between 1 and 20');
   return turns;
 };
 const commandBase = (state, actorPolityId, suffix) => ({
@@ -262,6 +270,8 @@ const runSuite = async (args) => {
   if (fs.existsSync(output)) throw new Error(`immutable Gate 0 run already exists: ${output}`);
   const model = args.model ?? MODEL;
   const effort = args.effort ?? EFFORT;
+  const extraTurns = ownerApprovedExtraTurns(args['owner-approved-extra-turns']);
+  const completedTurnCap = BASE_COMPLETED_TURN_CAP + extraTurns;
   const preflight = mode === 'live' ? validatePreflight(args.preflight, model, effort) : null;
   const built = buildProbes();
   const requestedProbeIds = args.only ? args.only.split(',').filter(Boolean) : null;
@@ -277,7 +287,8 @@ const runSuite = async (args) => {
     provider: mode === 'live' ? 'codex-subscription' : 'deterministic-mock', model: mode === 'live' ? model : 'deterministic-mock',
     effort: mode === 'live' ? effort : 'off', preflightChecksum: preflight?.preflightChecksum ?? 'sha256:mock' };
   const manifest = { schemaVersion: 'open-historia-strategic-gate0/1', runId, mode, status: 'running', freeze,
-    codeRevision: gitRevision(), packageChecksum, maxCompletedModelTurns: 40,
+    codeRevision: gitRevision(), packageChecksum, baseCompletedModelTurnCap: BASE_COMPLETED_TURN_CAP,
+    ownerApprovedExtraTurns: extraTurns, maxCompletedModelTurns: completedTurnCap,
     globalCompletedTurnsAtStart: mode === 'live' ? completedTurnsOnDisk() : 0, completedModelTurns: 0, probes: [] };
   atomicJson(path.join(output, 'manifest.json'), manifest);
   for (const [index, probe] of probes.entries()) {
@@ -350,7 +361,8 @@ const main = async () => {
     return;
   }
   if (command === 'preflight') {
-    if (completedTurnsOnDisk() >= 40) throw new Error('global Gate 0 completed-turn cap reached');
+    const completedTurnCap = BASE_COMPLETED_TURN_CAP + ownerApprovedExtraTurns(args['owner-approved-extra-turns']);
+    if (completedTurnsOnDisk() >= completedTurnCap) throw new Error('global Gate 0 completed-turn cap reached');
     const model = args.model ?? MODEL;
     const effort = args.effort ?? 'medium';
     const inspection = await inspectCodexSubscription({ desktopRuntime: true });
