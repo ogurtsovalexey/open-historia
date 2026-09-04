@@ -15,6 +15,83 @@ const APP_SERVER_TIMEOUT_MS = 15_000;
 const STRUCTURED_TURN_TIMEOUT_MS = 10 * 60_000;
 export const CODEX_STRATEGIC_CONTRACT = "StrategicBriefV4+StrategicDecisionV3";
 
+const schemaVariant = (schema, value) => {
+  const variants = schema?.anyOf ?? schema?.oneOf;
+  if (!Array.isArray(variants)) return schema;
+  return variants.find((candidate) => schemaAcceptsValue(candidate, value)) ?? variants[0];
+};
+
+const schemaAcceptsValue = (schema, value) => {
+  if (!schema || typeof schema !== "object") return true;
+  const variants = schema.anyOf ?? schema.oneOf;
+  if (Array.isArray(variants)) return variants.some((candidate) => schemaAcceptsValue(candidate, value));
+  if (Object.hasOwn(schema, "const") && value !== schema.const) return false;
+  if (Array.isArray(schema.enum) && !schema.enum.includes(value)) return false;
+  if (schema.type === "null") return value === null;
+  if (schema.type === "array") return Array.isArray(value);
+  if (schema.type === "object") {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+    return Object.entries(schema.properties ?? {}).every(([key, child]) =>
+      !Object.hasOwn(value, key) || schemaAcceptsValue(child, value[key]));
+  }
+  if (schema.type === "string") return typeof value === "string";
+  if (schema.type === "integer") return Number.isInteger(value);
+  if (schema.type === "number") return typeof value === "number" && Number.isFinite(value);
+  if (schema.type === "boolean") return typeof value === "boolean";
+  return true;
+};
+
+const nullableSchema = (schema) => {
+  const variants = schema?.anyOf;
+  return Array.isArray(variants) && variants.some((entry) => entry?.type === "null")
+    ? schema
+    : { anyOf: [schema, { type: "null" }] };
+};
+
+/** Convert general Zod JSON Schema into the strict subset accepted by Codex. */
+export function codexOutputSchema(schema) {
+  if (Array.isArray(schema)) return schema.map(codexOutputSchema);
+  if (!schema || typeof schema !== "object") return schema;
+  const converted = {};
+  for (const [key, value] of Object.entries(schema)) {
+    if (key === "$schema") continue;
+    converted[key === "oneOf" ? "anyOf" : key] = codexOutputSchema(value);
+  }
+  if (converted.type === "object" && converted.properties) {
+    const originallyRequired = new Set(converted.required ?? []);
+    for (const key of Object.keys(converted.properties)) {
+      if (!originallyRequired.has(key)) converted.properties[key] = nullableSchema(converted.properties[key]);
+    }
+    converted.required = Object.keys(converted.properties);
+    converted.additionalProperties = false;
+  }
+  return converted;
+}
+
+/** Remove transport-only nulls from fields which are optional in the source schema. */
+export function normalizeCodexOutput(value, schema) {
+  if (!schema || typeof schema !== "object") return value;
+  const selected = schemaVariant(schema, value);
+  if (selected !== schema) return normalizeCodexOutput(value, selected);
+  if (Array.isArray(value)) return value.map((entry) => normalizeCodexOutput(entry, schema.items));
+  if (!value || typeof value !== "object") return value;
+  const required = new Set(schema.required ?? []);
+  return Object.fromEntries(Object.entries(value).flatMap(([key, entry]) => {
+    if (entry === null && !required.has(key)) return [];
+    return [[key, normalizeCodexOutput(entry, schema.properties?.[key])]];
+  }));
+}
+
+export function codexFailureMessage(stdout, stderr, code) {
+  const events = String(stdout ?? "").split(/\r?\n/).filter(Boolean).flatMap((line) => {
+    try { return [JSON.parse(line)]; } catch { return []; }
+  });
+  const eventMessage = events.findLast((entry) => entry?.type === "turn.failed")?.error?.message
+    ?? events.findLast((entry) => entry?.type === "error")?.message;
+  return String(stderr ?? "").trim() || String(eventMessage ?? "").trim()
+    || `Codex exited without an error message (code ${code}).`;
+}
+
 export function sanitizeCodexProviderEnvironment(source = process.env) {
   return Object.fromEntries(Object.entries(source).filter(([name, value]) => {
     if (value === undefined) return false;
@@ -162,7 +239,7 @@ export function invokeCodexStructured({
   const workingDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "open-historia-codex-provider-"));
   const schemaPath = path.join(workingDirectory, "output-schema.json");
   const outputPath = path.join(workingDirectory, "last-message.json");
-  fs.writeFileSync(schemaPath, `${JSON.stringify(schema, null, 2)}\n`, "utf8");
+  fs.writeFileSync(schemaPath, `${JSON.stringify(codexOutputSchema(schema), null, 2)}\n`, "utf8");
   const args = codexStructuredExecArgs({ cwd: workingDirectory, schemaPath, outputPath, model, effort });
   return new Promise((resolve, reject) => {
     const child = spawnImpl("codex", args, {
@@ -191,11 +268,11 @@ export function invokeCodexStructured({
     child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
     child.on("close", (code) => {
       if (code !== 0) {
-        finish(new Error(`Codex schema transport failed (code ${code}): ${stderr.trim()}`));
+        finish(new Error(`Codex schema transport failed (code ${code}): ${codexFailureMessage(stdout, stderr, code)}`));
         return;
       }
       try {
-        const response = JSON.parse(fs.readFileSync(outputPath, "utf8"));
+        const response = normalizeCodexOutput(JSON.parse(fs.readFileSync(outputPath, "utf8")), schema);
         const completed = stdout.split(/\r?\n/).filter(Boolean).some((line) => {
           try { return JSON.parse(line).type === "turn.completed"; } catch { return false; }
         });

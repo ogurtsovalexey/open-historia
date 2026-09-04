@@ -15,6 +15,7 @@ import {
     cancelAgentTurn,
     clearQueuedEconomyCommands,
     commitAgentTurn,
+    fetchAgentTurnDraft,
     fetchEconomyState,
     getActiveEngineGame,
     getQueuedEconomyCommands,
@@ -1329,6 +1330,7 @@ const DateWidget = ({
     const [engineSnapshot, setEngineSnapshot] = useState(null);
     // Holds the in-flight jump's AbortController so the Cancel button can stop it.
     const jumpAbortRef = React.useRef(null);
+    const restoredDraftTokenRef = React.useRef(null);
     // Mirrors the latest applied turn (round + date) so the 5s refresh poll can tell a
     // stale read from a genuinely newer one — and never revert a just-completed jump.
     const gameStampRef = React.useRef({ round: 0, date: "" });
@@ -1385,11 +1387,12 @@ const DateWidget = ({
         const loadState = async () => {
             try {
                 const engineGame = await getActiveEngineGame();
-                const [game, nextEvents, world, nextEngineSnapshot] = await Promise.all([
+                const [game, nextEvents, world, nextEngineSnapshot, savedDraft] = await Promise.all([
                     readGameData({ force: true }),
                                                                     readEventsState({ force: true }),
                                                                     readWorldState({ force: true }),
                                                                     engineGame ? fetchEconomyState(engineGame.id) : Promise.resolve(null),
+                                                                    engineGame ? fetchAgentTurnDraft(engineGame.id).catch(() => null) : Promise.resolve(null),
                 ]);
 
                 if (cancelled) {
@@ -1412,6 +1415,12 @@ const DateWidget = ({
                 setEvents(nextEvents);
                 setWorldState(world);
                 setEngineSnapshot(nextEngineSnapshot);
+                if (engineGame && savedDraft?.phase === "confirm-player"
+                    && restoredDraftTokenRef.current !== savedDraft.turnToken) {
+                    restoredDraftTokenRef.current = savedDraft.turnToken;
+                    setAgentConfirmation({ gameId: engineGame.id, draft: savedDraft, items: savedDraft.confirmation ?? [], canAdvance: true });
+                    setPanel("skip");
+                }
             } catch (loadError) {
                 if (!cancelled) {
                     console.error("Failed to load timeline state:", loadError);

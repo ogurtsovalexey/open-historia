@@ -48,6 +48,11 @@ export const prepareAgentTurn = ({ gameId, targetDate, expectedSessionRevision, 
     body: JSON.stringify({ targetDate, expectedSessionRevision, actions, commands, locale }),
   });
 
+export const fetchAgentTurnDraft = (gameId) => {
+  if (!gameId) throw new Error("gameId is required to read an agent-turn draft");
+  return request(`/api/games/${encodeURIComponent(gameId)}/agent-turn/draft`);
+};
+
 export const stepAgentTurn = ({ gameId, ...body }) =>
   request(`/api/games/${encodeURIComponent(gameId)}/agent-turn/step`, {
     method: "POST",

@@ -8,12 +8,15 @@ import test from "node:test";
 import { z } from "zod";
 import { strategicDecisionV3Schema } from "@open-historia/agent-runtime";
 import {
+  codexFailureMessage,
   codexAppServerArgs,
+  codexOutputSchema,
   codexStructuredExecArgs,
   hasChatGptLogin,
   inspectCodexSubscription,
   invokePreflightedCodex,
   matchingCodexPreflight,
+  normalizeCodexOutput,
   normalizeCodexModelCatalog,
   queryCodexModels,
   readCodexPreflights,
@@ -125,6 +128,45 @@ test("server preflight schema stays structurally identical to canonical Strategi
   const canonical = z.toJSONSchema(strategicDecisionV3Schema);
   delete canonical.$schema;
   assert.deepEqual(strategicDecisionV3JsonSchema(), canonical);
+});
+
+test("Codex schema transport requires every property and restores source optional fields", () => {
+  const source = {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    type: "object",
+    properties: {
+      command: {
+        oneOf: [{
+          type: "object",
+          properties: {
+            kind: { type: "string", const: "project.start" },
+            expectedRevision: { type: "string" },
+            targetRegionId: { type: "string" },
+          },
+          required: ["kind"],
+          additionalProperties: false,
+        }, { type: "null" }],
+      },
+    },
+    required: ["command"],
+    additionalProperties: false,
+  };
+  const transport = codexOutputSchema(source);
+  assert.equal(Object.hasOwn(transport, "$schema"), false);
+  assert.equal(Object.hasOwn(transport.properties.command, "oneOf"), false);
+  assert.deepEqual(transport.properties.command.anyOf[0].required, ["kind", "expectedRevision", "targetRegionId"]);
+  assert.deepEqual(normalizeCodexOutput({
+    command: { kind: "project.start", expectedRevision: null, targetRegionId: null },
+  }, source), { command: { kind: "project.start" } });
+  assert.deepEqual(normalizeCodexOutput({ command: null }, source), { command: null });
+});
+
+test("Codex transport failures surface JSONL API errors when stderr is empty", () => {
+  const message = codexFailureMessage([
+    JSON.stringify({ type: "error", message: "invalid_json_schema" }),
+    JSON.stringify({ type: "turn.failed", error: { message: "Missing expectedRevision" } }),
+  ].join("\n"), "", 1);
+  assert.equal(message, "Missing expectedRevision");
 });
 
 test("runtime invocation requires desktop and an exact model, effort and contract preflight", async () => {

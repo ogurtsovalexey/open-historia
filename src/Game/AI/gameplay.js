@@ -45,6 +45,7 @@ import { dedupeGeneratedEvents } from "../../runtime/eventDedup.js";
 import { difficultyDirective } from "../../runtime/difficulty.js";
 import { MAP_SETTING_KEYS, getMapSetting } from "../../runtime/mapSettings.js";
 import { applyCampaignMemoryOps, buildCampaignMemoryText } from "../../runtime/campaignMemory.js";
+import { getStoredLanguage } from "../../runtime/i18n.js";
 
 const CHAT_HINT_PATTERNS = [
   /\bchat\b/i,
@@ -88,6 +89,35 @@ const DEFAULT_SUGGESTION_TOPICS = [
     description: "Expand the industrial and fiscal base that decides whether later gambles are sustainable.",
   },
 ];
+
+const RU_SUGGESTION_TOPICS = [
+  {
+    title: "Стабилизировать внутреннее положение",
+    description: "Сохранить порядок внутри страны и снизить риск внутреннего кризиса на фоне растущего внешнего давления.",
+  },
+  {
+    title: "Изменить дипломатическую обстановку",
+    description: "Использовать переговоры, сигналы и рычаги влияния, чтобы сузить возможности противников до следующего кризиса.",
+  },
+  {
+    title: "Подготовить военный рычаг",
+    description: "Повысить видимую готовность и создать практические резервы, которые соперникам придётся учитывать.",
+  },
+  {
+    title: "Укрепить экономическую базу",
+    description: "Расширить промышленную и финансовую основу, от которой зависит устойчивость будущих решений.",
+  },
+];
+
+const RU_COUNTRY_NAMES = Object.freeze({
+  Austria: "Австрию",
+  Czechoslovakia: "Чехословакию",
+  France: "Францию",
+  Germany: "Германию",
+  Italy: "Италию",
+  Poland: "Польшу",
+  "United Kingdom": "Великобританию",
+});
 
 const cloneValue = (value) => {
   if (value == null) return value;
@@ -856,21 +886,28 @@ const inferInviteeNames = async (text, world, playerCountry = "") => {
 };
 
 const fallbackActionSuggestions = async (bundle) => {
-  const recentTitles = normalizeEvents(bundle.events).slice(-3).map((event) => event.title);
-  const topics = DEFAULT_SUGGESTION_TOPICS.map((topic, index) => {
+  const russian = getStoredLanguage() === "ru";
+  const recentTitles = russian ? [] : normalizeEvents(bundle.events).slice(-3).map((event) => event.title);
+  const sourceTopics = russian ? RU_SUGGESTION_TOPICS : DEFAULT_SUGGESTION_TOPICS;
+  const topics = sourceTopics.map((topic, index) => {
     const recentTitle = recentTitles[index];
+    const country = RU_COUNTRY_NAMES[bundle.game.country] ?? "страну";
     const actions = [
       normalizeActionEntry({
         kind: "action",
         source: "suggested",
-        text: `Issue a concrete order addressing ${recentTitle || topic.title.toLowerCase()} and assign a responsible ministry or command.`,
-        title: recentTitle ? `Respond to ${recentTitle}` : `Act on ${topic.title}`,
+        text: russian
+          ? `Отдайте конкретный приказ по направлению «${topic.title.toLowerCase()}» и назначьте ответственное министерство или командование.`
+          : `Issue a concrete order addressing ${recentTitle || topic.title.toLowerCase()} and assign a responsible ministry or command.`,
+        title: russian ? `Действовать: ${topic.title}` : recentTitle ? `Respond to ${recentTitle}` : `Act on ${topic.title}`,
       }),
       normalizeActionEntry({
         kind: "action",
         source: "suggested",
-        text: `Prepare a second-order measure that protects ${bundle.game.country || "the polity"} if this line of effort triggers resistance.`,
-        title: "Create a contingency layer",
+        text: russian
+          ? `Подготовьте резервную меру, которая защитит ${country}, если это направление встретит сопротивление.`
+          : `Prepare a second-order measure that protects ${bundle.game.country || "the polity"} if this line of effort triggers resistance.`,
+        title: russian ? "Подготовить запасной план" : "Create a contingency layer",
       }),
     ].filter(Boolean);
 
