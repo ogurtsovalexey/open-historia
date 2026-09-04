@@ -12,3 +12,6 @@ export type {
   LegacyMigrationResult,
   WrittenLegacyMigration,
 } from './legacy-adapter.js';
+
+/** Explicit authoring boundary while Scenario V2 remains available for replay. */
+export * as scenarioV3 from './v3/index.js';

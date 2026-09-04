@@ -23,3 +23,10 @@ export * from './report.js';
 export * from './persist.js';
 export * from './pipeline.js';
 export * from './historicalScenario.js';
+
+/**
+ * The living-world contracts intentionally live behind a namespace while the
+ * legacy engine remains supported. This avoids ambiguous legacy/V2 entity IDs
+ * during the migration and gives callers an explicit version boundary.
+ */
+export * as worldV2 from './world/index.js';

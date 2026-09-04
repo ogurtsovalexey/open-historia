@@ -1,0 +1,310 @@
+import { z } from 'zod';
+import { worldV2 } from '@open-historia/engine';
+
+const boundedText = z.string().trim().min(1).max(1000);
+export const MAX_PLAYER_INPUT_V2_CHARS = 20000;
+const interpretationIdSchema = (prefix: 'question' | 'claim' | 'action' | 'initiative') =>
+  z.string().max(160).regex(new RegExp(`^${prefix}:[a-z0-9][a-z0-9._-]*$`));
+const entityIdSchema = z.string().max(160).regex(/^[a-z][a-z0-9-]*:[A-Za-z0-9][A-Za-z0-9._:-]*$/);
+
+export const sourceSpanSchema = z.object({
+  start: z.number().int().min(0),
+  end: z.number().int().min(0),
+  text: z.string().max(4000),
+}).strict().refine((span) => span.end >= span.start, { message: 'source span end must not precede start' });
+
+export const questionV2Schema = z.object({
+  questionId: interpretationIdSchema('question'),
+  text: boundedText,
+  sourceSpan: sourceSpanSchema,
+}).strict();
+
+export const claimGroundingSchema = z.enum(['supported', 'contradicted', 'unknown', 'subjective']);
+export type ClaimGrounding = z.infer<typeof claimGroundingSchema>;
+
+export const claimV2ModelSchema = z.object({
+  claimId: interpretationIdSchema('claim'),
+  subject: entityIdSchema,
+  predicate: z.string().trim().min(1).max(120),
+  proposedValue: z.union([z.string().max(1000), z.number().finite(), z.boolean(), z.null()]),
+  proposedTime: z.string().trim().min(1).max(120).nullable(),
+  sourceSpan: sourceSpanSchema,
+  grounding: claimGroundingSchema,
+  evidenceIds: z.array(worldV2.evidenceIdSchema).max(64),
+}).strict();
+
+export const requestedActionV2ModelSchema = z.object({
+  actionId: interpretationIdSchema('action'),
+  domain: z.enum(['politics', 'economy', 'military', 'diplomacy', 'society', 'science', 'administration', 'other']),
+  scope: z.enum(['domestic', 'external', 'mixed']),
+  intent: boundedText,
+  targetEntityIds: z.array(entityIdSchema).max(64),
+  claimRefs: z.array(interpretationIdSchema('claim')).max(64),
+  evidenceIds: z.array(worldV2.evidenceIdSchema).max(64),
+  sourceSpan: sourceSpanSchema,
+}).strict();
+
+export const proposedInitiativeV2ModelSchema = z.object({
+  initiativeId: interpretationIdSchema('initiative'),
+  kind: z.enum(['technology', 'ideology', 'institution', 'doctrine', 'movement', 'project', 'investigation', 'other']),
+  name: z.string().trim().min(1).max(160),
+  description: boundedText,
+  targetEntityIds: z.array(entityIdSchema).max(64),
+  evidenceIds: z.array(worldV2.evidenceIdSchema).max(64),
+  sourceSpan: sourceSpanSchema,
+}).strict();
+
+export const playerInputV2ModelOutputSchema = z.object({
+  revision: worldV2.worldRevisionHashSchema,
+  questions: z.array(questionV2Schema).max(32),
+  claims: z.array(claimV2ModelSchema).max(64),
+  requestedActions: z.array(requestedActionV2ModelSchema).max(64),
+  proposedInitiatives: z.array(proposedInitiativeV2ModelSchema).max(32),
+}).strict().superRefine((output, context) => {
+  const collections = [
+    ['questions', output.questions.map((entry) => entry.questionId)],
+    ['claims', output.claims.map((entry) => entry.claimId)],
+    ['requestedActions', output.requestedActions.map((entry) => entry.actionId)],
+    ['proposedInitiatives', output.proposedInitiatives.map((entry) => entry.initiativeId)],
+  ] as const;
+  for (const [field, ids] of collections) {
+    const seen = new Set<string>();
+    for (const [index, id] of ids.entries()) {
+      if (seen.has(id)) context.addIssue({ code: 'custom', path: [field, index], message: `duplicate ${field} ID ${id}` });
+      seen.add(id);
+    }
+  }
+});
+
+export type PlayerInputV2ModelOutput = z.infer<typeof playerInputV2ModelOutputSchema>;
+export type PlayerInputV2ModelInput = z.input<typeof playerInputV2ModelOutputSchema>;
+type ModelClaim = PlayerInputV2ModelOutput['claims'][number];
+type ModelAction = PlayerInputV2ModelOutput['requestedActions'][number];
+type ModelInitiative = PlayerInputV2ModelOutput['proposedInitiatives'][number];
+type ModelQuestion = PlayerInputV2ModelOutput['questions'][number];
+
+export interface GroundedQuestion extends ModelQuestion {
+  status: 'grounded' | 'blocked';
+  reasons: string[];
+}
+
+export interface GroundedClaim extends Omit<ModelClaim, 'grounding'> {
+  grounding: ClaimGrounding;
+  reasons: string[];
+}
+
+export interface GroundedRequestedAction extends ModelAction {
+  status: 'grounded' | 'blocked';
+  reasons: string[];
+}
+
+export interface GroundedProposedInitiative extends ModelInitiative {
+  status: 'grounded' | 'blocked';
+  reasons: string[];
+}
+
+export interface PlayerInputInterpretationV2 {
+  actorPolityId: string;
+  untrustedPlayerText: string;
+  questions: GroundedQuestion[];
+  claims: GroundedClaim[];
+  requestedActions: GroundedRequestedAction[];
+  proposedInitiatives: GroundedProposedInitiative[];
+}
+
+export interface InterpretPlayerInputV2Request {
+  actorPolityId: string;
+  playerText: string;
+  modelOutput: unknown;
+}
+
+const compare = (left: string, right: string): number => left < right ? -1 : left > right ? 1 : 0;
+const sortedUnique = (values: readonly string[]): string[] => [...new Set(values)].sort(compare);
+
+function spanReasons(playerText: string, span: z.infer<typeof sourceSpanSchema>): string[] {
+  if (span.end > playerText.length || playerText.slice(span.start, span.end) !== span.text) return ['invalid-source-span'];
+  return [];
+}
+
+function entityIds(state: worldV2.WorldStateV2): Set<string> {
+  return new Set([
+    ...state.polities.map((entry) => entry.id),
+    ...state.regions.map((entry) => entry.regionId),
+    ...state.populationCohorts.map((entry) => entry.cohortId),
+    ...state.formations.map((entry) => entry.formationId),
+    ...state.characters.map((entry) => entry.characterId),
+    ...state.groups.map((entry) => entry.groupId),
+    ...state.institutions.map((entry) => entry.institutionId),
+    ...state.concepts.map((entry) => entry.conceptId),
+    ...state.processes.map((entry) => entry.processId),
+    ...state.relationships.map((entry) => entry.relationshipId),
+  ]);
+}
+
+function evidenceReasons(
+  state: worldV2.WorldStateV2,
+  actorPolityId: string,
+  evidenceIds: readonly string[],
+): { accepted: worldV2.EvidenceId[]; reasons: string[] } {
+  const validation = worldV2.validateEvidenceIdsForPolity(state, {
+    polityId: actorPolityId,
+    expectedRevision: state.revision,
+    evidenceIds,
+  }).value;
+  return {
+    accepted: validation.acceptedEvidenceIds,
+    reasons: validation.rejected.map((entry) => `evidence-${entry.reason}:${entry.evidenceId}`).sort(compare),
+  };
+}
+
+function deterministicClaimGrounding(state: worldV2.WorldStateV2, claim: ModelClaim): ClaimGrounding {
+  if (claim.grounding === 'subjective') return 'subjective';
+  if (claim.predicate === 'controls-region' && typeof claim.proposedValue === 'string') {
+    const polity = state.polities.find((entry) => entry.id === claim.subject);
+    const region = state.regions.find((entry) => entry.regionId === claim.proposedValue);
+    if (!polity || !region) return 'unknown';
+    return region.control.actualControllerPolityId === polity.id ? 'supported' : 'contradicted';
+  }
+  if (claim.predicate === 'conquered-region' && typeof claim.proposedValue === 'string') {
+    const polity = state.polities.find((entry) => entry.id === claim.subject);
+    const region = state.regions.find((entry) => entry.regionId === claim.proposedValue);
+    if (!polity || !region) return 'unknown';
+    const recorded = state.events.some((event) =>
+      event.kind.includes('territorial-transition')
+      && event.entityRefs.includes(polity.id)
+      && event.entityRefs.includes(region.regionId));
+    // Entity references prove that a territorial event involved both entities,
+    // not who gained control. Absence in the complete causal ledger contradicts
+    // the claimed event; an ambiguous matching event requires richer evidence.
+    return recorded ? 'unknown' : 'contradicted';
+  }
+  if (claim.predicate === 'fielded-personnel' && typeof claim.proposedValue === 'number') {
+    const polity = state.polities.find((entry) => entry.id === claim.subject);
+    if (!polity) return 'unknown';
+    const actual = state.formations
+      .filter((formation) => formation.polityId === polity.id)
+      .reduce((sum, formation) => sum + formation.manpower, 0);
+    return actual === claim.proposedValue ? 'supported' : 'contradicted';
+  }
+  return 'unknown';
+}
+
+function domesticScopeIsProven(state: worldV2.WorldStateV2, actorPolityId: string, entityId: string): boolean {
+  if (entityId === actorPolityId) return true;
+  const region = state.regions.find((entry) => entry.regionId === entityId);
+  if (region) return region.control.actualControllerPolityId === actorPolityId;
+  const formation = state.formations.find((entry) => entry.formationId === entityId);
+  if (formation) return formation.polityId === actorPolityId;
+  const character = state.characters.find((entry) => entry.characterId === entityId);
+  if (character) return character.polityId === actorPolityId;
+  const group = state.groups.find((entry) => entry.groupId === entityId);
+  if (group) return group.polityId === actorPolityId;
+  const institution = state.institutions.find((entry) => entry.institutionId === entityId);
+  if (institution) return institution.polityId === actorPolityId;
+  const process = state.processes.find((entry) => entry.processId === entityId);
+  if (process) return process.sponsorPolityIds.some((polityId) => polityId === actorPolityId);
+  return false;
+}
+
+function sortBySpanAndId<T extends { sourceSpan: { start: number }; }>(rows: T[], idOf: (row: T) => string): T[] {
+  return rows.sort((left, right) => left.sourceSpan.start - right.sourceSpan.start || compare(idOf(left), idOf(right)));
+}
+
+/** Render player prose as JSON data, never as a prompt instruction section. */
+export function quoteUntrustedPlayerText(playerText: string): string {
+  return `[UNTRUSTED_PLAYER_TEXT]\n${JSON.stringify(playerText)}`;
+}
+
+export function interpretPlayerInputV2(
+  state: worldV2.WorldStateV2,
+  request: InterpretPlayerInputV2Request,
+): worldV2.GroundedProjection<PlayerInputInterpretationV2> {
+  if (request.playerText.length > MAX_PLAYER_INPUT_V2_CHARS) {
+    throw new Error(`player input exceeds ${MAX_PLAYER_INPUT_V2_CHARS} characters`);
+  }
+  const actor = state.polities.find((entry) => entry.id === request.actorPolityId);
+  if (!actor) throw new Error(`unknown polity ${request.actorPolityId}`);
+  const modelOutput = playerInputV2ModelOutputSchema.parse(request.modelOutput);
+  if (modelOutput.revision !== state.revision) {
+    throw new Error(`stale interpretation revision: expected ${state.revision}, received ${modelOutput.revision}`);
+  }
+
+  const knownEntities = entityIds(state);
+  const acceptedEvidence = new Set<worldV2.EvidenceId>();
+  const questions = sortBySpanAndId(modelOutput.questions.map((question): GroundedQuestion => {
+    const reasons = spanReasons(request.playerText, question.sourceSpan);
+    return { ...question, status: reasons.length === 0 ? 'grounded' : 'blocked', reasons };
+  }), (question) => question.questionId);
+
+  const claims = sortBySpanAndId(modelOutput.claims.map((claim): GroundedClaim => {
+    const evidence = evidenceReasons(state, actor.id, claim.evidenceIds);
+    evidence.accepted.forEach((id) => acceptedEvidence.add(id));
+    const reasons = [
+      ...spanReasons(request.playerText, claim.sourceSpan),
+      ...(!knownEntities.has(claim.subject) ? [`unknown-entity:${claim.subject}`] : []),
+      ...evidence.reasons,
+    ].sort(compare);
+    const grounding = reasons.length === 0 ? deterministicClaimGrounding(state, claim) : 'unknown';
+    return { ...claim, evidenceIds: evidence.accepted, grounding, reasons };
+  }), (claim) => claim.claimId);
+  const claimsById = new Map(claims.map((claim) => [claim.claimId, claim]));
+
+  const requestedActions = sortBySpanAndId(modelOutput.requestedActions.map((action): GroundedRequestedAction => {
+    const evidence = evidenceReasons(state, actor.id, action.evidenceIds);
+    evidence.accepted.forEach((id) => acceptedEvidence.add(id));
+    const reasons = [
+      ...spanReasons(request.playerText, action.sourceSpan),
+      ...action.targetEntityIds.filter((id) => !knownEntities.has(id)).map((id) => `unknown-entity:${id}`),
+      ...action.claimRefs.flatMap((claimId) => {
+        const claim = claimsById.get(claimId);
+        return !claim ? [`unknown-claim:${claimId}`]
+          : claim.grounding === 'supported' ? [] : [`${claim.grounding}-claim:${claimId}`];
+      }),
+      ...(action.scope === 'domestic'
+        ? action.targetEntityIds.filter((id) => knownEntities.has(id) && !domesticScopeIsProven(state, actor.id, id))
+          .map((id) => `foreign-or-unproven-domestic-target:${id}`)
+        : []),
+      ...evidence.reasons,
+    ];
+    const sortedReasons = sortedUnique(reasons);
+    return {
+      ...action,
+      targetEntityIds: sortedUnique(action.targetEntityIds),
+      claimRefs: sortedUnique(action.claimRefs),
+      evidenceIds: evidence.accepted,
+      status: sortedReasons.length === 0 ? 'grounded' : 'blocked',
+      reasons: sortedReasons,
+    };
+  }), (action) => action.actionId);
+
+  const proposedInitiatives = sortBySpanAndId(modelOutput.proposedInitiatives.map((initiative): GroundedProposedInitiative => {
+    const evidence = evidenceReasons(state, actor.id, initiative.evidenceIds);
+    evidence.accepted.forEach((id) => acceptedEvidence.add(id));
+    const reasons = sortedUnique([
+      ...spanReasons(request.playerText, initiative.sourceSpan),
+      ...initiative.targetEntityIds.filter((id) => !knownEntities.has(id)).map((id) => `unknown-entity:${id}`),
+      ...evidence.reasons,
+    ]);
+    return {
+      ...initiative,
+      targetEntityIds: sortedUnique(initiative.targetEntityIds),
+      evidenceIds: evidence.accepted,
+      status: reasons.length === 0 ? 'grounded' : 'blocked',
+      reasons,
+    };
+  }), (initiative) => initiative.initiativeId);
+
+  return {
+    revision: state.revision,
+    asOfMonth: state.month,
+    value: {
+      actorPolityId: actor.id,
+      untrustedPlayerText: request.playerText,
+      questions,
+      claims,
+      requestedActions,
+      proposedInitiatives,
+    },
+    evidenceIds: [...acceptedEvidence].sort(compare),
+  };
+}
