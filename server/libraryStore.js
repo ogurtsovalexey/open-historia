@@ -14,6 +14,10 @@ import {
   rekeyOwnerMap,
 } from "./ownerMigration.js";
 import { readEngineSession } from "./engineSessionStore.js";
+import {
+  EUROPE_1935_SCENARIO_ID,
+  materializeEurope1935RuntimeScenario,
+} from "./europe1935Runtime.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.join(__dirname, "..");
@@ -349,6 +353,7 @@ const TEMPLATE_WORLD_OVERRIDE_KEYS = [
 "mapCredit",
 "notes",
 "ownerCodes",
+"playableOwnerCodes",
 "polityOverrides",
 "regionOwnershipOverrides",
 "simulationRules",
@@ -1079,6 +1084,14 @@ const ensureScenarioStore = () => {
   ensureDirectory(SERVER_DATA_DIR);
   ensureDirectory(SCENARIOS_DIR);
   ensureDefaultScenario();
+  const europe = materializeEurope1935RuntimeScenario({ scenariosDirectory: SCENARIOS_DIR });
+  const manifest = getScenarioManifest();
+  if (!manifest.order.includes(EUROPE_1935_SCENARIO_ID)) {
+    manifest.order.push(EUROPE_1935_SCENARIO_ID);
+    saveScenarioManifest(manifest);
+  } else if (europe.created) {
+    invalidateCatalogs();
+  }
 };
 
 const ensureGameStore = () => {

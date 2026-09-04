@@ -10,15 +10,15 @@ import { getGameDetails, getGameDirectory, invalidateLibraryCatalogs } from "./l
 import {
   EngineSessionError, backupLegacyEconomySave, commitEngineSession, readEngineSession,
 } from "./engineSessionStore.js";
+import { resolveEngineFixtureDirectory } from "./europe1935Runtime.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ENGINE_FIXTURES_DIR = path.join(REPO_ROOT, "packages", "engine", "fixtures");
 const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
 
 const loadFixture = (engineScenario) => {
   const name = String(engineScenario ?? "").trim();
   if (!/^[a-z0-9][a-z0-9-]*$/.test(name)) throw new Error(`invalid engineScenario '${engineScenario}'`);
-  const dir = path.join(ENGINE_FIXTURES_DIR, name);
+  const dir = resolveEngineFixtureDirectory(name, REPO_ROOT);
   if (!fs.existsSync(path.join(dir, "scenario.json"))) throw new Error(`engine scenario '${name}' has no scenario.json`);
   const scenario = parseScenario(readJson(path.join(dir, "scenario.json")));
   const linkPath = path.join(dir, "map-link.json");

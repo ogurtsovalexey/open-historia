@@ -127,6 +127,8 @@
       "dist/**",
       "server/**",
       "electron/**",
+      "packages/data-packs/fixtures/europe-1935-benchmark/engine/**",
+      "packages/data-packs/fixtures/europe-1935-benchmark/geography/runtime-regions.geojson",
       "scripts/fetch-map-assets.mjs",
       "scripts/map-assets.json",
       "public/lang/**",

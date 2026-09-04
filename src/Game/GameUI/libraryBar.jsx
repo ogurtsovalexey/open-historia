@@ -41,6 +41,7 @@ import {
   embedScenarioBundleVector,
 } from "../../runtime/communityBasemaps.js";
 import { zipBundle, unzipBundle, looksLikeZip } from "../../runtime/bundleZip.js";
+import { buildScenarioCountryOptions } from "./scenarioCountries.js";
 
 const UNIT_TYPE_LABELS = {
   infantry: "Infantry",
@@ -68,20 +69,6 @@ const hexToRgbArray = (hex) => {
   const n = parseInt(m[1], 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 };
-
-const TECHNICAL_OWNER_CODES = new Set([
-  "NA",
-  "XCA",
-  "Z01",
-  "Z02",
-  "Z03",
-  "Z04",
-  "Z05",
-  "Z06",
-  "Z07",
-  "Z08",
-  "Z09",
-]);
 
 // Set by the mounted LibraryTopBar; lets outside callers open the main menu
 // on a specific tab.
@@ -1236,44 +1223,6 @@ const LibraryTopBar = () => {
   // Build the start-country list for a scenario: only the factions that actually
   // exist in it (world.ownerCodes), named as era polities where defined. Falls
   // back to every country for scenarios without an owner list.
-  const buildScenarioCountryOptions = (world, allCountries, nameOverrides = {}) => {
-    const entries = Array.isArray(allCountries) ? allCountries : [];
-    const entriesByCode = new Map();
-    for (const entry of entries) {
-      const code = String(entry?.code ?? "").trim();
-      const name = String(entry?.name ?? "").trim();
-      if (!code || !name || TECHNICAL_OWNER_CODES.has(code)) continue;
-      const existing = entriesByCode.get(code);
-      if (!existing || existing.name === code) entriesByCode.set(code, { code, name });
-    }
-    const list = [...entriesByCode.values()];
-    const ownerCodes = Array.isArray(world?.ownerCodes) ? world.ownerCodes : null;
-    const nameByCode = new Map(list.map((entry) => [entry.code, entry.name]));
-    const polity = world?.polityOverrides ?? {};
-    const resolveOption = (code, fallbackName = code) => {
-      const scenarioName = nameOverrides[code] || nameOverrides[fallbackName];
-      const polityName = polity[code]?.name;
-      return {
-        code,
-        name: (polityName && polityName !== code ? polityName : null) || scenarioName || fallbackName,
-      };
-    };
-    // ownerCodes lists only owners that hold territory (it is the deduped values of
-    // regionOwnershipOverrides). A LANDLESS faction — a polity that owns no regions,
-    // e.g. a government-in-exile — is defined in polityOverrides but appears in no
-    // ownership override, so it would never reach this list. Union the two: a
-    // faction is playable if it holds land OR exists as a polity. The map surface
-    // needs no change — a landless faction has nothing to click, and the list
-    // button is selection enough.
-    const codes = new Set(ownerCodes && ownerCodes.length ? ownerCodes : list.map((e) => e.code));
-    for (const code of Object.keys(polity)) codes.add(code);
-    const options = [...codes]
-      .filter((code) => !TECHNICAL_OWNER_CODES.has(code))
-      .map((code) => resolveOption(code, nameByCode.get(code) || code));
-    return options
-      .sort((left, right) => left.name.localeCompare(right.name));
-  };
-
   const getBaseCountryOptions = () =>
     Object.entries(countryNames ?? {}).map(([code, name]) => ({ code, name }));
 
