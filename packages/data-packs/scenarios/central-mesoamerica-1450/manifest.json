@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "open-historia-scenario-package/1",
+  "scenarioId": "scenario:central-mesoamerica-1450",
+  "profile": "historical",
+  "effectiveDate": "1450-01-01",
+  "regionCount": 44,
+  "activeStrategicSubjectCount": 10,
+  "files": [
+    {
+      "path": "scenario.json",
+      "checksum": "sha256:1cb8b2a2960b0b6d8152c33dcd910e6c545fb0efe302c6b5c64d48d1c8de0627"
+    },
+    {
+      "path": "sources.json",
+      "checksum": "sha256:c972dec70c1d956d6fd8ea551b8f8dafc7850bbb4bbd08626f7ce17d14b74002"
+    },
+    {
+      "path": "authoring.json",
+      "checksum": "sha256:c2906b3033d5acf64fb7177a94c621bd7f5d769274c9618abab79309c761159f"
+    },
+    {
+      "path": "geography/candidate-region-plan.json",
+      "checksum": "sha256:3f2016d5072ed4886f4618268732019903eca0bde8b145849e5a696d6080895f"
+    },
+    {
+      "path": "geography/runtime-regions.geojson",
+      "checksum": "sha256:b3049ad7a1062091e169bd352424d59721a26b8b6229942aef26d11b0c6a96e1"
+    },
+    {
+      "path": "geography/runtime-land-adjacency.json",
+      "checksum": "sha256:8d4287bd51b4e8ffefc7f5c08a541db489341752a6709a34d1cb7f2358ac973c"
+    },
+    {
+      "path": "geography/runtime-integration-control.json",
+      "checksum": "sha256:d2c3c03508764618d41800e547069927cf3da0735021579e26cbf09eec64f033"
+    },
+    {
+      "path": "geography/runtime-geography-manifest.json",
+      "checksum": "sha256:4467ab1e95b02c5d41ad1357db61cf7a935359f5458190f8e80d631cc053b14f"
+    },
+    {
+      "path": "starting-state/population.json",
+      "checksum": "sha256:9d2803d0c1b367b8c96c7b0005a99d6bf29c2cdbc518191dc094c7858eec75ab"
+    },
+    {
+      "path": "starting-state/control.json",
+      "checksum": "sha256:15c73d3c77a77eaf010a90356d6da1678242d4eb14c64c47080c18bafff2c3b2"
+    },
+    {
+      "path": "starting-state/economy.json",
+      "checksum": "sha256:d968d532ce39ba54b29354c583d003aa242e6d021799cfe9682107af896f7695"
+    },
+    {
+      "path": "starting-state/obligations.json",
+      "checksum": "sha256:7ddd997674a19c832a6b1b61847b258c89a17ebbfc681bb727f81ba3ea13b4da"
+    },
+    {
+      "path": "starting-state/diplomacy.json",
+      "checksum": "sha256:c8fc4c8f80759779e79d70459a92ee2c6d34e448fc4edb2966b3f578758bf7e4"
+    },
+    {
+      "path": "starting-state/politics.json",
+      "checksum": "sha256:73500ef5a8c8f7208509887776216703553a8b5a2e59651b5bdd63602512da24"
+    },
+    {
+      "path": "starting-state/military.json",
+      "checksum": "sha256:681d6b2c152fba0386cb29f208604d740cad45044057b83b62554faf93fc438e"
+    },
+    {
+      "path": "starting-state/identity.json",
+      "checksum": "sha256:7818dc55ff5f1dc62e14e1ebbcbbe915c2afb5b7d19488bbe5d2a0ed52610fd1"
+    },
+    {
+      "path": "starting-state/concepts.json",
+      "checksum": "sha256:768dd582bb11ed80d4acfd38218a7966952df1ba310a64640dc3524ead951c65"
+    },
+    {
+      "path": "starting-state/knowledge.json",
+      "checksum": "sha256:e5b3dc319c0ee1d8fb14d3e43213464b6c613f747f0103c4c1e60f8883cc8d6b"
+    },
+    {
+      "path": "starting-state/starting-state-manifest.json",
+      "checksum": "sha256:959f640d703da4fd850106672ff93e56b2416542ffdffde9181903ee11fbd881"
+    }
+  ],
+  "scenarioChecksum": "sha256:d555dbb5bc8328d2bc3d3d713cb40982370eed5d5e730ca9725465bbc5bbf973"
+}

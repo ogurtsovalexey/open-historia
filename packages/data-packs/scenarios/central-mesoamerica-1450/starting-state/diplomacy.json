@@ -1,0 +1,48 @@
+{
+  "relationship:chalco-conflict": {
+    "id": "relationship:chalco-conflict",
+    "typeId": "relationship-type:active-conflict",
+    "participantPolityIds": [
+      "polity:tenochtitlan",
+      "polity:chalco"
+    ],
+    "evidenceIds": [
+      "evidence:meso1450-relationship-chalco-conflict"
+    ]
+  },
+  "relationship:tlaxcallan-independent-conflict": {
+    "id": "relationship:tlaxcallan-independent-conflict",
+    "typeId": "relationship-type:active-conflict",
+    "participantPolityIds": [
+      "polity:tenochtitlan",
+      "polity:tlaxcallan"
+    ],
+    "evidenceIds": [
+      "evidence:meso1450-relationship-tlaxcallan-independent-conflict"
+    ]
+  },
+  "relationship:triple-alliance": {
+    "id": "relationship:triple-alliance",
+    "typeId": "relationship-type:tribute-alliance",
+    "participantPolityIds": [
+      "polity:tenochtitlan",
+      "polity:texcoco",
+      "polity:tlacopan"
+    ],
+    "evidenceIds": [
+      "evidence:meso1450-relationship-triple-alliance"
+    ]
+  },
+  "relationship:triple-alliance-shared-war": {
+    "id": "relationship:triple-alliance-shared-war",
+    "typeId": "relationship-type:shared-war-obligation",
+    "participantPolityIds": [
+      "polity:tenochtitlan",
+      "polity:texcoco",
+      "polity:tlacopan"
+    ],
+    "evidenceIds": [
+      "evidence:meso1450-relationship-triple-alliance-shared-war"
+    ]
+  }
+}

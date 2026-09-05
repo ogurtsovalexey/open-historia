@@ -1,0 +1,277 @@
+{
+  "count": 44,
+  "allocation": {
+    "mexicanBasin": 12,
+    "pueblaTlaxcala": 8,
+    "chalcoMorelosEasternFrontiers": 6,
+    "purepechaWesternFrontier": 8,
+    "mixtecaOaxaca": 8,
+    "externalExchangeCorridors": 2
+  },
+  "regions": [
+    {
+      "regionId": "region:meso1450:tenochtitlan",
+      "displayName": "Mexico-Tenochtitlan",
+      "owner": "polity:tenochtitlan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tlatelolco",
+      "displayName": "Mexico-Tlatelolco",
+      "owner": "polity:tlatelolco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:texcoco",
+      "displayName": "Tetzcoco",
+      "owner": "polity:texcoco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tlacopan",
+      "displayName": "Tlacopan",
+      "owner": "polity:tlacopan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:xochimilco",
+      "displayName": "Xochimilco",
+      "owner": "polity:xochimilco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:culhuacan",
+      "displayName": "Culhuacan",
+      "owner": "polity:tenochtitlan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:coyoacan",
+      "displayName": "Coyoacan",
+      "owner": "polity:tlacopan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:azcapotzalco",
+      "displayName": "Azcapotzalco",
+      "owner": "polity:azcapotzalco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:cuauhtitlan",
+      "displayName": "Cuauhtitlan",
+      "owner": "polity:cuauhtitlan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:otompan",
+      "displayName": "Otompan",
+      "owner": "polity:texcoco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:teotihuacan",
+      "displayName": "Teotihuacan",
+      "owner": "polity:texcoco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:acolman",
+      "displayName": "Acolman",
+      "owner": "polity:texcoco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tepeticpac",
+      "displayName": "Tepeticpac",
+      "owner": "polity:tlaxcallan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:ocotelulco",
+      "displayName": "Ocotelulco",
+      "owner": "polity:tlaxcallan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:quiahuiztlan",
+      "displayName": "Quiahuiztlan",
+      "owner": "polity:tlaxcallan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tizatlan",
+      "displayName": "Tizatlan",
+      "owner": "polity:tlaxcallan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:cholollan",
+      "displayName": "Cholollan",
+      "owner": "polity:cholollan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:huexotzinco",
+      "displayName": "Huexotzinco",
+      "owner": "polity:huexotzinco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tepeaca",
+      "displayName": "Tepeaca",
+      "owner": "polity:tepeaca",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:cuauhtinchan",
+      "displayName": "Cuauhtinchan",
+      "owner": "polity:cuauhtinchan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:chalco",
+      "displayName": "Chalco",
+      "owner": "polity:chalco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:amecameca",
+      "displayName": "Amecameca",
+      "owner": "polity:chalco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:cuauhnahuac",
+      "displayName": "Cuauhnahuac",
+      "owner": "polity:cuauhnahuac",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:yautepec",
+      "displayName": "Yauhtepec",
+      "owner": "polity:yautepec",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:huaxtepec",
+      "displayName": "Huaxtepec",
+      "owner": "polity:yautepec",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tlayacapan",
+      "displayName": "Tlayacapan",
+      "owner": "polity:chalco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tzintzuntzan",
+      "displayName": "Tzintzuntzan",
+      "owner": "polity:purepecha",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:patzcuaro",
+      "displayName": "Pátzcuaro",
+      "owner": "polity:purepecha",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:ihuatzio",
+      "displayName": "Ihuatzio",
+      "owner": "polity:purepecha",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:uruapan",
+      "displayName": "Uruapan",
+      "owner": "polity:purepecha",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:zacapu",
+      "displayName": "Zacapu",
+      "owner": "polity:purepecha",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:cuitzeo",
+      "displayName": "Cuitzeo",
+      "owner": "polity:purepecha",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:ucareo-zinapecuaro",
+      "displayName": "Ucareo–Zinapécuaro",
+      "owner": "polity:purepecha",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:balsas-frontier",
+      "displayName": "Balsas frontier",
+      "owner": "polity:purepecha",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tututepec",
+      "displayName": "Yucu Dzaa (Tututepec)",
+      "owner": "polity:tututepec",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:coixtlahuaca",
+      "displayName": "Coixtlahuaca",
+      "owner": "polity:coixtlahuaca",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tilantongo",
+      "displayName": "Tilantongo",
+      "owner": "polity:tilantongo",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tlaxiaco",
+      "displayName": "Tlaxiaco",
+      "owner": "polity:tlaxiaco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:teozacoalco",
+      "displayName": "Teozacoalco",
+      "owner": "polity:teozacoalco",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:nochistlan",
+      "displayName": "Nochistlan",
+      "owner": "polity:nochistlan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:yanhuitlan",
+      "displayName": "Yanhuitlan",
+      "owner": "polity:yanhuitlan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:huajuapan",
+      "displayName": "Huajuapan",
+      "owner": "polity:huajuapan",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:tochtepec-corridor",
+      "displayName": "Tochtepec exchange corridor",
+      "owner": "polity:tochtepec",
+      "geometryStatus": "unknown"
+    },
+    {
+      "regionId": "region:meso1450:soconusco-corridor",
+      "displayName": "Soconusco exchange corridor",
+      "owner": "polity:soconusco",
+      "geometryStatus": "unknown"
+    }
+  ]
+}

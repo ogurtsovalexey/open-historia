@@ -1,0 +1,326 @@
+{
+  "regions": [
+    {
+      "regionId": "region:meso1450:acolman",
+      "adjacentRegionIds": [
+        "region:meso1450:tenochtitlan",
+        "region:meso1450:teotihuacan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:amecameca",
+      "adjacentRegionIds": [
+        "region:meso1450:chalco",
+        "region:meso1450:cuauhnahuac"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:azcapotzalco",
+      "adjacentRegionIds": [
+        "region:meso1450:coyoacan",
+        "region:meso1450:cuauhtitlan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:balsas-frontier",
+      "adjacentRegionIds": [
+        "region:meso1450:tututepec",
+        "region:meso1450:tzintzuntzan",
+        "region:meso1450:ucareo-zinapecuaro"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:chalco",
+      "adjacentRegionIds": [
+        "region:meso1450:amecameca",
+        "region:meso1450:cholollan",
+        "region:meso1450:tlayacapan",
+        "region:meso1450:xochimilco"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:cholollan",
+      "adjacentRegionIds": [
+        "region:meso1450:chalco",
+        "region:meso1450:huexotzinco",
+        "region:meso1450:tizatlan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:coixtlahuaca",
+      "adjacentRegionIds": [
+        "region:meso1450:tilantongo",
+        "region:meso1450:tochtepec-corridor",
+        "region:meso1450:tututepec"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:coyoacan",
+      "adjacentRegionIds": [
+        "region:meso1450:azcapotzalco",
+        "region:meso1450:culhuacan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:cuauhnahuac",
+      "adjacentRegionIds": [
+        "region:meso1450:amecameca",
+        "region:meso1450:culhuacan",
+        "region:meso1450:yautepec"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:cuauhtinchan",
+      "adjacentRegionIds": [
+        "region:meso1450:tepeaca",
+        "region:meso1450:tepeticpac"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:cuauhtitlan",
+      "adjacentRegionIds": [
+        "region:meso1450:azcapotzalco",
+        "region:meso1450:otompan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:cuitzeo",
+      "adjacentRegionIds": [
+        "region:meso1450:ucareo-zinapecuaro",
+        "region:meso1450:zacapu"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:culhuacan",
+      "adjacentRegionIds": [
+        "region:meso1450:coyoacan",
+        "region:meso1450:cuauhnahuac",
+        "region:meso1450:xochimilco"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:huajuapan",
+      "adjacentRegionIds": [
+        "region:meso1450:tututepec",
+        "region:meso1450:yanhuitlan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:huaxtepec",
+      "adjacentRegionIds": [
+        "region:meso1450:tlayacapan",
+        "region:meso1450:yautepec"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:huexotzinco",
+      "adjacentRegionIds": [
+        "region:meso1450:cholollan",
+        "region:meso1450:tepeaca",
+        "region:meso1450:tzintzuntzan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:ihuatzio",
+      "adjacentRegionIds": [
+        "region:meso1450:patzcuaro",
+        "region:meso1450:uruapan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:nochistlan",
+      "adjacentRegionIds": [
+        "region:meso1450:teozacoalco",
+        "region:meso1450:yanhuitlan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:ocotelulco",
+      "adjacentRegionIds": [
+        "region:meso1450:quiahuiztlan",
+        "region:meso1450:tepeticpac"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:otompan",
+      "adjacentRegionIds": [
+        "region:meso1450:cuauhtitlan",
+        "region:meso1450:teotihuacan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:patzcuaro",
+      "adjacentRegionIds": [
+        "region:meso1450:ihuatzio",
+        "region:meso1450:tzintzuntzan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:quiahuiztlan",
+      "adjacentRegionIds": [
+        "region:meso1450:ocotelulco",
+        "region:meso1450:tizatlan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:soconusco-corridor",
+      "adjacentRegionIds": [
+        "region:meso1450:tochtepec-corridor",
+        "region:meso1450:tututepec"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tenochtitlan",
+      "adjacentRegionIds": [
+        "region:meso1450:acolman",
+        "region:meso1450:tepeticpac",
+        "region:meso1450:tlatelolco"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:teotihuacan",
+      "adjacentRegionIds": [
+        "region:meso1450:acolman",
+        "region:meso1450:otompan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:teozacoalco",
+      "adjacentRegionIds": [
+        "region:meso1450:nochistlan",
+        "region:meso1450:tlaxiaco"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tepeaca",
+      "adjacentRegionIds": [
+        "region:meso1450:cuauhtinchan",
+        "region:meso1450:huexotzinco"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tepeticpac",
+      "adjacentRegionIds": [
+        "region:meso1450:cuauhtinchan",
+        "region:meso1450:ocotelulco",
+        "region:meso1450:tenochtitlan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:texcoco",
+      "adjacentRegionIds": [
+        "region:meso1450:tlacopan",
+        "region:meso1450:tlatelolco"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tilantongo",
+      "adjacentRegionIds": [
+        "region:meso1450:coixtlahuaca",
+        "region:meso1450:tlaxiaco"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tizatlan",
+      "adjacentRegionIds": [
+        "region:meso1450:cholollan",
+        "region:meso1450:quiahuiztlan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tlacopan",
+      "adjacentRegionIds": [
+        "region:meso1450:texcoco",
+        "region:meso1450:xochimilco"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tlatelolco",
+      "adjacentRegionIds": [
+        "region:meso1450:tenochtitlan",
+        "region:meso1450:texcoco"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tlaxiaco",
+      "adjacentRegionIds": [
+        "region:meso1450:teozacoalco",
+        "region:meso1450:tilantongo"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tlayacapan",
+      "adjacentRegionIds": [
+        "region:meso1450:chalco",
+        "region:meso1450:huaxtepec"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tochtepec-corridor",
+      "adjacentRegionIds": [
+        "region:meso1450:coixtlahuaca",
+        "region:meso1450:soconusco-corridor"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tututepec",
+      "adjacentRegionIds": [
+        "region:meso1450:balsas-frontier",
+        "region:meso1450:coixtlahuaca",
+        "region:meso1450:huajuapan",
+        "region:meso1450:soconusco-corridor"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:tzintzuntzan",
+      "adjacentRegionIds": [
+        "region:meso1450:balsas-frontier",
+        "region:meso1450:huexotzinco",
+        "region:meso1450:patzcuaro"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:ucareo-zinapecuaro",
+      "adjacentRegionIds": [
+        "region:meso1450:balsas-frontier",
+        "region:meso1450:cuitzeo"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:uruapan",
+      "adjacentRegionIds": [
+        "region:meso1450:ihuatzio",
+        "region:meso1450:zacapu"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:xochimilco",
+      "adjacentRegionIds": [
+        "region:meso1450:chalco",
+        "region:meso1450:culhuacan",
+        "region:meso1450:tlacopan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:yanhuitlan",
+      "adjacentRegionIds": [
+        "region:meso1450:huajuapan",
+        "region:meso1450:nochistlan"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:yautepec",
+      "adjacentRegionIds": [
+        "region:meso1450:cuauhnahuac",
+        "region:meso1450:huaxtepec"
+      ]
+    },
+    {
+      "regionId": "region:meso1450:zacapu",
+      "adjacentRegionIds": [
+        "region:meso1450:cuitzeo",
+        "region:meso1450:uruapan"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "obligations": [
+    {
+      "id": "obligation:triple-alliance",
+      "kind": "tribute-and-shared-war",
+      "participantPolityIds": [
+        "polity:tenochtitlan",
+        "polity:texcoco",
+        "polity:tlacopan"
+      ],
+      "beneficiaryShares": "unknown",
+      "deliveries": "unknown",
+      "cadence": "unknown",
+      "arrears": "unknown",
+      "changesControl": false,
+      "evidenceIds": [
+        "evidence:meso1450-relationship-triple-alliance",
+        "evidence:meso1450-relationship-triple-alliance-shared-war"
+      ]
+    }
+  ]
+}

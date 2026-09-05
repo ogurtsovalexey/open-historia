@@ -1,0 +1,596 @@
+{
+  "policy": "modeled-central-estimates",
+  "regions": {
+    "region:meso1450:acolman": {
+      "fiscalBase": 222,
+      "productiveCapacity": 444,
+      "supplyCapacity": 555,
+      "resources": {
+        "commodity:maize": 1481,
+        "commodity:food-basket": 740,
+        "commodity:timber": 222,
+        "commodity:stone": 177,
+        "commodity:clay": 148
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:amecameca": {
+      "fiscalBase": 257,
+      "productiveCapacity": 514,
+      "supplyCapacity": 642,
+      "resources": {
+        "commodity:maize": 1714,
+        "commodity:food-basket": 857,
+        "commodity:timber": 257,
+        "commodity:stone": 205,
+        "commodity:clay": 171
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:azcapotzalco": {
+      "fiscalBase": 200,
+      "productiveCapacity": 400,
+      "supplyCapacity": 500,
+      "resources": {
+        "commodity:maize": 1333,
+        "commodity:food-basket": 666,
+        "commodity:timber": 200,
+        "commodity:stone": 160,
+        "commodity:clay": 133
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:balsas-frontier": {
+      "fiscalBase": 307,
+      "productiveCapacity": 614,
+      "supplyCapacity": 768,
+      "resources": {
+        "commodity:maize": 2049,
+        "commodity:food-basket": 1024,
+        "commodity:timber": 307,
+        "commodity:stone": 245,
+        "commodity:clay": 204,
+        "commodity:copper": 61
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:chalco": {
+      "fiscalBase": 385,
+      "productiveCapacity": 771,
+      "supplyCapacity": 964,
+      "resources": {
+        "commodity:maize": 4113,
+        "commodity:food-basket": 1285,
+        "commodity:timber": 385,
+        "commodity:stone": 308,
+        "commodity:clay": 257
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:cholollan": {
+      "fiscalBase": 500,
+      "productiveCapacity": 1000,
+      "supplyCapacity": 1250,
+      "resources": {
+        "commodity:maize": 3333,
+        "commodity:food-basket": 1666,
+        "commodity:timber": 500,
+        "commodity:stone": 400,
+        "commodity:clay": 333
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:coixtlahuaca": {
+      "fiscalBase": 400,
+      "productiveCapacity": 800,
+      "supplyCapacity": 1000,
+      "resources": {
+        "commodity:maize": 2666,
+        "commodity:food-basket": 1333,
+        "commodity:timber": 400,
+        "commodity:stone": 320,
+        "commodity:clay": 266
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:coyoacan": {
+      "fiscalBase": 225,
+      "productiveCapacity": 450,
+      "supplyCapacity": 562,
+      "resources": {
+        "commodity:maize": 2400,
+        "commodity:food-basket": 750,
+        "commodity:timber": 225,
+        "commodity:stone": 180,
+        "commodity:clay": 150
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:cuauhnahuac": {
+      "fiscalBase": 500,
+      "productiveCapacity": 1000,
+      "supplyCapacity": 1250,
+      "resources": {
+        "commodity:maize": 3333,
+        "commodity:food-basket": 1666,
+        "commodity:timber": 500,
+        "commodity:stone": 400,
+        "commodity:clay": 333,
+        "commodity:cotton": 250
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:cuauhtinchan": {
+      "fiscalBase": 200,
+      "productiveCapacity": 400,
+      "supplyCapacity": 500,
+      "resources": {
+        "commodity:maize": 1333,
+        "commodity:food-basket": 666,
+        "commodity:timber": 200,
+        "commodity:stone": 160,
+        "commodity:clay": 133
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:cuauhtitlan": {
+      "fiscalBase": 300,
+      "productiveCapacity": 600,
+      "supplyCapacity": 750,
+      "resources": {
+        "commodity:maize": 2000,
+        "commodity:food-basket": 1000,
+        "commodity:timber": 300,
+        "commodity:stone": 240,
+        "commodity:clay": 200
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:cuitzeo": {
+      "fiscalBase": 559,
+      "productiveCapacity": 1118,
+      "supplyCapacity": 1397,
+      "resources": {
+        "commodity:maize": 3726,
+        "commodity:food-basket": 1863,
+        "commodity:timber": 559,
+        "commodity:stone": 447,
+        "commodity:clay": 372,
+        "commodity:copper": 111
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:culhuacan": {
+      "fiscalBase": 320,
+      "productiveCapacity": 640,
+      "supplyCapacity": 800,
+      "resources": {
+        "commodity:maize": 3413,
+        "commodity:food-basket": 1066,
+        "commodity:timber": 320,
+        "commodity:stone": 256,
+        "commodity:clay": 213
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:huajuapan": {
+      "fiscalBase": 250,
+      "productiveCapacity": 500,
+      "supplyCapacity": 625,
+      "resources": {
+        "commodity:maize": 1666,
+        "commodity:food-basket": 833,
+        "commodity:timber": 250,
+        "commodity:stone": 200,
+        "commodity:clay": 166
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:huaxtepec": {
+      "fiscalBase": 250,
+      "productiveCapacity": 500,
+      "supplyCapacity": 625,
+      "resources": {
+        "commodity:maize": 1666,
+        "commodity:food-basket": 833,
+        "commodity:timber": 250,
+        "commodity:stone": 200,
+        "commodity:clay": 166,
+        "commodity:cotton": 125
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:huexotzinco": {
+      "fiscalBase": 450,
+      "productiveCapacity": 900,
+      "supplyCapacity": 1125,
+      "resources": {
+        "commodity:maize": 3000,
+        "commodity:food-basket": 1500,
+        "commodity:timber": 450,
+        "commodity:stone": 360,
+        "commodity:clay": 300
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:ihuatzio": {
+      "fiscalBase": 559,
+      "productiveCapacity": 1118,
+      "supplyCapacity": 1397,
+      "resources": {
+        "commodity:maize": 3726,
+        "commodity:food-basket": 1863,
+        "commodity:timber": 559,
+        "commodity:stone": 447,
+        "commodity:clay": 372,
+        "commodity:copper": 111
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:nochistlan": {
+      "fiscalBase": 200,
+      "productiveCapacity": 400,
+      "supplyCapacity": 500,
+      "resources": {
+        "commodity:maize": 1333,
+        "commodity:food-basket": 666,
+        "commodity:timber": 200,
+        "commodity:stone": 160,
+        "commodity:clay": 133
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:ocotelulco": {
+      "fiscalBase": 500,
+      "productiveCapacity": 1000,
+      "supplyCapacity": 1250,
+      "resources": {
+        "commodity:maize": 3333,
+        "commodity:food-basket": 1666,
+        "commodity:timber": 500,
+        "commodity:stone": 400,
+        "commodity:clay": 333
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:otompan": {
+      "fiscalBase": 222,
+      "productiveCapacity": 444,
+      "supplyCapacity": 555,
+      "resources": {
+        "commodity:maize": 1481,
+        "commodity:food-basket": 740,
+        "commodity:timber": 222,
+        "commodity:stone": 177,
+        "commodity:clay": 148,
+        "commodity:obsidian": 88
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:patzcuaro": {
+      "fiscalBase": 559,
+      "productiveCapacity": 1118,
+      "supplyCapacity": 1397,
+      "resources": {
+        "commodity:maize": 3726,
+        "commodity:food-basket": 1863,
+        "commodity:timber": 559,
+        "commodity:stone": 447,
+        "commodity:clay": 372,
+        "commodity:copper": 111
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:quiahuiztlan": {
+      "fiscalBase": 333,
+      "productiveCapacity": 666,
+      "supplyCapacity": 833,
+      "resources": {
+        "commodity:maize": 2222,
+        "commodity:food-basket": 1111,
+        "commodity:timber": 333,
+        "commodity:stone": 266,
+        "commodity:clay": 222
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:soconusco-corridor": {
+      "fiscalBase": 125,
+      "productiveCapacity": 250,
+      "supplyCapacity": 312,
+      "resources": {
+        "commodity:maize": 833,
+        "commodity:food-basket": 416,
+        "commodity:timber": 125,
+        "commodity:stone": 100,
+        "commodity:clay": 83,
+        "commodity:cotton": 62,
+        "commodity:cacao": 31
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tenochtitlan": {
+      "fiscalBase": 480,
+      "productiveCapacity": 960,
+      "supplyCapacity": 1200,
+      "resources": {
+        "commodity:maize": 5120,
+        "commodity:food-basket": 1600,
+        "commodity:timber": 480,
+        "commodity:stone": 384,
+        "commodity:clay": 320
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:teotihuacan": {
+      "fiscalBase": 122,
+      "productiveCapacity": 244,
+      "supplyCapacity": 305,
+      "resources": {
+        "commodity:maize": 814,
+        "commodity:food-basket": 407,
+        "commodity:timber": 122,
+        "commodity:stone": 97,
+        "commodity:clay": 81,
+        "commodity:obsidian": 48
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:teozacoalco": {
+      "fiscalBase": 250,
+      "productiveCapacity": 500,
+      "supplyCapacity": 625,
+      "resources": {
+        "commodity:maize": 1666,
+        "commodity:food-basket": 833,
+        "commodity:timber": 250,
+        "commodity:stone": 200,
+        "commodity:clay": 166
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tepeaca": {
+      "fiscalBase": 400,
+      "productiveCapacity": 800,
+      "supplyCapacity": 1000,
+      "resources": {
+        "commodity:maize": 2666,
+        "commodity:food-basket": 1333,
+        "commodity:timber": 400,
+        "commodity:stone": 320,
+        "commodity:clay": 266
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tepeticpac": {
+      "fiscalBase": 333,
+      "productiveCapacity": 666,
+      "supplyCapacity": 833,
+      "resources": {
+        "commodity:maize": 2222,
+        "commodity:food-basket": 1111,
+        "commodity:timber": 333,
+        "commodity:stone": 266,
+        "commodity:clay": 222
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:texcoco": {
+      "fiscalBase": 333,
+      "productiveCapacity": 666,
+      "supplyCapacity": 833,
+      "resources": {
+        "commodity:maize": 2222,
+        "commodity:food-basket": 1111,
+        "commodity:timber": 333,
+        "commodity:stone": 266,
+        "commodity:clay": 222
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tilantongo": {
+      "fiscalBase": 250,
+      "productiveCapacity": 500,
+      "supplyCapacity": 625,
+      "resources": {
+        "commodity:maize": 1666,
+        "commodity:food-basket": 833,
+        "commodity:timber": 250,
+        "commodity:stone": 200,
+        "commodity:clay": 166
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tizatlan": {
+      "fiscalBase": 333,
+      "productiveCapacity": 666,
+      "supplyCapacity": 833,
+      "resources": {
+        "commodity:maize": 2222,
+        "commodity:food-basket": 1111,
+        "commodity:timber": 333,
+        "commodity:stone": 266,
+        "commodity:clay": 222
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tlacopan": {
+      "fiscalBase": 225,
+      "productiveCapacity": 450,
+      "supplyCapacity": 562,
+      "resources": {
+        "commodity:maize": 1500,
+        "commodity:food-basket": 750,
+        "commodity:timber": 225,
+        "commodity:stone": 180,
+        "commodity:clay": 150
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tlatelolco": {
+      "fiscalBase": 350,
+      "productiveCapacity": 700,
+      "supplyCapacity": 875,
+      "resources": {
+        "commodity:maize": 3733,
+        "commodity:food-basket": 1166,
+        "commodity:timber": 350,
+        "commodity:stone": 280,
+        "commodity:clay": 233
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tlaxiaco": {
+      "fiscalBase": 250,
+      "productiveCapacity": 500,
+      "supplyCapacity": 625,
+      "resources": {
+        "commodity:maize": 1666,
+        "commodity:food-basket": 833,
+        "commodity:timber": 250,
+        "commodity:stone": 200,
+        "commodity:clay": 166
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tlayacapan": {
+      "fiscalBase": 257,
+      "productiveCapacity": 514,
+      "supplyCapacity": 642,
+      "resources": {
+        "commodity:maize": 1714,
+        "commodity:food-basket": 857,
+        "commodity:timber": 257,
+        "commodity:stone": 205,
+        "commodity:clay": 171
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tochtepec-corridor": {
+      "fiscalBase": 125,
+      "productiveCapacity": 250,
+      "supplyCapacity": 312,
+      "resources": {
+        "commodity:maize": 833,
+        "commodity:food-basket": 416,
+        "commodity:timber": 125,
+        "commodity:stone": 100,
+        "commodity:clay": 83,
+        "commodity:cacao": 31
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tututepec": {
+      "fiscalBase": 750,
+      "productiveCapacity": 1500,
+      "supplyCapacity": 1875,
+      "resources": {
+        "commodity:maize": 5000,
+        "commodity:food-basket": 2500,
+        "commodity:timber": 750,
+        "commodity:stone": 600,
+        "commodity:clay": 500,
+        "commodity:cotton": 375,
+        "commodity:cacao": 187
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:tzintzuntzan": {
+      "fiscalBase": 838,
+      "productiveCapacity": 1677,
+      "supplyCapacity": 2096,
+      "resources": {
+        "commodity:maize": 5590,
+        "commodity:food-basket": 2795,
+        "commodity:timber": 838,
+        "commodity:stone": 670,
+        "commodity:clay": 559,
+        "commodity:copper": 167
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:ucareo-zinapecuaro": {
+      "fiscalBase": 559,
+      "productiveCapacity": 1118,
+      "supplyCapacity": 1397,
+      "resources": {
+        "commodity:maize": 3726,
+        "commodity:food-basket": 1863,
+        "commodity:timber": 559,
+        "commodity:stone": 447,
+        "commodity:clay": 372,
+        "commodity:obsidian": 223,
+        "commodity:copper": 111
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:uruapan": {
+      "fiscalBase": 559,
+      "productiveCapacity": 1118,
+      "supplyCapacity": 1397,
+      "resources": {
+        "commodity:maize": 3726,
+        "commodity:food-basket": 1863,
+        "commodity:timber": 559,
+        "commodity:stone": 447,
+        "commodity:clay": 372,
+        "commodity:copper": 111
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:xochimilco": {
+      "fiscalBase": 500,
+      "productiveCapacity": 1000,
+      "supplyCapacity": 1250,
+      "resources": {
+        "commodity:maize": 5333,
+        "commodity:food-basket": 1666,
+        "commodity:timber": 500,
+        "commodity:stone": 400,
+        "commodity:clay": 333
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:yanhuitlan": {
+      "fiscalBase": 250,
+      "productiveCapacity": 500,
+      "supplyCapacity": 625,
+      "resources": {
+        "commodity:maize": 1666,
+        "commodity:food-basket": 833,
+        "commodity:timber": 250,
+        "commodity:stone": 200,
+        "commodity:clay": 166
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:yautepec": {
+      "fiscalBase": 250,
+      "productiveCapacity": 500,
+      "supplyCapacity": 625,
+      "resources": {
+        "commodity:maize": 1666,
+        "commodity:food-basket": 833,
+        "commodity:timber": 250,
+        "commodity:stone": 200,
+        "commodity:clay": 166,
+        "commodity:cotton": 125
+      },
+      "status": "modeled-low-confidence"
+    },
+    "region:meso1450:zacapu": {
+      "fiscalBase": 559,
+      "productiveCapacity": 1118,
+      "supplyCapacity": 1397,
+      "resources": {
+        "commodity:maize": 3726,
+        "commodity:food-basket": 1863,
+        "commodity:timber": 559,
+        "commodity:stone": 447,
+        "commodity:clay": 372,
+        "commodity:copper": 111
+      },
+      "status": "modeled-low-confidence"
+    }
+  }
+}

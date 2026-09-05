@@ -1,0 +1,552 @@
+{
+  "formations": {
+    "formation:meso1450-azcapotzalco-1": {
+      "id": "formation:meso1450-azcapotzalco-1",
+      "polityId": "polity:azcapotzalco",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:azcapotzalco": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 245,
+        "equipment-class:shields": 204,
+        "equipment-class:cotton-armour": 36,
+        "equipment-class:provisions-and-porters": 105
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-azcapotzalco-1"
+      ]
+    },
+    "formation:meso1450-chalco-1": {
+      "id": "formation:meso1450-chalco-1",
+      "polityId": "polity:chalco",
+      "archetypeId": "formation-archetype:household-levy",
+      "personnelOrigins": {
+        "region:meso1450:chalco": 926,
+        "region:meso1450:amecameca": 617,
+        "region:meso1450:tlayacapan": 617
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 1771,
+        "equipment-class:shields": 1468,
+        "equipment-class:cotton-armour": 475,
+        "equipment-class:provisions-and-porters": 756
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-chalco-1"
+      ]
+    },
+    "formation:meso1450-cholollan-1": {
+      "id": "formation:meso1450-cholollan-1",
+      "polityId": "polity:cholollan",
+      "archetypeId": "formation-archetype:household-levy",
+      "personnelOrigins": {
+        "region:meso1450:cholollan": 1200
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 983,
+        "equipment-class:shields": 816,
+        "equipment-class:cotton-armour": 264,
+        "equipment-class:provisions-and-porters": 420
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-cholollan-1"
+      ]
+    },
+    "formation:meso1450-coixtlahuaca-1": {
+      "id": "formation:meso1450-coixtlahuaca-1",
+      "polityId": "polity:coixtlahuaca",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:coixtlahuaca": 480
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 393,
+        "equipment-class:shields": 326,
+        "equipment-class:cotton-armour": 57,
+        "equipment-class:provisions-and-porters": 168
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-coixtlahuaca-1"
+      ]
+    },
+    "formation:meso1450-cuauhnahuac-1": {
+      "id": "formation:meso1450-cuauhnahuac-1",
+      "polityId": "polity:cuauhnahuac",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:cuauhnahuac": 600
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 491,
+        "equipment-class:shields": 408,
+        "equipment-class:cotton-armour": 72,
+        "equipment-class:provisions-and-porters": 210
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-cuauhnahuac-1"
+      ]
+    },
+    "formation:meso1450-cuauhtinchan-1": {
+      "id": "formation:meso1450-cuauhtinchan-1",
+      "polityId": "polity:cuauhtinchan",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:cuauhtinchan": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 245,
+        "equipment-class:shields": 204,
+        "equipment-class:cotton-armour": 36,
+        "equipment-class:provisions-and-porters": 105
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-cuauhtinchan-1"
+      ]
+    },
+    "formation:meso1450-cuauhtitlan-1": {
+      "id": "formation:meso1450-cuauhtitlan-1",
+      "polityId": "polity:cuauhtitlan",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:cuauhtitlan": 360
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 295,
+        "equipment-class:shields": 244,
+        "equipment-class:cotton-armour": 43,
+        "equipment-class:provisions-and-porters": 125
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-cuauhtitlan-1"
+      ]
+    },
+    "formation:meso1450-huajuapan-1": {
+      "id": "formation:meso1450-huajuapan-1",
+      "polityId": "polity:huajuapan",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:huajuapan": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 245,
+        "equipment-class:shields": 204,
+        "equipment-class:cotton-armour": 36,
+        "equipment-class:provisions-and-porters": 105
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-huajuapan-1"
+      ]
+    },
+    "formation:meso1450-huexotzinco-1": {
+      "id": "formation:meso1450-huexotzinco-1",
+      "polityId": "polity:huexotzinco",
+      "archetypeId": "formation-archetype:household-levy",
+      "personnelOrigins": {
+        "region:meso1450:huexotzinco": 1080
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 885,
+        "equipment-class:shields": 734,
+        "equipment-class:cotton-armour": 237,
+        "equipment-class:provisions-and-porters": 378
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-huexotzinco-1"
+      ]
+    },
+    "formation:meso1450-nochistlan-1": {
+      "id": "formation:meso1450-nochistlan-1",
+      "polityId": "polity:nochistlan",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:nochistlan": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 245,
+        "equipment-class:shields": 204,
+        "equipment-class:cotton-armour": 36,
+        "equipment-class:provisions-and-porters": 105
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-nochistlan-1"
+      ]
+    },
+    "formation:meso1450-purepecha-1": {
+      "id": "formation:meso1450-purepecha-1",
+      "polityId": "polity:purepecha",
+      "archetypeId": "formation-archetype:household-levy",
+      "personnelOrigins": {
+        "region:meso1450:tzintzuntzan": 1006,
+        "region:meso1450:patzcuaro": 671,
+        "region:meso1450:ihuatzio": 671,
+        "region:meso1450:uruapan": 671,
+        "region:meso1450:zacapu": 671,
+        "region:meso1450:cuitzeo": 671,
+        "region:meso1450:ucareo-zinapecuaro": 670,
+        "region:meso1450:balsas-frontier": 369
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 4428,
+        "equipment-class:shields": 3672,
+        "equipment-class:cotton-armour": 1188,
+        "equipment-class:provisions-and-porters": 1889
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-purepecha-1"
+      ]
+    },
+    "formation:meso1450-purepecha-2": {
+      "id": "formation:meso1450-purepecha-2",
+      "polityId": "polity:purepecha",
+      "archetypeId": "formation-archetype:elite-retinue",
+      "personnelOrigins": {
+        "region:meso1450:tzintzuntzan": 1006,
+        "region:meso1450:patzcuaro": 671,
+        "region:meso1450:ihuatzio": 671,
+        "region:meso1450:uruapan": 671,
+        "region:meso1450:zacapu": 671,
+        "region:meso1450:cuitzeo": 671,
+        "region:meso1450:ucareo-zinapecuaro": 670,
+        "region:meso1450:balsas-frontier": 369
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 4428,
+        "equipment-class:shields": 3672,
+        "equipment-class:cotton-armour": 1188,
+        "equipment-class:provisions-and-porters": 1889
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-purepecha-2"
+      ]
+    },
+    "formation:meso1450-soconusco-1": {
+      "id": "formation:meso1450-soconusco-1",
+      "polityId": "polity:soconusco",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:soconusco-corridor": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 245,
+        "equipment-class:shields": 204,
+        "equipment-class:cotton-armour": 36,
+        "equipment-class:provisions-and-porters": 105
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-soconusco-1"
+      ]
+    },
+    "formation:meso1450-tenochtitlan-1": {
+      "id": "formation:meso1450-tenochtitlan-1",
+      "polityId": "polity:tenochtitlan",
+      "archetypeId": "formation-archetype:household-levy",
+      "personnelOrigins": {
+        "region:meso1450:tenochtitlan": 576,
+        "region:meso1450:culhuacan": 384
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 787,
+        "equipment-class:shields": 652,
+        "equipment-class:cotton-armour": 211,
+        "equipment-class:provisions-and-porters": 336
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tenochtitlan-1"
+      ]
+    },
+    "formation:meso1450-tenochtitlan-2": {
+      "id": "formation:meso1450-tenochtitlan-2",
+      "polityId": "polity:tenochtitlan",
+      "archetypeId": "formation-archetype:elite-retinue",
+      "personnelOrigins": {
+        "region:meso1450:tenochtitlan": 576,
+        "region:meso1450:culhuacan": 384
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 787,
+        "equipment-class:shields": 652,
+        "equipment-class:cotton-armour": 211,
+        "equipment-class:provisions-and-porters": 336
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tenochtitlan-2"
+      ]
+    },
+    "formation:meso1450-teozacoalco-1": {
+      "id": "formation:meso1450-teozacoalco-1",
+      "polityId": "polity:teozacoalco",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:teozacoalco": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 245,
+        "equipment-class:shields": 204,
+        "equipment-class:cotton-armour": 36,
+        "equipment-class:provisions-and-porters": 105
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-teozacoalco-1"
+      ]
+    },
+    "formation:meso1450-tepeaca-1": {
+      "id": "formation:meso1450-tepeaca-1",
+      "polityId": "polity:tepeaca",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:tepeaca": 480
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 393,
+        "equipment-class:shields": 326,
+        "equipment-class:cotton-armour": 57,
+        "equipment-class:provisions-and-porters": 168
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tepeaca-1"
+      ]
+    },
+    "formation:meso1450-texcoco-1": {
+      "id": "formation:meso1450-texcoco-1",
+      "polityId": "polity:texcoco",
+      "archetypeId": "formation-archetype:household-levy",
+      "personnelOrigins": {
+        "region:meso1450:texcoco": 400,
+        "region:meso1450:otompan": 267,
+        "region:meso1450:teotihuacan": 147,
+        "region:meso1450:acolman": 266
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 885,
+        "equipment-class:shields": 734,
+        "equipment-class:cotton-armour": 237,
+        "equipment-class:provisions-and-porters": 378
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-texcoco-1"
+      ]
+    },
+    "formation:meso1450-texcoco-2": {
+      "id": "formation:meso1450-texcoco-2",
+      "polityId": "polity:texcoco",
+      "archetypeId": "formation-archetype:elite-retinue",
+      "personnelOrigins": {
+        "region:meso1450:texcoco": 400,
+        "region:meso1450:otompan": 267,
+        "region:meso1450:teotihuacan": 147,
+        "region:meso1450:acolman": 266
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 885,
+        "equipment-class:shields": 734,
+        "equipment-class:cotton-armour": 237,
+        "equipment-class:provisions-and-porters": 378
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-texcoco-2"
+      ]
+    },
+    "formation:meso1450-tilantongo-1": {
+      "id": "formation:meso1450-tilantongo-1",
+      "polityId": "polity:tilantongo",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:tilantongo": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 245,
+        "equipment-class:shields": 204,
+        "equipment-class:cotton-armour": 36,
+        "equipment-class:provisions-and-porters": 105
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tilantongo-1"
+      ]
+    },
+    "formation:meso1450-tlacopan-1": {
+      "id": "formation:meso1450-tlacopan-1",
+      "polityId": "polity:tlacopan",
+      "archetypeId": "formation-archetype:household-levy",
+      "personnelOrigins": {
+        "region:meso1450:tlacopan": 540,
+        "region:meso1450:coyoacan": 540
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 885,
+        "equipment-class:shields": 734,
+        "equipment-class:cotton-armour": 237,
+        "equipment-class:provisions-and-porters": 378
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tlacopan-1"
+      ]
+    },
+    "formation:meso1450-tlatelolco-1": {
+      "id": "formation:meso1450-tlatelolco-1",
+      "polityId": "polity:tlatelolco",
+      "archetypeId": "formation-archetype:household-levy",
+      "personnelOrigins": {
+        "region:meso1450:tlatelolco": 840
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 688,
+        "equipment-class:shields": 571,
+        "equipment-class:cotton-armour": 184,
+        "equipment-class:provisions-and-porters": 294
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tlatelolco-1"
+      ]
+    },
+    "formation:meso1450-tlaxcallan-1": {
+      "id": "formation:meso1450-tlaxcallan-1",
+      "polityId": "polity:tlaxcallan",
+      "archetypeId": "formation-archetype:household-levy",
+      "personnelOrigins": {
+        "region:meso1450:tepeticpac": 400,
+        "region:meso1450:ocotelulco": 600,
+        "region:meso1450:quiahuiztlan": 400,
+        "region:meso1450:tizatlan": 400
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 1476,
+        "equipment-class:shields": 1224,
+        "equipment-class:cotton-armour": 396,
+        "equipment-class:provisions-and-porters": 630
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tlaxcallan-1"
+      ]
+    },
+    "formation:meso1450-tlaxcallan-2": {
+      "id": "formation:meso1450-tlaxcallan-2",
+      "polityId": "polity:tlaxcallan",
+      "archetypeId": "formation-archetype:elite-retinue",
+      "personnelOrigins": {
+        "region:meso1450:tepeticpac": 400,
+        "region:meso1450:ocotelulco": 600,
+        "region:meso1450:quiahuiztlan": 400,
+        "region:meso1450:tizatlan": 400
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 1476,
+        "equipment-class:shields": 1224,
+        "equipment-class:cotton-armour": 396,
+        "equipment-class:provisions-and-porters": 630
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tlaxcallan-2"
+      ]
+    },
+    "formation:meso1450-tlaxiaco-1": {
+      "id": "formation:meso1450-tlaxiaco-1",
+      "polityId": "polity:tlaxiaco",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:tlaxiaco": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 245,
+        "equipment-class:shields": 204,
+        "equipment-class:cotton-armour": 36,
+        "equipment-class:provisions-and-porters": 105
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tlaxiaco-1"
+      ]
+    },
+    "formation:meso1450-tochtepec-1": {
+      "id": "formation:meso1450-tochtepec-1",
+      "polityId": "polity:tochtepec",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:tochtepec-corridor": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 245,
+        "equipment-class:shields": 204,
+        "equipment-class:cotton-armour": 36,
+        "equipment-class:provisions-and-porters": 105
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tochtepec-1"
+      ]
+    },
+    "formation:meso1450-tututepec-1": {
+      "id": "formation:meso1450-tututepec-1",
+      "polityId": "polity:tututepec",
+      "archetypeId": "formation-archetype:household-levy",
+      "personnelOrigins": {
+        "region:meso1450:tututepec": 1800
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 1476,
+        "equipment-class:shields": 1224,
+        "equipment-class:cotton-armour": 396,
+        "equipment-class:provisions-and-porters": 630
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-tututepec-1"
+      ]
+    },
+    "formation:meso1450-xochimilco-1": {
+      "id": "formation:meso1450-xochimilco-1",
+      "polityId": "polity:xochimilco",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:xochimilco": 600
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 491,
+        "equipment-class:shields": 408,
+        "equipment-class:cotton-armour": 72,
+        "equipment-class:provisions-and-porters": 210
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-xochimilco-1"
+      ]
+    },
+    "formation:meso1450-yanhuitlan-1": {
+      "id": "formation:meso1450-yanhuitlan-1",
+      "polityId": "polity:yanhuitlan",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:yanhuitlan": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 245,
+        "equipment-class:shields": 204,
+        "equipment-class:cotton-armour": 36,
+        "equipment-class:provisions-and-porters": 105
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-yanhuitlan-1"
+      ]
+    },
+    "formation:meso1450-yautepec-1": {
+      "id": "formation:meso1450-yautepec-1",
+      "polityId": "polity:yautepec",
+      "archetypeId": "formation-archetype:tributary-contingent",
+      "personnelOrigins": {
+        "region:meso1450:yautepec": 300,
+        "region:meso1450:huaxtepec": 300
+      },
+      "equipment": {
+        "equipment-class:projectile-and-close-weapons": 491,
+        "equipment-class:shields": 408,
+        "equipment-class:cotton-armour": 72,
+        "equipment-class:provisions-and-porters": 210
+      },
+      "evidenceIds": [
+        "evidence:meso1450-formation-meso1450-yautepec-1"
+      ]
+    }
+  },
+  "quantitativeStatus": "modeled-central-estimates",
+  "supportedArchetypeIds": [
+    "formation-archetype:household-levy",
+    "formation-archetype:elite-retinue",
+    "formation-archetype:tributary-contingent"
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "institution:purepecha-uacusecha": {
+    "id": "institution:purepecha-uacusecha",
+    "typeId": "institution-type:uacusecha-authority",
+    "polityId": "polity:purepecha",
+    "regionId": "region:meso1450:tzintzuntzan",
+    "evidenceIds": [
+      "evidence:meso1450-institution-purepecha-uacusecha"
+    ]
+  },
+  "institution:tenochtitlan-altepetl": {
+    "id": "institution:tenochtitlan-altepetl",
+    "typeId": "institution-type:altepetl",
+    "polityId": "polity:tenochtitlan",
+    "regionId": "region:meso1450:tenochtitlan",
+    "evidenceIds": [
+      "evidence:meso1450-institution-tenochtitlan-altepetl"
+    ]
+  },
+  "institution:tenochtitlan-pochteca": {
+    "id": "institution:tenochtitlan-pochteca",
+    "typeId": "institution-type:pochteca-market-authority",
+    "polityId": "polity:tenochtitlan",
+    "regionId": "region:meso1450:tenochtitlan",
+    "evidenceIds": [
+      "evidence:meso1450-institution-tenochtitlan-pochteca"
+    ]
+  },
+  "institution:texcoco-altepetl": {
+    "id": "institution:texcoco-altepetl",
+    "typeId": "institution-type:altepetl",
+    "polityId": "polity:texcoco",
+    "regionId": "region:meso1450:texcoco",
+    "evidenceIds": [
+      "evidence:meso1450-institution-texcoco-altepetl"
+    ]
+  },
+  "institution:tlacopan-altepetl": {
+    "id": "institution:tlacopan-altepetl",
+    "typeId": "institution-type:altepetl",
+    "polityId": "polity:tlacopan",
+    "regionId": "region:meso1450:tlacopan",
+    "evidenceIds": [
+      "evidence:meso1450-institution-tlacopan-altepetl"
+    ]
+  },
+  "institution:tlatelolco-altepetl": {
+    "id": "institution:tlatelolco-altepetl",
+    "typeId": "institution-type:altepetl",
+    "polityId": "polity:tlatelolco",
+    "regionId": "region:meso1450:tlatelolco",
+    "evidenceIds": [
+      "evidence:meso1450-institution-tlatelolco-altepetl"
+    ]
+  },
+  "institution:tlatelolco-market": {
+    "id": "institution:tlatelolco-market",
+    "typeId": "institution-type:pochteca-market-authority",
+    "polityId": "polity:tlatelolco",
+    "regionId": "region:meso1450:tlatelolco",
+    "evidenceIds": [
+      "evidence:meso1450-institution-tlatelolco-market"
+    ]
+  },
+  "institution:tlaxcallan-four-centers": {
+    "id": "institution:tlaxcallan-four-centers",
+    "typeId": "institution-type:tlaxcallan-four-centers",
+    "polityId": "polity:tlaxcallan",
+    "evidenceIds": [
+      "evidence:meso1450-institution-tlaxcallan-four-centers"
+    ]
+  },
+  "institution:tututepec-nuu": {
+    "id": "institution:tututepec-nuu",
+    "typeId": "institution-type:nuu",
+    "polityId": "polity:tututepec",
+    "regionId": "region:meso1450:tututepec",
+    "evidenceIds": [
+      "evidence:meso1450-institution-tututepec-nuu"
+    ]
+  }
+}

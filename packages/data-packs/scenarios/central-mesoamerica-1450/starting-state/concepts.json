@@ -1,0 +1,326 @@
+{
+  "concept:altepetl-governance": {
+    "id": "concept:altepetl-governance",
+    "type": "institution",
+    "semanticKey": "altepetl-governance",
+    "displayName": {
+      "en": "Altepetl governance"
+    },
+    "description": {
+      "en": "Local political-economic authority joining a center, constituent communities, land, labor, dynasty and patron cult."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:tenochtitlan"
+      ],
+      "originMonth": "1450-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:meso1450-concept-altepetl-governance"
+    ],
+    "domains": [
+      "domain:government",
+      "domain:identity"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {},
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:meso1450-concept-altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-concept-altepetl-governance"
+    ]
+  },
+  "concept:canoe-and-porter-logistics": {
+    "id": "concept:canoe-and-porter-logistics",
+    "type": "technology",
+    "semanticKey": "canoe-and-porter-logistics",
+    "displayName": {
+      "en": "Canoe and porter logistics"
+    },
+    "description": {
+      "en": "Movement of people and goods through canoe routes, roads, portage and relays."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:tenochtitlan"
+      ],
+      "originMonth": "1450-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:meso1450-concept-canoe-and-porter-logistics"
+    ],
+    "domains": [
+      "domain:communication",
+      "domain:military"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {},
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:meso1450-concept-canoe-and-porter-logistics",
+    "evidenceIds": [
+      "evidence:meso1450-concept-canoe-and-porter-logistics"
+    ]
+  },
+  "concept:chinampa-cultivation": {
+    "id": "concept:chinampa-cultivation",
+    "type": "technology",
+    "semanticKey": "chinampa-cultivation",
+    "displayName": {
+      "en": "Chinampa cultivation"
+    },
+    "description": {
+      "en": "Intensive wetland cultivation practiced in suitable lacustrine settings."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:tenochtitlan"
+      ],
+      "originMonth": "1450-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:meso1450-concept-chinampa-cultivation"
+    ],
+    "domains": [
+      "domain:production",
+      "domain:ecology"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {},
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:meso1450-concept-chinampa-cultivation",
+    "evidenceIds": [
+      "evidence:meso1450-concept-chinampa-cultivation"
+    ]
+  },
+  "concept:cotton-weaving": {
+    "id": "concept:cotton-weaving",
+    "type": "technology",
+    "semanticKey": "cotton-weaving",
+    "displayName": {
+      "en": "Cotton weaving"
+    },
+    "description": {
+      "en": "Production of woven mantles and quilted protective equipment."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:tenochtitlan"
+      ],
+      "originMonth": "1450-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:meso1450-concept-cotton-weaving"
+    ],
+    "domains": [
+      "domain:production",
+      "domain:tribute"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {},
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:meso1450-concept-cotton-weaving",
+    "evidenceIds": [
+      "evidence:meso1450-concept-cotton-weaving"
+    ]
+  },
+  "concept:market-exchange": {
+    "id": "concept:market-exchange",
+    "type": "economic-practice",
+    "semanticKey": "market-exchange",
+    "displayName": {
+      "en": "Market and long-distance exchange"
+    },
+    "description": {
+      "en": "Local markets and specialist merchants connecting ecological zones and political communities."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:tenochtitlan"
+      ],
+      "originMonth": "1450-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:meso1450-concept-market-exchange"
+    ],
+    "domains": [
+      "domain:economy",
+      "domain:communication"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {},
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:meso1450-concept-market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-concept-market-exchange"
+    ]
+  },
+  "concept:obsidian-craft": {
+    "id": "concept:obsidian-craft",
+    "type": "technology",
+    "semanticKey": "obsidian-craft",
+    "displayName": {
+      "en": "Obsidian blade craft"
+    },
+    "description": {
+      "en": "Specialist working of obsidian into blades and tools."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:tenochtitlan"
+      ],
+      "originMonth": "1450-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:meso1450-concept-obsidian-craft"
+    ],
+    "domains": [
+      "domain:production",
+      "domain:military"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {},
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:meso1450-concept-obsidian-craft",
+    "evidenceIds": [
+      "evidence:meso1450-concept-obsidian-craft"
+    ]
+  },
+  "concept:pictorial-records": {
+    "id": "concept:pictorial-records",
+    "type": "technology",
+    "semanticKey": "pictorial-records",
+    "displayName": {
+      "en": "Pictorial records"
+    },
+    "description": {
+      "en": "Durable pictorial and calendrical recording practices used for memory, genealogy and obligations."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:tenochtitlan"
+      ],
+      "originMonth": "1450-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:meso1450-concept-pictorial-records"
+    ],
+    "domains": [
+      "domain:knowledge",
+      "domain:administration"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {},
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:meso1450-concept-pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-concept-pictorial-records"
+    ]
+  },
+  "concept:tribute-accounting": {
+    "id": "concept:tribute-accounting",
+    "type": "economic-practice",
+    "semanticKey": "tribute-accounting",
+    "displayName": {
+      "en": "Tribute accounting"
+    },
+    "description": {
+      "en": "Recorded obligations in goods, labor and service administered through local political units."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:tenochtitlan"
+      ],
+      "originMonth": "1450-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:meso1450-concept-tribute-accounting"
+    ],
+    "domains": [
+      "domain:tribute",
+      "domain:administration"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {},
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:meso1450-concept-tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-concept-tribute-accounting"
+    ]
+  },
+  "concept:western-copper-working": {
+    "id": "concept:western-copper-working",
+    "type": "technology",
+    "semanticKey": "western-copper-working",
+    "displayName": {
+      "en": "Western copper working"
+    },
+    "description": {
+      "en": "Regional metalworking practices centered in western Mesoamerica."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:purepecha"
+      ],
+      "originMonth": "1450-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:meso1450-concept-western-copper-working"
+    ],
+    "domains": [
+      "domain:production",
+      "domain:knowledge"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {},
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:meso1450-concept-western-copper-working",
+    "evidenceIds": [
+      "evidence:meso1450-concept-western-copper-working"
+    ]
+  }
+}

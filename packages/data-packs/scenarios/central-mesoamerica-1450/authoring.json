@@ -1,0 +1,27 @@
+{
+  "historicalBoundary": "1450-01-01",
+  "quantitativePolicy": "modeled-central-estimates-with-low-confidence-provenance",
+  "modeledNumericFields": [
+    "population",
+    "workforce participation",
+    "recruitment eligibility",
+    "treasury",
+    "stockpiles",
+    "fiscal base",
+    "productive capacity",
+    "supply capacity",
+    "formation strength",
+    "equipment"
+  ],
+  "unresolvedNumericFields": [
+    "tribute deliveries",
+    "delivery-specific beneficiary shares",
+    "cadence",
+    "arrears"
+  ],
+  "sourceCautions": [
+    "The Matrícula de Tributos and Codex Mendoza are later evidence used for vocabulary and categories only.",
+    "Off-map links preserve named strategic localities without fabricating exact polygons.",
+    "Modeled integers are canonical simulation controls and low-confidence estimates, not claims of census or tribute precision."
+  ]
+}

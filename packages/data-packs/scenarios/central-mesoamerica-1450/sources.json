@@ -1,0 +1,68 @@
+[
+  {
+    "id": "source:meso1450:bodleian-mendoza",
+    "title": "Bodleian Libraries — Codex Mendoza",
+    "locator": "https://digital.bodleian.ox.ac.uk/objects/2fea788e-2aa2-4f08-b6d9-648c00486220/",
+    "checksum": "sha256:642546aec9146722033d70729b7d04ffddf7db8ca1f4cc84b003918f6b5249c6"
+  },
+  {
+    "id": "source:meso1450:cambridge-altepetl",
+    "title": "Cambridge University Press — altepetl and political-economic organization excerpt",
+    "locator": "https://assets.cambridge.org/97810093/68094/excerpt/9781009368094_excerpt.pdf",
+    "checksum": "sha256:0a61bec2228b2af68954e70a38da2a135e80662ab90bcd869251b8947dab1885"
+  },
+  {
+    "id": "source:meso1450:cambridge-economic-world",
+    "title": "Cambridge University Press — The Aztec Economic World excerpt",
+    "locator": "https://assets.cambridge.org/97811071/42770/excerpt/9781107142770_excerpt.pdf",
+    "checksum": "sha256:10add63a1d5ff6cdbcdbcf3f0f7279a772986bad0a833993918e6e88e0ae33d8"
+  },
+  {
+    "id": "source:meso1450:inah-ihuatzio",
+    "title": "INAH — Ihuatzio",
+    "locator": "https://lugares.inah.gob.mx/es/node/4418",
+    "checksum": "sha256:57b36e9346a136308b5696d937d60036d6684e3fd0e4c65c20c50f324377fcc1"
+  },
+  {
+    "id": "source:meso1450:inah-matricula",
+    "title": "INAH — Matrícula de Tributos",
+    "locator": "https://www.codices.inah.gob.mx/pc/contenido.php?id=54",
+    "checksum": "sha256:9689daba64097bce5a7103d0e8c69569e7973547837820c8c42aee497b02c823"
+  },
+  {
+    "id": "source:meso1450:inah-population-uncertainty",
+    "title": "INAH repository — Mexico: From the Olmecs to the Aztecs (demographic uncertainty)",
+    "locator": "https://deas.inah.gob.mx/pdf/biblioteca/repositorio/repositorio%2821040%29-4563.pdf",
+    "checksum": "sha256:d1f2fc5c134446f5390b5f410b3c083e0436cbf4329bc88367b9e16f00ff35b9"
+  },
+  {
+    "id": "source:meso1450:inah-tlatelolco",
+    "title": "INAH — Zona arqueológica de Tlatelolco",
+    "locator": "https://lugares.inah.gob.mx/es/mundial/6438",
+    "checksum": "sha256:f5c43ef576947c2d802d13d84ca7a6496e72bc70848108920982e986a3c2a001"
+  },
+  {
+    "id": "source:meso1450:inah-tlaxcallan",
+    "title": "INAH — Tlaxcala de Xicohténcatl",
+    "locator": "https://lugares.inah.gob.mx/es/node/4818",
+    "checksum": "sha256:1dc9b81ff19e1a5d341b2010102d975316fbbf697c1c4b315eb0eb1895016fd4"
+  },
+  {
+    "id": "source:meso1450:inah-tututepec",
+    "title": "INAH — Códice de Tututepec",
+    "locator": "https://www.codices.inah.gob.mx/movil/contenido.php?id=11",
+    "checksum": "sha256:bb583509b3ff1b5fa0bb4177dc4eea1c4474fe8c84ada73980af9e83ad93f562"
+  },
+  {
+    "id": "source:meso1450:inah-tzintzuntzan",
+    "title": "INAH — Tzintzuntzan",
+    "locator": "https://lugares.inah.gob.mx/es/node/4481",
+    "checksum": "sha256:5c2974165002c4a90fc03737c5e3e17204f474fcd2d3ef92282bf76065d45050"
+  },
+  {
+    "id": "source:meso1450:met-triple-alliance",
+    "title": "The Metropolitan Museum of Art — Mexico, 1400–1600 A.D.",
+    "locator": "https://www.metmuseum.org/toah/ht/08/canm.html",
+    "checksum": "sha256:cb8919c87f6a39ed184694185c7eb01e3f9f109f6c1b505b645fd99f1c9458fc"
+  }
+]

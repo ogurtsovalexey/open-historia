@@ -1,0 +1,442 @@
+{
+  "cohort:meso1450-acolman": {
+    "id": "cohort:meso1450-acolman",
+    "regionId": "region:meso1450:acolman",
+    "population": 44444,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-acolman"
+    ]
+  },
+  "cohort:meso1450-amecameca": {
+    "id": "cohort:meso1450-amecameca",
+    "regionId": "region:meso1450:amecameca",
+    "population": 51429,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-amecameca"
+    ]
+  },
+  "cohort:meso1450-azcapotzalco": {
+    "id": "cohort:meso1450-azcapotzalco",
+    "regionId": "region:meso1450:azcapotzalco",
+    "population": 40000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-azcapotzalco"
+    ]
+  },
+  "cohort:meso1450-balsas-frontier": {
+    "id": "cohort:meso1450-balsas-frontier",
+    "regionId": "region:meso1450:balsas-frontier",
+    "population": 61491,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-balsas-frontier"
+    ]
+  },
+  "cohort:meso1450-chalco": {
+    "id": "cohort:meso1450-chalco",
+    "regionId": "region:meso1450:chalco",
+    "population": 77143,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-chalco"
+    ]
+  },
+  "cohort:meso1450-cholollan": {
+    "id": "cohort:meso1450-cholollan",
+    "regionId": "region:meso1450:cholollan",
+    "population": 100000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-cholollan"
+    ]
+  },
+  "cohort:meso1450-coixtlahuaca": {
+    "id": "cohort:meso1450-coixtlahuaca",
+    "regionId": "region:meso1450:coixtlahuaca",
+    "population": 80000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-coixtlahuaca"
+    ]
+  },
+  "cohort:meso1450-coyoacan": {
+    "id": "cohort:meso1450-coyoacan",
+    "regionId": "region:meso1450:coyoacan",
+    "population": 45000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-coyoacan"
+    ]
+  },
+  "cohort:meso1450-cuauhnahuac": {
+    "id": "cohort:meso1450-cuauhnahuac",
+    "regionId": "region:meso1450:cuauhnahuac",
+    "population": 100000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-cuauhnahuac"
+    ]
+  },
+  "cohort:meso1450-cuauhtinchan": {
+    "id": "cohort:meso1450-cuauhtinchan",
+    "regionId": "region:meso1450:cuauhtinchan",
+    "population": 40000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-cuauhtinchan"
+    ]
+  },
+  "cohort:meso1450-cuauhtitlan": {
+    "id": "cohort:meso1450-cuauhtitlan",
+    "regionId": "region:meso1450:cuauhtitlan",
+    "population": 60000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-cuauhtitlan"
+    ]
+  },
+  "cohort:meso1450-cuitzeo": {
+    "id": "cohort:meso1450-cuitzeo",
+    "regionId": "region:meso1450:cuitzeo",
+    "population": 111801,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-cuitzeo"
+    ]
+  },
+  "cohort:meso1450-culhuacan": {
+    "id": "cohort:meso1450-culhuacan",
+    "regionId": "region:meso1450:culhuacan",
+    "population": 64000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-culhuacan"
+    ]
+  },
+  "cohort:meso1450-huajuapan": {
+    "id": "cohort:meso1450-huajuapan",
+    "regionId": "region:meso1450:huajuapan",
+    "population": 50000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-huajuapan"
+    ]
+  },
+  "cohort:meso1450-huaxtepec": {
+    "id": "cohort:meso1450-huaxtepec",
+    "regionId": "region:meso1450:huaxtepec",
+    "population": 50000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-huaxtepec"
+    ]
+  },
+  "cohort:meso1450-huexotzinco": {
+    "id": "cohort:meso1450-huexotzinco",
+    "regionId": "region:meso1450:huexotzinco",
+    "population": 90000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-huexotzinco"
+    ]
+  },
+  "cohort:meso1450-ihuatzio": {
+    "id": "cohort:meso1450-ihuatzio",
+    "regionId": "region:meso1450:ihuatzio",
+    "population": 111801,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-ihuatzio"
+    ]
+  },
+  "cohort:meso1450-nochistlan": {
+    "id": "cohort:meso1450-nochistlan",
+    "regionId": "region:meso1450:nochistlan",
+    "population": 40000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-nochistlan"
+    ]
+  },
+  "cohort:meso1450-ocotelulco": {
+    "id": "cohort:meso1450-ocotelulco",
+    "regionId": "region:meso1450:ocotelulco",
+    "population": 100000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-ocotelulco"
+    ]
+  },
+  "cohort:meso1450-otompan": {
+    "id": "cohort:meso1450-otompan",
+    "regionId": "region:meso1450:otompan",
+    "population": 44445,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-otompan"
+    ]
+  },
+  "cohort:meso1450-patzcuaro": {
+    "id": "cohort:meso1450-patzcuaro",
+    "regionId": "region:meso1450:patzcuaro",
+    "population": 111802,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-patzcuaro"
+    ]
+  },
+  "cohort:meso1450-quiahuiztlan": {
+    "id": "cohort:meso1450-quiahuiztlan",
+    "regionId": "region:meso1450:quiahuiztlan",
+    "population": 66667,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-quiahuiztlan"
+    ]
+  },
+  "cohort:meso1450-soconusco-corridor": {
+    "id": "cohort:meso1450-soconusco-corridor",
+    "regionId": "region:meso1450:soconusco-corridor",
+    "population": 25000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-soconusco-corridor"
+    ]
+  },
+  "cohort:meso1450-tenochtitlan": {
+    "id": "cohort:meso1450-tenochtitlan",
+    "regionId": "region:meso1450:tenochtitlan",
+    "population": 96000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tenochtitlan"
+    ]
+  },
+  "cohort:meso1450-teotihuacan": {
+    "id": "cohort:meso1450-teotihuacan",
+    "regionId": "region:meso1450:teotihuacan",
+    "population": 24444,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-teotihuacan"
+    ]
+  },
+  "cohort:meso1450-teozacoalco": {
+    "id": "cohort:meso1450-teozacoalco",
+    "regionId": "region:meso1450:teozacoalco",
+    "population": 50000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-teozacoalco"
+    ]
+  },
+  "cohort:meso1450-tepeaca": {
+    "id": "cohort:meso1450-tepeaca",
+    "regionId": "region:meso1450:tepeaca",
+    "population": 80000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tepeaca"
+    ]
+  },
+  "cohort:meso1450-tepeticpac": {
+    "id": "cohort:meso1450-tepeticpac",
+    "regionId": "region:meso1450:tepeticpac",
+    "population": 66667,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tepeticpac"
+    ]
+  },
+  "cohort:meso1450-texcoco": {
+    "id": "cohort:meso1450-texcoco",
+    "regionId": "region:meso1450:texcoco",
+    "population": 66667,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-texcoco"
+    ]
+  },
+  "cohort:meso1450-tilantongo": {
+    "id": "cohort:meso1450-tilantongo",
+    "regionId": "region:meso1450:tilantongo",
+    "population": 50000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tilantongo"
+    ]
+  },
+  "cohort:meso1450-tizatlan": {
+    "id": "cohort:meso1450-tizatlan",
+    "regionId": "region:meso1450:tizatlan",
+    "population": 66666,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tizatlan"
+    ]
+  },
+  "cohort:meso1450-tlacopan": {
+    "id": "cohort:meso1450-tlacopan",
+    "regionId": "region:meso1450:tlacopan",
+    "population": 45000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tlacopan"
+    ]
+  },
+  "cohort:meso1450-tlatelolco": {
+    "id": "cohort:meso1450-tlatelolco",
+    "regionId": "region:meso1450:tlatelolco",
+    "population": 70000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tlatelolco"
+    ]
+  },
+  "cohort:meso1450-tlaxiaco": {
+    "id": "cohort:meso1450-tlaxiaco",
+    "regionId": "region:meso1450:tlaxiaco",
+    "population": 50000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tlaxiaco"
+    ]
+  },
+  "cohort:meso1450-tlayacapan": {
+    "id": "cohort:meso1450-tlayacapan",
+    "regionId": "region:meso1450:tlayacapan",
+    "population": 51428,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tlayacapan"
+    ]
+  },
+  "cohort:meso1450-tochtepec-corridor": {
+    "id": "cohort:meso1450-tochtepec-corridor",
+    "regionId": "region:meso1450:tochtepec-corridor",
+    "population": 25000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tochtepec-corridor"
+    ]
+  },
+  "cohort:meso1450-tututepec": {
+    "id": "cohort:meso1450-tututepec",
+    "regionId": "region:meso1450:tututepec",
+    "population": 150000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tututepec"
+    ]
+  },
+  "cohort:meso1450-tzintzuntzan": {
+    "id": "cohort:meso1450-tzintzuntzan",
+    "regionId": "region:meso1450:tzintzuntzan",
+    "population": 167702,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-tzintzuntzan"
+    ]
+  },
+  "cohort:meso1450-ucareo-zinapecuaro": {
+    "id": "cohort:meso1450-ucareo-zinapecuaro",
+    "regionId": "region:meso1450:ucareo-zinapecuaro",
+    "population": 111801,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-ucareo-zinapecuaro"
+    ]
+  },
+  "cohort:meso1450-uruapan": {
+    "id": "cohort:meso1450-uruapan",
+    "regionId": "region:meso1450:uruapan",
+    "population": 111801,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-uruapan"
+    ]
+  },
+  "cohort:meso1450-xochimilco": {
+    "id": "cohort:meso1450-xochimilco",
+    "regionId": "region:meso1450:xochimilco",
+    "population": 100000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-xochimilco"
+    ]
+  },
+  "cohort:meso1450-yanhuitlan": {
+    "id": "cohort:meso1450-yanhuitlan",
+    "regionId": "region:meso1450:yanhuitlan",
+    "population": 50000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-yanhuitlan"
+    ]
+  },
+  "cohort:meso1450-yautepec": {
+    "id": "cohort:meso1450-yautepec",
+    "regionId": "region:meso1450:yautepec",
+    "population": 50000,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-yautepec"
+    ]
+  },
+  "cohort:meso1450-zacapu": {
+    "id": "cohort:meso1450-zacapu",
+    "regionId": "region:meso1450:zacapu",
+    "population": 111801,
+    "workforceParticipationBp": 5500,
+    "recruitmentEligibilityBp": 1000,
+    "evidenceIds": [
+      "evidence:meso1450-cohort-zacapu"
+    ]
+  }
+}

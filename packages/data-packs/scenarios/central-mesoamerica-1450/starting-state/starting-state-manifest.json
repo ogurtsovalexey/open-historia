@@ -1,0 +1,5 @@
+{
+  "effectiveDate": "1450-01-01",
+  "authoritativeScenario": "../scenario.json",
+  "quantitativePolicy": "modeled-central-estimates-with-low-confidence-provenance"
+}

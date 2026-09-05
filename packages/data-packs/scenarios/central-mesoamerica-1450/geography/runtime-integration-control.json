@@ -1,0 +1,266 @@
+[
+  {
+    "regionId": "region:meso1450:acolman",
+    "legalOwnerPolityId": "polity:texcoco",
+    "actualControllerPolityId": "polity:texcoco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:amecameca",
+    "legalOwnerPolityId": "polity:chalco",
+    "actualControllerPolityId": "polity:chalco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:azcapotzalco",
+    "legalOwnerPolityId": "polity:azcapotzalco",
+    "actualControllerPolityId": "polity:azcapotzalco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:balsas-frontier",
+    "legalOwnerPolityId": "polity:purepecha",
+    "actualControllerPolityId": "polity:purepecha",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:chalco",
+    "legalOwnerPolityId": "polity:chalco",
+    "actualControllerPolityId": "polity:chalco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:cholollan",
+    "legalOwnerPolityId": "polity:cholollan",
+    "actualControllerPolityId": "polity:cholollan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:coixtlahuaca",
+    "legalOwnerPolityId": "polity:coixtlahuaca",
+    "actualControllerPolityId": "polity:coixtlahuaca",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:coyoacan",
+    "legalOwnerPolityId": "polity:tlacopan",
+    "actualControllerPolityId": "polity:tlacopan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:cuauhnahuac",
+    "legalOwnerPolityId": "polity:cuauhnahuac",
+    "actualControllerPolityId": "polity:cuauhnahuac",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:cuauhtinchan",
+    "legalOwnerPolityId": "polity:cuauhtinchan",
+    "actualControllerPolityId": "polity:cuauhtinchan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:cuauhtitlan",
+    "legalOwnerPolityId": "polity:cuauhtitlan",
+    "actualControllerPolityId": "polity:cuauhtitlan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:cuitzeo",
+    "legalOwnerPolityId": "polity:purepecha",
+    "actualControllerPolityId": "polity:purepecha",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:culhuacan",
+    "legalOwnerPolityId": "polity:tenochtitlan",
+    "actualControllerPolityId": "polity:tenochtitlan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:huajuapan",
+    "legalOwnerPolityId": "polity:huajuapan",
+    "actualControllerPolityId": "polity:huajuapan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:huaxtepec",
+    "legalOwnerPolityId": "polity:yautepec",
+    "actualControllerPolityId": "polity:yautepec",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:huexotzinco",
+    "legalOwnerPolityId": "polity:huexotzinco",
+    "actualControllerPolityId": "polity:huexotzinco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:ihuatzio",
+    "legalOwnerPolityId": "polity:purepecha",
+    "actualControllerPolityId": "polity:purepecha",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:nochistlan",
+    "legalOwnerPolityId": "polity:nochistlan",
+    "actualControllerPolityId": "polity:nochistlan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:ocotelulco",
+    "legalOwnerPolityId": "polity:tlaxcallan",
+    "actualControllerPolityId": "polity:tlaxcallan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:otompan",
+    "legalOwnerPolityId": "polity:texcoco",
+    "actualControllerPolityId": "polity:texcoco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:patzcuaro",
+    "legalOwnerPolityId": "polity:purepecha",
+    "actualControllerPolityId": "polity:purepecha",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:quiahuiztlan",
+    "legalOwnerPolityId": "polity:tlaxcallan",
+    "actualControllerPolityId": "polity:tlaxcallan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:soconusco-corridor",
+    "legalOwnerPolityId": "polity:soconusco",
+    "actualControllerPolityId": "polity:soconusco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tenochtitlan",
+    "legalOwnerPolityId": "polity:tenochtitlan",
+    "actualControllerPolityId": "polity:tenochtitlan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:teotihuacan",
+    "legalOwnerPolityId": "polity:texcoco",
+    "actualControllerPolityId": "polity:texcoco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:teozacoalco",
+    "legalOwnerPolityId": "polity:teozacoalco",
+    "actualControllerPolityId": "polity:teozacoalco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tepeaca",
+    "legalOwnerPolityId": "polity:tepeaca",
+    "actualControllerPolityId": "polity:tepeaca",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tepeticpac",
+    "legalOwnerPolityId": "polity:tlaxcallan",
+    "actualControllerPolityId": "polity:tlaxcallan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:texcoco",
+    "legalOwnerPolityId": "polity:texcoco",
+    "actualControllerPolityId": "polity:texcoco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tilantongo",
+    "legalOwnerPolityId": "polity:tilantongo",
+    "actualControllerPolityId": "polity:tilantongo",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tizatlan",
+    "legalOwnerPolityId": "polity:tlaxcallan",
+    "actualControllerPolityId": "polity:tlaxcallan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tlacopan",
+    "legalOwnerPolityId": "polity:tlacopan",
+    "actualControllerPolityId": "polity:tlacopan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tlatelolco",
+    "legalOwnerPolityId": "polity:tlatelolco",
+    "actualControllerPolityId": "polity:tlatelolco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tlaxiaco",
+    "legalOwnerPolityId": "polity:tlaxiaco",
+    "actualControllerPolityId": "polity:tlaxiaco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tlayacapan",
+    "legalOwnerPolityId": "polity:chalco",
+    "actualControllerPolityId": "polity:chalco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tochtepec-corridor",
+    "legalOwnerPolityId": "polity:tochtepec",
+    "actualControllerPolityId": "polity:tochtepec",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tututepec",
+    "legalOwnerPolityId": "polity:tututepec",
+    "actualControllerPolityId": "polity:tututepec",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:tzintzuntzan",
+    "legalOwnerPolityId": "polity:purepecha",
+    "actualControllerPolityId": "polity:purepecha",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:ucareo-zinapecuaro",
+    "legalOwnerPolityId": "polity:purepecha",
+    "actualControllerPolityId": "polity:purepecha",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:uruapan",
+    "legalOwnerPolityId": "polity:purepecha",
+    "actualControllerPolityId": "polity:purepecha",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:xochimilco",
+    "legalOwnerPolityId": "polity:xochimilco",
+    "actualControllerPolityId": "polity:xochimilco",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:yanhuitlan",
+    "legalOwnerPolityId": "polity:yanhuitlan",
+    "actualControllerPolityId": "polity:yanhuitlan",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:yautepec",
+    "legalOwnerPolityId": "polity:yautepec",
+    "actualControllerPolityId": "polity:yautepec",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  },
+  {
+    "regionId": "region:meso1450:zacapu",
+    "legalOwnerPolityId": "polity:purepecha",
+    "actualControllerPolityId": "polity:purepecha",
+    "controlProfileId": "control-profile:sovereign-altepetl"
+  }
+]

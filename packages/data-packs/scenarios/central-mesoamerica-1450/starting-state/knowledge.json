@@ -1,0 +1,322 @@
+{
+  "knowledge:chalco-altepetl-governance": {
+    "id": "knowledge:chalco-altepetl-governance",
+    "polityId": "polity:chalco",
+    "conceptId": "concept:altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-chalco-altepetl-governance"
+    ]
+  },
+  "knowledge:chalco-market-exchange": {
+    "id": "knowledge:chalco-market-exchange",
+    "polityId": "polity:chalco",
+    "conceptId": "concept:market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-chalco-market-exchange"
+    ]
+  },
+  "knowledge:chalco-pictorial-records": {
+    "id": "knowledge:chalco-pictorial-records",
+    "polityId": "polity:chalco",
+    "conceptId": "concept:pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-chalco-pictorial-records"
+    ]
+  },
+  "knowledge:chalco-tribute-accounting": {
+    "id": "knowledge:chalco-tribute-accounting",
+    "polityId": "polity:chalco",
+    "conceptId": "concept:tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-chalco-tribute-accounting"
+    ]
+  },
+  "knowledge:cholollan-altepetl-governance": {
+    "id": "knowledge:cholollan-altepetl-governance",
+    "polityId": "polity:cholollan",
+    "conceptId": "concept:altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-cholollan-altepetl-governance"
+    ]
+  },
+  "knowledge:cholollan-market-exchange": {
+    "id": "knowledge:cholollan-market-exchange",
+    "polityId": "polity:cholollan",
+    "conceptId": "concept:market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-cholollan-market-exchange"
+    ]
+  },
+  "knowledge:cholollan-pictorial-records": {
+    "id": "knowledge:cholollan-pictorial-records",
+    "polityId": "polity:cholollan",
+    "conceptId": "concept:pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-cholollan-pictorial-records"
+    ]
+  },
+  "knowledge:cholollan-tribute-accounting": {
+    "id": "knowledge:cholollan-tribute-accounting",
+    "polityId": "polity:cholollan",
+    "conceptId": "concept:tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-cholollan-tribute-accounting"
+    ]
+  },
+  "knowledge:huexotzinco-altepetl-governance": {
+    "id": "knowledge:huexotzinco-altepetl-governance",
+    "polityId": "polity:huexotzinco",
+    "conceptId": "concept:altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-huexotzinco-altepetl-governance"
+    ]
+  },
+  "knowledge:huexotzinco-market-exchange": {
+    "id": "knowledge:huexotzinco-market-exchange",
+    "polityId": "polity:huexotzinco",
+    "conceptId": "concept:market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-huexotzinco-market-exchange"
+    ]
+  },
+  "knowledge:huexotzinco-pictorial-records": {
+    "id": "knowledge:huexotzinco-pictorial-records",
+    "polityId": "polity:huexotzinco",
+    "conceptId": "concept:pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-huexotzinco-pictorial-records"
+    ]
+  },
+  "knowledge:huexotzinco-tribute-accounting": {
+    "id": "knowledge:huexotzinco-tribute-accounting",
+    "polityId": "polity:huexotzinco",
+    "conceptId": "concept:tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-huexotzinco-tribute-accounting"
+    ]
+  },
+  "knowledge:purepecha-altepetl-governance": {
+    "id": "knowledge:purepecha-altepetl-governance",
+    "polityId": "polity:purepecha",
+    "conceptId": "concept:altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-purepecha-altepetl-governance"
+    ]
+  },
+  "knowledge:purepecha-market-exchange": {
+    "id": "knowledge:purepecha-market-exchange",
+    "polityId": "polity:purepecha",
+    "conceptId": "concept:market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-purepecha-market-exchange"
+    ]
+  },
+  "knowledge:purepecha-pictorial-records": {
+    "id": "knowledge:purepecha-pictorial-records",
+    "polityId": "polity:purepecha",
+    "conceptId": "concept:pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-purepecha-pictorial-records"
+    ]
+  },
+  "knowledge:purepecha-tribute-accounting": {
+    "id": "knowledge:purepecha-tribute-accounting",
+    "polityId": "polity:purepecha",
+    "conceptId": "concept:tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-purepecha-tribute-accounting"
+    ]
+  },
+  "knowledge:tenochtitlan-altepetl-governance": {
+    "id": "knowledge:tenochtitlan-altepetl-governance",
+    "polityId": "polity:tenochtitlan",
+    "conceptId": "concept:altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tenochtitlan-altepetl-governance"
+    ]
+  },
+  "knowledge:tenochtitlan-market-exchange": {
+    "id": "knowledge:tenochtitlan-market-exchange",
+    "polityId": "polity:tenochtitlan",
+    "conceptId": "concept:market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tenochtitlan-market-exchange"
+    ]
+  },
+  "knowledge:tenochtitlan-pictorial-records": {
+    "id": "knowledge:tenochtitlan-pictorial-records",
+    "polityId": "polity:tenochtitlan",
+    "conceptId": "concept:pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tenochtitlan-pictorial-records"
+    ]
+  },
+  "knowledge:tenochtitlan-tribute-accounting": {
+    "id": "knowledge:tenochtitlan-tribute-accounting",
+    "polityId": "polity:tenochtitlan",
+    "conceptId": "concept:tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tenochtitlan-tribute-accounting"
+    ]
+  },
+  "knowledge:texcoco-altepetl-governance": {
+    "id": "knowledge:texcoco-altepetl-governance",
+    "polityId": "polity:texcoco",
+    "conceptId": "concept:altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-texcoco-altepetl-governance"
+    ]
+  },
+  "knowledge:texcoco-market-exchange": {
+    "id": "knowledge:texcoco-market-exchange",
+    "polityId": "polity:texcoco",
+    "conceptId": "concept:market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-texcoco-market-exchange"
+    ]
+  },
+  "knowledge:texcoco-pictorial-records": {
+    "id": "knowledge:texcoco-pictorial-records",
+    "polityId": "polity:texcoco",
+    "conceptId": "concept:pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-texcoco-pictorial-records"
+    ]
+  },
+  "knowledge:texcoco-tribute-accounting": {
+    "id": "knowledge:texcoco-tribute-accounting",
+    "polityId": "polity:texcoco",
+    "conceptId": "concept:tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-texcoco-tribute-accounting"
+    ]
+  },
+  "knowledge:tlacopan-altepetl-governance": {
+    "id": "knowledge:tlacopan-altepetl-governance",
+    "polityId": "polity:tlacopan",
+    "conceptId": "concept:altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlacopan-altepetl-governance"
+    ]
+  },
+  "knowledge:tlacopan-market-exchange": {
+    "id": "knowledge:tlacopan-market-exchange",
+    "polityId": "polity:tlacopan",
+    "conceptId": "concept:market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlacopan-market-exchange"
+    ]
+  },
+  "knowledge:tlacopan-pictorial-records": {
+    "id": "knowledge:tlacopan-pictorial-records",
+    "polityId": "polity:tlacopan",
+    "conceptId": "concept:pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlacopan-pictorial-records"
+    ]
+  },
+  "knowledge:tlacopan-tribute-accounting": {
+    "id": "knowledge:tlacopan-tribute-accounting",
+    "polityId": "polity:tlacopan",
+    "conceptId": "concept:tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlacopan-tribute-accounting"
+    ]
+  },
+  "knowledge:tlatelolco-altepetl-governance": {
+    "id": "knowledge:tlatelolco-altepetl-governance",
+    "polityId": "polity:tlatelolco",
+    "conceptId": "concept:altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlatelolco-altepetl-governance"
+    ]
+  },
+  "knowledge:tlatelolco-market-exchange": {
+    "id": "knowledge:tlatelolco-market-exchange",
+    "polityId": "polity:tlatelolco",
+    "conceptId": "concept:market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlatelolco-market-exchange"
+    ]
+  },
+  "knowledge:tlatelolco-pictorial-records": {
+    "id": "knowledge:tlatelolco-pictorial-records",
+    "polityId": "polity:tlatelolco",
+    "conceptId": "concept:pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlatelolco-pictorial-records"
+    ]
+  },
+  "knowledge:tlatelolco-tribute-accounting": {
+    "id": "knowledge:tlatelolco-tribute-accounting",
+    "polityId": "polity:tlatelolco",
+    "conceptId": "concept:tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlatelolco-tribute-accounting"
+    ]
+  },
+  "knowledge:tlaxcallan-altepetl-governance": {
+    "id": "knowledge:tlaxcallan-altepetl-governance",
+    "polityId": "polity:tlaxcallan",
+    "conceptId": "concept:altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlaxcallan-altepetl-governance"
+    ]
+  },
+  "knowledge:tlaxcallan-market-exchange": {
+    "id": "knowledge:tlaxcallan-market-exchange",
+    "polityId": "polity:tlaxcallan",
+    "conceptId": "concept:market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlaxcallan-market-exchange"
+    ]
+  },
+  "knowledge:tlaxcallan-pictorial-records": {
+    "id": "knowledge:tlaxcallan-pictorial-records",
+    "polityId": "polity:tlaxcallan",
+    "conceptId": "concept:pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlaxcallan-pictorial-records"
+    ]
+  },
+  "knowledge:tlaxcallan-tribute-accounting": {
+    "id": "knowledge:tlaxcallan-tribute-accounting",
+    "polityId": "polity:tlaxcallan",
+    "conceptId": "concept:tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tlaxcallan-tribute-accounting"
+    ]
+  },
+  "knowledge:tututepec-altepetl-governance": {
+    "id": "knowledge:tututepec-altepetl-governance",
+    "polityId": "polity:tututepec",
+    "conceptId": "concept:altepetl-governance",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tututepec-altepetl-governance"
+    ]
+  },
+  "knowledge:tututepec-market-exchange": {
+    "id": "knowledge:tututepec-market-exchange",
+    "polityId": "polity:tututepec",
+    "conceptId": "concept:market-exchange",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tututepec-market-exchange"
+    ]
+  },
+  "knowledge:tututepec-pictorial-records": {
+    "id": "knowledge:tututepec-pictorial-records",
+    "polityId": "polity:tututepec",
+    "conceptId": "concept:pictorial-records",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tututepec-pictorial-records"
+    ]
+  },
+  "knowledge:tututepec-tribute-accounting": {
+    "id": "knowledge:tututepec-tribute-accounting",
+    "polityId": "polity:tututepec",
+    "conceptId": "concept:tribute-accounting",
+    "evidenceIds": [
+      "evidence:meso1450-knowledge-tututepec-tribute-accounting"
+    ]
+  }
+}
