@@ -64,6 +64,16 @@ describe('living-world production Strategic V5', () => {
       assert.deepStrictEqual(schema.properties.selectedChoiceIds.items.enum, task.brief.frozenChoices.map((choice) => choice.choiceId));
       assert.deepStrictEqual(schema.properties.evidenceIds.items.enum, task.brief.evidence.map((entry) => entry.evidenceId));
       assert.deepStrictEqual(schema.properties.processDecisions.items.properties.processId.enum, task.brief.processOptions.map((option) => option.processId));
+      assert.deepStrictEqual(schema.properties.processDecisions.items.properties.directionId.enum, [...new Set(task.brief.processOptions.flatMap((option) => option.allowedDirections.map((direction) => direction.directionId)))].sort());
+      assert.deepStrictEqual(schema.properties.processDecisions.items.properties.pace.enum, [...new Set(task.brief.processOptions.flatMap((option) => option.allowedPaces))].sort());
+      assert.deepStrictEqual(schema.properties.processDecisions.items.properties.effectFamilies.items.enum, [...new Set(task.brief.processOptions.flatMap((option) => option.compatibleEffectFamilies))].sort());
+      const initiative = schema.properties.initiativeProposals.items.properties;
+      assert.deepStrictEqual(initiative.type.enum, task.brief.initiativeEnvelope.allowedConceptTypes);
+      assert.deepStrictEqual(initiative.directionId.enum, task.brief.initiativeEnvelope.allowedDirectionIds);
+      assert.deepStrictEqual(initiative.domainIds.items.enum, task.brief.initiativeEnvelope.allowedDomains);
+      assert.deepStrictEqual(initiative.sponsorEntityRefs.items.enum, task.brief.initiativeEnvelope.allowedSponsorEntityRefs);
+      assert.deepStrictEqual(initiative.affectedEntityRefs.items.enum, task.brief.initiativeEnvelope.allowedTargetEntityRefs);
+      assert.deepStrictEqual(initiative.effectFamilies.items.enum, task.brief.initiativeEnvelope.allowedEffectFamilies);
       const evidenceIds = task.brief.evidence.map((entry) => entry.evidenceId);
       assert.deepStrictEqual(schema.properties.processDecisions.items.properties.factsUsed.items.enum, evidenceIds);
       assert.deepStrictEqual(schema.properties.initiativeProposals.items.properties.factsUsed.items.enum, evidenceIds);
