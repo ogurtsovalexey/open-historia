@@ -14,6 +14,8 @@ import {
   rekeyOwnerMap,
 } from "./ownerMigration.js";
 import { readEngineSession } from "./engineSessionStore.js";
+import { commitLivingWorldSession } from "./engineSessionStore.js";
+import { listCompiledScenarioPacks, loadCompiledScenarioPack } from "./scenarioPackStore.js";
 import {
   EUROPE_1935_SCENARIO_ID,
   materializeEurope1935RuntimeScenario,
@@ -28,6 +30,7 @@ const SCENARIOS_DIR = path.join(SERVER_DATA_DIR, "scenarios");
 const GAMES_DIR = path.join(SERVER_DATA_DIR, "games");
 const SCENARIO_MANIFEST_PATH = path.join(SERVER_DATA_DIR, "scenario-manifest.json");
 const GAME_MANIFEST_PATH = path.join(SERVER_DATA_DIR, "game-manifest.json");
+const COMPILED_SCENARIOS_DIR = path.join(PROJECT_ROOT, "build", "scenarios");
 
 // Stock map archives normally sit in the checkout's public/assets. A PACKAGED
 // desktop build ships them nowhere — they are ~200MB and are downloaded after
@@ -241,6 +244,82 @@ const DEFAULT_GAME_META = {
   name: "Modern Day Session",
   scenarioId: DEFAULT_SCENARIO_ID,
   subtitle: "Current campaign",
+};
+
+const emptyAssetStatus = () => Object.fromEntries(
+  Object.keys(UPLOADABLE_SCENARIO_ASSET_FILES).map((key) => [key, false]),
+);
+
+const compiledScenarioSummaries = (usageCounts = new Map()) => {
+  try {
+    return listCompiledScenarioPacks({ rootDirectory: COMPILED_SCENARIOS_DIR }).map((pack) => ({
+      accentColor: "#b28a52",
+      assetStatus: emptyAssetStatus(),
+      cacheToken: pack.seedChecksum,
+      canDelete: false,
+      coverImageContentType: null,
+      coverImageUrl: null,
+      countryNameOverrides: {},
+      createdAt: pack.startDate,
+      description: `Grounded ${pack.profile} world with canonical population, economy, territory and forces.`,
+      eyebrow: "Living World",
+      gameCount: usageCounts.get(pack.scenarioId) ?? 0,
+      heroSubtitle: `${pack.startDate} · ${pack.playerEligiblePolityIds.length} playable polities`,
+      heroTitle: pack.title.en,
+      hubOrigin: null,
+      id: pack.scenarioId,
+      immutable: true,
+      livingWorld: true,
+      name: pack.title.en,
+      playCount: 0,
+      playerEligiblePolityIds: pack.playerEligiblePolityIds,
+      defaultPlayerPolityId: pack.defaultPlayerPolityId,
+      profile: pack.profile,
+      seedChecksum: pack.seedChecksum,
+      startDate: pack.startDate,
+      startView: null,
+      subtitle: `${pack.startDate} · grounded ScenarioV3`,
+      updatedAt: pack.startDate,
+    }));
+  } catch (error) {
+    console.warn(`Compiled scenarios are unavailable: ${error instanceof Error ? error.message : String(error)}`);
+    return [];
+  }
+};
+
+const compiledScenarioDetails = (scenarioId) => {
+  const pack = loadCompiledScenarioPack(scenarioId, { rootDirectory: COMPILED_SCENARIOS_DIR });
+  const summary = compiledScenarioSummaries().find((entry) => entry.id === scenarioId);
+  if (!summary) throw new Error(`Compiled scenario not found: ${scenarioId}`);
+  const polityById = Object.fromEntries(pack.runtimeProjection.polities.map((polity) => [polity.polityId, {
+    name: polity.displayName.en,
+    aliases: [],
+    color: polity.color,
+    note: polity.playerEligible ? "Player eligible" : "AI polity",
+  }]));
+  return {
+    assetStatus: summary.assetStatus,
+    data: {
+      actions: [], advisor: [], chat: [], events: [], prompts: {},
+      game: {
+        country: pack.runtimeProjection.defaultPlayerPolityId,
+        gameDate: pack.runtimeProjection.startDate,
+        startDate: pack.runtimeProjection.startDate,
+        round: 1,
+      },
+      world: {
+        customRegions: false,
+        ownerCodes: pack.runtimeProjection.polities.map((entry) => entry.polityId),
+        playableOwnerCodes: pack.runtimeProjection.playerEligiblePolityIds,
+        polityOverrides: polityById,
+        regionOwnershipOverrides: Object.fromEntries(pack.runtimeProjection.regions.map((region) => [
+          region.regionId,
+          region.control.actualControllerPolityId,
+        ])),
+      },
+    },
+    scenario: summary,
+  };
 };
 
 const STORAGE_JSON_ASSET_FILES = {
@@ -698,6 +777,9 @@ const readGameMeta = (gameId) => {
     updatedAt: raw?.updatedAt ?? new Date().toISOString(),
     engineDriven: raw?.engineDriven === true,
     engineScenario: String(raw?.engineScenario ?? "").trim() || null,
+    livingWorld: raw?.livingWorld === true,
+    playerPolityId: String(raw?.playerPolityId ?? "").trim() || null,
+    seedChecksum: String(raw?.seedChecksum ?? "").trim() || null,
     // Where the camera opens for this scenario; null keeps the app default.
     startView: normalizeStartView(raw?.startView),
   };
@@ -1192,7 +1274,7 @@ const buildScenarioCatalog = () => {
   const manifest = getScenarioManifest();
   const orderedScenarioIds = resolveOrderedIds(manifest.order, SCENARIOS_DIR, DEFAULT_SCENARIO_ID);
 
-  const scenarios = orderedScenarioIds
+  const editableScenarios = orderedScenarioIds
   .map((scenarioId) => {
     const metaPath = getScenarioMetaPath(scenarioId);
     if (!fs.existsSync(metaPath)) {
@@ -1217,6 +1299,10 @@ const buildScenarioCatalog = () => {
     };
   })
   .filter(Boolean);
+  const scenarios = [
+    ...compiledScenarioSummaries(usageCounts),
+    ...editableScenarios.filter((entry) => !entry.livingWorld),
+  ];
 
   // Fall back to the first scenario that actually exists — the built-in one
   // may have been deleted.
@@ -1261,10 +1347,14 @@ const buildGameCatalog = () => {
     const meta = readGameMeta(gameId);
     const assetStatus = getGameAssetStatus(gameId);
     let gameData = readJsonFile(getGameJsonPath(gameId, "game"), {});
-    if (meta.engineDriven) {
+    if (meta.engineDriven || meta.livingWorld) {
       const session = readEngineSession(getGameDirectory(gameId));
       if (session) {
-        gameData = { ...gameData, gameDate: session.manifest.gameDate, round: session.manifest.round };
+        gameData = {
+          ...gameData,
+          gameDate: session.manifest.gameDate,
+          round: session.manifest.turn === undefined ? session.manifest.round : session.manifest.turn + 1,
+        };
       }
     }
     const actions = readJsonFile(getGameJsonPath(gameId, "actions"), []);
@@ -1372,6 +1462,7 @@ const getGameSummary = (gameId) => {
 
 const getScenarioDetails = (scenarioId) => {
   const summary = getScenarioSummary(scenarioId);
+  if (summary.livingWorld) return compiledScenarioDetails(scenarioId);
 
   return {
     assetStatus: summary.assetStatus,
@@ -1392,6 +1483,14 @@ const getScenarioDetails = (scenarioId) => {
 // separate from the public scenario response avoids expanding that API and
 // makes it impossible for callers to accidentally forward map geometry.
 const getScenarioAgentProfiles = (scenarioId) => {
+  const summary = getScenarioSummary(scenarioId);
+  if (summary.livingWorld) {
+    const details = compiledScenarioDetails(scenarioId);
+    return Object.fromEntries(Object.entries(details.data.world.polityOverrides).map(([id, polity]) => [id, {
+      note: polity.note,
+      tags: [],
+    }]));
+  }
   const world = readJsonFile(getScenarioJsonPath(scenarioId, "world"), {});
   const tags = readJsonFile(getScenarioJsonPath(scenarioId, "tags"), {});
   return Object.fromEntries(Object.entries(world.polityOverrides ?? {}).map(([name, polity]) => [name, {
@@ -1422,16 +1521,19 @@ const getGameDetails = (gameId) => {
 const setSelectedScenario = (scenarioId) => {
   ensureScenarioStore();
 
-  if (!fs.existsSync(getScenarioDirectory(scenarioId))) {
+  const summary = getScenarioSummary(scenarioId);
+  if (!summary) {
     throw new Error(`Scenario not found: ${scenarioId}`);
   }
 
   const manifest = getScenarioManifest();
   manifest.selectedScenarioId = scenarioId;
-  manifest.order = resolveOrderedIds(manifest.order, SCENARIOS_DIR, DEFAULT_SCENARIO_ID).filter(
-    (entry) => entry !== scenarioId,
-  );
-  manifest.order.unshift(scenarioId);
+  if (!summary.livingWorld) {
+    manifest.order = resolveOrderedIds(manifest.order, SCENARIOS_DIR, DEFAULT_SCENARIO_ID).filter(
+      (entry) => entry !== scenarioId,
+    );
+    manifest.order.unshift(scenarioId);
+  }
   saveScenarioManifest(manifest);
   return getLibraryCatalog();
 };
@@ -1589,6 +1691,7 @@ const createGame = ({
   id,
   name,
   scenarioId,
+  playerPolityId,
   seedGameId,
   setActive,
   subtitle,
@@ -1602,19 +1705,46 @@ const createGame = ({
 
   let sourceScenario = null;
   let sourceGame = null;
+  let compiledPack = null;
 
   if (seedGameId && fs.existsSync(getGameDirectory(seedGameId))) {
     sourceGame = getGameSummary(seedGameId);
+    if (sourceGame.livingWorld) {
+      throw new Error("Living-world games cannot be cloned until an explicit revision fork is selected.");
+    }
     seedGameJsonFilesFromGame(resolvedGameId, seedGameId);
   } else {
     const nextScenarioId = String(scenarioId ?? DEFAULT_SCENARIO_ID).trim() || DEFAULT_SCENARIO_ID;
     sourceScenario = getScenarioSummary(nextScenarioId);
-    seedGameJsonFilesFromScenario(resolvedGameId, nextScenarioId);
+    if (sourceScenario.livingWorld) {
+      compiledPack = loadCompiledScenarioPack(nextScenarioId, { rootDirectory: COMPILED_SCENARIOS_DIR });
+      for (const [assetKey, fallback] of Object.entries(JSON_ASSET_DEFAULTS)) {
+        writeJsonFile(getGameJsonPath(resolvedGameId, assetKey), cloneJson(fallback));
+      }
+    } else {
+      seedGameJsonFilesFromScenario(resolvedGameId, nextScenarioId);
+    }
   }
 
   const createdAt = new Date().toISOString();
   const scenarioSummary = sourceScenario ?? getScenarioSummary(sourceGame?.scenarioId ?? DEFAULT_SCENARIO_ID);
   const seedName = sourceGame?.name ?? scenarioSummary.name;
+  const selectedPlayerPolityId = compiledPack
+    ? String(playerPolityId ?? compiledPack.runtimeProjection.defaultPlayerPolityId).trim()
+    : null;
+  if (compiledPack && !compiledPack.runtimeProjection.playerEligiblePolityIds.includes(selectedPlayerPolityId)) {
+    throw new Error(`Polity ${selectedPlayerPolityId} is not player-eligible in ${compiledPack.manifest.scenarioId}.`);
+  }
+
+  if (compiledPack) {
+    writeJsonFile(getGameJsonPath(resolvedGameId, "game"), {
+      country: selectedPlayerPolityId,
+      gameDate: compiledPack.initialState.month,
+      startDate: compiledPack.initialState.month,
+      round: 1,
+    });
+    writeJsonFile(getGameJsonPath(resolvedGameId, "world"), compiledScenarioDetails(compiledPack.manifest.scenarioId).data.world);
+  }
 
   writeJsonFile(getGameMetaPath(resolvedGameId), {
     accentColor:
@@ -1648,6 +1778,9 @@ const createGame = ({
                 // stays deterministic for every session started from it.
                 engineDriven: sourceGame?.engineDriven === true || scenarioSummary.engineDriven === true,
                 engineScenario: sourceGame?.engineScenario ?? scenarioSummary.engineScenario ?? null,
+                livingWorld: compiledPack !== null,
+                playerPolityId: selectedPlayerPolityId,
+                seedChecksum: compiledPack?.manifest.seedChecksum ?? null,
                 startView: sourceGame?.startView ?? scenarioSummary.startView ?? null,
                 coverImageContentType: sourceGame?.coverImageContentType ?? null,
                 subtitle:
@@ -1667,6 +1800,19 @@ const createGame = ({
     manifest.activeGameId = resolvedGameId;
   }
   saveGameManifest(manifest);
+  if (compiledPack) {
+    commitLivingWorldSession(gameDir, {
+      expectedRevision: null,
+      gameId: resolvedGameId,
+      scenarioId: compiledPack.manifest.scenarioId,
+      seedChecksum: compiledPack.manifest.seedChecksum,
+      state: compiledPack.initialState,
+      lastTransition: null,
+      strategicState: { schemaVersion: "open-historia-strategic-memory/1", polities: [] },
+      agentTurn: null,
+      playerIntent: null,
+    });
+  }
   if (setActive) {
     recordGamePlayed(resolvedGameId);
   }
@@ -1812,12 +1958,28 @@ const updateGame = (
       : worldPatch && typeof worldPatch === "object" ? worldPatch
         : readJsonFile(getGameJsonPath(gameId, "world"), JSON_ASSET_DEFAULTS.world));
 
+  const normalizeLivingWorldGame = (value) => {
+    if (!currentMeta.livingWorld || !value || typeof value !== "object") return null;
+    const country = String(value.country ?? "").trim();
+    if (country) {
+      const pack = loadCompiledScenarioPack(currentMeta.scenarioId, { rootDirectory: COMPILED_SCENARIOS_DIR });
+      if (!pack.runtimeProjection.playerEligiblePolityIds.includes(country)) {
+        throw new Error(`Polity ${country} is not player-eligible in ${currentMeta.scenarioId}.`);
+      }
+      writeGameMeta(gameId, { playerPolityId: country });
+    }
+    return { ...value, ...(country ? { country } : {}) };
+  };
+
   if (game && typeof game === "object") {
-    writeJsonFile(getGameJsonPath(gameId, "game"), canonicalizeGameCountry(game, gameWorldContext()));
+    writeJsonFile(
+      getGameJsonPath(gameId, "game"),
+      normalizeLivingWorldGame(game) ?? canonicalizeGameCountry(game, gameWorldContext()),
+    );
   } else if (gamePatch && typeof gamePatch === "object") {
     mergeJsonAsset(
       getGameJsonPath(gameId, "game"),
-      canonicalizeGameCountry(gamePatch, gameWorldContext()),
+      normalizeLivingWorldGame(gamePatch) ?? canonicalizeGameCountry(gamePatch, gameWorldContext()),
       JSON_ASSET_DEFAULTS.game,
     );
   }
