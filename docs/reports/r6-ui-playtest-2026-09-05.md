@@ -34,3 +34,27 @@ To close WP15, repeat these three runs with a configured production provider,
 record the preview and revision before each decision, and execute the scripted
 intent coverage in canon 23 section 20. Do not bypass the checkpoint or add a
 test-only provider to a production playtest.
+
+## Model-mediated smoke test (subsequent run)
+
+After enabling the desktop Codex-subscription provider in both strategic and
+utility roles (GPT-5.6-Luna, low effort), schema preflight passed for both
+contracts. In a fresh French 1805 game, the Russian order
+“Сосредоточить действующую армию на Рейне и подготовить дипломатическое
+давление на Австрию, не начиная войну без подтверждённого преимущества.”
+was sent through the real Orders UI.
+
+The model returned two typed actions, affected France and Austria, and an
+engine-derived initial commitment of 1,757 with an explicit resistance risk.
+The user-facing confirmation initially exposed a validation defect for a
+non-Latin semantic name; it was fixed in `8a98c30` and the same already
+model-verified interpretation then confirmed through the UI. The engine
+created the long-running French process and committed its resources.
+
+Advancing the real UI once then completed three monthly boundaries
+(`1805-01-01` → `1805-04-01`), with the process visibly progressing from 0% to
+9%. The UI waited for strategic resolution rather than using the explicit skip
+recovery. This proves one end-to-end model-mediated player intent and one
+strategic settlement, but it does **not** replace the three 10-decision runs or
+complete the remaining diplomacy, counterfactual-concept and territorial
+pressure cases required by WP15.
