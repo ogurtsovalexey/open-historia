@@ -8,8 +8,6 @@
   "description": "Development fixture for a deterministic ten-month economy soak. All economic values are synthetic test balance, not historical statistics; no annexation, war or territorial transfer is predetermined.",
   "accentColor": "#6ea8fe",
   "countryNameOverrides": {},
-  "engineDriven": true,
-  "engineScenario": "scenario-dev-map-4c",
   "startView": {
     "longitude": 12.6,
     "latitude": 50.2,

@@ -9,8 +9,9 @@ Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the pr
 This section is the authoritative resume point for the next implementation
 agent. Do not restart the merge ladder and do not reconstruct completed work
 from the old baseline. The current pushed implementation checkpoint is
-`b8bbb01` on `feature/campaign-memory` (`feat(living-world): settle three-month
-player turns`). The next package is R4.
+`937335c` on `feature/campaign-memory` (`test(living-world): add cross-era
+acceptance`). R5's WP12 acceptance suite is committed; the in-progress hard
+cut of retired runtime paths is the next work to verify and commit.
 
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
@@ -21,7 +22,7 @@ canonical reducer.
 
 ### 0.1 What is already implemented
 
-| Area | State at `b8bbb01` | Main proof |
+| Area | State at `937335c` | Main proof |
 | --- | --- | --- |
 | Canon and contracts | Complete enough to build on. Canon 22 is the product authority. | `docs/canon/22-living-world-program.md` |
 | WorldStateV2 | Canonical schema, hashing, revisions, invariants, evidence registry and grounded selectors exist. Writable national population/army aggregates are not the V2 authority. | `packages/engine/src/world/*`; `worldStateV2.test.ts` |
@@ -36,6 +37,7 @@ canonical reducer.
 | Production opponent loop | Required V5 batches are atomic and visibly fail closed. Background calls are evidence-aware and capped; accepted initiatives enter the same engine process path. | `server/livingWorldStrategy.js`; R1 checkpoint |
 | Typed diplomacy and territory | A proposal stays immaterial until its frozen recipient response; accepted cessions use the sole territorial-control reducer. | `world/diplomacy.ts`; R2 checkpoint |
 | Three-month player loop | One normal decision resolves three local monthly boundaries, including monthly tribute and stable process settlement, then records every submonth. | `server/livingWorldStore.js`; R3 checkpoint |
+| Cross-era acceptance | Napoleonic and Mesoamerican worlds prove false-history rejection, bounded open concepts, territorial causality, deterministic replay, catalog isolation and epistemic privacy. | `server/crossEraAcceptance.test.js`; WP12 checkpoint |
 
 Completed commits, in dependency order:
 
@@ -56,6 +58,8 @@ db4b0cc feat(processes): materialize grounded checkpoint effects
 a082bdc fix(ai): make required strategic checkpoints atomic
 2ae4396 feat(living-world): add typed diplomatic agreements
 b8bbb01 feat(living-world): settle three-month player turns
+a12693f feat(ui): complete living-world turn feedback
+937335c test(living-world): add cross-era acceptance
 ```
 
 ### 0.2 Verification truth at the checkpoint
@@ -321,12 +325,20 @@ never engine settlement.
 
 #### R5 — cross-era fixtures, legacy deletion and full release gates
 
-Progress checkpoint: WP12 cross-era acceptance is implemented in
+Delivered: WP12 cross-era acceptance is implemented in
 `server/crossEraAcceptance.test.js` and included in `npm run test:living-world`.
 It runs false-history, open-concept, territorial-causality, replay,
 scenario-leakage and epistemics assertions against both Napoleonic and Central
-Mesoamerican compiled worlds. Legacy deletion, saved-session migration and the
-WP14 release gate remain required before R5 can be marked complete.
+Mesoamerican compiled worlds. The hard cut removes retired economy/agent-turn
+HTTP endpoints, their UI controls, Europe-specific runtime materialization and
+the dual live-engine flags. WorldStateV2 session V3 now rejects a pre-V2
+pointer explicitly, while old on-disk economy directories are backed up before
+a new V3 session is created.
+
+The remaining `strategicV4.ts` source and Europe 1935 authoring scripts are
+offline historical-audit tooling only: no server, browser runtime, or session
+writer imports them. They may not regain a live export or call path. This is a
+documented migration/audit exception to the production-match search below.
 
 Complete WP12 fixtures in two relevant scenarios each. Only after those and
 R4 are green, remove live Strategic V4, model-authored impacts, binding-canon

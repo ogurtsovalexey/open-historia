@@ -79,7 +79,7 @@ export type HistoricalAuthoring = z.infer<typeof historicalAuthoringSchema>;
 export interface HistoricalProjectionInput {
   bundle: ScenarioBundle;
   authoring: unknown;
-  engineScenario: unknown;
+  legacyScenario: unknown;
   mapLink?: unknown;
 }
 
@@ -136,7 +136,7 @@ export function compileHistoricalProjection(input: HistoricalProjectionInput): H
   const validated = new ScenarioV2Validator().validateBundle(input.bundle);
   if (!validated.valid) throw new Error(`ScenarioV2 invalid: ${validated.errors.map((entry) => `${entry.path} ${entry.message}`).join('; ')}`);
   const authoring = historicalAuthoringSchema.parse(input.authoring);
-  const scenario = parseScenario(input.engineScenario);
+  const scenario = parseScenario(input.legacyScenario);
   if (scenario.label !== 'historical-projection') throw new Error('historical engine projection must use label historical-projection');
   if (scenario.scenarioId !== input.bundle.scenario.id || authoring.scenarioId !== input.bundle.scenario.id) throw new Error('scenario ids do not match');
 

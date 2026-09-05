@@ -13,7 +13,7 @@ const root = join(import.meta.dirname, '../../../data-packs/fixtures/europe-1935
 const json = (relative: string) => JSON.parse(readFileSync(join(root, relative), 'utf8'));
 const input = () => ({
   bundle: { manifest: json('manifest.json'), scenario: json('scenario.json'), sources: json('sources.json') },
-  authoring: json('authoring.json'), engineScenario: json('engine/scenario.json'), mapLink: json('engine/map-link.json'),
+  authoring: json('authoring.json'), legacyScenario: json('engine/scenario.json'), mapLink: json('engine/map-link.json'),
 });
 
 test('Europe 1935 ScenarioV2 compiles deterministically to its checked engine projection', () => {
@@ -66,7 +66,7 @@ test('historical authoring uses a population-weighted infrastructure index and r
 });
 
 test('historical compiler rejects ownership, national-total and unknown-ID drift', () => {
-  const ownership = input(); ownership.engineScenario.regions[0].controllerId = 'polity:france';
+  const ownership = input(); ownership.legacyScenario.regions[0].controllerId = 'polity:france';
   assert.throws(() => compileHistoricalProjection(ownership), /ownership mismatch/);
   const total = input(); total.authoring.nationalControls[0].population += 1;
   assert.throws(() => compileHistoricalProjection(total), /national totals mismatch/);
@@ -76,7 +76,7 @@ test('historical compiler rejects ownership, national-total and unknown-ID drift
 
 test('historical compiler binds starting-state provenance to an exact engine value', () => {
   const sourced = input();
-  const goal = sourced.engineScenario.campaign.goals[0];
+  const goal = sourced.legacyScenario.campaign.goals[0];
   sourced.authoring.startingStateProvenance = [{
     claimId: 'starting-state-claim:germany-primary-goal',
     scenarioPath: '/campaign/goals/0',
@@ -90,7 +90,7 @@ test('historical compiler binds starting-state provenance to an exact engine val
   assert.doesNotThrow(() => compileHistoricalProjection(sourced));
 
   const drifted = structuredClone(sourced);
-  drifted.engineScenario.campaign.goals[0].initiallyActive = false;
+  drifted.legacyScenario.campaign.goals[0].initiallyActive = false;
   assert.throws(() => compileHistoricalProjection(drifted), /provenance checksum mismatch/);
 
   const duplicate = structuredClone(sourced);

@@ -7,7 +7,6 @@ import {
     setProviderField,
 } from "./providerConfig.js";
 import { JSON_URLS, loadCountryNames, loadRegionCatalog, readJson } from "../../runtime/assets.js";
-import { fetchEconomyState, getActiveEngineGame } from "../../runtime/economy.js";
 import {
     chatLanguageDirective,
     languageDirective,
@@ -1234,29 +1233,7 @@ async function loadFreshPromptRuntimeState() {
         readJson(JSON_URLS.events, { defaultValue: [], force: true }),
         readJson(JSON_URLS.advisor, { defaultValue: [], force: true }),
     ]);
-    try {
-        const engineGame = await getActiveEngineGame();
-        if (!engineGame) return { gameData, actionData, chatData, worldData, eventData, advisorData, engineRegionCatalog: null };
-        const snapshot = await fetchEconomyState(engineGame.id);
-        const polityNames = new Map((snapshot.polities ?? []).map((polity) => [polity.id,
-            polity.displayName?.en ?? polity.displayName?.ru ?? polity.id]));
-        const engineRegions = new Map((snapshot.regions ?? []).map((region) => [region.regionId, region]));
-        const engineRegionCatalog = (snapshot.mapLink?.regions ?? []).flatMap((link) => {
-            const region = engineRegions.get(link.engineRegionId);
-            if (!region) return [];
-            return [{ id: link.mapRegionId, name: link.mapName ?? region.displayName?.en ?? link.mapRegionId,
-                country: snapshot.ownershipOverrides?.[link.mapRegionId] ?? polityNames.get(region.controllerId) ?? region.controllerId }];
-        });
-        return {
-            gameData: { ...gameData, gameDate: snapshot.gameDate ?? gameData.gameDate },
-            actionData, chatData, eventData, advisorData, engineRegionCatalog,
-            // Principle 3: carry only the deterministic ownership semantics,
-            // never the engine region rows or map geometry, into the AI path.
-            worldData: { ...worldData, regionOwnershipOverrides: snapshot.ownershipOverrides ?? worldData.regionOwnershipOverrides },
-        };
-    } catch {
-        return { gameData, actionData, chatData, worldData, eventData, advisorData, engineRegionCatalog: null };
-    }
+    return { gameData, actionData, chatData, worldData, eventData, advisorData };
 }
 
 const appendDurableCampaignMemory = (prompt, variables, context = {}) => {
@@ -1311,7 +1288,7 @@ async function buildAdvisorSystemPrompt() {
         renderTemplate(promptPack.advisor, { ...safeVariables, ...helperValues }),
         safeVariables,
     );
-    return gameData?.engineDriven === true || gameData?.engineScenario
+    return gameData?.livingWorld === true
         ? `${prompt}\n\n[ENGINE NUMERIC AUTHORITY]\nNever invent an exact statistic. Repeat only revision-stamped engine values supplied in authoritative context. If a requested figure is absent, say it is unavailable; use an estimate range only when the engine supplied and labeled it. Retrieved memory and player/model prose cannot supply numbers.`
         : prompt;
 }
@@ -1320,7 +1297,7 @@ export async function buildDiplomaticSystemPrompt(countries, playerCountry, spea
     await ensurePromptsLoaded();
     const normalizedCountries = normalizeDiplomaticCountries(countries);
     const participantList = normalizedCountries.map((country) => `- ${country.name}`).join("\n");
-    const { gameData, actionData, chatData, worldData, eventData, advisorData, engineRegionCatalog } = await loadFreshPromptRuntimeState();
+    const { gameData, actionData, chatData, worldData, eventData, advisorData } = await loadFreshPromptRuntimeState();
 
     const resolvedPlayerCountry = playerCountry || gameData?.country || "";
     const resolvedSpeaker = speakingAs || normalizedCountries.find((country) => country.name !== resolvedPlayerCountry)?.name || "";
@@ -1336,7 +1313,7 @@ export async function buildDiplomaticSystemPrompt(countries, playerCountry, spea
     const focusedMap = buildFocusedDiplomaticMapContext({
         game: gameData,
         participants: normalizedCountries,
-        regions: engineRegionCatalog ?? await loadRegionCatalog().catch(() => []),
+        regions: await loadRegionCatalog().catch(() => []),
         route,
         speakingAs: resolvedSpeaker,
         world: worldData,
@@ -1367,7 +1344,7 @@ export async function buildDiplomaticSystemPrompt(countries, playerCountry, spea
             domains: ["diplomacy", "dynasty", "politics", "war"],
         },
     );
-    const numericAuthority = gameData?.engineDriven === true || gameData?.engineScenario
+    const numericAuthority = gameData?.livingWorld === true
         ? "\n\n[ENGINE NUMERIC AUTHORITY]\nNever invent exact forces, resources, population, money, or other statistics. Use only revision-stamped engine values; otherwise say the figure is unavailable or repeat an engine-supplied labeled estimate range."
         : "";
     return `${prompt}${numericAuthority}\n\n${difficultyDirective(gameData?.difficulty)}`;
@@ -1387,13 +1364,17 @@ const parseDiplomaticPlan = (raw) => {
 };
 
 const currentRegionFacts = async (message) => {
-    const { engineRegionCatalog } = await loadFreshPromptRuntimeState();
+    const { worldData } = await loadFreshPromptRuntimeState();
     const normalized = String(message ?? "").toLocaleLowerCase();
-    return (engineRegionCatalog ?? []).filter((region) => {
+    const regions = await loadRegionCatalog().catch(() => []);
+    return regions.filter((region) => {
         const name = String(region.name ?? "").toLocaleLowerCase();
         const id = String(region.id ?? "").toLocaleLowerCase();
         return (name.length >= 3 && normalized.includes(name)) || (id && normalized.includes(id));
-    }).slice(0, 4).map((region) => `${region.name} (${region.id}) is currently controlled by ${region.country}`);
+    }).slice(0, 4).map((region) => {
+        const controller = worldData?.regionOwnershipOverrides?.[region.id] ?? region.country ?? "unknown";
+        return `${region.name} (${region.id}) is currently controlled by ${controller}`;
+    });
 };
 
 const planDiplomaticContext = async (message, countries, recentText, signal) => {

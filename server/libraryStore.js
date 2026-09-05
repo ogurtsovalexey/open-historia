@@ -16,10 +16,6 @@ import {
 import { readEngineSession } from "./engineSessionStore.js";
 import { commitLivingWorldSession } from "./engineSessionStore.js";
 import { listCompiledScenarioPacks, loadCompiledScenarioPack } from "./scenarioPackStore.js";
-import {
-  EUROPE_1935_SCENARIO_ID,
-  materializeEurope1935RuntimeScenario,
-} from "./europe1935Runtime.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.join(__dirname, "..");
@@ -714,10 +710,6 @@ const readScenarioMeta = (scenarioId) => {
     playCount: normalizePlayCount(raw?.playCount),
     subtitle,
     updatedAt: raw?.updatedAt ?? new Date().toISOString(),
-    // Routes the time jump through the deterministic economy engine instead of
-    // the model. Absent/false for every legacy scenario.
-    engineDriven: raw?.engineDriven === true,
-    engineScenario: String(raw?.engineScenario ?? "").trim() || null,
     // Where the camera opens for this scenario; null keeps the app default.
     startView: normalizeStartView(raw?.startView),
   };
@@ -775,8 +767,10 @@ const readGameMeta = (gameId) => {
     scenarioId: String(raw?.scenarioId ?? "").trim() || DEFAULT_SCENARIO_ID,
     subtitle,
     updatedAt: raw?.updatedAt ?? new Date().toISOString(),
-    engineDriven: raw?.engineDriven === true,
-    engineScenario: String(raw?.engineScenario ?? "").trim() || null,
+    // The prior economy-engine session format is deliberately not a second
+    // runtime. Keep only this migration marker so callers can show an explicit
+    // incompatibility instead of silently loading mixed state.
+    legacySessionIncompatible: raw?.engineDriven === true || typeof raw?.engineScenario === "string",
     livingWorld: raw?.livingWorld === true,
     playerPolityId: String(raw?.playerPolityId ?? "").trim() || null,
     seedChecksum: String(raw?.seedChecksum ?? "").trim() || null,
@@ -1166,14 +1160,6 @@ const ensureScenarioStore = () => {
   ensureDirectory(SERVER_DATA_DIR);
   ensureDirectory(SCENARIOS_DIR);
   ensureDefaultScenario();
-  const europe = materializeEurope1935RuntimeScenario({ scenariosDirectory: SCENARIOS_DIR });
-  const manifest = getScenarioManifest();
-  if (!manifest.order.includes(EUROPE_1935_SCENARIO_ID)) {
-    manifest.order.push(EUROPE_1935_SCENARIO_ID);
-    saveScenarioManifest(manifest);
-  } else if (europe.created) {
-    invalidateCatalogs();
-  }
 };
 
 const ensureGameStore = () => {
@@ -1347,7 +1333,7 @@ const buildGameCatalog = () => {
     const meta = readGameMeta(gameId);
     const assetStatus = getGameAssetStatus(gameId);
     let gameData = readJsonFile(getGameJsonPath(gameId, "game"), {});
-    if (meta.engineDriven || meta.livingWorld) {
+    if (meta.livingWorld) {
       const session = readEngineSession(getGameDirectory(gameId));
       if (session) {
         gameData = {
@@ -1501,6 +1487,11 @@ const getScenarioAgentProfiles = (scenarioId) => {
 
 const getGameDetails = (gameId) => {
   const summary = getGameSummary(gameId);
+  if (summary.legacySessionIncompatible) {
+    const error = new Error("This save uses the retired economy-engine format. Its files are preserved as an archive, but it cannot be opened as a Living World game.");
+    error.code = "LEGACY_SESSION_REQUIRES_MIGRATION";
+    throw error;
+  }
 
   return {
     assetStatus: summary.assetStatus,
@@ -1774,10 +1765,6 @@ const createGame = ({
     DEFAULT_GAME_META.heroTitle,
     name: String(name ?? "").trim() || `${seedName} Session`,
                 scenarioId: scenarioSummary.id,
-                // A game keeps the scenario's engine routing, so the time jump
-                // stays deterministic for every session started from it.
-                engineDriven: sourceGame?.engineDriven === true || scenarioSummary.engineDriven === true,
-                engineScenario: sourceGame?.engineScenario ?? scenarioSummary.engineScenario ?? null,
                 livingWorld: compiledPack !== null,
                 playerPolityId: selectedPlayerPolityId,
                 seedChecksum: compiledPack?.manifest.seedChecksum ?? null,
@@ -2488,7 +2475,7 @@ const readRuntimeJsonAsset = (assetKey) => {
 
   if (gamePath && fs.existsSync(gamePath)) {
     let data = readJsonFile(gamePath, JSON_ASSET_DEFAULTS[assetKey] ?? {});
-    if (activeGame?.engineDriven && (assetKey === "game" || assetKey === "world")) {
+    if (activeGame?.livingWorld && (assetKey === "game" || assetKey === "world")) {
       const session = readEngineSession(getGameDirectory(activeGame.id));
       if (session && assetKey === "game") {
         data = { ...data, gameDate: session.manifest.gameDate, round: session.manifest.round };

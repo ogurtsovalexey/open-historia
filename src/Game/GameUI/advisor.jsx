@@ -6,13 +6,6 @@ import { sendMessage, startChat, loadHistory } from "../AI/main.jsx";
 import { JSON_URLS, readJson, writeJson } from "../../runtime/assets.js";
 import { chatLanguageDiffersFromUi, isRtlLanguage, resolveChatLanguage } from "../../runtime/i18n.js";
 import StatsPane from "./stats.jsx";
-import EconomyPane from "./economy.jsx";
-import DiplomacyPane from "./diplomacy.jsx";
-import StatecraftPane from "./statecraft.jsx";
-import PoliticsPane from "./politics.jsx";
-import MilitaryPane from "./military.jsx";
-import SocietyPane from "./society.jsx";
-import CampaignPane from "./campaign.jsx";
 import { engineLocale, engineText } from "./engineI18n.js";
 
 Chart.register(...registerables);
@@ -200,7 +193,7 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
     const messagesEndRef            = useRef(null);
     const [hasOpened, setHasOpened] = useState(isAdvisorOpen);
     const [hasBootstrapped, setHasBootstrapped] = useState(false);
-    const [activeTab, setActiveTab] = useState("economy");
+    const [activeTab, setActiveTab] = useState("advisor");
     const inputRef = useRef(null);
     const [isResizing, setIsResizing] = useState(false);
     const [handleHover, setHandleHover] = useState(false);
@@ -385,13 +378,6 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
         )}
         {/* Header: tabs to flip between the advisor chat and national stats. */}
         <div style={{ alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", display: "flex", overflowX: "auto", padding: "0 0.75rem 0 0.35rem" }}>
-        <TabButton icon="🏭" label={t("Economy")} active={activeTab === "economy"} onClick={() => setActiveTab("economy")} />
-        <TabButton icon="🤝" label={t("Diplomacy")} active={activeTab === "diplomacy"} onClick={() => setActiveTab("diplomacy")} />
-        <TabButton icon="🏛" label={t("Statecraft")} active={activeTab === "statecraft"} onClick={() => setActiveTab("statecraft")} />
-        <TabButton icon="⚖" label={t("Politics")} active={activeTab === "politics"} onClick={() => setActiveTab("politics")} />
-        <TabButton icon="⚔" label={t("War")} active={activeTab === "military"} onClick={() => setActiveTab("military")} />
-        <TabButton icon="🧬" label={t("Society")} active={activeTab === "society"} onClick={() => setActiveTab("society")} />
-        <TabButton icon="🏁" label={t("Campaign")} active={activeTab === "campaign"} onClick={() => setActiveTab("campaign")} />
         <TabButton icon="🧭" label={t("Advisor")} active={activeTab === "advisor"} onClick={() => setActiveTab("advisor")} />
         <TabButton icon="📊" label={t("Stats")} active={activeTab === "stats"} onClick={() => setActiveTab("stats")} />
         <div style={{ flex: 1 }} />
@@ -411,35 +397,6 @@ const AdvisorPanel = ({ isAdvisorOpen, onClose, width, onResize }) => {
             style={{ background: "none", border: "none", color: "rgba(255,255,255,0.55)", cursor: "pointer", fontSize: "1.35rem", lineHeight: 1, padding: "0 0 0 0.5rem", display: "flex", alignItems: "center" }}
             >✕</button>
         )}
-        </div>
-
-        {/* Deterministic economy pane — engine numbers only, zero model calls. */}
-        <div style={{ display: activeTab === "economy" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
-        <EconomyPane active={isAdvisorOpen && activeTab === "economy"} />
-        </div>
-
-        <div style={{ display: activeTab === "diplomacy" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
-        <DiplomacyPane active={isAdvisorOpen && activeTab === "diplomacy"} />
-        </div>
-
-        <div style={{ display: activeTab === "statecraft" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
-        <StatecraftPane active={isAdvisorOpen && activeTab === "statecraft"} />
-        </div>
-
-        <div style={{ display: activeTab === "politics" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
-        <PoliticsPane active={isAdvisorOpen && activeTab === "politics"} />
-        </div>
-
-        <div style={{ display: activeTab === "military" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
-        <MilitaryPane active={isAdvisorOpen && activeTab === "military"} />
-        </div>
-
-        <div style={{ display: activeTab === "society" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
-        <SocietyPane active={isAdvisorOpen && activeTab === "society"} />
-        </div>
-
-        <div style={{ display: activeTab === "campaign" ? "flex" : "none", flex: 1, flexDirection: "column", minHeight: 0 }}>
-        <CampaignPane active={isAdvisorOpen && activeTab === "campaign"} />
         </div>
 
         {/* National stats pane — kept mounted so flipping tabs is instant. */}

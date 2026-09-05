@@ -4,9 +4,7 @@ import { createPortal } from "react-dom";
 import { useMap } from "react-map-gl/maplibre";
 import { getNationFlags, resolveCountryDisplayName } from "../../runtime/assets.js";
 import { flagImageUrlFromGid, flagEmojiFromGid } from "../../runtime/countryFlags.js";
-import { fetchEconomyState, getActiveEngineGame } from "../../runtime/economy.js";
 import { readWorldState } from "../../runtime/gameState.js";
-import { getStoredLanguage } from "../../runtime/i18n.js";
 import { requestDiplomaticChat } from "../GameUI/chat.jsx";
 import { openCountryPanel } from "./CountryPanel.jsx";
 
@@ -164,26 +162,6 @@ const RegionPopup = () => {
         getNationFlags()
             .then((flags) => {
                 if (!cancelled) setCustomFlags(flags || {});
-            })
-            .catch(() => {});
-        getActiveEngineGame()
-            .then(async (game) => game ? fetchEconomyState(game.id) : null)
-            .then((snapshot) => {
-                if (cancelled || !snapshot) return;
-                const locale = getStoredLanguage();
-                const regionsById = new Map(
-                    (snapshot.regions ?? []).map((region) => [region.regionId, region]),
-                );
-                const names = {};
-                for (const link of snapshot.mapLink?.regions ?? []) {
-                    const region = regionsById.get(link.engineRegionId);
-                    for (const mapRegionId of link.mapRegionIds ?? [link.mapRegionId]) {
-                        names[mapRegionId] = region?.displayName?.[locale]
-                            ?? region?.displayName?.en
-                            ?? link.mapName;
-                    }
-                }
-                setLocalizedRegionNames(names);
             })
             .catch(() => {});
         return () => {

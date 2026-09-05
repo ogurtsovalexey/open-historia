@@ -8,8 +8,6 @@
   "description": "Playable development scenario for deterministic economy, diplomacy, statecraft, politics and aggregate war. Economic and military values are synthetic test balance; no historical outcome is predetermined.",
   "accentColor": "#6ea8fe",
   "countryNameOverrides": {},
-  "engineDriven": true,
-  "engineScenario": "scenario-dev-map-6c",
   "startView": {
     "longitude": 11.5,
     "latitude": 49.5,
