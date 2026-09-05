@@ -31,6 +31,7 @@ import {
     mergeDiplomaticPlan,
     normalizeDiplomaticCountries,
 } from "./diplomacyRouting.js";
+import { extractErrorMessage, readErrorPayload } from "./errorPayload.js";
 import {
     buildPromptContext,
     renderTemplate,
@@ -90,27 +91,6 @@ const canRetryBeforeDeadline = (deadline, retryDelay) =>
 
 function normalizeEndpoint(endpoint) {
     return (endpoint ?? "").trim().replace(/\/$/, "");
-}
-
-async function readErrorPayload(response) {
-    const text = await response.text();
-
-    if (!text) return {};
-
-    try {
-        return JSON.parse(text);
-    } catch {
-        return { rawText: text };
-    }
-}
-
-function extractErrorMessage(payload, fallback) {
-    if (!payload) return fallback;
-    if (typeof payload === "string" && payload.trim()) return payload.trim();
-    if (payload.error?.message) return payload.error.message;
-    if (payload.message) return payload.message;
-    if (typeof payload.rawText === "string" && payload.rawText.trim()) return payload.rawText.trim();
-    return fallback;
 }
 
 // Settings (per provider): an escape hatch for request-body fields the built-in
