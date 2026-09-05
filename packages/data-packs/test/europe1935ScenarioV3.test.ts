@@ -35,7 +35,7 @@ describe('Europe 1935 shipped ScenarioV3', () => {
         .filter((polity) => polity.decisionMode === 'inert')
         .map((polity) => polity.id)
         .sort(),
-      ['polity:free-city-of-danzig', 'polity:saar-basin'],
+      ['polity:free-city-of-danzig', 'polity:saargebiet'],
     );
   });
 

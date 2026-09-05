@@ -15,16 +15,20 @@ const labelOf = (value) => String(value ?? '').split(':').at(-1).replaceAll('-',
 const localized = (value) => value?.en ?? value?.ru ?? '';
 const unique = (values) => [...new Set(values)].sort();
 const actorShard = (polityId) => [...polityId].reduce((sum, character) => sum + character.codePointAt(0), 0) % 3;
+const BACKGROUND_TASK_LIMIT = 4;
 
 function memoryFor(strategicState, polityId) {
   return strategicState?.polities?.find((entry) => entry.polityId === polityId) ?? {
     polityId, durablePlan: null, evidenceIds: [], lastAcceptedRevision: null,
+    reviewedEvidenceIds: [], lastReviewedRevision: null,
   };
 }
 
 function visibleEvidence(state, polityId) {
   return worldV2.selectEvidenceRegistry(state, polityId).value.entries
-    .filter((entry) => entry.canonicalPointers.length > 0)
+    // Clock ticks are canonical, but do not by themselves require an actor to
+    // consume a strategic-model call. Material evidence remains visible.
+    .filter((entry) => entry.canonicalPointers.length > 0 && entry.kind !== 'clock-transition')
     .slice(0, 48)
     .map((entry) => ({
       evidenceId: entry.evidenceId,
@@ -102,19 +106,39 @@ function buildBrief(state, polity, strategicState) {
   return strategicBriefV5Schema.parse(brief);
 }
 
-export function buildLivingWorldStrategicTasks(state, playerPolityId, strategicState) {
-  const actors = state.polities.filter((polity) => (
-    polity.id !== playerPolityId
+function requiresBackgroundReview(state, polity, strategicState) {
+  const memory = memoryFor(strategicState, polity.id);
+  if (!memory.durablePlan) return true;
+  const reviewed = new Set(memory.reviewedEvidenceIds ?? []);
+  return visibleEvidence(state, polity.id).some((entry) => !reviewed.has(entry.evidenceId));
+}
+
+/**
+ * Build only meaningful actor-private checkpoints. Autonomous reviews are
+ * sparse and capped; directly addressed actors (wired by diplomacy in R2)
+ * are intentionally allowed ahead of that background budget.
+ */
+export function buildLivingWorldStrategicTasks(state, playerPolityId, strategicState, options = {}) {
+  const directedPolityIds = new Set(options.directedPolityIds ?? []);
+  const backgroundTaskLimit = options.backgroundTaskLimit ?? BACKGROUND_TASK_LIMIT;
+  const actors = state.polities
+    .filter((polity) => polity.id !== playerPolityId && polity.decisionMode !== 'inert')
+    .sort((left, right) => left.id.localeCompare(right.id));
+  const directed = actors.filter((polity) => directedPolityIds.has(polity.id));
+  const background = actors.filter((polity) => (
+    !directedPolityIds.has(polity.id)
     && polity.decisionMode === 'active'
     && actorShard(polity.id) === state.turn % 3
-  )).sort((left, right) => left.id.localeCompare(right.id));
-  return actors.map((polity) => {
+    && requiresBackgroundReview(state, polity, strategicState)
+  )).slice(0, backgroundTaskLimit);
+  return [...directed, ...background].map((polity) => {
     const brief = buildBrief(state, polity, strategicState);
     if (!brief) return null;
     const taskKey = `strategic-v5:${state.turn}:${polity.id}`;
     return {
       taskKey,
       actorPolityId: polity.id,
+      reviewEvidenceIds: brief.evidence.map((entry) => entry.evidenceId),
       brief,
       systemPrompt: SYSTEM_PROMPT,
       userPrompt: renderStrategicPromptV5(brief),
@@ -124,7 +148,7 @@ export function buildLivingWorldStrategicTasks(state, playerPolityId, strategicS
         schema: exportJsonSchema(strategicDecisionV4Schema),
       },
     };
-  }).filter(Boolean);
+  }).filter(Boolean).sort((left, right) => left.taskKey.localeCompare(right.taskKey));
 }
 
 function normalizeAttempt(task, submitted) {
@@ -182,17 +206,40 @@ function materializeInitiative(state, task, proposal) {
 }
 
 export function resolveLivingWorldStrategicTasks(stateInput, tasks, submittedAttempts = [], strategicStateInput) {
-  let state = stateInput;
   const attempts = new Map(submittedAttempts.map((entry) => [entry.taskKey, entry]));
   const prior = strategicStateInput?.schemaVersion === 'open-historia-strategic-memory/1'
     ? strategicStateInput : { schemaVersion: 'open-historia-strategic-memory/1', polities: [] };
-  const memories = new Map((prior.polities ?? []).map((entry) => [entry.polityId, entry]));
-  const records = [];
+  const resolutions = [];
   for (const task of [...tasks].sort((left, right) => left.taskKey.localeCompare(right.taskKey))) {
     const resolution = resolveStrategicDecisionV5(task.brief, normalizeAttempt(task, attempts.get(task.taskKey)));
+    resolutions.push({ task, resolution });
+  }
+  const blockedTasks = resolutions
+    .filter(({ task, resolution }) => task.brief.checkpoint.required && resolution.status !== 'accepted')
+    .map(({ task, resolution }) => ({
+      taskKey: task.taskKey,
+      actorPolityId: task.actorPolityId,
+      status: resolution.status,
+      reason: resolution.status === 'accepted' ? '' : resolution.reason,
+    }));
+  if (blockedTasks.length > 0) {
+    return {
+      state: stateInput,
+      strategicState: structuredClone(prior),
+      records: resolutions.map(({ task, resolution }) => ({
+        taskKey: task.taskKey, actorPolityId: task.actorPolityId, status: resolution.status,
+        materializedProcessIds: [], errors: resolution.status === 'accepted' ? [] : [resolution.reason],
+      })),
+      blockedTasks,
+    };
+  }
+
+  let state = stateInput;
+  const memories = new Map((prior.polities ?? []).map((entry) => [entry.polityId, entry]));
+  const records = [];
+  for (const { task, resolution } of resolutions) {
     const record = { taskKey: task.taskKey, actorPolityId: task.actorPolityId, status: resolution.status, materializedProcessIds: [], errors: [] };
     if (resolution.status === 'accepted') {
-      memories.set(task.actorPolityId, commitStrategicMemoryV5(memoryFor(prior, task.actorPolityId), resolution));
       for (const decision of resolution.semanticPackage.processDecisions) {
         try {
           state = processes.applyProcessDecision(state, {
@@ -212,9 +259,32 @@ export function resolveLivingWorldStrategicTasks(stateInput, tasks, submittedAtt
     } else record.errors.push(resolution.reason);
     records.push(record);
   }
+  // Materialization failures are also required-checkpoint failures. Return to
+  // the original immutable state instead of committing a partial actor batch.
+  const materializationFailures = records.filter((record) => record.errors.length > 0);
+  if (materializationFailures.length > 0) {
+    return {
+      state: stateInput,
+      strategicState: structuredClone(prior),
+      records,
+      blockedTasks: materializationFailures.map((record) => ({
+        taskKey: record.taskKey, actorPolityId: record.actorPolityId,
+        status: 'rejected', reason: record.errors.join(' ').slice(0, 320),
+      })),
+    };
+  }
+  for (const { task, resolution } of resolutions) {
+    if (resolution.status !== 'accepted') continue;
+    memories.set(task.actorPolityId, {
+      ...commitStrategicMemoryV5(memoryFor(prior, task.actorPolityId), resolution),
+      reviewedEvidenceIds: [...task.reviewEvidenceIds],
+      lastReviewedRevision: stateInput.revision,
+    });
+  }
   return {
     state,
     strategicState: { schemaVersion: 'open-historia-strategic-memory/1', polities: [...memories.values()].sort((left, right) => left.polityId.localeCompare(right.polityId)) },
     records,
+    blockedTasks: [],
   };
 }

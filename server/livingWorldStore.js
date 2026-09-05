@@ -24,10 +24,17 @@ function requireSession(gameId) {
 
 function response(gameId) {
   const { session, playerPolityId } = requireSession(gameId);
+  const strategicCheckpoint = session.agentTurn?.kind === 'strategic-checkpoint-blocked'
+    && session.agentTurn.worldRevisionBefore === session.state.revision
+    ? session.agentTurn.strategicCheckpoint
+    : null;
   return {
     gameId,
     sessionRevision: session.manifest.revision,
-    projection: buildIntentFirstProjection({ session, playerPolityId }),
+    projection: {
+      ...buildIntentFirstProjection({ session, playerPolityId }),
+      strategicCheckpoint,
+    },
     interpretationContext: buildPlayerIntentContext({ session, playerPolityId }),
     strategicTasks: buildLivingWorldStrategicTasks(session.state, playerPolityId, session.agentState),
   };
@@ -330,13 +337,56 @@ export function dismissLivingWorldIntent(gameId, { revision, sessionRevision, in
   return response(gameId);
 }
 
-export function advanceLivingWorld(gameId, { revision, sessionRevision, optionId, strategicAttempts } = {}) {
+export function advanceLivingWorld(gameId, {
+  revision, sessionRevision, optionId, strategicAttempts,
+  strategicDisposition = 'resolve',
+} = {}) {
   const { session, playerPolityId } = requireSession(gameId);
   assertConcurrency(session, revision, sessionRevision);
   if (optionId !== 'advance-one-month') throw new Error(`Unsupported time option ${String(optionId)}.`);
   if (session.playerIntent?.status === 'pending') throw new Error('Confirm or revise the pending interpretation before advancing time.');
   const strategicTasks = buildLivingWorldStrategicTasks(session.state, playerPolityId, session.agentState);
-  const strategy = resolveLivingWorldStrategicTasks(session.state, strategicTasks, strategicAttempts, session.agentState);
+  if (strategicDisposition !== 'resolve' && strategicDisposition !== 'continue-without-decisions') {
+    throw new Error(`Unsupported strategic disposition ${String(strategicDisposition)}.`);
+  }
+  const strategy = strategicDisposition === 'continue-without-decisions'
+    ? {
+      state: session.state,
+      strategicState: session.agentState,
+      records: strategicTasks.map((task) => ({
+        taskKey: task.taskKey, actorPolityId: task.actorPolityId, status: 'skipped',
+        materializedProcessIds: [], errors: ['Explicitly continued without this required strategic decision.'],
+      })),
+      blockedTasks: [],
+    }
+    : resolveLivingWorldStrategicTasks(session.state, strategicTasks, strategicAttempts, session.agentState);
+  if (strategy.blockedTasks.length > 0) {
+    commit(gameId, session, {
+      state: session.state,
+      lastTransition: {
+        kind: 'strategic-checkpoint-blocked',
+        strategicRecords: strategy.records,
+        blockedTasks: strategy.blockedTasks,
+      },
+      strategicState: session.agentState,
+      agentTurn: {
+        schemaVersion: 'open-historia-agent-turn/2',
+        kind: 'strategic-checkpoint-blocked',
+        worldRevisionBefore: session.state.revision,
+        worldRevisionAfter: session.state.revision,
+        month: session.state.month,
+        strategicRecords: strategy.records,
+        strategicCheckpoint: {
+          revision: session.state.revision,
+          month: session.state.month,
+          blockedTasks: strategy.blockedTasks,
+          availableActions: ['retry', 'continue-without-decisions'],
+        },
+      },
+      playerIntent: session.playerIntent,
+    });
+    return response(gameId);
+  }
   const clock = worldV2.advanceWorldMonth(strategy.state, { expectedRevision: strategy.state.revision });
   const { state: _clockState, ...clockRecord } = clock;
   void _clockState;

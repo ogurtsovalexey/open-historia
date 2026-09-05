@@ -66,6 +66,30 @@ describe('living-world production Strategic V5', () => {
     assert.equal(result.records.length, tasks.length);
     assert.ok(result.records.every((entry) => entry.status === 'accepted' && entry.materializedProcessIds.length === 0));
     assert.deepStrictEqual(result.strategicState.polities.map((entry) => entry.polityId), tasks.map((entry) => entry.actorPolityId).sort());
+    assert.deepStrictEqual(buildLivingWorldStrategicTasks(state, 'polity:france', result.strategicState), []);
+  });
+
+  it('keeps the whole required checkpoint atomic when one model attempt fails', () => {
+    const tasks = buildLivingWorldStrategicTasks(state, 'polity:france', memory);
+    const failed = tasks[0];
+    const result = resolveLivingWorldStrategicTasks(state, tasks, tasks.map((task) => task.taskKey === failed.taskKey
+      ? { taskKey: task.taskKey, status: 'failed', message: 'provider unavailable' }
+      : hold(task)), memory);
+    assert.deepStrictEqual(result.state, state);
+    assert.deepStrictEqual(result.strategicState, memory);
+    assert.deepStrictEqual(result.blockedTasks.map((task) => task.taskKey), [failed.taskKey]);
+    assert.ok(result.records.some((record) => record.status === 'accepted'));
+    assert.ok(result.records.some((record) => record.status === 'pending'));
+  });
+
+  it('caps background work and permits a directly addressed supported actor only', () => {
+    const capped = buildLivingWorldStrategicTasks(state, 'polity:france', memory, { backgroundTaskLimit: 1 });
+    assert.equal(capped.length, 1);
+    const supported = state.polities.find((polity) => polity.id !== 'polity:france' && polity.decisionMode === 'supported');
+    assert.ok(supported);
+    const directed = buildLivingWorldStrategicTasks(state, 'polity:france', memory, { directedPolityIds: [supported.id] });
+    assert.ok(directed.some((task) => task.actorPolityId === supported.id));
+    assert.ok(directed.length <= 5);
   });
 
   it('materializes a novel opponent initiative as a funded process while the model supplies no numbers', () => {

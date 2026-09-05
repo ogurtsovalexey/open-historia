@@ -89,10 +89,12 @@ export function useLivingWorldRuntime() {
       },
       confirmInterpretation: ({ revision, interpretationId }) => mutate("intent/confirm", { revision, interpretationId }),
       dismissInterpretation: ({ revision, interpretationId }) => mutate("intent/dismiss", { revision, interpretationId }),
-      advanceTime: async ({ revision, optionId }) => {
+      advanceTime: async ({ revision, optionId, strategicDisposition = 'resolve' }) => {
         const current = payloadRef.current;
-        const strategicAttempts = await runStrategicTasks(current?.strategicTasks);
-        return mutate('advance', { revision, optionId, strategicAttempts });
+        const strategicAttempts = strategicDisposition === 'continue-without-decisions'
+          ? []
+          : await runStrategicTasks(current?.strategicTasks);
+        return mutate('advance', { revision, optionId, strategicAttempts, strategicDisposition });
       },
     };
   }, [activeGameId, enabled]);

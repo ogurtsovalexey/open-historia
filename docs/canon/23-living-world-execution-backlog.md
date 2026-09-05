@@ -33,7 +33,7 @@ canonical reducer.
 | Tribute kernel | Typed multi-beneficiary commodity, labor and military-service obligations conserve deliveries and arrears. Mesoamerica contains one sourced example. | `world/tribute.ts`; `tribute.test.ts` |
 | Intent-first shell | Six primary surfaces, grounded facts, false-claim preview, confirmation, process cards and a canonical one-month advance are connected to a real saved V2 session. | `intentFirstShell.jsx`; `livingWorldStore.js` |
 | Strategic V5 contracts | Private revision-frozen briefs, evidence checks, open initiatives, durable retrieval memory and deterministic materialization exist. | `strategicV5.ts`; `strategicV5.test.ts` |
-| Production opponent loop | Active non-player polities are sharded; supported/inert actors do not consume scheduled calls. Accepted initiatives enter the same engine process path. | `server/livingWorldStrategy.js`; commit `3d14edc` |
+| Production opponent loop | Required V5 batches are atomic and visibly fail closed. Background calls are evidence-aware and capped; accepted initiatives enter the same engine process path. | `server/livingWorldStrategy.js`; R1 checkpoint |
 
 Completed commits, in dependency order:
 
@@ -78,34 +78,30 @@ result is unknown, not failed.
 
 ### 0.3 Known gaps that must not be mistaken for completed features
 
-1. `resolveLivingWorldStrategicTasks` records provider failures and
-   `advanceLivingWorld` still advances the month. This contradicts the
-   required-checkpoint fail-closed rule. It is the first production defect to
-   fix.
-2. Current sharding is based on the monthly `state.turn`. Once the UI advances
+1. Current sharding is based on the monthly `state.turn`. Once the UI advances
    three months, using only the initial shard would starve two shards, while
    calling all three would spend too many model calls. Replace it with the
    bounded, change-aware scheduling contract in section 0.5.
-3. Confirmed player requested actions are currently materialized as generic
+2. Confirmed player requested actions are currently materialized as generic
    processes. There is no V2 production command path for typed diplomacy,
    accepted agreements, combat authority or territorial cession. The visible
    legacy diplomacy/military panes are not permission to call their old
    reducers.
-4. `applyTerritorialTransition` is a correct low-level kernel, but no normal
+3. `applyTerritorialTransition` is a correct low-level kernel, but no normal
    living-world order can yet produce its required peace/agreement/combat
    authority. Never synthesize `gm` authority from ordinary player prose.
-5. Tribute settlement is callable and tested but is not scheduled
+4. Tribute settlement is callable and tested but is not scheduled
    automatically at monthly boundaries.
-6. The live UI advances one month. The required play loop is one player
+5. The live UI advances one month. The required play loop is one player
    decision followed by three deterministic monthly boundaries.
-7. Relationships in V2 are starting facts only. Pending proposals, responses
+6. Relationships in V2 are starting facts only. Pending proposals, responses
    and agreement creation need a typed canonical reducer and evidence.
-8. Only two process effect families are materialized. Do not re-expose the
+7. Only two process effect families are materialized. Do not re-expose the
    other enum values until an exact engine reducer and invariant test exist.
-9. `server/europe1935Runtime.js`, legacy impacts, old management panes and
+8. `server/europe1935Runtime.js`, legacy impacts, old management panes and
    other parallel write paths remain. Delete them only after replacement
    tests pass; do not connect them to V2 as a shortcut.
-10. Only `tests/e2e/living-world-intent-shell.spec.js` exists for the new UI,
+9. Only `tests/e2e/living-world-intent-shell.spec.js` exists for the new UI,
     and it is mostly a shell fixture. The production Playwright and real game
     gates are still red.
 
@@ -126,7 +122,14 @@ commits it.
 
 ### 0.5 Remaining merge ladder (execute strictly in this order)
 
-#### R1 — make Strategic V5 atomic, sparse and visibly fail-closed
+#### R1 — make Strategic V5 atomic, sparse and visibly fail-closed — complete
+
+Delivered: every required task is resolved before material mutation; provider,
+schema and materialization failures preserve the exact WorldStateV2 and
+strategic memory; the session publishes a retry/explicit-skip checkpoint;
+background calls exclude clock-only evidence and cap at four; supported actors
+are callable only when explicitly directed. The next implementation package is
+R2.
 
 Owned files:
 

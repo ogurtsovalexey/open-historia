@@ -11,6 +11,22 @@ let living;
 let gameId;
 let mesoGameId;
 
+function hold(task) {
+  const evidenceId = task.brief.evidence[0].evidenceId;
+  return {
+    taskKey: task.taskKey,
+    status: 'succeeded',
+    modelOutput: {
+      polityId: task.actorPolityId,
+      revision: task.brief.revision,
+      selectedChoiceIds: [], processDecisions: [], initiativeProposals: [],
+      durablePlan: { objective: `Preserve ${task.brief.actor.name}.`, goals: [], commitments: [], revisit: 'Review when material conditions change.' },
+      evidenceIds: [evidenceId],
+      hold: { reason: 'no-legal-action', detail: 'No legal material action is needed.', revisit: 'when-blocker-changes' },
+    },
+  };
+}
+
 before(async () => {
   temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'open-historia-living-store-'));
   process.env.OH_DATA_DIR = temporary;
@@ -110,7 +126,7 @@ describe('living-world command store', () => {
     }), /confirm or revise/i);
   });
 
-  it('advances one canonical month after confirmation and rejects stale sessions', () => {
+  it('blocks a failed required strategy at the same world revision, then retries atomically', () => {
     const pending = living.readLivingWorld(gameId);
     const confirmed = living.confirmLivingWorldIntent(gameId, {
       revision: pending.projection.revision,
@@ -122,13 +138,28 @@ describe('living-world command store', () => {
     assert.equal(confirmed.projection.processes[0].name, 'Electricity');
     assert.equal(confirmed.projection.processes[0].pace, 'steady');
     assert.match(confirmed.projection.facts.find((entry) => entry.factId === 'fact:treasury').value, /^[0-9,]+$/u);
-    const advanced = living.advanceLivingWorld(gameId, {
+    const failedTask = confirmed.strategicTasks[0];
+    assert.ok(failedTask);
+    const blocked = living.advanceLivingWorld(gameId, {
       revision: confirmed.projection.revision,
       sessionRevision: confirmed.sessionRevision,
       optionId: 'advance-one-month',
+      strategicAttempts: confirmed.strategicTasks.map((task) => task.taskKey === failedTask.taskKey
+        ? { taskKey: task.taskKey, status: 'failed', message: 'temporary provider failure' }
+        : hold(task)),
+    });
+    assert.equal(blocked.projection.revision, confirmed.projection.revision);
+    assert.equal(blocked.projection.asOf, confirmed.projection.asOf);
+    assert.equal(blocked.projection.strategicCheckpoint.blockedTasks[0].taskKey, failedTask.taskKey);
+    const advanced = living.advanceLivingWorld(gameId, {
+      revision: blocked.projection.revision,
+      sessionRevision: blocked.sessionRevision,
+      optionId: 'advance-one-month',
+      strategicAttempts: blocked.strategicTasks.map(hold),
     });
     const parsed = parseIntentFirstProjection(advanced.projection);
     assert.equal(parsed.asOf, '1805-02-01');
+    assert.equal(parsed.strategicCheckpoint, null);
     assert.equal(parsed.interpretation, null);
     assert.equal(parsed.briefing.changes[0].authority, 'canonical');
     assert.throws(() => living.advanceLivingWorld(gameId, {

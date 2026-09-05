@@ -103,11 +103,31 @@ export const IntentFirstShell = ({ projection: rawProjection, commands: rawComma
       </main>
       <footer className="oh-intent-footer">
         <div className="oh-intent-footer-meta"><strong>{projection.time.label}</strong> · {projection.playerPolity.displayName}</div>
+        {projection.strategicCheckpoint && (
+          <div className="oh-intent-card" data-testid="strategic-checkpoint" role="status">
+            <strong>Strategic decision required</strong>
+            <p className="oh-intent-muted">{projection.strategicCheckpoint.blockedTasks.map((task) => task.reason).join(" ")}</p>
+            <div className="oh-intent-actions">
+              <button
+                className="oh-intent-button"
+                data-testid="retry-strategic-checkpoint"
+                disabled={busy}
+                onClick={() => void invoke(() => commands.advanceTime({ revision: projection.revision, optionId: projection.time.options[0]?.optionId, strategicDisposition: "resolve" }))}
+              >Retry</button>
+              <button
+                className="oh-intent-button"
+                data-testid="continue-without-strategy"
+                disabled={busy}
+                onClick={() => void invoke(() => commands.advanceTime({ revision: projection.revision, optionId: projection.time.options[0]?.optionId, strategicDisposition: "continue-without-decisions" }))}
+              >Continue without this decision</button>
+            </div>
+          </div>
+        )}
         <button
           className="oh-intent-button"
           data-primary="true"
           data-testid="advance-time"
-          disabled={busy || projection.interpretation?.confirmationRequired || projection.time.options.length === 0}
+          disabled={busy || Boolean(projection.strategicCheckpoint) || projection.interpretation?.confirmationRequired || projection.time.options.length === 0}
           onClick={() => void invoke(() => commands.advanceTime({ revision: projection.revision, optionId: projection.time.options[0].optionId }))}
         >
           {projection.time.options[0]?.label ?? "Time unavailable"}

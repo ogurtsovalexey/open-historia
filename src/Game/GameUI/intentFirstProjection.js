@@ -250,6 +250,23 @@ export const parseIntentFirstProjection = (value) => {
     stringAt(option.optionId, `projection.time.options[${index}].optionId`);
     stringAt(option.label, `projection.time.options[${index}].label`);
   });
+  let strategicCheckpoint = null;
+  if (root.strategicCheckpoint !== null && root.strategicCheckpoint !== undefined) {
+    const checkpoint = objectAt(root.strategicCheckpoint, "projection.strategicCheckpoint");
+    stringAt(checkpoint.revision, "projection.strategicCheckpoint.revision");
+    stringAt(checkpoint.month, "projection.strategicCheckpoint.month");
+    const actions = stringArrayAt(checkpoint.availableActions, "projection.strategicCheckpoint.availableActions", { nonEmpty: true });
+    if (!actions.every((action) => action === "retry" || action === "continue-without-decisions")) {
+      fail("projection.strategicCheckpoint.availableActions", "contains an unsupported action");
+    }
+    const blockedTasks = arrayAt(checkpoint.blockedTasks, "projection.strategicCheckpoint.blockedTasks").map((task, index) => {
+      const path = `projection.strategicCheckpoint.blockedTasks[${index}]`;
+      const row = objectAt(task, path);
+      for (const key of ["taskKey", "actorPolityId", "status", "reason"]) stringAt(row[key], `${path}.${key}`);
+      return row;
+    });
+    strategicCheckpoint = { ...checkpoint, availableActions: actions, blockedTasks };
+  }
   return {
     ...root,
     playerPolity,
@@ -261,6 +278,7 @@ export const parseIntentFirstProjection = (value) => {
     diplomacy: { ...diplomacy, conversations, commitments },
     details,
     time,
+    strategicCheckpoint,
   };
 };
 
