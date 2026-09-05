@@ -185,4 +185,25 @@ describe('PlayerInputInterpretationV2', () => {
     const blocked = interpretPlayerInputV2(world, { actorPolityId: 'polity:alpha', playerText, modelOutput: invalidRelationship });
     assert.ok(blocked.value.requestedActions[0]!.reasons.includes('undeclared-relationship-type:relationship-type:invented'));
   });
+
+  it('repairs only an unambiguous verbatim source span with model-miscalculated offsets', () => {
+    const world = state();
+    const playerText = 'Investigate electrical phenomena.';
+    const output = baseOutput(world.revision);
+    output.requestedActions.push({
+      actionId: 'action:electricity', domain: 'science', scope: 'domestic', intent: playerText,
+      pace: 'slow', effectFamilies: ['knowledge.reveal'], targetEntityIds: ['polity:alpha'], claimRefs: [], evidenceIds: ['evidence:public'],
+      // The literal clause is right, but these offsets are intentionally wrong.
+      sourceSpan: { start: 4, end: playerText.length + 4, text: playerText },
+    });
+    const repaired = interpretPlayerInputV2(world, { actorPolityId: 'polity:alpha', playerText, modelOutput: output });
+    assert.equal(repaired.value.requestedActions[0]!.status, 'grounded');
+    assert.deepEqual(repaired.value.requestedActions[0]!.sourceSpan, { start: 0, end: playerText.length, text: playerText });
+
+    const repeatedText = 'Investigate. Investigate.';
+    const repeated = structuredClone(output);
+    repeated.requestedActions[0]!.sourceSpan = { start: 9, end: 20, text: 'Investigate' };
+    const blocked = interpretPlayerInputV2(world, { actorPolityId: 'polity:alpha', playerText: repeatedText, modelOutput: repeated });
+    assert.ok(blocked.value.requestedActions[0]!.reasons.includes('invalid-source-span'));
+  });
 });

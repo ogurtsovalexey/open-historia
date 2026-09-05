@@ -10,7 +10,7 @@ const entityIdSchema = z.string().max(160).regex(/^[a-z][a-z0-9-]*:[A-Za-z0-9][A
 export const sourceSpanSchema = z.object({
   start: z.number().int().min(0),
   end: z.number().int().min(0),
-  text: z.string().max(4000),
+  text: z.string().min(1).max(4000),
 }).strict().refine((span) => span.end >= span.start, { message: 'source span end must not precede start' });
 
 export const questionV2Schema = z.object({
@@ -154,6 +154,22 @@ function spanReasons(playerText: string, span: z.infer<typeof sourceSpanSchema>)
   return [];
 }
 
+/**
+ * Models sometimes copy an exact clause correctly but miscount its offsets.
+ * Repair only an unambiguous verbatim match; a paraphrase, empty span or
+ * repeated clause remains blocked, so this cannot broaden the player's order.
+ */
+function repairVerbatimSourceSpan(playerText: string, span: z.infer<typeof sourceSpanSchema>): z.infer<typeof sourceSpanSchema> {
+  if (spanReasons(playerText, span).length === 0) return span;
+  const first = playerText.indexOf(span.text);
+  if (first < 0 || playerText.indexOf(span.text, first + 1) !== -1) return span;
+  return { start: first, end: first + span.text.length, text: span.text };
+}
+
+function repairEntrySpan<T extends { sourceSpan: z.infer<typeof sourceSpanSchema> }>(playerText: string, entry: T): T {
+  return { ...entry, sourceSpan: repairVerbatimSourceSpan(playerText, entry.sourceSpan) };
+}
+
 function entityIds(state: worldV2.WorldStateV2): Set<string> {
   return new Set([
     ...state.polities.map((entry) => entry.id),
@@ -283,14 +299,22 @@ export function interpretPlayerInputV2(
     throw new Error(`stale interpretation revision: expected ${state.revision}, received ${modelOutput.revision}`);
   }
 
+  const repairedOutput = {
+    ...modelOutput,
+    questions: modelOutput.questions.map((entry) => repairEntrySpan(request.playerText, entry)),
+    claims: modelOutput.claims.map((entry) => repairEntrySpan(request.playerText, entry)),
+    requestedActions: modelOutput.requestedActions.map((entry) => repairEntrySpan(request.playerText, entry)),
+    proposedInitiatives: modelOutput.proposedInitiatives.map((entry) => repairEntrySpan(request.playerText, entry)),
+  };
+
   const knownEntities = entityIds(state);
   const acceptedEvidence = new Set<worldV2.EvidenceId>();
-  const questions = sortBySpanAndId(modelOutput.questions.map((question): GroundedQuestion => {
+  const questions = sortBySpanAndId(repairedOutput.questions.map((question): GroundedQuestion => {
     const reasons = spanReasons(request.playerText, question.sourceSpan);
     return { ...question, status: reasons.length === 0 ? 'grounded' : 'blocked', reasons };
   }), (question) => question.questionId);
 
-  const claims = sortBySpanAndId(modelOutput.claims.map((claim): GroundedClaim => {
+  const claims = sortBySpanAndId(repairedOutput.claims.map((claim): GroundedClaim => {
     const evidence = evidenceReasons(state, actor.id, claim.evidenceIds);
     evidence.accepted.forEach((id) => acceptedEvidence.add(id));
     const reasons = [
@@ -303,7 +327,7 @@ export function interpretPlayerInputV2(
   }), (claim) => claim.claimId);
   const claimsById = new Map(claims.map((claim) => [claim.claimId, claim]));
 
-  const requestedActions = sortBySpanAndId(modelOutput.requestedActions.map((action): GroundedRequestedAction => {
+  const requestedActions = sortBySpanAndId(repairedOutput.requestedActions.map((action): GroundedRequestedAction => {
     const evidence = evidenceReasons(state, actor.id, action.evidenceIds);
     evidence.accepted.forEach((id) => acceptedEvidence.add(id));
     const reasons = [
@@ -332,7 +356,7 @@ export function interpretPlayerInputV2(
     };
   }), (action) => action.actionId);
 
-  const proposedInitiatives = sortBySpanAndId(modelOutput.proposedInitiatives.map((initiative): GroundedProposedInitiative => {
+  const proposedInitiatives = sortBySpanAndId(repairedOutput.proposedInitiatives.map((initiative): GroundedProposedInitiative => {
     const evidence = evidenceReasons(state, actor.id, initiative.evidenceIds);
     evidence.accepted.forEach((id) => acceptedEvidence.add(id));
     const reasons = sortedUnique([
