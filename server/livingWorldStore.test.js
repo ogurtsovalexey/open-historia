@@ -15,6 +15,7 @@ let skippedStrategyGameId;
 let russianIntentGameId;
 let resolveLivingWorldSubmonths;
 let readEngineSession;
+let buildPlayerIntentContext;
 
 function hold(task) {
   const evidenceId = task.brief.evidence[0].evidenceId;
@@ -39,6 +40,7 @@ before(async () => {
   living = await import('./livingWorldStore.js');
   ({ resolveLivingWorldSubmonths } = living);
   ({ readEngineSession } = await import('./engineSessionStore.js'));
+  ({ buildPlayerIntentContext } = await import('./livingWorldProjection.js'));
   gameId = library.createGame({
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
@@ -79,6 +81,28 @@ describe('living-world command store', () => {
     assert.equal(parsed.asOf, '1805-01-01');
     assert.ok(parsed.facts.some((entry) => entry.factId === 'fact:controlled-population' && entry.authority === 'derived'));
     assert.ok(parsed.facts.some((entry) => entry.factId === 'fact:fielded-personnel' && entry.authority === 'derived'));
+  });
+
+  it('keeps a growing player semantic index bounded without dropping actor-owned regions', () => {
+    const session = readEngineSession(library.getGameDirectory(gameId));
+    const expanded = structuredClone(session);
+    const evidenceId = expanded.state.polities.find((entry) => entry.id === 'polity:france').evidenceIds[0];
+    for (let index = 0; index < 80; index += 1) {
+      expanded.state.processes.push({
+        processId: `process:test-context-${String(index).padStart(3, '0')}`,
+        sponsorEntityRefs: ['polity:france'],
+        kind: 'project',
+        status: 'proposed',
+        evidenceIds: [evidenceId],
+      });
+    }
+    const context = buildPlayerIntentContext({ session: expanded, playerPolityId: 'polity:france' });
+    assert.ok(JSON.stringify(context).length < 50_000);
+    assert.equal(context.entities.filter((entry) => entry.kind === 'process').length, 24);
+    assert.ok(context.entities.some((entry) => entry.entityId === 'polity:france'));
+    assert.ok(context.entities.some((entry) => (
+      entry.kind === 'region' && entry.actualControllerPolityId === 'polity:france'
+    )));
   });
 
   it('projects scenario-local tribute obligations and their conserved-service opportunity cost', () => {

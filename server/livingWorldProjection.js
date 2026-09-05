@@ -8,6 +8,25 @@ const applyBp = (value, bp) => Number(BigInt(value) * BigInt(bp) / 10000n);
 const labelOf = (value) => String(value ?? '').split(':').at(-1).replaceAll('-', ' ');
 const localized = (value, locale) => value?.[locale] ?? value?.en ?? '';
 
+// This is an index for a semantic interpreter, not a serialized world copy.
+// Stable caps prevent a long campaign from making an already-grounded player
+// preview impossible to confirm merely because its context grew.
+const PLAYER_INTENT_CONTEXT_MAX = Object.freeze({
+  polities: 64, regions: 96, formations: 32, concepts: 32, processes: 24,
+  relationships: 32, tributeObligations: 32, evidence: 96, labelLength: 120,
+});
+
+function contextLabel(value, locale) {
+  return localized(value, locale).replace(/\s+/gu, ' ').trim().slice(0, PLAYER_INTENT_CONTEXT_MAX.labelLength);
+}
+
+function boundedContextEntries(entries, maximum, preferred = () => false) {
+  return [...entries].sort((left, right) => (
+    Number(preferred(right)) - Number(preferred(left))
+    || String(left.entityId ?? left.evidenceId).localeCompare(String(right.entityId ?? right.evidenceId))
+  )).slice(0, maximum);
+}
+
 function visibleEvidence(state, polityId) {
   const registry = worldV2.selectEvidenceRegistry(state, polityId).value.entries;
   return new Map(registry.map((entry) => [entry.evidenceId, entry]));
@@ -258,56 +277,58 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
   if (!actor) throw new Error(`Unknown player polity ${playerPolityId}`);
   const registry = worldV2.selectEvidenceRegistry(state, actor.id).value.entries;
   const visibleIds = new Set(registry.map((entry) => entry.evidenceId));
-  const regionRows = state.regions.map((region) => ({
+  const regionRows = boundedContextEntries(state.regions.map((region) => ({
     entityId: region.regionId,
     kind: 'region',
-    label: localized(region.displayName, locale),
+    label: contextLabel(region.displayName, locale),
     legalOwnerPolityId: region.control.legalOwnerPolityId,
     actualControllerPolityId: region.control.actualControllerPolityId,
     evidenceIds: region.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
-  }));
+  })), PLAYER_INTENT_CONTEXT_MAX.regions, (region) => (
+    region.legalOwnerPolityId === actor.id || region.actualControllerPolityId === actor.id
+  ));
   const entities = [
-    ...state.polities.map((polity) => ({
+    ...boundedContextEntries(state.polities.map((polity) => ({
       entityId: polity.id,
       kind: 'polity',
-      label: localized(polity.displayName, locale),
+      label: contextLabel(polity.displayName, locale),
       evidenceIds: polity.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
-    })),
+    })), PLAYER_INTENT_CONTEXT_MAX.polities, (polity) => polity.entityId === actor.id),
     ...regionRows,
-    ...state.formations.filter((entry) => entry.polityId === actor.id).map((formation) => ({
+    ...boundedContextEntries(state.formations.filter((entry) => entry.polityId === actor.id).map((formation) => ({
       entityId: formation.formationId,
       kind: 'formation',
-      label: labelOf(formation.formationId),
+      label: contextLabel(labelOf(formation.formationId), locale),
       polityId: formation.polityId,
       evidenceIds: formation.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
-    })),
-    ...state.concepts.map((concept) => ({
+    })), PLAYER_INTENT_CONTEXT_MAX.formations),
+    ...boundedContextEntries(state.concepts.map((concept) => ({
       entityId: concept.conceptId,
       kind: 'concept',
-      label: localized(concept.displayName, locale),
+      label: contextLabel(concept.displayName, locale),
       status: concept.status,
       evidenceIds: concept.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
-    })),
-    ...state.processes.filter((entry) => entry.sponsorEntityRefs.includes(actor.id)).map((process) => ({
+    })), PLAYER_INTENT_CONTEXT_MAX.concepts),
+    ...boundedContextEntries(state.processes.filter((entry) => entry.sponsorEntityRefs.includes(actor.id)).map((process) => ({
       entityId: process.processId,
       kind: 'process',
-      label: labelOf(process.kind),
+      label: contextLabel(labelOf(process.kind), locale),
       status: process.status,
       evidenceIds: process.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
-    })),
-    ...state.relationships.filter((entry) => entry.participantPolityIds.includes(actor.id)).map((relationship) => ({
+    })), PLAYER_INTENT_CONTEXT_MAX.processes),
+    ...boundedContextEntries(state.relationships.filter((entry) => entry.participantPolityIds.includes(actor.id)).map((relationship) => ({
       entityId: relationship.relationshipId,
       kind: 'relationship',
-      label: labelOf(relationship.kind),
+      label: contextLabel(labelOf(relationship.kind), locale),
       participantPolityIds: relationship.participantPolityIds,
       evidenceIds: relationship.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
-    })),
-    ...state.tributeObligations.filter((entry) => (
+    })), PLAYER_INTENT_CONTEXT_MAX.relationships),
+    ...boundedContextEntries(state.tributeObligations.filter((entry) => (
       entry.payerPolityIds.includes(actor.id) || entry.beneficiaries.some((beneficiary) => beneficiary.polityId === actor.id)
     )).map((obligation) => ({
       entityId: obligation.obligationId,
       kind: 'tribute-obligation',
-      label: labelOf(obligation.obligationId),
+      label: contextLabel(labelOf(obligation.obligationId), locale),
       payerPolityIds: obligation.payerPolityIds,
       beneficiaries: obligation.beneficiaries,
       deliveries: obligation.deliveries,
@@ -317,12 +338,13 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
       arrears: obligation.arrears,
       complianceBp: obligation.complianceBp,
       evidenceIds: obligation.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
-    })),
+    })), PLAYER_INTENT_CONTEXT_MAX.tributeObligations),
   ];
   const referencedEvidence = new Set(entities.flatMap((entry) => entry.evidenceIds));
   const evidence = registry
     .filter((entry) => referencedEvidence.has(entry.evidenceId))
-    .slice(0, 240)
+    .sort((left, right) => left.evidenceId.localeCompare(right.evidenceId))
+    .slice(0, PLAYER_INTENT_CONTEXT_MAX.evidence)
     .map((entry) => ({
       evidenceId: entry.evidenceId,
       kind: entry.kind,
@@ -330,7 +352,7 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
   const context = {
     revision: state.revision,
     month: state.month,
-    actor: { entityId: actor.id, label: localized(actor.displayName, locale) },
+    actor: { entityId: actor.id, label: contextLabel(actor.displayName, locale) },
     worldRules: state.worldRules,
     entities,
     evidence,
@@ -339,6 +361,5 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
     allowedDiplomaticOperations: ['process.propose', 'diplomacy.propose', 'territory.offer'],
     relationshipTypes: state.catalogs.relationshipTypes.map((entry) => entry.relationshipTypeId).sort(),
   };
-  if (JSON.stringify(context).length > 50_000) throw new Error('Player intent context exceeds the bounded semantic prompt budget.');
   return context;
 }
