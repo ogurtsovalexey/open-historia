@@ -118,3 +118,21 @@ provider. Confirmation returned normally, and Details showed exactly one
 doctrine input. The read-only audit for this clean game has three revisions,
 sanitized Utility provenance only, no raw model traffic, and replay checksum
 `sha256:5f4f5a38b1c21715351f5a79423711cb13b7076751de13a4df3886d4eba09aa3`.
+
+## Mirrored process-proposal regression (subsequent run)
+
+One live French run exposed a distinct Utility-AI integration defect: the same
+single source sentence was emitted as both a typed `process.propose` action
+and a richer proposed initiative. The old materializer treated these two views
+as two authorizations, creating two separately funded optical-communications
+processes. `c610bad` preserves source spans in the pending interpretation and
+deduplicates material candidates by their exact player source span, preferring
+the richer initiative. Different player fragments remain independent.
+
+In a fresh French UI game, the real provider again returned both forms for
+“Предложить стандартизированную гражданско-военную оптическую службу связи;
+начать только как предлагаемый процесс.” The preview now showed one 1,757
+commitment (not a summed duplicate), and confirmation produced exactly one
+`develop / proposed` optical-communications process at 0%. Its read-only
+audit has three revisions, Utility provenance only, no raw traffic, and replay
+checksum `sha256:3f7c9da24a05fbb0239ac11f5dd3b9b21eec532ef3ab08605f26fba4ac1028cb`.
