@@ -4,15 +4,16 @@ Status: implementation companion to [22 — Living world program](./22-living-wo
 
 Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the production Europe 1935, Strategic V4, localization and Codex transport changes.
 
-## 0. Current checkpoint and low-context handoff (2026-09-05)
+## 0. Current checkpoint and low-context handoff (2026-09-06)
 
 This section is the authoritative resume point for the next implementation
 agent. Do not restart the merge ladder and do not reconstruct completed work
 from the old baseline. The current pushed implementation checkpoint is
-`bd4fa1c` on `feature/campaign-memory` (`test(ui): record deterministic
-cross-era playtests`). R5 is complete. R6 has verified the deterministic UI
-loop across all three scenarios, but its model-mediated coverage remains
-blocked until a production AI provider is configured.
+`26300fe` on `feature/campaign-memory` (`docs(playtest): record
+model-mediated living-world smoke test`). R5 is complete. R6 has verified the
+deterministic UI loop across all three scenarios and one real
+Codex-subscription player-intent/strategic-settlement path, but the required
+three full model-mediated campaigns remain incomplete.
 
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
@@ -376,11 +377,15 @@ redacted reports and screenshots; raw provider traffic remains gitignored.
 
 Progress checkpoint: `docs/reports/r6-ui-playtest-2026-09-05.md` records ten
 three-month decisions/30 deterministic boundaries each in Napoleonic,
-Mesoamerican and Europe 1935 UI sessions. The browser had no configured
+Mesoamerican and Europe 1935 UI sessions. The original runs had no configured
 provider, so each advance correctly presented a visible strategic checkpoint
-and the test used only its explicit skip action. This is not WP15 completion:
-repeat with the configured production provider to cover model-mediated player
-intent, diplomacy, counterfactual concept and territorial-pressure paths.
+and used only its explicit skip action. A subsequent real
+Codex-subscription smoke test verified one French player intention through
+typed interpretation, engine resource commitment and a three-month strategic
+settlement (0% → 9% process progress). This is still not WP15 completion:
+repeat the three full runs with the configured production provider to cover
+model-mediated diplomacy, counterfactual concept and territorial-pressure
+paths.
 
 ### 0.6 Definition of a safe handoff between remaining packages
 
