@@ -181,3 +181,19 @@ regression run, not three fresh ten-decision campaigns. The attempted Malta
 claim is now safely omitted when Malta is outside the bounded interpreter
 index; resolving a player-named remote region without inflating that index is
 an explicit future UX/context task.
+
+## Remote territorial-claim regression (subsequent run)
+
+`f008fac` adds a compact scenario-wide region reference index used only while
+interpreting retrospective territorial claims. It carries a region ID and
+label, never control, numeric values, evidence, or permission to target the
+region with a future action. This separates *naming a past claim* from
+authorizing a territorial command.
+
+After a production rebuild, the live UI interpreted “France already owns
+Bohemia.” as `controls-region region:nap1805:bohemia`, marked it
+`contradicted`, and displayed 13 grounded sources. The statement did not
+create a material action or change control. The literal Malta wording still
+cannot be grounded because the Napoleonic ScenarioV3 fixture contains no Malta
+region at all (not because it was context-pruned); that fixture/text mismatch
+remains an explicit scenario-data defect in WP15 coverage.
