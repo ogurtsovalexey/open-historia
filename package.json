@@ -52,7 +52,7 @@
     "campaign-lab:legacy-v2": "npm run build:data-packs && npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/campaign-lab.mjs",
     "living-world:baseline": "npm run build:domain && npm run build:data-packs && npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/living-world-gate.mjs",
     "living-world:target": "npm run build:domain && npm run build:data-packs && npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node scripts/living-world-gate.mjs --target",
-    "test:living-world": "npm run build:domain && npm run build:data-packs && npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node --test server/livingWorldGate.test.js",
+    "test:living-world": "npm run build:domain && npm run build:data-packs && npm run build:engine && cd packages/agent-runtime && npm run build && cd ../.. && node --test server/livingWorldGate.test.js server/crossEraAcceptance.test.js",
     "validate:scenarios": "npm run build:data-packs && npm run build:engine && node scripts/scenarios/fleet.mjs validate",
     "compile:scenarios": "npm run build:data-packs && npm run build:engine && node scripts/scenarios/fleet.mjs compile",
     "test:scenarios": "npm run validate:scenarios && npm run compile:scenarios && npm run test:data-packs && cd packages/engine && npm run build:tests && node --test \"dist-test/test/*ScenarioV3.test.js\" && cd ../.. && node --test server/scenarioV3Cli.test.js server/scenarioPackStore.test.js server/scenarioFleet.test.js",

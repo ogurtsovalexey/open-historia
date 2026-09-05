@@ -321,6 +321,13 @@ never engine settlement.
 
 #### R5 — cross-era fixtures, legacy deletion and full release gates
 
+Progress checkpoint: WP12 cross-era acceptance is implemented in
+`server/crossEraAcceptance.test.js` and included in `npm run test:living-world`.
+It runs false-history, open-concept, territorial-causality, replay,
+scenario-leakage and epistemics assertions against both Napoleonic and Central
+Mesoamerican compiled worlds. Legacy deletion, saved-session migration and the
+WP14 release gate remain required before R5 can be marked complete.
+
 Complete WP12 fixtures in two relevant scenarios each. Only after those and
 R4 are green, remove live Strategic V4, model-authored impacts, binding-canon
 memory, AI-generated exact statistics, Europe-specific runtime branches,
