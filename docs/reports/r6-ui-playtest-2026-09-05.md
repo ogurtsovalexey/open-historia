@@ -136,3 +136,19 @@ commitment (not a summed duplicate), and confirmation produced exactly one
 `develop / proposed` optical-communications process at 0%. Its read-only
 audit has three revisions, Utility provenance only, no raw traffic, and replay
 checksum `sha256:3f7c9da24a05fbb0239ac11f5dd3b9b21eec532ef3ab08605f26fba4ac1028cb`.
+
+## Strategic-checkpoint map regression (subsequent run)
+
+A live strategic retry then exposed a client-only failure: one opponent provider
+call returned `Failed to fetch`, which correctly left the world at its frozen
+revision and displayed Retry/explicit Skip, but the old `react-map-gl 8.1.0`
+adapter could dereference a temporarily null MapLibre style (`_loaded`) and
+take down the whole world view. `7201b41` upgrades it to 8.1.3, whose style
+component update is null-safe.
+
+After restart, the same saved French checkpoint rendered normally with its
+precise provider error and retry action. Retrying through the real UI completed
+`1805-01-01` → `1805-04-01` with all three monthly boundaries resolved and no
+map/UI crash. The read-only audit records Utility and Strategic provenance,
+excludes raw traffic, and has replay checksum
+`sha256:4ebebb95b97a2bb0b134ad73dbc171cbe7d943f1ca1b92c585749584e3f9c390`.
