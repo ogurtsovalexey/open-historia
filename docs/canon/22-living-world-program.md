@@ -679,13 +679,34 @@ means and which effect families are relevant. The engine owns all numbers.
 
 Scheduling rules:
 
-- scheduled actor review remains quarterly by default;
+- the deterministic scheduler may review actors every quarter, but a review
+  does not by itself justify a model call;
+- call a strategic model only when the actor has a new material situation, a
+  pending interaction, a process checkpoint, or no still-valid recorded plan;
 - material war, proposal, crisis, government, occupation, peace, default and
   process checkpoints are immediate;
 - ongoing processes do not require monthly model calls;
+- coalesce several changes for the same actor into one private brief and never
+  call a model merely to narrate deterministic settlement;
+- the default production budget is at most four autonomous background actor
+  calls per three-month player turn. Directly addressed actors and required
+  semantic checkpoints have priority; excess background reviews are deferred
+  in stable order, never silently replaced by invented actions;
 - a required failed strategic/semantic call pauses at the same revision;
 - accepted packages commit in stable polity order;
 - recorded decisions replay with zero model calls.
+
+The normal player advance is three simulated monthly boundaries. Monthly
+settlement remains the engine time quantum, so tribute, production, processes
+and control changes still reconcile month by month. The session separately
+counts player decisions; `WorldStateV2.turn` continues to count canonical
+monthly boundaries. A one-month advance may remain available as a diagnostic
+control, but the release play loop and ten-turn acceptance use three months.
+
+This budget is a product constraint, not only a cost optimization. A living
+world is produced by durable plans plus deterministic consequences between
+sparse meaningful decisions. Repeatedly asking every polity what it wants
+would waste context, make actors erratic and make long games impractical.
 
 ## 13. Phase 8 — existing-domain migration
 

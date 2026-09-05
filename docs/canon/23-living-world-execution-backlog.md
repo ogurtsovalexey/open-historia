@@ -2,7 +2,353 @@
 
 Status: implementation companion to [22 — Living world program](./22-living-world-program.md).  This document turns that product contract into merge-sized work.  It does not weaken or replace canon 22.  Where a task below appears to conflict with canon 22, canon 22 wins and this backlog must be corrected.
 
-Baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the production Europe 1935, Strategic V4, localization and Codex transport changes.
+Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the production Europe 1935, Strategic V4, localization and Codex transport changes.
+
+## 0. Current checkpoint and low-context handoff (2026-09-05)
+
+This section is the authoritative resume point for the next implementation
+agent. Do not restart the merge ladder and do not reconstruct completed work
+from the old baseline. The current pushed implementation checkpoint is
+`3d14edc` on `feature/campaign-memory` (`feat(ai): run staggered Strategic V5
+opponents`). The documentation commit containing this section follows it.
+
+The next owner is expected to work serially in one session. Do not start the
+repository's agent orchestrator and do not spawn subagents unless the owner
+explicitly reverses that instruction. Prefer focused tests while developing;
+run the complete gates only at the merge points listed below. This is both a
+usage constraint and protection against several agents editing the same
+canonical reducer.
+
+### 0.1 What is already implemented
+
+| Area | State at `3d14edc` | Main proof |
+| --- | --- | --- |
+| Canon and contracts | Complete enough to build on. Canon 22 is the product authority. | `docs/canon/22-living-world-program.md` |
+| WorldStateV2 | Canonical schema, hashing, revisions, invariants, evidence registry and grounded selectors exist. Writable national population/army aggregates are not the V2 authority. | `packages/engine/src/world/*`; `worldStateV2.test.ts` |
+| Territorial causality kernel | One strict `applyTerritorialTransition` owns control. Population, production, tax and recruitment projections follow the region; formation personnel retain origins. | `control.ts`; territorial/personnel/combat causality tests |
+| Claims boundary | Player text is split into questions, claims, requested actions and initiatives. False past claims and prompt spoofing are rejected independently of valid intentions. | `playerInputV2.ts`; `claimsBoundary.test.js` |
+| ScenarioV3 | One offline compiler and generic fleet registry ship Europe 1935, Napoleonic 1805 and Central Mesoamerica 1450. | `scripts/scenarios/fleet.mjs`; three scenario packages |
+| Open concepts/processes | Unauthored technologies, ideologies, institutions and projects can become funded, staged processes. AI selects semantics and pace; engine derives exact costs, progress and checkpoint effects. | `packages/engine/src/processes/*` |
+| Materialized effects | Only `capacity.modify` and `supply-capacity.modify` are currently safe live effect primitives. Unsupported families are deliberately hidden from AI/UI envelopes. | `processEffects.test.ts` |
+| Tribute kernel | Typed multi-beneficiary commodity, labor and military-service obligations conserve deliveries and arrears. Mesoamerica contains one sourced example. | `world/tribute.ts`; `tribute.test.ts` |
+| Intent-first shell | Six primary surfaces, grounded facts, false-claim preview, confirmation, process cards and a canonical one-month advance are connected to a real saved V2 session. | `intentFirstShell.jsx`; `livingWorldStore.js` |
+| Strategic V5 contracts | Private revision-frozen briefs, evidence checks, open initiatives, durable retrieval memory and deterministic materialization exist. | `strategicV5.ts`; `strategicV5.test.ts` |
+| Production opponent loop | Active non-player polities are sharded; supported/inert actors do not consume scheduled calls. Accepted initiatives enter the same engine process path. | `server/livingWorldStrategy.js`; commit `3d14edc` |
+
+Completed commits, in dependency order:
+
+```text
+8e0f213 feat(ai): add grounded strategic v5 contracts
+eb4c61a feat(ui): add grounded intent-first shell
+272b9db feat(runtime): add atomic WorldStateV2 sessions
+553acab feat(scenarios): migrate Europe 1935 to ScenarioV3
+cf999ec feat(scenarios): add grounded Napoleonic Europe 1805
+885e59c feat(scenarios): add grounded Central Mesoamerica 1450
+6555f0b feat(scenarios): compile the product fleet generically
+b7bda70 feat(runtime): start grounded living-world games
+12ed1bb feat(ui): connect intent-first living-world runtime
+6917726 feat(ai): ground open player initiatives
+05c5bb8 feat(living-world): conserve tribute obligations
+db4b0cc feat(processes): materialize grounded checkpoint effects
+3d14edc feat(ai): run staggered Strategic V5 opponents
+```
+
+### 0.2 Verification truth at the checkpoint
+
+Do not report `3d14edc` as fully green without rerunning the interrupted gate.
+The following passed after its changes:
+
+```text
+npm run lint
+npm run build:data-packs
+npm run build:engine
+node --test \
+  packages/data-packs/dist-test/test/europe1935ScenarioV3.test.js \
+  packages/data-packs/dist-test/test/napoleonic1805.test.js \
+  packages/data-packs/dist-test/test/mesoamerica1450.test.js \
+  packages/engine/dist-test/test/compileScenarioV3.test.js \
+  server/livingWorldStrategy.test.js \
+  server/livingWorldStore.test.js
+```
+
+That focused run passed 25 tests. A root `npm test` was intentionally stopped
+after all package test builds, before the full Node test run, to conserve the
+owner's usage. Therefore the next merge point must run the full gates; their
+result is unknown, not failed.
+
+### 0.3 Known gaps that must not be mistaken for completed features
+
+1. `resolveLivingWorldStrategicTasks` records provider failures and
+   `advanceLivingWorld` still advances the month. This contradicts the
+   required-checkpoint fail-closed rule. It is the first production defect to
+   fix.
+2. Current sharding is based on the monthly `state.turn`. Once the UI advances
+   three months, using only the initial shard would starve two shards, while
+   calling all three would spend too many model calls. Replace it with the
+   bounded, change-aware scheduling contract in section 0.5.
+3. Confirmed player requested actions are currently materialized as generic
+   processes. There is no V2 production command path for typed diplomacy,
+   accepted agreements, combat authority or territorial cession. The visible
+   legacy diplomacy/military panes are not permission to call their old
+   reducers.
+4. `applyTerritorialTransition` is a correct low-level kernel, but no normal
+   living-world order can yet produce its required peace/agreement/combat
+   authority. Never synthesize `gm` authority from ordinary player prose.
+5. Tribute settlement is callable and tested but is not scheduled
+   automatically at monthly boundaries.
+6. The live UI advances one month. The required play loop is one player
+   decision followed by three deterministic monthly boundaries.
+7. Relationships in V2 are starting facts only. Pending proposals, responses
+   and agreement creation need a typed canonical reducer and evidence.
+8. Only two process effect families are materialized. Do not re-expose the
+   other enum values until an exact engine reducer and invariant test exist.
+9. `server/europe1935Runtime.js`, legacy impacts, old management panes and
+   other parallel write paths remain. Delete them only after replacement
+   tests pass; do not connect them to V2 as a shortcut.
+10. Only `tests/e2e/living-world-intent-shell.spec.js` exists for the new UI,
+    and it is mostly a shell fixture. The production Playwright and real game
+    gates are still red.
+
+### 0.4 Scope guard for a simpler implementation agent
+
+The remaining work is not permission to build EU/HOI systems. Use aggregate
+formations, regional control, typed commitments and long-running processes.
+Do not add technology trees, province construction queues, tactical units,
+factory-by-factory production, sliders for basis points, or AI-authored exact
+numbers. When a missing mechanic is needed, add the smallest scenario-neutral
+typed state and reducer that makes one intended player loop honest.
+
+Use `apply_patch` for edits. Keep generated scenario JSON synchronized with
+its assembler. Never hand-edit only a generated scenario artifact. Keep every
+model-facing context bounded, revision-stamped and actor-private. Every model
+output is a proposal until a deterministic engine function validates and
+commits it.
+
+### 0.5 Remaining merge ladder (execute strictly in this order)
+
+#### R1 — make Strategic V5 atomic, sparse and visibly fail-closed
+
+Owned files:
+
+```text
+server/livingWorldStrategy.js
+server/livingWorldStore.js
+server/livingWorldStrategy.test.js
+server/livingWorldStore.test.js
+src/runtime/livingWorld.js
+src/Game/GameUI/intentFirstShell.jsx
+```
+
+Required behavior:
+
+- Resolve every submitted attempt to a semantic package before mutating
+  `WorldStateV2` or strategic memory. If any required task fails validation or
+  provider execution, return `blockedTasks`; material state, month, revision
+  and memory remain byte-identical for the whole strategic boundary.
+- Persist a session-level visible checkpoint with bounded reasons. Offer
+  `Retry` and an explicit `Continue without this actor decision`. Continue
+  records an audit item but creates no hidden action or narrative fallback.
+- A scheduled review alone does not cause a call. Store the last reviewed
+  revision/evidence IDs in retrieval-only strategic memory and enqueue a task
+  only for a new material event, directly addressed proposal, due process
+  checkpoint or absent valid plan.
+- Coalesce triggers per actor. Per three-month player advance, allow at most
+  four background actor calls in stable polity order. Directly addressed
+  actors and required semantic checkpoints take priority. Defer the remainder
+  without changing their state.
+- `active` actors may initiate. `supported` actors receive a call only when
+  directly addressed or materially required as a participant. `inert` actors
+  never receive a strategic call.
+
+Red tests:
+
+- one failed task beside one accepted task leaves state and all memory
+  byte-identical;
+- retry at the same revision can commit once, and stale retry is rejected;
+- unchanged evidence produces zero background tasks;
+- five due actors schedule four and defer one deterministically;
+- a directly addressed `supported` actor gets one private response task;
+- no brief contains another polity's private evidence.
+
+Merge gate: focused server tests, then `npm test`, `npm run test:scenarios`,
+`npm run build`, `npm run lint`, `git diff --check`. Commit this package alone.
+
+#### R2 — typed diplomacy and authorized territory, end to end
+
+Do not route a territorial request through a generic process effect. Add the
+smallest canonical proposal state needed for a real negotiation:
+
+```ts
+type DiplomaticTerm =
+  | { kind: 'relationship'; relationshipTypeId: string; participantPolityIds: string[] }
+  | { kind: 'territorial-cession'; regionId: string; fromPolityId: string; toPolityId: string };
+
+interface DiplomaticProposalState {
+  proposalId: string;
+  proposerPolityId: string;
+  recipientPolityIds: string[];
+  terms: DiplomaticTerm[];
+  status: 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+  createdAtRevision: string;
+  evidenceIds: string[];
+}
+```
+
+Exact naming may follow repository conventions, but responsibilities may not
+be collapsed. Add the collection to ScenarioV3/WorldSeedV2/WorldStateV2 as an
+empty starting array, canonical hashing, invariants, evidence registry and
+selectors. Compile relationship type IDs into the runtime catalog manifest;
+do not accept arbitrary relationship labels from the model.
+
+Extend `requestedActionV2ModelSchema` with a discriminated semantic operation
+for at least `process.propose`, `diplomacy.propose` and `territory.offer`.
+The model may select visible polity/region/type IDs and qualitative intent; it
+may not set shares, access basis points, control profiles or numeric effects.
+Confirmation creates a pending proposal, not an agreement and not a transfer.
+
+Expose pending proposals as frozen Strategic V5 choices to their recipients.
+An accepted relationship term creates one typed relationship event. An
+accepted territorial-cession term calls `applyTerritorialTransition` with
+`authority: { kind: 'agreement', agreementId }`, opening phase, exact expected
+control and an engine-selected declared control profile. Reject proposals
+where the ceding party is not the legal owner, the target is unknown, the
+recipient is not a participant, or the revision/control changed. A rejection
+changes only proposal status and evidence.
+
+Minimum tests:
+
+- false claim plus a valid diplomatic offer retains only the valid offer;
+- offer creation changes no territory/population/army/economy;
+- acceptance transfers exactly one region and both polity snapshots reconcile
+  in the same committed revision;
+- fielded formations do not change allegiance or duplicate;
+- rejection and stale acceptance change no control;
+- ordinary text cannot select `gm` or `combat` authority;
+- a model-supplied access percentage or undeclared relationship type fails.
+
+Add `tests/e2e/living-world-territory.spec.js` only after server tests pass.
+
+#### R3 — monthly settlement inside a three-month player turn
+
+Add `advance-three-months` as the normal UI option. Keep
+`advance-one-month` only as a diagnostic option if existing tests need it.
+Store a separate `playerDecisionIndex` in the session/audit metadata; do not
+reinterpret monthly `WorldStateV2.turn`.
+
+For each of the three submonths execute one pure, stable sequence and record
+all intermediate revisions:
+
+1. apply already-authorized opening agreements/peace transitions;
+2. settle obligations due for the current month, including tribute arrears;
+3. advance every active process once in stable process-ID order;
+4. apply already-resolved closing combat occupations, if the military slice
+   exists by then;
+5. advance the canonical clock one month.
+
+No model call occurs between these substeps. Strategic and semantic decisions
+must already be recorded before the batch. If any deterministic substep fails,
+commit none of the three months. Implement on a cloned/local state and persist
+only the final state plus a lossless list of submonth transitions.
+
+Initially support the authored `monthly` tribute cadence and reject unknown
+runtime cadence rather than guessing. Commodity payer debits must equal
+beneficiary credits plus arrears change; labor and military reservations must
+continue to reduce workforce/manpower projections without deleting people.
+
+Tests: exact date after 3/30 months, atomic rollback on month two, three process
+advances, three tribute settlements, deterministic replay, and no extra AI
+calls during submonths.
+
+#### R4 — finish the production intent-first UI and automated acceptance
+
+Make the new six-surface shell the only primary UI for living-world games.
+Legacy panes may remain under `Details` read-only until R5, but their old queue
+buttons must be unreachable for V2 sessions.
+
+The player must be able to see and operate:
+
+- claim contradiction beside the preserved valid intention;
+- process funding, pace, stage, blockers and engine-derived effects;
+- pending diplomatic proposal, recipient response and resulting agreement;
+- before/after territorial population, tax/output, recruitment and formation
+  exception rows;
+- strategic checkpoint retry/continue;
+- three-month advance progress and causal summary.
+
+Finish Russian and English labels. At 1440x900 and 390x844, no primary control
+may be outside the scrollable surface. Add and run the exact WP13 Playwright
+files. Tests use the production server/session path; mock only model outputs,
+never engine settlement.
+
+#### R5 — cross-era fixtures, legacy deletion and full release gates
+
+Complete WP12 fixtures in two relevant scenarios each. Only after those and
+R4 are green, remove live Strategic V4, model-authored impacts, binding-canon
+memory, AI-generated exact statistics, Europe-specific runtime branches,
+dual engine flags and writable legacy controls. Audit `packages/sim-core`
+imports before deciding whether it can be deleted.
+
+Required searches must return no live production matches (test/migration
+readers may be explicitly documented):
+
+```bash
+rg -n "Binding Canon|model-authored impacts|engineDriven|engineScenario" src server packages
+rg -n "polity:(germany|france|ussr)|commodity:(coal|iron|goods)" server packages/engine/src packages/agent-runtime/src
+rg -n "europe1935Runtime" server src electron package.json
+```
+
+Then run the complete WP14 gate exactly as written. Do not weaken tests to
+make deletion pass.
+
+#### R6 — real games and evidence
+
+Run WP15 through the visible production-equivalent UI after all automated
+gates pass. The required release evidence is three fresh games, ten player
+decisions and 30 simulated months each. The minimum originally requested by
+the owner—Napoleonic 1805 plus one structurally unlike scenario—is covered by
+Napoleonic France and Mesoamerican Tenochtitlan; Europe 1935 remains mandatory
+as the migration regression.
+
+Use the scripted intentions in WP15 as coverage goals, not text that must be
+forced through an invalid world. If war/occupation is not legally reachable,
+record the actual blocker and repeat the affected path in another fresh save
+until the cross-scenario territorial gate is genuinely exercised. Commit only
+redacted reports and screenshots; raw provider traffic remains gitignored.
+
+### 0.6 Definition of a safe handoff between remaining packages
+
+At the end of R1-R6, leave:
+
+- one coherent commit per package, pushed to `feature/campaign-memory`;
+- a clean `git status`;
+- the exact commands and pass/fail counts in the commit/handoff note;
+- no generated artifact differing from its assembler;
+- no skipped or weakened failing test without a documented product decision;
+- no claim that the program is complete before R6 reports exist.
+
+If context is limited, read section 0, the relevant R package, and the
+corresponding detailed WP below. Canon 22 decides any conflict.
+
+### 0.7 Minimal bootstrap prompt for the next agent
+
+The owner may start a lower-cost coding agent with this prompt:
+
+```text
+Work in /Users/alexey/Documents/projects/open-historia-next on branch
+feature/campaign-memory. Work serially: do not spawn subagents and do not run
+the agent orchestrator. Read AGENTS.md, docs/principles.md, canon 22, and
+section 0 plus R1 of canon 23. HEAD includes 3d14edc and the later handoff-doc
+commit. Preserve unrelated changes.
+
+Implement R1 only: make production Strategic V5 all-or-nothing on required
+failures, expose a visible retry/explicit-skip checkpoint, and make scheduling
+change-aware with the documented four-background-call budget. Write the R1
+red tests first. Do not add diplomacy, three-month turns, or legacy adapters
+in this commit. Do not let model output author numbers or see another actor's
+private evidence. Run the focused tests during development, then the exact R1
+merge gate. Commit and push only when green, and report the commit hash, test
+counts, and any remaining R1 defect. Then stop for the next instruction.
+```
 
 ## 1. How an implementation agent must use this backlog
 
