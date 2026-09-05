@@ -132,6 +132,14 @@ describe('PlayerInputInterpretationV2', () => {
     }), /invalid enum value/i);
   });
 
+  it('requires a canonical region ID instead of a display name for territorial claims', () => {
+    assert.throws(() => claimV2ModelSchema.parse({
+      claimId: 'claim:malta', subject: 'polity:alpha', predicate: 'controls-region',
+      proposedValue: 'Malta', proposedTime: null, sourceSpan: { start: 0, end: 1, text: 'x' },
+      grounding: 'supported', evidenceIds: [],
+    }), /invalid_string/i);
+  });
+
   it('rejects a false premise while preserving a separate valid domestic investment intention', () => {
     const world = state();
     const playerText = 'I conquered B. Invest in A.';

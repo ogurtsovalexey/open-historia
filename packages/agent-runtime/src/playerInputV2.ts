@@ -27,16 +27,23 @@ export type ClaimGrounding = z.infer<typeof claimGroundingSchema>;
 // permanently `unknown` predicates from leaking through the semantic layer.
 export const claimPredicateSchema = z.enum(['controls-region', 'conquered-region', 'fielded-personnel']);
 
-export const claimV2ModelSchema = z.object({
+const claimV2CommonSchema = {
   claimId: interpretationIdSchema('claim'),
   subject: entityIdSchema,
-  predicate: claimPredicateSchema,
-  proposedValue: z.union([z.string().max(1000), z.number().finite(), z.boolean(), z.null()]),
   proposedTime: z.string().trim().min(1).max(120).nullable(),
   sourceSpan: sourceSpanSchema,
   grounding: claimGroundingSchema,
   evidenceIds: z.array(worldV2.evidenceIdSchema).max(64),
-}).strict();
+};
+
+// The predicate fixes the value domain. In particular, a region claim cannot
+// smuggle a display name such as "Malta": it must name one of the canonical
+// `region:*` entities presented to the model.
+export const claimV2ModelSchema = z.discriminatedUnion('predicate', [
+  z.object({ ...claimV2CommonSchema, predicate: z.literal('controls-region'), proposedValue: entityIdSchema }).strict(),
+  z.object({ ...claimV2CommonSchema, predicate: z.literal('conquered-region'), proposedValue: entityIdSchema }).strict(),
+  z.object({ ...claimV2CommonSchema, predicate: z.literal('fielded-personnel'), proposedValue: z.number().finite() }).strict(),
+]);
 
 export const requestedActionV2ModelSchema = z.object({
   actionId: interpretationIdSchema('action'),
