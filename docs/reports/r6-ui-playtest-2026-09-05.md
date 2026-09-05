@@ -197,3 +197,28 @@ create a material action or change control. The literal Malta wording still
 cannot be grounded because the Napoleonic ScenarioV3 fixture contains no Malta
 region at all (not because it was context-pruned); that fixture/text mismatch
 remains an explicit scenario-data defect in WP15 coverage.
+
+## Strategic evidence-closure recovery (subsequent run)
+
+A later real Strategic retry reached the same October 1805 checkpoint with
+valid nested `factsUsed` but omitted a duplicate entry in the top-level
+`evidenceIds` audit summary. That was previously rejected before the engine
+could advance. `9935b48` keeps every nested reference subject to the same
+actor-visible evidence validation, then deterministically closes the durable
+summary from those already parsed citations and from selected frozen choices'
+published canonical facts. It does not accept invented evidence, change an
+action envelope, or supply numbers; unknown, stale, and cross-actor IDs still
+fail closed. The provider tool schema now also enumerates visible evidence for
+initiatives and durable-plan facts, not only process facts.
+
+After rebuilding and restarting production, clicking the existing UI's
+`Повторить` advanced the frozen campaign `1805-10-01` → `1806-01-01` through
+all three deterministic monthly boundaries. The read-only audit for
+`napoleonic-europe-january-1805-session-4` records turn 12 / player decision
+4, current world revision
+`sha256:a4ddc9950afb422cbf2887be15c6fcd28c5ae5bfd6166389f9c3a88074c11842`,
+replay checksum
+`sha256:15621ff7353c77ad0af1e16a057f4c12036855d918d3be2a515766ce6dad9145`,
+and no raw prompts or responses. This validates recovery of this checkpoint;
+it remains evidence for a focused French run, not the still-open full WP15
+three-scenario ten-decision gate.
