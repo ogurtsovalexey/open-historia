@@ -1811,6 +1811,7 @@ const createGame = ({
       strategicState: { schemaVersion: "open-historia-strategic-memory/1", polities: [] },
       agentTurn: null,
       playerIntent: null,
+      playerDecisionIndex: 0,
     });
   }
   if (setActive) {

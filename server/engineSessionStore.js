@@ -133,6 +133,8 @@ export const readEngineSession = (gameDir) => {
       return {
         manifest,
         state,
+        playerDecisionIndex: Number.isSafeInteger(manifest.playerDecisionIndex) && manifest.playerDecisionIndex >= 0
+          ? manifest.playerDecisionIndex : 0,
         lastTurn: parseJson(path.join(dir, FILES_V3.lastTransition)),
         ownership: null,
         agentState: parseJson(path.join(dir, FILES_V3.strategicState)),
@@ -256,6 +258,7 @@ export const commitLivingWorldSession = (gameDir, {
   strategicState,
   agentTurn,
   playerIntent,
+  playerDecisionIndex,
 }) => {
   const current = readEngineSession(gameDir);
   const actual = current?.manifest.revision ?? null;
@@ -301,6 +304,9 @@ export const commitLivingWorldSession = (gameDir, {
     worldRevision: state.revision,
     gameDate: state.month,
     turn: state.turn,
+    playerDecisionIndex: Number.isSafeInteger(playerDecisionIndex) && playerDecisionIndex >= 0
+      ? playerDecisionIndex
+      : (current?.manifest.playerDecisionIndex ?? 0),
     files: Object.fromEntries(Object.entries(payloads).map(([key, bytes]) => [key, descriptor(bytes)])),
   };
   const manifest = { ...content, revision: sha256(canonical(content)) };

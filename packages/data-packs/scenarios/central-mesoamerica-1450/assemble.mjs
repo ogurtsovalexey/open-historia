@@ -408,7 +408,9 @@ scenario.startingState.tributeObligations[tributeId] = {
   laborService: { people: 120 },
   militaryService: { personnel: 80 },
   routeIds: ['route:lake-texcoco-canoe'],
-  cadence: 'modeled 80-day delivery cycle',
+  // The runtime settles at monthly boundaries; this is a simulation cadence,
+  // not a claim about an exact historical itinerary.
+  cadence: 'monthly',
   arrears: [],
   complianceBp: 7000,
   enforcementBasisId: 'relationship:triple-alliance',

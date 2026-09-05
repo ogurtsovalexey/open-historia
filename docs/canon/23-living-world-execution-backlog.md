@@ -242,7 +242,15 @@ Minimum tests:
 
 Add `tests/e2e/living-world-territory.spec.js` only after server tests pass.
 
-#### R3 — monthly settlement inside a three-month player turn
+#### R3 — monthly settlement inside a three-month player turn — complete
+
+Delivered: normal living-world advance now resolves three local deterministic
+monthly boundaries and persists only the final state plus a lossless submonth
+audit. `WorldStateV2.turn` remains monthly while session metadata separately
+counts successful player decisions. Tribute accepts only explicit `monthly`
+cadence; the Mesoamerican authored obligation now declares that simulation
+cadence rather than an engine-guessed interval. One-month advance remains a
+server-only diagnostic route. The next implementation package is R4.
 
 Add `advance-three-months` as the normal UI option. Keep
 `advance-one-month` only as a diagnostic option if existing tests need it.

@@ -3647,7 +3647,7 @@
         "routeIds": [
           "route:lake-texcoco-canoe"
         ],
-        "cadence": "modeled 80-day delivery cycle",
+        "cadence": "monthly",
         "arrears": [],
         "complianceBp": 7000,
         "enforcementBasisId": "relationship:triple-alliance",
@@ -7078,7 +7078,7 @@
         "id": "evidence:meso1450-obligation-xochimilco-triple-alliance",
         "binding": {
           "path": "/startingState/tributeObligations/obligation:xochimilco-triple-alliance",
-          "valueChecksum": "sha256:47e84136836e65abadf518e594bf801fce9e387c17d755d89d53b984bf7cbe78"
+          "valueChecksum": "sha256:d6c0ae2e7d1e38ff108053cf9fb435a5ee20e6503b38e06eaa3c795d0d58adff"
         },
         "basis": {
           "kind": "historical",

@@ -8,7 +8,7 @@
   "files": [
     {
       "path": "scenario.json",
-      "checksum": "sha256:6826f1715335b3b10ecb3281160f1e2243e4439325f9f3228bcaed0cdfa74301"
+      "checksum": "sha256:b2c9ee4801367d4c0514947555477554ef313844e372df0bf89c86310e77465d"
     },
     {
       "path": "sources.json",
@@ -52,7 +52,7 @@
     },
     {
       "path": "starting-state/obligations.json",
-      "checksum": "sha256:ca99f0f729303141cc4f88cbe768bddca5606879b61de46d9d46f1871047c13b"
+      "checksum": "sha256:ea498deb905510dbf26b9fddaac0c20a1500e29606ee207826ceab1b97cb24c7"
     },
     {
       "path": "starting-state/diplomacy.json",
@@ -83,5 +83,5 @@
       "checksum": "sha256:959f640d703da4fd850106672ff93e56b2416542ffdffde9181903ee11fbd881"
     }
   ],
-  "scenarioChecksum": "sha256:bd6e886dfe6c13159ed111a2903befd237ab60b412742761c236b134d57a2aae"
+  "scenarioChecksum": "sha256:7ed84ec14c19b99dded5d65cf38da4d17ce925a22a97862dcab4deb0b2061901"
 }

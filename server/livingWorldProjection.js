@@ -92,7 +92,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
   const changes = last?.kind === 'world-month-advanced' ? [{
     changeId: `change:clock-${state.turn}`,
     magnitude: `Now ${state.month}`,
-    label: 'Time advanced; no unauthored material values were changed',
+    label: `Time advanced through ${last.submonths?.length ?? 1} deterministic monthly ${((last.submonths?.length ?? 1) === 1) ? 'boundary' : 'boundaries'}`,
     authority: 'canonical',
     evidenceIds: groundedEvidence([last.clock?.evidenceId], visible, snapshotEvidence),
     causes: [{ category: 'other', label: 'Confirmed time advance', contribution: 'One calendar month' }],
@@ -200,7 +200,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       { detailId: 'detail:forces', label: 'Forces', summary: `${formatNumber(snapshot.fieldedPersonnel)} fielded personnel; ${formatNumber(snapshot.availableManpower)} additional recruitable people under current access.` },
       { detailId: 'detail:provenance', label: 'Evidence', summary: `${visible.size} public or polity-visible evidence records ground this view at one exact revision.` },
     ],
-    time: { label: state.month, options: [{ optionId: 'advance-one-month', label: 'Advance one month' }] },
+    time: { label: state.month, options: [{ optionId: 'advance-three-months', label: 'Advance three months' }] },
   };
 }
 

@@ -10,6 +10,9 @@ let library;
 let living;
 let gameId;
 let mesoGameId;
+let mesoLongGameId;
+let resolveLivingWorldSubmonths;
+let readEngineSession;
 
 function hold(task) {
   const evidenceId = task.brief.evidence[0].evidenceId;
@@ -32,6 +35,8 @@ before(async () => {
   process.env.OH_DATA_DIR = temporary;
   library = await import('./libraryStore.js');
   living = await import('./livingWorldStore.js');
+  ({ resolveLivingWorldSubmonths } = living);
+  ({ readEngineSession } = await import('./engineSessionStore.js'));
   gameId = library.createGame({
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
@@ -41,6 +46,11 @@ before(async () => {
     scenarioId: 'scenario:central-mesoamerica-1450',
     playerPolityId: 'polity:tenochtitlan',
     name: 'Living tribute test',
+  }).game.id;
+  mesoLongGameId = library.createGame({
+    scenarioId: 'scenario:central-mesoamerica-1450',
+    playerPolityId: 'polity:tenochtitlan',
+    name: 'Living thirty-month test',
   }).game.id;
 });
 
@@ -67,6 +77,49 @@ describe('living-world command store', () => {
     assert.ok(parsed.diplomacy.commitments.some((entry) => /obligation-xochimilco-triple-alliance/.test(entry.commitmentId)));
     assert.ok(view.interpretationContext.entities.some((entry) => entry.entityId === 'obligation:xochimilco-triple-alliance' && entry.kind === 'tribute-obligation'));
     assert.doesNotMatch(JSON.stringify(parsed).toLowerCase(), /(?:^|[^a-z])(gdp|bonds?|unemployment)(?:[^a-z]|$)/);
+  });
+
+  it('advances one player decision through three atomic monthly tribute settlements', () => {
+    const before = living.readLivingWorld(mesoGameId);
+    assert.equal(before.projection.time.options[0].optionId, 'advance-three-months');
+    assert.equal(before.playerDecisionIndex, 0);
+    const advanced = living.advanceLivingWorld(mesoGameId, {
+      revision: before.projection.revision, sessionRevision: before.sessionRevision,
+      optionId: 'advance-three-months', strategicAttempts: before.strategicTasks.map(hold),
+    });
+    assert.equal(advanced.projection.asOf, '1450-04-01');
+    assert.equal(advanced.playerDecisionIndex, 1);
+    assert.equal(advanced.lastTransition.submonths.length, 3);
+    assert.equal(advanced.lastTransition.submonths.flatMap((month) => month.tributeSettlements).length, 3);
+    assert.deepStrictEqual(advanced.lastTransition.submonths.map((month) => month.monthAfter), ['1450-02-01', '1450-03-01', '1450-04-01']);
+  });
+
+  it('reaches thirty deterministic monthly boundaries after ten player decisions', () => {
+    let view = living.readLivingWorld(mesoLongGameId);
+    const startRevision = view.projection.revision;
+    for (let decision = 0; decision < 10; decision += 1) {
+      view = living.advanceLivingWorld(mesoLongGameId, {
+        revision: view.projection.revision, sessionRevision: view.sessionRevision,
+        optionId: 'advance-three-months', strategicAttempts: view.strategicTasks.map(hold),
+      });
+    }
+    assert.notEqual(view.projection.revision, startRevision);
+    assert.equal(view.projection.asOf, '1452-07-01');
+    assert.equal(view.playerDecisionIndex, 10);
+    assert.equal(view.lastTransition.submonths.length, 3);
+  });
+
+  it('does not expose a partial local batch when its second monthly settlement fails', () => {
+    const before = living.readLivingWorld(mesoGameId);
+    const state = readEngineSession(library.getGameDirectory(mesoGameId)).state;
+    let calls = 0;
+    assert.throws(() => resolveLivingWorldSubmonths(state, 3, (input) => {
+      calls += 1;
+      if (calls === 2) throw new Error('simulated month two failure');
+      return { state: input, record: { monthBefore: input.month, monthAfter: input.month, revisionBefore: input.revision, revisionAfter: input.revision } };
+    }), /month two failure/i);
+    assert.equal(calls, 2);
+    assert.equal(readEngineSession(library.getGameDirectory(mesoGameId)).state.revision, before.projection.revision);
   });
 
   it('keeps untrusted past claims out of canonical history and requires confirmation', () => {

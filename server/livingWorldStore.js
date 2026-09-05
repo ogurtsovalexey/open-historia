@@ -31,6 +31,8 @@ function response(gameId) {
   return {
     gameId,
     sessionRevision: session.manifest.revision,
+    playerDecisionIndex: session.playerDecisionIndex ?? 0,
+    lastTransition: session.lastTurn,
     projection: {
       ...buildIntentFirstProjection({ session, playerPolityId }),
       strategicCheckpoint,
@@ -189,7 +191,61 @@ function commit(gameId, session, values) {
     strategicState: values.strategicState,
     agentTurn: values.agentTurn,
     playerIntent: values.playerIntent,
+    playerDecisionIndex: values.playerDecisionIndex,
   });
+}
+
+function settleSubmonth(stateInput) {
+  let state = stateInput;
+  const monthBefore = state.month;
+  const openingTransitions = [];
+  const unsupportedCadences = state.tributeObligations
+    .filter((obligation) => obligation.cadence !== 'monthly')
+    .map((obligation) => `${obligation.obligationId}:${obligation.cadence}`);
+  if (unsupportedCadences.length > 0) {
+    throw new Error(`Unsupported tribute cadence(s): ${unsupportedCadences.join(', ')}.`);
+  }
+  const tributeSettlements = [];
+  for (const obligation of [...state.tributeObligations].sort((left, right) => left.obligationId.localeCompare(right.obligationId))) {
+    const settled = worldV2.applyTributeDelivery(state, { obligationId: obligation.obligationId, expectedRevision: state.revision });
+    state = settled.state;
+    tributeSettlements.push({
+      obligationId: settled.obligationId, rows: settled.rows, laborReserved: settled.laborReserved,
+      militaryPersonnelReserved: settled.militaryPersonnelReserved, revisionAfter: state.revision,
+      eventId: settled.eventId, evidenceId: settled.evidenceId,
+    });
+  }
+  const processTransitions = [];
+  for (const process of processes.activeProcesses(state).sort((left, right) => left.processId.localeCompare(right.processId))) {
+    const transition = processes.advanceProcessDeterministically(state, process.processId);
+    state = transition.state;
+    processTransitions.push({
+      processId: transition.processId, revisionAfter: state.revision,
+      eventIds: transition.eventIds, evidenceIds: transition.evidenceIds,
+    });
+  }
+  const closingTransitions = [];
+  const clock = worldV2.advanceWorldMonth(state, { expectedRevision: state.revision });
+  state = clock.state;
+  const { state: _clockState, ...clockRecord } = clock;
+  void _clockState;
+  return {
+    state,
+    record: { monthBefore, monthAfter: state.month, revisionBefore: stateInput.revision, revisionAfter: state.revision,
+      openingTransitions, tributeSettlements, processTransitions, closingTransitions, clock: clockRecord },
+  };
+}
+
+/** Resolve local state only; callers persist after every requested submonth succeeds. */
+export function resolveLivingWorldSubmonths(stateInput, submonthCount, settle = settleSubmonth) {
+  let state = stateInput;
+  const submonths = [];
+  for (let index = 0; index < submonthCount; index += 1) {
+    const resolved = settle(state);
+    state = resolved.state;
+    submonths.push({ index: index + 1, ...resolved.record });
+  }
+  return { state, submonths };
 }
 
 function conceptTypeFor(kind, name) {
@@ -366,7 +422,8 @@ export function advanceLivingWorld(gameId, {
 } = {}) {
   const { session, playerPolityId } = requireSession(gameId);
   assertConcurrency(session, revision, sessionRevision);
-  if (optionId !== 'advance-one-month') throw new Error(`Unsupported time option ${String(optionId)}.`);
+  const submonthCount = optionId === 'advance-three-months' ? 3 : optionId === 'advance-one-month' ? 1 : 0;
+  if (submonthCount === 0) throw new Error(`Unsupported time option ${String(optionId)}.`);
   if (session.playerIntent?.status === 'pending') throw new Error('Confirm or revise the pending interpretation before advancing time.');
   const strategicTasks = buildLivingWorldStrategicTasks(session.state, playerPolityId, session.agentState);
   if (strategicDisposition !== 'resolve' && strategicDisposition !== 'continue-without-decisions') {
@@ -410,24 +467,11 @@ export function advanceLivingWorld(gameId, {
     });
     return response(gameId);
   }
-  const clock = worldV2.advanceWorldMonth(strategy.state, { expectedRevision: strategy.state.revision });
-  const { state: _clockState, ...clockRecord } = clock;
-  void _clockState;
-  let state = clock.state;
-  const processTransitions = [];
-  for (const process of processes.activeProcesses(state)) {
-    const transition = processes.advanceProcessDeterministically(state, process.processId);
-    state = transition.state;
-    processTransitions.push({
-      processId: transition.processId,
-      revisionAfter: transition.state.revision,
-      eventIds: transition.eventIds,
-      evidenceIds: transition.evidenceIds,
-    });
-  }
+  const batch = resolveLivingWorldSubmonths(strategy.state, submonthCount);
+  const { state, submonths } = batch;
   commit(gameId, session, {
     state,
-    lastTransition: { kind: 'world-month-advanced', clock: clockRecord, strategicRecords: strategy.records, processTransitions },
+    lastTransition: { kind: 'world-month-advanced', strategicRecords: strategy.records, submonths },
     strategicState: strategy.strategicState,
     agentTurn: {
       schemaVersion: 'open-historia-agent-turn/2',
@@ -437,6 +481,7 @@ export function advanceLivingWorld(gameId, {
       strategicRecords: strategy.records,
     },
     playerIntent: session.playerIntent?.status === 'confirmed' ? null : session.playerIntent,
+    playerDecisionIndex: (session.playerDecisionIndex ?? 0) + (optionId === 'advance-three-months' ? 1 : 0),
   });
   return response(gameId);
 }

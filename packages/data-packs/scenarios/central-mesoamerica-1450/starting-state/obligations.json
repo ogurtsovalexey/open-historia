@@ -37,7 +37,7 @@
       "routeIds": [
         "route:lake-texcoco-canoe"
       ],
-      "cadence": "modeled 80-day delivery cycle",
+      "cadence": "monthly",
       "arrears": [],
       "complianceBp": 7000,
       "enforcementBasisId": "relationship:triple-alliance",
