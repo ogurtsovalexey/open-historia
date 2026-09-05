@@ -10,12 +10,18 @@
 2. **Read [`docs/canon/22-living-world-program.md`](docs/canon/22-living-world-program.md)**
    for all post-Strategic-V4 product work and
    [`docs/canon/23-living-world-execution-backlog.md`](docs/canon/23-living-world-execution-backlog.md)
-   for its required implementation order, then read the relevant doc in
+   for its required implementation order. For the current Living World branch,
+   begin at **section 0**, use its current checkpoint rather than the original
+   baseline, and implement only the next `R` package before committing. Then
+   read the relevant doc in
    [`docs/canon/`](docs/canon/README.md) — the
    compressed, binding spec set (the old `docs/spec/` + `docs/product/` corpus
    is archived reference). Never guess schemas, formulas or contracts.
-3. For parallel work, claim a ready GitHub Issue and follow
-   `docs/agent-workflow.md` in a separate worktree.
+3. Current owner direction for the Living World program is serial work in one
+   session: do not spawn subagents or start the repository agent orchestrator.
+   Parallel work resumes only after an explicit new owner instruction. For
+   other work where parallelism is explicitly authorized, claim a ready GitHub
+   Issue and follow `docs/agent-workflow.md` in a separate worktree.
 4. Do not edit files outside the issue's owned paths.
 5. Check that your change does not violate a principle; escalate if it does.
 6. Reference principle numbers and acceptance criteria in reviews.
