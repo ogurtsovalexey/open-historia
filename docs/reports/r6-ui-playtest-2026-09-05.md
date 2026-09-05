@@ -70,3 +70,13 @@ and audit checksum
 `sha256:28aa8822f5a7ffb2a23bcd67bf7b35ca9272094e7e02b5265b12e1e66cb38c2f`.
 The exporter contains no raw prompts, responses, API keys or endpoints; its
 `rawPromptsOrResponsesIncluded` field is explicitly `false`.
+
+The corrected Utility-AI route was then exercised with a bounded Russian
+counterfactual research request. The model supplied invalid source spans, so
+the PlayerInputV2 boundary marked both the typed action and proposed initiative
+as `blocked: invalid-source-span`; no process, technology, number or historical
+fact was created. The interpretation was explicitly revised away in the UI.
+This is an open **AI-contract/model-quality defect**, not a successful
+counterfactual WP15 case, but demonstrates the required fail-closed behavior.
+The later audit contains both `strategic` and `utility` provenance records for
+the same `codex-subscription / gpt-5.6-luna / low` configuration.
