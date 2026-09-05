@@ -64,6 +64,11 @@ describe('living-world production Strategic V5', () => {
       assert.deepStrictEqual(schema.properties.selectedChoiceIds.items.enum, task.brief.frozenChoices.map((choice) => choice.choiceId));
       assert.deepStrictEqual(schema.properties.evidenceIds.items.enum, task.brief.evidence.map((entry) => entry.evidenceId));
       assert.deepStrictEqual(schema.properties.processDecisions.items.properties.processId.enum, task.brief.processOptions.map((option) => option.processId));
+      const evidenceIds = task.brief.evidence.map((entry) => entry.evidenceId);
+      assert.deepStrictEqual(schema.properties.processDecisions.items.properties.factsUsed.items.enum, evidenceIds);
+      assert.deepStrictEqual(schema.properties.initiativeProposals.items.properties.factsUsed.items.enum, evidenceIds);
+      assert.deepStrictEqual(schema.properties.durablePlan.properties.goals.items.properties.factsUsed.items.enum, evidenceIds);
+      assert.deepStrictEqual(schema.properties.durablePlan.properties.commitments.items.properties.factsUsed.items.enum, evidenceIds);
     }
   });
 
