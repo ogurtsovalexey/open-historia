@@ -58,3 +58,15 @@ recovery. This proves one end-to-end model-mediated player intent and one
 strategic settlement, but it does **not** replace the three 10-decision runs or
 complete the remaining diplomacy, counterfactual-concept and territorial
 pressure cases required by WP15.
+
+After `6d3d57a`, the same UI campaign advanced one further real strategic
+three-month decision (`1805-04-01` → `1805-07-01`). The read-only command
+`npm run playtest:audit -- --data-dir test-results/playwright-data --game
+napoleonic-europe-january-1805-session-2` validated the immutable revision
+chain and recorded sanitized provenance `codex-subscription / gpt-5.6-luna /
+low`, with replay checksum
+`sha256:041303e7f3fed85b52cd9d59b5f8014e9c1b1a521ffe0b0d6f80d5fe12e507a5`
+and audit checksum
+`sha256:28aa8822f5a7ffb2a23bcd67bf7b35ca9272094e7e02b5265b12e1e66cb38c2f`.
+The exporter contains no raw prompts, responses, API keys or endpoints; its
+`rawPromptsOrResponsesIncluded` field is explicitly `false`.
