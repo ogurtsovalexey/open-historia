@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { refreshLibraryCatalog, useLibraryState } from "./library.js";
+import { getStoredLanguage } from "./i18n.js";
 
 const parseResponse = async (response) => {
   let payload = null;
@@ -58,7 +59,8 @@ export function useLivingWorldRuntime() {
     }
     const controller = new AbortController();
     setPayload(null);
-    request(livingWorldEndpoint(activeGameId), { signal: controller.signal })
+    const locale = getStoredLanguage();
+    request(`${livingWorldEndpoint(activeGameId)}?locale=${encodeURIComponent(locale)}`, { signal: controller.signal })
       .then(setPayload)
       .catch((error) => {
         if (error?.name !== "AbortError") console.error("Failed to load living-world projection:", error);
@@ -72,7 +74,7 @@ export function useLivingWorldRuntime() {
       const current = payloadRef.current;
       if (!current?.sessionRevision) throw new Error("The living-world session is still loading.");
       const next = await request(livingWorldEndpoint(activeGameId, action), {
-        body: { ...values, sessionRevision: current.sessionRevision },
+        body: { ...values, locale: getStoredLanguage(), sessionRevision: current.sessionRevision },
       });
       payloadRef.current = next;
       setPayload(next);

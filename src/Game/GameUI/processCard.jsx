@@ -8,7 +8,7 @@ export const ProcessCard = ({ process, locale }) => {
     <article className="oh-intent-card oh-intent-card-grid" data-testid={`process-card-${process.processId}`}>
       <div className="oh-intent-card-header">
         <div>
-          <strong>{process.name}</strong>
+          <strong>{locale === "ru" && process.nameRu ? process.nameRu : process.name}</strong>
           <div className="oh-intent-muted">{process.direction}</div>
         </div>
         <span className="oh-intent-tag">{process.stage}</span>

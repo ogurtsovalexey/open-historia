@@ -218,6 +218,7 @@ export const parseIntentFirstProjection = (value) => {
     for (const key of ["processId", "name", "direction", "stage", "pace", "feasibility", "progressLabel", "nextCheckpoint"]) {
       stringAt(item[key], `${path}.${key}`);
     }
+    if (item.nameRu !== null && item.nameRu !== undefined) stringAt(item.nameRu, `${path}.nameRu`);
     if (!Number.isFinite(item.progressPercent) || item.progressPercent < 0 || item.progressPercent > 100) {
       fail(`${path}.progressPercent`, "must be a finite percentage from 0 to 100");
     }

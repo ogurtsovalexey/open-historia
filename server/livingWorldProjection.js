@@ -34,6 +34,7 @@ function processProjection(state, process, visible, locale) {
   return {
     processId: process.processId,
     name: localized(concept?.displayName, locale) || labelOf(process.kind),
+    nameRu: concept?.displayName?.ru ?? null,
     direction: labelOf(process.direction),
     stage: process.stage,
     pace: process.currentPace,

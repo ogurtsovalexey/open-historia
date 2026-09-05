@@ -12,6 +12,7 @@ let gameId;
 let mesoGameId;
 let mesoLongGameId;
 let skippedStrategyGameId;
+let russianIntentGameId;
 let resolveLivingWorldSubmonths;
 let readEngineSession;
 
@@ -57,6 +58,11 @@ before(async () => {
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
     name: 'Living explicit strategy skip test',
+  }).game.id;
+  russianIntentGameId = library.createGame({
+    scenarioId: 'scenario:napoleonic-europe-1805',
+    playerPolityId: 'polity:france',
+    name: 'Living Russian intent test',
   }).game.id;
 });
 
@@ -208,6 +214,36 @@ describe('living-world command store', () => {
       sessionRevision: submitted.sessionRevision,
       optionId: 'advance-one-month',
     }), /confirm or revise/i);
+  });
+
+  it('materializes a Russian-language proposal without requiring the model to invent an English semantic key', () => {
+    const before = living.readLivingWorld(russianIntentGameId);
+    const actorEvidence = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    const text = 'Сосредоточить действующую армию на Рейне.';
+    const submitted = living.submitLivingWorldIntent(russianIntentGameId, {
+      revision: before.projection.revision,
+      sessionRevision: before.sessionRevision,
+      intentions: [text],
+      modelOutput: {
+        revision: before.projection.revision, questions: [], claims: [], proposedInitiatives: [],
+        requestedActions: [{
+          actionId: 'action:concentrate-rhine', domain: 'military', scope: 'domestic', intent: text, pace: 'steady',
+          effectFamilies: ['capacity.modify'], targetEntityIds: ['polity:france'], claimRefs: [], evidenceIds: [actorEvidence],
+          operation: { kind: 'process.propose' }, sourceSpan: { start: 0, end: text.length, text },
+        }],
+      },
+    });
+    const confirmed = living.confirmLivingWorldIntent(russianIntentGameId, {
+      revision: submitted.projection.revision,
+      sessionRevision: submitted.sessionRevision,
+      interpretationId: submitted.projection.interpretation.interpretationId,
+    });
+    const concept = readEngineSession(library.getGameDirectory(russianIntentGameId)).state.concepts.find((entry) => entry.displayName.ru === 'Сосредоточить действующую армию на Рейне.');
+    assert.ok(concept);
+    assert.match(concept.semanticKey, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    assert.equal(confirmed.projection.processes[0].name, 'sosredotochit-deistvuyushchuyu-armiyu-na-reine');
+    assert.equal(confirmed.projection.processes[0].nameRu, 'Сосредоточить действующую армию на Рейне.');
+    assert.equal(living.readLivingWorld(russianIntentGameId, { locale: 'ru' }).projection.processes[0].name, 'Сосредоточить действующую армию на Рейне.');
   });
 
   it('blocks a failed required strategy at the same world revision, then retries atomically', () => {

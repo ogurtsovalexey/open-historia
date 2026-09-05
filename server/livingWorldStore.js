@@ -8,6 +8,40 @@ import { buildLivingWorldStrategicTasks, resolveLivingWorldStrategicTasks } from
 
 const hashId = (prefix, values) => `${prefix}:${crypto.createHash('sha256').update(values.join('\u001f')).digest('hex').slice(0, 32)}`;
 
+// Concepts need an ASCII semantic key, but player intentions are deliberately
+// accepted in the UI language.  The process reducer derives the key from the
+// English display name, so preserve the player's name as a localized label and
+// derive a deterministic, legal fallback only when it cannot itself be a key.
+const CYRILLIC_TO_LATIN = {
+  а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'i',
+  к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
+  х: 'kh', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'shch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
+};
+
+function semanticDisplayName(name, stableSeed) {
+  const original = String(name ?? '').trim();
+  const transliterated = [...original.toLocaleLowerCase('ru-RU')]
+    .map((character) => CYRILLIC_TO_LATIN[character] ?? character)
+    .join('')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-');
+  return transliterated || `initiative-${hashId('semantic-name', [stableSeed]).split(':')[1]}`;
+}
+
+function localizedProposalText(name, stableSeed) {
+  const original = String(name ?? '').trim();
+  const english = semanticDisplayName(original, stableSeed);
+  // Keep an existing Latin display name human-readable; the reducer will
+  // normalize it to a semantic key itself.  For non-Latin player text, retain
+  // the original as Russian UI text and use the deterministic transliteration
+  // solely for the engine's English/key-bearing representation.
+  if (/^[\x20-\x7e]+$/u.test(original)) return { en: original };
+  return original ? { en: english, ru: original } : { en: english };
+}
+
 function requireSession(gameId) {
   const details = getGameDetails(gameId);
   if (!details.game.livingWorld) throw new Error(`Game ${gameId} is not a living-world game.`);
@@ -22,8 +56,9 @@ function requireSession(gameId) {
   return { details, session, playerPolityId };
 }
 
-function response(gameId) {
+function response(gameId, requestedLocale = 'en') {
   const { session, playerPolityId } = requireSession(gameId);
+  const locale = requestedLocale === 'ru' ? 'ru' : 'en';
   const strategicCheckpoint = session.agentTurn?.kind === 'strategic-checkpoint-blocked'
     && session.agentTurn.worldRevisionBefore === session.state.revision
     ? session.agentTurn.strategicCheckpoint
@@ -34,7 +69,7 @@ function response(gameId) {
     playerDecisionIndex: session.playerDecisionIndex ?? 0,
     lastTransition: session.lastTurn,
     projection: {
-      ...buildIntentFirstProjection({ session, playerPolityId }),
+      ...buildIntentFirstProjection({ session, playerPolityId, locale }),
       strategicCheckpoint,
     },
     interpretationContext: buildPlayerIntentContext({ session, playerPolityId }),
@@ -273,8 +308,8 @@ function proposalForCandidate(interpretationId, playerPolityId, candidate) {
   return {
     semanticProposalId: hashId('semantic-proposal', [interpretationId, candidate.sourceId]),
     type: candidate.conceptType,
-    displayName: { en: candidate.name },
-    description: { en: candidate.description },
+    displayName: localizedProposalText(candidate.name, `${interpretationId}:${candidate.sourceId}`),
+    description: localizedProposalText(candidate.description, `${interpretationId}:${candidate.sourceId}:description`),
     originEntityRefs: [playerPolityId],
     parentConceptIds: [],
     domains: [`domain:${candidate.domain}`],
@@ -376,17 +411,17 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
   return { state, created, createdProposals };
 }
 
-export const readLivingWorld = (gameId) => response(gameId);
+export const readLivingWorld = (gameId, { locale = 'en' } = {}) => response(gameId, locale);
 
-export function submitLivingWorldIntent(gameId, { revision, sessionRevision, intentions, modelOutput } = {}) {
+export function submitLivingWorldIntent(gameId, { revision, sessionRevision, intentions, modelOutput, locale = 'en' } = {}) {
   const { session, playerPolityId } = requireSession(gameId);
   assertConcurrency(session, revision, sessionRevision);
   if (session.playerIntent?.status === 'pending') throw new Error('Resolve the pending interpretation before submitting another intent.');
   commit(gameId, session, { playerIntent: buildPendingIntent(session, playerPolityId, intentions, modelOutput) });
-  return response(gameId);
+  return response(gameId, locale);
 }
 
-export function confirmLivingWorldIntent(gameId, { revision, sessionRevision, interpretationId } = {}) {
+export function confirmLivingWorldIntent(gameId, { revision, sessionRevision, interpretationId, locale = 'en' } = {}) {
   const { session } = requireSession(gameId);
   assertConcurrency(session, revision, sessionRevision);
   if (session.playerIntent?.status !== 'pending' || session.playerIntent.interpretationId !== interpretationId) {
@@ -403,22 +438,22 @@ export function confirmLivingWorldIntent(gameId, { revision, sessionRevision, in
     },
     playerIntent: { ...session.playerIntent, status: 'confirmed' },
   });
-  return response(gameId);
+  return response(gameId, locale);
 }
 
-export function dismissLivingWorldIntent(gameId, { revision, sessionRevision, interpretationId } = {}) {
+export function dismissLivingWorldIntent(gameId, { revision, sessionRevision, interpretationId, locale = 'en' } = {}) {
   const { session } = requireSession(gameId);
   assertConcurrency(session, revision, sessionRevision);
   if (session.playerIntent?.status !== 'pending' || session.playerIntent.interpretationId !== interpretationId) {
     throw new Error('Pending interpretation does not match this dismissal.');
   }
   commit(gameId, session, { playerIntent: null });
-  return response(gameId);
+  return response(gameId, locale);
 }
 
 export function advanceLivingWorld(gameId, {
   revision, sessionRevision, optionId, strategicAttempts,
-  strategicDisposition = 'resolve',
+  strategicDisposition = 'resolve', locale = 'en',
 } = {}) {
   const { session, playerPolityId } = requireSession(gameId);
   assertConcurrency(session, revision, sessionRevision);
@@ -465,7 +500,7 @@ export function advanceLivingWorld(gameId, {
       },
       playerIntent: session.playerIntent,
     });
-    return response(gameId);
+    return response(gameId, locale);
   }
   const batch = resolveLivingWorldSubmonths(strategy.state, submonthCount);
   const { state, submonths } = batch;
@@ -483,5 +518,5 @@ export function advanceLivingWorld(gameId, {
     playerIntent: session.playerIntent?.status === 'confirmed' ? null : session.playerIntent,
     playerDecisionIndex: (session.playerDecisionIndex ?? 0) + (optionId === 'advance-three-months' ? 1 : 0),
   });
-  return response(gameId);
+  return response(gameId, locale);
 }

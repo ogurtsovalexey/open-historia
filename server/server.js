@@ -506,7 +506,7 @@ app.get("/api/games/:gameId", (req, res) => {
 
 app.get("/api/games/:gameId/living-world", (req, res) => {
   try {
-    res.json(readLivingWorld(req.params.gameId));
+    res.json(readLivingWorld(req.params.gameId, { locale: req.query.locale }));
   } catch (error) {
     sendError(res, 404, error);
   }
