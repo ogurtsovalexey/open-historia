@@ -152,6 +152,7 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
     effectFamilies: action.effectFamilies,
     targetEntityIds: action.targetEntityIds,
     operation: action.operation ?? { kind: 'process.propose' },
+    sourceSpan: action.sourceSpan,
     status: action.status,
   }));
   const proposedInitiatives = grounded.proposedInitiatives.map((initiative) => ({
@@ -167,12 +168,15 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
     pace: initiative.pace,
     effectFamilies: initiative.effectFamilies,
     targetEntityIds: initiative.targetEntityIds,
+    sourceSpan: initiative.sourceSpan,
     status: initiative.status,
   }));
   const enginePreviews = [];
-  for (const entry of [...requestedActions.filter((item) => item.operation.kind === 'process.propose'), ...proposedInitiatives].filter((item) => item.material)) {
-    const candidate = entry.actionId ? {
+  const previewCandidates = dedupeMaterialCandidates([
+    ...requestedActions.filter((item) => item.operation.kind === 'process.propose' && item.material).map((entry) => ({
+      kind: 'action', entry,
       sourceId: entry.actionId,
+      sourceSpan: entry.sourceSpan,
       conceptType: conceptTypeForAction(entry.domain),
       domain: entry.domain,
       name: entry.summary.slice(0, 100),
@@ -181,8 +185,11 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
       pace: entry.pace,
       effectFamilies: entry.effectFamilies,
       evidenceIds: entry.evidenceIds,
-    } : {
+    })),
+    ...proposedInitiatives.filter((item) => item.material).map((entry) => ({
+      kind: 'initiative', entry,
       sourceId: entry.initiativeId,
+      sourceSpan: entry.sourceSpan,
       conceptType: conceptTypeFor(entry.kind, entry.name),
       domain: entry.kind,
       name: entry.name,
@@ -191,7 +198,10 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
       pace: entry.pace,
       effectFamilies: entry.effectFamilies,
       evidenceIds: entry.evidenceIds,
-    };
+    })),
+  ]);
+  for (const candidate of previewCandidates) {
+    const { entry } = candidate;
     const proposal = proposalForCandidate(interpretationId, playerPolityId, candidate);
     const resolved = processes.buildSemanticProcessEnginePlan(session.state, proposal);
     if (!resolved.allowedPacesAfterCommitment.includes(candidate.pace)) {
@@ -342,14 +352,37 @@ function proposalForCandidate(interpretationId, playerPolityId, candidate) {
   };
 }
 
+// A Utility response can express one player sentence both as a typed
+// `process.propose` action and as its richer proposed initiative. They are two
+// views of one authorization, not two treasury commitments. Prefer the
+// initiative (it carries a stable name/description), but leave separately
+// sourced actions independent.
+function dedupeMaterialCandidates(candidates) {
+  const selected = new Map();
+  for (const candidate of candidates) {
+    const span = candidate.sourceSpan;
+    const key = span
+      ? `${span.start}:${span.end}:${span.text}`
+      : `source:${candidate.sourceId}`;
+    const current = selected.get(key);
+    if (!current || candidate.kind === 'initiative') selected.set(key, candidate);
+  }
+  return [...selected.values()].sort((left, right) => (
+    (left.sourceSpan?.start ?? Number.MAX_SAFE_INTEGER) - (right.sourceSpan?.start ?? Number.MAX_SAFE_INTEGER)
+    || left.sourceId.localeCompare(right.sourceId)
+  ));
+}
+
 function materializeConfirmedInitiatives(stateInput, playerIntent) {
   let state = stateInput;
   const created = [];
-  const candidates = [
+  const candidates = dedupeMaterialCandidates([
     ...playerIntent.requestedActions
       .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind === 'process.propose')
       .map((action) => ({
+        kind: 'action',
         sourceId: action.actionId,
+        sourceSpan: action.sourceSpan,
         conceptType: conceptTypeForAction(action.domain),
         domain: action.domain,
         name: action.summary.slice(0, 100),
@@ -362,7 +395,9 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
     ...playerIntent.proposedInitiatives
       .filter((entry) => entry.material && entry.status === 'grounded')
       .map((initiative) => ({
+        kind: 'initiative',
         sourceId: initiative.initiativeId,
+        sourceSpan: initiative.sourceSpan,
         conceptType: conceptTypeFor(initiative.kind, initiative.name),
         domain: initiative.kind,
         name: initiative.name,
@@ -372,7 +407,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
         effectFamilies: initiative.effectFamilies,
         evidenceIds: initiative.evidenceIds,
       })),
-  ];
+  ]);
   for (const initiative of candidates) {
     const proposal = proposalForCandidate(playerIntent.interpretationId, playerIntent.playerPolityId, initiative);
     const affectedEntityRefs = proposal.affectedEntityRefs;

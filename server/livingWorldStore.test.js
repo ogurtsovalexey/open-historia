@@ -13,6 +13,7 @@ let mesoGameId;
 let mesoLongGameId;
 let skippedStrategyGameId;
 let russianIntentGameId;
+let duplicateCandidateGameId;
 let resolveLivingWorldSubmonths;
 let readEngineSession;
 let buildPlayerIntentContext;
@@ -65,6 +66,11 @@ before(async () => {
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
     name: 'Living Russian intent test',
+  }).game.id;
+  duplicateCandidateGameId = library.createGame({
+    scenarioId: 'scenario:napoleonic-europe-1805',
+    playerPolityId: 'polity:france',
+    name: 'Living duplicate candidate test',
   }).game.id;
 });
 
@@ -276,6 +282,39 @@ describe('living-world command store', () => {
     assert.equal(confirmed.projection.processes[0].name, 'sosredotochit-deistvuyushchuyu-armiyu-na-reine');
     assert.equal(confirmed.projection.processes[0].nameRu, 'Сосредоточить действующую армию на Рейне.');
     assert.equal(living.readLivingWorld(russianIntentGameId, { locale: 'ru' }).projection.processes[0].name, 'Сосредоточить действующую армию на Рейне.');
+  });
+
+  it('materializes one process when a model duplicates one source span as action and initiative', () => {
+    const before = living.readLivingWorld(duplicateCandidateGameId);
+    const actorEvidence = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    const text = 'Start an optical relay service.';
+    const sourceSpan = { start: 0, end: text.length, text };
+    const submitted = living.submitLivingWorldIntent(duplicateCandidateGameId, {
+      revision: before.projection.revision,
+      sessionRevision: before.sessionRevision,
+      intentions: [text],
+      modelOutput: {
+        revision: before.projection.revision, questions: [], claims: [],
+        requestedActions: [{
+          actionId: 'action:relay', domain: 'military', scope: 'domestic', intent: text, pace: 'slow',
+          effectFamilies: ['capacity.modify'], targetEntityIds: ['polity:france'], claimRefs: [], evidenceIds: [actorEvidence],
+          operation: { kind: 'process.propose' }, sourceSpan,
+        }],
+        proposedInitiatives: [{
+          initiativeId: 'initiative:relay', kind: 'institution', name: 'Optical relay service',
+          description: 'Create a standardized optical communications service.', pace: 'slow',
+          effectFamilies: ['capacity.modify'], targetEntityIds: ['polity:france'], evidenceIds: [actorEvidence], sourceSpan,
+        }],
+      },
+    });
+    const confirmed = living.confirmLivingWorldIntent(duplicateCandidateGameId, {
+      revision: submitted.projection.revision,
+      sessionRevision: submitted.sessionRevision,
+      interpretationId: submitted.projection.interpretation.interpretationId,
+    });
+    assert.equal(confirmed.lastTransition.createdProcesses.length, 1);
+    assert.equal(confirmed.projection.processes.length, 1);
+    assert.equal(confirmed.projection.processes[0].name, 'Optical relay service');
   });
 
   it('blocks a failed required strategy at the same world revision, then retries atomically', () => {
