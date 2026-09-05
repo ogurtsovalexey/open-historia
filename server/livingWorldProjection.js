@@ -116,7 +116,15 @@ function interpretationProjection(intent, fallbackEvidence) {
     sourceText: intent.sourceText,
     confirmationRequired: true,
     questions: intent.questions ?? [],
-    claims: intent.claims ?? [],
+    // Older saved previews predate the rule that deterministic claims carry
+    // visible evidence. Repair the read-only projection rather than mutating
+    // historic revisions, so a legacy pending preview cannot crash the UI.
+    claims: (intent.claims ?? []).map((claim) => (
+      (claim.status === 'supported' || claim.status === 'contradicted')
+        && (!Array.isArray(claim.evidenceIds) || claim.evidenceIds.length === 0)
+        ? { ...claim, evidenceIds: fallbackEvidence }
+        : claim
+    )),
     requestedActions: intent.requestedActions ?? [],
     proposedInitiatives: intent.proposedInitiatives ?? [],
     preview: intent.preview ?? {
