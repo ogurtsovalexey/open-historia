@@ -245,3 +245,29 @@ and audit checksum
 This establishes the French ten-decision/30-month UI loop after the recovery;
 it does not by itself certify every scripted military and territorial-pressure
 case or the corresponding Europe 1935 and Mesoamerica model-mediated runs.
+
+## Mesoamerica ten-decision model-mediated run (subsequent run)
+
+A fresh Central Mesoamerica 1450 campaign was then played in the real browser
+as Mexico-Tenochtitlan. The initial Russian order limited the scope to the
+already offered tribute-route and supply-reliability process. Its preview
+remained typed and bounded to the polity's controlled communities, showing an
+engine-derived initial treasury commitment of 32 rather than model-created
+statistics. No direct API, file, or skip action changed the campaign state.
+
+After the strategic provider schema was tightened in `da6bd53`, the campaign
+completed all ten visible `Continue for three months` decisions and each
+settled at `3 / 3 monthly boundaries resolved`: `1450-01-01` → `1452-07-01`,
+turn 30, `playerDecisionIndex: 10`. The final read-only audit for
+`central-mesoamerica-1450-session-2` records world revision
+`sha256:6094bac6db324c82f9af7d0d677a04e4e7a2cbdb1b2179a4ef331838d15d5dae`,
+replay checksum
+`sha256:80f06c9f2a4787f59d28f1f3df18bd1b37c2f821150f3220b5d1623d2deab87e`,
+and audit checksum
+`sha256:54e76a9e1a40cdc7da20b725f8e4dec885888d9159d636eb36be76f6fa6c547b`.
+The export contains sanitized `codex-subscription / gpt-5.6-luna / low`
+Utility and Strategic provenance and no raw prompts or responses.
+
+This completes the second of the three required fresh, model-mediated
+ten-decision campaigns. Europe 1935 remains to be replayed under the same
+conditions before WP15 can be closed.
