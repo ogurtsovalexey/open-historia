@@ -9,11 +9,14 @@ Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the pr
 This section is the authoritative resume point for the next implementation
 agent. Do not restart the merge ladder and do not reconstruct completed work
 from the old baseline. The current pushed implementation checkpoint is
-`26300fe` on `feature/campaign-memory` (`docs(playtest): record
-model-mediated living-world smoke test`). R5 is complete. R6 has verified the
-deterministic UI loop across all three scenarios and one real
-Codex-subscription player-intent/strategic-settlement path, but the required
-three full model-mediated campaigns remain incomplete.
+`67ddbc8` on `feature/campaign-memory` (`fix(ui): preserve failed intent
+drafts for retry`). R5 is complete. R6 has verified ten three-month UI
+decisions (30 monthly boundaries) in each of the three scenarios, with
+sanitized replay/audit evidence in `docs/reports/r6-ui-playtest-2026-09-05.md`.
+Those runs are not WP15 completion: the individual scripted-report artifacts,
+full model-mediated coverage and a real UI-driven populated-region transfer
+remain to be demonstrated. A failed semantic request now visibly preserves
+the player draft for an explicit retry rather than silently discarding it.
 
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
@@ -377,11 +380,10 @@ redacted reports and screenshots; raw provider traffic remains gitignored.
 
 Progress checkpoint: `docs/reports/r6-ui-playtest-2026-09-05.md` records ten
 three-month decisions/30 deterministic boundaries each in Napoleonic,
-Mesoamerican and Europe 1935 UI sessions. The original runs had no configured
-provider, so each advance correctly presented a visible strategic checkpoint
-and used only its explicit skip action. Subsequent real Codex-subscription
-smoke tests verified a French player intention through typed interpretation,
-engine resource commitment and two strategic three-month settlements; they
+Mesoamerican and Europe 1935 UI sessions, with sanitized Codex-subscription
+provider metadata and verified replay/audit checksums. A French
+Codex-subscription path verified a player intention through typed
+interpretation, engine resource commitment and strategic three-month settlements; it
 also verified a bounded counterfactual electricity-research intention becoming
 a proposed, funded long-running process rather than instant technology. The
 first Utility-AI attempt failed closed on invalid source spans; `2eb7b52`
