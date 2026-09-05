@@ -2,9 +2,11 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { worldV2 } from "@open-historia/engine";
 
 export const ENGINE_SESSION_SCHEMA = "open-historia-engine-session/1";
 export const ENGINE_SESSION_SCHEMA_V2 = "open-historia-engine-session/2";
+export const ENGINE_SESSION_SCHEMA_V3 = "open-historia-engine-session/3";
 const POINTER_FILE = "current.json";
 const MANIFEST_FILE = "manifest.json";
 const FILES_V1 = Object.freeze({ state: "state.json", lastTurn: "last-turn.json", ownership: "ownership.json" });
@@ -13,7 +15,18 @@ const FILES_V2 = Object.freeze({
   agentState: "agent-state.json",
   agentTurn: "agent-turn.json",
 });
-const filesForSchema = (schema) => schema === ENGINE_SESSION_SCHEMA_V2 ? FILES_V2 : FILES_V1;
+const FILES_V3 = Object.freeze({
+  state: "world-state.json",
+  lastTransition: "last-transition.json",
+  strategicState: "strategic-state.json",
+  agentTurn: "agent-turn.json",
+  playerIntent: "player-intent.json",
+});
+const filesForSchema = (schema) => {
+  if (schema === ENGINE_SESSION_SCHEMA_V3) return FILES_V3;
+  if (schema === ENGINE_SESSION_SCHEMA_V2) return FILES_V2;
+  return FILES_V1;
+};
 
 export class EngineSessionError extends Error {
   constructor(code, message) {
@@ -75,7 +88,7 @@ const verifyDirectoryFiles = (dir, manifest) => {
 };
 
 const verifyManifest = (gameDir, manifest, visited = new Set()) => {
-  if (!manifest || ![ENGINE_SESSION_SCHEMA, ENGINE_SESSION_SCHEMA_V2].includes(manifest.schema) || typeof manifest.revision !== "string") {
+  if (!manifest || ![ENGINE_SESSION_SCHEMA, ENGINE_SESSION_SCHEMA_V2, ENGINE_SESSION_SCHEMA_V3].includes(manifest.schema) || typeof manifest.revision !== "string") {
     throw new EngineSessionError("CORRUPT_SESSION", "engine session manifest has an invalid schema");
   }
   const { revision, ...content } = manifest;
@@ -108,6 +121,25 @@ export const readEngineSession = (gameDir) => {
     const dir = revisionFor(gameDir, pointer.revision);
     const manifest = verifyManifest(gameDir, parseJson(path.join(dir, MANIFEST_FILE)));
     if (manifest.revision !== pointer.revision) throw new Error("pointer mismatch");
+    if (manifest.schema === ENGINE_SESSION_SCHEMA_V3) {
+      const state = worldV2.parseWorldStateV2(parseJson(path.join(dir, FILES_V3.state)));
+      if (state.revision !== manifest.worldRevision
+        || state.scenarioId !== manifest.scenarioId
+        || state.revisionLineage.seedRevision !== manifest.seedChecksum
+        || state.month !== manifest.gameDate
+        || state.turn !== manifest.turn) {
+        throw new EngineSessionError("CORRUPT_SESSION", "living-world manifest does not match its canonical WorldStateV2");
+      }
+      return {
+        manifest,
+        state,
+        lastTurn: parseJson(path.join(dir, FILES_V3.lastTransition)),
+        ownership: null,
+        agentState: parseJson(path.join(dir, FILES_V3.strategicState)),
+        agentTurn: parseJson(path.join(dir, FILES_V3.agentTurn)),
+        playerIntent: parseJson(path.join(dir, FILES_V3.playerIntent)),
+      };
+    }
     return {
       manifest,
       state: parseJson(path.join(dir, FILES_V1.state)),
@@ -115,6 +147,7 @@ export const readEngineSession = (gameDir) => {
       ownership: parseJson(path.join(dir, FILES_V1.ownership)),
       agentState: manifest.schema === ENGINE_SESSION_SCHEMA_V2 ? parseJson(path.join(dir, FILES_V2.agentState)) : null,
       agentTurn: manifest.schema === ENGINE_SESSION_SCHEMA_V2 ? parseJson(path.join(dir, FILES_V2.agentTurn)) : null,
+      playerIntent: null,
     };
   } catch (error) {
     if (error instanceof EngineSessionError) throw error;
@@ -127,35 +160,7 @@ const writeExclusive = (file, bytes) => {
   fs.writeFileSync(file, bytes, { flag: "wx" });
 };
 
-export const commitEngineSession = (gameDir, {
-  expectedRevision = null, gameId, engineScenario, gameDate, round, state,
-  lastTurn = null, ownership = {}, monthlyTicks = 0, agentState, agentTurn,
-}) => {
-  const current = readEngineSession(gameDir);
-  const actual = current?.manifest.revision ?? null;
-  if (expectedRevision !== actual) {
-    throw new EngineSessionError("STALE_SESSION", `stale engine session: expected ${expectedRevision ?? "none"}, current is ${actual ?? "none"}`);
-  }
-
-  const useV2 = agentState !== undefined || agentTurn !== undefined || current?.manifest.schema === ENGINE_SESSION_SCHEMA_V2;
-  const effectiveAgentState = agentState ?? current?.agentState ?? { schemaVersion: "open-historia-agent-state/1", polities: [] };
-  const effectiveAgentTurn = agentTurn ?? current?.agentTurn ?? null;
-  const payloads = {
-    state: jsonBytes(state), lastTurn: jsonBytes(lastTurn), ownership: jsonBytes(ownership),
-    ...(useV2 ? { agentState: jsonBytes(effectiveAgentState), agentTurn: jsonBytes(effectiveAgentTurn) } : {}),
-  };
-  const content = {
-    schema: useV2 ? ENGINE_SESSION_SCHEMA_V2 : ENGINE_SESSION_SCHEMA,
-    gameId,
-    engineScenario,
-    parentRevision: actual,
-    engineRevision: state.revision,
-    gameDate,
-    round,
-    monthlyTicks,
-    files: Object.fromEntries(Object.entries(payloads).map(([key, bytes]) => [key, descriptor(bytes)])),
-  };
-  const manifest = { ...content, revision: sha256(canonical(content)) };
+const publishSessionRevision = (gameDir, { actual, gameId, manifest, payloads }) => {
   const root = rootFor(gameDir);
   const staging = path.join(root, "staging", revisionDiskToken(manifest.revision));
   const finalDir = revisionFor(gameDir, manifest.revision);
@@ -164,7 +169,9 @@ export const commitEngineSession = (gameDir, {
   fs.mkdirSync(staging, { recursive: true });
   try {
     hook("beforeFiles", { gameId, revision: manifest.revision });
-    for (const [key, filename] of Object.entries(filesForSchema(content.schema))) writeExclusive(path.join(staging, filename), payloads[key]);
+    for (const [key, filename] of Object.entries(filesForSchema(manifest.schema))) {
+      writeExclusive(path.join(staging, filename), payloads[key]);
+    }
     hook("afterFiles", { gameId, revision: manifest.revision });
     writeExclusive(path.join(staging, MANIFEST_FILE), `${canonical(manifest)}\n`);
     hook("afterManifest", { gameId, revision: manifest.revision });
@@ -194,6 +201,110 @@ export const commitEngineSession = (gameDir, {
     }
     throw error;
   }
+};
+
+export const commitEngineSession = (gameDir, {
+  expectedRevision = null, gameId, engineScenario, gameDate, round, state,
+  lastTurn = null, ownership = {}, monthlyTicks = 0, agentState, agentTurn,
+}) => {
+  const current = readEngineSession(gameDir);
+  const actual = current?.manifest.revision ?? null;
+  if (expectedRevision !== actual) {
+    throw new EngineSessionError("STALE_SESSION", `stale engine session: expected ${expectedRevision ?? "none"}, current is ${actual ?? "none"}`);
+  }
+  if (state?.schemaVersion === worldV2.WORLD_STATE_V2_SCHEMA_VERSION) {
+    throw new EngineSessionError("WRONG_WRITER", "WorldStateV2 must use the living-world writer");
+  }
+  if (current?.manifest.schema === ENGINE_SESSION_SCHEMA_V3) {
+    throw new EngineSessionError("WRONG_WRITER", "living-world sessions cannot be mutated by the legacy engine writer");
+  }
+
+  const useV2 = agentState !== undefined || agentTurn !== undefined || current?.manifest.schema === ENGINE_SESSION_SCHEMA_V2;
+  const effectiveAgentState = agentState ?? current?.agentState ?? { schemaVersion: "open-historia-agent-state/1", polities: [] };
+  const effectiveAgentTurn = agentTurn ?? current?.agentTurn ?? null;
+  const payloads = {
+    state: jsonBytes(state), lastTurn: jsonBytes(lastTurn), ownership: jsonBytes(ownership),
+    ...(useV2 ? { agentState: jsonBytes(effectiveAgentState), agentTurn: jsonBytes(effectiveAgentTurn) } : {}),
+  };
+  const content = {
+    schema: useV2 ? ENGINE_SESSION_SCHEMA_V2 : ENGINE_SESSION_SCHEMA,
+    gameId,
+    engineScenario,
+    parentRevision: actual,
+    engineRevision: state.revision,
+    gameDate,
+    round,
+    monthlyTicks,
+    files: Object.fromEntries(Object.entries(payloads).map(([key, bytes]) => [key, descriptor(bytes)])),
+  };
+  const manifest = { ...content, revision: sha256(canonical(content)) };
+  return publishSessionRevision(gameDir, { actual, gameId, manifest, payloads });
+};
+
+/**
+ * Commit a living-world session. WorldStateV2 is the only canonical material
+ * state; all other files are revision-bound explanations, plans or pending
+ * intent and can never shadow territory, population, personnel or economy.
+ */
+export const commitLivingWorldSession = (gameDir, {
+  expectedRevision = null,
+  gameId,
+  scenarioId,
+  seedChecksum,
+  state: stateInput,
+  lastTransition,
+  strategicState,
+  agentTurn,
+  playerIntent,
+}) => {
+  const current = readEngineSession(gameDir);
+  const actual = current?.manifest.revision ?? null;
+  if (expectedRevision !== actual) {
+    throw new EngineSessionError("STALE_SESSION", `stale engine session: expected ${expectedRevision ?? "none"}, current is ${actual ?? "none"}`);
+  }
+  if (current && current.manifest.schema !== ENGINE_SESSION_SCHEMA_V3) {
+    throw new EngineSessionError("INCOMPATIBLE_SESSION", "a legacy engine session must be migrated explicitly before living-world commits");
+  }
+  let state;
+  try {
+    state = worldV2.parseWorldStateV2(stateInput);
+  } catch (error) {
+    throw new EngineSessionError("INVALID_WORLD_STATE", `invalid WorldStateV2: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  if (state.scenarioId !== scenarioId) {
+    throw new EngineSessionError("SCENARIO_MISMATCH", "WorldStateV2 scenario does not match the session scenario");
+  }
+  if (state.revisionLineage.seedRevision !== seedChecksum) {
+    throw new EngineSessionError("SEED_MISMATCH", "WorldStateV2 seed lineage does not match the compiled scenario seed");
+  }
+  if (current && (current.manifest.gameId !== gameId
+    || current.manifest.scenarioId !== scenarioId
+    || current.manifest.seedChecksum !== seedChecksum)) {
+    throw new EngineSessionError("SESSION_IDENTITY_MISMATCH", "living-world session identity cannot change after initialization");
+  }
+  const prior = current ?? {};
+  const valueOrPrior = (value, key, fallback) => value !== undefined ? value : (prior[key] ?? fallback);
+  const payloadValues = {
+    state,
+    lastTransition: valueOrPrior(lastTransition, "lastTurn", null),
+    strategicState: valueOrPrior(strategicState, "agentState", { schemaVersion: "open-historia-strategic-memory/1", polities: [] }),
+    agentTurn: valueOrPrior(agentTurn, "agentTurn", null),
+    playerIntent: valueOrPrior(playerIntent, "playerIntent", null),
+  };
+  const payloads = Object.fromEntries(Object.entries(payloadValues).map(([key, value]) => [key, jsonBytes(value)]));
+  const content = {
+    schema: ENGINE_SESSION_SCHEMA_V3,
+    gameId,
+    scenarioId,
+    seedChecksum,
+    parentRevision: actual,
+    worldRevision: state.revision,
+    gameDate: state.month,
+    turn: state.turn,
+    files: Object.fromEntries(Object.entries(payloads).map(([key, bytes]) => [key, descriptor(bytes)])),
+  };
+  const manifest = { ...content, revision: sha256(canonical(content)) };
+  return publishSessionRevision(gameDir, { actual, gameId, manifest, payloads });
 };
 
 export const backupLegacyEconomySave = (gameDir) => {

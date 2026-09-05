@@ -4,12 +4,16 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, it } from "node:test";
 import {
+  ENGINE_SESSION_SCHEMA_V3,
   EngineSessionError,
   backupLegacyEconomySave,
   commitEngineSession,
+  commitLivingWorldSession,
   readEngineSession,
   setEngineSessionTestHooks,
 } from "./engineSessionStore.js";
+import { worldV2 } from "@open-historia/engine";
+import { minimalScenarioV3 } from "../packages/data-packs/dist-test/test/scenarioV3Fixtures.js";
 
 const roots = [];
 const gameDir = () => {
@@ -89,5 +93,77 @@ describe("atomic engine session store", { concurrency: false }, () => {
     const backup = backupLegacyEconomySave(root);
     assert.equal(fs.existsSync(path.join(root, "economy")), false);
     assert.equal(fs.existsSync(path.join(backup, "state.json")), true);
+  });
+});
+
+describe("atomic WorldStateV2 sessions", { concurrency: false }, () => {
+  const compiledWorld = () => worldV2.compileScenarioV3(minimalScenarioV3());
+
+  it("stores one canonical world without a writable ownership duplicate", () => {
+    const root = gameDir();
+    const compiled = compiledWorld();
+    const first = commitLivingWorldSession(root, {
+      expectedRevision: null,
+      gameId: "living-game",
+      scenarioId: compiled.seed.id,
+      seedChecksum: compiled.seedChecksum,
+      state: compiled.initialState,
+      lastTransition: null,
+      strategicState: { schemaVersion: "open-historia-strategic-memory/1", polities: [] },
+      agentTurn: null,
+      playerIntent: null,
+    });
+    assert.equal(first.manifest.schema, ENGINE_SESSION_SCHEMA_V3);
+    assert.equal(first.manifest.worldRevision, compiled.initialState.revision);
+    assert.equal(first.state.revision, compiled.initialState.revision);
+    assert.equal(first.ownership, null);
+    const directory = path.join(root, "engine-session", "revisions", first.manifest.revision.replace(":", "-"));
+    assert.equal(fs.existsSync(path.join(directory, "world-state.json")), true);
+    assert.equal(fs.existsSync(path.join(directory, "ownership.json")), false);
+    assert.equal(fs.existsSync(path.join(directory, "state.json")), false);
+  });
+
+  it("binds scenario, seed and world revision and follows the session CAS chain", () => {
+    const root = gameDir();
+    const compiled = compiledWorld();
+    const first = commitLivingWorldSession(root, {
+      expectedRevision: null, gameId: "living-game", scenarioId: compiled.seed.id,
+      seedChecksum: compiled.seedChecksum, state: compiled.initialState,
+    });
+    const second = commitLivingWorldSession(root, {
+      expectedRevision: first.manifest.revision, gameId: "living-game", scenarioId: compiled.seed.id,
+      seedChecksum: compiled.seedChecksum, state: compiled.initialState,
+      playerIntent: { schemaVersion: "open-historia-player-intent-state/1", status: "pending" },
+    });
+    assert.equal(second.manifest.parentRevision, first.manifest.revision);
+    assert.equal(second.manifest.worldRevision, first.manifest.worldRevision);
+    assert.equal(second.playerIntent.status, "pending");
+    assert.throws(() => commitLivingWorldSession(root, {
+      expectedRevision: first.manifest.revision, gameId: "living-game", scenarioId: compiled.seed.id,
+      seedChecksum: compiled.seedChecksum, state: compiled.initialState,
+    }), (error) => error instanceof EngineSessionError && error.code === "STALE_SESSION");
+    assert.throws(() => commitLivingWorldSession(root, {
+      expectedRevision: second.manifest.revision, gameId: "living-game", scenarioId: "scenario:other",
+      seedChecksum: compiled.seedChecksum, state: compiled.initialState,
+    }), /scenario/i);
+  });
+
+  it("refuses WorldStateV2 through the legacy writer and detects state tampering", () => {
+    const root = gameDir();
+    const compiled = compiledWorld();
+    assert.throws(() => commitEngineSession(root, {
+      expectedRevision: null, gameId: "living-game", engineScenario: "legacy-name",
+      gameDate: compiled.initialState.month, round: 0, state: compiled.initialState,
+    }), /WorldStateV2.*living-world writer/i);
+    const committed = commitLivingWorldSession(root, {
+      expectedRevision: null, gameId: "living-game", scenarioId: compiled.seed.id,
+      seedChecksum: compiled.seedChecksum, state: compiled.initialState,
+    });
+    const directory = path.join(root, "engine-session", "revisions", committed.manifest.revision.replace(":", "-"));
+    const statePath = path.join(directory, "world-state.json");
+    const state = JSON.parse(fs.readFileSync(statePath, "utf8"));
+    state.turn += 1;
+    fs.writeFileSync(statePath, JSON.stringify(state));
+    assert.throws(() => readEngineSession(root), (error) => error instanceof EngineSessionError && error.code === "CORRUPT_SESSION");
   });
 });
