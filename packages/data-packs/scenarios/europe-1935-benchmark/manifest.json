@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "open-historia-scenario-package/3",
+  "scenarioId": "scenario:europe-1935-benchmark",
+  "scenarioPath": "scenario.json",
+  "geographyAssets": [
+    {
+      "path": "geography/runtime-regions.geojson",
+      "checksum": "sha256:cbaab9d9a5fe714d554fc4e282a5268fd8ec7ebfb2013f56e325918a49f46cfd"
+    }
+  ],
+  "deterministicInputs": [
+    "../../fixtures/europe-1935-benchmark/engine/scenario.json",
+    "../../fixtures/europe-1935-benchmark/scenario.json",
+    "../../fixtures/europe-1935-benchmark/sources.json",
+    "../../fixtures/europe-1935-benchmark/authoring.json",
+    "../../fixtures/europe-1935-benchmark/engine/map-link.json",
+    "../../fixtures/europe-1935-benchmark/geography/runtime-land-adjacency.json",
+    "../../fixtures/europe-1935-benchmark/geography/runtime-geography-manifest.json",
+    "../../fixtures/europe-1935-benchmark/geography/runtime-regions.geojson"
+  ],
+  "scenarioChecksum": "sha256:3d709542e71ee07d1b8cae817cac9e24d9507e192956d2ab687c325bc8a76c2c"
+}
