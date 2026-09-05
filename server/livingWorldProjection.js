@@ -363,6 +363,15 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
     actor: { entityId: actor.id, label: contextLabel(actor.displayName, locale) },
     worldRules: state.worldRules,
     entities,
+    // A deliberately tiny reference index for retrospective territorial
+    // claims. Unlike operational entity context it carries no metrics,
+    // ownership or evidence, so it does not turn a remote region into a legal
+    // action target. It lets the interpreter name any scenario region by its
+    // canonical ID and lets the reducer answer the claim from WorldState.
+    claimableRegionRefs: state.regions.map((region) => ({
+      entityId: region.regionId,
+      label: contextLabel(region.displayName, locale),
+    })).sort((left, right) => left.entityId.localeCompare(right.entityId)),
     evidence,
     allowedInitiativeKinds: ['technology', 'ideology', 'institution', 'doctrine', 'movement', 'project', 'investigation', 'other'],
     allowedEffectFamilies: [...processes.materializableEffectKinds],
