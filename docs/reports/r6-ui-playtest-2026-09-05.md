@@ -80,3 +80,22 @@ This is an open **AI-contract/model-quality defect**, not a successful
 counterfactual WP15 case, but demonstrates the required fail-closed behavior.
 The later audit contains both `strategic` and `utility` provenance records for
 the same `codex-subscription / gpt-5.6-luna / low` configuration.
+
+## Utility-AI source-span repair (subsequent run)
+
+`2eb7b52` repaired a narrowly defined recoverable model defect at the
+PlayerInputV2 boundary. An invalid model offset is repaired only when its
+verbatim source text occurs exactly once in the original player message;
+ambiguous or non-verbatim spans remain blocked. This preserves the boundary's
+fail-closed rule: the repair cannot turn a paraphrase into an authorization or
+expand a player's order.
+
+The live Utility-AI UI was then re-run with the exact one-sentence Russian
+input “Исследовать электрические явления.” The model interpretation appeared
+as a proposed process, was explicitly confirmed, and Details showed
+“Исследование электрических явлений” as `develop / proposed`, at 0% progress,
+with a 1,740 initial treasury commitment and `scientific theory: 14,455` as a
+grounded input. It was not granted as an instant technology or historical fact.
+This is a successful bounded counterfactual-concept smoke case with a real
+provider; it still does not satisfy the ten-decision, three-scenario WP15
+release gate.

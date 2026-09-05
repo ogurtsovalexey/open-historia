@@ -379,13 +379,16 @@ Progress checkpoint: `docs/reports/r6-ui-playtest-2026-09-05.md` records ten
 three-month decisions/30 deterministic boundaries each in Napoleonic,
 Mesoamerican and Europe 1935 UI sessions. The original runs had no configured
 provider, so each advance correctly presented a visible strategic checkpoint
-and used only its explicit skip action. A subsequent real
-Codex-subscription smoke test verified one French player intention through
-typed interpretation, engine resource commitment and a three-month strategic
-settlement (0% → 9% process progress). This is still not WP15 completion:
-repeat the three full runs with the configured production provider to cover
-model-mediated diplomacy, counterfactual concept and territorial-pressure
-paths.
+and used only its explicit skip action. Subsequent real Codex-subscription
+smoke tests verified a French player intention through typed interpretation,
+engine resource commitment and two strategic three-month settlements; they
+also verified a bounded counterfactual electricity-research intention becoming
+a proposed, funded long-running process rather than instant technology. The
+first Utility-AI attempt failed closed on invalid source spans; `2eb7b52`
+repairs only uniquely matching verbatim spans, while ambiguous/paraphrased
+spans remain blocked. This is still not WP15 completion: repeat the three full
+runs with the configured production provider to cover model-mediated
+diplomacy, counterfactual concept and territorial-pressure paths.
 
 ### 0.6 Definition of a safe handoff between remaining packages
 
