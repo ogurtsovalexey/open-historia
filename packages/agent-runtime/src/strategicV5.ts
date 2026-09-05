@@ -202,15 +202,6 @@ export const strategicDecisionV4Schema = z.object({
   ] as const) if (new Set(values).size !== values.length) ctx.addIssue({ code: 'custom', path: [path], message: `${path} must be unique` });
   const materialCount = decision.selectedChoiceIds.length + decision.processDecisions.length + decision.initiativeProposals.length;
   if ((materialCount === 0) !== (decision.hold !== null)) ctx.addIssue({ code: 'custom', path: ['hold'], message: 'hold is required exactly when no material decision is proposed' });
-  const citedFacts = [
-    ...decision.processDecisions.flatMap((row) => row.factsUsed),
-    ...decision.initiativeProposals.flatMap((row) => row.factsUsed),
-    ...decision.durablePlan.goals.flatMap((row) => row.factsUsed),
-    ...decision.durablePlan.commitments.flatMap((row) => row.factsUsed),
-  ];
-  if (citedFacts.some((factId) => !decision.evidenceIds.includes(factId))) {
-    ctx.addIssue({ code: 'custom', path: ['evidenceIds'], message: 'evidenceIds must include every fact used by a material decision or durable plan' });
-  }
 });
 export type StrategicDecisionV4 = z.infer<typeof strategicDecisionV4Schema>;
 
@@ -241,6 +232,14 @@ export type StrategicResolutionV5 = PendingResolution | RejectedResolution | Acc
 
 const compare = (left: string, right: string) => left < right ? -1 : left > right ? 1 : 0;
 function uniqueSorted(values: readonly string[]): string[] { return [...new Set(values)].sort(compare); }
+function citedFactIds(decision: StrategicDecisionV4): string[] {
+  return [
+    ...decision.processDecisions.flatMap((row) => row.factsUsed),
+    ...decision.initiativeProposals.flatMap((row) => row.factsUsed),
+    ...decision.durablePlan.goals.flatMap((row) => row.factsUsed),
+    ...decision.durablePlan.commitments.flatMap((row) => row.factsUsed),
+  ];
+}
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize);
   if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value as Record<string, unknown>)
@@ -290,23 +289,23 @@ export function resolveStrategicDecisionV5(briefInput: unknown, attemptInput: un
   if (attempt.status === 'failed') return pending(attempt.metadata, 'provider-failure', `${attempt.failure.kind}: ${attempt.failure.message}`);
   const parsed = strategicDecisionV4Schema.safeParse(attempt.response);
   if (!parsed.success) return pending(attempt.metadata, 'schema-failure', parsed.error.issues[0]?.message ?? 'invalid StrategicDecisionV4');
-  const decision = parsed.data;
+  // `evidenceIds` is the durable audit summary, while every material object
+  // carries its own exact factsUsed list. Providers can validly return the
+  // latter and omit the redundant summary entry. Close that summary only from
+  // already parsed, actor-visible citations; unknown citations are still
+  // rejected below and this never grants an extra action or fact.
+  let decision = normalizeDecision({ ...parsed.data, evidenceIds: [...parsed.data.evidenceIds, ...citedFactIds(parsed.data)] });
   if (decision.revision !== brief.revision) return pending(attempt.metadata, 'stale-revision', 'The frozen revision changed; rebuild the brief and retry.');
   if (decision.polityId !== brief.actor.id) return rejected(attempt.metadata, 'unknown-reference', 'Decision actor does not match the private brief actor.');
   const evidence = new Set(brief.evidence.map((row) => row.evidenceId));
-  const cited = [
-    ...decision.evidenceIds,
-    ...decision.processDecisions.flatMap((row) => row.factsUsed),
-    ...decision.initiativeProposals.flatMap((row) => row.factsUsed),
-    ...decision.durablePlan.goals.flatMap((row) => row.factsUsed),
-    ...decision.durablePlan.commitments.flatMap((row) => row.factsUsed),
-  ];
+  const cited = [...decision.evidenceIds, ...citedFactIds(decision)];
   if (cited.some((ref) => !evidence.has(ref))) return rejected(attempt.metadata, 'unknown-reference', 'Decision cites invented, stale, or cross-actor evidence.');
-  if (cited.some((ref) => !decision.evidenceIds.includes(ref))) return rejected(attempt.metadata, 'insufficient-evidence', 'Every material and durable-plan fact must be declared in decision evidenceIds.');
   const choices = new Map(brief.frozenChoices.map((row) => [row.choiceId, row]));
   if (decision.selectedChoiceIds.some((choiceId) => !choices.has(choiceId))) return rejected(attempt.metadata, 'unknown-reference', 'Decision cites an unpublished choice ID.');
   const requiredChoiceFacts = decision.selectedChoiceIds.flatMap((choiceId) => choices.get(choiceId)!.factsUsed);
-  if (requiredChoiceFacts.some((ref) => !decision.evidenceIds.includes(ref))) return rejected(attempt.metadata, 'insufficient-evidence', 'Selected frozen choices must retain their canonical facts.');
+  // Frozen choices are engine-published and their canonical facts are part of
+  // the same actor-visible brief, so retain them in the audit package too.
+  decision = normalizeDecision({ ...decision, evidenceIds: [...decision.evidenceIds, ...requiredChoiceFacts] });
   const processOptions = new Map(brief.processOptions.map((row) => [row.processId, row]));
   for (const process of decision.processDecisions) {
     const option = processOptions.get(process.processId);

@@ -32,6 +32,11 @@ function decisionToolSchema(brief) {
   const evidenceEnum = brief.evidence.map((entry) => entry.evidenceId);
   properties.evidenceIds.items = { type: 'string', enum: evidenceEnum };
   process.factsUsed.items = { type: 'string', enum: evidenceEnum };
+  const initiative = properties.initiativeProposals.items.properties;
+  initiative.factsUsed.items = { type: 'string', enum: evidenceEnum };
+  const durablePlan = properties.durablePlan.properties;
+  durablePlan.goals.items.properties.factsUsed.items = { type: 'string', enum: evidenceEnum };
+  durablePlan.commitments.items.properties.factsUsed.items = { type: 'string', enum: evidenceEnum };
   return schema;
 }
 

@@ -120,13 +120,17 @@ test('Strategic V5 rejects invented entities/evidence and emits no authority aft
     status: 'succeeded', metadata: { provider: 'test-provider', model: 'test-model', effort: 'medium', requestId: 'request:2' }, response,
   });
   assert.equal(attempt({ ...base, initiativeProposals: [{ ...base.initiativeProposals[0], affectedEntityRefs: ['region:invented'] }] }).status, 'rejected');
-  assert.equal(attempt({ ...base, evidenceIds: ['evidence:invented'] }).status, 'pending');
+  assert.equal(attempt({ ...base, evidenceIds: ['evidence:invented'] }).status, 'rejected');
   const stale = attempt({ ...base, revision: `sha256:${'c'.repeat(64)}` });
   assert.equal(stale.status, 'pending');
   assert.deepEqual(stale.selectedMaterializationRefs, []);
   assert.equal('semanticPackage' in stale, false);
   const missingTopLevelEvidence = strategicDecisionV4Schema.safeParse({ ...base, evidenceIds: ['evidence:process'] });
-  assert.equal(missingTopLevelEvidence.success, false);
+  assert.equal(missingTopLevelEvidence.success, true);
+  const normalized = attempt({ ...base, evidenceIds: ['evidence:process'] });
+  assert.equal(normalized.status, 'accepted');
+  if (normalized.status !== 'accepted') assert.fail('expected evidence normalization to accept a grounded decision');
+  assert.deepEqual(normalized.semanticPackage.evidenceIds, ['evidence:process', 'evidence:workshops']);
 });
 
 test('Strategic V5 process choices are qualitative, frozen and deterministic', () => {
