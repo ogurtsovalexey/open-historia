@@ -1,6 +1,10 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { assertAcyclicConceptDependencies, buildFeasibilityEnvelope } from '../src/processes/feasibility.js';
+import {
+  assertAcyclicConceptDependencies,
+  buildFeasibilityEnvelope,
+  buildSemanticProcessEnginePlan,
+} from '../src/processes/feasibility.js';
 import { computeEffectDelta, semanticEffectSelectionSchema } from '../src/processes/effects.js';
 import {
   acceptSemanticProcessProposal,
@@ -130,6 +134,30 @@ describe('scenario-neutral process kernel', () => {
     assert.ok(result.causalRecord);
     const transitionEvidence = result.state.evidence.find((entry) => entry.evidenceId === result.evidenceIds[0])!;
     assert.deepStrictEqual(transitionEvidence.canonicalPointers, ['/concepts/0', '/processes/0']);
+  });
+
+  it('turns early electricity into a funded investigation while prohibiting implausible pace', () => {
+    const initial = stampWorldStateRevision(worldInput('1500-01-01'));
+    const semantic = { ...proposal('technology', 'Electricity', 'bounded-electricity'), pace: 'stalled' as const };
+    const resolution = buildSemanticProcessEnginePlan(initial, semantic);
+    assert.deepStrictEqual(resolution.allowedPacesAfterCommitment, ['stalled', 'slow', 'steady']);
+    const accepted = acceptSemanticProcessProposal(initial, semantic, resolution.plan);
+    assert.deepStrictEqual(buildFeasibilityEnvelope(accepted.state, accepted.state.processes[0]!).allowedPaces, ['stalled']);
+    const funded = commitProcessResources(accepted.state, {
+      processId: accepted.processId,
+      expectedRevision: accepted.state.revision,
+      investments: [{ investorEntityRef: 'polity:test', amount: resolution.fundingCommitment }],
+      capacityUse: resolution.capacityUse,
+      evidenceIds: ['evidence:grounding'],
+    }).state;
+    assert.deepStrictEqual(buildFeasibilityEnvelope(funded, funded.processes[0]!).allowedPaces, ['stalled', 'slow', 'steady']);
+    assert.throws(() => applyProcessDecision(funded, {
+      processId: accepted.processId,
+      direction: semantic.direction,
+      pace: 'breakthrough',
+      effectSelections: [{ kind: 'capacity.modify', targetEntityRef: 'region:test:capital' }],
+      evidenceIds: ['evidence:grounding'],
+    }), /pace breakthrough is infeasible/i);
   });
 
   it('accepts communism in 1200 but exposes material and institutional constraints', () => {

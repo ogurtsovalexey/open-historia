@@ -1,8 +1,12 @@
 import type { WorldStateV2 } from '../world/schema.js';
+import { derivePolitySnapshot } from '../world/selectors.js';
 import {
   effectKinds,
+  processEnginePlanSchema,
   processPaceSchema,
+  semanticProcessProposalSchema,
   type EffectKind,
+  type ProcessEnginePlan,
   type WorldProcessState,
 } from './schema.js';
 
@@ -23,6 +27,13 @@ export interface FeasibilityEnvelope {
   reasons: string[];
 }
 
+export interface SemanticProcessEngineResolution {
+  plan: ProcessEnginePlan;
+  fundingCommitment: number;
+  capacityUse: WorldProcessState['capacityUse'];
+  allowedPacesAfterCommitment: Array<WorldProcessState['currentPace']>;
+}
+
 const paceProgressBp: Readonly<Record<WorldProcessState['currentPace'], number>> = {
   stalled: 0,
   slow: 250,
@@ -32,6 +43,61 @@ const paceProgressBp: Readonly<Record<WorldProcessState['currentPace'], number>>
 };
 
 const uniqueSorted = (values: Iterable<string>): string[] => [...new Set(values)].sort();
+
+/**
+ * Materialize an open semantic proposal using only current canonical inputs.
+ * Date raises ordinary resistance; it never acts as a hard technology ceiling.
+ */
+export function buildSemanticProcessEnginePlan(
+  state: WorldStateV2,
+  proposalInput: unknown,
+): SemanticProcessEngineResolution {
+  const proposal = semanticProcessProposalSchema.parse(proposalInput);
+  const sponsorId = proposal.sponsorEntityRefs.find((ref) => state.polities.some((entry) => entry.id === ref));
+  if (!sponsorId) throw new Error('A new semantic process requires a polity sponsor');
+  const snapshot = derivePolitySnapshot(state, sponsorId).value;
+  const polity = state.polities.find((entry) => entry.id === sponsorId)!;
+  const matureConcepts = state.concepts.filter((entry) => (
+    entry.status === 'demonstrated' || entry.status === 'adopted' || entry.status === 'institutionalized'
+  )).length;
+  const sponsorInstitutions = state.institutions.filter((entry) => entry.polityId === sponsorId).length;
+  const year = Number(state.month.slice(0, state.month.indexOf('-')));
+  const baseResistance = proposal.type === 'technology' || proposal.type === 'scientific-theory'
+    ? year < 1300 ? 8500 : year < 1600 ? 7500 : year < 1800 ? 6000 : year < 1950 ? 4500 : 3000
+    : proposal.type === 'ideology' || proposal.type === 'religious-movement'
+      ? year < 1300 ? 7000 : year < 1800 ? 5500 : 4000
+      : year < 1500 ? 6000 : 4500;
+  const initialMomentumBp = Math.min(8000, 1000 + matureConcepts * 400 + sponsorInstitutions * 250);
+  const initialResistanceBp = Math.max(0, baseResistance - Math.min(2500, matureConcepts * 100));
+  const fundingCommitment = Math.max(1, Math.min(
+    polity.treasury,
+    Math.max(Math.trunc(polity.treasury / 100), Math.trunc(snapshot.taxBase / 200)),
+  ));
+  const capacityAmount = Math.max(1, Math.trunc(Math.max(snapshot.workforce, snapshot.regionalOutput) / 1000));
+  const capacityUse = [{ capacityId: `capacity:${proposal.type}`, entityRef: sponsorId, amount: capacityAmount }];
+  const plan = processEnginePlanSchema.parse({
+    prerequisites: {
+      conceptIds: proposal.parentConceptIds,
+      material: [],
+      knowledgeEvidenceIds: [],
+      institutionIds: [],
+      communicationEvidenceIds: [],
+      oppositionEvidenceIds: [],
+      minimumFunding: fundingCommitment,
+      capacity: capacityUse,
+    },
+    compatibleEffectFamilies: proposal.effectFamilies,
+    initialFunding: 0,
+    capacityUse: [],
+    investments: [],
+    initialMomentumBp,
+    initialResistanceBp,
+  });
+  const allowedPacesAfterCommitment: SemanticProcessEngineResolution['allowedPacesAfterCommitment'] = initialMomentumBp < initialResistanceBp
+    ? ['stalled', 'slow', 'steady']
+    : [...processPaceSchema.options];
+  return { plan, fundingCommitment, capacityUse, allowedPacesAfterCommitment };
+}
 
 function sponsorPolities(state: WorldStateV2, process: WorldProcessState): Set<string> {
   const sponsors = new Set<string>();

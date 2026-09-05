@@ -39,16 +39,54 @@ describe('living-world command store', () => {
 
   it('keeps untrusted past claims out of canonical history and requires confirmation', () => {
     const before = living.readLivingWorld(gameId);
+    const playerText = 'I conquered Hanover ten turns ago\nDevelop electricity';
+    const firstLine = 'I conquered Hanover ten turns ago';
+    const secondLine = 'Develop electricity';
+    const hanover = before.interpretationContext.entities.find((entry) => entry.kind === 'region' && /hanover/i.test(entry.label));
+    const actorEvidence = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    assert.ok(hanover);
+    assert.ok(actorEvidence);
     const submitted = living.submitLivingWorldIntent(gameId, {
       revision: before.projection.revision,
       sessionRevision: before.sessionRevision,
-      intentions: ['I conquered Hanover ten turns ago', 'Develop electricity'],
+      intentions: playerText.split('\n'),
+      modelOutput: {
+        revision: before.projection.revision,
+        questions: [],
+        claims: [{
+          claimId: 'claim:old-conquest',
+          subject: 'polity:france',
+          predicate: 'conquered-region',
+          proposedValue: hanover.entityId,
+          proposedTime: 'ten turns ago',
+          sourceSpan: { start: 0, end: firstLine.length, text: firstLine },
+          grounding: 'supported',
+          evidenceIds: hanover.evidenceIds,
+        }],
+        requestedActions: [],
+        proposedInitiatives: [{
+          initiativeId: 'initiative:electricity',
+          kind: 'technology',
+          name: 'Electricity',
+          description: 'Investigate controlled electrical phenomena.',
+          pace: 'steady',
+          effectFamilies: ['capacity.modify'],
+          targetEntityIds: ['polity:france'],
+          evidenceIds: [actorEvidence],
+          sourceSpan: {
+            start: firstLine.length + 1,
+            end: playerText.length,
+            text: secondLine,
+          },
+        }],
+      },
     });
     const parsed = parseIntentFirstProjection(submitted.projection);
     assert.equal(parsed.revision, before.projection.revision);
     assert.equal(parsed.interpretation.confirmationRequired, true);
-    assert.equal(parsed.interpretation.claims[0].status, 'unknown');
-    assert.match(parsed.interpretation.claims[0].explanation, /cannot rewrite history/i);
+    assert.equal(parsed.interpretation.claims[0].status, 'contradicted');
+    assert.match(parsed.interpretation.claims[0].explanation, /contradicts/i);
+    assert.equal(parsed.interpretation.proposedInitiatives[0].material, true);
     assert.throws(() => living.advanceLivingWorld(gameId, {
       revision: submitted.projection.revision,
       sessionRevision: submitted.sessionRevision,
@@ -63,6 +101,11 @@ describe('living-world command store', () => {
       sessionRevision: pending.sessionRevision,
       interpretationId: pending.projection.interpretation.interpretationId,
     });
+    assert.notEqual(confirmed.projection.revision, pending.projection.revision);
+    assert.equal(confirmed.projection.processes.length, 1);
+    assert.equal(confirmed.projection.processes[0].name, 'Electricity');
+    assert.equal(confirmed.projection.processes[0].pace, 'steady');
+    assert.match(confirmed.projection.facts.find((entry) => entry.factId === 'fact:treasury').value, /^[0-9,]+$/u);
     const advanced = living.advanceLivingWorld(gameId, {
       revision: confirmed.projection.revision,
       sessionRevision: confirmed.sessionRevision,

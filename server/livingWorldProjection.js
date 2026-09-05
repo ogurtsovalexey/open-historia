@@ -154,3 +154,77 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     time: { label: state.month, options: [{ optionId: 'advance-one-month', label: 'Advance one month' }] },
   };
 }
+
+/** Bounded, actor-visible facts for the semantic interpreter; never a writable state copy. */
+export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en' }) {
+  const state = session.state;
+  const actor = state.polities.find((entry) => entry.id === playerPolityId);
+  if (!actor) throw new Error(`Unknown player polity ${playerPolityId}`);
+  const registry = worldV2.selectEvidenceRegistry(state, actor.id).value.entries;
+  const visibleIds = new Set(registry.map((entry) => entry.evidenceId));
+  const regionRows = state.regions.map((region) => ({
+    entityId: region.regionId,
+    kind: 'region',
+    label: localized(region.displayName, locale),
+    legalOwnerPolityId: region.control.legalOwnerPolityId,
+    actualControllerPolityId: region.control.actualControllerPolityId,
+    evidenceIds: region.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
+  }));
+  const entities = [
+    ...state.polities.map((polity) => ({
+      entityId: polity.id,
+      kind: 'polity',
+      label: localized(polity.displayName, locale),
+      evidenceIds: polity.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
+    })),
+    ...regionRows,
+    ...state.formations.filter((entry) => entry.polityId === actor.id).map((formation) => ({
+      entityId: formation.formationId,
+      kind: 'formation',
+      label: labelOf(formation.formationId),
+      polityId: formation.polityId,
+      evidenceIds: formation.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
+    })),
+    ...state.concepts.map((concept) => ({
+      entityId: concept.conceptId,
+      kind: 'concept',
+      label: localized(concept.displayName, locale),
+      status: concept.status,
+      evidenceIds: concept.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
+    })),
+    ...state.processes.filter((entry) => entry.sponsorEntityRefs.includes(actor.id)).map((process) => ({
+      entityId: process.processId,
+      kind: 'process',
+      label: labelOf(process.kind),
+      status: process.status,
+      evidenceIds: process.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
+    })),
+    ...state.relationships.filter((entry) => entry.participantPolityIds.includes(actor.id)).map((relationship) => ({
+      entityId: relationship.relationshipId,
+      kind: 'relationship',
+      label: labelOf(relationship.kind),
+      participantPolityIds: relationship.participantPolityIds,
+      evidenceIds: relationship.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
+    })),
+  ];
+  const referencedEvidence = new Set(entities.flatMap((entry) => entry.evidenceIds));
+  const evidence = registry
+    .filter((entry) => referencedEvidence.has(entry.evidenceId))
+    .slice(0, 240)
+    .map((entry) => ({
+      evidenceId: entry.evidenceId,
+      kind: entry.kind,
+    }));
+  const context = {
+    revision: state.revision,
+    month: state.month,
+    actor: { entityId: actor.id, label: localized(actor.displayName, locale) },
+    worldRules: state.worldRules,
+    entities,
+    evidence,
+    allowedInitiativeKinds: ['technology', 'ideology', 'institution', 'doctrine', 'movement', 'project', 'investigation', 'other'],
+    allowedEffectFamilies: [...processes.effectKinds],
+  };
+  if (JSON.stringify(context).length > 50_000) throw new Error('Player intent context exceeds the bounded semantic prompt budget.');
+  return context;
+}

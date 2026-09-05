@@ -90,7 +90,9 @@ function requireKnownRefs(state: WorldStateV2, proposal: SemanticProcessProposal
   }
   for (const id of proposal.evidenceIds) if (!evidence.has(id)) throw new Error(`Semantic proposal references unknown evidence ${id}`);
   for (const id of proposal.parentConceptIds) if (!concepts.has(id)) throw new Error(`Semantic proposal references unknown parent concept ${id}`);
-  const normalizedProhibitions = state.worldRules.hardProhibitions.map((value) => normalizeSemanticKey(value));
+  const normalizedProhibitions = state.worldRules.hardProhibitions.flatMap((value) => {
+    try { return [normalizeSemanticKey(value)]; } catch { return []; }
+  });
   const semanticKey = normalizeSemanticKey(proposal.displayName.en);
   if (normalizedProhibitions.includes(semanticKey)) throw new Error(`Concept ${semanticKey} is prohibited by world rules`);
 }

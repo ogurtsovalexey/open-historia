@@ -45,10 +45,12 @@ describe('PlayerInputV2 prompt-spoof boundary', () => {
     const sourceSpan = { start: 0, end: 4, text: 'test' };
     const action = {
       actionId: 'action:test', domain: 'economy', scope: 'domestic', intent: 'test', targetEntityIds: [],
+      pace: 'slow', effectFamilies: ['capacity.modify'],
       claimRefs: [], evidenceIds: [], sourceSpan, command: { kind: 'finance.issue-bonds', amount: 999 },
     };
     const initiative = {
       initiativeId: 'initiative:test', kind: 'institution', name: 'Test', description: 'Test',
+      pace: 'slow', effectFamilies: ['institution.create'],
       targetEntityIds: [], evidenceIds: [], sourceSpan, numericEffects: { treasury: 999 },
     };
     assert.strictEqual(playerInputV2ModelOutputSchema.safeParse({

@@ -56,7 +56,13 @@ export function useLivingWorldRuntime() {
       return next;
     };
     return {
-      submitIntent: ({ revision, intentions }) => mutate("intent", { revision, intentions }),
+      submitIntent: async ({ revision, intentions }) => {
+        const current = payloadRef.current;
+        if (!current?.interpretationContext) throw new Error("The grounded interpretation context is unavailable.");
+        const { interpretLivingWorldIntent } = await import("./livingWorldAi.js");
+        const modelOutput = await interpretLivingWorldIntent(current.interpretationContext, intentions);
+        return mutate("intent", { revision, intentions, modelOutput });
+      },
       confirmInterpretation: ({ revision, interpretationId }) => mutate("intent/confirm", { revision, interpretationId }),
       dismissInterpretation: ({ revision, interpretationId }) => mutate("intent/dismiss", { revision, interpretationId }),
       advanceTime: ({ revision, optionId }) => mutate("advance", { revision, optionId }),

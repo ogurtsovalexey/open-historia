@@ -95,6 +95,7 @@ describe('PlayerInputInterpretationV2', () => {
     });
     output.requestedActions.push({
       actionId: 'action:recruit-b', domain: 'military', scope: 'domestic', intent: 'recruit in B',
+      pace: 'slow', effectFamilies: ['recruitment-access.modify'],
       targetEntityIds: ['region:test:B'], claimRefs: ['claim:conquest'], evidenceIds: [],
       sourceSpan: span(playerText, 'recruit there now'),
     });
@@ -131,6 +132,7 @@ describe('PlayerInputInterpretationV2', () => {
     });
     output.requestedActions.push({
       actionId: 'action:invest-a', domain: 'economy', scope: 'domestic', intent: 'invest in A',
+      pace: 'steady', effectFamilies: ['capacity.modify'],
       targetEntityIds: ['region:test:A'], claimRefs: [], evidenceIds: ['evidence:public'],
       sourceSpan: span(playerText, 'Invest in A'),
     });
@@ -152,6 +154,7 @@ describe('PlayerInputInterpretationV2', () => {
     const output = baseOutput(world.revision);
     output.requestedActions.push({
       actionId: 'action:bad', domain: 'economy', scope: 'domestic', intent: 'invest somewhere',
+      pace: 'steady', effectFamilies: ['capacity.modify'],
       targetEntityIds: ['region:test:missing'], claimRefs: [], evidenceIds: ['evidence:beta'],
       sourceSpan: span(playerText, playerText),
     });
