@@ -9,9 +9,10 @@ Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the pr
 This section is the authoritative resume point for the next implementation
 agent. Do not restart the merge ladder and do not reconstruct completed work
 from the old baseline. The current pushed implementation checkpoint is
-`937335c` on `feature/campaign-memory` (`test(living-world): add cross-era
-acceptance`). R5's WP12 acceptance suite is committed; the in-progress hard
-cut of retired runtime paths is the next work to verify and commit.
+`bd4fa1c` on `feature/campaign-memory` (`test(ui): record deterministic
+cross-era playtests`). R5 is complete. R6 has verified the deterministic UI
+loop across all three scenarios, but its model-mediated coverage remains
+blocked until a production AI provider is configured.
 
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
@@ -372,6 +373,14 @@ forced through an invalid world. If war/occupation is not legally reachable,
 record the actual blocker and repeat the affected path in another fresh save
 until the cross-scenario territorial gate is genuinely exercised. Commit only
 redacted reports and screenshots; raw provider traffic remains gitignored.
+
+Progress checkpoint: `docs/reports/r6-ui-playtest-2026-09-05.md` records ten
+three-month decisions/30 deterministic boundaries each in Napoleonic,
+Mesoamerican and Europe 1935 UI sessions. The browser had no configured
+provider, so each advance correctly presented a visible strategic checkpoint
+and the test used only its explicit skip action. This is not WP15 completion:
+repeat with the configured production provider to cover model-mediated player
+intent, diplomacy, counterfactual concept and territorial-pressure paths.
 
 ### 0.6 Definition of a safe handoff between remaining packages
 
