@@ -152,3 +152,32 @@ precise provider error and retry action. Retrying through the real UI completed
 map/UI crash. The read-only audit records Utility and Strategic provenance,
 excludes raw traffic, and has replay checksum
 `sha256:4ebebb95b97a2bb0b134ad73dbc171cbe7d943f1ca1b92c585749584e3f9c390`.
+
+## Verifiable-claim and recovery regression (subsequent run)
+
+The same live French save exposed three adjacent contract faults while testing
+false retrospective statements. A free-form model predicate could look
+structured but always resolve `unknown`; a territorial claim could use a
+display label instead of a canonical region ID; and a deterministically
+contradicted claim without model-supplied evidence could fail the strict UI
+parser. The corrections in `8354aaf`, `75fbf31`, `6b5034b`, and `2f2fac5`
+close the predicate/value vocabulary, attach visible server-owned evidence to
+new deterministic outcomes, and repair only the read-only projection of old
+pending previews. No historic world revision is rewritten.
+
+After a production rebuild/restart, the existing saved UI recovered rather
+than crashing. The statement “У Франции уже есть два миллиона солдат в поле.”
+rendered as `fielded-personnel 2000000` with status `contradicted` and 24
+grounded sources, then was explicitly confirmed as a non-material result. A
+real Strategic model advance completed `1805-07-01` → `1805-10-01`, again with
+all three monthly boundaries resolved. The read-only audit for
+`napoleonic-europe-january-1805-session-4` has 19 immutable revisions, replay
+checksum `sha256:3477d73caab901eb9d3d471b218ca6ee9c2cbac01ca908522ba947db43dfe132`,
+sanitized `codex-subscription / gpt-5.6-luna / low` Utility and Strategic
+provenance, and no raw prompts, responses, keys, or endpoints.
+
+The full WP15 gate remains open: this is a focused French model-mediated
+regression run, not three fresh ten-decision campaigns. The attempted Malta
+claim is now safely omitted when Malta is outside the bounded interpreter
+index; resolving a player-named remote region without inflating that index is
+an explicit future UX/context task.
