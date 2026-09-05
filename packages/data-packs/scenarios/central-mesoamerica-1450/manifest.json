@@ -8,7 +8,7 @@
   "files": [
     {
       "path": "scenario.json",
-      "checksum": "sha256:1cb8b2a2960b0b6d8152c33dcd910e6c545fb0efe302c6b5c64d48d1c8de0627"
+      "checksum": "sha256:3e409e02cd8144b568b134d9c55e6cf2618efd6e6eed91f7c0a930d47ebaccce"
     },
     {
       "path": "sources.json",
@@ -16,7 +16,7 @@
     },
     {
       "path": "authoring.json",
-      "checksum": "sha256:c2906b3033d5acf64fb7177a94c621bd7f5d769274c9618abab79309c761159f"
+      "checksum": "sha256:6b4153a3c8d06b616729002d2152b4d92ed5c3b730a39ad96b263a34289df3f4"
     },
     {
       "path": "geography/candidate-region-plan.json",
@@ -52,7 +52,7 @@
     },
     {
       "path": "starting-state/obligations.json",
-      "checksum": "sha256:7ddd997674a19c832a6b1b61847b258c89a17ebbfc681bb727f81ba3ea13b4da"
+      "checksum": "sha256:ca99f0f729303141cc4f88cbe768bddca5606879b61de46d9d46f1871047c13b"
     },
     {
       "path": "starting-state/diplomacy.json",
@@ -83,5 +83,5 @@
       "checksum": "sha256:959f640d703da4fd850106672ff93e56b2416542ffdffde9181903ee11fbd881"
     }
   ],
-  "scenarioChecksum": "sha256:d555dbb5bc8328d2bc3d3d713cb40982370eed5d5e730ca9725465bbc5bbf973"
+  "scenarioChecksum": "sha256:77aad04a231f5e26b70cd1a61abd2fa05e4066d925d2e4209940ce5890d627e5"
 }

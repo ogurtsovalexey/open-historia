@@ -6,6 +6,7 @@ import type {
   RouteId,
   WorldStateV2,
 } from './schema.js';
+import { tributeServiceReservedInRegion } from './tribute.js';
 
 export interface GroundedProjection<T> {
   revision: WorldStateV2['revision'];
@@ -42,6 +43,8 @@ export interface RegionSnapshot {
   population: number;
   potentialWorkforce: number;
   mobilizedPersonnel: number;
+  obligatedLabor: number;
+  obligatedMilitaryService: number;
   workforce: number;
   eligiblePopulation: number;
   fiscalBase: number;
@@ -58,6 +61,7 @@ export interface RecruitmentAccess {
   recruitmentAccessBp: number;
   eligiblePopulation: number;
   mobilizedPersonnel: number;
+  obligatedMilitaryService: number;
   recruitablePopulation: number;
   unmobilizedRecruitablePopulation: number;
   mobilizationCeiling: number;
@@ -234,11 +238,15 @@ export function deriveRegionSnapshot(state: WorldStateV2, regionId: string): Gro
   );
   const mobilizedPersonnel = sumSafe(origins.map((origin) => origin.personnel), `mobilized personnel in ${regionId}`);
   if (mobilizedPersonnel > population) throw new Error(`mobilized personnel exceeds population in ${regionId}`);
-  const workforce = Math.max(0, potentialWorkforce - mobilizedPersonnel);
+  const tributeService = tributeServiceReservedInRegion(state, regionId);
+  const obligatedLabor = tributeService.labor;
+  const obligatedMilitaryService = tributeService.military;
+  const workforce = Math.max(0, potentialWorkforce - mobilizedPersonnel - obligatedLabor - obligatedMilitaryService);
   const directEvidence = [
     ...region.evidenceIds,
     ...cohorts.flatMap((cohort) => cohort.evidenceIds),
     ...origins.flatMap(({ formation }) => formation.evidenceIds),
+    ...tributeService.evidenceIds,
   ];
   return projection(state, {
     regionId: region.regionId,
@@ -246,6 +254,8 @@ export function deriveRegionSnapshot(state: WorldStateV2, regionId: string): Gro
     population,
     potentialWorkforce,
     mobilizedPersonnel,
+    obligatedLabor,
+    obligatedMilitaryService,
     workforce,
     eligiblePopulation,
     fiscalBase: region.fiscalBase,
@@ -254,7 +264,14 @@ export function deriveRegionSnapshot(state: WorldStateV2, regionId: string): Gro
     resourceDeposits: region.resourceDeposits.map((entry) => ({ ...entry })).sort((a, b) => compareIds(a.resourceId, b.resourceId)),
   }, entityEvidence(
     state,
-    [region.regionId, ...cohorts.map((cohort) => cohort.cohortId), ...origins.map(({ formation }) => formation.formationId)],
+    [
+      region.regionId,
+      ...cohorts.map((cohort) => cohort.cohortId),
+      ...origins.map(({ formation }) => formation.formationId),
+      ...state.tributeObligations
+        .filter((obligation) => obligation.sourceRegionIds.includes(region.regionId))
+        .map((obligation) => obligation.obligationId),
+    ],
     directEvidence,
   ));
 }
@@ -278,10 +295,11 @@ export function deriveRegionalRecruitmentAvailability(
     recruitmentAccessBp,
     eligiblePopulation: region.eligiblePopulation,
     mobilizedPersonnel: region.mobilizedPersonnel,
+    obligatedMilitaryService: hasControl ? region.obligatedMilitaryService : 0,
     recruitablePopulation,
-    unmobilizedRecruitablePopulation: Math.max(0, recruitablePopulation - region.mobilizedPersonnel),
+    unmobilizedRecruitablePopulation: Math.max(0, recruitablePopulation - region.mobilizedPersonnel - (hasControl ? region.obligatedMilitaryService : 0)),
     mobilizationCeiling: recruitablePopulation,
-    availableManpower: Math.max(0, recruitablePopulation - region.mobilizedPersonnel),
+    availableManpower: Math.max(0, recruitablePopulation - region.mobilizedPersonnel - (hasControl ? region.obligatedMilitaryService : 0)),
   }, [...polity.evidenceIds, ...regionProjection.evidenceIds]);
 }
 

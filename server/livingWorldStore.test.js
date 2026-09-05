@@ -9,6 +9,7 @@ let temporary;
 let library;
 let living;
 let gameId;
+let mesoGameId;
 
 before(async () => {
   temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'open-historia-living-store-'));
@@ -19,6 +20,11 @@ before(async () => {
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
     name: 'Living store test',
+  }).game.id;
+  mesoGameId = library.createGame({
+    scenarioId: 'scenario:central-mesoamerica-1450',
+    playerPolityId: 'polity:tenochtitlan',
+    name: 'Living tribute test',
   }).game.id;
 });
 
@@ -35,6 +41,16 @@ describe('living-world command store', () => {
     assert.equal(parsed.asOf, '1805-01-01');
     assert.ok(parsed.facts.some((entry) => entry.factId === 'fact:controlled-population' && entry.authority === 'derived'));
     assert.ok(parsed.facts.some((entry) => entry.factId === 'fact:fielded-personnel' && entry.authority === 'derived'));
+  });
+
+  it('projects scenario-local tribute obligations and their conserved-service opportunity cost', () => {
+    const view = living.readLivingWorld(mesoGameId);
+    const parsed = parseIntentFirstProjection(view.projection);
+    assert.equal(parsed.playerPolity.polityId, 'polity:tenochtitlan');
+    assert.ok(parsed.facts.some((entry) => entry.factId === 'fact:tribute-incoming' && /maize/i.test(entry.value)));
+    assert.ok(parsed.diplomacy.commitments.some((entry) => /obligation-xochimilco-triple-alliance/.test(entry.commitmentId)));
+    assert.ok(view.interpretationContext.entities.some((entry) => entry.entityId === 'obligation:xochimilco-triple-alliance' && entry.kind === 'tribute-obligation'));
+    assert.doesNotMatch(JSON.stringify(parsed).toLowerCase(), /(?:^|[^a-z])(gdp|bonds?|unemployment)(?:[^a-z]|$)/);
   });
 
   it('keeps untrusted past claims out of canonical history and requires confirmation', () => {

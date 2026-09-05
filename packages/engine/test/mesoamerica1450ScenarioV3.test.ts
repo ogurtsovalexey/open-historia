@@ -2,7 +2,8 @@ import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { describe, it } from 'node:test';
 import { compileScenarioV3 } from '../src/world/compileScenarioV3.js';
-import { derivePolitySnapshot } from '../src/world/selectors.js';
+import { applyTributeDelivery } from '../src/world/tribute.js';
+import { derivePolitySnapshot, deriveRegionSnapshot } from '../src/world/selectors.js';
 
 const scenarioUrl = new URL('../../../data-packs/scenarios/central-mesoamerica-1450/scenario.json', import.meta.url);
 
@@ -39,6 +40,18 @@ describe('Central Mesoamerica 1450 ScenarioV3 compiler regression', () => {
     const alliance = initialState.relationships.find((entry) => entry.relationshipId === 'relationship:triple-alliance');
     assert.ok(alliance);
     assert.deepStrictEqual(alliance.participantPolityIds, ['polity:tenochtitlan', 'polity:texcoco', 'polity:tlacopan']);
+    const obligation = initialState.tributeObligations.find((entry) => entry.obligationId === 'obligation:xochimilco-triple-alliance');
+    assert.ok(obligation);
+    assert.strictEqual(obligation.beneficiaries.reduce((sum, entry) => sum + entry.shareBp, 0), 10_000);
+    const controls = initialState.regions.map((region) => structuredClone(region.control));
+    const beforeMaize = initialState.polities.reduce((sum, polity) => sum + (polity.stockpiles.find((entry) => entry.commodityId === 'commodity:maize')?.quantity ?? 0), 0);
+    const delivered = applyTributeDelivery(initialState, { obligationId: obligation.obligationId, expectedRevision: initialState.revision });
+    const afterMaize = delivered.state.polities.reduce((sum, polity) => sum + (polity.stockpiles.find((entry) => entry.commodityId === 'commodity:maize')?.quantity ?? 0), 0);
+    assert.strictEqual(afterMaize, beforeMaize);
+    assert.strictEqual(delivered.rows[0]!.payerDebits.reduce((sum, row) => sum + row.quantity, 0), delivered.rows[0]!.beneficiaryCredits.reduce((sum, row) => sum + row.quantity, 0));
+    assert.deepStrictEqual(delivered.state.regions.map((region) => region.control), controls);
+    const xochimilco = deriveRegionSnapshot(initialState, 'region:meso1450:xochimilco').value;
+    assert.ok(xochimilco.obligatedLabor > 0 && xochimilco.obligatedMilitaryService > 0);
     const catalog = JSON.stringify(initialState.catalogs).toLowerCase();
     assert.doesNotMatch(catalog, /(?:^|[^a-z])(coal|oil|steel|bonds?|gdp)(?:[^a-z]|$)/);
     assert.ok(initialState.catalogs.commodities.some((entry) => entry.commodityId === 'commodity:maize'));

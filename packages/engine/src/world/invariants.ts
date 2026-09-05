@@ -82,6 +82,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     ...conceptIds,
     ...state.processes.map((entry) => entry.processId as string),
     ...state.relationships.map((entry) => entry.relationshipId as string),
+    ...state.tributeObligations.map((entry) => entry.obligationId as string),
   ]);
 
   checkUnique(violations, 'polity', state.polities.map((entry) => entry.id));
@@ -95,6 +96,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
   checkUnique(violations, 'concept', state.concepts.map((entry) => entry.conceptId));
   checkUnique(violations, 'process', state.processes.map((entry) => entry.processId));
   checkUnique(violations, 'relationship', state.relationships.map((entry) => entry.relationshipId));
+  checkUnique(violations, 'tribute obligation', state.tributeObligations.map((entry) => entry.obligationId));
   checkUnique(violations, 'event', state.events.map((entry) => entry.eventId));
   checkUnique(violations, 'evidence', state.evidence.map((entry) => entry.evidenceId));
   checkUnique(violations, 'module', state.modules.enabled);
@@ -344,6 +346,40 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     checkUnique(violations, `relationship participant in ${relationship.relationshipId}`, relationship.participantPolityIds);
     for (const polityId of relationship.participantPolityIds) assertPolity(polityId, `relationship ${relationship.relationshipId}`);
   }
+  for (const obligation of state.tributeObligations) {
+    checkUnique(violations, `payer in ${obligation.obligationId}`, obligation.payerPolityIds);
+    checkUnique(violations, `source region in ${obligation.obligationId}`, obligation.sourceRegionIds);
+    checkUnique(violations, `beneficiary in ${obligation.obligationId}`, obligation.beneficiaries.map((entry) => entry.polityId));
+    checkUnique(violations, `delivery in ${obligation.obligationId}`, obligation.deliveries.map((entry) => entry.commodityId));
+    checkUnique(violations, `route in ${obligation.obligationId}`, obligation.routeIds);
+    checkUnique(violations, `arrears in ${obligation.obligationId}`, obligation.arrears.map((entry) => entry.commodityId));
+    for (const polityId of obligation.payerPolityIds) assertPolity(polityId, `tribute obligation ${obligation.obligationId} payer`);
+    for (const regionId of obligation.sourceRegionIds) {
+      assertRegion(regionId, `tribute obligation ${obligation.obligationId} source`);
+      const controller = state.regions.find((entry) => entry.regionId === regionId)?.control.actualControllerPolityId;
+      if (controller && !obligation.payerPolityIds.includes(controller)) {
+        violations.push(`tribute obligation ${obligation.obligationId} source ${regionId} is outside its payers' actual control`);
+      }
+    }
+    for (const beneficiary of obligation.beneficiaries) assertPolity(beneficiary.polityId, `tribute obligation ${obligation.obligationId} beneficiary`);
+    const totalShares = obligation.beneficiaries.reduce((sum, entry) => sum + entry.shareBp, 0);
+    if (totalShares !== 10000) violations.push(`tribute obligation ${obligation.obligationId} beneficiary shares sum ${totalShares}, expected 10000`);
+    for (const delivery of [...obligation.deliveries, ...obligation.arrears]) {
+      if (!catalogCommodities.has(delivery.commodityId)) {
+        violations.push(`tribute obligation ${obligation.obligationId} references unknown commodity ${delivery.commodityId}`);
+      }
+    }
+    for (const routeId of obligation.routeIds) {
+      if (!state.routes.some((entry) => entry.routeId === routeId)) violations.push(`tribute obligation ${obligation.obligationId} references unknown route ${routeId}`);
+    }
+    for (const delivery of obligation.deliveries) {
+      if (obligation.routeIds.length > 0 && !obligation.routeIds.some((routeId) => state.routes.some(
+        (route) => route.routeId === routeId && route.allowedCommodityIds.includes(delivery.commodityId),
+      ))) {
+        violations.push(`tribute obligation ${obligation.obligationId} has no declared route for commodity ${delivery.commodityId}`);
+      }
+    }
+  }
   for (const record of state.knowledge.records) {
     assertPolity(record.polityId, 'knowledge record');
     if (!conceptIds.has(record.conceptId)) violations.push(`knowledge record references unknown concept ${record.conceptId}`);
@@ -364,6 +400,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     ...state.concepts.map((entry) => ({ label: `concept ${entry.conceptId}`, evidenceIds: entry.evidenceIds })),
     ...state.processes.map((entry) => ({ label: `process ${entry.processId}`, evidenceIds: entry.evidenceIds })),
     ...state.relationships.map((entry) => ({ label: `relationship ${entry.relationshipId}`, evidenceIds: entry.evidenceIds })),
+    ...state.tributeObligations.map((entry) => ({ label: `tribute obligation ${entry.obligationId}`, evidenceIds: entry.evidenceIds })),
     ...state.knowledge.records.map((entry) => ({ label: `knowledge ${entry.polityId}/${entry.conceptId}`, evidenceIds: entry.evidenceIds })),
     ...state.events.map((entry) => ({ label: `event ${entry.eventId}`, evidenceIds: entry.evidenceIds })),
   ];

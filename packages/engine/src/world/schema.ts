@@ -39,6 +39,7 @@ export const institutionIdSchema = prefixedIdSchema('institution').brand<'Instit
 export const conceptIdSchema = prefixedIdSchema('concept').brand<'ConceptId'>();
 export const processIdSchema = prefixedIdSchema('process').brand<'ProcessId'>();
 export const relationshipIdSchema = prefixedIdSchema('relationship').brand<'RelationshipId'>();
+export const tributeObligationIdSchema = prefixedIdSchema('obligation').brand<'TributeObligationId'>();
 export const evidenceIdSchema = prefixedIdSchema('evidence').brand<'EvidenceId'>();
 export const worldEventIdSchema = prefixedIdSchema('event').brand<'WorldEventId'>();
 export const worldRevisionHashSchema = z.string().regex(/^sha256:[a-f0-9]{64}$/, 'Invalid world revision hash');
@@ -199,6 +200,32 @@ export const relationshipStateSchema = z.object({
   evidenceIds: evidenceIdsSchema,
 }).strict();
 
+export const tributeObligationStateSchema = z.object({
+  obligationId: tributeObligationIdSchema,
+  payerPolityIds: z.array(polityIdSchema).min(1),
+  sourceRegionIds: z.array(regionIdSchema).min(1),
+  beneficiaries: z.array(z.object({
+    polityId: polityIdSchema,
+    shareBp: basisPointsSchema,
+  }).strict()).min(1),
+  deliveries: z.array(z.object({
+    commodityId: stableIdSchema,
+    quantity: safeNonNegativeIntegerSchema,
+  }).strict()),
+  laborService: z.object({ people: safeNonNegativeIntegerSchema }).strict().optional(),
+  militaryService: z.object({ personnel: safeNonNegativeIntegerSchema }).strict().optional(),
+  routeIds: z.array(routeIdSchema),
+  cadence: nonEmptyTextSchema,
+  arrears: z.array(z.object({
+    commodityId: stableIdSchema,
+    quantity: safeNonNegativeIntegerSchema,
+  }).strict()),
+  complianceBp: basisPointsSchema,
+  enforcementBasisId: stableIdSchema,
+  evidenceIds: evidenceIdsSchema,
+}).strict();
+export type TributeObligationState = z.infer<typeof tributeObligationStateSchema>;
+
 export const knowledgeStateSchema = z.object({
   records: z.array(z.object({
     polityId: polityIdSchema,
@@ -219,6 +246,7 @@ const entityRefSchema = z.union([
   conceptIdSchema,
   processIdSchema,
   relationshipIdSchema,
+  tributeObligationIdSchema,
 ]);
 
 export const worldEventSchema = z.object({
@@ -322,6 +350,7 @@ export const worldStateV2ContentSchema = z.object({
   concepts: z.array(conceptStateSchema),
   processes: z.array(worldProcessStateSchema),
   relationships: z.array(relationshipStateSchema),
+  tributeObligations: z.array(tributeObligationStateSchema).default([]),
   knowledge: knowledgeStateSchema,
   events: z.array(worldEventSchema),
   evidence: z.array(evidenceRecordSchema),

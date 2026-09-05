@@ -1,22 +1,50 @@
 {
-  "obligations": [
-    {
-      "id": "obligation:triple-alliance",
-      "kind": "tribute-and-shared-war",
-      "participantPolityIds": [
-        "polity:tenochtitlan",
-        "polity:texcoco",
-        "polity:tlacopan"
+  "obligations": {
+    "obligation:xochimilco-triple-alliance": {
+      "id": "obligation:xochimilco-triple-alliance",
+      "payerPolityIds": [
+        "polity:xochimilco"
       ],
-      "beneficiaryShares": "unknown",
-      "deliveries": "unknown",
-      "cadence": "unknown",
-      "arrears": "unknown",
-      "changesControl": false,
+      "sourceRegionIds": [
+        "region:meso1450:xochimilco"
+      ],
+      "beneficiaries": [
+        {
+          "polityId": "polity:tenochtitlan",
+          "shareBp": 5000
+        },
+        {
+          "polityId": "polity:texcoco",
+          "shareBp": 3000
+        },
+        {
+          "polityId": "polity:tlacopan",
+          "shareBp": 2000
+        }
+      ],
+      "deliveries": [
+        {
+          "commodityId": "commodity:maize",
+          "quantity": 300
+        }
+      ],
+      "laborService": {
+        "people": 120
+      },
+      "militaryService": {
+        "personnel": 80
+      },
+      "routeIds": [
+        "route:lake-texcoco-canoe"
+      ],
+      "cadence": "modeled 80-day delivery cycle",
+      "arrears": [],
+      "complianceBp": 7000,
+      "enforcementBasisId": "relationship:triple-alliance",
       "evidenceIds": [
-        "evidence:meso1450-relationship-triple-alliance",
-        "evidence:meso1450-relationship-triple-alliance-shared-war"
+        "evidence:meso1450-obligation-xochimilco-triple-alliance"
       ]
     }
-  ]
+  },
+  "accountingRule": "Goods debited from payers exactly equal goods credited to beneficiaries; service is reserved from workforce and recruitment; control is unchanged."
 }

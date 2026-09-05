@@ -56,6 +56,15 @@ function canonicalScenario(scenario: ValidatedScenarioV3): ValidatedScenarioV3 {
   }
   for (const region of Object.values(result.geography.regions)) region.adjacentRegionIds.sort(compareIds);
   for (const relationship of Object.values(result.startingState.relationships)) relationship.participantPolityIds.sort(compareIds);
+  for (const obligation of Object.values(result.startingState.tributeObligations)) {
+    obligation.payerPolityIds.sort(compareIds);
+    obligation.sourceRegionIds.sort(compareIds);
+    obligation.beneficiaries.sort((a, b) => compareIds(a.polityId, b.polityId));
+    obligation.deliveries.sort((a, b) => compareIds(a.commodityId, b.commodityId));
+    obligation.routeIds.sort(compareIds);
+    obligation.arrears.sort((a, b) => compareIds(a.commodityId, b.commodityId));
+    obligation.evidenceIds.sort(compareIds);
+  }
   for (const route of Object.values(result.startingState.routes)) {
     route.regionIds.sort(compareIds);
     route.allowedCommodityIds.sort(compareIds);
@@ -241,6 +250,21 @@ function buildInitialState(
     participantPolityIds: [...relationship.participantPolityIds].sort(compareIds),
     evidenceIds: [...relationship.evidenceIds].sort(compareIds),
   }));
+  const tributeObligations = sortedValues(scenario.startingState.tributeObligations).map((obligation) => ({
+    obligationId: obligation.id,
+    payerPolityIds: [...obligation.payerPolityIds].sort(compareIds),
+    sourceRegionIds: [...obligation.sourceRegionIds].sort(compareIds),
+    beneficiaries: obligation.beneficiaries.map((entry) => ({ ...entry })).sort((a, b) => compareIds(a.polityId, b.polityId)),
+    deliveries: obligation.deliveries.map((entry) => ({ ...entry })).sort((a, b) => compareIds(a.commodityId, b.commodityId)),
+    ...(obligation.laborService ? { laborService: { ...obligation.laborService } } : {}),
+    ...(obligation.militaryService ? { militaryService: { ...obligation.militaryService } } : {}),
+    routeIds: [...obligation.routeIds].sort(compareIds),
+    cadence: obligation.cadence,
+    arrears: obligation.arrears.map((entry) => ({ ...entry })).sort((a, b) => compareIds(a.commodityId, b.commodityId)),
+    complianceBp: obligation.complianceBp,
+    enforcementBasisId: obligation.enforcementBasisId,
+    evidenceIds: [...obligation.evidenceIds].sort(compareIds),
+  }));
   const knowledgeRecords = sortedValues(scenario.startingState.knowledge).map((knowledge) => ({
     polityId: knowledge.polityId,
     conceptId: knowledge.conceptId,
@@ -268,6 +292,7 @@ function buildInitialState(
     `/concepts/${index}`,
   ));
   relationships.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.relationshipId], `/relationships/${index}`));
+  tributeObligations.forEach((entry, index) => linkEvidence(entry.evidenceIds, [entry.obligationId], `/tributeObligations/${index}`));
   knowledgeRecords.forEach((entry, index) => linkEvidence(
     entry.evidenceIds,
     [entry.polityId, entry.conceptId],
@@ -312,6 +337,7 @@ function buildInitialState(
     concepts,
     processes: [],
     relationships,
+    tributeObligations,
     knowledge: { records: knowledgeRecords },
     events: [],
     evidence: sortedValues(scenario.provenance.evidence).map((evidence) => {

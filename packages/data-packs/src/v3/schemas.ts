@@ -43,6 +43,7 @@ const cohortIdSchema = stableId('cohort');
 const formationIdSchema = stableId('formation');
 const institutionIdSchema = stableId('institution');
 const relationshipIdSchema = stableId('relationship');
+const tributeObligationIdSchema = stableId('obligation');
 const routeIdSchema = stableId('route');
 const conceptIdSchema = stableId('concept');
 const knowledgeIdSchema = stableId('knowledge');
@@ -219,6 +220,30 @@ export const scenarioV3Schema = z.object({
       participantPolityIds: z.array(polityIdSchema).min(2),
       evidenceIds: evidenceIdsSchema,
     }).strict()),
+    tributeObligations: z.record(tributeObligationIdSchema, z.object({
+      id: tributeObligationIdSchema,
+      payerPolityIds: z.array(polityIdSchema).min(1),
+      sourceRegionIds: z.array(regionIdSchema).min(1),
+      beneficiaries: z.array(z.object({
+        polityId: polityIdSchema,
+        shareBp: basisPoints,
+      }).strict()).min(1),
+      deliveries: z.array(z.object({
+        commodityId: commodityIdSchema,
+        quantity: nonNegativeSafeInteger,
+      }).strict()),
+      laborService: z.object({ people: nonNegativeSafeInteger }).strict().optional(),
+      militaryService: z.object({ personnel: nonNegativeSafeInteger }).strict().optional(),
+      routeIds: z.array(routeIdSchema),
+      cadence: nonEmptyText,
+      arrears: z.array(z.object({
+        commodityId: commodityIdSchema,
+        quantity: nonNegativeSafeInteger,
+      }).strict()),
+      complianceBp: basisPoints,
+      enforcementBasisId: genericStableId,
+      evidenceIds: evidenceIdsSchema,
+    }).strict()).default({}),
     routes: z.record(routeIdSchema, z.object({
       id: routeIdSchema,
       classId: routeClassIdSchema,

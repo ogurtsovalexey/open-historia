@@ -3582,6 +3582,53 @@
         ]
       }
     },
+    "tributeObligations": {
+      "obligation:xochimilco-triple-alliance": {
+        "id": "obligation:xochimilco-triple-alliance",
+        "payerPolityIds": [
+          "polity:xochimilco"
+        ],
+        "sourceRegionIds": [
+          "region:meso1450:xochimilco"
+        ],
+        "beneficiaries": [
+          {
+            "polityId": "polity:tenochtitlan",
+            "shareBp": 5000
+          },
+          {
+            "polityId": "polity:texcoco",
+            "shareBp": 3000
+          },
+          {
+            "polityId": "polity:tlacopan",
+            "shareBp": 2000
+          }
+        ],
+        "deliveries": [
+          {
+            "commodityId": "commodity:maize",
+            "quantity": 300
+          }
+        ],
+        "laborService": {
+          "people": 120
+        },
+        "militaryService": {
+          "personnel": 80
+        },
+        "routeIds": [
+          "route:lake-texcoco-canoe"
+        ],
+        "cadence": "modeled 80-day delivery cycle",
+        "arrears": [],
+        "complianceBp": 7000,
+        "enforcementBasisId": "relationship:triple-alliance",
+        "evidenceIds": [
+          "evidence:meso1450-obligation-xochimilco-triple-alliance"
+        ]
+      }
+    },
     "routes": {
       "route:lake-texcoco-canoe": {
         "id": "route:lake-texcoco-canoe",
@@ -3590,7 +3637,8 @@
           "region:meso1450:tenochtitlan",
           "region:meso1450:tlatelolco",
           "region:meso1450:tlacopan",
-          "region:meso1450:texcoco"
+          "region:meso1450:texcoco",
+          "region:meso1450:xochimilco"
         ],
         "allowedCommodityIds": [
           "commodity:maize",
@@ -6999,6 +7047,26 @@
           "polity:tututepec"
         ]
       },
+      "evidence:meso1450-obligation-xochimilco-triple-alliance": {
+        "id": "evidence:meso1450-obligation-xochimilco-triple-alliance",
+        "binding": {
+          "path": "/startingState/tributeObligations/obligation:xochimilco-triple-alliance",
+          "valueChecksum": "sha256:47e84136836e65abadf518e594bf801fce9e387c17d755d89d53b984bf7cbe78"
+        },
+        "basis": {
+          "kind": "historical",
+          "sourceIds": [
+            "source:meso1450:bodleian-mendoza",
+            "source:meso1450:inah-matricula",
+            "source:meso1450:met-triple-alliance"
+          ],
+          "observationDate": "1450-01-01",
+          "method": "A single scenario-specific Xochimilco obligation demonstrates conserved maize, labor and military service. The beneficiary shares, delivery quantity, cadence and compliance are explicit gameplay controls; they are not asserted as an exact 1450 schedule or reused as a universal alliance formula.",
+          "confidence": "low",
+          "todo": "Replace each modeled delivery, share, cadence and service quantity with obligation-specific evidence after a dedicated tribute-roll audit."
+        },
+        "visibility": "public"
+      },
       "evidence:meso1450-polity-azcapotzalco": {
         "id": "evidence:meso1450-polity-azcapotzalco",
         "binding": {
@@ -8341,7 +8409,7 @@
         "id": "evidence:meso1450-route-lake-texcoco-canoe",
         "binding": {
           "path": "/startingState/routes/route:lake-texcoco-canoe",
-          "valueChecksum": "sha256:ad224cd5fbe958e5da980c1c57bf129e86f63971d53dd116e3907c67cd5fbb32"
+          "valueChecksum": "sha256:1cc0d9883361672c88b63ab69bf45afa6f989675fb0298fe4325785f731ddc3d"
         },
         "basis": {
           "kind": "historical",

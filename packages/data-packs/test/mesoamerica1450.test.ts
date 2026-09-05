@@ -46,6 +46,13 @@ describe('Central Mesoamerica 1450 shipped ScenarioV3', () => {
     assert.ok(alliance);
     assert.deepStrictEqual(alliance.participantPolityIds, ['polity:tenochtitlan', 'polity:texcoco', 'polity:tlacopan']);
     assert.strictEqual(alliance.typeId, 'relationship-type:tribute-alliance');
+    const obligation = scenario.startingState.tributeObligations['obligation:xochimilco-triple-alliance'];
+    assert.ok(obligation);
+    assert.deepStrictEqual(obligation.payerPolityIds, ['polity:xochimilco']);
+    assert.strictEqual(obligation.beneficiaries.reduce((sum, entry) => sum + entry.shareBp, 0), 10_000);
+    assert.deepStrictEqual(obligation.deliveries, [{ commodityId: 'commodity:maize', quantity: 300 }]);
+    assert.strictEqual(obligation.enforcementBasisId, alliance.id);
+    assert.ok(obligation.evidenceIds.every((evidenceId) => scenario.provenance.evidence[evidenceId]?.basis.kind === 'historical'));
     for (const region of Object.values(scenario.startingState.regions)) {
       assert.strictEqual(region.legalOwnerPolityId, region.actualControllerPolityId, region.id);
     }

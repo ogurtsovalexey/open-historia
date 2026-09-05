@@ -109,6 +109,15 @@ export function canonicalWorldState(state: WorldStateV2): WorldStateV2 {
       ...sortedEvidence(entry),
       participantPolityIds: sortedStrings(entry.participantPolityIds),
     })).sort((a, b) => compareId(a.relationshipId, b.relationshipId)),
+    tributeObligations: state.tributeObligations.map((entry) => ({
+      ...sortedEvidence(entry),
+      payerPolityIds: sortedStrings(entry.payerPolityIds),
+      sourceRegionIds: sortedStrings(entry.sourceRegionIds),
+      beneficiaries: [...entry.beneficiaries].sort((a, b) => compareId(a.polityId, b.polityId)),
+      deliveries: [...entry.deliveries].sort((a, b) => compareId(a.commodityId, b.commodityId)),
+      routeIds: sortedStrings(entry.routeIds),
+      arrears: [...entry.arrears].sort((a, b) => compareId(a.commodityId, b.commodityId)),
+    })).sort((a, b) => compareId(a.obligationId, b.obligationId)),
     knowledge: {
       records: state.knowledge.records.map(sortedEvidence).sort((a, b) => compareId(`${a.polityId}|${a.conceptId}`, `${b.polityId}|${b.conceptId}`)),
     },

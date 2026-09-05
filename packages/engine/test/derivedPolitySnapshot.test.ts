@@ -204,7 +204,7 @@ describe('WorldStateV2 authoritative selectors', () => {
     assert.deepStrictEqual(occupiedForAlpha, {
       regionId: 'region:test:B', polityId: 'polity:alpha', actualControllerPolityId: 'polity:alpha',
       hasControl: true, recruitmentAccessBp: 1000, eligiblePopulation: 400,
-      mobilizedPersonnel: 200, recruitablePopulation: 40,
+      mobilizedPersonnel: 200, obligatedMilitaryService: 0, recruitablePopulation: 40,
       unmobilizedRecruitablePopulation: 0,
       mobilizationCeiling: 40,
       availableManpower: 0,

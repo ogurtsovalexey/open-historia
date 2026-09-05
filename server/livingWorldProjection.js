@@ -4,6 +4,7 @@ export const INTENT_FIRST_UI_SCHEMA_VERSION = 'open-historia-ui/intent-first/1';
 
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const formatNumber = (value) => number.format(value);
+const applyBp = (value, bp) => Number(BigInt(value) * BigInt(bp) / 10000n);
 const labelOf = (value) => String(value ?? '').split(':').at(-1).replaceAll('-', ' ');
 const localized = (value, locale) => value?.[locale] ?? value?.en ?? '';
 
@@ -101,6 +102,28 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     .map((entry) => processProjection(state, entry, visible, locale))
     .filter(Boolean);
   const relationships = state.relationships.filter((entry) => entry.participantPolityIds.includes(polity.id));
+  const tributeObligations = state.tributeObligations.filter((entry) => (
+    entry.payerPolityIds.includes(polity.id) || entry.beneficiaries.some((beneficiary) => beneficiary.polityId === polity.id)
+  ));
+  const tributeEvidence = groundedEvidence(tributeObligations.flatMap((entry) => entry.evidenceIds), visible);
+  const outgoing = tributeObligations.filter((entry) => entry.payerPolityIds.includes(polity.id));
+  const incoming = tributeObligations.filter((entry) => entry.beneficiaries.some((beneficiary) => beneficiary.polityId === polity.id));
+  const outgoingGoods = outgoing.flatMap((entry) => entry.deliveries.map((delivery) => (
+    `${labelOf(delivery.commodityId)} ${formatNumber(applyBp(delivery.quantity, entry.complianceBp))}`
+  )));
+  const incomingGoods = incoming.flatMap((entry) => {
+    const beneficiary = entry.beneficiaries.find((candidate) => candidate.polityId === polity.id);
+    return entry.deliveries.map((delivery) => (
+      `${labelOf(delivery.commodityId)} ${formatNumber(applyBp(applyBp(delivery.quantity, entry.complianceBp), beneficiary?.shareBp ?? 0))}`
+    ));
+  });
+  const outgoingLabor = outgoing.reduce((sum, entry) => sum + applyBp(entry.laborService?.people ?? 0, entry.complianceBp), 0);
+  const outgoingMilitary = outgoing.reduce((sum, entry) => sum + applyBp(entry.militaryService?.personnel ?? 0, entry.complianceBp), 0);
+  const tributeFacts = tributeObligations.length === 0 ? [] : [
+    fact('fact:tribute-outgoing', 'Scheduled outgoing tribute', outgoingGoods.length > 0 ? outgoingGoods.join(' · ') : 'none', tributeEvidence, ['Every listed delivery is debited from payer stock before beneficiary credit']),
+    fact('fact:tribute-incoming', 'Scheduled incoming tribute', incomingGoods.length > 0 ? incomingGoods.join(' · ') : 'none', tributeEvidence, ['Beneficiary shares are applied to conserved delivered goods']),
+    fact('fact:tribute-service', 'Reserved tribute service', `${formatNumber(outgoingLabor)} labor · ${formatNumber(outgoingMilitary)} military`, tributeEvidence, ['Reserved service is already removed from available workforce and recruitment']),
+  ];
 
   return {
     schemaVersion: INTENT_FIRST_UI_SCHEMA_VERSION,
@@ -124,6 +147,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       fact('fact:fielded-personnel', 'Fielded personnel', formatNumber(snapshot.fieldedPersonnel), snapshotEvidence, ['Summed from canonical formations']),
       fact('fact:available-manpower', 'Unmobilized recruitable population', formatNumber(snapshot.availableManpower), snapshotEvidence, ['Population eligibility and regional recruitment access set the ceiling']),
       fact('fact:supply-capacity', 'Accessible supply capacity', formatNumber(snapshot.supplyCapacity), snapshotEvidence),
+      ...tributeFacts,
     ],
     interpretation: pendingIntent,
     processes: active,
@@ -136,14 +160,22 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     })),
     diplomacy: {
       conversations: [],
-      commitments: relationships.map((relationship) => ({
+      commitments: [
+        ...relationships.map((relationship) => ({
         commitmentId: `commitment:${relationship.relationshipId.replaceAll(':', '-')}`,
         title: labelOf(relationship.kind),
         summary: relationship.participantPolityIds
           .map((id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id))
           .join(' · '),
         evidenceIds: groundedEvidence(relationship.evidenceIds, visible, snapshotEvidence),
-      })),
+        })),
+        ...tributeObligations.map((obligation) => ({
+          commitmentId: `commitment:${obligation.obligationId.replaceAll(':', '-')}`,
+          title: 'tribute obligation',
+          summary: `${obligation.payerPolityIds.map(labelOf).join(', ')} → ${obligation.beneficiaries.map((entry) => `${labelOf(entry.polityId)} ${entry.shareBp / 100}%`).join(', ')} · ${obligation.cadence}`,
+          evidenceIds: groundedEvidence(obligation.evidenceIds, visible),
+        })),
+      ],
     },
     details: [
       { detailId: 'detail:territory', label: 'Territory', summary: `${controlledRegions.length} actually controlled regions; ${occupations.length} held under non-sovereign control.` },
@@ -205,6 +237,22 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
       label: labelOf(relationship.kind),
       participantPolityIds: relationship.participantPolityIds,
       evidenceIds: relationship.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
+    })),
+    ...state.tributeObligations.filter((entry) => (
+      entry.payerPolityIds.includes(actor.id) || entry.beneficiaries.some((beneficiary) => beneficiary.polityId === actor.id)
+    )).map((obligation) => ({
+      entityId: obligation.obligationId,
+      kind: 'tribute-obligation',
+      label: labelOf(obligation.obligationId),
+      payerPolityIds: obligation.payerPolityIds,
+      beneficiaries: obligation.beneficiaries,
+      deliveries: obligation.deliveries,
+      laborService: obligation.laborService,
+      militaryService: obligation.militaryService,
+      cadence: obligation.cadence,
+      arrears: obligation.arrears,
+      complianceBp: obligation.complianceBp,
+      evidenceIds: obligation.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
     })),
   ];
   const referencedEvidence = new Set(entities.flatMap((entry) => entry.evidenceIds));

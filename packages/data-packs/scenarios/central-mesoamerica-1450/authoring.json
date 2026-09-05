@@ -11,13 +11,14 @@
     "productive capacity",
     "supply capacity",
     "formation strength",
-    "equipment"
+    "equipment",
+    "one scenario-specific tribute obligation"
   ],
   "unresolvedNumericFields": [
-    "tribute deliveries",
-    "delivery-specific beneficiary shares",
-    "cadence",
-    "arrears"
+    "historically exact tribute deliveries",
+    "historically exact delivery-specific beneficiary shares",
+    "historically exact cadence",
+    "historically exact arrears"
   ],
   "sourceCautions": [
     "The Matrícula de Tributos and Codex Mendoza are later evidence used for vocabulary and categories only.",

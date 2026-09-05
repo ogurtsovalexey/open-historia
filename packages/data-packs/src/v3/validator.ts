@@ -113,6 +113,7 @@ export function validateScenarioV3(input: unknown): ScenarioV3ValidationResult {
     ...Object.keys(startingState.formations),
     ...Object.keys(startingState.institutions),
     ...Object.keys(startingState.relationships),
+    ...Object.keys(startingState.tributeObligations),
     ...conceptIds,
   ]);
 
@@ -140,6 +141,7 @@ export function validateScenarioV3(input: unknown): ScenarioV3ValidationResult {
     [startingState.formations, '/startingState/formations'],
     [startingState.institutions, '/startingState/institutions'],
     [startingState.relationships, '/startingState/relationships'],
+    [startingState.tributeObligations, '/startingState/tributeObligations'],
     [startingState.routes, '/startingState/routes'],
     [startingState.concepts, '/startingState/concepts'],
     [startingState.knowledge, '/startingState/knowledge'],
@@ -254,6 +256,36 @@ export function validateScenarioV3(input: unknown): ScenarioV3ValidationResult {
     errors.push(...duplicateErrors(relationship.participantPolityIds, `${base}/participantPolityIds`));
     relationship.participantPolityIds.forEach((ref, index) => requireRef(polityIds, ref, `${base}/participantPolityIds/${index}`, 'polity'));
     requireEvidence(relationship.evidenceIds, `${base}/evidenceIds`);
+  }
+  for (const [id, obligation] of Object.entries(startingState.tributeObligations)) {
+    const base = childPath('/startingState/tributeObligations', id);
+    errors.push(...duplicateErrors(obligation.payerPolityIds, `${base}/payerPolityIds`));
+    errors.push(...duplicateErrors(obligation.sourceRegionIds, `${base}/sourceRegionIds`));
+    errors.push(...duplicateErrors(obligation.beneficiaries.map((entry) => entry.polityId), `${base}/beneficiaries`));
+    errors.push(...duplicateErrors(obligation.deliveries.map((entry) => entry.commodityId), `${base}/deliveries`));
+    errors.push(...duplicateErrors(obligation.routeIds, `${base}/routeIds`));
+    errors.push(...duplicateErrors(obligation.arrears.map((entry) => entry.commodityId), `${base}/arrears`));
+    obligation.payerPolityIds.forEach((ref, index) => requireRef(polityIds, ref, `${base}/payerPolityIds/${index}`, 'polity'));
+    obligation.sourceRegionIds.forEach((ref, index) => {
+      requireRef(regionIds, ref, `${base}/sourceRegionIds/${index}`, 'region');
+      const controller = startingState.regions[ref]?.actualControllerPolityId;
+      if (controller && !obligation.payerPolityIds.includes(controller)) {
+        errors.push(refError('integrity.tribute-source-outside-payer-control', `${base}/sourceRegionIds/${index}`, `tribute source "${ref}" is outside the payers' actual control`, [ref, controller]));
+      }
+    });
+    obligation.beneficiaries.forEach((beneficiary, index) => requireRef(polityIds, beneficiary.polityId, `${base}/beneficiaries/${index}/polityId`, 'polity'));
+    const totalShares = obligation.beneficiaries.reduce((sum, entry) => sum + entry.shareBp, 0);
+    if (totalShares !== 10000) errors.push({ code: 'integrity.tribute-beneficiary-shares', path: `${base}/beneficiaries`, message: `tribute beneficiary shares sum ${totalShares}, expected 10000` });
+    for (const [index, delivery] of obligation.deliveries.entries()) {
+      requireRef(commodityIds, delivery.commodityId, `${base}/deliveries/${index}/commodityId`, 'commodity');
+      if (obligation.routeIds.length > 0 && !obligation.routeIds.some((routeId) => startingState.routes[routeId]?.allowedCommodityIds.includes(delivery.commodityId))) {
+        errors.push(refError('integrity.tribute-route-incompatible', `${base}/deliveries/${index}/commodityId`, `no declared tribute route accepts "${delivery.commodityId}"`, [delivery.commodityId]));
+      }
+    }
+    obligation.arrears.forEach((entry, index) => requireRef(commodityIds, entry.commodityId, `${base}/arrears/${index}/commodityId`, 'commodity'));
+    obligation.routeIds.forEach((ref, index) => requireRef(new Set(Object.keys(startingState.routes)), ref, `${base}/routeIds/${index}`, 'route'));
+    requireRef(startingEntityIds, obligation.enforcementBasisId, `${base}/enforcementBasisId`, 'entity');
+    requireEvidence(obligation.evidenceIds, `${base}/evidenceIds`);
   }
   for (const [id, route] of Object.entries(startingState.routes)) {
     const base = childPath('/startingState/routes', id);

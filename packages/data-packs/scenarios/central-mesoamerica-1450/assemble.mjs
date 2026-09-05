@@ -211,7 +211,7 @@ const scenario = {
     },
   },
   geography: { assets: {}, regions: {} },
-  startingState: { polities: {}, regions: {}, populationCohorts: {}, formations: {}, institutions: {}, relationships: {}, routes: {}, concepts: {}, knowledge: {} },
+  startingState: { polities: {}, regions: {}, populationCohorts: {}, formations: {}, institutions: {}, relationships: {}, tributeObligations: {}, routes: {}, concepts: {}, knowledge: {} },
   provenance: { sources: sortedRecord(sources), evidence: {} },
 };
 
@@ -378,7 +378,7 @@ for (const [id, typeId, participantPolityIds, sourceIds, method] of relationship
 }
 
 const routeRows = [
-  ['route:lake-texcoco-canoe', 'route-class:canoe', ['tenochtitlan', 'tlatelolco', 'tlacopan', 'texcoco'], ['commodity:maize', 'commodity:food-basket', 'commodity:mantles', 'commodity:obsidian']],
+  ['route:lake-texcoco-canoe', 'route-class:canoe', ['tenochtitlan', 'tlatelolco', 'tlacopan', 'texcoco', 'xochimilco'], ['commodity:maize', 'commodity:food-basket', 'commodity:mantles', 'commodity:obsidian']],
   ['route:puebla-tlaxcala-portage', 'route-class:road-portage', ['cholollan', 'huexotzinco', 'ocotelulco', 'tepeaca'], ['commodity:maize', 'commodity:mantles', 'commodity:obsidian', 'commodity:salt']],
   ['route:western-exchange', 'route-class:long-distance-market', ['tzintzuntzan', 'ucareo-zinapecuaro', 'balsas-frontier'], ['commodity:copper', 'commodity:cotton', 'commodity:cacao', 'commodity:feathers', 'commodity:obsidian']],
   ['route:southern-exchange', 'route-class:long-distance-market', ['coixtlahuaca', 'tututepec', 'soconusco-corridor'], ['commodity:cacao', 'commodity:cotton', 'commodity:feathers', 'commodity:shell', 'commodity:gold']],
@@ -388,6 +388,40 @@ for (const [id, classId, regionSlugs, allowedCommodityIds] of routeRows) {
   scenario.startingState.routes[id] = { id, classId, regionIds: regionSlugs.map((name) => `region:meso1450:${name}`), allowedCommodityIds, evidenceIds: [evidenceId] };
   addEvidence(evidenceId, `/startingState/routes/${pointerToken(id)}`, lowUnknown(['source:meso1450:cambridge-economic-world', 'source:meso1450:inah-tlatelolco'], 'The route represents a sourced exchange mode and connected named centers; capacity, cadence and exact 1450 itinerary remain unasserted.', 'Review archaeology and route scholarship before adding capacity, exact path, seasonality or delivery quantities.'));
 }
+
+// This is one explicit, low-confidence playable obligation—not a universal
+// Triple Alliance formula. Later tribute manuscripts inform the vocabulary;
+// every integer remains a visible balance assumption bound to its evidence.
+const tributeId = 'obligation:xochimilco-triple-alliance';
+const tributeEvidenceId = 'evidence:meso1450-obligation-xochimilco-triple-alliance';
+scenario.startingState.tributeObligations[tributeId] = {
+  id: tributeId,
+  payerPolityIds: ['polity:xochimilco'],
+  sourceRegionIds: ['region:meso1450:xochimilco'],
+  beneficiaries: [
+    { polityId: 'polity:tenochtitlan', shareBp: 5000 },
+    { polityId: 'polity:texcoco', shareBp: 3000 },
+    { polityId: 'polity:tlacopan', shareBp: 2000 },
+  ],
+  deliveries: [{ commodityId: 'commodity:maize', quantity: 300 }],
+  laborService: { people: 120 },
+  militaryService: { personnel: 80 },
+  routeIds: ['route:lake-texcoco-canoe'],
+  cadence: 'modeled 80-day delivery cycle',
+  arrears: [],
+  complianceBp: 7000,
+  enforcementBasisId: 'relationship:triple-alliance',
+  evidenceIds: [tributeEvidenceId],
+};
+addEvidence(
+  tributeEvidenceId,
+  `/startingState/tributeObligations/${pointerToken(tributeId)}`,
+  lowUnknown(
+    ['source:meso1450:met-triple-alliance', 'source:meso1450:inah-matricula', 'source:meso1450:bodleian-mendoza'],
+    'A single scenario-specific Xochimilco obligation demonstrates conserved maize, labor and military service. The beneficiary shares, delivery quantity, cadence and compliance are explicit gameplay controls; they are not asserted as an exact 1450 schedule or reused as a universal alliance formula.',
+    'Replace each modeled delivery, share, cadence and service quantity with obligation-specific evidence after a dedicated tribute-roll audit.',
+  ),
+);
 
 const conceptRows = [
   ['altepetl-governance', 'institution', 'Altepetl governance', 'Local political-economic authority joining a center, constituent communities, land, labor, dynasty and patron cult.', ['domain:government', 'domain:identity']],
@@ -425,7 +459,7 @@ for (const polityId of activePolities.map(([id]) => id)) {
   }
 }
 
-for (const recordName of ['polities', 'regions', 'populationCohorts', 'formations', 'institutions', 'relationships', 'routes', 'concepts', 'knowledge']) {
+for (const recordName of ['polities', 'regions', 'populationCohorts', 'formations', 'institutions', 'relationships', 'tributeObligations', 'routes', 'concepts', 'knowledge']) {
   scenario.startingState[recordName] = sortedRecord(scenario.startingState[recordName]);
 }
 scenario.geography.regions = sortedRecord(scenario.geography.regions);
@@ -446,8 +480,8 @@ files.push(await writeJson('sources.json', Object.values(scenario.provenance.sou
 files.push(await writeJson('authoring.json', {
   historicalBoundary: '1450-01-01',
   quantitativePolicy: 'modeled-central-estimates-with-low-confidence-provenance',
-  modeledNumericFields: ['population', 'workforce participation', 'recruitment eligibility', 'treasury', 'stockpiles', 'fiscal base', 'productive capacity', 'supply capacity', 'formation strength', 'equipment'],
-  unresolvedNumericFields: ['tribute deliveries', 'delivery-specific beneficiary shares', 'cadence', 'arrears'],
+  modeledNumericFields: ['population', 'workforce participation', 'recruitment eligibility', 'treasury', 'stockpiles', 'fiscal base', 'productive capacity', 'supply capacity', 'formation strength', 'equipment', 'one scenario-specific tribute obligation'],
+  unresolvedNumericFields: ['historically exact tribute deliveries', 'historically exact delivery-specific beneficiary shares', 'historically exact cadence', 'historically exact arrears'],
   sourceCautions: [
     'The Matrícula de Tributos and Codex Mendoza are later evidence used for vocabulary and categories only.',
     'Off-map links preserve named strategic localities without fabricating exact polygons.',
@@ -467,13 +501,8 @@ files.push(await writeJson('starting-state/population.json', scenario.startingSt
 files.push(await writeJson('starting-state/control.json', Object.fromEntries(Object.entries(scenario.startingState.regions).map(([id, region]) => [id, { legalOwnerPolityId: region.legalOwnerPolityId, actualControllerPolityId: region.actualControllerPolityId, controlProfileId: region.controlProfileId }]))));
 files.push(await writeJson('starting-state/economy.json', { policy: 'modeled-central-estimates', regions: Object.fromEntries(Object.entries(scenario.startingState.regions).map(([id, region]) => [id, { fiscalBase: region.fiscalBase, productiveCapacity: region.productiveCapacity, supplyCapacity: region.supplyCapacity, resources: region.resources, status: 'modeled-low-confidence' }])) }));
 files.push(await writeJson('starting-state/obligations.json', {
-  obligations: [{
-    id: 'obligation:triple-alliance', kind: 'tribute-and-shared-war',
-    participantPolityIds: ['polity:tenochtitlan', 'polity:texcoco', 'polity:tlacopan'],
-    beneficiaryShares: 'unknown', deliveries: 'unknown', cadence: 'unknown', arrears: 'unknown',
-    changesControl: false,
-    evidenceIds: ['evidence:meso1450-relationship-triple-alliance', 'evidence:meso1450-relationship-triple-alliance-shared-war'],
-  }],
+  obligations: scenario.startingState.tributeObligations,
+  accountingRule: 'Goods debited from payers exactly equal goods credited to beneficiaries; service is reserved from workforce and recruitment; control is unchanged.',
 }));
 files.push(await writeJson('starting-state/diplomacy.json', scenario.startingState.relationships));
 files.push(await writeJson('starting-state/politics.json', scenario.startingState.institutions));
