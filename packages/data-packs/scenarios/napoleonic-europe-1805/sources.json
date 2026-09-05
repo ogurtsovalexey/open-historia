@@ -1,0 +1,112 @@
+{
+  "scenarioId": "scenario:napoleonic-europe-1805",
+  "observedBoundary": "1805-01-01",
+  "generatedOn": "2026-09-04",
+  "checksumScope": "Each checksum binds the bibliographic title and stable locator because remote source content is not vendored.",
+  "sources": [
+    {
+      "id": "source:nap1805:italian-crown",
+      "title": "Fondation Napoléon: How Napoleon became King of Italy",
+      "locator": "https://www.napoleon.org/en/history-of-the-two-empires/articles/how-napoleon-became-king-of-italy/",
+      "checksum": "sha256:e7e84f58087d373f14b73627a3bc0bcc013c82fcb3eab788dc45294014b3a612",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:trafalgar-context",
+      "title": "Royal Museums Greenwich: Battle of Trafalgar background",
+      "locator": "https://www.rmg.co.uk/stories/maritime-history/battle-trafalgar-background",
+      "checksum": "sha256:3c913ef35d019c587ca31a1f3a625e3b127fd538420df36c9788454457c79230",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:british-census",
+      "title": "Office for National Statistics: Census data 1801 to 1991",
+      "locator": "https://www.ons.gov.uk/census/2011census/2011censusdata/censusdata18011991",
+      "checksum": "sha256:b67e6d8d90ae179b16f31c705cf46b524b0c7d9d8032349768b5063f270d1fa9",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:french-statistics",
+      "title": "Bibliothèque numérique de la statistique publique: historical French population tables",
+      "locator": "https://www.bnsp.insee.fr/ark:/12148/bc6p06xrtrb.pdf",
+      "checksum": "sha256:9125a8d30ab12ba7ac0c3c1f3910989894f266fc3ba2c58e60b199be62278127",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:europe-map",
+      "title": "Library of Congress Geography and Map Division: Hauslab-Liechtenstein map collection",
+      "locator": "https://www.loc.gov/item/2004629175/",
+      "checksum": "sha256:4e26e76631987e7af75d4cc8078dab6d12ac2807bdbeaee0a4b676603e62afaf",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:napoleonic-army",
+      "title": "National Army Museum: Napoleonic Wars collection and research",
+      "locator": "https://www.nam.ac.uk/explore/napoleonic-wars",
+      "checksum": "sha256:ce205570d835490041848a3cef552d49d0ed536afd4f57c655073b285f9b7d02",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:british-archives",
+      "title": "The National Archives: Napoleonic Wars research guide",
+      "locator": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/british-army-operations-napoleonic-wars/",
+      "checksum": "sha256:76a17e5c240c4adb1e5ceb029f5a512e2320eafadd222526bb28f2cc0d6ed503",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:french-archives",
+      "title": "Fondation Napoléon: Correspondance générale de Napoléon Bonaparte",
+      "locator": "https://fondationnapoleon.org/en/activities-and-services/publishing/correspondance-generale-de-napoleon-bonaparte/",
+      "checksum": "sha256:c4cab11596ff72f8bc15f11bd4912888477020e78a36e0486f5891a9f9350784",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:naval-archives",
+      "title": "Royal Museums Greenwich: Navy and maritime history collections",
+      "locator": "https://www.rmg.co.uk/collections",
+      "checksum": "sha256:7c0b142589df18b955ae333dabc756d10bf5556c329f078bf80638e08cf19e25",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:hre",
+      "title": "German Historical Institute: Holy Roman Empire research resources",
+      "locator": "https://www.ghil.ac.uk/research/holy-roman-empire",
+      "checksum": "sha256:e31bc283b5b02b8e586f801a4dd17c2cdb9a4d38090f047bed5e1cb854e91362",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:gibraltar",
+      "title": "UK Parliament: Gibraltar historical and constitutional background",
+      "locator": "https://commonslibrary.parliament.uk/research-briefings/sn06432/",
+      "checksum": "sha256:c24b89812ce16f2c435983fae394017b006ef2f362b10d3ce34f42201adbc964",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:war-1805",
+      "title": "Fondation Napoléon chronology: campaigns and battles of 1805",
+      "locator": "https://www.napoleon.org/en/history-of-the-two-empires/timelines/",
+      "checksum": "sha256:e70acd86f39428732a259513101f8381639ec336a22e8bb0753081f451be559b",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    },
+    {
+      "id": "source:nap1805:world-population",
+      "title": "Federico and Tena-Junguito: World Population 1800–1938",
+      "locator": "https://www.uc3m.es/investigacion/federico-tena-population",
+      "checksum": "sha256:04bbfe6aae619bba15f3273fdcb8e59a5c0016a45f8b4da5436b828a3e4ec49b",
+      "sourceQuality": "institutional, official collection, or academic historical series",
+      "extractionMethod": "manual structural transcription; quantitative values are low-confidence modeled controls unless a binding states otherwise"
+    }
+  ]
+}

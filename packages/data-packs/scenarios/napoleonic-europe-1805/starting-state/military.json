@@ -1,0 +1,1106 @@
+{
+  "quantitativeStatus": "modeled-central-estimates",
+  "formations": {
+    "formation:nap1805-france-1": {
+      "id": "formation:nap1805-france-1",
+      "polityId": "polity:france",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:paris-and-seine": 6131,
+        "region:nap1805:normandy": 3607,
+        "region:nap1805:brittany": 3606,
+        "region:nap1805:loire": 3606,
+        "region:nap1805:aquitaine": 3606,
+        "region:nap1805:pyrenees": 3606,
+        "region:nap1805:languedoc": 3606,
+        "region:nap1805:provence": 3606,
+        "region:nap1805:alps": 3606,
+        "region:nap1805:burgundy": 3606,
+        "region:nap1805:alsace": 3606,
+        "region:nap1805:lorraine": 3606,
+        "region:nap1805:champagne": 3606,
+        "region:nap1805:picardy": 3606,
+        "region:nap1805:flanders": 3606,
+        "region:nap1805:corsica": 1984
+      },
+      "equipment": {
+        "equipment-class:small-arms": 42192,
+        "equipment-class:artillery": 195,
+        "equipment-class:horses": 4688,
+        "equipment-class:transport": 2930
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-france-1"
+      ]
+    },
+    "formation:nap1805-france-2": {
+      "id": "formation:nap1805-france-2",
+      "polityId": "polity:france",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:paris-and-seine": 6131,
+        "region:nap1805:normandy": 3607,
+        "region:nap1805:brittany": 3606,
+        "region:nap1805:loire": 3606,
+        "region:nap1805:aquitaine": 3606,
+        "region:nap1805:pyrenees": 3606,
+        "region:nap1805:languedoc": 3606,
+        "region:nap1805:provence": 3606,
+        "region:nap1805:alps": 3606,
+        "region:nap1805:burgundy": 3606,
+        "region:nap1805:alsace": 3606,
+        "region:nap1805:lorraine": 3606,
+        "region:nap1805:champagne": 3606,
+        "region:nap1805:picardy": 3606,
+        "region:nap1805:flanders": 3606,
+        "region:nap1805:corsica": 1984
+      },
+      "equipment": {
+        "equipment-class:small-arms": 42192,
+        "equipment-class:artillery": 195,
+        "equipment-class:horses": 4688,
+        "equipment-class:transport": 2930
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-france-2"
+      ]
+    },
+    "formation:nap1805-france-3": {
+      "id": "formation:nap1805-france-3",
+      "polityId": "polity:france",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:paris-and-seine": 6131,
+        "region:nap1805:normandy": 3607,
+        "region:nap1805:brittany": 3606,
+        "region:nap1805:loire": 3606,
+        "region:nap1805:aquitaine": 3606,
+        "region:nap1805:pyrenees": 3606,
+        "region:nap1805:languedoc": 3606,
+        "region:nap1805:provence": 3606,
+        "region:nap1805:alps": 3606,
+        "region:nap1805:burgundy": 3606,
+        "region:nap1805:alsace": 3606,
+        "region:nap1805:lorraine": 3606,
+        "region:nap1805:champagne": 3606,
+        "region:nap1805:picardy": 3606,
+        "region:nap1805:flanders": 3606,
+        "region:nap1805:corsica": 1984
+      },
+      "equipment": {
+        "equipment-class:small-arms": 42192,
+        "equipment-class:artillery": 195,
+        "equipment-class:horses": 4688,
+        "equipment-class:transport": 2930
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-france-3"
+      ]
+    },
+    "formation:nap1805-france-4": {
+      "id": "formation:nap1805-france-4",
+      "polityId": "polity:france",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:paris-and-seine": 6131,
+        "region:nap1805:normandy": 3607,
+        "region:nap1805:brittany": 3606,
+        "region:nap1805:loire": 3606,
+        "region:nap1805:aquitaine": 3606,
+        "region:nap1805:pyrenees": 3606,
+        "region:nap1805:languedoc": 3606,
+        "region:nap1805:provence": 3606,
+        "region:nap1805:alps": 3606,
+        "region:nap1805:burgundy": 3606,
+        "region:nap1805:alsace": 3606,
+        "region:nap1805:lorraine": 3606,
+        "region:nap1805:champagne": 3606,
+        "region:nap1805:picardy": 3606,
+        "region:nap1805:flanders": 3606,
+        "region:nap1805:corsica": 1984
+      },
+      "equipment": {
+        "equipment-class:small-arms": 42192,
+        "equipment-class:artillery": 195,
+        "equipment-class:horses": 4688,
+        "equipment-class:transport": 2930
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-france-4"
+      ]
+    },
+    "formation:nap1805-france-5": {
+      "id": "formation:nap1805-france-5",
+      "polityId": "polity:france",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:paris-and-seine": 6131,
+        "region:nap1805:normandy": 3607,
+        "region:nap1805:brittany": 3606,
+        "region:nap1805:loire": 3606,
+        "region:nap1805:aquitaine": 3606,
+        "region:nap1805:pyrenees": 3606,
+        "region:nap1805:languedoc": 3606,
+        "region:nap1805:provence": 3606,
+        "region:nap1805:alps": 3606,
+        "region:nap1805:burgundy": 3606,
+        "region:nap1805:alsace": 3606,
+        "region:nap1805:lorraine": 3606,
+        "region:nap1805:champagne": 3606,
+        "region:nap1805:picardy": 3606,
+        "region:nap1805:flanders": 3606,
+        "region:nap1805:corsica": 1984
+      },
+      "equipment": {
+        "equipment-class:small-arms": 42192,
+        "equipment-class:artillery": 195,
+        "equipment-class:horses": 4688,
+        "equipment-class:transport": 2930
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-france-5"
+      ]
+    },
+    "formation:nap1805-united-kingdom-1": {
+      "id": "formation:nap1805-united-kingdom-1",
+      "polityId": "polity:united-kingdom",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:london-and-home-counties": 9986,
+        "region:nap1805:southwest-england": 5874,
+        "region:nap1805:midlands": 5874,
+        "region:nap1805:northern-england": 5874,
+        "region:nap1805:wales": 5874,
+        "region:nap1805:scottish-lowlands": 5874,
+        "region:nap1805:scottish-highlands": 3230,
+        "region:nap1805:ireland": 5874,
+        "region:nap1805:gibraltar": 5874
+      },
+      "equipment": {
+        "equipment-class:small-arms": 39120,
+        "equipment-class:artillery": 181,
+        "equipment-class:horses": 4346,
+        "equipment-class:transport": 2716
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-united-kingdom-1"
+      ]
+    },
+    "formation:nap1805-united-kingdom-2": {
+      "id": "formation:nap1805-united-kingdom-2",
+      "polityId": "polity:united-kingdom",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:london-and-home-counties": 9985,
+        "region:nap1805:southwest-england": 5874,
+        "region:nap1805:midlands": 5874,
+        "region:nap1805:northern-england": 5874,
+        "region:nap1805:wales": 5874,
+        "region:nap1805:scottish-lowlands": 5874,
+        "region:nap1805:scottish-highlands": 3230,
+        "region:nap1805:ireland": 5874,
+        "region:nap1805:gibraltar": 5874
+      },
+      "equipment": {
+        "equipment-class:small-arms": 39119,
+        "equipment-class:artillery": 181,
+        "equipment-class:horses": 4346,
+        "equipment-class:transport": 2716
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-united-kingdom-2"
+      ]
+    },
+    "formation:nap1805-united-kingdom-3": {
+      "id": "formation:nap1805-united-kingdom-3",
+      "polityId": "polity:united-kingdom",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:london-and-home-counties": 9985,
+        "region:nap1805:southwest-england": 5874,
+        "region:nap1805:midlands": 5874,
+        "region:nap1805:northern-england": 5874,
+        "region:nap1805:wales": 5874,
+        "region:nap1805:scottish-lowlands": 5874,
+        "region:nap1805:scottish-highlands": 3230,
+        "region:nap1805:ireland": 5874,
+        "region:nap1805:gibraltar": 5874
+      },
+      "equipment": {
+        "equipment-class:small-arms": 39119,
+        "equipment-class:artillery": 181,
+        "equipment-class:horses": 4346,
+        "equipment-class:transport": 2716
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-united-kingdom-3"
+      ]
+    },
+    "formation:nap1805-austria-1": {
+      "id": "formation:nap1805-austria-1",
+      "polityId": "polity:austria",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:vienna-and-lower-austria": 8391,
+        "region:nap1805:upper-austria": 4936,
+        "region:nap1805:salzburg": 4936,
+        "region:nap1805:bohemia": 4936,
+        "region:nap1805:moravia": 4936,
+        "region:nap1805:austrian-silesia": 4936,
+        "region:nap1805:tyrol": 4936,
+        "region:nap1805:carinthia-and-carniola": 4936,
+        "region:nap1805:hungary-west": 4936,
+        "region:nap1805:hungary-east": 4936,
+        "region:nap1805:venetia": 4935
+      },
+      "equipment": {
+        "equipment-class:small-arms": 41580,
+        "equipment-class:artillery": 192,
+        "equipment-class:horses": 4620,
+        "equipment-class:transport": 2887
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-austria-1"
+      ]
+    },
+    "formation:nap1805-austria-2": {
+      "id": "formation:nap1805-austria-2",
+      "polityId": "polity:austria",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:vienna-and-lower-austria": 8391,
+        "region:nap1805:upper-austria": 4936,
+        "region:nap1805:salzburg": 4936,
+        "region:nap1805:bohemia": 4936,
+        "region:nap1805:moravia": 4936,
+        "region:nap1805:austrian-silesia": 4936,
+        "region:nap1805:tyrol": 4936,
+        "region:nap1805:carinthia-and-carniola": 4936,
+        "region:nap1805:hungary-west": 4936,
+        "region:nap1805:hungary-east": 4936,
+        "region:nap1805:venetia": 4935
+      },
+      "equipment": {
+        "equipment-class:small-arms": 41580,
+        "equipment-class:artillery": 192,
+        "equipment-class:horses": 4620,
+        "equipment-class:transport": 2887
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-austria-2"
+      ]
+    },
+    "formation:nap1805-austria-3": {
+      "id": "formation:nap1805-austria-3",
+      "polityId": "polity:austria",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:vienna-and-lower-austria": 8391,
+        "region:nap1805:upper-austria": 4936,
+        "region:nap1805:salzburg": 4936,
+        "region:nap1805:bohemia": 4936,
+        "region:nap1805:moravia": 4936,
+        "region:nap1805:austrian-silesia": 4936,
+        "region:nap1805:tyrol": 4936,
+        "region:nap1805:carinthia-and-carniola": 4936,
+        "region:nap1805:hungary-west": 4936,
+        "region:nap1805:hungary-east": 4936,
+        "region:nap1805:venetia": 4935
+      },
+      "equipment": {
+        "equipment-class:small-arms": 41580,
+        "equipment-class:artillery": 192,
+        "equipment-class:horses": 4620,
+        "equipment-class:transport": 2887
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-austria-3"
+      ]
+    },
+    "formation:nap1805-austria-4": {
+      "id": "formation:nap1805-austria-4",
+      "polityId": "polity:austria",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:vienna-and-lower-austria": 8391,
+        "region:nap1805:upper-austria": 4936,
+        "region:nap1805:salzburg": 4936,
+        "region:nap1805:bohemia": 4936,
+        "region:nap1805:moravia": 4936,
+        "region:nap1805:austrian-silesia": 4936,
+        "region:nap1805:tyrol": 4936,
+        "region:nap1805:carinthia-and-carniola": 4936,
+        "region:nap1805:hungary-west": 4936,
+        "region:nap1805:hungary-east": 4936,
+        "region:nap1805:venetia": 4935
+      },
+      "equipment": {
+        "equipment-class:small-arms": 41580,
+        "equipment-class:artillery": 192,
+        "equipment-class:horses": 4620,
+        "equipment-class:transport": 2887
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-austria-4"
+      ]
+    },
+    "formation:nap1805-russia-1": {
+      "id": "formation:nap1805-russia-1",
+      "polityId": "polity:russia",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:baltic-provinces": 7143,
+        "region:nap1805:lithuania": 7143,
+        "region:nap1805:belarus": 7143,
+        "region:nap1805:volhynia": 7143,
+        "region:nap1805:podolia": 7143,
+        "region:nap1805:ukraine-west": 7143,
+        "region:nap1805:new-russia": 7142
+      },
+      "equipment": {
+        "equipment-class:small-arms": 36000,
+        "equipment-class:artillery": 166,
+        "equipment-class:horses": 4000,
+        "equipment-class:transport": 2500
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-russia-1"
+      ]
+    },
+    "formation:nap1805-russia-2": {
+      "id": "formation:nap1805-russia-2",
+      "polityId": "polity:russia",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:baltic-provinces": 7143,
+        "region:nap1805:lithuania": 7143,
+        "region:nap1805:belarus": 7143,
+        "region:nap1805:volhynia": 7143,
+        "region:nap1805:podolia": 7143,
+        "region:nap1805:ukraine-west": 7143,
+        "region:nap1805:new-russia": 7142
+      },
+      "equipment": {
+        "equipment-class:small-arms": 36000,
+        "equipment-class:artillery": 166,
+        "equipment-class:horses": 4000,
+        "equipment-class:transport": 2500
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-russia-2"
+      ]
+    },
+    "formation:nap1805-russia-3": {
+      "id": "formation:nap1805-russia-3",
+      "polityId": "polity:russia",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:baltic-provinces": 7143,
+        "region:nap1805:lithuania": 7143,
+        "region:nap1805:belarus": 7143,
+        "region:nap1805:volhynia": 7143,
+        "region:nap1805:podolia": 7143,
+        "region:nap1805:ukraine-west": 7143,
+        "region:nap1805:new-russia": 7142
+      },
+      "equipment": {
+        "equipment-class:small-arms": 36000,
+        "equipment-class:artillery": 166,
+        "equipment-class:horses": 4000,
+        "equipment-class:transport": 2500
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-russia-3"
+      ]
+    },
+    "formation:nap1805-russia-4": {
+      "id": "formation:nap1805-russia-4",
+      "polityId": "polity:russia",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:baltic-provinces": 7143,
+        "region:nap1805:lithuania": 7143,
+        "region:nap1805:belarus": 7143,
+        "region:nap1805:volhynia": 7143,
+        "region:nap1805:podolia": 7143,
+        "region:nap1805:ukraine-west": 7143,
+        "region:nap1805:new-russia": 7142
+      },
+      "equipment": {
+        "equipment-class:small-arms": 36000,
+        "equipment-class:artillery": 166,
+        "equipment-class:horses": 4000,
+        "equipment-class:transport": 2500
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-russia-4"
+      ]
+    },
+    "formation:nap1805-prussia-1": {
+      "id": "formation:nap1805-prussia-1",
+      "polityId": "polity:prussia",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:brandenburg": 4283,
+        "region:nap1805:pomerania": 4283,
+        "region:nap1805:east-prussia": 4283,
+        "region:nap1805:west-prussia": 4283,
+        "region:nap1805:silesia": 4283,
+        "region:nap1805:magdeburg": 4282,
+        "region:nap1805:westphalian-prussia": 4282,
+        "region:nap1805:neuchatel": 2355
+      },
+      "equipment": {
+        "equipment-class:small-arms": 23280,
+        "equipment-class:artillery": 107,
+        "equipment-class:horses": 2586,
+        "equipment-class:transport": 1616
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-prussia-1"
+      ]
+    },
+    "formation:nap1805-prussia-2": {
+      "id": "formation:nap1805-prussia-2",
+      "polityId": "polity:prussia",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:brandenburg": 4283,
+        "region:nap1805:pomerania": 4283,
+        "region:nap1805:east-prussia": 4283,
+        "region:nap1805:west-prussia": 4283,
+        "region:nap1805:silesia": 4282,
+        "region:nap1805:magdeburg": 4282,
+        "region:nap1805:westphalian-prussia": 4282,
+        "region:nap1805:neuchatel": 2355
+      },
+      "equipment": {
+        "equipment-class:small-arms": 23279,
+        "equipment-class:artillery": 107,
+        "equipment-class:horses": 2586,
+        "equipment-class:transport": 1616
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-prussia-2"
+      ]
+    },
+    "formation:nap1805-prussia-3": {
+      "id": "formation:nap1805-prussia-3",
+      "polityId": "polity:prussia",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:brandenburg": 4283,
+        "region:nap1805:pomerania": 4283,
+        "region:nap1805:east-prussia": 4283,
+        "region:nap1805:west-prussia": 4283,
+        "region:nap1805:silesia": 4282,
+        "region:nap1805:magdeburg": 4282,
+        "region:nap1805:westphalian-prussia": 4282,
+        "region:nap1805:neuchatel": 2355
+      },
+      "equipment": {
+        "equipment-class:small-arms": 23279,
+        "equipment-class:artillery": 107,
+        "equipment-class:horses": 2586,
+        "equipment-class:transport": 1616
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-prussia-3"
+      ]
+    },
+    "formation:nap1805-spain-1": {
+      "id": "formation:nap1805-spain-1",
+      "polityId": "polity:spain",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:madrid-and-castile": 7899,
+        "region:nap1805:galicia": 4647,
+        "region:nap1805:basque-provinces-and-navarre": 4647,
+        "region:nap1805:aragon": 4647,
+        "region:nap1805:catalonia": 4646,
+        "region:nap1805:valencia-and-murcia": 4646,
+        "region:nap1805:andalusia": 4646,
+        "region:nap1805:balearic-islands": 2556
+      },
+      "equipment": {
+        "equipment-class:small-arms": 27600,
+        "equipment-class:artillery": 127,
+        "equipment-class:horses": 3066,
+        "equipment-class:transport": 1916
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-spain-1"
+      ]
+    },
+    "formation:nap1805-spain-2": {
+      "id": "formation:nap1805-spain-2",
+      "polityId": "polity:spain",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:madrid-and-castile": 7899,
+        "region:nap1805:galicia": 4647,
+        "region:nap1805:basque-provinces-and-navarre": 4647,
+        "region:nap1805:aragon": 4646,
+        "region:nap1805:catalonia": 4646,
+        "region:nap1805:valencia-and-murcia": 4646,
+        "region:nap1805:andalusia": 4646,
+        "region:nap1805:balearic-islands": 2556
+      },
+      "equipment": {
+        "equipment-class:small-arms": 27599,
+        "equipment-class:artillery": 127,
+        "equipment-class:horses": 3066,
+        "equipment-class:transport": 1916
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-spain-2"
+      ]
+    },
+    "formation:nap1805-spain-3": {
+      "id": "formation:nap1805-spain-3",
+      "polityId": "polity:spain",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:madrid-and-castile": 7899,
+        "region:nap1805:galicia": 4647,
+        "region:nap1805:basque-provinces-and-navarre": 4647,
+        "region:nap1805:aragon": 4646,
+        "region:nap1805:catalonia": 4646,
+        "region:nap1805:valencia-and-murcia": 4646,
+        "region:nap1805:andalusia": 4646,
+        "region:nap1805:balearic-islands": 2556
+      },
+      "equipment": {
+        "equipment-class:small-arms": 27599,
+        "equipment-class:artillery": 127,
+        "equipment-class:horses": 3066,
+        "equipment-class:transport": 1916
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-spain-3"
+      ]
+    },
+    "formation:nap1805-ottoman-empire-1": {
+      "id": "formation:nap1805-ottoman-empire-1",
+      "polityId": "polity:ottoman-empire",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:thrace-and-constantinople": 7360,
+        "region:nap1805:rumelia-east": 4329,
+        "region:nap1805:rumelia-west": 4329,
+        "region:nap1805:bosnia": 4329,
+        "region:nap1805:danubian-principalities": 4329,
+        "region:nap1805:morea-and-aegean": 4329,
+        "region:nap1805:western-anatolia": 4329
+      },
+      "equipment": {
+        "equipment-class:small-arms": 24000,
+        "equipment-class:artillery": 111,
+        "equipment-class:horses": 2666,
+        "equipment-class:transport": 1666
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-ottoman-empire-1"
+      ]
+    },
+    "formation:nap1805-ottoman-empire-2": {
+      "id": "formation:nap1805-ottoman-empire-2",
+      "polityId": "polity:ottoman-empire",
+      "archetypeId": "formation-archetype:corps",
+      "personnelOrigins": {
+        "region:nap1805:thrace-and-constantinople": 7359,
+        "region:nap1805:rumelia-east": 4329,
+        "region:nap1805:rumelia-west": 4329,
+        "region:nap1805:bosnia": 4329,
+        "region:nap1805:danubian-principalities": 4329,
+        "region:nap1805:morea-and-aegean": 4329,
+        "region:nap1805:western-anatolia": 4329
+      },
+      "equipment": {
+        "equipment-class:small-arms": 23999,
+        "equipment-class:artillery": 111,
+        "equipment-class:horses": 2666,
+        "equipment-class:transport": 1666
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-ottoman-empire-2"
+      ]
+    },
+    "formation:nap1805-ottoman-empire-3": {
+      "id": "formation:nap1805-ottoman-empire-3",
+      "polityId": "polity:ottoman-empire",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:thrace-and-constantinople": 7359,
+        "region:nap1805:rumelia-east": 4329,
+        "region:nap1805:rumelia-west": 4329,
+        "region:nap1805:bosnia": 4329,
+        "region:nap1805:danubian-principalities": 4329,
+        "region:nap1805:morea-and-aegean": 4329,
+        "region:nap1805:western-anatolia": 4329
+      },
+      "equipment": {
+        "equipment-class:small-arms": 23999,
+        "equipment-class:artillery": 111,
+        "equipment-class:horses": 2666,
+        "equipment-class:transport": 1666
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-ottoman-empire-3"
+      ]
+    },
+    "formation:nap1805-sweden-1": {
+      "id": "formation:nap1805-sweden-1",
+      "polityId": "polity:sweden",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:svealand": 3517,
+        "region:nap1805:gotaland": 3517,
+        "region:nap1805:norrland": 1934,
+        "region:nap1805:swedish-pomerania": 3516,
+        "region:nap1805:finland": 3516
+      },
+      "equipment": {
+        "equipment-class:small-arms": 11520,
+        "equipment-class:artillery": 53,
+        "equipment-class:horses": 1280,
+        "equipment-class:transport": 800
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-sweden-1"
+      ]
+    },
+    "formation:nap1805-sweden-2": {
+      "id": "formation:nap1805-sweden-2",
+      "polityId": "polity:sweden",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:svealand": 3517,
+        "region:nap1805:gotaland": 3517,
+        "region:nap1805:norrland": 1934,
+        "region:nap1805:swedish-pomerania": 3516,
+        "region:nap1805:finland": 3516
+      },
+      "equipment": {
+        "equipment-class:small-arms": 11520,
+        "equipment-class:artillery": 53,
+        "equipment-class:horses": 1280,
+        "equipment-class:transport": 800
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-sweden-2"
+      ]
+    },
+    "formation:nap1805-denmark-norway-1": {
+      "id": "formation:nap1805-denmark-norway-1",
+      "polityId": "polity:denmark-norway",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:zealand": 2528,
+        "region:nap1805:jutland": 2528,
+        "region:nap1805:schleswig-holstein": 2527,
+        "region:nap1805:southern-norway": 2527,
+        "region:nap1805:northern-norway": 1390
+      },
+      "equipment": {
+        "equipment-class:small-arms": 8280,
+        "equipment-class:artillery": 38,
+        "equipment-class:horses": 920,
+        "equipment-class:transport": 575
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-denmark-norway-1"
+      ]
+    },
+    "formation:nap1805-denmark-norway-2": {
+      "id": "formation:nap1805-denmark-norway-2",
+      "polityId": "polity:denmark-norway",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:zealand": 2528,
+        "region:nap1805:jutland": 2528,
+        "region:nap1805:schleswig-holstein": 2527,
+        "region:nap1805:southern-norway": 2527,
+        "region:nap1805:northern-norway": 1390
+      },
+      "equipment": {
+        "equipment-class:small-arms": 8280,
+        "equipment-class:artillery": 38,
+        "equipment-class:horses": 920,
+        "equipment-class:transport": 575
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-denmark-norway-2"
+      ]
+    },
+    "formation:nap1805-naples-sicily-1": {
+      "id": "formation:nap1805-naples-sicily-1",
+      "polityId": "polity:naples-sicily",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:campania": 7625,
+        "region:nap1805:apulia-and-calabria": 7625,
+        "region:nap1805:sicily-east": 7625,
+        "region:nap1805:sicily-west": 7625
+      },
+      "equipment": {
+        "equipment-class:small-arms": 21960,
+        "equipment-class:artillery": 101,
+        "equipment-class:horses": 2440,
+        "equipment-class:transport": 1525
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-naples-sicily-1"
+      ]
+    },
+    "formation:nap1805-naples-sicily-2": {
+      "id": "formation:nap1805-naples-sicily-2",
+      "polityId": "polity:naples-sicily",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:campania": 7625,
+        "region:nap1805:apulia-and-calabria": 7625,
+        "region:nap1805:sicily-east": 7625,
+        "region:nap1805:sicily-west": 7625
+      },
+      "equipment": {
+        "equipment-class:small-arms": 21960,
+        "equipment-class:artillery": 101,
+        "equipment-class:horses": 2440,
+        "equipment-class:transport": 1525
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-naples-sicily-2"
+      ]
+    },
+    "formation:nap1805-italy-1": {
+      "id": "formation:nap1805-italy-1",
+      "polityId": "polity:italy",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:milan-and-lombardy": 5667,
+        "region:nap1805:emilia": 3334,
+        "region:nap1805:romagna": 3333,
+        "region:nap1805:modena": 3333,
+        "region:nap1805:mantua": 3333
+      },
+      "equipment": {
+        "equipment-class:small-arms": 13680,
+        "equipment-class:artillery": 63,
+        "equipment-class:horses": 1520,
+        "equipment-class:transport": 950
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-italy-1"
+      ]
+    },
+    "formation:nap1805-italy-2": {
+      "id": "formation:nap1805-italy-2",
+      "polityId": "polity:italy",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:milan-and-lombardy": 5667,
+        "region:nap1805:emilia": 3334,
+        "region:nap1805:romagna": 3333,
+        "region:nap1805:modena": 3333,
+        "region:nap1805:mantua": 3333
+      },
+      "equipment": {
+        "equipment-class:small-arms": 13680,
+        "equipment-class:artillery": 63,
+        "equipment-class:horses": 1520,
+        "equipment-class:transport": 950
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-italy-2"
+      ]
+    },
+    "formation:nap1805-bavaria-1": {
+      "id": "formation:nap1805-bavaria-1",
+      "polityId": "polity:bavaria",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:upper-bavaria": 5000,
+        "region:nap1805:lower-bavaria": 5000,
+        "region:nap1805:franconian-bavaria": 5000
+      },
+      "equipment": {
+        "equipment-class:small-arms": 10800,
+        "equipment-class:artillery": 50,
+        "equipment-class:horses": 1200,
+        "equipment-class:transport": 750
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-bavaria-1"
+      ]
+    },
+    "formation:nap1805-bavaria-2": {
+      "id": "formation:nap1805-bavaria-2",
+      "polityId": "polity:bavaria",
+      "archetypeId": "formation-archetype:reserve",
+      "personnelOrigins": {
+        "region:nap1805:upper-bavaria": 5000,
+        "region:nap1805:lower-bavaria": 5000,
+        "region:nap1805:franconian-bavaria": 5000
+      },
+      "equipment": {
+        "equipment-class:small-arms": 10800,
+        "equipment-class:artillery": 50,
+        "equipment-class:horses": 1200,
+        "equipment-class:transport": 750
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-bavaria-2"
+      ]
+    },
+    "formation:nap1805-portugal-1": {
+      "id": "formation:nap1805-portugal-1",
+      "polityId": "polity:portugal",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:northern-portugal": 6000,
+        "region:nap1805:central-portugal": 6000,
+        "region:nap1805:southern-portugal": 6000
+      },
+      "equipment": {
+        "equipment-class:small-arms": 12960,
+        "equipment-class:artillery": 60,
+        "equipment-class:horses": 1440,
+        "equipment-class:transport": 900
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-portugal-1"
+      ]
+    },
+    "formation:nap1805-batavian-republic-1": {
+      "id": "formation:nap1805-batavian-republic-1",
+      "polityId": "polity:batavian-republic",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:holland": 5789,
+        "region:nap1805:friesland": 3406,
+        "region:nap1805:batavian-interior": 3405
+      },
+      "equipment": {
+        "equipment-class:small-arms": 9072,
+        "equipment-class:artillery": 42,
+        "equipment-class:horses": 1008,
+        "equipment-class:transport": 630
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-batavian-republic-1"
+      ]
+    },
+    "formation:nap1805-swiss-confederation-1": {
+      "id": "formation:nap1805-swiss-confederation-1",
+      "polityId": "polity:swiss-confederation",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:western-switzerland": 3400,
+        "region:nap1805:central-switzerland": 3400,
+        "region:nap1805:eastern-switzerland": 3400
+      },
+      "equipment": {
+        "equipment-class:small-arms": 7344,
+        "equipment-class:artillery": 34,
+        "equipment-class:horses": 816,
+        "equipment-class:transport": 510
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-swiss-confederation-1"
+      ]
+    },
+    "formation:nap1805-saxony-1": {
+      "id": "formation:nap1805-saxony-1",
+      "polityId": "polity:saxony",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:dresden-and-meissen": 6000,
+        "region:nap1805:leipzig-and-thuringian-saxony": 6000
+      },
+      "equipment": {
+        "equipment-class:small-arms": 8640,
+        "equipment-class:artillery": 40,
+        "equipment-class:horses": 960,
+        "equipment-class:transport": 600
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-saxony-1"
+      ]
+    },
+    "formation:nap1805-wurttemberg-1": {
+      "id": "formation:nap1805-wurttemberg-1",
+      "polityId": "polity:wurttemberg",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:stuttgart-and-neckar": 2100,
+        "region:nap1805:swabian-wurttemberg": 2100
+      },
+      "equipment": {
+        "equipment-class:small-arms": 3024,
+        "equipment-class:artillery": 14,
+        "equipment-class:horses": 336,
+        "equipment-class:transport": 210
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-wurttemberg-1"
+      ]
+    },
+    "formation:nap1805-baden-1": {
+      "id": "formation:nap1805-baden-1",
+      "polityId": "polity:baden",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:upper-baden": 1500,
+        "region:nap1805:lower-baden": 1500
+      },
+      "equipment": {
+        "equipment-class:small-arms": 2160,
+        "equipment-class:artillery": 10,
+        "equipment-class:horses": 240,
+        "equipment-class:transport": 150
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-baden-1"
+      ]
+    },
+    "formation:nap1805-hanover-1": {
+      "id": "formation:nap1805-hanover-1",
+      "polityId": "polity:hanover",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:hanover": 2400,
+        "region:nap1805:bremen-verden": 2400
+      },
+      "equipment": {
+        "equipment-class:small-arms": 3456,
+        "equipment-class:artillery": 16,
+        "equipment-class:horses": 384,
+        "equipment-class:transport": 240
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-hanover-1"
+      ]
+    },
+    "formation:nap1805-papal-states-1": {
+      "id": "formation:nap1805-papal-states-1",
+      "polityId": "polity:papal-states",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:rome-and-lazio": 9067,
+        "region:nap1805:umbria-and-marche": 5333
+      },
+      "equipment": {
+        "equipment-class:small-arms": 10368,
+        "equipment-class:artillery": 48,
+        "equipment-class:horses": 1152,
+        "equipment-class:transport": 720
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-papal-states-1"
+      ]
+    },
+    "formation:nap1805-etruria-1": {
+      "id": "formation:nap1805-etruria-1",
+      "polityId": "polity:etruria",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:tuscany": 6000
+      },
+      "equipment": {
+        "equipment-class:small-arms": 4320,
+        "equipment-class:artillery": 20,
+        "equipment-class:horses": 480,
+        "equipment-class:transport": 300
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-etruria-1"
+      ]
+    },
+    "formation:nap1805-ligurian-republic-1": {
+      "id": "formation:nap1805-ligurian-republic-1",
+      "polityId": "polity:ligurian-republic",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:liguria": 3600
+      },
+      "equipment": {
+        "equipment-class:small-arms": 2592,
+        "equipment-class:artillery": 12,
+        "equipment-class:horses": 288,
+        "equipment-class:transport": 180
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-ligurian-republic-1"
+      ]
+    },
+    "formation:nap1805-sardinia-1": {
+      "id": "formation:nap1805-sardinia-1",
+      "polityId": "polity:sardinia",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:sardinia": 9600
+      },
+      "equipment": {
+        "equipment-class:small-arms": 6912,
+        "equipment-class:artillery": 32,
+        "equipment-class:horses": 768,
+        "equipment-class:transport": 480
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-sardinia-1"
+      ]
+    },
+    "formation:nap1805-hesse-kassel-1": {
+      "id": "formation:nap1805-hesse-kassel-1",
+      "polityId": "polity:hesse-kassel",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:hesse-kassel": 2700
+      },
+      "equipment": {
+        "equipment-class:small-arms": 1944,
+        "equipment-class:artillery": 9,
+        "equipment-class:horses": 216,
+        "equipment-class:transport": 135
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-hesse-kassel-1"
+      ]
+    },
+    "formation:nap1805-hesse-darmstadt-1": {
+      "id": "formation:nap1805-hesse-darmstadt-1",
+      "polityId": "polity:hesse-darmstadt",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:hesse-darmstadt": 2100
+      },
+      "equipment": {
+        "equipment-class:small-arms": 1512,
+        "equipment-class:artillery": 7,
+        "equipment-class:horses": 168,
+        "equipment-class:transport": 105
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-hesse-darmstadt-1"
+      ]
+    },
+    "formation:nap1805-brunswick-1": {
+      "id": "formation:nap1805-brunswick-1",
+      "polityId": "polity:brunswick",
+      "archetypeId": "formation-archetype:theatre-army",
+      "personnelOrigins": {
+        "region:nap1805:brunswick": 1200
+      },
+      "equipment": {
+        "equipment-class:small-arms": 864,
+        "equipment-class:artillery": 4,
+        "equipment-class:horses": 96,
+        "equipment-class:transport": 60
+      },
+      "evidenceIds": [
+        "evidence:nap1805-formation-brunswick-1"
+      ]
+    }
+  }
+}

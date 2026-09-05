@@ -1,0 +1,1135 @@
+{
+  "status": "modeled-central-estimates",
+  "cohorts": {
+    "cohort:nap1805-paris-and-seine": {
+      "id": "cohort:nap1805-paris-and-seine",
+      "regionId": "region:nap1805:paris-and-seine",
+      "population": 3065230,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-paris-and-seine"
+      ]
+    },
+    "cohort:nap1805-normandy": {
+      "id": "cohort:nap1805-normandy",
+      "regionId": "region:nap1805:normandy",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-normandy"
+      ]
+    },
+    "cohort:nap1805-brittany": {
+      "id": "cohort:nap1805-brittany",
+      "regionId": "region:nap1805:brittany",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-brittany"
+      ]
+    },
+    "cohort:nap1805-loire": {
+      "id": "cohort:nap1805-loire",
+      "regionId": "region:nap1805:loire",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-loire"
+      ]
+    },
+    "cohort:nap1805-aquitaine": {
+      "id": "cohort:nap1805-aquitaine",
+      "regionId": "region:nap1805:aquitaine",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-aquitaine"
+      ]
+    },
+    "cohort:nap1805-pyrenees": {
+      "id": "cohort:nap1805-pyrenees",
+      "regionId": "region:nap1805:pyrenees",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-pyrenees"
+      ]
+    },
+    "cohort:nap1805-languedoc": {
+      "id": "cohort:nap1805-languedoc",
+      "regionId": "region:nap1805:languedoc",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-languedoc"
+      ]
+    },
+    "cohort:nap1805-provence": {
+      "id": "cohort:nap1805-provence",
+      "regionId": "region:nap1805:provence",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-provence"
+      ]
+    },
+    "cohort:nap1805-alps": {
+      "id": "cohort:nap1805-alps",
+      "regionId": "region:nap1805:alps",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-alps"
+      ]
+    },
+    "cohort:nap1805-burgundy": {
+      "id": "cohort:nap1805-burgundy",
+      "regionId": "region:nap1805:burgundy",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-burgundy"
+      ]
+    },
+    "cohort:nap1805-alsace": {
+      "id": "cohort:nap1805-alsace",
+      "regionId": "region:nap1805:alsace",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-alsace"
+      ]
+    },
+    "cohort:nap1805-lorraine": {
+      "id": "cohort:nap1805-lorraine",
+      "regionId": "region:nap1805:lorraine",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-lorraine"
+      ]
+    },
+    "cohort:nap1805-champagne": {
+      "id": "cohort:nap1805-champagne",
+      "regionId": "region:nap1805:champagne",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-champagne"
+      ]
+    },
+    "cohort:nap1805-picardy": {
+      "id": "cohort:nap1805-picardy",
+      "regionId": "region:nap1805:picardy",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-picardy"
+      ]
+    },
+    "cohort:nap1805-flanders": {
+      "id": "cohort:nap1805-flanders",
+      "regionId": "region:nap1805:flanders",
+      "population": 1803077,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-flanders"
+      ]
+    },
+    "cohort:nap1805-corsica": {
+      "id": "cohort:nap1805-corsica",
+      "regionId": "region:nap1805:corsica",
+      "population": 991692,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-corsica"
+      ]
+    },
+    "cohort:nap1805-london-and-home-counties": {
+      "id": "cohort:nap1805-london-and-home-counties",
+      "regionId": "region:nap1805:london-and-home-counties",
+      "population": 2995676,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-london-and-home-counties"
+      ]
+    },
+    "cohort:nap1805-southwest-england": {
+      "id": "cohort:nap1805-southwest-england",
+      "regionId": "region:nap1805:southwest-england",
+      "population": 1762162,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-southwest-england"
+      ]
+    },
+    "cohort:nap1805-midlands": {
+      "id": "cohort:nap1805-midlands",
+      "regionId": "region:nap1805:midlands",
+      "population": 1762162,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-midlands"
+      ]
+    },
+    "cohort:nap1805-northern-england": {
+      "id": "cohort:nap1805-northern-england",
+      "regionId": "region:nap1805:northern-england",
+      "population": 1762162,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-northern-england"
+      ]
+    },
+    "cohort:nap1805-wales": {
+      "id": "cohort:nap1805-wales",
+      "regionId": "region:nap1805:wales",
+      "population": 1762162,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-wales"
+      ]
+    },
+    "cohort:nap1805-scottish-lowlands": {
+      "id": "cohort:nap1805-scottish-lowlands",
+      "regionId": "region:nap1805:scottish-lowlands",
+      "population": 1762162,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-scottish-lowlands"
+      ]
+    },
+    "cohort:nap1805-scottish-highlands": {
+      "id": "cohort:nap1805-scottish-highlands",
+      "regionId": "region:nap1805:scottish-highlands",
+      "population": 969190,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-scottish-highlands"
+      ]
+    },
+    "cohort:nap1805-ireland": {
+      "id": "cohort:nap1805-ireland",
+      "regionId": "region:nap1805:ireland",
+      "population": 1762162,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-ireland"
+      ]
+    },
+    "cohort:nap1805-gibraltar": {
+      "id": "cohort:nap1805-gibraltar",
+      "regionId": "region:nap1805:gibraltar",
+      "population": 1762162,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-gibraltar"
+      ]
+    },
+    "cohort:nap1805-vienna-and-lower-austria": {
+      "id": "cohort:nap1805-vienna-and-lower-austria",
+      "regionId": "region:nap1805:vienna-and-lower-austria",
+      "population": 3356410,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-vienna-and-lower-austria"
+      ]
+    },
+    "cohort:nap1805-upper-austria": {
+      "id": "cohort:nap1805-upper-austria",
+      "regionId": "region:nap1805:upper-austria",
+      "population": 1974359,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-upper-austria"
+      ]
+    },
+    "cohort:nap1805-salzburg": {
+      "id": "cohort:nap1805-salzburg",
+      "regionId": "region:nap1805:salzburg",
+      "population": 1974359,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-salzburg"
+      ]
+    },
+    "cohort:nap1805-bohemia": {
+      "id": "cohort:nap1805-bohemia",
+      "regionId": "region:nap1805:bohemia",
+      "population": 1974359,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-bohemia"
+      ]
+    },
+    "cohort:nap1805-moravia": {
+      "id": "cohort:nap1805-moravia",
+      "regionId": "region:nap1805:moravia",
+      "population": 1974359,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-moravia"
+      ]
+    },
+    "cohort:nap1805-austrian-silesia": {
+      "id": "cohort:nap1805-austrian-silesia",
+      "regionId": "region:nap1805:austrian-silesia",
+      "population": 1974359,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-austrian-silesia"
+      ]
+    },
+    "cohort:nap1805-tyrol": {
+      "id": "cohort:nap1805-tyrol",
+      "regionId": "region:nap1805:tyrol",
+      "population": 1974359,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-tyrol"
+      ]
+    },
+    "cohort:nap1805-carinthia-and-carniola": {
+      "id": "cohort:nap1805-carinthia-and-carniola",
+      "regionId": "region:nap1805:carinthia-and-carniola",
+      "population": 1974359,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-carinthia-and-carniola"
+      ]
+    },
+    "cohort:nap1805-hungary-west": {
+      "id": "cohort:nap1805-hungary-west",
+      "regionId": "region:nap1805:hungary-west",
+      "population": 1974359,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-hungary-west"
+      ]
+    },
+    "cohort:nap1805-hungary-east": {
+      "id": "cohort:nap1805-hungary-east",
+      "regionId": "region:nap1805:hungary-east",
+      "population": 1974359,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-hungary-east"
+      ]
+    },
+    "cohort:nap1805-venetia": {
+      "id": "cohort:nap1805-venetia",
+      "regionId": "region:nap1805:venetia",
+      "population": 1974359,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-venetia"
+      ]
+    },
+    "cohort:nap1805-baltic-provinces": {
+      "id": "cohort:nap1805-baltic-provinces",
+      "regionId": "region:nap1805:baltic-provinces",
+      "population": 2857143,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-baltic-provinces"
+      ]
+    },
+    "cohort:nap1805-lithuania": {
+      "id": "cohort:nap1805-lithuania",
+      "regionId": "region:nap1805:lithuania",
+      "population": 2857143,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-lithuania"
+      ]
+    },
+    "cohort:nap1805-belarus": {
+      "id": "cohort:nap1805-belarus",
+      "regionId": "region:nap1805:belarus",
+      "population": 2857143,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-belarus"
+      ]
+    },
+    "cohort:nap1805-volhynia": {
+      "id": "cohort:nap1805-volhynia",
+      "regionId": "region:nap1805:volhynia",
+      "population": 2857143,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-volhynia"
+      ]
+    },
+    "cohort:nap1805-podolia": {
+      "id": "cohort:nap1805-podolia",
+      "regionId": "region:nap1805:podolia",
+      "population": 2857143,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-podolia"
+      ]
+    },
+    "cohort:nap1805-ukraine-west": {
+      "id": "cohort:nap1805-ukraine-west",
+      "regionId": "region:nap1805:ukraine-west",
+      "population": 2857143,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-ukraine-west"
+      ]
+    },
+    "cohort:nap1805-new-russia": {
+      "id": "cohort:nap1805-new-russia",
+      "regionId": "region:nap1805:new-russia",
+      "population": 2857142,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-new-russia"
+      ]
+    },
+    "cohort:nap1805-brandenburg": {
+      "id": "cohort:nap1805-brandenburg",
+      "regionId": "region:nap1805:brandenburg",
+      "population": 1284769,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-brandenburg"
+      ]
+    },
+    "cohort:nap1805-pomerania": {
+      "id": "cohort:nap1805-pomerania",
+      "regionId": "region:nap1805:pomerania",
+      "population": 1284768,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-pomerania"
+      ]
+    },
+    "cohort:nap1805-east-prussia": {
+      "id": "cohort:nap1805-east-prussia",
+      "regionId": "region:nap1805:east-prussia",
+      "population": 1284768,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-east-prussia"
+      ]
+    },
+    "cohort:nap1805-west-prussia": {
+      "id": "cohort:nap1805-west-prussia",
+      "regionId": "region:nap1805:west-prussia",
+      "population": 1284768,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-west-prussia"
+      ]
+    },
+    "cohort:nap1805-silesia": {
+      "id": "cohort:nap1805-silesia",
+      "regionId": "region:nap1805:silesia",
+      "population": 1284768,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-silesia"
+      ]
+    },
+    "cohort:nap1805-magdeburg": {
+      "id": "cohort:nap1805-magdeburg",
+      "regionId": "region:nap1805:magdeburg",
+      "population": 1284768,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-magdeburg"
+      ]
+    },
+    "cohort:nap1805-westphalian-prussia": {
+      "id": "cohort:nap1805-westphalian-prussia",
+      "regionId": "region:nap1805:westphalian-prussia",
+      "population": 1284768,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-westphalian-prussia"
+      ]
+    },
+    "cohort:nap1805-neuchatel": {
+      "id": "cohort:nap1805-neuchatel",
+      "regionId": "region:nap1805:neuchatel",
+      "population": 706623,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-neuchatel"
+      ]
+    },
+    "cohort:nap1805-madrid-and-castile": {
+      "id": "cohort:nap1805-madrid-and-castile",
+      "regionId": "region:nap1805:madrid-and-castile",
+      "population": 2369697,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-madrid-and-castile"
+      ]
+    },
+    "cohort:nap1805-galicia": {
+      "id": "cohort:nap1805-galicia",
+      "regionId": "region:nap1805:galicia",
+      "population": 1393940,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-galicia"
+      ]
+    },
+    "cohort:nap1805-basque-provinces-and-navarre": {
+      "id": "cohort:nap1805-basque-provinces-and-navarre",
+      "regionId": "region:nap1805:basque-provinces-and-navarre",
+      "population": 1393940,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-basque-provinces-and-navarre"
+      ]
+    },
+    "cohort:nap1805-aragon": {
+      "id": "cohort:nap1805-aragon",
+      "regionId": "region:nap1805:aragon",
+      "population": 1393939,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-aragon"
+      ]
+    },
+    "cohort:nap1805-catalonia": {
+      "id": "cohort:nap1805-catalonia",
+      "regionId": "region:nap1805:catalonia",
+      "population": 1393939,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-catalonia"
+      ]
+    },
+    "cohort:nap1805-valencia-and-murcia": {
+      "id": "cohort:nap1805-valencia-and-murcia",
+      "regionId": "region:nap1805:valencia-and-murcia",
+      "population": 1393939,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-valencia-and-murcia"
+      ]
+    },
+    "cohort:nap1805-andalusia": {
+      "id": "cohort:nap1805-andalusia",
+      "regionId": "region:nap1805:andalusia",
+      "population": 1393939,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-andalusia"
+      ]
+    },
+    "cohort:nap1805-balearic-islands": {
+      "id": "cohort:nap1805-balearic-islands",
+      "regionId": "region:nap1805:balearic-islands",
+      "population": 766667,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-balearic-islands"
+      ]
+    },
+    "cohort:nap1805-thrace-and-constantinople": {
+      "id": "cohort:nap1805-thrace-and-constantinople",
+      "regionId": "region:nap1805:thrace-and-constantinople",
+      "population": 2207792,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-thrace-and-constantinople"
+      ]
+    },
+    "cohort:nap1805-rumelia-east": {
+      "id": "cohort:nap1805-rumelia-east",
+      "regionId": "region:nap1805:rumelia-east",
+      "population": 1298702,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-rumelia-east"
+      ]
+    },
+    "cohort:nap1805-rumelia-west": {
+      "id": "cohort:nap1805-rumelia-west",
+      "regionId": "region:nap1805:rumelia-west",
+      "population": 1298702,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-rumelia-west"
+      ]
+    },
+    "cohort:nap1805-bosnia": {
+      "id": "cohort:nap1805-bosnia",
+      "regionId": "region:nap1805:bosnia",
+      "population": 1298701,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-bosnia"
+      ]
+    },
+    "cohort:nap1805-danubian-principalities": {
+      "id": "cohort:nap1805-danubian-principalities",
+      "regionId": "region:nap1805:danubian-principalities",
+      "population": 1298701,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-danubian-principalities"
+      ]
+    },
+    "cohort:nap1805-morea-and-aegean": {
+      "id": "cohort:nap1805-morea-and-aegean",
+      "regionId": "region:nap1805:morea-and-aegean",
+      "population": 1298701,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-morea-and-aegean"
+      ]
+    },
+    "cohort:nap1805-western-anatolia": {
+      "id": "cohort:nap1805-western-anatolia",
+      "regionId": "region:nap1805:western-anatolia",
+      "population": 1298701,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-western-anatolia"
+      ]
+    },
+    "cohort:nap1805-svealand": {
+      "id": "cohort:nap1805-svealand",
+      "regionId": "region:nap1805:svealand",
+      "population": 703297,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-svealand"
+      ]
+    },
+    "cohort:nap1805-gotaland": {
+      "id": "cohort:nap1805-gotaland",
+      "regionId": "region:nap1805:gotaland",
+      "population": 703297,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-gotaland"
+      ]
+    },
+    "cohort:nap1805-norrland": {
+      "id": "cohort:nap1805-norrland",
+      "regionId": "region:nap1805:norrland",
+      "population": 386813,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-norrland"
+      ]
+    },
+    "cohort:nap1805-swedish-pomerania": {
+      "id": "cohort:nap1805-swedish-pomerania",
+      "regionId": "region:nap1805:swedish-pomerania",
+      "population": 703297,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-swedish-pomerania"
+      ]
+    },
+    "cohort:nap1805-finland": {
+      "id": "cohort:nap1805-finland",
+      "regionId": "region:nap1805:finland",
+      "population": 703296,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-finland"
+      ]
+    },
+    "cohort:nap1805-zealand": {
+      "id": "cohort:nap1805-zealand",
+      "regionId": "region:nap1805:zealand",
+      "population": 505495,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-zealand"
+      ]
+    },
+    "cohort:nap1805-jutland": {
+      "id": "cohort:nap1805-jutland",
+      "regionId": "region:nap1805:jutland",
+      "population": 505495,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-jutland"
+      ]
+    },
+    "cohort:nap1805-schleswig-holstein": {
+      "id": "cohort:nap1805-schleswig-holstein",
+      "regionId": "region:nap1805:schleswig-holstein",
+      "population": 505494,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-schleswig-holstein"
+      ]
+    },
+    "cohort:nap1805-southern-norway": {
+      "id": "cohort:nap1805-southern-norway",
+      "regionId": "region:nap1805:southern-norway",
+      "population": 505494,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-southern-norway"
+      ]
+    },
+    "cohort:nap1805-northern-norway": {
+      "id": "cohort:nap1805-northern-norway",
+      "regionId": "region:nap1805:northern-norway",
+      "population": 278022,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-northern-norway"
+      ]
+    },
+    "cohort:nap1805-campania": {
+      "id": "cohort:nap1805-campania",
+      "regionId": "region:nap1805:campania",
+      "population": 1525000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-campania"
+      ]
+    },
+    "cohort:nap1805-apulia-and-calabria": {
+      "id": "cohort:nap1805-apulia-and-calabria",
+      "regionId": "region:nap1805:apulia-and-calabria",
+      "population": 1525000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-apulia-and-calabria"
+      ]
+    },
+    "cohort:nap1805-sicily-east": {
+      "id": "cohort:nap1805-sicily-east",
+      "regionId": "region:nap1805:sicily-east",
+      "population": 1525000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-sicily-east"
+      ]
+    },
+    "cohort:nap1805-sicily-west": {
+      "id": "cohort:nap1805-sicily-west",
+      "regionId": "region:nap1805:sicily-west",
+      "population": 1525000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-sicily-west"
+      ]
+    },
+    "cohort:nap1805-milan-and-lombardy": {
+      "id": "cohort:nap1805-milan-and-lombardy",
+      "regionId": "region:nap1805:milan-and-lombardy",
+      "population": 1133333,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-milan-and-lombardy"
+      ]
+    },
+    "cohort:nap1805-emilia": {
+      "id": "cohort:nap1805-emilia",
+      "regionId": "region:nap1805:emilia",
+      "population": 666667,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-emilia"
+      ]
+    },
+    "cohort:nap1805-romagna": {
+      "id": "cohort:nap1805-romagna",
+      "regionId": "region:nap1805:romagna",
+      "population": 666667,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-romagna"
+      ]
+    },
+    "cohort:nap1805-modena": {
+      "id": "cohort:nap1805-modena",
+      "regionId": "region:nap1805:modena",
+      "population": 666667,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-modena"
+      ]
+    },
+    "cohort:nap1805-mantua": {
+      "id": "cohort:nap1805-mantua",
+      "regionId": "region:nap1805:mantua",
+      "population": 666666,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-mantua"
+      ]
+    },
+    "cohort:nap1805-upper-bavaria": {
+      "id": "cohort:nap1805-upper-bavaria",
+      "regionId": "region:nap1805:upper-bavaria",
+      "population": 1000000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-upper-bavaria"
+      ]
+    },
+    "cohort:nap1805-lower-bavaria": {
+      "id": "cohort:nap1805-lower-bavaria",
+      "regionId": "region:nap1805:lower-bavaria",
+      "population": 1000000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-lower-bavaria"
+      ]
+    },
+    "cohort:nap1805-franconian-bavaria": {
+      "id": "cohort:nap1805-franconian-bavaria",
+      "regionId": "region:nap1805:franconian-bavaria",
+      "population": 1000000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-franconian-bavaria"
+      ]
+    },
+    "cohort:nap1805-holland": {
+      "id": "cohort:nap1805-holland",
+      "regionId": "region:nap1805:holland",
+      "population": 964865,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-holland"
+      ]
+    },
+    "cohort:nap1805-friesland": {
+      "id": "cohort:nap1805-friesland",
+      "regionId": "region:nap1805:friesland",
+      "population": 567568,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-friesland"
+      ]
+    },
+    "cohort:nap1805-batavian-interior": {
+      "id": "cohort:nap1805-batavian-interior",
+      "regionId": "region:nap1805:batavian-interior",
+      "population": 567567,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-batavian-interior"
+      ]
+    },
+    "cohort:nap1805-northern-portugal": {
+      "id": "cohort:nap1805-northern-portugal",
+      "regionId": "region:nap1805:northern-portugal",
+      "population": 1000000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-northern-portugal"
+      ]
+    },
+    "cohort:nap1805-central-portugal": {
+      "id": "cohort:nap1805-central-portugal",
+      "regionId": "region:nap1805:central-portugal",
+      "population": 1000000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-central-portugal"
+      ]
+    },
+    "cohort:nap1805-southern-portugal": {
+      "id": "cohort:nap1805-southern-portugal",
+      "regionId": "region:nap1805:southern-portugal",
+      "population": 1000000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-southern-portugal"
+      ]
+    },
+    "cohort:nap1805-western-switzerland": {
+      "id": "cohort:nap1805-western-switzerland",
+      "regionId": "region:nap1805:western-switzerland",
+      "population": 566667,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-western-switzerland"
+      ]
+    },
+    "cohort:nap1805-central-switzerland": {
+      "id": "cohort:nap1805-central-switzerland",
+      "regionId": "region:nap1805:central-switzerland",
+      "population": 566667,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-central-switzerland"
+      ]
+    },
+    "cohort:nap1805-eastern-switzerland": {
+      "id": "cohort:nap1805-eastern-switzerland",
+      "regionId": "region:nap1805:eastern-switzerland",
+      "population": 566666,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-eastern-switzerland"
+      ]
+    },
+    "cohort:nap1805-dresden-and-meissen": {
+      "id": "cohort:nap1805-dresden-and-meissen",
+      "regionId": "region:nap1805:dresden-and-meissen",
+      "population": 1000000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-dresden-and-meissen"
+      ]
+    },
+    "cohort:nap1805-leipzig-and-thuringian-saxony": {
+      "id": "cohort:nap1805-leipzig-and-thuringian-saxony",
+      "regionId": "region:nap1805:leipzig-and-thuringian-saxony",
+      "population": 1000000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-leipzig-and-thuringian-saxony"
+      ]
+    },
+    "cohort:nap1805-stuttgart-and-neckar": {
+      "id": "cohort:nap1805-stuttgart-and-neckar",
+      "regionId": "region:nap1805:stuttgart-and-neckar",
+      "population": 350000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-stuttgart-and-neckar"
+      ]
+    },
+    "cohort:nap1805-swabian-wurttemberg": {
+      "id": "cohort:nap1805-swabian-wurttemberg",
+      "regionId": "region:nap1805:swabian-wurttemberg",
+      "population": 350000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-swabian-wurttemberg"
+      ]
+    },
+    "cohort:nap1805-upper-baden": {
+      "id": "cohort:nap1805-upper-baden",
+      "regionId": "region:nap1805:upper-baden",
+      "population": 250000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-upper-baden"
+      ]
+    },
+    "cohort:nap1805-lower-baden": {
+      "id": "cohort:nap1805-lower-baden",
+      "regionId": "region:nap1805:lower-baden",
+      "population": 250000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-lower-baden"
+      ]
+    },
+    "cohort:nap1805-hanover": {
+      "id": "cohort:nap1805-hanover",
+      "regionId": "region:nap1805:hanover",
+      "population": 400000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-hanover"
+      ]
+    },
+    "cohort:nap1805-bremen-verden": {
+      "id": "cohort:nap1805-bremen-verden",
+      "regionId": "region:nap1805:bremen-verden",
+      "population": 400000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-bremen-verden"
+      ]
+    },
+    "cohort:nap1805-rome-and-lazio": {
+      "id": "cohort:nap1805-rome-and-lazio",
+      "regionId": "region:nap1805:rome-and-lazio",
+      "population": 1511111,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-rome-and-lazio"
+      ]
+    },
+    "cohort:nap1805-umbria-and-marche": {
+      "id": "cohort:nap1805-umbria-and-marche",
+      "regionId": "region:nap1805:umbria-and-marche",
+      "population": 888889,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-umbria-and-marche"
+      ]
+    },
+    "cohort:nap1805-tuscany": {
+      "id": "cohort:nap1805-tuscany",
+      "regionId": "region:nap1805:tuscany",
+      "population": 1000000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-tuscany"
+      ]
+    },
+    "cohort:nap1805-liguria": {
+      "id": "cohort:nap1805-liguria",
+      "regionId": "region:nap1805:liguria",
+      "population": 600000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-liguria"
+      ]
+    },
+    "cohort:nap1805-sardinia": {
+      "id": "cohort:nap1805-sardinia",
+      "regionId": "region:nap1805:sardinia",
+      "population": 1600000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-sardinia"
+      ]
+    },
+    "cohort:nap1805-hesse-kassel": {
+      "id": "cohort:nap1805-hesse-kassel",
+      "regionId": "region:nap1805:hesse-kassel",
+      "population": 450000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-hesse-kassel"
+      ]
+    },
+    "cohort:nap1805-hesse-darmstadt": {
+      "id": "cohort:nap1805-hesse-darmstadt",
+      "regionId": "region:nap1805:hesse-darmstadt",
+      "population": 350000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-hesse-darmstadt"
+      ]
+    },
+    "cohort:nap1805-brunswick": {
+      "id": "cohort:nap1805-brunswick",
+      "regionId": "region:nap1805:brunswick",
+      "population": 200000,
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "evidenceIds": [
+        "evidence:nap1805-cohort-brunswick"
+      ]
+    }
+  }
+}

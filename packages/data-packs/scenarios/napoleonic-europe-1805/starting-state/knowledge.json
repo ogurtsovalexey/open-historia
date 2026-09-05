@@ -1,0 +1,50 @@
+{
+  "knowledge:nap1805-france-staff-system": {
+    "id": "knowledge:nap1805-france-staff-system",
+    "polityId": "polity:france",
+    "conceptId": "concept:staff-system",
+    "evidenceIds": [
+      "evidence:nap1805-knowledge-france-staff-system"
+    ]
+  },
+  "knowledge:nap1805-austria-staff-system": {
+    "id": "knowledge:nap1805-austria-staff-system",
+    "polityId": "polity:austria",
+    "conceptId": "concept:staff-system",
+    "evidenceIds": [
+      "evidence:nap1805-knowledge-austria-staff-system"
+    ]
+  },
+  "knowledge:nap1805-prussia-staff-system": {
+    "id": "knowledge:nap1805-prussia-staff-system",
+    "polityId": "polity:prussia",
+    "conceptId": "concept:staff-system",
+    "evidenceIds": [
+      "evidence:nap1805-knowledge-prussia-staff-system"
+    ]
+  },
+  "knowledge:nap1805-russia-staff-system": {
+    "id": "knowledge:nap1805-russia-staff-system",
+    "polityId": "polity:russia",
+    "conceptId": "concept:staff-system",
+    "evidenceIds": [
+      "evidence:nap1805-knowledge-russia-staff-system"
+    ]
+  },
+  "knowledge:nap1805-france-mass-conscription": {
+    "id": "knowledge:nap1805-france-mass-conscription",
+    "polityId": "polity:france",
+    "conceptId": "concept:mass-conscription",
+    "evidenceIds": [
+      "evidence:nap1805-knowledge-france-mass-conscription"
+    ]
+  },
+  "knowledge:nap1805-france-optical-telegraph": {
+    "id": "knowledge:nap1805-france-optical-telegraph",
+    "polityId": "polity:france",
+    "conceptId": "concept:optical-telegraph",
+    "evidenceIds": [
+      "evidence:nap1805-knowledge-france-optical-telegraph"
+    ]
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "relationship:nap1805-anglo-french-war": {
+    "id": "relationship:nap1805-anglo-french-war",
+    "typeId": "relationship-type:war",
+    "participantPolityIds": [
+      "polity:united-kingdom",
+      "polity:france"
+    ],
+    "evidenceIds": [
+      "evidence:nap1805-relationship-anglo-french-war"
+    ]
+  },
+  "relationship:nap1805-anglo-spanish-war": {
+    "id": "relationship:nap1805-anglo-spanish-war",
+    "typeId": "relationship-type:war",
+    "participantPolityIds": [
+      "polity:united-kingdom",
+      "polity:spain"
+    ],
+    "evidenceIds": [
+      "evidence:nap1805-relationship-anglo-spanish-war"
+    ]
+  },
+  "relationship:nap1805-anglo-russian-coalition-negotiation": {
+    "id": "relationship:nap1805-anglo-russian-coalition-negotiation",
+    "typeId": "relationship-type:coalition-negotiation",
+    "participantPolityIds": [
+      "polity:united-kingdom",
+      "polity:russia"
+    ],
+    "evidenceIds": [
+      "evidence:nap1805-relationship-anglo-russian-coalition-negotiation"
+    ]
+  },
+  "relationship:nap1805-prussian-neutrality": {
+    "id": "relationship:nap1805-prussian-neutrality",
+    "typeId": "relationship-type:neutrality",
+    "participantPolityIds": [
+      "polity:prussia",
+      "polity:france",
+      "polity:austria",
+      "polity:russia"
+    ],
+    "evidenceIds": [
+      "evidence:nap1805-relationship-prussian-neutrality"
+    ]
+  },
+  "relationship:nap1805-france-italy-linked-executive": {
+    "id": "relationship:nap1805-france-italy-linked-executive",
+    "typeId": "relationship-type:linked-executive",
+    "participantPolityIds": [
+      "polity:france",
+      "polity:italy"
+    ],
+    "evidenceIds": [
+      "evidence:nap1805-relationship-france-italy-linked-executive"
+    ]
+  },
+  "relationship:nap1805-uk-hanover-personal-union": {
+    "id": "relationship:nap1805-uk-hanover-personal-union",
+    "typeId": "relationship-type:personal-union",
+    "participantPolityIds": [
+      "polity:united-kingdom",
+      "polity:hanover"
+    ],
+    "evidenceIds": [
+      "evidence:nap1805-relationship-uk-hanover-personal-union"
+    ]
+  },
+  "relationship:nap1805-britain-naples-alliance": {
+    "id": "relationship:nap1805-britain-naples-alliance",
+    "typeId": "relationship-type:alliance",
+    "participantPolityIds": [
+      "polity:naples-sicily",
+      "polity:united-kingdom"
+    ],
+    "evidenceIds": [
+      "evidence:nap1805-relationship-britain-naples-alliance"
+    ]
+  },
+  "relationship:nap1805-hre-network": {
+    "id": "relationship:nap1805-hre-network",
+    "typeId": "relationship-type:hre-membership",
+    "participantPolityIds": [
+      "polity:austria",
+      "polity:prussia",
+      "polity:bavaria",
+      "polity:saxony",
+      "polity:wurttemberg",
+      "polity:baden",
+      "polity:hanover",
+      "polity:hesse-kassel",
+      "polity:hesse-darmstadt",
+      "polity:brunswick"
+    ],
+    "evidenceIds": [
+      "evidence:nap1805-relationship-hre-network"
+    ]
+  },
+  "relationship:nap1805-gibraltar-interdiction": {
+    "id": "relationship:nap1805-gibraltar-interdiction",
+    "typeId": "relationship-type:maritime-interdiction",
+    "participantPolityIds": [
+      "polity:united-kingdom",
+      "polity:france",
+      "polity:spain"
+    ],
+    "evidenceIds": [
+      "evidence:nap1805-relationship-gibraltar-interdiction"
+    ]
+  }
+}

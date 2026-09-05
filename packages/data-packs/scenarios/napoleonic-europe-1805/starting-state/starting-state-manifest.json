@@ -1,0 +1,23 @@
+{
+  "scenarioId": "scenario:napoleonic-europe-1805",
+  "files": [
+    "population.json",
+    "control.json",
+    "military.json",
+    "diplomacy.json",
+    "concepts.json",
+    "knowledge.json"
+  ],
+  "modeledQuantities": {
+    "status": "modeled-central-estimates",
+    "rule": "All integer quantities are canonical simulation controls. They are causally operative from turn one but must be presented as modeled estimates wherever their bound evidence confidence is low.",
+    "populationMethod": "Polity controls use nearby 1800/1801 population series and are allocated to strategic regions by declared integer weights and largest remainder.",
+    "derivedRatios": {
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "playableMobilizedShareBp": 100,
+      "otherMobilizedShareBp": 60,
+      "treasuryMonthsOfFiscalBase": 6
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "open-historia-scenario-package/1",
+  "id": "scenario:napoleonic-europe-1805",
+  "entrypoint": "scenario.json",
+  "profile": "historical",
+  "startDate": "1805-01-01",
+  "counts": {
+    "polities": 26,
+    "regions": 113,
+    "playablePolities": 12
+  },
+  "generatedBy": "build-scenario.mjs"
+}

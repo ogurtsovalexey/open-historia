@@ -1,0 +1,454 @@
+{
+  "region:nap1805:paris-and-seine": [
+    "region:nap1805:brunswick",
+    "region:nap1805:normandy"
+  ],
+  "region:nap1805:normandy": [
+    "region:nap1805:brittany",
+    "region:nap1805:paris-and-seine"
+  ],
+  "region:nap1805:brittany": [
+    "region:nap1805:loire",
+    "region:nap1805:normandy"
+  ],
+  "region:nap1805:loire": [
+    "region:nap1805:aquitaine",
+    "region:nap1805:brittany"
+  ],
+  "region:nap1805:aquitaine": [
+    "region:nap1805:loire",
+    "region:nap1805:pyrenees"
+  ],
+  "region:nap1805:pyrenees": [
+    "region:nap1805:aquitaine",
+    "region:nap1805:languedoc"
+  ],
+  "region:nap1805:languedoc": [
+    "region:nap1805:provence",
+    "region:nap1805:pyrenees"
+  ],
+  "region:nap1805:provence": [
+    "region:nap1805:alps",
+    "region:nap1805:languedoc"
+  ],
+  "region:nap1805:alps": [
+    "region:nap1805:burgundy",
+    "region:nap1805:provence"
+  ],
+  "region:nap1805:burgundy": [
+    "region:nap1805:alps",
+    "region:nap1805:alsace"
+  ],
+  "region:nap1805:alsace": [
+    "region:nap1805:burgundy",
+    "region:nap1805:lorraine"
+  ],
+  "region:nap1805:lorraine": [
+    "region:nap1805:alsace",
+    "region:nap1805:champagne"
+  ],
+  "region:nap1805:champagne": [
+    "region:nap1805:lorraine",
+    "region:nap1805:picardy"
+  ],
+  "region:nap1805:picardy": [
+    "region:nap1805:champagne",
+    "region:nap1805:flanders"
+  ],
+  "region:nap1805:flanders": [
+    "region:nap1805:corsica",
+    "region:nap1805:picardy"
+  ],
+  "region:nap1805:corsica": [
+    "region:nap1805:flanders",
+    "region:nap1805:london-and-home-counties"
+  ],
+  "region:nap1805:london-and-home-counties": [
+    "region:nap1805:corsica",
+    "region:nap1805:southwest-england"
+  ],
+  "region:nap1805:southwest-england": [
+    "region:nap1805:london-and-home-counties",
+    "region:nap1805:midlands"
+  ],
+  "region:nap1805:midlands": [
+    "region:nap1805:northern-england",
+    "region:nap1805:southwest-england"
+  ],
+  "region:nap1805:northern-england": [
+    "region:nap1805:midlands",
+    "region:nap1805:wales"
+  ],
+  "region:nap1805:wales": [
+    "region:nap1805:northern-england",
+    "region:nap1805:scottish-lowlands"
+  ],
+  "region:nap1805:scottish-lowlands": [
+    "region:nap1805:scottish-highlands",
+    "region:nap1805:wales"
+  ],
+  "region:nap1805:scottish-highlands": [
+    "region:nap1805:ireland",
+    "region:nap1805:scottish-lowlands"
+  ],
+  "region:nap1805:ireland": [
+    "region:nap1805:gibraltar",
+    "region:nap1805:scottish-highlands"
+  ],
+  "region:nap1805:gibraltar": [
+    "region:nap1805:ireland",
+    "region:nap1805:vienna-and-lower-austria"
+  ],
+  "region:nap1805:vienna-and-lower-austria": [
+    "region:nap1805:gibraltar",
+    "region:nap1805:upper-austria"
+  ],
+  "region:nap1805:upper-austria": [
+    "region:nap1805:salzburg",
+    "region:nap1805:vienna-and-lower-austria"
+  ],
+  "region:nap1805:salzburg": [
+    "region:nap1805:bohemia",
+    "region:nap1805:upper-austria"
+  ],
+  "region:nap1805:bohemia": [
+    "region:nap1805:moravia",
+    "region:nap1805:salzburg"
+  ],
+  "region:nap1805:moravia": [
+    "region:nap1805:austrian-silesia",
+    "region:nap1805:bohemia"
+  ],
+  "region:nap1805:austrian-silesia": [
+    "region:nap1805:moravia",
+    "region:nap1805:tyrol"
+  ],
+  "region:nap1805:tyrol": [
+    "region:nap1805:austrian-silesia",
+    "region:nap1805:carinthia-and-carniola"
+  ],
+  "region:nap1805:carinthia-and-carniola": [
+    "region:nap1805:hungary-west",
+    "region:nap1805:tyrol"
+  ],
+  "region:nap1805:hungary-west": [
+    "region:nap1805:carinthia-and-carniola",
+    "region:nap1805:hungary-east"
+  ],
+  "region:nap1805:hungary-east": [
+    "region:nap1805:hungary-west",
+    "region:nap1805:venetia"
+  ],
+  "region:nap1805:venetia": [
+    "region:nap1805:baltic-provinces",
+    "region:nap1805:hungary-east"
+  ],
+  "region:nap1805:baltic-provinces": [
+    "region:nap1805:lithuania",
+    "region:nap1805:venetia"
+  ],
+  "region:nap1805:lithuania": [
+    "region:nap1805:baltic-provinces",
+    "region:nap1805:belarus"
+  ],
+  "region:nap1805:belarus": [
+    "region:nap1805:lithuania",
+    "region:nap1805:volhynia"
+  ],
+  "region:nap1805:volhynia": [
+    "region:nap1805:belarus",
+    "region:nap1805:podolia"
+  ],
+  "region:nap1805:podolia": [
+    "region:nap1805:ukraine-west",
+    "region:nap1805:volhynia"
+  ],
+  "region:nap1805:ukraine-west": [
+    "region:nap1805:new-russia",
+    "region:nap1805:podolia"
+  ],
+  "region:nap1805:new-russia": [
+    "region:nap1805:brandenburg",
+    "region:nap1805:ukraine-west"
+  ],
+  "region:nap1805:brandenburg": [
+    "region:nap1805:new-russia",
+    "region:nap1805:pomerania"
+  ],
+  "region:nap1805:pomerania": [
+    "region:nap1805:brandenburg",
+    "region:nap1805:east-prussia"
+  ],
+  "region:nap1805:east-prussia": [
+    "region:nap1805:pomerania",
+    "region:nap1805:west-prussia"
+  ],
+  "region:nap1805:west-prussia": [
+    "region:nap1805:east-prussia",
+    "region:nap1805:silesia"
+  ],
+  "region:nap1805:silesia": [
+    "region:nap1805:magdeburg",
+    "region:nap1805:west-prussia"
+  ],
+  "region:nap1805:magdeburg": [
+    "region:nap1805:silesia",
+    "region:nap1805:westphalian-prussia"
+  ],
+  "region:nap1805:westphalian-prussia": [
+    "region:nap1805:magdeburg",
+    "region:nap1805:neuchatel"
+  ],
+  "region:nap1805:neuchatel": [
+    "region:nap1805:madrid-and-castile",
+    "region:nap1805:westphalian-prussia"
+  ],
+  "region:nap1805:madrid-and-castile": [
+    "region:nap1805:galicia",
+    "region:nap1805:neuchatel"
+  ],
+  "region:nap1805:galicia": [
+    "region:nap1805:basque-provinces-and-navarre",
+    "region:nap1805:madrid-and-castile"
+  ],
+  "region:nap1805:basque-provinces-and-navarre": [
+    "region:nap1805:aragon",
+    "region:nap1805:galicia"
+  ],
+  "region:nap1805:aragon": [
+    "region:nap1805:basque-provinces-and-navarre",
+    "region:nap1805:catalonia"
+  ],
+  "region:nap1805:catalonia": [
+    "region:nap1805:aragon",
+    "region:nap1805:valencia-and-murcia"
+  ],
+  "region:nap1805:valencia-and-murcia": [
+    "region:nap1805:andalusia",
+    "region:nap1805:catalonia"
+  ],
+  "region:nap1805:andalusia": [
+    "region:nap1805:balearic-islands",
+    "region:nap1805:valencia-and-murcia"
+  ],
+  "region:nap1805:balearic-islands": [
+    "region:nap1805:andalusia",
+    "region:nap1805:thrace-and-constantinople"
+  ],
+  "region:nap1805:thrace-and-constantinople": [
+    "region:nap1805:balearic-islands",
+    "region:nap1805:rumelia-east"
+  ],
+  "region:nap1805:rumelia-east": [
+    "region:nap1805:rumelia-west",
+    "region:nap1805:thrace-and-constantinople"
+  ],
+  "region:nap1805:rumelia-west": [
+    "region:nap1805:bosnia",
+    "region:nap1805:rumelia-east"
+  ],
+  "region:nap1805:bosnia": [
+    "region:nap1805:danubian-principalities",
+    "region:nap1805:rumelia-west"
+  ],
+  "region:nap1805:danubian-principalities": [
+    "region:nap1805:bosnia",
+    "region:nap1805:morea-and-aegean"
+  ],
+  "region:nap1805:morea-and-aegean": [
+    "region:nap1805:danubian-principalities",
+    "region:nap1805:western-anatolia"
+  ],
+  "region:nap1805:western-anatolia": [
+    "region:nap1805:morea-and-aegean",
+    "region:nap1805:svealand"
+  ],
+  "region:nap1805:svealand": [
+    "region:nap1805:gotaland",
+    "region:nap1805:western-anatolia"
+  ],
+  "region:nap1805:gotaland": [
+    "region:nap1805:norrland",
+    "region:nap1805:svealand"
+  ],
+  "region:nap1805:norrland": [
+    "region:nap1805:gotaland",
+    "region:nap1805:swedish-pomerania"
+  ],
+  "region:nap1805:swedish-pomerania": [
+    "region:nap1805:finland",
+    "region:nap1805:norrland"
+  ],
+  "region:nap1805:finland": [
+    "region:nap1805:swedish-pomerania",
+    "region:nap1805:zealand"
+  ],
+  "region:nap1805:zealand": [
+    "region:nap1805:finland",
+    "region:nap1805:jutland"
+  ],
+  "region:nap1805:jutland": [
+    "region:nap1805:schleswig-holstein",
+    "region:nap1805:zealand"
+  ],
+  "region:nap1805:schleswig-holstein": [
+    "region:nap1805:jutland",
+    "region:nap1805:southern-norway"
+  ],
+  "region:nap1805:southern-norway": [
+    "region:nap1805:northern-norway",
+    "region:nap1805:schleswig-holstein"
+  ],
+  "region:nap1805:northern-norway": [
+    "region:nap1805:campania",
+    "region:nap1805:southern-norway"
+  ],
+  "region:nap1805:campania": [
+    "region:nap1805:apulia-and-calabria",
+    "region:nap1805:northern-norway"
+  ],
+  "region:nap1805:apulia-and-calabria": [
+    "region:nap1805:campania",
+    "region:nap1805:sicily-east"
+  ],
+  "region:nap1805:sicily-east": [
+    "region:nap1805:apulia-and-calabria",
+    "region:nap1805:sicily-west"
+  ],
+  "region:nap1805:sicily-west": [
+    "region:nap1805:milan-and-lombardy",
+    "region:nap1805:sicily-east"
+  ],
+  "region:nap1805:milan-and-lombardy": [
+    "region:nap1805:emilia",
+    "region:nap1805:sicily-west"
+  ],
+  "region:nap1805:emilia": [
+    "region:nap1805:milan-and-lombardy",
+    "region:nap1805:romagna"
+  ],
+  "region:nap1805:romagna": [
+    "region:nap1805:emilia",
+    "region:nap1805:modena"
+  ],
+  "region:nap1805:modena": [
+    "region:nap1805:mantua",
+    "region:nap1805:romagna"
+  ],
+  "region:nap1805:mantua": [
+    "region:nap1805:modena",
+    "region:nap1805:upper-bavaria"
+  ],
+  "region:nap1805:upper-bavaria": [
+    "region:nap1805:lower-bavaria",
+    "region:nap1805:mantua"
+  ],
+  "region:nap1805:lower-bavaria": [
+    "region:nap1805:franconian-bavaria",
+    "region:nap1805:upper-bavaria"
+  ],
+  "region:nap1805:franconian-bavaria": [
+    "region:nap1805:holland",
+    "region:nap1805:lower-bavaria"
+  ],
+  "region:nap1805:holland": [
+    "region:nap1805:franconian-bavaria",
+    "region:nap1805:friesland"
+  ],
+  "region:nap1805:friesland": [
+    "region:nap1805:batavian-interior",
+    "region:nap1805:holland"
+  ],
+  "region:nap1805:batavian-interior": [
+    "region:nap1805:friesland",
+    "region:nap1805:northern-portugal"
+  ],
+  "region:nap1805:northern-portugal": [
+    "region:nap1805:batavian-interior",
+    "region:nap1805:central-portugal"
+  ],
+  "region:nap1805:central-portugal": [
+    "region:nap1805:northern-portugal",
+    "region:nap1805:southern-portugal"
+  ],
+  "region:nap1805:southern-portugal": [
+    "region:nap1805:central-portugal",
+    "region:nap1805:western-switzerland"
+  ],
+  "region:nap1805:western-switzerland": [
+    "region:nap1805:central-switzerland",
+    "region:nap1805:southern-portugal"
+  ],
+  "region:nap1805:central-switzerland": [
+    "region:nap1805:eastern-switzerland",
+    "region:nap1805:western-switzerland"
+  ],
+  "region:nap1805:eastern-switzerland": [
+    "region:nap1805:central-switzerland",
+    "region:nap1805:dresden-and-meissen"
+  ],
+  "region:nap1805:dresden-and-meissen": [
+    "region:nap1805:eastern-switzerland",
+    "region:nap1805:leipzig-and-thuringian-saxony"
+  ],
+  "region:nap1805:leipzig-and-thuringian-saxony": [
+    "region:nap1805:dresden-and-meissen",
+    "region:nap1805:stuttgart-and-neckar"
+  ],
+  "region:nap1805:stuttgart-and-neckar": [
+    "region:nap1805:leipzig-and-thuringian-saxony",
+    "region:nap1805:swabian-wurttemberg"
+  ],
+  "region:nap1805:swabian-wurttemberg": [
+    "region:nap1805:stuttgart-and-neckar",
+    "region:nap1805:upper-baden"
+  ],
+  "region:nap1805:upper-baden": [
+    "region:nap1805:lower-baden",
+    "region:nap1805:swabian-wurttemberg"
+  ],
+  "region:nap1805:lower-baden": [
+    "region:nap1805:hanover",
+    "region:nap1805:upper-baden"
+  ],
+  "region:nap1805:hanover": [
+    "region:nap1805:bremen-verden",
+    "region:nap1805:lower-baden"
+  ],
+  "region:nap1805:bremen-verden": [
+    "region:nap1805:hanover",
+    "region:nap1805:rome-and-lazio"
+  ],
+  "region:nap1805:rome-and-lazio": [
+    "region:nap1805:bremen-verden",
+    "region:nap1805:umbria-and-marche"
+  ],
+  "region:nap1805:umbria-and-marche": [
+    "region:nap1805:rome-and-lazio",
+    "region:nap1805:tuscany"
+  ],
+  "region:nap1805:tuscany": [
+    "region:nap1805:liguria",
+    "region:nap1805:umbria-and-marche"
+  ],
+  "region:nap1805:liguria": [
+    "region:nap1805:sardinia",
+    "region:nap1805:tuscany"
+  ],
+  "region:nap1805:sardinia": [
+    "region:nap1805:hesse-kassel",
+    "region:nap1805:liguria"
+  ],
+  "region:nap1805:hesse-kassel": [
+    "region:nap1805:hesse-darmstadt",
+    "region:nap1805:sardinia"
+  ],
+  "region:nap1805:hesse-darmstadt": [
+    "region:nap1805:brunswick",
+    "region:nap1805:hesse-kassel"
+  ],
+  "region:nap1805:brunswick": [
+    "region:nap1805:hesse-darmstadt",
+    "region:nap1805:paris-and-seine"
+  ]
+}

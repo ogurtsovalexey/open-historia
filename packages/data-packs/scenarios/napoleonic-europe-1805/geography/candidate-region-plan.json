@@ -1,0 +1,685 @@
+{
+  "scenarioId": "scenario:napoleonic-europe-1805",
+  "boundary": "1805-01-01",
+  "targetRegionCount": 113,
+  "regions": [
+    {
+      "id": "region:nap1805:paris-and-seine",
+      "name": "Paris and Seine",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:normandy",
+      "name": "Normandy",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:brittany",
+      "name": "Brittany",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:loire",
+      "name": "Loire",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:aquitaine",
+      "name": "Aquitaine",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:pyrenees",
+      "name": "Pyrenees",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:languedoc",
+      "name": "Languedoc",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:provence",
+      "name": "Provence",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:alps",
+      "name": "Alps",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:burgundy",
+      "name": "Burgundy",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:alsace",
+      "name": "Alsace",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:lorraine",
+      "name": "Lorraine",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:champagne",
+      "name": "Champagne",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:picardy",
+      "name": "Picardy",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:flanders",
+      "name": "Flanders",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:corsica",
+      "name": "Corsica",
+      "ownerId": "polity:france",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:london-and-home-counties",
+      "name": "London and Home Counties",
+      "ownerId": "polity:united-kingdom",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:southwest-england",
+      "name": "Southwest England",
+      "ownerId": "polity:united-kingdom",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:midlands",
+      "name": "Midlands",
+      "ownerId": "polity:united-kingdom",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:northern-england",
+      "name": "Northern England",
+      "ownerId": "polity:united-kingdom",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:wales",
+      "name": "Wales",
+      "ownerId": "polity:united-kingdom",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:scottish-lowlands",
+      "name": "Scottish Lowlands",
+      "ownerId": "polity:united-kingdom",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:scottish-highlands",
+      "name": "Scottish Highlands",
+      "ownerId": "polity:united-kingdom",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:ireland",
+      "name": "Ireland",
+      "ownerId": "polity:united-kingdom",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:gibraltar",
+      "name": "Gibraltar",
+      "ownerId": "polity:united-kingdom",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:vienna-and-lower-austria",
+      "name": "Vienna and Lower Austria",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:upper-austria",
+      "name": "Upper Austria",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:salzburg",
+      "name": "Salzburg",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:bohemia",
+      "name": "Bohemia",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:moravia",
+      "name": "Moravia",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:austrian-silesia",
+      "name": "Austrian Silesia",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:tyrol",
+      "name": "Tyrol",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:carinthia-and-carniola",
+      "name": "Carinthia and Carniola",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:hungary-west",
+      "name": "Hungary West",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:hungary-east",
+      "name": "Hungary East",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:venetia",
+      "name": "Venetia",
+      "ownerId": "polity:austria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:baltic-provinces",
+      "name": "Baltic Provinces",
+      "ownerId": "polity:russia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:lithuania",
+      "name": "Lithuania",
+      "ownerId": "polity:russia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:belarus",
+      "name": "Belarus",
+      "ownerId": "polity:russia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:volhynia",
+      "name": "Volhynia",
+      "ownerId": "polity:russia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:podolia",
+      "name": "Podolia",
+      "ownerId": "polity:russia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:ukraine-west",
+      "name": "Ukraine West",
+      "ownerId": "polity:russia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:new-russia",
+      "name": "New Russia",
+      "ownerId": "polity:russia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:brandenburg",
+      "name": "Brandenburg",
+      "ownerId": "polity:prussia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:pomerania",
+      "name": "Pomerania",
+      "ownerId": "polity:prussia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:east-prussia",
+      "name": "East Prussia",
+      "ownerId": "polity:prussia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:west-prussia",
+      "name": "West Prussia",
+      "ownerId": "polity:prussia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:silesia",
+      "name": "Silesia",
+      "ownerId": "polity:prussia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:magdeburg",
+      "name": "Magdeburg",
+      "ownerId": "polity:prussia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:westphalian-prussia",
+      "name": "Westphalian Prussia",
+      "ownerId": "polity:prussia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:neuchatel",
+      "name": "Neuchatel",
+      "ownerId": "polity:prussia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:madrid-and-castile",
+      "name": "Madrid and Castile",
+      "ownerId": "polity:spain",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:galicia",
+      "name": "Galicia",
+      "ownerId": "polity:spain",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:basque-provinces-and-navarre",
+      "name": "Basque Provinces and Navarre",
+      "ownerId": "polity:spain",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:aragon",
+      "name": "Aragon",
+      "ownerId": "polity:spain",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:catalonia",
+      "name": "Catalonia",
+      "ownerId": "polity:spain",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:valencia-and-murcia",
+      "name": "Valencia and Murcia",
+      "ownerId": "polity:spain",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:andalusia",
+      "name": "Andalusia",
+      "ownerId": "polity:spain",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:balearic-islands",
+      "name": "Balearic Islands",
+      "ownerId": "polity:spain",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:thrace-and-constantinople",
+      "name": "Thrace and Constantinople",
+      "ownerId": "polity:ottoman-empire",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:rumelia-east",
+      "name": "Rumelia East",
+      "ownerId": "polity:ottoman-empire",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:rumelia-west",
+      "name": "Rumelia West",
+      "ownerId": "polity:ottoman-empire",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:bosnia",
+      "name": "Bosnia",
+      "ownerId": "polity:ottoman-empire",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:danubian-principalities",
+      "name": "Danubian Principalities",
+      "ownerId": "polity:ottoman-empire",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:morea-and-aegean",
+      "name": "Morea and Aegean",
+      "ownerId": "polity:ottoman-empire",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:western-anatolia",
+      "name": "Western Anatolia",
+      "ownerId": "polity:ottoman-empire",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:svealand",
+      "name": "Svealand",
+      "ownerId": "polity:sweden",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:gotaland",
+      "name": "Gotaland",
+      "ownerId": "polity:sweden",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:norrland",
+      "name": "Norrland",
+      "ownerId": "polity:sweden",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:swedish-pomerania",
+      "name": "Swedish Pomerania",
+      "ownerId": "polity:sweden",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:finland",
+      "name": "Finland",
+      "ownerId": "polity:sweden",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:zealand",
+      "name": "Zealand",
+      "ownerId": "polity:denmark-norway",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:jutland",
+      "name": "Jutland",
+      "ownerId": "polity:denmark-norway",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:schleswig-holstein",
+      "name": "Schleswig-Holstein",
+      "ownerId": "polity:denmark-norway",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:southern-norway",
+      "name": "Southern Norway",
+      "ownerId": "polity:denmark-norway",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:northern-norway",
+      "name": "Northern Norway",
+      "ownerId": "polity:denmark-norway",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:campania",
+      "name": "Campania",
+      "ownerId": "polity:naples-sicily",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:apulia-and-calabria",
+      "name": "Apulia and Calabria",
+      "ownerId": "polity:naples-sicily",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:sicily-east",
+      "name": "Sicily East",
+      "ownerId": "polity:naples-sicily",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:sicily-west",
+      "name": "Sicily West",
+      "ownerId": "polity:naples-sicily",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:milan-and-lombardy",
+      "name": "Milan and Lombardy",
+      "ownerId": "polity:italy",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:emilia",
+      "name": "Emilia",
+      "ownerId": "polity:italy",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:romagna",
+      "name": "Romagna",
+      "ownerId": "polity:italy",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:modena",
+      "name": "Modena",
+      "ownerId": "polity:italy",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:mantua",
+      "name": "Mantua",
+      "ownerId": "polity:italy",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:upper-bavaria",
+      "name": "Upper Bavaria",
+      "ownerId": "polity:bavaria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:lower-bavaria",
+      "name": "Lower Bavaria",
+      "ownerId": "polity:bavaria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:franconian-bavaria",
+      "name": "Franconian Bavaria",
+      "ownerId": "polity:bavaria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:holland",
+      "name": "Holland",
+      "ownerId": "polity:batavian-republic",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:friesland",
+      "name": "Friesland",
+      "ownerId": "polity:batavian-republic",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:batavian-interior",
+      "name": "Batavian Interior",
+      "ownerId": "polity:batavian-republic",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:northern-portugal",
+      "name": "Northern Portugal",
+      "ownerId": "polity:portugal",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:central-portugal",
+      "name": "Central Portugal",
+      "ownerId": "polity:portugal",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:southern-portugal",
+      "name": "Southern Portugal",
+      "ownerId": "polity:portugal",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:western-switzerland",
+      "name": "Western Switzerland",
+      "ownerId": "polity:swiss-confederation",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:central-switzerland",
+      "name": "Central Switzerland",
+      "ownerId": "polity:swiss-confederation",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:eastern-switzerland",
+      "name": "Eastern Switzerland",
+      "ownerId": "polity:swiss-confederation",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:dresden-and-meissen",
+      "name": "Dresden and Meissen",
+      "ownerId": "polity:saxony",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:leipzig-and-thuringian-saxony",
+      "name": "Leipzig and Thuringian Saxony",
+      "ownerId": "polity:saxony",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:stuttgart-and-neckar",
+      "name": "Stuttgart and Neckar",
+      "ownerId": "polity:wurttemberg",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:swabian-wurttemberg",
+      "name": "Swabian Württemberg",
+      "ownerId": "polity:wurttemberg",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:upper-baden",
+      "name": "Upper Baden",
+      "ownerId": "polity:baden",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:lower-baden",
+      "name": "Lower Baden",
+      "ownerId": "polity:baden",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:hanover",
+      "name": "Hanover",
+      "ownerId": "polity:hanover",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:bremen-verden",
+      "name": "Bremen-Verden",
+      "ownerId": "polity:hanover",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:rome-and-lazio",
+      "name": "Rome and Lazio",
+      "ownerId": "polity:papal-states",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:umbria-and-marche",
+      "name": "Umbria and Marche",
+      "ownerId": "polity:papal-states",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:tuscany",
+      "name": "Tuscany",
+      "ownerId": "polity:etruria",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:liguria",
+      "name": "Liguria",
+      "ownerId": "polity:ligurian-republic",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:sardinia",
+      "name": "Sardinia",
+      "ownerId": "polity:sardinia",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:hesse-kassel",
+      "name": "Hesse-Kassel",
+      "ownerId": "polity:hesse-kassel",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:hesse-darmstadt",
+      "name": "Hesse-Darmstadt",
+      "ownerId": "polity:hesse-darmstadt",
+      "geometryStatus": "unknown"
+    },
+    {
+      "id": "region:nap1805:brunswick",
+      "name": "Brunswick",
+      "ownerId": "polity:brunswick",
+      "geometryStatus": "unknown"
+    }
+  ]
+}

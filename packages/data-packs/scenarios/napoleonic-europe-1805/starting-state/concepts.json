@@ -1,0 +1,119 @@
+{
+  "concept:staff-system": {
+    "id": "concept:staff-system",
+    "type": "doctrine",
+    "semanticKey": "staff-system",
+    "displayName": {
+      "en": "Staff planning"
+    },
+    "description": {
+      "en": "Institutional staff planning and operational coordination."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:france"
+      ],
+      "originMonth": "1805-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:nap1805-concept-staff-system"
+    ],
+    "domains": [
+      "domain:military",
+      "domain:communication"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {
+        "polity:france": 10000,
+        "polity:austria": 10000,
+        "polity:prussia": 10000,
+        "polity:russia": 10000
+      },
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:nap1805-concept-staff-system",
+    "evidenceIds": [
+      "evidence:nap1805-concept-staff-system"
+    ]
+  },
+  "concept:mass-conscription": {
+    "id": "concept:mass-conscription",
+    "type": "economic-practice",
+    "semanticKey": "mass-conscription",
+    "displayName": {
+      "en": "Mass conscription"
+    },
+    "description": {
+      "en": "State systems for large-scale conscription and levy administration."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:france"
+      ],
+      "originMonth": "1805-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:nap1805-concept-mass-conscription"
+    ],
+    "domains": [
+      "domain:military",
+      "domain:communication"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {
+        "polity:france": 10000
+      },
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:nap1805-concept-mass-conscription",
+    "evidenceIds": [
+      "evidence:nap1805-concept-mass-conscription"
+    ]
+  },
+  "concept:optical-telegraph": {
+    "id": "concept:optical-telegraph",
+    "type": "technology",
+    "semanticKey": "optical-telegraph",
+    "displayName": {
+      "en": "Optical telegraphy"
+    },
+    "description": {
+      "en": "Long-distance semaphore communication where infrastructure exists."
+    },
+    "origin": {
+      "originEntityRefs": [
+        "polity:france"
+      ],
+      "originMonth": "1805-01-01"
+    },
+    "parentConceptIds": [],
+    "supportingEvidenceIds": [
+      "evidence:nap1805-concept-optical-telegraph"
+    ],
+    "domains": [
+      "domain:military",
+      "domain:communication"
+    ],
+    "status": "institutionalized",
+    "maturityBp": 10000,
+    "diffusion": {},
+    "adoption": {
+      "polities": {
+        "polity:france": 10000
+      },
+      "regions": {}
+    },
+    "sourceEvidenceId": "evidence:nap1805-concept-optical-telegraph",
+    "evidenceIds": [
+      "evidence:nap1805-concept-optical-telegraph"
+    ]
+  }
+}

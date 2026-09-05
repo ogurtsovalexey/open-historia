@@ -1,0 +1,22 @@
+{
+  "scenarioId": "scenario:napoleonic-europe-1805",
+  "historicalBoundary": "1805-01-01",
+  "modeledQuantities": {
+    "status": "modeled-central-estimates",
+    "rule": "All integer quantities are canonical simulation controls. They are causally operative from turn one but must be presented as modeled estimates wherever their bound evidence confidence is low.",
+    "populationMethod": "Polity controls use nearby 1800/1801 population series and are allocated to strategic regions by declared integer weights and largest remainder.",
+    "derivedRatios": {
+      "workforceParticipationBp": 5000,
+      "recruitmentEligibilityBp": 1200,
+      "playableMobilizedShareBp": 100,
+      "otherMobilizedShareBp": 60,
+      "treasuryMonthsOfFiscalBase": 6
+    }
+  },
+  "methodology": [
+    "Starting facts only; no post-boundary result is authored.",
+    "Region names are strategic aggregates from canon section 21.2 and are not asserted as exact administrative boundaries.",
+    "The Italian Republic and Ligurian Republic exist at the January boundary; later crown and annexation changes require committed causal events.",
+    "Population, capacity, treasury, stockpile, formation and equipment integers are playable central estimates with low-confidence provenance, never claims of archival precision."
+  ]
+}

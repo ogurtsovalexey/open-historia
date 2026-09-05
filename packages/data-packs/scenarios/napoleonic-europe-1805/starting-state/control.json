@@ -1,0 +1,2170 @@
+{
+  "region:nap1805:paris-and-seine": {
+    "id": "region:nap1805:paris-and-seine",
+    "displayName": {
+      "en": "Paris and Seine"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 3065,
+    "productiveCapacity": 6130,
+    "supplyCapacity": 12260,
+    "resources": {
+      "commodity:grain": 38315,
+      "commodity:timber": 7663
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-paris-and-seine"
+    ]
+  },
+  "region:nap1805:normandy": {
+    "id": "region:nap1805:normandy",
+    "displayName": {
+      "en": "Normandy"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507,
+      "commodity:horses": 2003
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-normandy"
+    ]
+  },
+  "region:nap1805:brittany": {
+    "id": "region:nap1805:brittany",
+    "displayName": {
+      "en": "Brittany"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-brittany"
+    ]
+  },
+  "region:nap1805:loire": {
+    "id": "region:nap1805:loire",
+    "displayName": {
+      "en": "Loire"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-loire"
+    ]
+  },
+  "region:nap1805:aquitaine": {
+    "id": "region:nap1805:aquitaine",
+    "displayName": {
+      "en": "Aquitaine"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-aquitaine"
+    ]
+  },
+  "region:nap1805:pyrenees": {
+    "id": "region:nap1805:pyrenees",
+    "displayName": {
+      "en": "Pyrenees"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-pyrenees"
+    ]
+  },
+  "region:nap1805:languedoc": {
+    "id": "region:nap1805:languedoc",
+    "displayName": {
+      "en": "Languedoc"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-languedoc"
+    ]
+  },
+  "region:nap1805:provence": {
+    "id": "region:nap1805:provence",
+    "displayName": {
+      "en": "Provence"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-provence"
+    ]
+  },
+  "region:nap1805:alps": {
+    "id": "region:nap1805:alps",
+    "displayName": {
+      "en": "Alps"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-alps"
+    ]
+  },
+  "region:nap1805:burgundy": {
+    "id": "region:nap1805:burgundy",
+    "displayName": {
+      "en": "Burgundy"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-burgundy"
+    ]
+  },
+  "region:nap1805:alsace": {
+    "id": "region:nap1805:alsace",
+    "displayName": {
+      "en": "Alsace"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-alsace"
+    ]
+  },
+  "region:nap1805:lorraine": {
+    "id": "region:nap1805:lorraine",
+    "displayName": {
+      "en": "Lorraine"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-lorraine"
+    ]
+  },
+  "region:nap1805:champagne": {
+    "id": "region:nap1805:champagne",
+    "displayName": {
+      "en": "Champagne"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-champagne"
+    ]
+  },
+  "region:nap1805:picardy": {
+    "id": "region:nap1805:picardy",
+    "displayName": {
+      "en": "Picardy"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-picardy"
+    ]
+  },
+  "region:nap1805:flanders": {
+    "id": "region:nap1805:flanders",
+    "displayName": {
+      "en": "Flanders"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1803,
+    "productiveCapacity": 3606,
+    "supplyCapacity": 7212,
+    "resources": {
+      "commodity:grain": 22538,
+      "commodity:timber": 4507
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-flanders"
+    ]
+  },
+  "region:nap1805:corsica": {
+    "id": "region:nap1805:corsica",
+    "displayName": {
+      "en": "Corsica"
+    },
+    "legalOwnerPolityId": "polity:france",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 991,
+    "productiveCapacity": 1983,
+    "supplyCapacity": 3966,
+    "resources": {
+      "commodity:grain": 12396,
+      "commodity:timber": 2479
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-corsica"
+    ]
+  },
+  "region:nap1805:london-and-home-counties": {
+    "id": "region:nap1805:london-and-home-counties",
+    "displayName": {
+      "en": "London and Home Counties"
+    },
+    "legalOwnerPolityId": "polity:united-kingdom",
+    "actualControllerPolityId": "polity:united-kingdom",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 2995,
+    "productiveCapacity": 5991,
+    "supplyCapacity": 11982,
+    "resources": {
+      "commodity:grain": 37445,
+      "commodity:timber": 7489
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-london-and-home-counties"
+    ]
+  },
+  "region:nap1805:southwest-england": {
+    "id": "region:nap1805:southwest-england",
+    "displayName": {
+      "en": "Southwest England"
+    },
+    "legalOwnerPolityId": "polity:united-kingdom",
+    "actualControllerPolityId": "polity:united-kingdom",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1762,
+    "productiveCapacity": 3524,
+    "supplyCapacity": 7048,
+    "resources": {
+      "commodity:grain": 22027,
+      "commodity:timber": 4405
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-southwest-england"
+    ]
+  },
+  "region:nap1805:midlands": {
+    "id": "region:nap1805:midlands",
+    "displayName": {
+      "en": "Midlands"
+    },
+    "legalOwnerPolityId": "polity:united-kingdom",
+    "actualControllerPolityId": "polity:united-kingdom",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1762,
+    "productiveCapacity": 3524,
+    "supplyCapacity": 7048,
+    "resources": {
+      "commodity:grain": 22027,
+      "commodity:timber": 4405,
+      "commodity:iron": 1468
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-midlands"
+    ]
+  },
+  "region:nap1805:northern-england": {
+    "id": "region:nap1805:northern-england",
+    "displayName": {
+      "en": "Northern England"
+    },
+    "legalOwnerPolityId": "polity:united-kingdom",
+    "actualControllerPolityId": "polity:united-kingdom",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1762,
+    "productiveCapacity": 3524,
+    "supplyCapacity": 7048,
+    "resources": {
+      "commodity:grain": 22027,
+      "commodity:timber": 4405
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-northern-england"
+    ]
+  },
+  "region:nap1805:wales": {
+    "id": "region:nap1805:wales",
+    "displayName": {
+      "en": "Wales"
+    },
+    "legalOwnerPolityId": "polity:united-kingdom",
+    "actualControllerPolityId": "polity:united-kingdom",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1762,
+    "productiveCapacity": 3524,
+    "supplyCapacity": 7048,
+    "resources": {
+      "commodity:grain": 22027,
+      "commodity:timber": 4405,
+      "commodity:iron": 1468
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-wales"
+    ]
+  },
+  "region:nap1805:scottish-lowlands": {
+    "id": "region:nap1805:scottish-lowlands",
+    "displayName": {
+      "en": "Scottish Lowlands"
+    },
+    "legalOwnerPolityId": "polity:united-kingdom",
+    "actualControllerPolityId": "polity:united-kingdom",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1762,
+    "productiveCapacity": 3524,
+    "supplyCapacity": 7048,
+    "resources": {
+      "commodity:grain": 22027,
+      "commodity:timber": 4405
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-scottish-lowlands"
+    ]
+  },
+  "region:nap1805:scottish-highlands": {
+    "id": "region:nap1805:scottish-highlands",
+    "displayName": {
+      "en": "Scottish Highlands"
+    },
+    "legalOwnerPolityId": "polity:united-kingdom",
+    "actualControllerPolityId": "polity:united-kingdom",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 969,
+    "productiveCapacity": 1938,
+    "supplyCapacity": 3876,
+    "resources": {
+      "commodity:grain": 12114,
+      "commodity:timber": 2422
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-scottish-highlands"
+    ]
+  },
+  "region:nap1805:ireland": {
+    "id": "region:nap1805:ireland",
+    "displayName": {
+      "en": "Ireland"
+    },
+    "legalOwnerPolityId": "polity:united-kingdom",
+    "actualControllerPolityId": "polity:united-kingdom",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1762,
+    "productiveCapacity": 3524,
+    "supplyCapacity": 7048,
+    "resources": {
+      "commodity:grain": 22027,
+      "commodity:timber": 4405,
+      "commodity:horses": 1957
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-ireland"
+    ]
+  },
+  "region:nap1805:gibraltar": {
+    "id": "region:nap1805:gibraltar",
+    "displayName": {
+      "en": "Gibraltar"
+    },
+    "legalOwnerPolityId": "polity:united-kingdom",
+    "actualControllerPolityId": "polity:united-kingdom",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1762,
+    "productiveCapacity": 3524,
+    "supplyCapacity": 7048,
+    "resources": {
+      "commodity:grain": 22027,
+      "commodity:timber": 4405
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-gibraltar"
+    ]
+  },
+  "region:nap1805:vienna-and-lower-austria": {
+    "id": "region:nap1805:vienna-and-lower-austria",
+    "displayName": {
+      "en": "Vienna and Lower Austria"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 3356,
+    "productiveCapacity": 6712,
+    "supplyCapacity": 13425,
+    "resources": {
+      "commodity:grain": 41955,
+      "commodity:timber": 8391
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-vienna-and-lower-austria"
+    ]
+  },
+  "region:nap1805:upper-austria": {
+    "id": "region:nap1805:upper-austria",
+    "displayName": {
+      "en": "Upper Austria"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1974,
+    "productiveCapacity": 3948,
+    "supplyCapacity": 7897,
+    "resources": {
+      "commodity:grain": 24679,
+      "commodity:timber": 4935
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-upper-austria"
+    ]
+  },
+  "region:nap1805:salzburg": {
+    "id": "region:nap1805:salzburg",
+    "displayName": {
+      "en": "Salzburg"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1974,
+    "productiveCapacity": 3948,
+    "supplyCapacity": 7897,
+    "resources": {
+      "commodity:grain": 24679,
+      "commodity:timber": 4935
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-salzburg"
+    ]
+  },
+  "region:nap1805:bohemia": {
+    "id": "region:nap1805:bohemia",
+    "displayName": {
+      "en": "Bohemia"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1974,
+    "productiveCapacity": 3948,
+    "supplyCapacity": 7897,
+    "resources": {
+      "commodity:grain": 24679,
+      "commodity:timber": 4935,
+      "commodity:iron": 1645
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-bohemia"
+    ]
+  },
+  "region:nap1805:moravia": {
+    "id": "region:nap1805:moravia",
+    "displayName": {
+      "en": "Moravia"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1974,
+    "productiveCapacity": 3948,
+    "supplyCapacity": 7897,
+    "resources": {
+      "commodity:grain": 24679,
+      "commodity:timber": 4935
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-moravia"
+    ]
+  },
+  "region:nap1805:austrian-silesia": {
+    "id": "region:nap1805:austrian-silesia",
+    "displayName": {
+      "en": "Austrian Silesia"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1974,
+    "productiveCapacity": 3948,
+    "supplyCapacity": 7897,
+    "resources": {
+      "commodity:grain": 24679,
+      "commodity:timber": 4935,
+      "commodity:iron": 1645
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-austrian-silesia"
+    ]
+  },
+  "region:nap1805:tyrol": {
+    "id": "region:nap1805:tyrol",
+    "displayName": {
+      "en": "Tyrol"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1974,
+    "productiveCapacity": 3948,
+    "supplyCapacity": 7897,
+    "resources": {
+      "commodity:grain": 24679,
+      "commodity:timber": 4935
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-tyrol"
+    ]
+  },
+  "region:nap1805:carinthia-and-carniola": {
+    "id": "region:nap1805:carinthia-and-carniola",
+    "displayName": {
+      "en": "Carinthia and Carniola"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1974,
+    "productiveCapacity": 3948,
+    "supplyCapacity": 7897,
+    "resources": {
+      "commodity:grain": 24679,
+      "commodity:timber": 4935
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-carinthia-and-carniola"
+    ]
+  },
+  "region:nap1805:hungary-west": {
+    "id": "region:nap1805:hungary-west",
+    "displayName": {
+      "en": "Hungary West"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1974,
+    "productiveCapacity": 3948,
+    "supplyCapacity": 7897,
+    "resources": {
+      "commodity:grain": 24679,
+      "commodity:timber": 4935,
+      "commodity:horses": 2193
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-hungary-west"
+    ]
+  },
+  "region:nap1805:hungary-east": {
+    "id": "region:nap1805:hungary-east",
+    "displayName": {
+      "en": "Hungary East"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1974,
+    "productiveCapacity": 3948,
+    "supplyCapacity": 7897,
+    "resources": {
+      "commodity:grain": 24679,
+      "commodity:timber": 4935,
+      "commodity:horses": 2193
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-hungary-east"
+    ]
+  },
+  "region:nap1805:venetia": {
+    "id": "region:nap1805:venetia",
+    "displayName": {
+      "en": "Venetia"
+    },
+    "legalOwnerPolityId": "polity:austria",
+    "actualControllerPolityId": "polity:austria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1974,
+    "productiveCapacity": 3948,
+    "supplyCapacity": 7897,
+    "resources": {
+      "commodity:grain": 24679,
+      "commodity:timber": 4935
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-venetia"
+    ]
+  },
+  "region:nap1805:baltic-provinces": {
+    "id": "region:nap1805:baltic-provinces",
+    "displayName": {
+      "en": "Baltic Provinces"
+    },
+    "legalOwnerPolityId": "polity:russia",
+    "actualControllerPolityId": "polity:russia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 2857,
+    "productiveCapacity": 5714,
+    "supplyCapacity": 11428,
+    "resources": {
+      "commodity:grain": 35714,
+      "commodity:timber": 7142
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-baltic-provinces"
+    ]
+  },
+  "region:nap1805:lithuania": {
+    "id": "region:nap1805:lithuania",
+    "displayName": {
+      "en": "Lithuania"
+    },
+    "legalOwnerPolityId": "polity:russia",
+    "actualControllerPolityId": "polity:russia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 2857,
+    "productiveCapacity": 5714,
+    "supplyCapacity": 11428,
+    "resources": {
+      "commodity:grain": 35714,
+      "commodity:timber": 7142
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-lithuania"
+    ]
+  },
+  "region:nap1805:belarus": {
+    "id": "region:nap1805:belarus",
+    "displayName": {
+      "en": "Belarus"
+    },
+    "legalOwnerPolityId": "polity:russia",
+    "actualControllerPolityId": "polity:russia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 2857,
+    "productiveCapacity": 5714,
+    "supplyCapacity": 11428,
+    "resources": {
+      "commodity:grain": 35714,
+      "commodity:timber": 7142
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-belarus"
+    ]
+  },
+  "region:nap1805:volhynia": {
+    "id": "region:nap1805:volhynia",
+    "displayName": {
+      "en": "Volhynia"
+    },
+    "legalOwnerPolityId": "polity:russia",
+    "actualControllerPolityId": "polity:russia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 2857,
+    "productiveCapacity": 5714,
+    "supplyCapacity": 11428,
+    "resources": {
+      "commodity:grain": 35714,
+      "commodity:timber": 7142
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-volhynia"
+    ]
+  },
+  "region:nap1805:podolia": {
+    "id": "region:nap1805:podolia",
+    "displayName": {
+      "en": "Podolia"
+    },
+    "legalOwnerPolityId": "polity:russia",
+    "actualControllerPolityId": "polity:russia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 2857,
+    "productiveCapacity": 5714,
+    "supplyCapacity": 11428,
+    "resources": {
+      "commodity:grain": 35714,
+      "commodity:timber": 7142
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-podolia"
+    ]
+  },
+  "region:nap1805:ukraine-west": {
+    "id": "region:nap1805:ukraine-west",
+    "displayName": {
+      "en": "Ukraine West"
+    },
+    "legalOwnerPolityId": "polity:russia",
+    "actualControllerPolityId": "polity:russia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 2857,
+    "productiveCapacity": 5714,
+    "supplyCapacity": 11428,
+    "resources": {
+      "commodity:grain": 35714,
+      "commodity:timber": 7142,
+      "commodity:horses": 3174
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-ukraine-west"
+    ]
+  },
+  "region:nap1805:new-russia": {
+    "id": "region:nap1805:new-russia",
+    "displayName": {
+      "en": "New Russia"
+    },
+    "legalOwnerPolityId": "polity:russia",
+    "actualControllerPolityId": "polity:russia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 2857,
+    "productiveCapacity": 5714,
+    "supplyCapacity": 11428,
+    "resources": {
+      "commodity:grain": 35714,
+      "commodity:timber": 7142
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-new-russia"
+    ]
+  },
+  "region:nap1805:brandenburg": {
+    "id": "region:nap1805:brandenburg",
+    "displayName": {
+      "en": "Brandenburg"
+    },
+    "legalOwnerPolityId": "polity:prussia",
+    "actualControllerPolityId": "polity:prussia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1284,
+    "productiveCapacity": 2569,
+    "supplyCapacity": 5139,
+    "resources": {
+      "commodity:grain": 16059,
+      "commodity:timber": 3211,
+      "commodity:iron": 1070
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-brandenburg"
+    ]
+  },
+  "region:nap1805:pomerania": {
+    "id": "region:nap1805:pomerania",
+    "displayName": {
+      "en": "Pomerania"
+    },
+    "legalOwnerPolityId": "polity:prussia",
+    "actualControllerPolityId": "polity:prussia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1284,
+    "productiveCapacity": 2569,
+    "supplyCapacity": 5139,
+    "resources": {
+      "commodity:grain": 16059,
+      "commodity:timber": 3211
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-pomerania"
+    ]
+  },
+  "region:nap1805:east-prussia": {
+    "id": "region:nap1805:east-prussia",
+    "displayName": {
+      "en": "East Prussia"
+    },
+    "legalOwnerPolityId": "polity:prussia",
+    "actualControllerPolityId": "polity:prussia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1284,
+    "productiveCapacity": 2569,
+    "supplyCapacity": 5139,
+    "resources": {
+      "commodity:grain": 16059,
+      "commodity:timber": 3211,
+      "commodity:horses": 1427
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-east-prussia"
+    ]
+  },
+  "region:nap1805:west-prussia": {
+    "id": "region:nap1805:west-prussia",
+    "displayName": {
+      "en": "West Prussia"
+    },
+    "legalOwnerPolityId": "polity:prussia",
+    "actualControllerPolityId": "polity:prussia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1284,
+    "productiveCapacity": 2569,
+    "supplyCapacity": 5139,
+    "resources": {
+      "commodity:grain": 16059,
+      "commodity:timber": 3211,
+      "commodity:horses": 1427
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-west-prussia"
+    ]
+  },
+  "region:nap1805:silesia": {
+    "id": "region:nap1805:silesia",
+    "displayName": {
+      "en": "Silesia"
+    },
+    "legalOwnerPolityId": "polity:prussia",
+    "actualControllerPolityId": "polity:prussia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1284,
+    "productiveCapacity": 2569,
+    "supplyCapacity": 5139,
+    "resources": {
+      "commodity:grain": 16059,
+      "commodity:timber": 3211,
+      "commodity:iron": 1070
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-silesia"
+    ]
+  },
+  "region:nap1805:magdeburg": {
+    "id": "region:nap1805:magdeburg",
+    "displayName": {
+      "en": "Magdeburg"
+    },
+    "legalOwnerPolityId": "polity:prussia",
+    "actualControllerPolityId": "polity:prussia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1284,
+    "productiveCapacity": 2569,
+    "supplyCapacity": 5139,
+    "resources": {
+      "commodity:grain": 16059,
+      "commodity:timber": 3211
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-magdeburg"
+    ]
+  },
+  "region:nap1805:westphalian-prussia": {
+    "id": "region:nap1805:westphalian-prussia",
+    "displayName": {
+      "en": "Westphalian Prussia"
+    },
+    "legalOwnerPolityId": "polity:prussia",
+    "actualControllerPolityId": "polity:prussia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1284,
+    "productiveCapacity": 2569,
+    "supplyCapacity": 5139,
+    "resources": {
+      "commodity:grain": 16059,
+      "commodity:timber": 3211,
+      "commodity:iron": 1070,
+      "commodity:horses": 1427
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-westphalian-prussia"
+    ]
+  },
+  "region:nap1805:neuchatel": {
+    "id": "region:nap1805:neuchatel",
+    "displayName": {
+      "en": "Neuchatel"
+    },
+    "legalOwnerPolityId": "polity:prussia",
+    "actualControllerPolityId": "polity:prussia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 706,
+    "productiveCapacity": 1413,
+    "supplyCapacity": 2826,
+    "resources": {
+      "commodity:grain": 8832,
+      "commodity:timber": 1766
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-neuchatel"
+    ]
+  },
+  "region:nap1805:madrid-and-castile": {
+    "id": "region:nap1805:madrid-and-castile",
+    "displayName": {
+      "en": "Madrid and Castile"
+    },
+    "legalOwnerPolityId": "polity:spain",
+    "actualControllerPolityId": "polity:spain",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 2369,
+    "productiveCapacity": 4739,
+    "supplyCapacity": 9478,
+    "resources": {
+      "commodity:grain": 29621,
+      "commodity:timber": 5924,
+      "commodity:horses": 2632
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-madrid-and-castile"
+    ]
+  },
+  "region:nap1805:galicia": {
+    "id": "region:nap1805:galicia",
+    "displayName": {
+      "en": "Galicia"
+    },
+    "legalOwnerPolityId": "polity:spain",
+    "actualControllerPolityId": "polity:spain",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1393,
+    "productiveCapacity": 2787,
+    "supplyCapacity": 5575,
+    "resources": {
+      "commodity:grain": 17424,
+      "commodity:timber": 3484
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-galicia"
+    ]
+  },
+  "region:nap1805:basque-provinces-and-navarre": {
+    "id": "region:nap1805:basque-provinces-and-navarre",
+    "displayName": {
+      "en": "Basque Provinces and Navarre"
+    },
+    "legalOwnerPolityId": "polity:spain",
+    "actualControllerPolityId": "polity:spain",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1393,
+    "productiveCapacity": 2787,
+    "supplyCapacity": 5575,
+    "resources": {
+      "commodity:grain": 17424,
+      "commodity:timber": 3484
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-basque-provinces-and-navarre"
+    ]
+  },
+  "region:nap1805:aragon": {
+    "id": "region:nap1805:aragon",
+    "displayName": {
+      "en": "Aragon"
+    },
+    "legalOwnerPolityId": "polity:spain",
+    "actualControllerPolityId": "polity:spain",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1393,
+    "productiveCapacity": 2787,
+    "supplyCapacity": 5575,
+    "resources": {
+      "commodity:grain": 17424,
+      "commodity:timber": 3484
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-aragon"
+    ]
+  },
+  "region:nap1805:catalonia": {
+    "id": "region:nap1805:catalonia",
+    "displayName": {
+      "en": "Catalonia"
+    },
+    "legalOwnerPolityId": "polity:spain",
+    "actualControllerPolityId": "polity:spain",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1393,
+    "productiveCapacity": 2787,
+    "supplyCapacity": 5575,
+    "resources": {
+      "commodity:grain": 17424,
+      "commodity:timber": 3484
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-catalonia"
+    ]
+  },
+  "region:nap1805:valencia-and-murcia": {
+    "id": "region:nap1805:valencia-and-murcia",
+    "displayName": {
+      "en": "Valencia and Murcia"
+    },
+    "legalOwnerPolityId": "polity:spain",
+    "actualControllerPolityId": "polity:spain",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1393,
+    "productiveCapacity": 2787,
+    "supplyCapacity": 5575,
+    "resources": {
+      "commodity:grain": 17424,
+      "commodity:timber": 3484
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-valencia-and-murcia"
+    ]
+  },
+  "region:nap1805:andalusia": {
+    "id": "region:nap1805:andalusia",
+    "displayName": {
+      "en": "Andalusia"
+    },
+    "legalOwnerPolityId": "polity:spain",
+    "actualControllerPolityId": "polity:spain",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1393,
+    "productiveCapacity": 2787,
+    "supplyCapacity": 5575,
+    "resources": {
+      "commodity:grain": 17424,
+      "commodity:timber": 3484
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-andalusia"
+    ]
+  },
+  "region:nap1805:balearic-islands": {
+    "id": "region:nap1805:balearic-islands",
+    "displayName": {
+      "en": "Balearic Islands"
+    },
+    "legalOwnerPolityId": "polity:spain",
+    "actualControllerPolityId": "polity:spain",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 766,
+    "productiveCapacity": 1533,
+    "supplyCapacity": 3066,
+    "resources": {
+      "commodity:grain": 9583,
+      "commodity:timber": 1916
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-balearic-islands"
+    ]
+  },
+  "region:nap1805:thrace-and-constantinople": {
+    "id": "region:nap1805:thrace-and-constantinople",
+    "displayName": {
+      "en": "Thrace and Constantinople"
+    },
+    "legalOwnerPolityId": "polity:ottoman-empire",
+    "actualControllerPolityId": "polity:ottoman-empire",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 2207,
+    "productiveCapacity": 4415,
+    "supplyCapacity": 8831,
+    "resources": {
+      "commodity:grain": 27597,
+      "commodity:timber": 5519
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-thrace-and-constantinople"
+    ]
+  },
+  "region:nap1805:rumelia-east": {
+    "id": "region:nap1805:rumelia-east",
+    "displayName": {
+      "en": "Rumelia East"
+    },
+    "legalOwnerPolityId": "polity:ottoman-empire",
+    "actualControllerPolityId": "polity:ottoman-empire",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1298,
+    "productiveCapacity": 2597,
+    "supplyCapacity": 5194,
+    "resources": {
+      "commodity:grain": 16233,
+      "commodity:timber": 3246
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-rumelia-east"
+    ]
+  },
+  "region:nap1805:rumelia-west": {
+    "id": "region:nap1805:rumelia-west",
+    "displayName": {
+      "en": "Rumelia West"
+    },
+    "legalOwnerPolityId": "polity:ottoman-empire",
+    "actualControllerPolityId": "polity:ottoman-empire",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1298,
+    "productiveCapacity": 2597,
+    "supplyCapacity": 5194,
+    "resources": {
+      "commodity:grain": 16233,
+      "commodity:timber": 3246
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-rumelia-west"
+    ]
+  },
+  "region:nap1805:bosnia": {
+    "id": "region:nap1805:bosnia",
+    "displayName": {
+      "en": "Bosnia"
+    },
+    "legalOwnerPolityId": "polity:ottoman-empire",
+    "actualControllerPolityId": "polity:ottoman-empire",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1298,
+    "productiveCapacity": 2597,
+    "supplyCapacity": 5194,
+    "resources": {
+      "commodity:grain": 16233,
+      "commodity:timber": 3246
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-bosnia"
+    ]
+  },
+  "region:nap1805:danubian-principalities": {
+    "id": "region:nap1805:danubian-principalities",
+    "displayName": {
+      "en": "Danubian Principalities"
+    },
+    "legalOwnerPolityId": "polity:ottoman-empire",
+    "actualControllerPolityId": "polity:ottoman-empire",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1298,
+    "productiveCapacity": 2597,
+    "supplyCapacity": 5194,
+    "resources": {
+      "commodity:grain": 16233,
+      "commodity:timber": 3246
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-danubian-principalities"
+    ]
+  },
+  "region:nap1805:morea-and-aegean": {
+    "id": "region:nap1805:morea-and-aegean",
+    "displayName": {
+      "en": "Morea and Aegean"
+    },
+    "legalOwnerPolityId": "polity:ottoman-empire",
+    "actualControllerPolityId": "polity:ottoman-empire",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1298,
+    "productiveCapacity": 2597,
+    "supplyCapacity": 5194,
+    "resources": {
+      "commodity:grain": 16233,
+      "commodity:timber": 3246
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-morea-and-aegean"
+    ]
+  },
+  "region:nap1805:western-anatolia": {
+    "id": "region:nap1805:western-anatolia",
+    "displayName": {
+      "en": "Western Anatolia"
+    },
+    "legalOwnerPolityId": "polity:ottoman-empire",
+    "actualControllerPolityId": "polity:ottoman-empire",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1298,
+    "productiveCapacity": 2597,
+    "supplyCapacity": 5194,
+    "resources": {
+      "commodity:grain": 16233,
+      "commodity:timber": 3246,
+      "commodity:horses": 1443
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-western-anatolia"
+    ]
+  },
+  "region:nap1805:svealand": {
+    "id": "region:nap1805:svealand",
+    "displayName": {
+      "en": "Svealand"
+    },
+    "legalOwnerPolityId": "polity:sweden",
+    "actualControllerPolityId": "polity:sweden",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 703,
+    "productiveCapacity": 1406,
+    "supplyCapacity": 2813,
+    "resources": {
+      "commodity:grain": 8791,
+      "commodity:timber": 1758
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-svealand"
+    ]
+  },
+  "region:nap1805:gotaland": {
+    "id": "region:nap1805:gotaland",
+    "displayName": {
+      "en": "Gotaland"
+    },
+    "legalOwnerPolityId": "polity:sweden",
+    "actualControllerPolityId": "polity:sweden",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 703,
+    "productiveCapacity": 1406,
+    "supplyCapacity": 2813,
+    "resources": {
+      "commodity:grain": 8791,
+      "commodity:timber": 1758
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-gotaland"
+    ]
+  },
+  "region:nap1805:norrland": {
+    "id": "region:nap1805:norrland",
+    "displayName": {
+      "en": "Norrland"
+    },
+    "legalOwnerPolityId": "polity:sweden",
+    "actualControllerPolityId": "polity:sweden",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 386,
+    "productiveCapacity": 773,
+    "supplyCapacity": 1547,
+    "resources": {
+      "commodity:grain": 4835,
+      "commodity:timber": 967
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-norrland"
+    ]
+  },
+  "region:nap1805:swedish-pomerania": {
+    "id": "region:nap1805:swedish-pomerania",
+    "displayName": {
+      "en": "Swedish Pomerania"
+    },
+    "legalOwnerPolityId": "polity:sweden",
+    "actualControllerPolityId": "polity:sweden",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 703,
+    "productiveCapacity": 1406,
+    "supplyCapacity": 2813,
+    "resources": {
+      "commodity:grain": 8791,
+      "commodity:timber": 1758
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-swedish-pomerania"
+    ]
+  },
+  "region:nap1805:finland": {
+    "id": "region:nap1805:finland",
+    "displayName": {
+      "en": "Finland"
+    },
+    "legalOwnerPolityId": "polity:sweden",
+    "actualControllerPolityId": "polity:sweden",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 703,
+    "productiveCapacity": 1406,
+    "supplyCapacity": 2813,
+    "resources": {
+      "commodity:grain": 8791,
+      "commodity:timber": 1758
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-finland"
+    ]
+  },
+  "region:nap1805:zealand": {
+    "id": "region:nap1805:zealand",
+    "displayName": {
+      "en": "Zealand"
+    },
+    "legalOwnerPolityId": "polity:denmark-norway",
+    "actualControllerPolityId": "polity:denmark-norway",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 505,
+    "productiveCapacity": 1010,
+    "supplyCapacity": 2021,
+    "resources": {
+      "commodity:grain": 6318,
+      "commodity:timber": 1263
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-zealand"
+    ]
+  },
+  "region:nap1805:jutland": {
+    "id": "region:nap1805:jutland",
+    "displayName": {
+      "en": "Jutland"
+    },
+    "legalOwnerPolityId": "polity:denmark-norway",
+    "actualControllerPolityId": "polity:denmark-norway",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 505,
+    "productiveCapacity": 1010,
+    "supplyCapacity": 2021,
+    "resources": {
+      "commodity:grain": 6318,
+      "commodity:timber": 1263,
+      "commodity:horses": 561
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-jutland"
+    ]
+  },
+  "region:nap1805:schleswig-holstein": {
+    "id": "region:nap1805:schleswig-holstein",
+    "displayName": {
+      "en": "Schleswig-Holstein"
+    },
+    "legalOwnerPolityId": "polity:denmark-norway",
+    "actualControllerPolityId": "polity:denmark-norway",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 505,
+    "productiveCapacity": 1010,
+    "supplyCapacity": 2021,
+    "resources": {
+      "commodity:grain": 6318,
+      "commodity:timber": 1263
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-schleswig-holstein"
+    ]
+  },
+  "region:nap1805:southern-norway": {
+    "id": "region:nap1805:southern-norway",
+    "displayName": {
+      "en": "Southern Norway"
+    },
+    "legalOwnerPolityId": "polity:denmark-norway",
+    "actualControllerPolityId": "polity:denmark-norway",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 505,
+    "productiveCapacity": 1010,
+    "supplyCapacity": 2021,
+    "resources": {
+      "commodity:grain": 6318,
+      "commodity:timber": 1263
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-southern-norway"
+    ]
+  },
+  "region:nap1805:northern-norway": {
+    "id": "region:nap1805:northern-norway",
+    "displayName": {
+      "en": "Northern Norway"
+    },
+    "legalOwnerPolityId": "polity:denmark-norway",
+    "actualControllerPolityId": "polity:denmark-norway",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 278,
+    "productiveCapacity": 556,
+    "supplyCapacity": 1112,
+    "resources": {
+      "commodity:grain": 3475,
+      "commodity:timber": 695
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-northern-norway"
+    ]
+  },
+  "region:nap1805:campania": {
+    "id": "region:nap1805:campania",
+    "displayName": {
+      "en": "Campania"
+    },
+    "legalOwnerPolityId": "polity:naples-sicily",
+    "actualControllerPolityId": "polity:naples-sicily",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1525,
+    "productiveCapacity": 3050,
+    "supplyCapacity": 6100,
+    "resources": {
+      "commodity:grain": 19062,
+      "commodity:timber": 3812
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-campania"
+    ]
+  },
+  "region:nap1805:apulia-and-calabria": {
+    "id": "region:nap1805:apulia-and-calabria",
+    "displayName": {
+      "en": "Apulia and Calabria"
+    },
+    "legalOwnerPolityId": "polity:naples-sicily",
+    "actualControllerPolityId": "polity:naples-sicily",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1525,
+    "productiveCapacity": 3050,
+    "supplyCapacity": 6100,
+    "resources": {
+      "commodity:grain": 19062,
+      "commodity:timber": 3812
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-apulia-and-calabria"
+    ]
+  },
+  "region:nap1805:sicily-east": {
+    "id": "region:nap1805:sicily-east",
+    "displayName": {
+      "en": "Sicily East"
+    },
+    "legalOwnerPolityId": "polity:naples-sicily",
+    "actualControllerPolityId": "polity:naples-sicily",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1525,
+    "productiveCapacity": 3050,
+    "supplyCapacity": 6100,
+    "resources": {
+      "commodity:grain": 19062,
+      "commodity:timber": 3812
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-sicily-east"
+    ]
+  },
+  "region:nap1805:sicily-west": {
+    "id": "region:nap1805:sicily-west",
+    "displayName": {
+      "en": "Sicily West"
+    },
+    "legalOwnerPolityId": "polity:naples-sicily",
+    "actualControllerPolityId": "polity:naples-sicily",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1525,
+    "productiveCapacity": 3050,
+    "supplyCapacity": 6100,
+    "resources": {
+      "commodity:grain": 19062,
+      "commodity:timber": 3812
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-sicily-west"
+    ]
+  },
+  "region:nap1805:milan-and-lombardy": {
+    "id": "region:nap1805:milan-and-lombardy",
+    "displayName": {
+      "en": "Milan and Lombardy"
+    },
+    "legalOwnerPolityId": "polity:italy",
+    "actualControllerPolityId": "polity:italy",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1133,
+    "productiveCapacity": 2266,
+    "supplyCapacity": 4533,
+    "resources": {
+      "commodity:grain": 14166,
+      "commodity:timber": 2833
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-milan-and-lombardy"
+    ]
+  },
+  "region:nap1805:emilia": {
+    "id": "region:nap1805:emilia",
+    "displayName": {
+      "en": "Emilia"
+    },
+    "legalOwnerPolityId": "polity:italy",
+    "actualControllerPolityId": "polity:italy",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 666,
+    "productiveCapacity": 1333,
+    "supplyCapacity": 2666,
+    "resources": {
+      "commodity:grain": 8333,
+      "commodity:timber": 1666
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-emilia"
+    ]
+  },
+  "region:nap1805:romagna": {
+    "id": "region:nap1805:romagna",
+    "displayName": {
+      "en": "Romagna"
+    },
+    "legalOwnerPolityId": "polity:italy",
+    "actualControllerPolityId": "polity:italy",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 666,
+    "productiveCapacity": 1333,
+    "supplyCapacity": 2666,
+    "resources": {
+      "commodity:grain": 8333,
+      "commodity:timber": 1666
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-romagna"
+    ]
+  },
+  "region:nap1805:modena": {
+    "id": "region:nap1805:modena",
+    "displayName": {
+      "en": "Modena"
+    },
+    "legalOwnerPolityId": "polity:italy",
+    "actualControllerPolityId": "polity:italy",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 666,
+    "productiveCapacity": 1333,
+    "supplyCapacity": 2666,
+    "resources": {
+      "commodity:grain": 8333,
+      "commodity:timber": 1666
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-modena"
+    ]
+  },
+  "region:nap1805:mantua": {
+    "id": "region:nap1805:mantua",
+    "displayName": {
+      "en": "Mantua"
+    },
+    "legalOwnerPolityId": "polity:italy",
+    "actualControllerPolityId": "polity:italy",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 666,
+    "productiveCapacity": 1333,
+    "supplyCapacity": 2666,
+    "resources": {
+      "commodity:grain": 8333,
+      "commodity:timber": 1666
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-mantua"
+    ]
+  },
+  "region:nap1805:upper-bavaria": {
+    "id": "region:nap1805:upper-bavaria",
+    "displayName": {
+      "en": "Upper Bavaria"
+    },
+    "legalOwnerPolityId": "polity:bavaria",
+    "actualControllerPolityId": "polity:bavaria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1000,
+    "productiveCapacity": 2000,
+    "supplyCapacity": 4000,
+    "resources": {
+      "commodity:grain": 12500,
+      "commodity:timber": 2500,
+      "commodity:iron": 833
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-upper-bavaria"
+    ]
+  },
+  "region:nap1805:lower-bavaria": {
+    "id": "region:nap1805:lower-bavaria",
+    "displayName": {
+      "en": "Lower Bavaria"
+    },
+    "legalOwnerPolityId": "polity:bavaria",
+    "actualControllerPolityId": "polity:bavaria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1000,
+    "productiveCapacity": 2000,
+    "supplyCapacity": 4000,
+    "resources": {
+      "commodity:grain": 12500,
+      "commodity:timber": 2500,
+      "commodity:iron": 833
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-lower-bavaria"
+    ]
+  },
+  "region:nap1805:franconian-bavaria": {
+    "id": "region:nap1805:franconian-bavaria",
+    "displayName": {
+      "en": "Franconian Bavaria"
+    },
+    "legalOwnerPolityId": "polity:bavaria",
+    "actualControllerPolityId": "polity:bavaria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1000,
+    "productiveCapacity": 2000,
+    "supplyCapacity": 4000,
+    "resources": {
+      "commodity:grain": 12500,
+      "commodity:timber": 2500,
+      "commodity:iron": 833
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-franconian-bavaria"
+    ]
+  },
+  "region:nap1805:holland": {
+    "id": "region:nap1805:holland",
+    "displayName": {
+      "en": "Holland"
+    },
+    "legalOwnerPolityId": "polity:batavian-republic",
+    "actualControllerPolityId": "polity:batavian-republic",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 964,
+    "productiveCapacity": 1929,
+    "supplyCapacity": 3859,
+    "resources": {
+      "commodity:grain": 12060,
+      "commodity:timber": 2412
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-holland"
+    ]
+  },
+  "region:nap1805:friesland": {
+    "id": "region:nap1805:friesland",
+    "displayName": {
+      "en": "Friesland"
+    },
+    "legalOwnerPolityId": "polity:batavian-republic",
+    "actualControllerPolityId": "polity:batavian-republic",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 567,
+    "productiveCapacity": 1135,
+    "supplyCapacity": 2270,
+    "resources": {
+      "commodity:grain": 7094,
+      "commodity:timber": 1418
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-friesland"
+    ]
+  },
+  "region:nap1805:batavian-interior": {
+    "id": "region:nap1805:batavian-interior",
+    "displayName": {
+      "en": "Batavian Interior"
+    },
+    "legalOwnerPolityId": "polity:batavian-republic",
+    "actualControllerPolityId": "polity:batavian-republic",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 567,
+    "productiveCapacity": 1135,
+    "supplyCapacity": 2270,
+    "resources": {
+      "commodity:grain": 7094,
+      "commodity:timber": 1418
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-batavian-interior"
+    ]
+  },
+  "region:nap1805:northern-portugal": {
+    "id": "region:nap1805:northern-portugal",
+    "displayName": {
+      "en": "Northern Portugal"
+    },
+    "legalOwnerPolityId": "polity:portugal",
+    "actualControllerPolityId": "polity:portugal",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1000,
+    "productiveCapacity": 2000,
+    "supplyCapacity": 4000,
+    "resources": {
+      "commodity:grain": 12500,
+      "commodity:timber": 2500
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-northern-portugal"
+    ]
+  },
+  "region:nap1805:central-portugal": {
+    "id": "region:nap1805:central-portugal",
+    "displayName": {
+      "en": "Central Portugal"
+    },
+    "legalOwnerPolityId": "polity:portugal",
+    "actualControllerPolityId": "polity:portugal",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1000,
+    "productiveCapacity": 2000,
+    "supplyCapacity": 4000,
+    "resources": {
+      "commodity:grain": 12500,
+      "commodity:timber": 2500
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-central-portugal"
+    ]
+  },
+  "region:nap1805:southern-portugal": {
+    "id": "region:nap1805:southern-portugal",
+    "displayName": {
+      "en": "Southern Portugal"
+    },
+    "legalOwnerPolityId": "polity:portugal",
+    "actualControllerPolityId": "polity:portugal",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1000,
+    "productiveCapacity": 2000,
+    "supplyCapacity": 4000,
+    "resources": {
+      "commodity:grain": 12500,
+      "commodity:timber": 2500
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-southern-portugal"
+    ]
+  },
+  "region:nap1805:western-switzerland": {
+    "id": "region:nap1805:western-switzerland",
+    "displayName": {
+      "en": "Western Switzerland"
+    },
+    "legalOwnerPolityId": "polity:swiss-confederation",
+    "actualControllerPolityId": "polity:swiss-confederation",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 566,
+    "productiveCapacity": 1133,
+    "supplyCapacity": 2266,
+    "resources": {
+      "commodity:grain": 7083,
+      "commodity:timber": 1416
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-western-switzerland"
+    ]
+  },
+  "region:nap1805:central-switzerland": {
+    "id": "region:nap1805:central-switzerland",
+    "displayName": {
+      "en": "Central Switzerland"
+    },
+    "legalOwnerPolityId": "polity:swiss-confederation",
+    "actualControllerPolityId": "polity:swiss-confederation",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 566,
+    "productiveCapacity": 1133,
+    "supplyCapacity": 2266,
+    "resources": {
+      "commodity:grain": 7083,
+      "commodity:timber": 1416
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-central-switzerland"
+    ]
+  },
+  "region:nap1805:eastern-switzerland": {
+    "id": "region:nap1805:eastern-switzerland",
+    "displayName": {
+      "en": "Eastern Switzerland"
+    },
+    "legalOwnerPolityId": "polity:swiss-confederation",
+    "actualControllerPolityId": "polity:swiss-confederation",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 566,
+    "productiveCapacity": 1133,
+    "supplyCapacity": 2266,
+    "resources": {
+      "commodity:grain": 7083,
+      "commodity:timber": 1416
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-eastern-switzerland"
+    ]
+  },
+  "region:nap1805:dresden-and-meissen": {
+    "id": "region:nap1805:dresden-and-meissen",
+    "displayName": {
+      "en": "Dresden and Meissen"
+    },
+    "legalOwnerPolityId": "polity:saxony",
+    "actualControllerPolityId": "polity:saxony",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1000,
+    "productiveCapacity": 2000,
+    "supplyCapacity": 4000,
+    "resources": {
+      "commodity:grain": 12500,
+      "commodity:timber": 2500
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-dresden-and-meissen"
+    ]
+  },
+  "region:nap1805:leipzig-and-thuringian-saxony": {
+    "id": "region:nap1805:leipzig-and-thuringian-saxony",
+    "displayName": {
+      "en": "Leipzig and Thuringian Saxony"
+    },
+    "legalOwnerPolityId": "polity:saxony",
+    "actualControllerPolityId": "polity:saxony",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1000,
+    "productiveCapacity": 2000,
+    "supplyCapacity": 4000,
+    "resources": {
+      "commodity:grain": 12500,
+      "commodity:timber": 2500
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-leipzig-and-thuringian-saxony"
+    ]
+  },
+  "region:nap1805:stuttgart-and-neckar": {
+    "id": "region:nap1805:stuttgart-and-neckar",
+    "displayName": {
+      "en": "Stuttgart and Neckar"
+    },
+    "legalOwnerPolityId": "polity:wurttemberg",
+    "actualControllerPolityId": "polity:wurttemberg",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 350,
+    "productiveCapacity": 700,
+    "supplyCapacity": 1400,
+    "resources": {
+      "commodity:grain": 4375,
+      "commodity:timber": 875
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-stuttgart-and-neckar"
+    ]
+  },
+  "region:nap1805:swabian-wurttemberg": {
+    "id": "region:nap1805:swabian-wurttemberg",
+    "displayName": {
+      "en": "Swabian Württemberg"
+    },
+    "legalOwnerPolityId": "polity:wurttemberg",
+    "actualControllerPolityId": "polity:wurttemberg",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 350,
+    "productiveCapacity": 700,
+    "supplyCapacity": 1400,
+    "resources": {
+      "commodity:grain": 4375,
+      "commodity:timber": 875
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-swabian-wurttemberg"
+    ]
+  },
+  "region:nap1805:upper-baden": {
+    "id": "region:nap1805:upper-baden",
+    "displayName": {
+      "en": "Upper Baden"
+    },
+    "legalOwnerPolityId": "polity:baden",
+    "actualControllerPolityId": "polity:baden",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 250,
+    "productiveCapacity": 500,
+    "supplyCapacity": 1000,
+    "resources": {
+      "commodity:grain": 3125,
+      "commodity:timber": 625
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-upper-baden"
+    ]
+  },
+  "region:nap1805:lower-baden": {
+    "id": "region:nap1805:lower-baden",
+    "displayName": {
+      "en": "Lower Baden"
+    },
+    "legalOwnerPolityId": "polity:baden",
+    "actualControllerPolityId": "polity:baden",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 250,
+    "productiveCapacity": 500,
+    "supplyCapacity": 1000,
+    "resources": {
+      "commodity:grain": 3125,
+      "commodity:timber": 625
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-lower-baden"
+    ]
+  },
+  "region:nap1805:hanover": {
+    "id": "region:nap1805:hanover",
+    "displayName": {
+      "en": "Hanover"
+    },
+    "legalOwnerPolityId": "polity:hanover",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:occupation",
+    "fiscalBase": 400,
+    "productiveCapacity": 800,
+    "supplyCapacity": 1600,
+    "resources": {
+      "commodity:grain": 5000,
+      "commodity:timber": 1000
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-hanover"
+    ]
+  },
+  "region:nap1805:bremen-verden": {
+    "id": "region:nap1805:bremen-verden",
+    "displayName": {
+      "en": "Bremen-Verden"
+    },
+    "legalOwnerPolityId": "polity:hanover",
+    "actualControllerPolityId": "polity:france",
+    "controlProfileId": "control-profile:occupation",
+    "fiscalBase": 400,
+    "productiveCapacity": 800,
+    "supplyCapacity": 1600,
+    "resources": {
+      "commodity:grain": 5000,
+      "commodity:timber": 1000
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-bremen-verden"
+    ]
+  },
+  "region:nap1805:rome-and-lazio": {
+    "id": "region:nap1805:rome-and-lazio",
+    "displayName": {
+      "en": "Rome and Lazio"
+    },
+    "legalOwnerPolityId": "polity:papal-states",
+    "actualControllerPolityId": "polity:papal-states",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1511,
+    "productiveCapacity": 3022,
+    "supplyCapacity": 6044,
+    "resources": {
+      "commodity:grain": 18888,
+      "commodity:timber": 3777
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-rome-and-lazio"
+    ]
+  },
+  "region:nap1805:umbria-and-marche": {
+    "id": "region:nap1805:umbria-and-marche",
+    "displayName": {
+      "en": "Umbria and Marche"
+    },
+    "legalOwnerPolityId": "polity:papal-states",
+    "actualControllerPolityId": "polity:papal-states",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 888,
+    "productiveCapacity": 1777,
+    "supplyCapacity": 3555,
+    "resources": {
+      "commodity:grain": 11111,
+      "commodity:timber": 2222
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-umbria-and-marche"
+    ]
+  },
+  "region:nap1805:tuscany": {
+    "id": "region:nap1805:tuscany",
+    "displayName": {
+      "en": "Tuscany"
+    },
+    "legalOwnerPolityId": "polity:etruria",
+    "actualControllerPolityId": "polity:etruria",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1000,
+    "productiveCapacity": 2000,
+    "supplyCapacity": 4000,
+    "resources": {
+      "commodity:grain": 12500,
+      "commodity:timber": 2500
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-tuscany"
+    ]
+  },
+  "region:nap1805:liguria": {
+    "id": "region:nap1805:liguria",
+    "displayName": {
+      "en": "Liguria"
+    },
+    "legalOwnerPolityId": "polity:ligurian-republic",
+    "actualControllerPolityId": "polity:ligurian-republic",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 600,
+    "productiveCapacity": 1200,
+    "supplyCapacity": 2400,
+    "resources": {
+      "commodity:grain": 7500,
+      "commodity:timber": 1500
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-liguria"
+    ]
+  },
+  "region:nap1805:sardinia": {
+    "id": "region:nap1805:sardinia",
+    "displayName": {
+      "en": "Sardinia"
+    },
+    "legalOwnerPolityId": "polity:sardinia",
+    "actualControllerPolityId": "polity:sardinia",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 1600,
+    "productiveCapacity": 3200,
+    "supplyCapacity": 6400,
+    "resources": {
+      "commodity:grain": 20000,
+      "commodity:timber": 4000
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-sardinia"
+    ]
+  },
+  "region:nap1805:hesse-kassel": {
+    "id": "region:nap1805:hesse-kassel",
+    "displayName": {
+      "en": "Hesse-Kassel"
+    },
+    "legalOwnerPolityId": "polity:hesse-kassel",
+    "actualControllerPolityId": "polity:hesse-kassel",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 450,
+    "productiveCapacity": 900,
+    "supplyCapacity": 1800,
+    "resources": {
+      "commodity:grain": 5625,
+      "commodity:timber": 1125
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-hesse-kassel"
+    ]
+  },
+  "region:nap1805:hesse-darmstadt": {
+    "id": "region:nap1805:hesse-darmstadt",
+    "displayName": {
+      "en": "Hesse-Darmstadt"
+    },
+    "legalOwnerPolityId": "polity:hesse-darmstadt",
+    "actualControllerPolityId": "polity:hesse-darmstadt",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 350,
+    "productiveCapacity": 700,
+    "supplyCapacity": 1400,
+    "resources": {
+      "commodity:grain": 4375,
+      "commodity:timber": 875
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-hesse-darmstadt"
+    ]
+  },
+  "region:nap1805:brunswick": {
+    "id": "region:nap1805:brunswick",
+    "displayName": {
+      "en": "Brunswick"
+    },
+    "legalOwnerPolityId": "polity:brunswick",
+    "actualControllerPolityId": "polity:brunswick",
+    "controlProfileId": "control-profile:sovereign",
+    "fiscalBase": 200,
+    "productiveCapacity": 400,
+    "supplyCapacity": 800,
+    "resources": {
+      "commodity:grain": 2500,
+      "commodity:timber": 500
+    },
+    "evidenceIds": [
+      "evidence:nap1805-region-brunswick"
+    ]
+  }
+}
