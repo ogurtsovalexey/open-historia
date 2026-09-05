@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { playerInputModelJsonSchema, renderPlayerInputPrompt } from "./livingWorldAi.js";
+import { PLAYER_INPUT_SYSTEM_PROMPT, playerInputModelJsonSchema, renderPlayerInputPrompt } from "./livingWorldAi.js";
 
 const context = {
   revision: `sha256:${"1".repeat(64)}`,
@@ -25,6 +25,11 @@ describe("living-world semantic AI boundary", () => {
     assert.match(prompt, /\[OPEN_INITIATIVE_CONTRACT\]/u);
     assert.ok(prompt.endsWith(JSON.stringify(injection)));
     assert.equal(prompt.split("\n").at(-1), JSON.stringify(injection));
+  });
+
+  it("does not treat negated or hypothetical wording as a world-state claim", () => {
+    assert.match(PLAYER_INPUT_SYSTEM_PROMPT, /affirmative factual claim/i);
+    assert.match(PLAYER_INPUT_SYSTEM_PROMPT, /Do not emit a claim for a denial, a cautionary condition, a hypothetical/i);
   });
 
   it("constrains model IDs, evidence, pace and effects to the supplied envelope", () => {
