@@ -324,6 +324,35 @@ describe('scenario-neutral process kernel', () => {
     assert.ok(evidence.canonicalPointers.includes('/regions/0/productiveCapacity'));
   });
 
+  it('materializes selected checkpoint effects with engine-owned magnitudes and no later model call', () => {
+    const run = (): WorldStateV2 => {
+      let state = stampWorldStateRevision(worldInput());
+      const accepted = acceptSemanticProcessProposal(
+        state,
+        proposal('technology', 'Water power', 'automatic-checkpoint-effect'),
+        emptyPlan(),
+      );
+      state = applyProcessDecision(accepted.state, {
+        processId: accepted.processId,
+        direction: 'direction:experimental',
+        pace: 'breakthrough',
+        effectSelections: [{ kind: 'capacity.modify', targetEntityRef: 'polity:test' }],
+        evidenceIds: ['evidence:grounding'],
+      }).state;
+      for (let step = 0; step < 30; step += 1) state = advanceOneMonth(state, accepted.processId);
+      return state;
+    };
+    const first = run();
+    const replay = run();
+    assert.deepStrictEqual(replay, first);
+    assert.strictEqual(first.processes[0]!.stage, 'demonstrated');
+    assert.strictEqual(first.regions[0]!.productiveCapacity, 101);
+    const effectEvent = first.events.find((entry) => entry.kind === 'process-advanced-demonstrated');
+    assert.ok(effectEvent?.entityRefs.some((ref) => ref === 'region:test:capital'));
+    const evidence = first.evidence.find((entry) => entry.eventRefs.includes(effectEvent!.eventId));
+    assert.ok(evidence?.canonicalPointers.includes('/regions/0/productiveCapacity'));
+  });
+
   it('rejects cyclic concept dependencies', () => {
     const state = stampWorldStateRevision(worldInput());
     const base = acceptSemanticProcessProposal(state, proposal('technology', 'Electricity', 'cycle-a'), emptyPlan()).state;

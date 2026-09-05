@@ -271,7 +271,7 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
     entities,
     evidence,
     allowedInitiativeKinds: ['technology', 'ideology', 'institution', 'doctrine', 'movement', 'project', 'investigation', 'other'],
-    allowedEffectFamilies: [...processes.effectKinds],
+    allowedEffectFamilies: [...processes.materializableEffectKinds],
   };
   if (JSON.stringify(context).length > 50_000) throw new Error('Player intent context exceeds the bounded semantic prompt budget.');
   return context;

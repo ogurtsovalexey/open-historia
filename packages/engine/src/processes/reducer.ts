@@ -10,6 +10,7 @@ import {
 import {
   applyPermanentEffect,
   assertEffectFamiliesAllowed,
+  deriveCheckpointPermanentEffects,
   type AppliedPermanentEffect,
   type PermanentEffect,
 } from './effects.js';
@@ -339,17 +340,25 @@ export function advanceProcessDeterministically(
     processes: state.processes.map((entry) => entry.processId === processId ? updatedProcess : entry),
     concepts: state.concepts.map((entry) => entry.conceptId === process.conceptId ? evolveConcept(entry, updatedProcess) : entry),
   };
+  const checkpointEffects = permanentEffects.length > 0
+    ? permanentEffects
+    : reachedBoundary ? deriveCheckpointPermanentEffects(state, process, stage) : [];
   const appliedEffects: AppliedPermanentEffect[] = [];
-  if (permanentEffects.length > 0 && !reachedBoundary) throw new Error('Effects apply only at a stage boundary');
-  if (permanentEffects.length > 0 && stages.indexOf(stage) < stages.indexOf('demonstrated')) {
+  if (checkpointEffects.length > 0 && !reachedBoundary) throw new Error('Effects apply only at a stage boundary');
+  if (checkpointEffects.length > 0 && stages.indexOf(stage) < stages.indexOf('demonstrated')) {
     throw new Error(`Effects cannot apply before the demonstrated stage`);
   }
-  assertEffectFamiliesAllowed(permanentEffects.map((effect) => effect.kind), process.compatibleEffectFamilies);
-  assertEffectFamiliesAllowed(permanentEffects.map((effect) => effect.kind), process.selectedEffectFamilies);
-  for (const effect of permanentEffects) {
-    if (!process.selectedEffects.some((selection) => (
-      selection.kind === effect.kind && selection.targetEntityRef === effect.targetEntityRef
-    ))) throw new Error(`Effect ${effect.kind} on ${effect.targetEntityRef} was not selected at a semantic checkpoint`);
+  assertEffectFamiliesAllowed(checkpointEffects.map((effect) => effect.kind), process.compatibleEffectFamilies);
+  assertEffectFamiliesAllowed(checkpointEffects.map((effect) => effect.kind), process.selectedEffectFamilies);
+  for (const effect of checkpointEffects) {
+    if (!process.selectedEffects.some((selection) => {
+      if (selection.kind !== effect.kind) return false;
+      if (selection.targetEntityRef === effect.targetEntityRef) return true;
+      return state.regions.some((region) => (
+        region.regionId === effect.targetEntityRef
+        && region.control.actualControllerPolityId === selection.targetEntityRef
+      ));
+    })) throw new Error(`Effect ${effect.kind} on ${effect.targetEntityRef} was not selected at a semantic checkpoint`);
     if (effect.sourceProcessId !== processId) throw new Error(`Effect source ${effect.sourceProcessId} does not match process ${processId}`);
     const result = applyPermanentEffect(mutated, effect);
     mutated = result.state;

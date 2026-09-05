@@ -271,7 +271,9 @@ export function computeProcessProgressDelta(
 ): number {
   if (!envelope.allowedPaces.includes(process.currentPace)) throw new Error(`Pace ${process.currentPace} is infeasible`);
   const base = paceProgressBp[process.currentPace];
-  const netMomentumBp = Math.max(0, Math.min(10000, 5000 + process.momentumBp - process.resistanceBp));
+  const netMomentumBp = process.currentPace === 'stalled'
+    ? 0
+    : Math.max(1000, Math.min(10000, 5000 + process.momentumBp - process.resistanceBp));
   const delta = Math.trunc(base * netMomentumBp / 5000);
   return Math.max(0, Math.min(1000, delta));
 }

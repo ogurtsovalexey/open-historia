@@ -5,6 +5,7 @@ import {
   processBasisPointsSchema,
   processStableIdSchema,
   type EffectKind,
+  type WorldProcessState,
 } from './schema.js';
 
 const evidenceIdSchema = z.string().regex(/^evidence:[a-z0-9][a-z0-9._-]{0,139}$/);
@@ -94,8 +95,13 @@ export function applyPermanentEffect(
   };
 }
 
+export const materializableEffectKinds = [
+  'capacity.modify',
+  'supply-capacity.modify',
+] as const satisfies readonly EffectKind[];
+
 export function assertEffectFamilyMaterializable(kind: EffectKind): void {
-  if (kind !== 'capacity.modify' && kind !== 'supply-capacity.modify') {
+  if (!(materializableEffectKinds as readonly string[]).includes(kind)) {
     throw new UnsupportedEffectMaterializationError(kind);
   }
 }
@@ -121,4 +127,67 @@ export function computeEffectDelta(policy: EffectMagnitudePolicy, maturityBp: nu
   const result = Number(bounded);
   if (!Number.isSafeInteger(result)) throw new Error('Computed effect delta exceeds safe integer range');
   return result;
+}
+
+const checkpointRateBp: Readonly<Partial<Record<WorldProcessState['stage'], number>>> = {
+  demonstrated: 100,
+  adopted: 200,
+  institutionalized: 300,
+};
+
+function regionForSemanticTarget(
+  state: WorldStateV2,
+  targetEntityRef: string,
+  parameter: 'fiscalBase' | 'productiveCapacity' | 'supplyCapacity',
+) {
+  const direct = state.regions.find((region) => region.regionId === targetEntityRef);
+  if (direct) return direct;
+  if (!state.polities.some((polity) => polity.id === targetEntityRef)) return null;
+  return state.regions
+    .filter((region) => region.control.actualControllerPolityId === targetEntityRef)
+    .sort((left, right) => right[parameter] - left[parameter] || left.regionId.localeCompare(right.regionId))[0] ?? null;
+}
+
+/**
+ * Turn a model-selected family/target into engine-owned exact effects. The
+ * policy is deliberately small and generic: 1%, 2%, then 3% of the current
+ * regional input at demonstrated/adopted/institutionalized checkpoints.
+ */
+export function deriveCheckpointPermanentEffects(
+  state: WorldStateV2,
+  process: WorldProcessState,
+  stage: WorldProcessState['stage'],
+): PermanentEffect[] {
+  const rateBp = checkpointRateBp[stage];
+  if (!rateBp) return [];
+  const effects: PermanentEffect[] = [];
+  const seen = new Set<string>();
+  for (const selection of process.selectedEffects) {
+    if (!(materializableEffectKinds as readonly string[]).includes(selection.kind)) continue;
+    const parameter = selection.kind === 'capacity.modify' ? 'productiveCapacity' : 'supplyCapacity';
+    const region = regionForSemanticTarget(state, selection.targetEntityRef, parameter);
+    if (!region) throw new Error(`Effect target ${selection.targetEntityRef} cannot resolve to a controlled region`);
+    const key = `${selection.kind}|${region.regionId}|${parameter}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const current = region[parameter];
+    const delta = Math.min(1_000_000_000, Math.max(1, Number(BigInt(current) * BigInt(rateBp) / 10000n)));
+    effects.push(materializePermanentEffect({
+      kind: selection.kind,
+      targetEntityRef: region.regionId,
+      parameter,
+      duration: 'permanent',
+      stacking: 'additive',
+      sourceProcessId: process.processId,
+      sourceEvidenceIds: process.evidenceIds.slice(0, 12),
+      lowerBound: 0,
+      upperBound: Number.MAX_SAFE_INTEGER,
+      delta,
+    }));
+  }
+  return effects.sort((left, right) => {
+    const leftKey = `${left.kind}|${left.targetEntityRef}|${left.parameter}`;
+    const rightKey = `${right.kind}|${right.targetEntityRef}|${right.parameter}`;
+    return leftKey.localeCompare(rightKey);
+  });
 }
