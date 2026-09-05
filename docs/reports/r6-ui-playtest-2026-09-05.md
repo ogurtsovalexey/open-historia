@@ -222,3 +222,26 @@ replay checksum
 and no raw prompts or responses. This validates recovery of this checkpoint;
 it remains evidence for a focused French run, not the still-open full WP15
 three-scenario ten-decision gate.
+
+## French ten-decision strategic recovery run (subsequent run)
+
+The root production build had compiled scenarios and the browser bundle but
+omitted `packages/agent-runtime`, whose `main` points to its compiled `dist`
+output. Consequently a restarted server could retain an old strategic
+resolver even after source and browser changes. `9830f37` makes `npm run
+build` compile that runtime before Vite. After the production rebuild/restart,
+the frozen October 1806 checkpoint was retried through the visible UI and
+advanced normally.
+
+The same French UI game then completed all ten recorded player decisions and
+30 deterministic monthly boundaries: `1805-01-01` → `1807-07-01`, with
+`playerDecisionIndex: 10` and no `Continue without this decision` use in the
+final sequence. The read-only audit reports world revision
+`sha256:09a8d258c539bd4f508a4b4ef733d8c86d799092193eb74b2653048ca95766e2`,
+replay checksum
+`sha256:fe2a974660331268209a15632af5b85ca2cb590f623f15fb307ce00ba795c39a`,
+and audit checksum
+`sha256:1631827cb47a99d8a8c8b897a8bf2ebd576896f7b6a9f404d5ee9f4a2f385c96`.
+This establishes the French ten-decision/30-month UI loop after the recovery;
+it does not by itself certify every scripted military and territorial-pressure
+case or the corresponding Europe 1935 and Mesoamerica model-mediated runs.
