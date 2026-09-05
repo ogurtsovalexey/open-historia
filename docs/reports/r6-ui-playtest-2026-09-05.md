@@ -271,3 +271,32 @@ Utility and Strategic provenance and no raw prompts or responses.
 This completes the second of the three required fresh, model-mediated
 ten-decision campaigns. Europe 1935 remains to be replayed under the same
 conditions before WP15 can be closed.
+
+## Europe 1935 ten-decision model-mediated run (subsequent run)
+
+A new Europe 1935–1940 campaign was created through the browser's scenario
+flow as Poland at medium difficulty. The first fuller wording, which included
+two partners and negative qualifiers, was shown as `blocked:
+invalid-source-span`; it was not confirmed and produced no material state
+change. The revised, literal one-sentence order — consultations with France
+about Poland's security guarantees — was interpreted as a typed action
+affecting only Poland and France, explicitly confirmed through the UI, and
+then advanced by the same real Strategic provider.
+
+The campaign completed ten visible three-month decisions with no skip:
+`1935-01-01` → `1937-07-01`, turn 30, `playerDecisionIndex: 10`, each showing
+`3 / 3 monthly boundaries resolved`. The independent audit for
+`europe-1935-1940-benchmark-session-2` records world revision
+`sha256:73414e43baadd337c7190925cc9f6e42a999712df88353108cfc6738a6108ca6`,
+replay checksum
+`sha256:5eab476d7d078615b3a40c66055923ca19344f98377bb832ccd99aca482d82e9`,
+and audit checksum
+`sha256:d09945466e31edd00dca176de86f56471b50fa65f9bc435547ca8b0baec32264`.
+It preserves sanitized `codex-subscription / gpt-5.6-luna / low` Utility and
+Strategic provenance and excludes raw prompts and responses.
+
+Together with the French 1805 and Mesoamerica 1450 runs, this completes the
+three fresh model-mediated ten-decision/30-month UI campaigns required by the
+WP15 loop gate. The separate scenario-data gap for Malta and any unexecuted
+scripted territorial or combat cases remain coverage tasks; this result does
+not claim they were exercised by these deliberately bounded orders.
