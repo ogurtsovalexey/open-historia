@@ -57,6 +57,14 @@ describe('living-world production Strategic V5', () => {
     assert.ok(tasks.every((task) => task.brief.actor.id === task.actorPolityId && task.brief.revision === state.revision));
     assert.ok(tasks.every((task) => task.brief.initiativeEnvelope.allowedEffectFamilies.every((kind) => ['capacity.modify', 'supply-capacity.modify'].includes(kind))));
     assert.ok(tasks.every((task) => !task.userPrompt.includes('polity:france') || task.actorPolityId === 'polity:france'));
+    for (const task of tasks) {
+      const schema = task.tool.schema;
+      assert.deepStrictEqual(schema.properties.polityId.const, task.actorPolityId);
+      assert.deepStrictEqual(schema.properties.revision.const, task.brief.revision);
+      assert.deepStrictEqual(schema.properties.selectedChoiceIds.items.enum, task.brief.frozenChoices.map((choice) => choice.choiceId));
+      assert.deepStrictEqual(schema.properties.evidenceIds.items.enum, task.brief.evidence.map((entry) => entry.evidenceId));
+      assert.deepStrictEqual(schema.properties.processDecisions.items.properties.processId.enum, task.brief.processOptions.map((option) => option.processId));
+    }
   });
 
   it('commits accepted holds only to retrieval memory and leaves canonical material state byte-identical', () => {
