@@ -18,3 +18,16 @@ test("keyboard reaches the Russian intent-first primary loop at the mobile break
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   expect(errors).toEqual([]);
 });
+
+test("a failed semantic request preserves the player draft for an explicit retry", async ({ page }) => {
+  await page.goto("/tests/e2e/fixtures/intent-first.html?failIntent=1");
+  await page.getByTestId("intent-nav-orders").click();
+  const order = "Offer a bounded consultation without claiming an alliance.";
+  const composer = page.getByTestId("intent-order-composer");
+  await composer.fill(order);
+  await page.getByTestId("submit-intent").click();
+  await expect(page.getByRole("status")).toContainText("Semantic provider is unavailable");
+  await expect(composer).toHaveValue(order);
+  await expect(page.getByTestId("submit-intent")).toBeEnabled();
+  await expect(page.getByTestId("intent-interpretation")).toHaveCount(0);
+});

@@ -90,9 +90,11 @@ const interpreted = (sourceText) => ({
 
 const Harness = () => {
   const [projection, setProjection] = useState(baseProjection);
+  const failIntent = new URLSearchParams(window.location.search).has("failIntent");
   const commands = {
     submitIntent: async ({ revision, intentions }) => {
       if (revision !== projection.revision) throw new Error("Revision changed; review the current world.");
+      if (failIntent) throw new Error("Semantic provider is unavailable; the order was not sent.");
       setProjection((current) => ({ ...current, interpretation: interpreted(intentions.join(" ")) }));
     },
     confirmInterpretation: async ({ revision }) => {

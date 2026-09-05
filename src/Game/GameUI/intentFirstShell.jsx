@@ -32,8 +32,13 @@ export const IntentFirstShell = ({ projection: rawProjection, commands: rawComma
     setError("");
     try {
       await command();
+      return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "The request could not be completed.");
+      // Callers that own a draft need to distinguish an acknowledged command
+      // from a recoverable transport/provider failure. Do not make them infer
+      // success merely because this shell rendered the error.
+      return false;
     } finally {
       setBusy(false);
     }

@@ -12,8 +12,12 @@ export const Orders = ({ interpretation, busy, error, onSubmit, onConfirm, onDis
   const intentions = draft.split("\n").map((line) => line.trim()).filter(Boolean);
   const submit = async () => {
     if (intentions.length === 0) return;
-    await onSubmit(intentions);
-    setDraft("");
+    const completed = await onSubmit(intentions);
+    // IntentFirstShell deliberately catches provider/network errors to keep
+    // the primary loop usable. Preserve the exact player words until a
+    // command was actually acknowledged, so retrying cannot silently turn
+    // into re-authoring the order from memory.
+    if (completed !== false) setDraft("");
   };
   const onKeyDown = (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
