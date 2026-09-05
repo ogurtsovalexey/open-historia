@@ -202,6 +202,15 @@ export const strategicDecisionV4Schema = z.object({
   ] as const) if (new Set(values).size !== values.length) ctx.addIssue({ code: 'custom', path: [path], message: `${path} must be unique` });
   const materialCount = decision.selectedChoiceIds.length + decision.processDecisions.length + decision.initiativeProposals.length;
   if ((materialCount === 0) !== (decision.hold !== null)) ctx.addIssue({ code: 'custom', path: ['hold'], message: 'hold is required exactly when no material decision is proposed' });
+  const citedFacts = [
+    ...decision.processDecisions.flatMap((row) => row.factsUsed),
+    ...decision.initiativeProposals.flatMap((row) => row.factsUsed),
+    ...decision.durablePlan.goals.flatMap((row) => row.factsUsed),
+    ...decision.durablePlan.commitments.flatMap((row) => row.factsUsed),
+  ];
+  if (citedFacts.some((factId) => !decision.evidenceIds.includes(factId))) {
+    ctx.addIssue({ code: 'custom', path: ['evidenceIds'], message: 'evidenceIds must include every fact used by a material decision or durable plan' });
+  }
 });
 export type StrategicDecisionV4 = z.infer<typeof strategicDecisionV4Schema>;
 
@@ -423,7 +432,7 @@ export function renderStrategicPromptV5(briefInput: unknown, systemText = ''): s
     '[GROUNDED_BRIEF]', JSON.stringify(groundedBrief),
     '[UNTRUSTED_CLAIMS]', JSON.stringify(claims),
     '[OUTPUT]',
-    'Return exactly one StrategicDecisionV4 JSON object. Use only published IDs and current canonical evidence. Frozen choices select existing executable objects; initiative proposals may create only a proposed process. Never invent IDs, facts, past events, resources, territory, manpower, agreements, completed capabilities, numeric effects, or hidden state.',
+    'Return exactly one StrategicDecisionV4 JSON object. Use only published IDs and current canonical evidence. evidenceIds must include every ID cited in process decisions, initiative proposals, durable-plan goals, or commitments. Frozen choices select existing executable objects; initiative proposals may create only a proposed process. Never invent IDs, facts, past events, resources, territory, manpower, agreements, completed capabilities, numeric effects, or hidden state.',
   ].filter((line, index) => index > 0 || line.length > 0));
 }
 

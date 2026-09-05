@@ -129,7 +129,7 @@ describe('PlayerInputInterpretationV2', () => {
       claimId: 'claim:fleet', subject: 'polity:alpha', predicate: 'destroyed-british-fleet-at-trafalgar',
       proposedValue: true, proposedTime: 'last year', sourceSpan: { start: 0, end: 1, text: 'x' },
       grounding: 'supported', evidenceIds: [],
-    }), /invalid enum value/i);
+    }), /invalid input/i);
   });
 
   it('requires a canonical region ID instead of a display name for territorial claims', () => {
@@ -137,7 +137,7 @@ describe('PlayerInputInterpretationV2', () => {
       claimId: 'claim:malta', subject: 'polity:alpha', predicate: 'controls-region',
       proposedValue: 'Malta', proposedTime: null, sourceSpan: { start: 0, end: 1, text: 'x' },
       grounding: 'supported', evidenceIds: [],
-    }), /invalid_string/i);
+    }), /invalid string/i);
   });
 
   it('rejects a false premise while preserving a separate valid domestic investment intention', () => {
