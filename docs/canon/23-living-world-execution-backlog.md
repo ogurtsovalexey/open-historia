@@ -9,14 +9,17 @@ Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the pr
 This section is the authoritative resume point for the next implementation
 agent. Do not restart the merge ladder and do not reconstruct completed work
 from the old baseline. The current pushed implementation checkpoint is
-`67ddbc8` on `feature/campaign-memory` (`fix(ui): preserve failed intent
-drafts for retry`). R5 is complete. R6 has verified ten three-month UI
+`211ff39` on `feature/campaign-memory` (`fix(ai): show Codex relay error
+details`). R5 is complete. R6 has verified ten three-month UI
 decisions (30 monthly boundaries) in each of the three scenarios, with
 sanitized replay/audit evidence in `docs/reports/r6-ui-playtest-2026-09-05.md`.
 Those runs are not WP15 completion: the individual scripted-report artifacts,
 full model-mediated coverage and a real UI-driven populated-region transfer
 remain to be demonstrated. A failed semantic request now visibly preserves
 the player draft for an explicit retry rather than silently discarding it.
+The same live UI path now exposes the server's safe rejection text (including
+the required schema-preflight condition) instead of reducing it to an HTTP
+status, so an operator can complete the preflight before retrying.
 
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
