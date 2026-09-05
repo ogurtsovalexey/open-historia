@@ -11,6 +11,7 @@ let living;
 let gameId;
 let mesoGameId;
 let mesoLongGameId;
+let skippedStrategyGameId;
 let resolveLivingWorldSubmonths;
 let readEngineSession;
 
@@ -51,6 +52,11 @@ before(async () => {
     scenarioId: 'scenario:central-mesoamerica-1450',
     playerPolityId: 'polity:tenochtitlan',
     name: 'Living thirty-month test',
+  }).game.id;
+  skippedStrategyGameId = library.createGame({
+    scenarioId: 'scenario:napoleonic-europe-1805',
+    playerPolityId: 'polity:france',
+    name: 'Living explicit strategy skip test',
   }).game.id;
 });
 
@@ -108,6 +114,30 @@ describe('living-world command store', () => {
     assert.equal(view.projection.asOf, '1452-07-01');
     assert.equal(view.playerDecisionIndex, 10);
     assert.equal(view.lastTransition.submonths.length, 3);
+  });
+
+  it('requires an explicit strategic skip and records no hidden model decision', () => {
+    const initial = living.readLivingWorld(skippedStrategyGameId);
+    const blocked = living.advanceLivingWorld(skippedStrategyGameId, {
+      revision: initial.projection.revision,
+      sessionRevision: initial.sessionRevision,
+      optionId: 'advance-three-months',
+      strategicAttempts: [],
+    });
+    assert.equal(blocked.projection.asOf, initial.projection.asOf);
+    assert.ok(blocked.projection.strategicCheckpoint?.blockedTasks.length > 0);
+    const resumed = living.advanceLivingWorld(skippedStrategyGameId, {
+      revision: blocked.projection.revision,
+      sessionRevision: blocked.sessionRevision,
+      optionId: 'advance-three-months',
+      strategicDisposition: 'continue-without-decisions',
+    });
+    assert.equal(resumed.projection.asOf, '1805-04-01');
+    assert.equal(resumed.playerDecisionIndex, 1);
+    assert.equal(resumed.lastTransition.strategicRecords.every((record) => record.status === 'skipped'), true);
+    assert.equal(resumed.lastTransition.strategicRecords.every((record) => record.materializedProcessIds.length === 0), true);
+    assert.equal(resumed.lastTransition.strategicRecords.every((record) =>
+      record.errors.includes('Explicitly continued without this required strategic decision.')), true);
   });
 
   it('does not expose a partial local batch when its second monthly settlement fails', () => {
