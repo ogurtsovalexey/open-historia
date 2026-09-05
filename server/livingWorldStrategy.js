@@ -17,6 +17,24 @@ const unique = (values) => [...new Set(values)].sort();
 const actorShard = (polityId) => [...polityId].reduce((sum, character) => sum + character.codePointAt(0), 0) % 3;
 const BACKGROUND_TASK_LIMIT = 4;
 
+// The shared Zod schema protects the server, but a provider tool schema must
+// also be narrowed to this exact frozen checkpoint so it cannot invent a
+// syntactically valid choice ID before the server gets a chance to reject it.
+function decisionToolSchema(brief) {
+  const schema = structuredClone(exportJsonSchema(strategicDecisionV4Schema));
+  const properties = schema.properties;
+  properties.polityId = { type: 'string', const: brief.actor.id };
+  properties.revision = { type: 'string', const: brief.revision };
+  properties.selectedChoiceIds.items = { type: 'string', enum: brief.frozenChoices.map((choice) => choice.choiceId) };
+  const process = properties.processDecisions.items.properties;
+  process.processId = { type: 'string', enum: brief.processOptions.map((option) => option.processId) };
+  process.checkpointId = { type: 'string', enum: [...new Set(brief.processOptions.map((option) => option.checkpointId))] };
+  const evidenceEnum = brief.evidence.map((entry) => entry.evidenceId);
+  properties.evidenceIds.items = { type: 'string', enum: evidenceEnum };
+  process.factsUsed.items = { type: 'string', enum: evidenceEnum };
+  return schema;
+}
+
 function memoryFor(strategicState, polityId) {
   return strategicState?.polities?.find((entry) => entry.polityId === polityId) ?? {
     polityId, durablePlan: null, evidenceIds: [], lastAcceptedRevision: null,
@@ -176,7 +194,7 @@ export function buildLivingWorldStrategicTasks(state, playerPolityId, strategicS
       tool: {
         name: 'submit_strategic_decision_v4',
         description: 'Submit one bounded strategic decision for this actor and frozen revision.',
-        schema: exportJsonSchema(strategicDecisionV4Schema),
+        schema: decisionToolSchema(brief),
       },
     };
   }).filter(Boolean).sort((left, right) => left.taskKey.localeCompare(right.taskKey));
