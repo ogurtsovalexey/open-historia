@@ -217,7 +217,9 @@ describe('living-world command store', () => {
           proposedTime: 'ten turns ago',
           sourceSpan: { start: 0, end: firstLine.length, text: firstLine },
           grounding: 'supported',
-          evidenceIds: hanover.evidenceIds,
+          // The model may omit evidence, but deterministic contradictory
+          // claims must still render with server-owned visible evidence.
+          evidenceIds: [],
         }],
         requestedActions: [],
         proposedInitiatives: [{
@@ -242,6 +244,7 @@ describe('living-world command store', () => {
     assert.equal(parsed.revision, before.projection.revision);
     assert.equal(parsed.interpretation.confirmationRequired, true);
     assert.equal(parsed.interpretation.claims[0].status, 'contradicted');
+    assert.ok(parsed.interpretation.claims[0].evidenceIds.length > 0);
     assert.match(parsed.interpretation.claims[0].explanation, /contradicts/i);
     assert.equal(parsed.interpretation.proposedInitiatives[0].material, true);
     assert.deepEqual(readEngineSession(library.getGameDirectory(gameId)).playerIntent.modelMetadata, {

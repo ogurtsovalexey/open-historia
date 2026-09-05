@@ -130,7 +130,14 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
         : claim.grounding === 'contradicted' ? 'The canonical state or complete causal ledger contradicts this claim.'
           : claim.grounding === 'subjective' ? 'This is treated as a viewpoint, not a canonical fact.'
             : 'The available canonical evidence cannot establish this claim.',
-    evidenceIds: claim.evidenceIds,
+    // A deterministic supported/contradicted result is still a canonical
+    // assertion in the UI. Models are allowed to omit evidence IDs because
+    // the reducer independently verifies it; attach actor-visible baseline
+    // evidence so the projection remains auditable and never violates the
+    // strict UI contract by crashing on an otherwise safe rejection.
+    evidenceIds: (claim.grounding === 'supported' || claim.grounding === 'contradicted')
+      ? [...new Set([...claim.evidenceIds, ...evidenceIds])]
+      : claim.evidenceIds,
   }));
   if (pastClaim && claims.length === 0) claims.push({
     claimId: hashId('claim', [interpretationId, 'unresolved-past']),
