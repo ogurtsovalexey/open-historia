@@ -88,7 +88,25 @@ function commonEvidence(state, polityId) {
   return [...new Set(derived)].sort().slice(0, 12);
 }
 
-function buildPendingIntent(session, playerPolityId, intentions, modelOutput) {
+function auditText(value, maximum) {
+  if (typeof value !== 'string') return null;
+  const normalized = value.replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, maximum);
+  return normalized || null;
+}
+
+// Provider provenance is audit context only: it cannot influence any engine
+// choice. Keep the allowlist deliberately narrow so browser-side settings can
+// never smuggle credentials, endpoints or raw prompts into a save.
+function sanitizeModelMetadata(value, role) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const provider = auditText(value.provider, 80);
+  const model = auditText(value.model, 160);
+  const effort = auditText(value.effort, 40);
+  if (!provider && !model && !effort) return null;
+  return { role, provider, model, effort };
+}
+
+function buildPendingIntent(session, playerPolityId, intentions, modelOutput, modelMetadata) {
   if (!Array.isArray(intentions)) throw new Error('Intentions must be an array of non-empty text lines.');
   const lines = intentions.map((entry) => String(entry ?? '').trim()).filter(Boolean);
   if (lines.length === 0 || lines.length > 12) throw new Error('Submit between one and twelve intentions.');
@@ -192,6 +210,7 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput) {
     interpretationId,
     createdWorldRevision: session.state.revision,
     playerPolityId,
+    modelMetadata: sanitizeModelMetadata(modelMetadata, 'utility'),
     sourceText,
     status: 'pending',
     questions: grounded.questions.map((question) => ({ questionId: question.questionId, prompt: question.text })),
@@ -413,11 +432,11 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
 
 export const readLivingWorld = (gameId, { locale = 'en' } = {}) => response(gameId, locale);
 
-export function submitLivingWorldIntent(gameId, { revision, sessionRevision, intentions, modelOutput, locale = 'en' } = {}) {
+export function submitLivingWorldIntent(gameId, { revision, sessionRevision, intentions, modelOutput, modelMetadata, locale = 'en' } = {}) {
   const { session, playerPolityId } = requireSession(gameId);
   assertConcurrency(session, revision, sessionRevision);
   if (session.playerIntent?.status === 'pending') throw new Error('Resolve the pending interpretation before submitting another intent.');
-  commit(gameId, session, { playerIntent: buildPendingIntent(session, playerPolityId, intentions, modelOutput) });
+  commit(gameId, session, { playerIntent: buildPendingIntent(session, playerPolityId, intentions, modelOutput, modelMetadata) });
   return response(gameId, locale);
 }
 
@@ -433,6 +452,7 @@ export function confirmLivingWorldIntent(gameId, { revision, sessionRevision, in
     lastTransition: {
       kind: 'player-intent-confirmed',
       interpretationId,
+      modelMetadata: session.playerIntent.modelMetadata ?? null,
       createdProcesses: materialized.created,
       createdDiplomaticProposals: materialized.createdProposals,
     },
@@ -453,7 +473,7 @@ export function dismissLivingWorldIntent(gameId, { revision, sessionRevision, in
 
 export function advanceLivingWorld(gameId, {
   revision, sessionRevision, optionId, strategicAttempts,
-  strategicDisposition = 'resolve', locale = 'en',
+  strategicDisposition = 'resolve', strategicModelMetadata, locale = 'en',
 } = {}) {
   const { session, playerPolityId } = requireSession(gameId);
   assertConcurrency(session, revision, sessionRevision);
@@ -480,6 +500,7 @@ export function advanceLivingWorld(gameId, {
       state: session.state,
       lastTransition: {
         kind: 'strategic-checkpoint-blocked',
+        modelMetadata: sanitizeModelMetadata(strategicModelMetadata, 'strategic'),
         strategicRecords: strategy.records,
         blockedTasks: strategy.blockedTasks,
       },
@@ -506,7 +527,12 @@ export function advanceLivingWorld(gameId, {
   const { state, submonths } = batch;
   commit(gameId, session, {
     state,
-    lastTransition: { kind: 'world-month-advanced', strategicRecords: strategy.records, submonths },
+    lastTransition: {
+      kind: 'world-month-advanced',
+      modelMetadata: sanitizeModelMetadata(strategicModelMetadata, 'strategic'),
+      strategicRecords: strategy.records,
+      submonths,
+    },
     strategicState: strategy.strategicState,
     agentTurn: {
       schemaVersion: 'open-historia-agent-turn/2',

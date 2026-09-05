@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { refreshLibraryCatalog, useLibraryState } from "./library.js";
 import { getStoredLanguage } from "./i18n.js";
+import { getProviderSettings, getStoredProvider } from "../Game/AI/providerConfig.js";
 
 const parseResponse = async (response) => {
   let payload = null;
@@ -38,6 +39,20 @@ async function runStrategicTasks(tasks = []) {
     }
   }
   return attempts;
+}
+
+// Persist only the non-secret provenance needed to audit a model-mediated
+// decision. API keys, endpoint URLs, prompts and model output stay out of the
+// save and out of exported playtest evidence.
+function modelRunMetadata(role) {
+  const provider = getStoredProvider(role);
+  const settings = getProviderSettings(provider, role);
+  return {
+    role,
+    provider,
+    model: String(settings.model ?? "").trim() || null,
+    effort: String(settings.effort ?? "").trim() || null,
+  };
 }
 
 export const livingWorldEndpoint = (gameId, action = "") => (
@@ -87,7 +102,7 @@ export function useLivingWorldRuntime() {
         if (!current?.interpretationContext) throw new Error("The grounded interpretation context is unavailable.");
         const { interpretLivingWorldIntent } = await import("./livingWorldAi.js");
         const modelOutput = await interpretLivingWorldIntent(current.interpretationContext, intentions);
-        return mutate("intent", { revision, intentions, modelOutput });
+        return mutate("intent", { revision, intentions, modelOutput, modelMetadata: modelRunMetadata("utility") });
       },
       confirmInterpretation: ({ revision, interpretationId }) => mutate("intent/confirm", { revision, interpretationId }),
       dismissInterpretation: ({ revision, interpretationId }) => mutate("intent/dismiss", { revision, interpretationId }),
@@ -96,7 +111,13 @@ export function useLivingWorldRuntime() {
         const strategicAttempts = strategicDisposition === 'continue-without-decisions'
           ? []
           : await runStrategicTasks(current?.strategicTasks);
-        return mutate('advance', { revision, optionId, strategicAttempts, strategicDisposition });
+        return mutate('advance', {
+          revision,
+          optionId,
+          strategicAttempts,
+          strategicDisposition,
+          strategicModelMetadata: strategicDisposition === 'continue-without-decisions' ? null : modelRunMetadata("strategic"),
+        });
       },
     };
   }, [activeGameId, enabled]);

@@ -1140,7 +1140,12 @@ For each run preserve in its report or losslessly referenced gitignored audit bu
 - a concise defect log classified as engine, AI contract, scenario data or UI;
 - pass/fail against the scenario script and canon 22.
 
-Raw prompts/responses and unredacted run bundles remain gitignored.  Add a read-only `npm run playtest:audit` exporter for revision, grounded snapshots, ledgers, replay checksum and model metadata; it may not accept mutation commands.
+Raw prompts/responses and unredacted run bundles remain gitignored. The
+read-only exporter now exists as `npm run playtest:audit -- --game <game-id>`
+(optionally `--data-dir <directory>` and `--output <audit.json>`). It validates
+the immutable session chain and exports revisions, grounded snapshots, ledgers,
+replay checksum and sanitized provider/model/effort metadata; it accepts no
+game-state mutation command.
 
 Any state corruption, accepted fake fact, unexplained material number, cross-era leak, required-AI silent fallback or non-replayable outcome fails the release gate.  Cosmetic defects may be recorded for follow-up only if the full loop remains understandable and operable.
 

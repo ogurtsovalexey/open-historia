@@ -98,6 +98,7 @@ describe('living-world command store', () => {
     const advanced = living.advanceLivingWorld(mesoGameId, {
       revision: before.projection.revision, sessionRevision: before.sessionRevision,
       optionId: 'advance-three-months', strategicAttempts: before.strategicTasks.map(hold),
+      strategicModelMetadata: { provider: 'codex-subscription', model: 'gpt-5.6-luna', effort: 'low', apiKey: 'not-persisted' },
     });
     assert.equal(advanced.projection.asOf, '1450-04-01');
     assert.equal(advanced.playerDecisionIndex, 1);
@@ -105,6 +106,9 @@ describe('living-world command store', () => {
     assert.deepEqual(advanced.projection.time.completedSubmonths, 3);
     assert.equal(advanced.lastTransition.submonths.flatMap((month) => month.tributeSettlements).length, 3);
     assert.deepStrictEqual(advanced.lastTransition.submonths.map((month) => month.monthAfter), ['1450-02-01', '1450-03-01', '1450-04-01']);
+    assert.deepEqual(advanced.lastTransition.modelMetadata, {
+      role: 'strategic', provider: 'codex-subscription', model: 'gpt-5.6-luna', effort: 'low',
+    });
   });
 
   it('reaches thirty deterministic monthly boundaries after ten player decisions', () => {
@@ -202,6 +206,7 @@ describe('living-world command store', () => {
           },
         }],
       },
+      modelMetadata: { provider: 'codex-subscription', model: 'gpt-5.6-luna', effort: 'low', endpoint: 'not-persisted' },
     });
     const parsed = parseIntentFirstProjection(submitted.projection);
     assert.equal(parsed.revision, before.projection.revision);
@@ -209,6 +214,9 @@ describe('living-world command store', () => {
     assert.equal(parsed.interpretation.claims[0].status, 'contradicted');
     assert.match(parsed.interpretation.claims[0].explanation, /contradicts/i);
     assert.equal(parsed.interpretation.proposedInitiatives[0].material, true);
+    assert.deepEqual(readEngineSession(library.getGameDirectory(gameId)).playerIntent.modelMetadata, {
+      role: 'utility', provider: 'codex-subscription', model: 'gpt-5.6-luna', effort: 'low',
+    });
     assert.throws(() => living.advanceLivingWorld(gameId, {
       revision: submitted.projection.revision,
       sessionRevision: submitted.sessionRevision,
@@ -257,6 +265,9 @@ describe('living-world command store', () => {
     assert.equal(confirmed.projection.processes.length, 1);
     assert.equal(confirmed.projection.processes[0].name, 'Electricity');
     assert.equal(confirmed.projection.processes[0].pace, 'steady');
+    assert.deepEqual(confirmed.lastTransition.modelMetadata, {
+      role: 'utility', provider: 'codex-subscription', model: 'gpt-5.6-luna', effort: 'low',
+    });
     assert.match(confirmed.projection.facts.find((entry) => entry.factId === 'fact:treasury').value, /^[0-9,]+$/u);
     const failedTask = confirmed.strategicTasks[0];
     assert.ok(failedTask);

@@ -106,7 +106,7 @@ export async function interpretLivingWorldIntent(context, intentions) {
   ].join(" ");
   const result = await callAI(systemPrompt, [{ role: "user", parts: [{ text: renderPlayerInputPrompt(context, playerText) }] }], {
     languageMode: "none",
-    providerRole: "strategic",
+    providerRole: "utility",
     tool: {
       name: "interpret_player_input_v2",
       description: "Separate claims, actions and open initiatives under the exact current revision.",
