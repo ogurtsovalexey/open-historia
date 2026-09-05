@@ -1097,7 +1097,7 @@ Expected final date: no earlier than `1937-07-01`.
 | 1 | Start an army depot/provisions/supply-route process. |
 | 2 | Offer Bavaria or another actually available ally a typed coalition obligation. |
 | 3 | Propose a standardized civil-military optical relay service; it begins only at `proposed`. |
-| 4 | Claim that France destroyed the British fleet at Trafalgar last year and owns Malta; contradict both without changing fleet/control/knowledge. |
+| 4 | Claim that France destroyed the British fleet at Trafalgar last year and owns Bohemia (or another existing foreign ScenarioV3 region); the ownership claim must be contradicted without changing control or knowledge. The current aggregate model has no fleet-state predicate, so the Trafalgar sentence must remain non-material rather than being fabricated as a fact. |
 | 5 | Form a legal aggregate formation from visible origin regions and inspect workforce. |
 | 6 | If legal, pursue a limited war aim against Austria; otherwise address the actual blocker. |
 | 7 | Advance on one visible adjacent region only with adequate supply. |

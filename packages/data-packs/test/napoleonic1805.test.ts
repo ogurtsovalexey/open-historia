@@ -65,6 +65,12 @@ describe('Napoleonic Europe 1805 shipped ScenarioV3', () => {
     assert.ok(route);
     assert.strictEqual(route.classId, 'route-class:sea-blockade');
     assert.ok(route.regionIds.some((id) => id === 'region:nap1805:gibraltar'));
+    // WP15's false-history path must name a region that actually exists in
+    // this aggregate ScenarioV3 world; Malta is not a region in this fixture.
+    const bohemia = Object.values(scenario.startingState.regions)
+      .find((region) => region.id === 'region:nap1805:bohemia');
+    assert.ok(bohemia);
+    assert.strictEqual(bohemia.legalOwnerPolityId, 'polity:austria');
   });
 
   it('grounds population, capacity and mobilization in nonzero causal controls', async () => {
