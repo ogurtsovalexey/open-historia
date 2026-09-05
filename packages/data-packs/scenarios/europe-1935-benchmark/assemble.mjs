@@ -30,6 +30,16 @@ const atPointer = (root, pointer) => pointer.slice(1).split('/').reduce((current
 const slug = (value) => value.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
 const kebab = (value) => value.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 const uniqueSorted = (values) => [...new Set(values)].sort(compareIds);
+const playerEligiblePolityIds = [
+  'polity:austria',
+  'polity:czechoslovakia',
+  'polity:france',
+  'polity:germany',
+  'polity:italy',
+  'polity:poland',
+  'polity:united-kingdom',
+];
+const playerEligiblePolityIdSet = new Set(playerEligiblePolityIds);
 
 const [legacyScenario, v2Scenario, sources, authoring, mapLink, adjacency, geographyManifest, geojson] = await Promise.all([
   readJson(resolve(fixtureDir, 'engine/scenario.json')),
@@ -121,6 +131,7 @@ for (const polity of [...legacyScenario.polities].sort((left, right) => compareI
     id: polity.id,
     displayName: polity.displayName,
     color: colors.get(polity.id),
+    decisionMode: polity.decisionMode ?? (playerEligiblePolityIdSet.has(polity.id) ? 'active' : 'supported'),
     treasury: polity.treasury,
     stockpiles: Object.fromEntries(polity.stockpile.map((entry) => [`commodity:${entry.resource}`, entry.amount]).sort(([left], [right]) => compareIds(left, right))),
     evidenceIds: [evidenceId],
@@ -296,7 +307,7 @@ const scenario = {
   game: {
     startDate: v2Scenario.game.startDate,
     defaultPlayerPolityId: v2Scenario.game.defaultPlayer,
-    playerEligiblePolityIds: ['polity:austria', 'polity:czechoslovakia', 'polity:france', 'polity:germany', 'polity:italy', 'polity:poland', 'polity:united-kingdom'],
+    playerEligiblePolityIds,
   },
   worldRules: {
     physicalModel: 'world-model:physical-historical-earth',

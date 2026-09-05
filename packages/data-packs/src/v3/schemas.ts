@@ -175,6 +175,7 @@ export const scenarioV3Schema = z.object({
       id: polityIdSchema,
       displayName: localizedTextSchema,
       color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+      decisionMode: z.enum(['active', 'supported', 'inert']).optional(),
       treasury: nonNegativeSafeInteger,
       stockpiles: z.record(commodityIdSchema, nonNegativeSafeInteger),
       evidenceIds: evidenceIdsSchema,

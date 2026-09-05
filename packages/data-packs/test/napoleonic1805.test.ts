@@ -36,6 +36,13 @@ describe('Napoleonic Europe 1805 shipped ScenarioV3', () => {
         'Electorate of Bavaria',
       ],
     );
+    assert.ok(scenario.game.playerEligiblePolityIds.every(
+      (polityId) => scenario.startingState.polities[polityId]!.decisionMode === 'active',
+    ));
+    assert.strictEqual(
+      Object.values(scenario.startingState.polities).filter((polity) => polity.decisionMode === 'supported').length,
+      14,
+    );
   });
 
   it('owns Napoleonic catalogs, formation origins and the Gibraltar blockade route', async () => {

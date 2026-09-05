@@ -4638,7 +4638,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:austria",
-          "valueChecksum": "sha256:77fcb871594063b6a881a4e513875d3c733ec79dae48e3e431481abbe25b8858"
+          "valueChecksum": "sha256:f25bfb410823a368ccd94a01596cfe57ecf28c3b4fd06d0e7571edfae932fbfd"
         },
         "id": "evidence:e1935-polity-austria",
         "visibility": "public"
@@ -4656,7 +4656,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:czechoslovakia",
-          "valueChecksum": "sha256:6d706360fef56d7a9dd068d928c8d40365379fd23826da4c656464343abbcf46"
+          "valueChecksum": "sha256:978fc50da31c6152f2bfb1d68c334dbfb06d763422da5e58b4dc81d126fb5887"
         },
         "id": "evidence:e1935-polity-czechoslovakia",
         "visibility": "public"
@@ -4674,7 +4674,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:france",
-          "valueChecksum": "sha256:dd932d53fc339fc4b474919702cdfe64de5c5f586b8217268c4e360b10430e80"
+          "valueChecksum": "sha256:51dafa87104ffd3408eb013a9afce1778520c6803343b88291a1a74adca9121f"
         },
         "id": "evidence:e1935-polity-france",
         "visibility": "public"
@@ -4692,7 +4692,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:free-city-of-danzig",
-          "valueChecksum": "sha256:09032da1537bc145127befbfddc92c2a1eed9e5592a449ef14b26c56d08d46a7"
+          "valueChecksum": "sha256:987cfbfc62f4ed1036021f310acd4b2678f0d657d10459fa3662c9db57b0e5f4"
         },
         "id": "evidence:e1935-polity-free-city-of-danzig",
         "visibility": "public"
@@ -4710,7 +4710,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:germany",
-          "valueChecksum": "sha256:952c120f548b891cc41988f76e57cb6504497cae66aee386c074be5524f0b07f"
+          "valueChecksum": "sha256:d6e947ff70036fe6510cc602f928e8f3f09ba1b2bd1e15c9d92881d57fcfaaea"
         },
         "id": "evidence:e1935-polity-germany",
         "visibility": "public"
@@ -4728,7 +4728,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:italy",
-          "valueChecksum": "sha256:e718eea374ef97e0d22d8aaf9de9a727b72443c93f09f1510d0f02a7ec064c73"
+          "valueChecksum": "sha256:3aea8510b1c8c93e4005851cc112c2fe900bbeac6ec7b0dceb798580dde78fed"
         },
         "id": "evidence:e1935-polity-italy",
         "visibility": "public"
@@ -4747,7 +4747,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:poland",
-          "valueChecksum": "sha256:efbe722e572ac8336593a1e5faef53f96299ba91b0a20d9381570ba87bfd7e2d"
+          "valueChecksum": "sha256:e58fc989a16a69d2c610a9da550a5683ea9f2a265713a9879da5b36360cdc807"
         },
         "id": "evidence:e1935-polity-poland",
         "visibility": "public"
@@ -4765,7 +4765,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:saargebiet",
-          "valueChecksum": "sha256:b6774b18a2bd3128fce3f6da55659759c3aa6a427e74e886eb713902239a65df"
+          "valueChecksum": "sha256:2717d1a24c14bf9ec07062619ace2fa7197396b554cd632761eecc693a63f0fc"
         },
         "id": "evidence:e1935-polity-saargebiet",
         "visibility": "public"
@@ -4784,7 +4784,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:soviet-union",
-          "valueChecksum": "sha256:ad1452a056f7c3b6ce1c7a2adeca56cc8bb025808a19f7b43c7d7f478e80d5ae"
+          "valueChecksum": "sha256:e489fbbd05d1ac41164359b12e9fe1096a0155313b083c8f0f150dd97203970e"
         },
         "id": "evidence:e1935-polity-soviet-union",
         "visibility": "public"
@@ -4802,7 +4802,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:united-kingdom",
-          "valueChecksum": "sha256:d16759ff4b1c830b22b1feb2d5c8ab2580216dbf209da8a722bfc1d396a0e330"
+          "valueChecksum": "sha256:24493c186ce69b82779e58c89ad587e99e226e926146970fce7537d118b55067"
         },
         "id": "evidence:e1935-polity-united-kingdom",
         "visibility": "public"
@@ -4821,7 +4821,7 @@
         },
         "binding": {
           "path": "/startingState/polities/polity:united-states",
-          "valueChecksum": "sha256:aed7a54f249d104dc1f6547c79c9e07124b80c9442b97e5e79e5fea060ec174f"
+          "valueChecksum": "sha256:91d0317eec7487ba306875e7bd63b5096bf168a9c42c6245145b8eb7ff464c6b"
         },
         "id": "evidence:e1935-polity-united-states",
         "visibility": "public"
@@ -8053,6 +8053,7 @@
     "polities": {
       "polity:austria": {
         "color": "#d94848",
+        "decisionMode": "active",
         "displayName": {
           "en": "Austria",
           "ru": "Австрия"
@@ -8073,6 +8074,7 @@
       },
       "polity:czechoslovakia": {
         "color": "#4f78c4",
+        "decisionMode": "active",
         "displayName": {
           "en": "Czechoslovakia",
           "ru": "Чехословакия"
@@ -8093,6 +8095,7 @@
       },
       "polity:france": {
         "color": "#4169a8",
+        "decisionMode": "active",
         "displayName": {
           "en": "France",
           "ru": "Франция"
@@ -8113,6 +8116,7 @@
       },
       "polity:free-city-of-danzig": {
         "color": "#c9a45c",
+        "decisionMode": "inert",
         "displayName": {
           "en": "Freie Stadt Danzig",
           "ru": "Свободный город Данциг"
@@ -8133,6 +8137,7 @@
       },
       "polity:germany": {
         "color": "#555555",
+        "decisionMode": "active",
         "displayName": {
           "en": "Germany",
           "ru": "Германия"
@@ -8153,6 +8158,7 @@
       },
       "polity:italy": {
         "color": "#4f9960",
+        "decisionMode": "active",
         "displayName": {
           "en": "Italy",
           "ru": "Италия"
@@ -8173,6 +8179,7 @@
       },
       "polity:poland": {
         "color": "#d8d8d8",
+        "decisionMode": "active",
         "displayName": {
           "en": "Poland",
           "ru": "Польша"
@@ -8193,6 +8200,7 @@
       },
       "polity:saargebiet": {
         "color": "#7d8b94",
+        "decisionMode": "inert",
         "displayName": {
           "en": "Saargebiet",
           "ru": "Саарская область"
@@ -8213,6 +8221,7 @@
       },
       "polity:soviet-union": {
         "color": "#a72d2d",
+        "decisionMode": "supported",
         "displayName": {
           "en": "Soviet Union",
           "ru": "СССР"
@@ -8233,6 +8242,7 @@
       },
       "polity:united-kingdom": {
         "color": "#b44747",
+        "decisionMode": "active",
         "displayName": {
           "en": "United Kingdom",
           "ru": "Великобритания"
@@ -8253,6 +8263,7 @@
       },
       "polity:united-states": {
         "color": "#526fa8",
+        "decisionMode": "supported",
         "displayName": {
           "en": "United States",
           "ru": "США"

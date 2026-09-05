@@ -256,7 +256,7 @@ const addEvidence = (slug, path, sourceIds, method, confidence = 'medium', todo)
 
 for (const [slug, displayName, color] of polityRows) {
   const id = `polity:${slug}`;
-  scenario.startingState.polities[id] = { id, displayName: { en: displayName }, color, treasury: 0, stockpiles: {}, evidenceIds: [] };
+  scenario.startingState.polities[id] = { id, displayName: { en: displayName }, color, decisionMode: playableSlugs.includes(slug) ? 'active' : 'supported', treasury: 0, stockpiles: {}, evidenceIds: [] };
   const path = `/startingState/polities/${id}`;
   const evidenceId = addEvidence(`polity-${slug}`, path, ['source:nap1805:europe-map', 'source:nap1805:world-population'], 'Political title is transcribed for 1805-01-01. Treasury and stockpiles are deterministic balance estimates derived from represented population and regional capacity, not archival account balances.', 'low', 'Replace balance estimates with boundary-reconciled fiscal and stockpile series when reviewed sources are available.');
   scenario.startingState.polities[id].evidenceIds = [evidenceId];

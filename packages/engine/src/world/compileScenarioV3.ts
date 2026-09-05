@@ -137,6 +137,7 @@ function buildInitialState(
   const polities = sortedValues(scenario.startingState.polities).map((polity) => ({
     id: polity.id,
     displayName: polity.displayName,
+    decisionMode: polity.decisionMode ?? (scenario.game.playerEligiblePolityIds.includes(polity.id) ? 'active' as const : 'supported' as const),
     treasury: polity.treasury,
     stockpiles: Object.entries(polity.stockpiles)
       .map(([commodityId, quantity]) => ({ commodityId, quantity }))

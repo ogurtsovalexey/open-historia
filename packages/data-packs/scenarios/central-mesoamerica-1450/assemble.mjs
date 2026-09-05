@@ -222,9 +222,10 @@ const addEvidence = (id, path, basis, visibility = 'public', visibleToPolityIds)
   };
 };
 
+const activePolityIdsForDecisions = new Set(activePolities.map(([id]) => id));
 for (const [id, displayName, color] of [...activePolities, ...supportedPolities]) {
   const evidenceId = `evidence:meso1450-polity-${slug(id.slice(7))}`;
-  scenario.startingState.polities[id] = { id, displayName: { en: displayName }, color, treasury: 0, stockpiles: {}, evidenceIds: [evidenceId] };
+  scenario.startingState.polities[id] = { id, displayName: { en: displayName }, color, decisionMode: activePolityIdsForDecisions.has(id) ? 'active' : 'supported', treasury: 0, stockpiles: {}, evidenceIds: [evidenceId] };
   const specialized = id === 'polity:tlatelolco' ? ['source:meso1450:inah-tlatelolco']
     : id === 'polity:tlaxcallan' ? ['source:meso1450:inah-tlaxcallan']
       : id === 'polity:purepecha' ? ['source:meso1450:inah-tzintzuntzan', 'source:meso1450:inah-ihuatzio']

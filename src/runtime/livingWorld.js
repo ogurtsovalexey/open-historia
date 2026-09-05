@@ -15,6 +15,30 @@ const request = async (pathname, { body, signal } = {}) => parseResponse(await f
   signal,
 }));
 
+async function runStrategicTasks(tasks = []) {
+  if (tasks.length === 0) return [];
+  const { callAI } = await import('../Game/AI/main.jsx');
+  const attempts = [];
+  for (const task of tasks) {
+    try {
+      const result = await callAI(task.systemPrompt, [{ role: 'user', parts: [{ text: task.userPrompt }] }], {
+        languageMode: 'none',
+        providerRole: 'strategic',
+        tool: task.tool,
+      });
+      if (!result?.toolInput) throw new Error('The strategic model returned no structured decision.');
+      attempts.push({ taskKey: task.taskKey, status: 'succeeded', modelOutput: result.toolInput });
+    } catch (error) {
+      attempts.push({
+        taskKey: task.taskKey,
+        status: 'failed',
+        message: error instanceof Error ? error.message : 'Strategic model call failed.',
+      });
+    }
+  }
+  return attempts;
+}
+
 export const livingWorldEndpoint = (gameId, action = "") => (
   `/api/games/${encodeURIComponent(gameId)}/living-world${action ? `/${action}` : ""}`
 );
@@ -65,7 +89,11 @@ export function useLivingWorldRuntime() {
       },
       confirmInterpretation: ({ revision, interpretationId }) => mutate("intent/confirm", { revision, interpretationId }),
       dismissInterpretation: ({ revision, interpretationId }) => mutate("intent/dismiss", { revision, interpretationId }),
-      advanceTime: ({ revision, optionId }) => mutate("advance", { revision, optionId }),
+      advanceTime: async ({ revision, optionId }) => {
+        const current = payloadRef.current;
+        const strategicAttempts = await runStrategicTasks(current?.strategicTasks);
+        return mutate('advance', { revision, optionId, strategicAttempts });
+      },
     };
   }, [activeGameId, enabled]);
 

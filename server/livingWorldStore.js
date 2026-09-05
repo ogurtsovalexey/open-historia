@@ -4,6 +4,7 @@ import { interpretPlayerInputV2 } from '@open-historia/agent-runtime';
 import { getGameDetails, getGameDirectory } from './libraryStore.js';
 import { commitLivingWorldSession, ENGINE_SESSION_SCHEMA_V3, readEngineSession } from './engineSessionStore.js';
 import { buildIntentFirstProjection, buildPlayerIntentContext } from './livingWorldProjection.js';
+import { buildLivingWorldStrategicTasks, resolveLivingWorldStrategicTasks } from './livingWorldStrategy.js';
 
 const hashId = (prefix, values) => `${prefix}:${crypto.createHash('sha256').update(values.join('\u001f')).digest('hex').slice(0, 32)}`;
 
@@ -28,6 +29,7 @@ function response(gameId) {
     sessionRevision: session.manifest.revision,
     projection: buildIntentFirstProjection({ session, playerPolityId }),
     interpretationContext: buildPlayerIntentContext({ session, playerPolityId }),
+    strategicTasks: buildLivingWorldStrategicTasks(session.state, playerPolityId, session.agentState),
   };
 }
 
@@ -328,12 +330,14 @@ export function dismissLivingWorldIntent(gameId, { revision, sessionRevision, in
   return response(gameId);
 }
 
-export function advanceLivingWorld(gameId, { revision, sessionRevision, optionId } = {}) {
-  const { session } = requireSession(gameId);
+export function advanceLivingWorld(gameId, { revision, sessionRevision, optionId, strategicAttempts } = {}) {
+  const { session, playerPolityId } = requireSession(gameId);
   assertConcurrency(session, revision, sessionRevision);
   if (optionId !== 'advance-one-month') throw new Error(`Unsupported time option ${String(optionId)}.`);
   if (session.playerIntent?.status === 'pending') throw new Error('Confirm or revise the pending interpretation before advancing time.');
-  const clock = worldV2.advanceWorldMonth(session.state, { expectedRevision: session.state.revision });
+  const strategicTasks = buildLivingWorldStrategicTasks(session.state, playerPolityId, session.agentState);
+  const strategy = resolveLivingWorldStrategicTasks(session.state, strategicTasks, strategicAttempts, session.agentState);
+  const clock = worldV2.advanceWorldMonth(strategy.state, { expectedRevision: strategy.state.revision });
   const { state: _clockState, ...clockRecord } = clock;
   void _clockState;
   let state = clock.state;
@@ -350,7 +354,15 @@ export function advanceLivingWorld(gameId, { revision, sessionRevision, optionId
   }
   commit(gameId, session, {
     state,
-    lastTransition: { kind: 'world-month-advanced', clock: clockRecord, processTransitions },
+    lastTransition: { kind: 'world-month-advanced', clock: clockRecord, strategicRecords: strategy.records, processTransitions },
+    strategicState: strategy.strategicState,
+    agentTurn: {
+      schemaVersion: 'open-historia-agent-turn/2',
+      worldRevisionBefore: session.state.revision,
+      worldRevisionAfter: state.revision,
+      month: state.month,
+      strategicRecords: strategy.records,
+    },
     playerIntent: session.playerIntent?.status === 'confirmed' ? null : session.playerIntent,
   });
   return response(gameId);

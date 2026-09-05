@@ -1818,6 +1818,7 @@
           "en": "French Empire"
         },
         "color": "#2447a8",
+        "decisionMode": "active",
         "treasury": 175788,
         "stockpiles": {
           "commodity:grain": 1465000,
@@ -1834,6 +1835,7 @@
           "en": "United Kingdom of Great Britain and Ireland"
         },
         "color": "#c0392b",
+        "decisionMode": "active",
         "treasury": 97788,
         "stockpiles": {
           "commodity:grain": 815000,
@@ -1850,6 +1852,7 @@
           "en": "Austrian Empire"
         },
         "color": "#f5f5f5",
+        "decisionMode": "active",
         "treasury": 138576,
         "stockpiles": {
           "commodity:grain": 1155000,
@@ -1866,6 +1869,7 @@
           "en": "Russian Empire"
         },
         "color": "#2e8b57",
+        "decisionMode": "active",
         "treasury": 119994,
         "stockpiles": {
           "commodity:grain": 1000000,
@@ -1882,6 +1886,7 @@
           "en": "Kingdom of Prussia"
         },
         "color": "#2f3640",
+        "decisionMode": "active",
         "treasury": 58164,
         "stockpiles": {
           "commodity:grain": 485000,
@@ -1898,6 +1903,7 @@
           "en": "Kingdom of Spain"
         },
         "color": "#f1c40f",
+        "decisionMode": "active",
         "treasury": 68958,
         "stockpiles": {
           "commodity:grain": 575000,
@@ -1914,6 +1920,7 @@
           "en": "Ottoman Empire"
         },
         "color": "#27ae60",
+        "decisionMode": "active",
         "treasury": 59970,
         "stockpiles": {
           "commodity:grain": 500000,
@@ -1930,6 +1937,7 @@
           "en": "Kingdom of Sweden"
         },
         "color": "#3498db",
+        "decisionMode": "active",
         "treasury": 19188,
         "stockpiles": {
           "commodity:grain": 160000,
@@ -1946,6 +1954,7 @@
           "en": "Denmark–Norway"
         },
         "color": "#e74c3c",
+        "decisionMode": "active",
         "treasury": 13788,
         "stockpiles": {
           "commodity:grain": 115000,
@@ -1962,6 +1971,7 @@
           "en": "Kingdoms of Naples and Sicily"
         },
         "color": "#8e6e53",
+        "decisionMode": "active",
         "treasury": 36600,
         "stockpiles": {
           "commodity:grain": 305000,
@@ -1978,6 +1988,7 @@
           "en": "Italian Republic"
         },
         "color": "#2ecc71",
+        "decisionMode": "active",
         "treasury": 22782,
         "stockpiles": {
           "commodity:grain": 190000,
@@ -1994,6 +2005,7 @@
           "en": "Electorate of Bavaria"
         },
         "color": "#5dade2",
+        "decisionMode": "active",
         "treasury": 18000,
         "stockpiles": {
           "commodity:grain": 150000,
@@ -2010,6 +2022,7 @@
           "en": "Kingdom of Portugal and the Algarves"
         },
         "color": "#8e44ad",
+        "decisionMode": "supported",
         "treasury": 18000,
         "stockpiles": {
           "commodity:grain": 150000,
@@ -2026,6 +2039,7 @@
           "en": "Batavian Republic"
         },
         "color": "#e67e22",
+        "decisionMode": "supported",
         "treasury": 12588,
         "stockpiles": {
           "commodity:grain": 105000,
@@ -2042,6 +2056,7 @@
           "en": "Swiss Confederation"
         },
         "color": "#c0392b",
+        "decisionMode": "supported",
         "treasury": 10188,
         "stockpiles": {
           "commodity:grain": 85000,
@@ -2058,6 +2073,7 @@
           "en": "Electorate of Saxony"
         },
         "color": "#95a5a6",
+        "decisionMode": "supported",
         "treasury": 12000,
         "stockpiles": {
           "commodity:grain": 100000,
@@ -2074,6 +2090,7 @@
           "en": "Electorate of Württemberg"
         },
         "color": "#7f8c8d",
+        "decisionMode": "supported",
         "treasury": 4200,
         "stockpiles": {
           "commodity:grain": 35000,
@@ -2090,6 +2107,7 @@
           "en": "Electorate of Baden"
         },
         "color": "#f39c12",
+        "decisionMode": "supported",
         "treasury": 3000,
         "stockpiles": {
           "commodity:grain": 25000,
@@ -2106,6 +2124,7 @@
           "en": "Electorate of Hanover"
         },
         "color": "#d35400",
+        "decisionMode": "supported",
         "treasury": 4800,
         "stockpiles": {
           "commodity:grain": 40000,
@@ -2122,6 +2141,7 @@
           "en": "Papal States"
         },
         "color": "#f7dc6f",
+        "decisionMode": "supported",
         "treasury": 14394,
         "stockpiles": {
           "commodity:grain": 120000,
@@ -2138,6 +2158,7 @@
           "en": "Kingdom of Etruria"
         },
         "color": "#af7ac5",
+        "decisionMode": "supported",
         "treasury": 6000,
         "stockpiles": {
           "commodity:grain": 50000,
@@ -2154,6 +2175,7 @@
           "en": "Ligurian Republic"
         },
         "color": "#85c1e9",
+        "decisionMode": "supported",
         "treasury": 3600,
         "stockpiles": {
           "commodity:grain": 30000,
@@ -2170,6 +2192,7 @@
           "en": "Kingdom of Sardinia"
         },
         "color": "#2874a6",
+        "decisionMode": "supported",
         "treasury": 9600,
         "stockpiles": {
           "commodity:grain": 80000,
@@ -2186,6 +2209,7 @@
           "en": "Landgraviate of Hesse-Kassel"
         },
         "color": "#a569bd",
+        "decisionMode": "supported",
         "treasury": 2700,
         "stockpiles": {
           "commodity:grain": 22500,
@@ -2202,6 +2226,7 @@
           "en": "Landgraviate of Hesse-Darmstadt"
         },
         "color": "#884ea0",
+        "decisionMode": "supported",
         "treasury": 2100,
         "stockpiles": {
           "commodity:grain": 17500,
@@ -2218,6 +2243,7 @@
           "en": "Principality of Brunswick-Wolfenbüttel"
         },
         "color": "#5d6d7e",
+        "decisionMode": "supported",
         "treasury": 1200,
         "stockpiles": {
           "commodity:grain": 10000,
@@ -7190,7 +7216,7 @@
         "id": "evidence:nap1805-polity-france",
         "binding": {
           "path": "/startingState/polities/polity:france",
-          "valueChecksum": "sha256:618694733440341f77c1d48a07e386e17b6c92d27edef7a8e6b68d149f389539"
+          "valueChecksum": "sha256:4897be185f529618478c0821d2932097ab0c434c0483982786e98541139cfce1"
         },
         "basis": {
           "kind": "historical",
@@ -7209,7 +7235,7 @@
         "id": "evidence:nap1805-polity-united-kingdom",
         "binding": {
           "path": "/startingState/polities/polity:united-kingdom",
-          "valueChecksum": "sha256:293e839a6be1dec321b20b9bb2824fabba07377fcd157a4f754ff230735ac03f"
+          "valueChecksum": "sha256:5bce597726222272fd436674e34dac819299f057c1241bb3a5836946ede97a6a"
         },
         "basis": {
           "kind": "historical",
@@ -7228,7 +7254,7 @@
         "id": "evidence:nap1805-polity-austria",
         "binding": {
           "path": "/startingState/polities/polity:austria",
-          "valueChecksum": "sha256:b20a64d31a62ce0bda0ae598639f75b8a5f3222fd0dd85e0b8a7a01e1d8a1b09"
+          "valueChecksum": "sha256:ef648b531a5bf203cf8772df0a3f4af2ec83721a37f2d2d2d3aa4e8a2c1b8e05"
         },
         "basis": {
           "kind": "historical",
@@ -7247,7 +7273,7 @@
         "id": "evidence:nap1805-polity-russia",
         "binding": {
           "path": "/startingState/polities/polity:russia",
-          "valueChecksum": "sha256:eb7ee1a9928d93bc91ac6cb23a279ea334328bbc878d7b9914ae3a65bbd9a381"
+          "valueChecksum": "sha256:490be66f3945b1a92706e1b09165df74be18642e535c9c16c58bbafaa88d76c5"
         },
         "basis": {
           "kind": "historical",
@@ -7266,7 +7292,7 @@
         "id": "evidence:nap1805-polity-prussia",
         "binding": {
           "path": "/startingState/polities/polity:prussia",
-          "valueChecksum": "sha256:950eb33e4c10d08b70d47afd8dab9ae1f4e524a940b63385d4f1c509e74bba65"
+          "valueChecksum": "sha256:00d304cb9f5864050f893dc5d52c4bb4353e2d2f299749f0f87eea274bc942b4"
         },
         "basis": {
           "kind": "historical",
@@ -7285,7 +7311,7 @@
         "id": "evidence:nap1805-polity-spain",
         "binding": {
           "path": "/startingState/polities/polity:spain",
-          "valueChecksum": "sha256:61ed57ca5a1fc88d15a859ecee396e1d14be2ac13971fc3c0a85ec9bffdc82ef"
+          "valueChecksum": "sha256:7f9648611f8cd15c3443dd3be10a7be761da4ce8af3de2ae96a01d9cade079a4"
         },
         "basis": {
           "kind": "historical",
@@ -7304,7 +7330,7 @@
         "id": "evidence:nap1805-polity-ottoman-empire",
         "binding": {
           "path": "/startingState/polities/polity:ottoman-empire",
-          "valueChecksum": "sha256:00c34d564bb5c5aa5df70e429dcf0af1f08876a017c878fa35fd8838cf796154"
+          "valueChecksum": "sha256:7fcb04bf8eded391097cdb9648e0202e8931a5724298c4664d3ad87fd85c36a9"
         },
         "basis": {
           "kind": "historical",
@@ -7323,7 +7349,7 @@
         "id": "evidence:nap1805-polity-sweden",
         "binding": {
           "path": "/startingState/polities/polity:sweden",
-          "valueChecksum": "sha256:3027ac8516675e5ae571db52019445d2bebc97a5b0044cdc3de32f776b33a832"
+          "valueChecksum": "sha256:458e7f1fbc876c38459091b413ea5e436dc8dec62850ea66069cebd6fe689bcd"
         },
         "basis": {
           "kind": "historical",
@@ -7342,7 +7368,7 @@
         "id": "evidence:nap1805-polity-denmark-norway",
         "binding": {
           "path": "/startingState/polities/polity:denmark-norway",
-          "valueChecksum": "sha256:f3ea80651aa833fd649a71e97acfe4c7ad66e15c4b803bfc28a49af67bd38b06"
+          "valueChecksum": "sha256:fa140f91c996df30630bec2706a4a269992a9e6cb7a7456a0ae70e7114892529"
         },
         "basis": {
           "kind": "historical",
@@ -7361,7 +7387,7 @@
         "id": "evidence:nap1805-polity-naples-sicily",
         "binding": {
           "path": "/startingState/polities/polity:naples-sicily",
-          "valueChecksum": "sha256:03ffcc61c5acd6d1a4281a88485852172808d1fad959d97a874ecfeab95afbac"
+          "valueChecksum": "sha256:131ce81c8d6535c776ba7597b18d15c70f440228024a34884e4edcb08f8e9a34"
         },
         "basis": {
           "kind": "historical",
@@ -7380,7 +7406,7 @@
         "id": "evidence:nap1805-polity-italy",
         "binding": {
           "path": "/startingState/polities/polity:italy",
-          "valueChecksum": "sha256:23f3980b3e5ac8aae07685967963621f935decb0e6f54cb0db18e35393055a30"
+          "valueChecksum": "sha256:330df45c266caddf4719951553d7345de1f931a5d5b9c9099006c62330e34fa3"
         },
         "basis": {
           "kind": "historical",
@@ -7399,7 +7425,7 @@
         "id": "evidence:nap1805-polity-bavaria",
         "binding": {
           "path": "/startingState/polities/polity:bavaria",
-          "valueChecksum": "sha256:87df6da8f851742db64c30287ae212c312b6cae0c3c165d164e580f1e811fd79"
+          "valueChecksum": "sha256:964649fbf4589a350e0566f154d96cccd80e59e786a1c14c8ffee1a631b869c8"
         },
         "basis": {
           "kind": "historical",
@@ -7418,7 +7444,7 @@
         "id": "evidence:nap1805-polity-portugal",
         "binding": {
           "path": "/startingState/polities/polity:portugal",
-          "valueChecksum": "sha256:3c9733b7088cb637b6f9a8c3bf46def10c439aa883dae8c7185cbb32874a43ee"
+          "valueChecksum": "sha256:26a4fa58ec39fe6dabc8b2c0b8f23fb2f26c0615f1b8b13a5a48ad7d080819df"
         },
         "basis": {
           "kind": "historical",
@@ -7437,7 +7463,7 @@
         "id": "evidence:nap1805-polity-batavian-republic",
         "binding": {
           "path": "/startingState/polities/polity:batavian-republic",
-          "valueChecksum": "sha256:370894e0bb4db7554f13864c8758bc4223a422354f1b5725a52cfcb5dd7c1cb5"
+          "valueChecksum": "sha256:c63d37ff7ed8146f31cb650c731cc9fd94925afefa5c01b368c7c5929c32b9ee"
         },
         "basis": {
           "kind": "historical",
@@ -7456,7 +7482,7 @@
         "id": "evidence:nap1805-polity-swiss-confederation",
         "binding": {
           "path": "/startingState/polities/polity:swiss-confederation",
-          "valueChecksum": "sha256:daa67e081de1285f14ee0db5c4635688097262d39647515a9896607b6c460a11"
+          "valueChecksum": "sha256:d854acea1965a0a9e3a42e8b58f72705b54380c7fb64a99f0beecf04c1672f75"
         },
         "basis": {
           "kind": "historical",
@@ -7475,7 +7501,7 @@
         "id": "evidence:nap1805-polity-saxony",
         "binding": {
           "path": "/startingState/polities/polity:saxony",
-          "valueChecksum": "sha256:2f214a75c32b31ae0d4672efa4db057f7dafc2966afa91a5bec94ec9d60d3c00"
+          "valueChecksum": "sha256:ce9b55ce400bcb72f56b15d92fe9fa6fe12419aaaf9e9f8ba270c260f20b4e1b"
         },
         "basis": {
           "kind": "historical",
@@ -7494,7 +7520,7 @@
         "id": "evidence:nap1805-polity-wurttemberg",
         "binding": {
           "path": "/startingState/polities/polity:wurttemberg",
-          "valueChecksum": "sha256:20eb2d7d7fc2a9ae7b5657ae11c36c2810d11d6ee2e716ff896a277fba016553"
+          "valueChecksum": "sha256:32276a69679984ec61052d2d89a788793b0b9c2a165a6b6b00ec1bc3a12bdcf0"
         },
         "basis": {
           "kind": "historical",
@@ -7513,7 +7539,7 @@
         "id": "evidence:nap1805-polity-baden",
         "binding": {
           "path": "/startingState/polities/polity:baden",
-          "valueChecksum": "sha256:e3ea22b19e7225a3baa765c48ffeb547dbc576482469ba0389894fb21e48de69"
+          "valueChecksum": "sha256:5bd3aed942eb0fed1ebe41e25b8819f44eb249898eddbefbb8a09c16eb7293e0"
         },
         "basis": {
           "kind": "historical",
@@ -7532,7 +7558,7 @@
         "id": "evidence:nap1805-polity-hanover",
         "binding": {
           "path": "/startingState/polities/polity:hanover",
-          "valueChecksum": "sha256:e29bd2f6be2ccedda755b2b54571e4d38b24a6531948ab7a99bf2fbace360fb4"
+          "valueChecksum": "sha256:a8a5d34eb5376abdf4ddc12263e32b0fe50fd0f463b8ac607cd2161e4681c289"
         },
         "basis": {
           "kind": "historical",
@@ -7551,7 +7577,7 @@
         "id": "evidence:nap1805-polity-papal-states",
         "binding": {
           "path": "/startingState/polities/polity:papal-states",
-          "valueChecksum": "sha256:33407ec075e9235e31e9ed6e5fa0fa0625ce8ad8bd6f3b176b7df187684f29e0"
+          "valueChecksum": "sha256:90d8aacd955b54c589168d9cb59fd8676d54f199a884c1ed3c8016e24740f46c"
         },
         "basis": {
           "kind": "historical",
@@ -7570,7 +7596,7 @@
         "id": "evidence:nap1805-polity-etruria",
         "binding": {
           "path": "/startingState/polities/polity:etruria",
-          "valueChecksum": "sha256:117c650789e35b364d506c549e043280d85e2afa7b73986a5e75e0b6bb5d2159"
+          "valueChecksum": "sha256:ad44636a47c19d702722e87a951298c139afadaae112d82a908d526622453496"
         },
         "basis": {
           "kind": "historical",
@@ -7589,7 +7615,7 @@
         "id": "evidence:nap1805-polity-ligurian-republic",
         "binding": {
           "path": "/startingState/polities/polity:ligurian-republic",
-          "valueChecksum": "sha256:56ddbdfa5f53458b9dfa889c3c36069668a5238d2be54042603a60aa587ca475"
+          "valueChecksum": "sha256:eea8108d14797d5cd61fa7171731c0366a487c7c009a0fb1002b47d807b9cf81"
         },
         "basis": {
           "kind": "historical",
@@ -7608,7 +7634,7 @@
         "id": "evidence:nap1805-polity-sardinia",
         "binding": {
           "path": "/startingState/polities/polity:sardinia",
-          "valueChecksum": "sha256:9771f463d2a000fd975815c7cb9c36bf4cf01597ffb3b68d19fa4c37b13026bc"
+          "valueChecksum": "sha256:2e2936f1cd4e3f3aff908998252d3eb37f74b493586e443295a7a119a7e92737"
         },
         "basis": {
           "kind": "historical",
@@ -7627,7 +7653,7 @@
         "id": "evidence:nap1805-polity-hesse-kassel",
         "binding": {
           "path": "/startingState/polities/polity:hesse-kassel",
-          "valueChecksum": "sha256:880782f7b3a8ddeea01bb928a0c28eeacdbeefa33fa06978c1db84e562e2a59a"
+          "valueChecksum": "sha256:91bf447f6a68494f31afba06f94b88b50570e2e4714fe767d192459f571bf0c4"
         },
         "basis": {
           "kind": "historical",
@@ -7646,7 +7672,7 @@
         "id": "evidence:nap1805-polity-hesse-darmstadt",
         "binding": {
           "path": "/startingState/polities/polity:hesse-darmstadt",
-          "valueChecksum": "sha256:39cdc31a92c33b203c96965f850ee39b498fdbd29b6739ceed01e07dccaa0718"
+          "valueChecksum": "sha256:7a934821d0c7201ee85b73006a2b19cf0b63eceff8ccdb33ed52b128920a6811"
         },
         "basis": {
           "kind": "historical",
@@ -7665,7 +7691,7 @@
         "id": "evidence:nap1805-polity-brunswick",
         "binding": {
           "path": "/startingState/polities/polity:brunswick",
-          "valueChecksum": "sha256:80bf4928ce7e6527fc9a533d6c50b56675de83fe4695390e1c4188361c872d14"
+          "valueChecksum": "sha256:9c16337f9a3f9e506f28bc49265bffed5d5974e80c7ac2b2ff7dba81967af0ce"
         },
         "basis": {
           "kind": "historical",

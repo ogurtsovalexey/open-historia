@@ -26,6 +26,17 @@ describe('Europe 1935 shipped ScenarioV3', () => {
       'polity:poland',
       'polity:united-kingdom',
     ]);
+    const scenario = validation.scenario!;
+    assert.ok(scenario.game.playerEligiblePolityIds.every(
+      (polityId) => scenario.startingState.polities[polityId]!.decisionMode === 'active',
+    ));
+    assert.deepStrictEqual(
+      Object.values(scenario.startingState.polities)
+        .filter((polity) => polity.decisionMode === 'inert')
+        .map((polity) => polity.id)
+        .sort(),
+      ['polity:free-city-of-danzig', 'polity:saar-basin'],
+    );
   });
 
   it('owns era catalogs and starts capabilities as exact concepts, never future outcomes', async () => {

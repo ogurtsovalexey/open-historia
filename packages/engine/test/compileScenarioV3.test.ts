@@ -65,6 +65,7 @@ function minimalScenario() {
       polities: {
         'polity:alpha': {
           id: 'polity:alpha', displayName: { en: 'Alpha' }, color: '#112233', treasury: 10,
+          decisionMode: 'active',
           stockpiles: { 'commodity:food': 5 }, evidenceIds: ['evidence:polity-alpha'],
         },
       },

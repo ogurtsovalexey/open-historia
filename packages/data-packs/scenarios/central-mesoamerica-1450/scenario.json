@@ -1040,6 +1040,7 @@
           "en": "Azcapotzalco"
         },
         "color": "#3a555e",
+        "decisionMode": "supported",
         "treasury": 800,
         "stockpiles": {
           "commodity:maize": 2222,
@@ -1057,6 +1058,7 @@
           "en": "Chalco"
         },
         "color": "#4b83a6",
+        "decisionMode": "active",
         "treasury": 3596,
         "stockpiles": {
           "commodity:maize": 10000,
@@ -1074,6 +1076,7 @@
           "en": "Cholollan"
         },
         "color": "#b0762d",
+        "decisionMode": "active",
         "treasury": 2000,
         "stockpiles": {
           "commodity:maize": 5555,
@@ -1091,6 +1094,7 @@
           "en": "Coixtlahuaca"
         },
         "color": "#588b94",
+        "decisionMode": "supported",
         "treasury": 1600,
         "stockpiles": {
           "commodity:maize": 4444,
@@ -1108,6 +1112,7 @@
           "en": "Cuauhnahuac"
         },
         "color": "#4e7982",
+        "decisionMode": "supported",
         "treasury": 2000,
         "stockpiles": {
           "commodity:maize": 5555,
@@ -1125,6 +1130,7 @@
           "en": "Cuauhtinchan"
         },
         "color": "#497079",
+        "decisionMode": "supported",
         "treasury": 800,
         "stockpiles": {
           "commodity:maize": 2222,
@@ -1142,6 +1148,7 @@
           "en": "Cuauhtitlan"
         },
         "color": "#3f5e67",
+        "decisionMode": "supported",
         "treasury": 1200,
         "stockpiles": {
           "commodity:maize": 3333,
@@ -1159,6 +1166,7 @@
           "en": "Huajuapan"
         },
         "color": "#76c1ca",
+        "decisionMode": "supported",
         "treasury": 1000,
         "stockpiles": {
           "commodity:maize": 2777,
@@ -1176,6 +1184,7 @@
           "en": "Huexotzinco"
         },
         "color": "#8d5a91",
+        "decisionMode": "active",
         "treasury": 1800,
         "stockpiles": {
           "commodity:maize": 5000,
@@ -1193,6 +1202,7 @@
           "en": "Nochistlan"
         },
         "color": "#6cafb8",
+        "decisionMode": "supported",
         "treasury": 800,
         "stockpiles": {
           "commodity:maize": 2222,
@@ -1210,6 +1220,7 @@
           "en": "Purépecha state"
         },
         "color": "#4b4f8c",
+        "decisionMode": "active",
         "treasury": 17996,
         "stockpiles": {
           "commodity:maize": 50000,
@@ -1227,6 +1238,7 @@
           "en": "Soconusco corridor"
         },
         "color": "#80d3dc",
+        "decisionMode": "supported",
         "treasury": 500,
         "stockpiles": {
           "commodity:maize": 1388,
@@ -1244,6 +1256,7 @@
           "en": "Mexico-Tenochtitlan"
         },
         "color": "#2f7d32",
+        "decisionMode": "active",
         "treasury": 3200,
         "stockpiles": {
           "commodity:maize": 8888,
@@ -1261,6 +1274,7 @@
           "en": "Teozacoalco"
         },
         "color": "#67a6af",
+        "decisionMode": "supported",
         "treasury": 1000,
         "stockpiles": {
           "commodity:maize": 2777,
@@ -1278,6 +1292,7 @@
           "en": "Tepeaca"
         },
         "color": "#446770",
+        "decisionMode": "supported",
         "treasury": 1600,
         "stockpiles": {
           "commodity:maize": 4444,
@@ -1295,6 +1310,7 @@
           "en": "Tetzcoco"
         },
         "color": "#567d46",
+        "decisionMode": "active",
         "treasury": 3596,
         "stockpiles": {
           "commodity:maize": 10000,
@@ -1312,6 +1328,7 @@
           "en": "Tilantongo"
         },
         "color": "#5d949d",
+        "decisionMode": "supported",
         "treasury": 1000,
         "stockpiles": {
           "commodity:maize": 2777,
@@ -1329,6 +1346,7 @@
           "en": "Tlacopan"
         },
         "color": "#826b36",
+        "decisionMode": "active",
         "treasury": 1800,
         "stockpiles": {
           "commodity:maize": 5000,
@@ -1346,6 +1364,7 @@
           "en": "Mexico-Tlatelolco"
         },
         "color": "#755037",
+        "decisionMode": "active",
         "treasury": 1400,
         "stockpiles": {
           "commodity:maize": 3888,
@@ -1363,6 +1382,7 @@
           "en": "Tlaxcallan"
         },
         "color": "#a13d3d",
+        "decisionMode": "active",
         "treasury": 5996,
         "stockpiles": {
           "commodity:maize": 16666,
@@ -1380,6 +1400,7 @@
           "en": "Tlaxiaco"
         },
         "color": "#629da6",
+        "decisionMode": "supported",
         "treasury": 1000,
         "stockpiles": {
           "commodity:maize": 2777,
@@ -1397,6 +1418,7 @@
           "en": "Tochtepec corridor"
         },
         "color": "#7bcad3",
+        "decisionMode": "supported",
         "treasury": 500,
         "stockpiles": {
           "commodity:maize": 1388,
@@ -1414,6 +1436,7 @@
           "en": "Yucu Dzaa (Tututepec)"
         },
         "color": "#176b68",
+        "decisionMode": "active",
         "treasury": 3000,
         "stockpiles": {
           "commodity:maize": 8333,
@@ -1431,6 +1454,7 @@
           "en": "Xochimilco"
         },
         "color": "#354c55",
+        "decisionMode": "supported",
         "treasury": 2000,
         "stockpiles": {
           "commodity:maize": 5555,
@@ -1448,6 +1472,7 @@
           "en": "Yanhuitlan"
         },
         "color": "#71b8c1",
+        "decisionMode": "supported",
         "treasury": 1000,
         "stockpiles": {
           "commodity:maize": 2777,
@@ -1465,6 +1490,7 @@
           "en": "Yauhtepec"
         },
         "color": "#53828b",
+        "decisionMode": "supported",
         "treasury": 2000,
         "stockpiles": {
           "commodity:maize": 5555,
@@ -7071,7 +7097,7 @@
         "id": "evidence:meso1450-polity-azcapotzalco",
         "binding": {
           "path": "/startingState/polities/polity:azcapotzalco",
-          "valueChecksum": "sha256:52198d3fac94ec227c44908078af9fcd6f80f7cb725b43fce61ddeef980107b5"
+          "valueChecksum": "sha256:777bf7679e7a89ded929c937c81029f6b4ca9062ea8c6ba0411c355bce9b292f"
         },
         "basis": {
           "kind": "historical",
@@ -7089,7 +7115,7 @@
         "id": "evidence:meso1450-polity-chalco",
         "binding": {
           "path": "/startingState/polities/polity:chalco",
-          "valueChecksum": "sha256:3a648ce727e3ac97bac7a639968d8e8c178c6810a5a18ea8c8aabdbb9dc2e37b"
+          "valueChecksum": "sha256:80ffe54d67eb150717f2ebb9756295af2c3b9e98af9f7f61025ed6d5b74444db"
         },
         "basis": {
           "kind": "historical",
@@ -7107,7 +7133,7 @@
         "id": "evidence:meso1450-polity-cholollan",
         "binding": {
           "path": "/startingState/polities/polity:cholollan",
-          "valueChecksum": "sha256:7cd9e8c54f591fd137981e4681367ba8b880efd2cbe0cd650e6888e8044f8c2e"
+          "valueChecksum": "sha256:e90df75bc10a0d48ec4a7e150b0bfb6aebe6529d43a28c2fcadc3a89ced9c367"
         },
         "basis": {
           "kind": "historical",
@@ -7125,7 +7151,7 @@
         "id": "evidence:meso1450-polity-coixtlahuaca",
         "binding": {
           "path": "/startingState/polities/polity:coixtlahuaca",
-          "valueChecksum": "sha256:fb28d1906526871f5727c5fb3496a51cd5c8f3b0cd58e48c0d549392a2a379d9"
+          "valueChecksum": "sha256:3fb64182f21333b4bac71abe6fcd326a68fa79f5ab5c5d80ef66f1866b517e05"
         },
         "basis": {
           "kind": "historical",
@@ -7143,7 +7169,7 @@
         "id": "evidence:meso1450-polity-cuauhnahuac",
         "binding": {
           "path": "/startingState/polities/polity:cuauhnahuac",
-          "valueChecksum": "sha256:2612aad77aea0bfb91df3cb968f666829a476a284c8a93caa1220b72d1ef8ef2"
+          "valueChecksum": "sha256:16dca0d8cf072b51598f803db6826886c7a171e76369f19dd5a3273474db98b4"
         },
         "basis": {
           "kind": "historical",
@@ -7161,7 +7187,7 @@
         "id": "evidence:meso1450-polity-cuauhtinchan",
         "binding": {
           "path": "/startingState/polities/polity:cuauhtinchan",
-          "valueChecksum": "sha256:f4eeae8516715383bf168e489cbfc5b821e69e36a36b3dbceb850dc2cdf94f6d"
+          "valueChecksum": "sha256:2dea62772bfe0902095e4278ac592d7c8ab99a9ccb1ba6bba8d030107eff4762"
         },
         "basis": {
           "kind": "historical",
@@ -7179,7 +7205,7 @@
         "id": "evidence:meso1450-polity-cuauhtitlan",
         "binding": {
           "path": "/startingState/polities/polity:cuauhtitlan",
-          "valueChecksum": "sha256:8164e285e81348b61167e1cbcde16f92ac9a543ea56d0c60d72edb14fd2d33f5"
+          "valueChecksum": "sha256:9a8a870549944d1c7cf8ff8525ff37af38d994225618bc8b95c8e3a1d9a42904"
         },
         "basis": {
           "kind": "historical",
@@ -7197,7 +7223,7 @@
         "id": "evidence:meso1450-polity-huajuapan",
         "binding": {
           "path": "/startingState/polities/polity:huajuapan",
-          "valueChecksum": "sha256:3841e712cfb0cb4d8369e0982f1996beea8b831d56fff108c58f9a549b475a04"
+          "valueChecksum": "sha256:15052e7523bc49a03e9cbba3c765e2dbba04a0d25616c39a3bd2b9233ec35e91"
         },
         "basis": {
           "kind": "historical",
@@ -7215,7 +7241,7 @@
         "id": "evidence:meso1450-polity-huexotzinco",
         "binding": {
           "path": "/startingState/polities/polity:huexotzinco",
-          "valueChecksum": "sha256:9289f043c3b6e8321339731a6b29b0e38477d8eb4a86e23997e823d7570ea325"
+          "valueChecksum": "sha256:bab4cfdd512a1626519156040e981c7f6e4d0b38120e6728e4172dafde627b9d"
         },
         "basis": {
           "kind": "historical",
@@ -7233,7 +7259,7 @@
         "id": "evidence:meso1450-polity-nochistlan",
         "binding": {
           "path": "/startingState/polities/polity:nochistlan",
-          "valueChecksum": "sha256:18fa235ec3805e7c3ae47bd9b6f89ff1108cd9ec4f10f0ae0b28675acebbcd57"
+          "valueChecksum": "sha256:c7e6a6915b01a34927a249b27dbfe7420384353f236998d5ab5ac6b05a616ae5"
         },
         "basis": {
           "kind": "historical",
@@ -7251,7 +7277,7 @@
         "id": "evidence:meso1450-polity-purepecha",
         "binding": {
           "path": "/startingState/polities/polity:purepecha",
-          "valueChecksum": "sha256:ffca6951af4b1bd0e99cf08b95c447330dab18d6d753d627f12e1118c5d1ea42"
+          "valueChecksum": "sha256:f4546796ff2bb93d0f8adbb7511c05fdecc5d9d215dfc13ea29bf58cc71f4f8b"
         },
         "basis": {
           "kind": "historical",
@@ -7270,7 +7296,7 @@
         "id": "evidence:meso1450-polity-soconusco",
         "binding": {
           "path": "/startingState/polities/polity:soconusco",
-          "valueChecksum": "sha256:c87d3003b3d3c91f6f03154cf0328c8a7c9778a3720843420a2965bef2b6bddf"
+          "valueChecksum": "sha256:1901980424767ce98c83fd674170591b53cfc62f82b586e707562bc8dfb90c69"
         },
         "basis": {
           "kind": "historical",
@@ -7288,7 +7314,7 @@
         "id": "evidence:meso1450-polity-tenochtitlan",
         "binding": {
           "path": "/startingState/polities/polity:tenochtitlan",
-          "valueChecksum": "sha256:5e22d15c05ecb77ce128e85b891f12d7e09adf3fbc19a5b3a8f47ef9db84e352"
+          "valueChecksum": "sha256:8c7176dd2df52fb82789293470d14eee6db2cbd481404116a857e20337d8f026"
         },
         "basis": {
           "kind": "historical",
@@ -7306,7 +7332,7 @@
         "id": "evidence:meso1450-polity-teozacoalco",
         "binding": {
           "path": "/startingState/polities/polity:teozacoalco",
-          "valueChecksum": "sha256:033b05d588abbee9305aef3d76b065c32c5156bfd16fac5536422ac69f6276d8"
+          "valueChecksum": "sha256:172eb280962929369864879415fbd8210cb41c5deacbf520b6baf91d94d64523"
         },
         "basis": {
           "kind": "historical",
@@ -7324,7 +7350,7 @@
         "id": "evidence:meso1450-polity-tepeaca",
         "binding": {
           "path": "/startingState/polities/polity:tepeaca",
-          "valueChecksum": "sha256:37c6a0de392537a5e061d272fdc69d29f6668a428b50560d7a51009d65cac772"
+          "valueChecksum": "sha256:0117754ebcce8736c77a44f1d535dd9ab9cb3ee8588c2d18ecd386863f634bf4"
         },
         "basis": {
           "kind": "historical",
@@ -7342,7 +7368,7 @@
         "id": "evidence:meso1450-polity-texcoco",
         "binding": {
           "path": "/startingState/polities/polity:texcoco",
-          "valueChecksum": "sha256:701e392057b4eb606f09f5dcb6836a52a9b6128207926e877947d7a571878227"
+          "valueChecksum": "sha256:423382be06c45156483fa5773cdeee8983f19acc632a678c63b13d41d80f6504"
         },
         "basis": {
           "kind": "historical",
@@ -7360,7 +7386,7 @@
         "id": "evidence:meso1450-polity-tilantongo",
         "binding": {
           "path": "/startingState/polities/polity:tilantongo",
-          "valueChecksum": "sha256:e9f35563baf8f3ccfd7049f107128fc8b92993125ec787aaa7ab12d3a34da1be"
+          "valueChecksum": "sha256:f4b21c2265cdd3160f7eb4e888647c7ccc6f168d5767013e4974211e31a837dd"
         },
         "basis": {
           "kind": "historical",
@@ -7378,7 +7404,7 @@
         "id": "evidence:meso1450-polity-tlacopan",
         "binding": {
           "path": "/startingState/polities/polity:tlacopan",
-          "valueChecksum": "sha256:c7768073e45ef7af1c95c627847dea590fc7d1420ed2dd64fe82da9033aacd4d"
+          "valueChecksum": "sha256:7e0a1d01b8509e40acfe196bd09c7d22b00f69f05cec3bcec6d6a1d60bd902c2"
         },
         "basis": {
           "kind": "historical",
@@ -7396,7 +7422,7 @@
         "id": "evidence:meso1450-polity-tlatelolco",
         "binding": {
           "path": "/startingState/polities/polity:tlatelolco",
-          "valueChecksum": "sha256:9c8d2469d510eca088f00b961af9d96b9893b2ed7521c4b56f4d6b9d983ce126"
+          "valueChecksum": "sha256:27e936447ce48ab044d3a154138b0489d7e3cf612dcac8c832f5e007e84d1926"
         },
         "basis": {
           "kind": "historical",
@@ -7414,7 +7440,7 @@
         "id": "evidence:meso1450-polity-tlaxcallan",
         "binding": {
           "path": "/startingState/polities/polity:tlaxcallan",
-          "valueChecksum": "sha256:da06c4171cb1e594d6a2fd6f0a864b719ccee74a7d177339182d538a43953c89"
+          "valueChecksum": "sha256:1b358f71cf11a1c32e213c4890b320f07d9b90ad9c18bd4e44d16c49db91aa93"
         },
         "basis": {
           "kind": "historical",
@@ -7432,7 +7458,7 @@
         "id": "evidence:meso1450-polity-tlaxiaco",
         "binding": {
           "path": "/startingState/polities/polity:tlaxiaco",
-          "valueChecksum": "sha256:ec8a5edd90ef8b09057140ffb68708277a03c5de86a5ad92548c2e61584da2de"
+          "valueChecksum": "sha256:9948c4d7e87e29d7b09985be0a582f0e27dfaea7769e3b015e3b6cb41db781ca"
         },
         "basis": {
           "kind": "historical",
@@ -7450,7 +7476,7 @@
         "id": "evidence:meso1450-polity-tochtepec",
         "binding": {
           "path": "/startingState/polities/polity:tochtepec",
-          "valueChecksum": "sha256:fb1b98f962a77dd0f08896bb44212bd381cc257496637d4e090e7cf3ed8b1bd1"
+          "valueChecksum": "sha256:71bdc526aca036cb8644d43b3010530b9b70d909f6497a1d6e597271420455da"
         },
         "basis": {
           "kind": "historical",
@@ -7468,7 +7494,7 @@
         "id": "evidence:meso1450-polity-tututepec",
         "binding": {
           "path": "/startingState/polities/polity:tututepec",
-          "valueChecksum": "sha256:5d2acc0ae439fb0d120162ec261b2a669978dfdd4c7aef4ccb4db5d6335c7d54"
+          "valueChecksum": "sha256:53c0b36e81bb8910613001fc06956fae3e351a0d0355fdd309d379b6a1373a32"
         },
         "basis": {
           "kind": "historical",
@@ -7486,7 +7512,7 @@
         "id": "evidence:meso1450-polity-xochimilco",
         "binding": {
           "path": "/startingState/polities/polity:xochimilco",
-          "valueChecksum": "sha256:325a7618e6f0db1d148b678022bb4d76823dbaec158db23b8f643c15ba6dc775"
+          "valueChecksum": "sha256:61642ca47a2801e025c319956cc9b2ee5147d7167f653ac870c376b15a88e682"
         },
         "basis": {
           "kind": "historical",
@@ -7504,7 +7530,7 @@
         "id": "evidence:meso1450-polity-yanhuitlan",
         "binding": {
           "path": "/startingState/polities/polity:yanhuitlan",
-          "valueChecksum": "sha256:2c273d1c24d3579a42cc807ecb6a8913ec1d512c2cf345f72caab7f1ea2a4bc1"
+          "valueChecksum": "sha256:2848bb6701fc7429a726ef6ab125683dd249d0427b085bc96915c3b1f88ae268"
         },
         "basis": {
           "kind": "historical",
@@ -7522,7 +7548,7 @@
         "id": "evidence:meso1450-polity-yautepec",
         "binding": {
           "path": "/startingState/polities/polity:yautepec",
-          "valueChecksum": "sha256:4d38e022232f11ed2d06700c8a601507e4be9a2ab01f0ba81ca9da2545c1066a"
+          "valueChecksum": "sha256:f28c4aa7545deb705b039395585fe5e29c9e160e74242915e4526c5a3f0bc0ae"
         },
         "basis": {
           "kind": "historical",

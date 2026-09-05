@@ -23,6 +23,13 @@ describe('Central Mesoamerica 1450 shipped ScenarioV3', () => {
       'polity:tlaxcallan', 'polity:purepecha', 'polity:cholollan', 'polity:chalco',
       'polity:huexotzinco', 'polity:tututepec',
     ]);
+    assert.ok(scenario.game.playerEligiblePolityIds.every(
+      (polityId) => scenario.startingState.polities[polityId]!.decisionMode === 'active',
+    ));
+    assert.strictEqual(
+      Object.values(scenario.startingState.polities).filter((polity) => polity.decisionMode === 'supported').length,
+      16,
+    );
   });
 
   it('owns Mesoamerican catalogs and contains no industrial or modern-state defaults', async () => {
