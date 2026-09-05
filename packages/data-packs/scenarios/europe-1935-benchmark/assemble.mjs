@@ -372,6 +372,7 @@ const scenario = {
     formations: sortRecord(formations),
     institutions: sortRecord(institutions),
     relationships: sortRecord(relationships),
+    diplomaticProposals: {},
     routes: {},
     concepts: sortRecord(concepts),
     knowledge: {},

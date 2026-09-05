@@ -176,7 +176,18 @@ Red tests:
 Merge gate: focused server tests, then `npm test`, `npm run test:scenarios`,
 `npm run build`, `npm run lint`, `git diff --check`. Commit this package alone.
 
-#### R2 — typed diplomacy and authorized territory, end to end
+#### R2 — typed diplomacy and authorized territory, end to end — complete
+
+Delivered: canonical pending proposals, frozen recipient choices and typed
+relationship/territorial acceptance now form one strict path. Player/model
+text selects only published IDs and qualitative intent. It cannot provide
+numeric access, control profiles, combat, peace or GM authority. Territorial
+acceptance uses the agreement authority through `applyTerritorialTransition`;
+the offered control snapshot must still match. The three shipped scenarios
+declare the empty authored collection and compile their relationship-type
+catalogues into the runtime manifest. Server and Playwright coverage prove an
+offer is immaterial until the addressed recipient accepts it. The next package
+is R3.
 
 Do not route a territorial request through a generic process effect. Add the
 smallest canonical proposal state needed for a real negotiation:

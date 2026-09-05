@@ -41,7 +41,7 @@ function visibleEvidence(state, polityId) {
     }));
 }
 
-function buildBrief(state, polity, strategicState) {
+function buildBrief(state, polity, strategicState, pendingProposals = []) {
   const evidence = visibleEvidence(state, polity.id);
   if (evidence.length === 0) return null;
   const factId = evidence[0].evidenceId;
@@ -72,6 +72,24 @@ function buildBrief(state, polity, strategicState) {
     };
   });
   const domains = unique(state.concepts.flatMap((concept) => concept.domains)).slice(0, 16);
+  const frozenChoices = pendingProposals.flatMap((proposal) => {
+    const visibleFacts = proposal.evidenceIds.filter((id) => evidence.some((entry) => entry.evidenceId === id));
+    const factsUsed = visibleFacts.length > 0 ? [visibleFacts[0]] : [factId];
+    const territorial = proposal.terms.filter((term) => term.kind === 'territorial-cession').map((term) => labelOf(term.regionId)).join(', ');
+    const relationship = proposal.terms.filter((term) => term.kind === 'relationship').map((term) => labelOf(term.relationshipTypeId)).join(', ');
+    const subject = territorial || relationship || 'diplomatic proposal';
+    return ['accept', 'reject'].map((decision) => ({
+      choiceId: `choice:proposal-${decision}-${proposal.proposalId.slice('proposal:'.length)}`,
+      family: 'choice-family:diplomatic-proposal', materializationRef: proposal.proposalId,
+      triggerIds: [proposal.proposalId], factsUsed,
+      summary: `${decision === 'accept' ? 'Accept' : 'Reject'} ${subject} proposed by ${labelOf(proposal.proposerPolityId)}.`,
+      preview: {
+        feasibility: decision === 'accept' ? 'feasible' : 'feasible',
+        consequence: decision === 'accept' ? 'Commits only the published terms through the deterministic agreement reducer.' : 'Records a refusal without material territorial change.',
+        factsUsed,
+      },
+    }));
+  });
   const brief = {
     schemaVersion: 'open-historia-strategic-brief/5',
     decisionSchemaVersion: 'open-historia-strategic-decision/4',
@@ -90,7 +108,7 @@ function buildBrief(state, polity, strategicState) {
       summary: `${snapshot.controlledPopulation} people under actual control; treasury ${snapshot.treasury}; fielded personnel ${snapshot.fieldedPersonnel}.`,
       factsUsed: [factId],
     }],
-    claims: [], evidence, frozenChoices: [], processOptions,
+    claims: [], evidence, frozenChoices, processOptions,
     initiativeEnvelope: {
       allowedConceptTypes: ['technology', 'ideology', 'religious-movement', 'institution', 'doctrine', 'economic-practice', 'scientific-theory'],
       allowedDomains: domains.length > 0 ? domains : ['domain:general'],
@@ -119,7 +137,15 @@ function requiresBackgroundReview(state, polity, strategicState) {
  * are intentionally allowed ahead of that background budget.
  */
 export function buildLivingWorldStrategicTasks(state, playerPolityId, strategicState, options = {}) {
-  const directedPolityIds = new Set(options.directedPolityIds ?? []);
+  const pendingByRecipient = new Map();
+  for (const proposal of state.diplomaticProposals.filter((entry) => entry.status === 'pending')) {
+    for (const recipientId of proposal.recipientPolityIds) {
+      const proposals = pendingByRecipient.get(recipientId) ?? [];
+      proposals.push(proposal);
+      pendingByRecipient.set(recipientId, proposals);
+    }
+  }
+  const directedPolityIds = new Set([...(options.directedPolityIds ?? []), ...pendingByRecipient.keys()]);
   const backgroundTaskLimit = options.backgroundTaskLimit ?? BACKGROUND_TASK_LIMIT;
   const actors = state.polities
     .filter((polity) => polity.id !== playerPolityId && polity.decisionMode !== 'inert')
@@ -132,12 +158,17 @@ export function buildLivingWorldStrategicTasks(state, playerPolityId, strategicS
     && requiresBackgroundReview(state, polity, strategicState)
   )).slice(0, backgroundTaskLimit);
   return [...directed, ...background].map((polity) => {
-    const brief = buildBrief(state, polity, strategicState);
+    const proposals = (pendingByRecipient.get(polity.id) ?? []).sort((left, right) => left.proposalId.localeCompare(right.proposalId));
+    const brief = buildBrief(state, polity, strategicState, proposals);
     if (!brief) return null;
     const taskKey = `strategic-v5:${state.turn}:${polity.id}`;
     return {
       taskKey,
       actorPolityId: polity.id,
+      proposalResponses: Object.fromEntries(proposals.flatMap((proposal) => [
+        [`choice:proposal-accept-${proposal.proposalId.slice('proposal:'.length)}`, { proposalId: proposal.proposalId, decision: 'accept' }],
+        [`choice:proposal-reject-${proposal.proposalId.slice('proposal:'.length)}`, { proposalId: proposal.proposalId, decision: 'reject' }],
+      ])),
       reviewEvidenceIds: brief.evidence.map((entry) => entry.evidenceId),
       brief,
       systemPrompt: SYSTEM_PROMPT,
@@ -240,6 +271,21 @@ export function resolveLivingWorldStrategicTasks(stateInput, tasks, submittedAtt
   for (const { task, resolution } of resolutions) {
     const record = { taskKey: task.taskKey, actorPolityId: task.actorPolityId, status: resolution.status, materializedProcessIds: [], errors: [] };
     if (resolution.status === 'accepted') {
+      const selectedResponses = resolution.semanticPackage.selectedChoiceIds
+        .map((choiceId) => task.proposalResponses?.[choiceId])
+        .filter(Boolean);
+      const responseProposalIds = selectedResponses.map((response) => response.proposalId);
+      if (new Set(responseProposalIds).size !== responseProposalIds.length) {
+        record.errors.push('A diplomatic proposal cannot be both accepted and rejected in one decision.');
+      }
+      for (const response of selectedResponses) {
+        try {
+          state = worldV2.resolveDiplomaticProposal(state, {
+            proposalId: response.proposalId, actorPolityId: task.actorPolityId,
+            decision: response.decision, expectedRevision: state.revision,
+          });
+        } catch (error) { record.errors.push(error instanceof Error ? error.message : String(error)); }
+      }
       for (const decision of resolution.semanticPackage.processDecisions) {
         try {
           state = processes.applyProcessDecision(state, {

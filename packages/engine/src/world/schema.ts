@@ -39,6 +39,7 @@ export const institutionIdSchema = prefixedIdSchema('institution').brand<'Instit
 export const conceptIdSchema = prefixedIdSchema('concept').brand<'ConceptId'>();
 export const processIdSchema = prefixedIdSchema('process').brand<'ProcessId'>();
 export const relationshipIdSchema = prefixedIdSchema('relationship').brand<'RelationshipId'>();
+export const diplomaticProposalIdSchema = prefixedIdSchema('proposal').brand<'DiplomaticProposalId'>();
 export const tributeObligationIdSchema = prefixedIdSchema('obligation').brand<'TributeObligationId'>();
 export const evidenceIdSchema = prefixedIdSchema('evidence').brand<'EvidenceId'>();
 export const worldEventIdSchema = prefixedIdSchema('event').brand<'WorldEventId'>();
@@ -200,6 +201,35 @@ export const relationshipStateSchema = z.object({
   evidenceIds: evidenceIdsSchema,
 }).strict();
 
+export const diplomaticTermSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('relationship'),
+    relationshipTypeId: prefixedIdSchema('relationship-type'),
+    participantPolityIds: z.array(polityIdSchema).min(2),
+  }).strict(),
+  z.object({
+    kind: z.literal('territorial-cession'),
+    regionId: regionIdSchema,
+    fromPolityId: polityIdSchema,
+    toPolityId: polityIdSchema,
+    /** Frozen when offered; acceptance must fail rather than reinterpret changed control. */
+    expectedControl: regionalControlSchema,
+  }).strict(),
+]);
+export type DiplomaticTerm = z.infer<typeof diplomaticTermSchema>;
+
+export const diplomaticProposalStateSchema = z.object({
+  proposalId: diplomaticProposalIdSchema,
+  proposerPolityId: polityIdSchema,
+  recipientPolityIds: z.array(polityIdSchema).min(1),
+  terms: z.array(diplomaticTermSchema).min(1),
+  status: z.enum(['pending', 'accepted', 'rejected', 'withdrawn']),
+  createdAtRevision: nonzeroWorldRevisionHashSchema,
+  evidenceIds: evidenceIdsSchema,
+  acceptedAgreementId: prefixedIdSchema('agreement').optional(),
+}).strict();
+export type DiplomaticProposalState = z.infer<typeof diplomaticProposalStateSchema>;
+
 export const tributeObligationStateSchema = z.object({
   obligationId: tributeObligationIdSchema,
   payerPolityIds: z.array(polityIdSchema).min(1),
@@ -246,6 +276,7 @@ const entityRefSchema = z.union([
   conceptIdSchema,
   processIdSchema,
   relationshipIdSchema,
+  diplomaticProposalIdSchema,
   tributeObligationIdSchema,
 ]);
 
@@ -324,6 +355,9 @@ export const catalogManifestSchema = z.object({
   routeClasses: z.array(z.object({
     routeClassId: routeClassIdSchema,
   }).strict()),
+  relationshipTypes: z.array(z.object({
+    relationshipTypeId: prefixedIdSchema('relationship-type'),
+  }).strict()).default([]),
 }).strict();
 
 export const worldStateV2ContentSchema = z.object({
@@ -350,6 +384,7 @@ export const worldStateV2ContentSchema = z.object({
   concepts: z.array(conceptStateSchema),
   processes: z.array(worldProcessStateSchema),
   relationships: z.array(relationshipStateSchema),
+  diplomaticProposals: z.array(diplomaticProposalStateSchema).default([]),
   tributeObligations: z.array(tributeObligationStateSchema).default([]),
   knowledge: knowledgeStateSchema,
   events: z.array(worldEventSchema),

@@ -7758,6 +7758,7 @@
         "type": "doctrine"
       }
     },
+    "diplomaticProposals": {},
     "formations": {
       "formation:austria-home-theatre": {
         "archetypeId": "formation-archetype:home-theatre",

@@ -6805,6 +6805,7 @@
         ]
       }
     },
+    "diplomaticProposals": {},
     "routes": {
       "route:channel-north-sea": {
         "id": "route:channel-north-sea",

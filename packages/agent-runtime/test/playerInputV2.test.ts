@@ -3,6 +3,7 @@ import assert from 'node:assert';
 import { worldV2 } from '@open-historia/engine';
 import {
   interpretPlayerInputV2,
+  requestedActionV2ModelSchema,
   type PlayerInputV2ModelInput,
 } from '../src/playerInputV2.js';
 
@@ -163,5 +164,25 @@ describe('PlayerInputInterpretationV2', () => {
     assert.deepStrictEqual(result.value.requestedActions[0]!.reasons, [
       'evidence-not-visible:evidence:beta', 'unknown-entity:region:test:missing',
     ]);
+  });
+
+  it('grounds a typed territorial offer but rejects model-authored numeric access and undeclared relationship types', () => {
+    const world = state();
+    const playerText = 'Offer A to Beta.';
+    const output = baseOutput(world.revision);
+    output.requestedActions.push({
+      actionId: 'action:offer-a', domain: 'diplomacy', scope: 'external', intent: 'offer A to Beta',
+      pace: 'slow', effectFamilies: ['relation.modify'], targetEntityIds: ['region:test:A', 'polity:beta'], claimRefs: [], evidenceIds: ['evidence:public'],
+      operation: { kind: 'territory.offer', recipientPolityId: 'polity:beta', regionId: 'region:test:A' }, sourceSpan: span(playerText, playerText),
+    });
+    const result = interpretPlayerInputV2(world, { actorPolityId: 'polity:alpha', playerText, modelOutput: output });
+    assert.strictEqual(result.value.requestedActions[0]!.status, 'grounded');
+    assert.throws(() => requestedActionV2ModelSchema.parse({
+      ...output.requestedActions[0], operation: { kind: 'territory.offer', recipientPolityId: 'polity:beta', regionId: 'region:test:A', administrationAccessBp: 10000 },
+    }), /unrecognized key/i);
+    const invalidRelationship = structuredClone(output);
+    invalidRelationship.requestedActions[0]!.operation = { kind: 'diplomacy.propose', recipientPolityIds: ['polity:beta'], relationshipTypeId: 'relationship-type:invented' };
+    const blocked = interpretPlayerInputV2(world, { actorPolityId: 'polity:alpha', playerText, modelOutput: invalidRelationship });
+    assert.ok(blocked.value.requestedActions[0]!.reasons.includes('undeclared-relationship-type:relationship-type:invented'));
   });
 });

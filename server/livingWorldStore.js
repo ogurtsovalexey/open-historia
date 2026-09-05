@@ -96,6 +96,7 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput) {
     pace: action.pace,
     effectFamilies: action.effectFamilies,
     targetEntityIds: action.targetEntityIds,
+    operation: action.operation ?? { kind: 'process.propose' },
     status: action.status,
   }));
   const proposedInitiatives = grounded.proposedInitiatives.map((initiative) => ({
@@ -114,7 +115,7 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput) {
     status: initiative.status,
   }));
   const enginePreviews = [];
-  for (const entry of [...requestedActions, ...proposedInitiatives].filter((item) => item.material)) {
+  for (const entry of [...requestedActions.filter((item) => item.operation.kind === 'process.propose'), ...proposedInitiatives].filter((item) => item.material)) {
     const candidate = entry.actionId ? {
       sourceId: entry.actionId,
       conceptType: conceptTypeForAction(entry.domain),
@@ -236,7 +237,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
   const created = [];
   const candidates = [
     ...playerIntent.requestedActions
-      .filter((entry) => entry.material && entry.status === 'grounded')
+      .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind === 'process.propose')
       .map((action) => ({
         sourceId: action.actionId,
         conceptType: conceptTypeForAction(action.domain),
@@ -295,7 +296,28 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
       revisionAfter: state.revision,
     });
   }
-  return { state, created };
+  const createdProposals = [];
+  for (const action of playerIntent.requestedActions
+    .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind !== 'process.propose')
+    .sort((left, right) => left.actionId.localeCompare(right.actionId))) {
+    const operation = action.operation;
+    const base = {
+      proposalId: hashId('proposal', [playerIntent.interpretationId, action.actionId]),
+      proposerPolityId: playerIntent.playerPolityId,
+    };
+    const request = operation.kind === 'diplomacy.propose'
+      ? {
+        ...base, recipientPolityIds: operation.recipientPolityIds,
+        terms: [{ kind: 'relationship', relationshipTypeId: operation.relationshipTypeId, participantPolityIds: [playerIntent.playerPolityId, ...operation.recipientPolityIds] }],
+      }
+      : {
+        ...base, recipientPolityIds: [operation.recipientPolityId],
+        terms: [{ kind: 'territorial-cession', regionId: operation.regionId, fromPolityId: playerIntent.playerPolityId, toPolityId: operation.recipientPolityId }],
+      };
+    state = worldV2.proposeDiplomaticProposal(state, { ...request, evidenceIds: action.evidenceIds, expectedRevision: state.revision });
+    createdProposals.push({ proposalId: request.proposalId, actionId: action.actionId, revisionAfter: state.revision });
+  }
+  return { state, created, createdProposals };
 }
 
 export const readLivingWorld = (gameId) => response(gameId);
@@ -321,6 +343,7 @@ export function confirmLivingWorldIntent(gameId, { revision, sessionRevision, in
       kind: 'player-intent-confirmed',
       interpretationId,
       createdProcesses: materialized.created,
+      createdDiplomaticProposals: materialized.createdProposals,
     },
     playerIntent: { ...session.playerIntent, status: 'confirmed' },
   });

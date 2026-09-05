@@ -168,4 +168,44 @@ describe('living-world command store', () => {
       optionId: 'advance-one-month',
     }), /stale/i);
   });
+
+  it('creates a territory offer without immediate transfer and lets only its recipient accept the frozen choice', () => {
+    const before = living.readLivingWorld(gameId);
+    const region = before.interpretationContext.entities.find((entry) => entry.kind === 'region' && entry.legalOwnerPolityId === 'polity:france' && entry.actualControllerPolityId === 'polity:france');
+    const evidenceId = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    assert.ok(region && evidenceId);
+    const text = `Offer ${region.label} to Austria.`;
+    const submitted = living.submitLivingWorldIntent(gameId, {
+      revision: before.projection.revision, sessionRevision: before.sessionRevision, intentions: [text],
+      modelOutput: {
+        revision: before.projection.revision, questions: [], claims: [], proposedInitiatives: [],
+        requestedActions: [{
+          actionId: 'action:offer-region', domain: 'diplomacy', scope: 'external', intent: text, pace: 'slow',
+          effectFamilies: ['relation.modify'], targetEntityIds: [region.entityId, 'polity:austria'], claimRefs: [], evidenceIds: [evidenceId],
+          operation: { kind: 'territory.offer', recipientPolityId: 'polity:austria', regionId: region.entityId },
+          sourceSpan: { start: 0, end: text.length, text },
+        }],
+      },
+    });
+    const confirmed = living.confirmLivingWorldIntent(gameId, {
+      revision: submitted.projection.revision, sessionRevision: submitted.sessionRevision,
+      interpretationId: submitted.projection.interpretation.interpretationId,
+    });
+    assert.equal(confirmed.interpretationContext.entities.find((entry) => entry.entityId === region.entityId).legalOwnerPolityId, 'polity:france');
+    const austriaTask = confirmed.strategicTasks.find((task) => task.actorPolityId === 'polity:austria');
+    assert.ok(austriaTask);
+    const acceptChoice = austriaTask.brief.frozenChoices.find((choice) => choice.choiceId.startsWith('choice:proposal-accept-'));
+    assert.ok(acceptChoice);
+    const advanced = living.advanceLivingWorld(gameId, {
+      revision: confirmed.projection.revision, sessionRevision: confirmed.sessionRevision, optionId: 'advance-one-month',
+      strategicAttempts: confirmed.strategicTasks.map((task) => task.taskKey === austriaTask.taskKey ? {
+        taskKey: task.taskKey, status: 'succeeded', modelOutput: {
+          polityId: task.actorPolityId, revision: task.brief.revision, selectedChoiceIds: [acceptChoice.choiceId], processDecisions: [], initiativeProposals: [],
+          durablePlan: { objective: 'Answer the published proposal.', goals: [], commitments: [], revisit: 'Review changed conditions.' },
+          evidenceIds: [acceptChoice.factsUsed[0]], hold: null,
+        },
+      } : hold(task)),
+    });
+    assert.equal(advanced.interpretationContext.entities.find((entry) => entry.entityId === region.entityId).legalOwnerPolityId, 'polity:austria');
+  });
 });

@@ -221,6 +221,8 @@ export const scenarioV3Schema = z.object({
       participantPolityIds: z.array(polityIdSchema).min(2),
       evidenceIds: evidenceIdsSchema,
     }).strict()),
+    /** Runtime negotiation starts empty; pending proposals belong to WorldStateV2, not authored future facts. */
+    diplomaticProposals: z.record(z.string(), z.never()).default({}),
     tributeObligations: z.record(tributeObligationIdSchema, z.object({
       id: tributeObligationIdSchema,
       payerPolityIds: z.array(polityIdSchema).min(1),

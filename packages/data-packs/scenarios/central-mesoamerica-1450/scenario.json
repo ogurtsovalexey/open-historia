@@ -3608,6 +3608,7 @@
         ]
       }
     },
+    "diplomaticProposals": {},
     "tributeObligations": {
       "obligation:xochimilco-triple-alliance": {
         "id": "obligation:xochimilco-triple-alliance",

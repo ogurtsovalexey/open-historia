@@ -11,6 +11,8 @@ const context = {
   evidence: [{ evidenceId: "evidence:test", kind: "authored" }],
   allowedInitiativeKinds: ["technology"],
   allowedEffectFamilies: ["capacity.modify"],
+  allowedDiplomaticOperations: ["process.propose", "territory.offer"],
+  relationshipTypes: ["relationship-type:alliance"],
 };
 
 describe("living-world semantic AI boundary", () => {
@@ -33,6 +35,10 @@ describe("living-world semantic AI boundary", () => {
     assert.deepEqual(initiative.evidenceIds.items.enum, ["evidence:test"]);
     assert.deepEqual(initiative.effectFamilies.items.enum, ["capacity.modify"]);
     assert.ok(initiative.pace.enum.includes("slow"));
+    const operation = schema.properties.requestedActions.items.properties.operation.anyOf;
+    assert.equal(operation[2].properties.kind.const, "territory.offer");
+    assert.equal(JSON.stringify(operation).includes("administrationAccessBp"), false);
+    assert.equal(JSON.stringify(operation).includes("authority"), false);
     assert.equal(JSON.stringify(schema).includes("numericEffects"), false);
   });
 });

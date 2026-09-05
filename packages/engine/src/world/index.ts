@@ -9,3 +9,4 @@ export * from './seed.js';
 export * from './compileScenarioV3.js';
 export * from './time.js';
 export * from './tribute.js';
+export * from './diplomacy.js';

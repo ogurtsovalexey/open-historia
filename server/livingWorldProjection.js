@@ -102,6 +102,10 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     .map((entry) => processProjection(state, entry, visible, locale))
     .filter(Boolean);
   const relationships = state.relationships.filter((entry) => entry.participantPolityIds.includes(polity.id));
+  const pendingProposals = state.diplomaticProposals.filter((entry) => (
+    entry.status === 'pending'
+    && (entry.proposerPolityId === polity.id || entry.recipientPolityIds.includes(polity.id))
+  ));
   const tributeObligations = state.tributeObligations.filter((entry) => (
     entry.payerPolityIds.includes(polity.id) || entry.beneficiaries.some((beneficiary) => beneficiary.polityId === polity.id)
   ));
@@ -159,7 +163,20 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       evidenceIds: groundedEvidence(region.evidenceIds, visible, snapshotEvidence),
     })),
     diplomacy: {
-      conversations: [],
+      conversations: pendingProposals.map((proposal) => {
+        const counterparties = proposal.proposerPolityId === polity.id
+          ? proposal.recipientPolityIds
+          : [proposal.proposerPolityId];
+        const terms = proposal.terms.map((term) => term.kind === 'territorial-cession'
+          ? `${labelOf(term.regionId)} → ${labelOf(term.toPolityId)}`
+          : `${labelOf(term.relationshipTypeId)}: ${term.participantPolityIds.map(labelOf).join(', ')}`);
+        return {
+          conversationId: `conversation:${proposal.proposalId.slice('proposal:'.length)}`,
+          counterparty: counterparties.map((id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id)).join(' · '),
+          latestMessage: terms.join('; '), status: proposal.proposerPolityId === polity.id ? 'awaiting-response' : 'response-required',
+          evidenceIds: groundedEvidence(proposal.evidenceIds, visible, snapshotEvidence),
+        };
+      }),
       commitments: [
         ...relationships.map((relationship) => ({
         commitmentId: `commitment:${relationship.relationshipId.replaceAll(':', '-')}`,
@@ -272,6 +289,8 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
     evidence,
     allowedInitiativeKinds: ['technology', 'ideology', 'institution', 'doctrine', 'movement', 'project', 'investigation', 'other'],
     allowedEffectFamilies: [...processes.materializableEffectKinds],
+    allowedDiplomaticOperations: ['process.propose', 'diplomacy.propose', 'territory.offer'],
+    relationshipTypes: state.catalogs.relationshipTypes.map((entry) => entry.relationshipTypeId).sort(),
   };
   if (JSON.stringify(context).length > 50_000) throw new Error('Player intent context exceeds the bounded semantic prompt budget.');
   return context;

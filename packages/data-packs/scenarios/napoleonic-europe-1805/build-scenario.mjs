@@ -238,7 +238,7 @@ const scenario = {
     },
   },
   geography: { assets: {}, regions: {} },
-  startingState: { polities: {}, regions: {}, populationCohorts: {}, formations: {}, institutions: {}, relationships: {}, routes: {}, concepts: {}, knowledge: {} },
+  startingState: { polities: {}, regions: {}, populationCohorts: {}, formations: {}, institutions: {}, relationships: {}, diplomaticProposals: {}, routes: {}, concepts: {}, knowledge: {} },
   provenance: { sources: sourceRecord, evidence: {} },
 };
 

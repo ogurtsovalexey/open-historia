@@ -16,7 +16,7 @@ export const DiplomacySurface = ({ diplomacy }) => (
     {diplomacy.conversations.map((conversation) => (
       <article className="oh-intent-card" key={conversation.conversationId}>
         <strong>{conversation.counterparty}</strong><p className="oh-intent-muted">{conversation.latestMessage}</p>
-        <span className="oh-intent-tag">Uncommitted dialogue</span>
+        <span className="oh-intent-tag">{conversation.status === "response-required" ? "Response required" : "Awaiting response"}</span>
       </article>
     ))}
   </section>

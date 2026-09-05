@@ -84,7 +84,7 @@ function minimalScenario() {
           evidenceIds: ['evidence:cohort-alpha'],
         },
       },
-      formations: {}, institutions: {}, relationships: {}, tributeObligations: {}, routes: {},
+      formations: {}, institutions: {}, relationships: {}, diplomaticProposals: {}, tributeObligations: {}, routes: {},
       concepts: {
         'concept:writing': {
           id: 'concept:writing', type: 'technology', semanticKey: 'writing',

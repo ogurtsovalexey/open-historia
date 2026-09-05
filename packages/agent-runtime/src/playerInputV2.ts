@@ -45,6 +45,20 @@ export const requestedActionV2ModelSchema = z.object({
     'supply-capacity.modify', 'group-support.shift', 'identity-share.shift',
     'legitimacy.modify', 'relation.modify', 'knowledge.reveal', 'institution.create',
   ])).min(1).max(4),
+  /** Semantic route only: exact effects, access, profiles and authorities stay engine-owned. */
+  operation: z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('process.propose') }).strict(),
+    z.object({
+      kind: z.literal('diplomacy.propose'),
+      recipientPolityIds: z.array(entityIdSchema).min(1).max(16),
+      relationshipTypeId: entityIdSchema,
+    }).strict(),
+    z.object({
+      kind: z.literal('territory.offer'),
+      recipientPolityId: entityIdSchema,
+      regionId: entityIdSchema,
+    }).strict(),
+  ]).optional(),
   targetEntityIds: z.array(entityIdSchema).max(64),
   claimRefs: z.array(interpretationIdSchema('claim')).max(64),
   evidenceIds: z.array(worldV2.evidenceIdSchema).max(64),
@@ -220,6 +234,32 @@ function domesticScopeIsProven(state: worldV2.WorldStateV2, actorPolityId: strin
   return false;
 }
 
+function operationReasons(state: worldV2.WorldStateV2, actorPolityId: string, action: ModelAction): string[] {
+  const operation = action.operation ?? { kind: 'process.propose' as const };
+  if (operation.kind === 'process.propose') return [];
+  if (operation.kind === 'diplomacy.propose') {
+    const reasons: string[] = [];
+    if (action.domain !== 'diplomacy') reasons.push('diplomacy-operation-requires-diplomacy-domain');
+    for (const recipientId of operation.recipientPolityIds) {
+      if (!state.polities.some((entry) => entry.id === recipientId)) reasons.push(`unknown-recipient:${recipientId}`);
+      else if (recipientId === actorPolityId) reasons.push(`self-recipient:${recipientId}`);
+    }
+    if (!state.catalogs.relationshipTypes.some((entry) => entry.relationshipTypeId === operation.relationshipTypeId)) {
+      reasons.push(`undeclared-relationship-type:${operation.relationshipTypeId}`);
+    }
+    return reasons;
+  }
+  const region = state.regions.find((entry) => entry.regionId === operation.regionId);
+  const recipient = state.polities.find((entry) => entry.id === operation.recipientPolityId);
+  const reasons: string[] = action.domain !== 'diplomacy' ? ['territory-operation-requires-diplomacy-domain'] : [];
+  if (!recipient || operation.recipientPolityId === actorPolityId) reasons.push(`unknown-or-self-recipient:${operation.recipientPolityId}`);
+  if (!region) reasons.push(`unknown-region:${operation.regionId}`);
+  else if (region.control.legalOwnerPolityId !== actorPolityId || region.control.actualControllerPolityId !== actorPolityId) {
+    reasons.push(`not-owned-and-controlled-region:${operation.regionId}`);
+  }
+  return reasons;
+}
+
 function sortBySpanAndId<T extends { sourceSpan: { start: number }; }>(rows: T[], idOf: (row: T) => string): T[] {
   return rows.sort((left, right) => left.sourceSpan.start - right.sourceSpan.start || compare(idOf(left), idOf(right)));
 }
@@ -278,6 +318,7 @@ export function interpretPlayerInputV2(
         ? action.targetEntityIds.filter((id) => knownEntities.has(id) && !domesticScopeIsProven(state, actor.id, id))
           .map((id) => `foreign-or-unproven-domestic-target:${id}`)
         : []),
+      ...operationReasons(state, actor.id, action),
       ...evidence.reasons,
     ];
     const sortedReasons = sortedUnique(reasons);

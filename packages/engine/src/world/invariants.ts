@@ -70,6 +70,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     new Set(entry.equipmentClassIds as string[]),
   ]));
   const routeClasses = new Set(state.catalogs.routeClasses.map((entry) => entry.routeClassId as string));
+  const relationshipTypes = new Set(state.catalogs.relationshipTypes.map((entry) => entry.relationshipTypeId as string));
   const entityIds = new Set<string>([
     ...polityIds,
     ...regionIds,
@@ -82,6 +83,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     ...conceptIds,
     ...state.processes.map((entry) => entry.processId as string),
     ...state.relationships.map((entry) => entry.relationshipId as string),
+    ...state.diplomaticProposals.map((entry) => entry.proposalId as string),
     ...state.tributeObligations.map((entry) => entry.obligationId as string),
   ]);
 
@@ -96,6 +98,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
   checkUnique(violations, 'concept', state.concepts.map((entry) => entry.conceptId));
   checkUnique(violations, 'process', state.processes.map((entry) => entry.processId));
   checkUnique(violations, 'relationship', state.relationships.map((entry) => entry.relationshipId));
+  checkUnique(violations, 'diplomatic proposal', state.diplomaticProposals.map((entry) => entry.proposalId));
   checkUnique(violations, 'tribute obligation', state.tributeObligations.map((entry) => entry.obligationId));
   checkUnique(violations, 'event', state.events.map((entry) => entry.eventId));
   checkUnique(violations, 'evidence', state.evidence.map((entry) => entry.evidenceId));
@@ -107,6 +110,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
   checkUnique(violations, 'catalog formation archetype', state.catalogs.formationArchetypes.map((entry) => entry.formationArchetypeId));
   checkUnique(violations, 'catalog equipment class', state.catalogs.equipmentClasses.map((entry) => entry.equipmentClassId));
   checkUnique(violations, 'catalog route class', state.catalogs.routeClasses.map((entry) => entry.routeClassId));
+  checkUnique(violations, 'catalog relationship type', state.catalogs.relationshipTypes.map((entry) => entry.relationshipTypeId));
   checkUnique(violations, 'knowledge baseline concept', state.worldRules.knowledgeBaseline);
   checkUnique(violations, 'knowledge record', state.knowledge.records.map((entry) => `${entry.polityId}|${entry.conceptId}`));
   checkUnique(violations, 'ancestor revision', state.revisionLineage.ancestorRevisions);
@@ -346,6 +350,40 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     checkUnique(violations, `relationship participant in ${relationship.relationshipId}`, relationship.participantPolityIds);
     for (const polityId of relationship.participantPolityIds) assertPolity(polityId, `relationship ${relationship.relationshipId}`);
   }
+  for (const proposal of state.diplomaticProposals) {
+    checkUnique(violations, `recipient in diplomatic proposal ${proposal.proposalId}`, proposal.recipientPolityIds);
+    assertPolity(proposal.proposerPolityId, `diplomatic proposal ${proposal.proposalId} proposer`);
+    for (const polityId of proposal.recipientPolityIds) assertPolity(polityId, `diplomatic proposal ${proposal.proposalId} recipient`);
+    if (!lineageRevisions.has(proposal.createdAtRevision)) {
+      violations.push(`diplomatic proposal ${proposal.proposalId} creation revision is not in world lineage: ${proposal.createdAtRevision}`);
+    }
+    if (proposal.status !== 'accepted' && proposal.acceptedAgreementId) {
+      violations.push(`diplomatic proposal ${proposal.proposalId} has an agreement ID before acceptance`);
+    }
+    for (const term of proposal.terms) {
+      if (term.kind === 'relationship') {
+        if (!relationshipTypes.has(term.relationshipTypeId)) {
+          violations.push(`diplomatic proposal ${proposal.proposalId} references undeclared relationship type ${term.relationshipTypeId}`);
+        }
+        checkUnique(violations, `relationship participant in diplomatic proposal ${proposal.proposalId}`, term.participantPolityIds);
+        for (const polityId of term.participantPolityIds) assertPolity(polityId, `diplomatic proposal ${proposal.proposalId} relationship term`);
+        if (!term.participantPolityIds.includes(proposal.proposerPolityId)) {
+          violations.push(`diplomatic proposal ${proposal.proposalId} relationship term omits proposer`);
+        }
+        for (const recipientId of proposal.recipientPolityIds) {
+          if (!term.participantPolityIds.includes(recipientId)) {
+            violations.push(`diplomatic proposal ${proposal.proposalId} relationship term omits recipient ${recipientId}`);
+          }
+        }
+      } else {
+        assertRegion(term.regionId, `diplomatic proposal ${proposal.proposalId} territorial term`);
+        assertPolity(term.fromPolityId, `diplomatic proposal ${proposal.proposalId} territorial term from`);
+        assertPolity(term.toPolityId, `diplomatic proposal ${proposal.proposalId} territorial term to`);
+        if (term.fromPolityId !== proposal.proposerPolityId) violations.push(`diplomatic proposal ${proposal.proposalId} territorial term must be offered by its legal owner`);
+        if (!proposal.recipientPolityIds.includes(term.toPolityId)) violations.push(`diplomatic proposal ${proposal.proposalId} territorial term recipient is not a proposal recipient`);
+      }
+    }
+  }
   for (const obligation of state.tributeObligations) {
     checkUnique(violations, `payer in ${obligation.obligationId}`, obligation.payerPolityIds);
     checkUnique(violations, `source region in ${obligation.obligationId}`, obligation.sourceRegionIds);
@@ -401,6 +439,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     ...state.processes.map((entry) => ({ label: `process ${entry.processId}`, evidenceIds: entry.evidenceIds })),
     ...state.relationships.map((entry) => ({ label: `relationship ${entry.relationshipId}`, evidenceIds: entry.evidenceIds })),
     ...state.tributeObligations.map((entry) => ({ label: `tribute obligation ${entry.obligationId}`, evidenceIds: entry.evidenceIds })),
+    ...state.diplomaticProposals.map((entry) => ({ label: `diplomatic proposal ${entry.proposalId}`, evidenceIds: entry.evidenceIds })),
     ...state.knowledge.records.map((entry) => ({ label: `knowledge ${entry.polityId}/${entry.conceptId}`, evidenceIds: entry.evidenceIds })),
     ...state.events.map((entry) => ({ label: `event ${entry.eventId}`, evidenceIds: entry.evidenceIds })),
   ];

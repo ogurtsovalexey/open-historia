@@ -48,6 +48,7 @@ export function canonicalWorldState(state: WorldStateV2): WorldStateV2 {
       })).sort((a, b) => compareId(a.formationArchetypeId, b.formationArchetypeId)),
       equipmentClasses: [...state.catalogs.equipmentClasses].sort((a, b) => compareId(a.equipmentClassId, b.equipmentClassId)),
       routeClasses: [...state.catalogs.routeClasses].sort((a, b) => compareId(a.routeClassId, b.routeClassId)),
+      relationshipTypes: [...state.catalogs.relationshipTypes].sort((a, b) => compareId(a.relationshipTypeId, b.relationshipTypeId)),
     },
     polities: state.polities.map((entry) => ({
       ...sortedEvidence(entry),
@@ -109,6 +110,17 @@ export function canonicalWorldState(state: WorldStateV2): WorldStateV2 {
       ...sortedEvidence(entry),
       participantPolityIds: sortedStrings(entry.participantPolityIds),
     })).sort((a, b) => compareId(a.relationshipId, b.relationshipId)),
+    diplomaticProposals: state.diplomaticProposals.map((entry) => ({
+      ...sortedEvidence(entry),
+      recipientPolityIds: sortedStrings(entry.recipientPolityIds),
+      terms: entry.terms.map((term) => term.kind === 'relationship'
+        ? { ...term, participantPolityIds: sortedStrings(term.participantPolityIds) }
+        : { ...term, expectedControl: { ...term.expectedControl } })
+        .sort((a, b) => compareId(
+          a.kind === 'relationship' ? `relationship|${a.relationshipTypeId}` : `territory|${a.regionId}`,
+          b.kind === 'relationship' ? `relationship|${b.relationshipTypeId}` : `territory|${b.regionId}`,
+        )),
+    })).sort((a, b) => compareId(a.proposalId, b.proposalId)),
     tributeObligations: state.tributeObligations.map((entry) => ({
       ...sortedEvidence(entry),
       payerPolityIds: sortedStrings(entry.payerPolityIds),

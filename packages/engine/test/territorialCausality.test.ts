@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { polityIdSchema, regionIdSchema, type PolityId } from '@open-historia/domain';
 import { applyTerritorialTransition, type TerritorialTransition } from '../src/world/control.js';
+import { proposeDiplomaticProposal, resolveDiplomaticProposal } from '../src/world/diplomacy.js';
 import { stampWorldStateRevision } from '../src/world/revision.js';
 import type { RegionalControl, WorldStateV2, WorldStateV2Input } from '../src/world/schema.js';
 import {
@@ -293,5 +294,45 @@ describe('territorial causality', () => {
     assert.deepStrictEqual(ceded.formations[0], formationBefore);
     assert.strictEqual(derivePolitySnapshot(ceded, 'polity:alpha').value.fieldedPersonnel, 100_000);
     assert.strictEqual(derivePolitySnapshot(ceded, 'polity:beta').value.fieldedPersonnel, 0);
+  });
+
+  it('keeps a territorial offer immaterial, then transfers only its frozen region on recipient acceptance', () => {
+    const before = stampWorldStateRevision(fixtureInput());
+    const alphaBefore = derivePolitySnapshot(before, 'polity:alpha').value;
+    const betaBefore = derivePolitySnapshot(before, 'polity:beta').value;
+    const formationBefore = structuredClone(before.formations);
+    const pending = proposeDiplomaticProposal(before, {
+      proposalId: 'proposal:cede-a', proposerPolityId: 'polity:alpha', recipientPolityIds: ['polity:beta'],
+      terms: [{ kind: 'territorial-cession', regionId: 'region:test:A', fromPolityId: 'polity:alpha', toPolityId: 'polity:beta' }],
+      evidenceIds: [], expectedRevision: before.revision,
+    });
+    assert.deepStrictEqual(pending.regions, before.regions);
+    assert.deepStrictEqual(pending.populationCohorts, before.populationCohorts);
+    assert.deepStrictEqual(pending.formations, before.formations);
+    const accepted = resolveDiplomaticProposal(pending, {
+      proposalId: 'proposal:cede-a', actorPolityId: 'polity:beta', decision: 'accept', expectedRevision: pending.revision,
+    });
+    assert.strictEqual(accepted.regions.find((entry) => entry.regionId === REGION_A)!.control.legalOwnerPolityId, BETA);
+    assert.strictEqual(derivePolitySnapshot(accepted, 'polity:alpha').value.legalPopulation, alphaBefore.legalPopulation - 10_000_000);
+    assert.strictEqual(derivePolitySnapshot(accepted, 'polity:beta').value.legalPopulation, betaBefore.legalPopulation + 10_000_000);
+    assert.deepStrictEqual(accepted.formations, formationBefore);
+  });
+
+  it('rejects stale or foreign replies without changing control', () => {
+    const before = stampWorldStateRevision(fixtureInput());
+    const pending = proposeDiplomaticProposal(before, {
+      proposalId: 'proposal:cede-a', proposerPolityId: 'polity:alpha', recipientPolityIds: ['polity:beta'],
+      terms: [{ kind: 'territorial-cession', regionId: 'region:test:A', fromPolityId: 'polity:alpha', toPolityId: 'polity:beta' }], evidenceIds: [], expectedRevision: before.revision,
+    });
+    assert.throws(() => resolveDiplomaticProposal(pending, {
+      proposalId: 'proposal:cede-a', actorPolityId: 'polity:gamma', decision: 'accept', expectedRevision: pending.revision,
+    }), /only a proposal recipient/i);
+    assert.throws(() => resolveDiplomaticProposal(pending, {
+      proposalId: 'proposal:cede-a', actorPolityId: 'polity:beta', decision: 'accept', expectedRevision: before.revision,
+    }), /stale world revision/i);
+    const rejected = resolveDiplomaticProposal(pending, {
+      proposalId: 'proposal:cede-a', actorPolityId: 'polity:beta', decision: 'reject', expectedRevision: pending.revision,
+    });
+    assert.deepStrictEqual(rejected.regions, pending.regions);
   });
 });
