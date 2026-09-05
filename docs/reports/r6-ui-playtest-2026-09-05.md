@@ -99,3 +99,22 @@ grounded input. It was not granted as an instant technology or historical fact.
 This is a successful bounded counterfactual-concept smoke case with a real
 provider; it still does not satisfy the ten-decision, three-scenario WP15
 release gate.
+
+## Bounded-context confirmation regression (subsequent run)
+
+During the next French smoke attempt, accumulated visible entities made the
+old 50 kB context guard throw while composing the post-confirmation response.
+The material change had already been committed, so the UI misleadingly showed
+an error and retrying could create a duplicate proposal. `a746a7a` replaces
+that brittle all-or-nothing guard with a deterministic semantic index: capped
+entity/evidence lists, bounded labels, and priority for the player's owned or
+controlled regions. It does not make omitted targets legal; normal entity and
+evidence validation remains authoritative.
+
+A new French UI game then submitted “Начать предложенный процесс снабжения
+армии на Рейне через склады и маршруты провианта.” through the real Utility
+provider. Confirmation returned normally, and Details showed exactly one
+`develop / proposed` process at 0%, with engine-derived funding 1,757 and a
+doctrine input. The read-only audit for this clean game has three revisions,
+sanitized Utility provenance only, no raw model traffic, and replay checksum
+`sha256:5f4f5a38b1c21715351f5a79423711cb13b7076751de13a4df3886d4eba09aa3`.
