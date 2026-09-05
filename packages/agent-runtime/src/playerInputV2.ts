@@ -21,11 +21,16 @@ export const questionV2Schema = z.object({
 
 export const claimGroundingSchema = z.enum(['supported', 'contradicted', 'unknown', 'subjective']);
 export type ClaimGrounding = z.infer<typeof claimGroundingSchema>;
+// Claims are not an open-ended narration channel. These are the only
+// assertions whose truth WorldStateV2 can establish from control, the causal
+// ledger, or formations. A closed vocabulary prevents plausible-looking but
+// permanently `unknown` predicates from leaking through the semantic layer.
+export const claimPredicateSchema = z.enum(['controls-region', 'conquered-region', 'fielded-personnel']);
 
 export const claimV2ModelSchema = z.object({
   claimId: interpretationIdSchema('claim'),
   subject: entityIdSchema,
-  predicate: z.string().trim().min(1).max(120),
+  predicate: claimPredicateSchema,
   proposedValue: z.union([z.string().max(1000), z.number().finite(), z.boolean(), z.null()]),
   proposedTime: z.string().trim().min(1).max(120).nullable(),
   sourceSpan: sourceSpanSchema,

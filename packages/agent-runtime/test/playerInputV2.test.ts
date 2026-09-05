@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { worldV2 } from '@open-historia/engine';
 import {
+  claimV2ModelSchema,
   interpretPlayerInputV2,
   requestedActionV2ModelSchema,
   type PlayerInputV2ModelInput,
@@ -121,6 +122,14 @@ describe('PlayerInputInterpretationV2', () => {
     assert.strictEqual(result.value.claims[0]!.grounding, 'contradicted');
     assert.deepStrictEqual(result.value.requestedActions, []);
     assert.strictEqual(JSON.stringify(world), before);
+  });
+
+  it('rejects an unverifiable free-form claim predicate at the model boundary', () => {
+    assert.throws(() => claimV2ModelSchema.parse({
+      claimId: 'claim:fleet', subject: 'polity:alpha', predicate: 'destroyed-british-fleet-at-trafalgar',
+      proposedValue: true, proposedTime: 'last year', sourceSpan: { start: 0, end: 1, text: 'x' },
+      grounding: 'supported', evidenceIds: [],
+    }), /invalid enum value/i);
   });
 
   it('rejects a false premise while preserving a separate valid domestic investment intention', () => {
