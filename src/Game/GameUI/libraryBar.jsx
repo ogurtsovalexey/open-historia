@@ -495,12 +495,16 @@ const ScenarioCard = ({ onClone, onEdit, onPlay, onSelect, onUpdate, scenario, s
             >
               {updateAvailable ? "⬆ Update" : "New Game"}
             </button>
-            <button onClick={() => onEdit(scenario.id)} style={{ ...actionButtonStyle, flex: 1 }} type="button">
-              Edit
-            </button>
-            <button onClick={() => onClone(scenario)} style={{ ...actionButtonStyle, flexBasis: "100%" }} type="button">
-              Clone Scenario
-            </button>
+            {!scenario.immutable && (
+              <>
+                <button onClick={() => onEdit(scenario.id)} style={{ ...actionButtonStyle, flex: 1 }} type="button">
+                  Edit
+                </button>
+                <button onClick={() => onClone(scenario)} style={{ ...actionButtonStyle, flexBasis: "100%" }} type="button">
+                  Clone Scenario
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -599,12 +603,16 @@ const GameCard = ({ active, game, onActivate, onClone, onEdit }) => {
             >
               {active ? "Current" : "Play"}
             </button>
-            <button onClick={() => onEdit(game.id)} style={{ ...actionButtonStyle, flex: 1 }} type="button">
-              Edit
-            </button>
-            <button onClick={() => onClone(game)} style={{ ...actionButtonStyle, flexBasis: "100%" }} type="button">
-              Clone Game
-            </button>
+            {!game.livingWorld && (
+              <>
+                <button onClick={() => onEdit(game.id)} style={{ ...actionButtonStyle, flex: 1 }} type="button">
+                  Edit
+                </button>
+                <button onClick={() => onClone(game)} style={{ ...actionButtonStyle, flexBasis: "100%" }} type="button">
+                  Clone Game
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -1132,6 +1140,7 @@ const LibraryTopBar = () => {
     try {
       const details = await createGame({
         name: `${scenario.name} Session`,
+        ...(scenario.livingWorld && countryCode ? { playerPolityId: countryCode } : null),
         scenarioId: scenario.id,
         setActive: true,
       });

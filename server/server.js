@@ -36,6 +36,13 @@ import {
 import { advanceEconomy, readEconomyState } from "./economyStore.js";
 import { EngineSessionError } from "./engineSessionStore.js";
 import {
+  advanceLivingWorld,
+  confirmLivingWorldIntent,
+  dismissLivingWorldIntent,
+  readLivingWorld,
+  submitLivingWorldIntent,
+} from "./livingWorldStore.js";
+import {
   cancelAgentTurnDraft,
   commitPreparedAgentTurn,
   prepareAgentTurn,
@@ -503,6 +510,46 @@ app.get("/api/games/:gameId", (req, res) => {
     res.json(getGameDetails(req.params.gameId));
   } catch (error) {
     sendError(res, 404, error);
+  }
+});
+
+app.get("/api/games/:gameId/living-world", (req, res) => {
+  try {
+    res.json(readLivingWorld(req.params.gameId));
+  } catch (error) {
+    sendError(res, 404, error);
+  }
+});
+
+app.post("/api/games/:gameId/living-world/intent", jsonParser, (req, res) => {
+  try {
+    res.json(submitLivingWorldIntent(req.params.gameId, req.body ?? {}));
+  } catch (error) {
+    sendError(res, 409, error);
+  }
+});
+
+app.post("/api/games/:gameId/living-world/intent/confirm", jsonParser, (req, res) => {
+  try {
+    res.json(confirmLivingWorldIntent(req.params.gameId, req.body ?? {}));
+  } catch (error) {
+    sendError(res, 409, error);
+  }
+});
+
+app.post("/api/games/:gameId/living-world/intent/dismiss", jsonParser, (req, res) => {
+  try {
+    res.json(dismissLivingWorldIntent(req.params.gameId, req.body ?? {}));
+  } catch (error) {
+    sendError(res, 409, error);
+  }
+});
+
+app.post("/api/games/:gameId/living-world/advance", jsonParser, (req, res) => {
+  try {
+    res.json(advanceLivingWorld(req.params.gameId, req.body ?? {}));
+  } catch (error) {
+    sendError(res, 409, error);
   }
 });
 

@@ -14,6 +14,7 @@ import {
   runStartupPreload,
 } from "./runtime/preload.js";
 import { ensureLibraryCatalog, useLibraryState } from "./runtime/library.js";
+import { useLivingWorldRuntime } from "./runtime/livingWorld.js";
 
 const WorldShell = {
   backgroundColor: "#000",
@@ -56,6 +57,7 @@ function GameApp() {
   // the map ~8 times — the repeated flashing/reloading. The game id changes once,
   // when the new game activates, so the map remounts exactly once.
   const { activeGameId } = useLibraryState();
+  const livingWorld = useLivingWorldRuntime();
 
   useEffect(() => {
     localStorage.setItem("Globe", JSON.stringify(isGlobeEnabled));
@@ -181,6 +183,8 @@ function GameApp() {
       isGlobeEnabled={isGlobeEnabled}
       isTerrainEnabled={isTerrainEnabled}
       mapRef={mapRef}
+      intentFirstProjection={livingWorld.projection}
+      intentFirstCommands={livingWorld.commands}
       setIsGlobeEnabled={setIsGlobeEnabled}
       setIsTerrainEnabled={setIsTerrainEnabled}
       />
