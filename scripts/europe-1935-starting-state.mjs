@@ -781,7 +781,7 @@ export function calculateCheckpoint(fixture, expectedBaseline) {
   const projection = compileHistoricalProjection({
     bundle: { manifest: fixture.manifest, scenario: fixture.scenario, sources: fixture.sources },
     authoring: fixture.authoring,
-    engineScenario: fixture.engineScenario,
+    legacyScenario: fixture.engineScenario,
     mapLink: fixture.mapLink,
   });
   const actualBaseline = buildFirstMonthBaseline(resolveMonth(initState(projection.scenario), { commands: [] }));

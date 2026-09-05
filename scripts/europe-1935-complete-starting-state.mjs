@@ -343,7 +343,7 @@ export function buildCompleteStartingState(input) {
 
 export function verifyCompleteStartingState({ manifest, scenarioV2, mapLink, expectedBaseline, ...input }) {
   const built = buildCompleteStartingState(input);
-  const projection = compileHistoricalProjection({ bundle: { manifest, scenario: scenarioV2, sources: built.sources }, authoring: built.authoring, engineScenario: built.scenario, mapLink });
+  const projection = compileHistoricalProjection({ bundle: { manifest, scenario: scenarioV2, sources: built.sources }, authoring: built.authoring, legacyScenario: built.scenario, mapLink });
   const firstMonth = buildFirstMonthBaseline(resolveMonth(initState(projection.scenario), { commands: [] }));
   if (firstMonth.checksum !== expectedBaseline.checksum) throw new Error(`first-month checksum drift: ${firstMonth.checksum}`);
   return { ...built, projectionChecksum: projection.checksum, firstMonth };

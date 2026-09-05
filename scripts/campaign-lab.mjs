@@ -112,7 +112,7 @@ const loadPackage = () => {
   const authoring = readJson(path.join(PACKAGE_DIR, "authoring.json"));
   const engineScenario = readJson(path.join(PACKAGE_DIR, "engine/scenario.json"));
   const mapLink = readJson(path.join(PACKAGE_DIR, "engine/map-link.json"));
-  return { bundle, authoring, engineScenario, mapLink, projection: compileHistoricalProjection({ bundle, authoring, engineScenario, mapLink }) };
+  return { bundle, authoring, engineScenario, mapLink, projection: compileHistoricalProjection({ bundle, authoring, legacyScenario: engineScenario, mapLink }) };
 };
 const loadRun = (id) => ({ manifest: readJson(fileOf(id, "manifest.json")), state: parseWorldState(readJson(fileOf(id, "state.json"))) });
 const writeManifest = (id, manifest) => atomicJson(fileOf(id, "manifest.json"), manifest);
