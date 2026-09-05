@@ -6,6 +6,8 @@ import { DiplomacySurface } from "./diplomacySurface";
 import { INTENT_FIRST_SURFACES, assertIntentFirstCommands, parseIntentFirstProjection } from "./intentFirstProjection.js";
 import { Orders } from "./orders";
 import { Situations } from "./situations";
+import { intentText } from "./intentFirstText";
+import { getStoredLanguage } from "../../runtime/i18n.js";
 import "./intentFirst.css";
 
 const SURFACES = [
@@ -19,6 +21,7 @@ const SURFACES = [
 
 export const IntentFirstShell = ({ projection: rawProjection, commands: rawCommands }) => {
   const projection = useMemo(() => parseIntentFirstProjection(rawProjection), [rawProjection]);
+  const locale = getStoredLanguage();
   const commands = useMemo(() => assertIntentFirstCommands(rawCommands), [rawCommands]);
   const [surface, setSurface] = useState("briefing");
   const [busy, setBusy] = useState(false);
@@ -89,23 +92,25 @@ export const IntentFirstShell = ({ projection: rawProjection, commands: rawComma
             onClick={() => setSurface(item.id)}
             onKeyDown={(event) => moveTabFocus(event, index)}
           >
-            <span className="oh-intent-nav-icon" aria-hidden="true">{item.icon}</span>{item.label}
+            <span className="oh-intent-nav-icon" aria-hidden="true">{item.icon}</span>{intentText(locale, item.label)}
           </button>
         ))}
       </nav>
       <main id="intent-active-panel" className="oh-intent-body" role="tabpanel" aria-labelledby={`intent-tab-${surface}`}>
-        {surface === "briefing" && <Briefing briefing={projection.briefing} />}
-        {surface === "orders" && <Orders {...orderProps} />}
-        {surface === "diplomacy" && <DiplomacySurface diplomacy={projection.diplomacy} />}
-        {surface === "country" && <Country playerPolity={projection.playerPolity} facts={projection.facts} />}
-        {surface === "situations" && <Situations situations={projection.situations} onOpenOrders={() => setSurface("orders")} />}
-        {surface === "details" && <Details details={projection.details} processes={projection.processes} />}
+        {surface === "briefing" && <Briefing briefing={projection.briefing} locale={locale} />}
+        {surface === "orders" && <Orders {...orderProps} locale={locale} />}
+        {surface === "diplomacy" && <DiplomacySurface diplomacy={projection.diplomacy} locale={locale} />}
+        {surface === "country" && <Country playerPolity={projection.playerPolity} facts={projection.facts} locale={locale} />}
+        {surface === "situations" && <Situations situations={projection.situations} onOpenOrders={() => setSurface("orders")} locale={locale} />}
+        {surface === "details" && <Details details={projection.details} processes={projection.processes} locale={locale} />}
       </main>
       <footer className="oh-intent-footer">
-        <div className="oh-intent-footer-meta"><strong>{projection.time.label}</strong> · {projection.playerPolity.displayName}</div>
+        <div className="oh-intent-footer-meta"><strong>{projection.time.label}</strong> · {projection.playerPolity.displayName}
+          {projection.time.completedSubmonths > 0 && <span data-testid="turn-resolution-progress"> · {projection.time.completedSubmonths}/{projection.time.totalSubmonths} monthly boundaries resolved</span>}
+        </div>
         {projection.strategicCheckpoint && (
           <div className="oh-intent-card" data-testid="strategic-checkpoint" role="status">
-            <strong>Strategic decision required</strong>
+            <strong>{intentText(locale, "Strategic decision required")}</strong>
             <p className="oh-intent-muted">{projection.strategicCheckpoint.blockedTasks.map((task) => task.reason).join(" ")}</p>
             <div className="oh-intent-actions">
               <button
@@ -113,13 +118,13 @@ export const IntentFirstShell = ({ projection: rawProjection, commands: rawComma
                 data-testid="retry-strategic-checkpoint"
                 disabled={busy}
                 onClick={() => void invoke(() => commands.advanceTime({ revision: projection.revision, optionId: projection.time.options[0]?.optionId, strategicDisposition: "resolve" }))}
-              >Retry</button>
+              >{intentText(locale, "Retry")}</button>
               <button
                 className="oh-intent-button"
                 data-testid="continue-without-strategy"
                 disabled={busy}
                 onClick={() => void invoke(() => commands.advanceTime({ revision: projection.revision, optionId: projection.time.options[0]?.optionId, strategicDisposition: "continue-without-decisions" }))}
-              >Continue without this decision</button>
+              >{intentText(locale, "Continue without this decision")}</button>
             </div>
           </div>
         )}
@@ -130,7 +135,7 @@ export const IntentFirstShell = ({ projection: rawProjection, commands: rawComma
           disabled={busy || Boolean(projection.strategicCheckpoint) || projection.interpretation?.confirmationRequired || projection.time.options.length === 0}
           onClick={() => void invoke(() => commands.advanceTime({ revision: projection.revision, optionId: projection.time.options[0].optionId }))}
         >
-          {projection.time.options[0]?.label ?? "Time unavailable"}
+          {intentText(locale, projection.time.options[0]?.label ?? "Time unavailable")}
         </button>
       </footer>
     </aside>

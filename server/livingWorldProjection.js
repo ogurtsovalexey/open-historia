@@ -53,6 +53,42 @@ function processProjection(state, process, visible, locale) {
   };
 }
 
+function territoryEffectProjection(state, transition, visible, locale) {
+  const region = state.regions.find((entry) => entry.regionId === transition.regionId);
+  if (!region) return null;
+  const snapshot = worldV2.deriveRegionSnapshot(state, region.regionId);
+  const before = transition.controlBefore;
+  const after = transition.controlAfter;
+  const controlled = (control, field) => control.actualControllerPolityId ? applyBp(snapshot.value[field], control[field === 'productiveCapacity' ? 'extractionAccessBp' : 'administrationAccessBp']) : 0;
+  const recruitment = (control) => control.actualControllerPolityId
+    ? applyBp(snapshot.value.eligiblePopulation, control.recruitmentAccessBp) : 0;
+  const formationExceptions = state.formations
+    .filter((formation) => formation.personnelOrigins.some((origin) => origin.regionId === region.regionId)
+      && formation.polityId !== after.actualControllerPolityId)
+    .map((formation) => ({ formationId: formation.formationId, polityId: formation.polityId, personnel: formation.personnelOrigins
+      .filter((origin) => origin.regionId === region.regionId).reduce((sum, origin) => sum + origin.personnel, 0) }))
+    .sort((left, right) => left.formationId.localeCompare(right.formationId));
+  const evidenceIds = groundedEvidence(snapshot.evidenceIds, visible, region.evidenceIds);
+  if (evidenceIds.length === 0) return null;
+  return {
+    transferId: `transfer:${region.regionId}:${after.actualControllerPolityId}`,
+    regionName: localized(region.displayName, locale) || labelOf(region.regionId),
+    fromPolityId: before.legalOwnerPolityId,
+    toPolityId: after.legalOwnerPolityId,
+    population: formatNumber(snapshot.value.population),
+    taxBefore: formatNumber(controlled(before, 'fiscalBase')),
+    taxAfter: formatNumber(controlled(after, 'fiscalBase')),
+    outputBefore: formatNumber(controlled(before, 'productiveCapacity')),
+    outputAfter: formatNumber(controlled(after, 'productiveCapacity')),
+    recruitmentBefore: formatNumber(recruitment(before)),
+    recruitmentAfter: formatNumber(recruitment(after)),
+    formationExceptions: formationExceptions.map((entry) => ({
+      label: `${labelOf(entry.formationId)} (${labelOf(entry.polityId)})`, personnel: formatNumber(entry.personnel),
+    })),
+    evidenceIds,
+  };
+}
+
 function interpretationProjection(intent, fallbackEvidence) {
   if (!intent || intent.status !== 'pending') return null;
   return {
@@ -89,6 +125,10 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
   ));
   const pendingIntent = interpretationProjection(session.playerIntent, snapshotEvidence);
   const last = session.lastTurn;
+  const territoryEffects = (last?.strategicRecords ?? [])
+    .flatMap((record) => record.territorialTransitions ?? [])
+    .map((transition) => territoryEffectProjection(state, transition, visible, locale))
+    .filter(Boolean);
   const changes = last?.kind === 'world-month-advanced' ? [{
     changeId: `change:clock-${state.turn}`,
     magnitude: `Now ${state.month}`,
@@ -141,6 +181,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
         ? 'Claims about the past are separated from requested future actions. No material state changes before confirmation.'
         : `${formatNumber(snapshot.controlledPopulation)} people under actual control across ${controlledRegions.length} regions.`,
       changes,
+      territoryEffects,
     },
     facts: [
       fact('fact:controlled-population', 'Population under actual control', formatNumber(snapshot.controlledPopulation), snapshotEvidence, ['Summed from regional population cohorts and current actual control']),
@@ -200,7 +241,12 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       { detailId: 'detail:forces', label: 'Forces', summary: `${formatNumber(snapshot.fieldedPersonnel)} fielded personnel; ${formatNumber(snapshot.availableManpower)} additional recruitable people under current access.` },
       { detailId: 'detail:provenance', label: 'Evidence', summary: `${visible.size} public or polity-visible evidence records ground this view at one exact revision.` },
     ],
-    time: { label: state.month, options: [{ optionId: 'advance-three-months', label: 'Advance three months' }] },
+    time: {
+      label: state.month,
+      options: [{ optionId: 'advance-three-months', label: 'Advance three months' }],
+      completedSubmonths: last?.kind === 'world-month-advanced' ? last.submonths?.length ?? 1 : 0,
+      totalSubmonths: last?.kind === 'world-month-advanced' ? last.submonths?.length ?? 1 : 3,
+    },
   };
 }
 

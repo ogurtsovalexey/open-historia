@@ -48,7 +48,7 @@ test("a living-world territorial offer remains pending until the addressed polit
   const acceptChoice = austriaTask.brief.frozenChoices.find((choice) => choice.choiceId.startsWith("choice:proposal-accept-"));
   expect(acceptChoice).toBeTruthy();
   const advancedResponse = await request.post(`/api/games/${gameId}/living-world/advance`, { data: {
-    revision: confirmed.projection.revision, sessionRevision: confirmed.sessionRevision, optionId: "advance-one-month",
+    revision: confirmed.projection.revision, sessionRevision: confirmed.sessionRevision, optionId: "advance-three-months",
     strategicAttempts: confirmed.strategicTasks.map((task) => task.taskKey === austriaTask.taskKey ? {
       ...hold(task), modelOutput: { ...hold(task).modelOutput, selectedChoiceIds: [acceptChoice.choiceId], evidenceIds: [acceptChoice.factsUsed[0]], hold: null },
     } : hold(task)),
@@ -56,5 +56,12 @@ test("a living-world territorial offer remains pending until the addressed polit
   expect(advancedResponse.ok()).toBeTruthy();
   const advanced = await advancedResponse.json();
   expect(advanced.interpretationContext.entities.find((entry) => entry.entityId === region.entityId).legalOwnerPolityId).toBe("polity:austria");
+  expect(advanced.projection.asOf).toBe("1805-04-01");
+  expect(advanced.playerDecisionIndex).toBe(1);
+  expect(advanced.lastTransition.submonths).toHaveLength(3);
+  expect(advanced.projection.briefing.territoryEffects).toHaveLength(1);
+  expect(advanced.projection.briefing.territoryEffects[0]).toMatchObject({
+    fromPolityId: "polity:france", toPolityId: "polity:austria",
+  });
   await request.delete(`/api/games/${gameId}`);
 });

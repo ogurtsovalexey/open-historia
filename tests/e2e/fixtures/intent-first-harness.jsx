@@ -47,7 +47,7 @@ const baseProjection = {
     commitments: [{ commitmentId: "commitment:grain", title: "Seasonal grain passage", summary: "Open through the end of summer.", evidenceIds: ["evidence:commitment"] }],
   },
   details: [{ detailId: "detail:population", label: "Population ledger", summary: "Regional cohorts reconcile with the controlled total." }],
-  time: { label: "April 1500", options: [{ optionId: "time:3m", label: "Advance 3 months" }] },
+  time: { label: "April 1500", options: [{ optionId: "time:3m", label: "Advance 3 months" }], completedSubmonths: 0, totalSubmonths: 3 },
 };
 
 const interpreted = (sourceText) => ({
@@ -140,7 +140,7 @@ const Harness = () => {
           evidenceIds: ["evidence:roads-result"],
           sourceLabels: ["Road compact process ledger"],
         }],
-        time: { label: "July 1500", options: current.time.options },
+        time: { label: "July 1500", options: current.time.options, completedSubmonths: 3, totalSubmonths: 3 },
       }));
     },
   };

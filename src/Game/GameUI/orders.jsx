@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { intentText } from "./intentFirstText";
 
 const claimTone = (status) => ({ contradicted: "danger", supported: "positive", unknown: "warning" }[status]);
 
@@ -6,7 +7,7 @@ const PreviewList = ({ title, values }) => values.length > 0 && (
   <div><span className="oh-intent-eyebrow">{title}</span><ul className="oh-intent-list">{values.map((value) => <li key={value}>{value}</li>)}</ul></div>
 );
 
-export const Orders = ({ interpretation, busy, error, onSubmit, onConfirm, onDismiss }) => {
+export const Orders = ({ interpretation, busy, error, onSubmit, onConfirm, onDismiss, locale }) => {
   const [draft, setDraft] = useState("");
   const intentions = draft.split("\n").map((line) => line.trim()).filter(Boolean);
   const submit = async () => {
@@ -22,9 +23,9 @@ export const Orders = ({ interpretation, busy, error, onSubmit, onConfirm, onDis
   };
   return (
     <section className="oh-intent-section" aria-labelledby="intent-orders-title" data-testid="intent-surface-orders">
-      <span className="oh-intent-eyebrow">Express intent, not parameters</span>
-      <h2 id="intent-orders-title">Orders</h2>
-      <label htmlFor="intent-order-draft" className="oh-intent-muted">One intention per line. Claims about the past will be checked separately.</label>
+      <span className="oh-intent-eyebrow">{intentText(locale, "Express intent, not parameters")}</span>
+      <h2 id="intent-orders-title">{intentText(locale, "Orders")}</h2>
+      <label htmlFor="intent-order-draft" className="oh-intent-muted">{intentText(locale, "One intention per line. Claims about the past will be checked separately.")}</label>
       <textarea
         id="intent-order-draft"
         className="oh-intent-textarea"
@@ -37,10 +38,10 @@ export const Orders = ({ interpretation, busy, error, onSubmit, onConfirm, onDis
       />
       <div className="oh-intent-actions">
         <button className="oh-intent-button" data-primary="true" data-testid="submit-intent" disabled={busy || intentions.length === 0} onClick={() => void submit()}>
-          Interpret {intentions.length > 1 ? `${intentions.length} intentions` : "intention"}
+          {intentions.length > 1 ? `${intentions.length} ${intentText(locale, "intentions")}` : intentText(locale, "Interpret intention")}
         </button>
       </div>
-      <div className="oh-intent-status" role="status" aria-live="polite">{busy ? "Checking against the current world…" : error}</div>
+      <div className="oh-intent-status" role="status" aria-live="polite">{busy ? intentText(locale, "Checking against the current world…") : error}</div>
       {interpretation && (
         <div className="oh-intent-card-grid" data-testid="intent-interpretation">
           <div className="oh-intent-card">
@@ -77,8 +78,8 @@ export const Orders = ({ interpretation, busy, error, onSubmit, onConfirm, onDis
           {interpretation.questions.map((question) => <div className="oh-intent-card" key={question.questionId}>{question.prompt}</div>)}
           {interpretation.confirmationRequired && (
             <div className="oh-intent-actions">
-              <button className="oh-intent-button" data-primary="true" data-testid="confirm-intent" disabled={busy} onClick={() => void onConfirm(interpretation.interpretationId)}>Confirm grounded actions</button>
-              <button className="oh-intent-button" disabled={busy} onClick={() => void onDismiss(interpretation.interpretationId)}>Revise</button>
+              <button className="oh-intent-button" data-primary="true" data-testid="confirm-intent" disabled={busy} onClick={() => void onConfirm(interpretation.interpretationId)}>{intentText(locale, "Confirm grounded actions")}</button>
+              <button className="oh-intent-button" disabled={busy} onClick={() => void onDismiss(interpretation.interpretationId)}>{intentText(locale, "Revise")}</button>
             </div>
           )}
         </div>

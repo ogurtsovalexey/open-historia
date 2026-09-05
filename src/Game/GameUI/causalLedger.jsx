@@ -1,4 +1,5 @@
 import React from "react";
+import { intentText } from "./intentFirstText";
 
 const authorityLabel = {
   canonical: "Canonical",
@@ -8,7 +9,7 @@ const authorityLabel = {
   unknown: "Unknown",
 };
 
-export const GroundedValue = ({ fact }) => (
+export const GroundedValue = ({ fact, locale }) => (
   <article className="oh-intent-card" data-testid={`grounded-fact-${fact.factId}`}>
     <div className="oh-intent-card-header">
       <div>
@@ -22,13 +23,13 @@ export const GroundedValue = ({ fact }) => (
       </span>
     </div>
     {fact.authority === "unknown" && <p className="oh-intent-muted">{fact.unknownReason}</p>}
-    <WhyDisclosure reasons={fact.why} evidenceCount={fact.evidenceIds.length} sourceLabels={fact.sourceLabels} />
+    <WhyDisclosure reasons={fact.why} evidenceCount={fact.evidenceIds.length} sourceLabels={fact.sourceLabels} locale={locale} />
   </article>
 );
 
-export const WhyDisclosure = ({ reasons = [], evidenceCount = 0, causes = [], sourceLabels = [] }) => (
+export const WhyDisclosure = ({ reasons = [], evidenceCount = 0, causes = [], sourceLabels = [], locale }) => (
   <details className="oh-intent-why">
-    <summary>Why?</summary>
+    <summary>{intentText(locale, "Why?")}</summary>
     <div className="oh-intent-why-body">
       {causes.map((cause, index) => (
         <div key={`${cause.label}-${index}`}>
@@ -45,7 +46,7 @@ export const WhyDisclosure = ({ reasons = [], evidenceCount = 0, causes = [], so
   </details>
 );
 
-export const CausalLedger = ({ changes }) => (
+export const CausalLedger = ({ changes, locale }) => (
   <div className="oh-intent-card-grid" data-testid="causal-ledger">
     {changes.map((change) => (
       <article className="oh-intent-card" key={change.changeId} data-testid={`causal-change-${change.changeId}`}>
@@ -53,7 +54,7 @@ export const CausalLedger = ({ changes }) => (
           <strong>{change.label}</strong>
           <span className="oh-intent-value" data-no-translate="true">{change.magnitude}</span>
         </div>
-        <WhyDisclosure causes={change.causes} evidenceCount={change.evidenceIds.length} sourceLabels={change.sourceLabels} />
+        <WhyDisclosure causes={change.causes} evidenceCount={change.evidenceIds.length} sourceLabels={change.sourceLabels} locale={locale} />
       </article>
     ))}
   </div>

@@ -269,7 +269,10 @@ export function resolveLivingWorldStrategicTasks(stateInput, tasks, submittedAtt
   const memories = new Map((prior.polities ?? []).map((entry) => [entry.polityId, entry]));
   const records = [];
   for (const { task, resolution } of resolutions) {
-    const record = { taskKey: task.taskKey, actorPolityId: task.actorPolityId, status: resolution.status, materializedProcessIds: [], errors: [] };
+    const record = {
+      taskKey: task.taskKey, actorPolityId: task.actorPolityId, status: resolution.status,
+      materializedProcessIds: [], territorialTransitions: [], errors: [],
+    };
     if (resolution.status === 'accepted') {
       const selectedResponses = resolution.semanticPackage.selectedChoiceIds
         .map((choiceId) => task.proposalResponses?.[choiceId])
@@ -280,10 +283,21 @@ export function resolveLivingWorldStrategicTasks(stateInput, tasks, submittedAtt
       }
       for (const response of selectedResponses) {
         try {
+          const controlsBefore = new Map(state.regions.map((region) => [region.regionId, region.control]));
           state = worldV2.resolveDiplomaticProposal(state, {
             proposalId: response.proposalId, actorPolityId: task.actorPolityId,
             decision: response.decision, expectedRevision: state.revision,
           });
+          for (const region of state.regions) {
+            const controlBefore = controlsBefore.get(region.regionId);
+            if (controlBefore && JSON.stringify(controlBefore) !== JSON.stringify(region.control)) {
+              record.territorialTransitions.push({
+                regionId: region.regionId,
+                controlBefore: { ...controlBefore },
+                controlAfter: { ...region.control },
+              });
+            }
+          }
         } catch (error) { record.errors.push(error instanceof Error ? error.message : String(error)); }
       }
       for (const decision of resolution.semanticPackage.processDecisions) {

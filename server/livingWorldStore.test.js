@@ -90,6 +90,7 @@ describe('living-world command store', () => {
     assert.equal(advanced.projection.asOf, '1450-04-01');
     assert.equal(advanced.playerDecisionIndex, 1);
     assert.equal(advanced.lastTransition.submonths.length, 3);
+    assert.deepEqual(advanced.projection.time.completedSubmonths, 3);
     assert.equal(advanced.lastTransition.submonths.flatMap((month) => month.tributeSettlements).length, 3);
     assert.deepStrictEqual(advanced.lastTransition.submonths.map((month) => month.monthAfter), ['1450-02-01', '1450-03-01', '1450-04-01']);
   });
@@ -260,5 +261,15 @@ describe('living-world command store', () => {
       } : hold(task)),
     });
     assert.equal(advanced.interpretationContext.entities.find((entry) => entry.entityId === region.entityId).legalOwnerPolityId, 'polity:austria');
+    const parsed = parseIntentFirstProjection(advanced.projection);
+    assert.equal(parsed.briefing.territoryEffects.length, 1);
+    const effect = parsed.briefing.territoryEffects[0];
+    assert.equal(effect.fromPolityId, 'polity:france');
+    assert.equal(effect.toPolityId, 'polity:austria');
+    assert.match(effect.population, /^\d[\d,]*$/u);
+    assert.match(effect.taxBefore, /^\d[\d,]*$/u);
+    assert.match(effect.taxAfter, /^\d[\d,]*$/u);
+    assert.match(effect.recruitmentBefore, /^\d[\d,]*$/u);
+    assert.match(effect.recruitmentAfter, /^\d[\d,]*$/u);
   });
 });

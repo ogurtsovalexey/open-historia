@@ -9,8 +9,8 @@ Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the pr
 This section is the authoritative resume point for the next implementation
 agent. Do not restart the merge ladder and do not reconstruct completed work
 from the old baseline. The current pushed implementation checkpoint is
-`3d14edc` on `feature/campaign-memory` (`feat(ai): run staggered Strategic V5
-opponents`). The documentation commit containing this section follows it.
+`b8bbb01` on `feature/campaign-memory` (`feat(living-world): settle three-month
+player turns`). The next package is R4.
 
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
@@ -21,7 +21,7 @@ canonical reducer.
 
 ### 0.1 What is already implemented
 
-| Area | State at `3d14edc` | Main proof |
+| Area | State at `b8bbb01` | Main proof |
 | --- | --- | --- |
 | Canon and contracts | Complete enough to build on. Canon 22 is the product authority. | `docs/canon/22-living-world-program.md` |
 | WorldStateV2 | Canonical schema, hashing, revisions, invariants, evidence registry and grounded selectors exist. Writable national population/army aggregates are not the V2 authority. | `packages/engine/src/world/*`; `worldStateV2.test.ts` |
@@ -31,9 +31,11 @@ canonical reducer.
 | Open concepts/processes | Unauthored technologies, ideologies, institutions and projects can become funded, staged processes. AI selects semantics and pace; engine derives exact costs, progress and checkpoint effects. | `packages/engine/src/processes/*` |
 | Materialized effects | Only `capacity.modify` and `supply-capacity.modify` are currently safe live effect primitives. Unsupported families are deliberately hidden from AI/UI envelopes. | `processEffects.test.ts` |
 | Tribute kernel | Typed multi-beneficiary commodity, labor and military-service obligations conserve deliveries and arrears. Mesoamerica contains one sourced example. | `world/tribute.ts`; `tribute.test.ts` |
-| Intent-first shell | Six primary surfaces, grounded facts, false-claim preview, confirmation, process cards and a canonical one-month advance are connected to a real saved V2 session. | `intentFirstShell.jsx`; `livingWorldStore.js` |
+| Intent-first shell | Six primary surfaces, grounded facts, false-claim preview, confirmation, process cards and the canonical three-month advance are connected to a real saved V2 session. | `intentFirstShell.jsx`; `livingWorldStore.js` |
 | Strategic V5 contracts | Private revision-frozen briefs, evidence checks, open initiatives, durable retrieval memory and deterministic materialization exist. | `strategicV5.ts`; `strategicV5.test.ts` |
 | Production opponent loop | Required V5 batches are atomic and visibly fail closed. Background calls are evidence-aware and capped; accepted initiatives enter the same engine process path. | `server/livingWorldStrategy.js`; R1 checkpoint |
+| Typed diplomacy and territory | A proposal stays immaterial until its frozen recipient response; accepted cessions use the sole territorial-control reducer. | `world/diplomacy.ts`; R2 checkpoint |
+| Three-month player loop | One normal decision resolves three local monthly boundaries, including monthly tribute and stable process settlement, then records every submonth. | `server/livingWorldStore.js`; R3 checkpoint |
 
 Completed commits, in dependency order:
 
@@ -51,12 +53,17 @@ b7bda70 feat(runtime): start grounded living-world games
 05c5bb8 feat(living-world): conserve tribute obligations
 db4b0cc feat(processes): materialize grounded checkpoint effects
 3d14edc feat(ai): run staggered Strategic V5 opponents
+a082bdc fix(ai): make required strategic checkpoints atomic
+2ae4396 feat(living-world): add typed diplomatic agreements
+b8bbb01 feat(living-world): settle three-month player turns
 ```
 
 ### 0.2 Verification truth at the checkpoint
 
-Do not report `3d14edc` as fully green without rerunning the interrupted gate.
-The following passed after its changes:
+The historical `3d14edc` handoff had an interrupted root gate. That limitation
+does not apply to the later R1–R3 commits: each was merged after its focused
+tests and the complete repository/scenario/build/lint gates. The following is
+kept only as the original baseline record:
 
 ```text
 npm run lint
@@ -281,7 +288,17 @@ Tests: exact date after 3/30 months, atomic rollback on month two, three process
 advances, three tribute settlements, deterministic replay, and no extra AI
 calls during submonths.
 
-#### R4 — finish the production intent-first UI and automated acceptance
+#### R4 — finish the production intent-first UI and automated acceptance — complete
+
+Delivered: the living-world shell remains the sole primary surface for V2
+sessions, exposes a completed three-boundary resolution indicator and renders
+territorial transitions with the region-held population, tax/output,
+recruitment and formation-exception rows. Its primary labels have explicit
+English/Russian display handling. Focused Playwright coverage now includes the
+named intent, claims, process and territory suites; the three shipped
+production session paths each create a fresh save and resolve their first real
+three-month engine turn with only strategic outputs mocked. The next package
+is R5.
 
 Make the new six-surface shell the only primary UI for living-world games.
 Legacy panes may remain under `Details` read-only until R5, but their old queue

@@ -194,6 +194,21 @@ export const parseIntentFirstProjection = (value) => {
     });
     return item;
   });
+  const territoryEffects = assertUnique(arrayAt(briefing.territoryEffects ?? [], "projection.briefing.territoryEffects").map((effect, index) => {
+    const path = `projection.briefing.territoryEffects[${index}]`;
+    const item = objectAt(effect, path);
+    for (const key of ["transferId", "regionName", "fromPolityId", "toPolityId", "population", "taxBefore", "taxAfter", "outputBefore", "outputAfter", "recruitmentBefore", "recruitmentAfter"]) {
+      stringAt(item[key], `${path}.${key}`);
+    }
+    stringArrayAt(item.evidenceIds, `${path}.evidenceIds`, { nonEmpty: true });
+    const formationExceptions = arrayAt(item.formationExceptions, `${path}.formationExceptions`).map((entry, exceptionIndex) => {
+      const exception = objectAt(entry, `${path}.formationExceptions[${exceptionIndex}]`);
+      stringAt(exception.label, `${path}.formationExceptions[${exceptionIndex}].label`);
+      stringAt(exception.personnel, `${path}.formationExceptions[${exceptionIndex}].personnel`);
+      return exception;
+    });
+    return { ...item, formationExceptions };
+  }), "transferId", "projection.briefing.territoryEffects");
   const facts = assertUnique(arrayAt(root.facts, "facts")
     .map((fact, index) => parseGroundedDisplay(fact, `facts[${index}]`)), "factId", "facts");
   const interpretation = parseInterpretation(root.interpretation);
@@ -250,6 +265,12 @@ export const parseIntentFirstProjection = (value) => {
     stringAt(option.optionId, `projection.time.options[${index}].optionId`);
     stringAt(option.label, `projection.time.options[${index}].label`);
   });
+  for (const key of ["completedSubmonths", "totalSubmonths"]) {
+    if (!Number.isSafeInteger(time[key]) || time[key] < 0 || time[key] > 3) {
+      fail(`projection.time.${key}`, "must be a whole monthly-boundary count from 0 to 3");
+    }
+  }
+  if (time.completedSubmonths > time.totalSubmonths) fail("projection.time.completedSubmonths", "cannot exceed totalSubmonths");
   let strategicCheckpoint = null;
   if (root.strategicCheckpoint !== null && root.strategicCheckpoint !== undefined) {
     const checkpoint = objectAt(root.strategicCheckpoint, "projection.strategicCheckpoint");
@@ -270,7 +291,7 @@ export const parseIntentFirstProjection = (value) => {
   return {
     ...root,
     playerPolity,
-    briefing: { ...briefing, changes },
+    briefing: { ...briefing, changes, territoryEffects },
     facts,
     interpretation,
     processes,

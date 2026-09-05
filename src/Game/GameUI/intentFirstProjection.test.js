@@ -53,7 +53,7 @@ const groundedProjection = () => ({
   situations: [],
   diplomacy: { conversations: [], commitments: [] },
   details: [],
-  time: { label: "April 1500", options: [{ optionId: "time:3m", label: "Advance 3 months" }] },
+  time: { label: "April 1500", options: [{ optionId: "time:3m", label: "Advance 3 months" }], completedSubmonths: 0, totalSubmonths: 3 },
 });
 
 test("intent-first projection accepts revision-bound grounded values and unknowns", () => {
