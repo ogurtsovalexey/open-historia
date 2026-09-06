@@ -5,7 +5,9 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const source = path.join(root, 'server', 'data');
-const target = path.join(root, '.local-playtests', 'live-data');
+const target = process.env.OH_PLAYTEST_DATA_DIR
+  ? path.resolve(process.env.OH_PLAYTEST_DATA_DIR)
+  : path.join(root, '.local-playtests', 'live-data');
 const marker = path.join(target, '.open-historia-live-playtest-store');
 
 fs.mkdirSync(target, { recursive: true });
