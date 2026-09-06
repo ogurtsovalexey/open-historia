@@ -135,34 +135,22 @@ after all package test builds, before the full Node test run, to conserve the
 owner's usage. Therefore the next merge point must run the full gates; their
 result is unknown, not failed.
 
-### 0.3 Known gaps that must not be mistaken for completed features
+### 0.3 Remaining limits that must not be mistaken for completed coverage
 
-1. Current sharding is based on the monthly `state.turn`. Once the UI advances
-   three months, using only the initial shard would starve two shards, while
-   calling all three would spend too many model calls. Replace it with the
-   bounded, change-aware scheduling contract in section 0.5.
-2. Confirmed player requested actions are currently materialized as generic
-   processes. There is no V2 production command path for typed diplomacy,
-   accepted agreements, combat authority or territorial cession. The visible
-   legacy diplomacy/military panes are not permission to call their old
-   reducers.
-3. `applyTerritorialTransition` is a correct low-level kernel, but no normal
-   living-world order can yet produce its required peace/agreement/combat
-   authority. Never synthesize `gm` authority from ordinary player prose.
-4. Tribute settlement is callable and tested but is not scheduled
-   automatically at monthly boundaries.
-5. The live UI advances one month. The required play loop is one player
-   decision followed by three deterministic monthly boundaries.
-6. Relationships in V2 are starting facts only. Pending proposals, responses
-   and agreement creation need a typed canonical reducer and evidence.
-7. Only two process effect families are materialized. Do not re-expose the
-   other enum values until an exact engine reducer and invariant test exist.
-8. `server/europe1935Runtime.js`, legacy impacts, old management panes and
-   other parallel write paths remain. Delete them only after replacement
-   tests pass; do not connect them to V2 as a shortcut.
-9. Only `tests/e2e/living-world-intent-shell.spec.js` exists for the new UI,
-    and it is mostly a shell fixture. The production Playwright and real game
-    gates are still red.
+1. Only `capacity.modify` and `supply-capacity.modify` are safe materialized
+   process-effect families. Do not expose any other effect family until it has
+   one exact engine reducer and invariant tests.
+2. The three fresh 30-month UI games, model-mediated interpretations, claim
+   boundaries, counterfactual process, and audits are complete. The complete
+   per-turn WP15 script table is not: mobile/keyboard checks, political
+   situations, legal territorial pressure and all individual prescribed
+   intentions still require direct evidence.
+3. A legal territorial transition must still arise only from its typed peace,
+   agreement or combat authority. Ordinary player prose must never synthesize
+   `gm` authority.
+4. Retired Strategic V4 source and Europe-specific authoring utilities remain
+   documented offline audit tooling only. A future deletion commit needs the
+   required `rg` audit and persisted-save migration proof before removing them.
 
 ### 0.4 Scope guard for a simpler implementation agent
 
