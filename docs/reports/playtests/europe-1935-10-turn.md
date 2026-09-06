@@ -55,3 +55,33 @@ npm run playtest:audit -- --game europe-1935-1940-benchmark-session-3 \
 
 The export contains only sanitized `codex-subscription / gpt-5.6-luna / low`
 Utility and Strategic provenance, never raw provider prompts or responses.
+
+## Persistent-store rerun
+
+The original report predates the persistent live-playtest store. On 2026-09-06,
+the same visible UI flow was repeated from a fresh store at
+`.local-playtests/live-data`: Poland / Medium, ten three-month decisions and
+thirty resolved monthly boundaries, ending at `1937-07-01`. Before the first
+decision the UI's **Run schema preflight** control was used; no gameplay API or
+filesystem mutation was used. This rerun deliberately exercised three distinct
+boundaries: a bounded electricity investigation (initial treasury commitment
+`440`), a rejected retrospective claim about East Prussia and two million
+soldiers (14 and 13 grounded sources), and a bounded `461`-person reserve
+drawn from Warsaw's civilian workforce.
+
+| Field | Persistent rerun value |
+| --- | --- |
+| Date / engine turn / decisions | `1937-07-01` / `30` / `10` |
+| World revision | `sha256:1b8ad01496003aa316c317584be0a90fd607550f3ece86c22163a12f542beef4` |
+| Population / workforce / fielded personnel | `34,000,000` / `13,499,539` / `100,461` |
+| Available manpower / supply capacity | `3,979,533` / `132,000` |
+| Replay checksum | `sha256:9183f68bf30ff968e52df0bf625485afe907bc289319ab7ce63d639af426c955` |
+| Audit checksum | `sha256:7b9ce46babdca189dcabe81b8559f304d2ea9d95c8fa637092b10afd6618874f` |
+
+The exact audit can be regenerated while the ignored persistent store is
+present:
+
+```text
+npm run playtest:audit -- --game europe-1935-1940-benchmark-session \
+  --data-dir .local-playtests/live-data --output /tmp/europe-persistent-ui-audit.json
+```
