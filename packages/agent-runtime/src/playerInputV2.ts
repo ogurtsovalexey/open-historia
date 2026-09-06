@@ -273,6 +273,7 @@ function operationReasons(state: worldV2.WorldStateV2, actorPolityId: string, ac
     if (!process) reasons.push(`unknown-process:${operation.processId}`);
     else {
       if (!process.sponsorEntityRefs.includes(actorPolityId)) reasons.push(`not-sponsored-process:${operation.processId}`);
+      if (process.status !== 'active') reasons.push(`process-not-active:${operation.processId}`);
       const envelope = processes.buildFeasibilityEnvelope(state, process);
       if (!envelope.allowedPaces.includes(action.pace)) reasons.push(`infeasible-process-pace:${action.pace}`);
     }

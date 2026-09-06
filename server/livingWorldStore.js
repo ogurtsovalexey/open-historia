@@ -225,11 +225,11 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
     .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind === 'process.adjust')
     .map((entry) => {
       const process = session.state.processes.find((candidate) => candidate.processId === entry.operation.processId);
-      if (!process || !process.sponsorEntityRefs.includes(playerPolityId)) {
+      if (!process || !process.sponsorEntityRefs.includes(playerPolityId) || process.status !== 'active') {
         entry.material = false;
         entry.status = 'blocked';
         entry.evidenceIds = [];
-        entry.summary = `${entry.summary} (blocked: the process is not sponsored by this polity)`;
+        entry.summary = `${entry.summary} (blocked: the process is unavailable for an active sponsored pace adjustment)`;
         return null;
       }
       const envelope = processes.buildFeasibilityEnvelope(session.state, process);
@@ -535,7 +535,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
     }
     if (operation.kind === 'process.adjust') {
       const process = state.processes.find((entry) => entry.processId === operation.processId);
-      if (!process || !process.sponsorEntityRefs.includes(playerIntent.playerPolityId)) {
+      if (!process || !process.sponsorEntityRefs.includes(playerIntent.playerPolityId) || process.status !== 'active') {
         throw new Error(`Cannot adjust an unsponsored or unknown process ${operation.processId}.`);
       }
       const envelope = processes.buildFeasibilityEnvelope(state, process);

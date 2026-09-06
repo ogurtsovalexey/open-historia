@@ -371,6 +371,7 @@ export function applyProcessDecision(state: WorldStateV2, input: unknown): Proce
   const decision = proposalDecisionSchema.parse(input);
   const process = state.processes.find((entry) => entry.processId === decision.processId);
   if (!process) throw new Error(`Unknown process ${decision.processId}`);
+  if (process.status !== 'active') throw new Error(`Process ${decision.processId} is ${process.status}`);
   if (decision.direction !== process.direction) throw new Error(`Direction ${decision.direction} is not allowed for ${decision.processId}`);
   const envelope = buildFeasibilityEnvelope(state, process);
   if (!envelope.allowedPaces.includes(decision.pace)) throw new Error(`Pace ${decision.pace} is infeasible`);

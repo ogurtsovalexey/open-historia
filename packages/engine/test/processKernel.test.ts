@@ -160,6 +160,22 @@ describe('scenario-neutral process kernel', () => {
     }), /pace breakthrough is infeasible/i);
   });
 
+  it('does not reopen a completed process through a later pace decision', () => {
+    const initial = stampWorldStateRevision(worldInput());
+    const accepted = acceptSemanticProcessProposal(initial, proposal('technology', 'Completed relay', 'completed-relay'), emptyPlan());
+    const completed = {
+      ...accepted.state,
+      processes: accepted.state.processes.map((entry) => ({ ...entry, status: 'completed' as const })),
+    };
+    assert.throws(() => applyProcessDecision(completed, {
+      processId: accepted.processId,
+      direction: 'direction:experimental',
+      pace: 'slow',
+      effectSelections: [{ kind: 'capacity.modify', targetEntityRef: 'region:test:capital' }],
+      evidenceIds: ['evidence:grounding'],
+    }), /is completed/i);
+  });
+
   it('accepts communism in 1200 but exposes material and institutional constraints', () => {
     const state = stampWorldStateRevision(worldInput('1200-01-01'));
     const plan = emptyPlan();
