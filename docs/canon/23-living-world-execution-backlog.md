@@ -67,6 +67,18 @@ documented offline-audit exception below: it is no longer re-exported from the
 agent-runtime root used by live server code, and the Gate-0 audit fixture loads
 it by its direct offline module path.
 
+A player can now also ask to adjust the qualitative pace of an already
+published, sponsored process. The engine supplies the current feasible pace
+menu in the revision-stamped private intent context; the interpreter and
+confirmation path both reject any process outside that sponsorship/menu. A
+pace adjustment retains the exact engine-approved funding, targets and effect
+selections, so the utility model cannot use it as a back door to rewrite a
+process. `server/livingWorldStore.test.js` and
+`tests/e2e/living-world-process-pace.spec.js` cover the bounded preview,
+confirmation and production shell. This closes the implementation prerequisite
+for WP15 turn 9; it is not retroactive proof that every historical playtest
+script row has been run.
+
 Strategic background actor work is now dispatched concurrently, still capped
 by the canonical four tasks, with a 45-second per-task deadline. This removes
 the former UI appearance of a stuck turn when four actors were selected
