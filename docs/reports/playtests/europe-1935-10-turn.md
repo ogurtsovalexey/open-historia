@@ -22,6 +22,15 @@ contains both a canonical diplomatic-proposal evidence item and its acceptance.
 The final visible **Why?** disclosure showed the latest calendar transition and
 24 grounded sources.
 
+After the ten-turn loop, the same UI session also tested the required false
+retrospective claim: “Poland annexed East Prussia ten turns ago and mobilized
+two million soldiers.” The preview separately contradicted the conquered-region
+and fielded-personnel assertions, citing 13 grounded sources for each. Its
+confirmation created no process, mobilization or diplomatic proposal. The
+read-only post-claim audit retained `1937-07-01`, turn `30`, decision index
+`10`, and the identical world revision below, proving that untrusted prose
+cannot rewrite territory or army figures.
+
 ## Independent audit
 
 ```text
