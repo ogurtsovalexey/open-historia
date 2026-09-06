@@ -41,7 +41,7 @@ describe("living-world semantic AI boundary", () => {
     assert.deepEqual(initiative.effectFamilies.items.enum, ["capacity.modify"]);
     assert.ok(initiative.pace.enum.includes("slow"));
     const operation = schema.properties.requestedActions.items.properties.operation.anyOf;
-    assert.equal(operation[1].properties.kind.const, "military.mobilize");
+    assert.equal(operation[0].properties.kind.const, "military.mobilize");
     assert.equal(operation[3].properties.kind.const, "territory.offer");
     assert.equal(JSON.stringify(operation).includes("administrationAccessBp"), false);
     assert.equal(JSON.stringify(operation).includes("authority"), false);
