@@ -93,6 +93,8 @@ export type PolityStateV2 = z.infer<typeof polityStateV2Schema>;
 export const regionStateV2Schema = z.object({
   regionId: regionIdSchema,
   displayName: localizedTextSchema,
+  /** Canonical local topology used to prove any future bounded military pressure. */
+  adjacentRegionIds: z.array(regionIdSchema).default([]),
   control: regionalControlSchema,
   fiscalBase: safeNonNegativeIntegerSchema,
   productiveCapacity: safeNonNegativeIntegerSchema,

@@ -56,6 +56,7 @@ export function canonicalWorldState(state: WorldStateV2): WorldStateV2 {
     })).sort((a, b) => compareId(a.id, b.id)),
     regions: state.regions.map((entry) => ({
       ...sortedEvidence(entry),
+      adjacentRegionIds: sortedStrings(entry.adjacentRegionIds),
       resourceDeposits: [...entry.resourceDeposits].sort((a, b) => compareId(a.resourceId, b.resourceId)),
     })).sort((a, b) => compareId(a.regionId, b.regionId)),
     populationCohorts: state.populationCohorts.map(sortedEvidence).sort((a, b) => compareId(a.cohortId, b.cohortId)),

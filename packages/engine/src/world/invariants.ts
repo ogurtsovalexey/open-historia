@@ -157,6 +157,18 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
   for (const region of state.regions) {
     assertPolity(region.control.legalOwnerPolityId, `region ${region.regionId} legal owner`);
     assertPolity(region.control.actualControllerPolityId, `region ${region.regionId} actual controller`);
+    checkUnique(violations, `adjacent region in ${region.regionId}`, region.adjacentRegionIds);
+    for (const adjacentRegionId of region.adjacentRegionIds) {
+      if (adjacentRegionId === region.regionId) {
+        violations.push(`region ${region.regionId} cannot be adjacent to itself`);
+        continue;
+      }
+      assertRegion(adjacentRegionId, `region ${region.regionId} adjacency`);
+      const adjacent = state.regions.find((candidate) => candidate.regionId === adjacentRegionId);
+      if (adjacent && !adjacent.adjacentRegionIds.includes(region.regionId)) {
+        violations.push(`region adjacency ${region.regionId} -> ${adjacentRegionId} is not symmetric`);
+      }
+    }
     checkUnique(violations, `resource deposit in ${region.regionId}`, region.resourceDeposits.map((entry) => entry.resourceId));
     const control = region.control;
     const profile = controlProfiles.get(control.controlProfileId);

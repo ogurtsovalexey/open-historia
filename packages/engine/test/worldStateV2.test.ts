@@ -213,6 +213,14 @@ describe('WorldStateV2 shell', () => {
     const inconsistent = worldInput();
     inconsistent.formations[0]!.personnelOrigins[0]!.personnel = 99;
     assert.throws(() => stampWorldStateRevision(inconsistent), /personnel origins.*manpower/i);
+
+    const asymmetricAdjacency = worldInput();
+    asymmetricAdjacency.regions[0]!.adjacentRegionIds = ['region:test:A'];
+    assert.throws(() => stampWorldStateRevision(asymmetricAdjacency), /adjacency.*not symmetric/i);
+
+    const selfAdjacency = worldInput();
+    selfAdjacency.regions[0]!.adjacentRegionIds = [selfAdjacency.regions[0]!.regionId];
+    assert.throws(() => stampWorldStateRevision(selfAdjacency), /cannot be adjacent to itself/i);
   });
 
   it('exposes invariant checks separately for commit boundaries', () => {

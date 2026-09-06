@@ -164,6 +164,7 @@ describe('ScenarioV3 engine compiler', () => {
       administrationAccessBp: 10000, extractionAccessBp: 10000,
       recruitmentAccessBp: 10000, integrationBp: 10000,
     });
+    assert.deepStrictEqual(compiled.initialState.regions[0]!.adjacentRegionIds, []);
     const knowledgeEvidence = compiled.initialState.evidence.find(
       (entry) => entry.evidenceId === 'evidence:knowledge-alpha-writing',
     )!;

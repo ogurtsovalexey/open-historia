@@ -149,6 +149,7 @@ function buildInitialState(
     return {
       regionId: region.id,
       displayName: region.displayName,
+      adjacentRegionIds: [...scenario.geography.regions[region.id]!.adjacentRegionIds].sort(compareIds),
       control: {
         legalOwnerPolityId: region.legalOwnerPolityId,
         actualControllerPolityId: region.actualControllerPolityId,
