@@ -14,18 +14,39 @@ import {
   materializeStrategicDecisionV4,
   pendingTriggerRetryMonth,
   renderStrategicPromptV4,
-} from '../packages/agent-runtime/dist/index.js';
+} from '../packages/agent-runtime/dist/strategicV4.js';
 import {
-  CODEX_STRATEGIC_CONTRACT,
   hasChatGptLogin,
   inspectCodexSubscription,
   invokeCodexStructured,
-  runCodexSchemaPreflight,
-  strategicDecisionV3JsonSchema,
 } from '../server/codexSubscriptionProvider.js';
 import { assessCodexDecisionReferences } from './lib/campaign-lab-contract.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// Gate 0 is retained exclusively as an offline historical-audit fixture. Its
+// V4/V3 schema must not be exported by, or certify, the live Living World
+// transport. Keep the frozen shape beside the fixture that consumes it.
+const LEGACY_STRATEGIC_CONTRACT = 'StrategicBriefV4+StrategicDecisionV3';
+const legacyStrategicDecisionV3JsonSchema = () => {
+  const string = (maxLength) => ({ type: 'string', minLength: 1, ...(maxLength ? { maxLength } : {}) });
+  const array = (items, maxItems, minItems) => ({
+    ...(minItems ? { minItems } : {}), ...(maxItems ? { maxItems } : {}), type: 'array', items,
+  });
+  const object = (properties) => ({ type: 'object', properties, required: Object.keys(properties), additionalProperties: false });
+  const hold = object({
+    reason: { type: 'string', enum: ['no-legal-action', 'waiting-response', 'insufficient-resources', 'plan-sequencing', 'risk-too-high', 'mandatory-overflow', 'stale'] },
+    detail: string(320), revisitAfterMonths: { type: 'integer', minimum: 1, maximum: 12 },
+  });
+  return object({
+    polityId: string(), revision: string(),
+    objective: object({ domain: { type: 'string', enum: ['economy', 'diplomacy', 'politics', 'military', 'statecraft', 'campaign'] }, summary: string(320), horizon: { type: 'string', enum: ['short', 'medium', 'long'] } }),
+    selectedChoices: array(object({ choiceId: string(), purpose: string(240), evidenceIds: array(string(), 12, 1), expectedConsequence: string(320) }), 10),
+    triggerCoverage: array(object({ triggerId: string(), choiceIds: array(string(), 1, 1) }), 32),
+    rejectedChoices: array(object({ choiceId: string(), reason: string(240) }), 3),
+    durablePlan: object({ objective: string(320), futureSteps: array(string(240), 8), commitments: array(string(240), 8) }),
+    contingency: string(500), hold: { anyOf: [hold, { type: 'null' }] },
+  });
+};
 const RUNS = process.env.CAMPAIGN_LAB_RUNS_DIR
   ? path.resolve(process.env.CAMPAIGN_LAB_RUNS_DIR)
   : path.join(ROOT, 'runs/campaign-lab');
@@ -92,7 +113,7 @@ const commandBase = (state, actorPolityId, suffix) => ({
 const tokenCount = (text) => countTokens(text);
 
 const schemaForBrief = (brief) => {
-  const schema = strategicDecisionV3JsonSchema();
+  const schema = legacyStrategicDecisionV3JsonSchema();
   const choiceIds = brief.choices.map((entry) => entry.choiceId);
   const evidenceIds = [...new Set([
     ...brief.choices.map((entry) => entry.evidenceId),
@@ -254,7 +275,7 @@ const parseTransport = (stdout) => {
 const validatePreflight = (file, model, effort) => {
   if (!file) throw new Error('live Gate 0 requires --preflight <Codex preflight JSON>');
   const record = readJson(path.resolve(file));
-  if (record.provider !== 'codex-subscription' || record.contract !== CODEX_STRATEGIC_CONTRACT
+  if (record.provider !== 'codex-subscription' || record.contract !== LEGACY_STRATEGIC_CONTRACT
     || record.model !== model || record.effort !== effort || !record.preflightChecksum) {
     throw new Error('preflight does not match the frozen provider/model/effort/contract');
   }
@@ -283,7 +304,7 @@ const runSuite = async (args) => {
   }) : built.probes;
   const { contentVersion, packageChecksum } = built;
   const freeze = { schemaVersion: 'open-historia-strategic-run/3', scenarioId: 'scenario:europe-1935-benchmark',
-    scenarioContentVersion: contentVersion, promptContract: CODEX_STRATEGIC_CONTRACT,
+    scenarioContentVersion: contentVersion, promptContract: LEGACY_STRATEGIC_CONTRACT,
     provider: mode === 'live' ? 'codex-subscription' : 'deterministic-mock', model: mode === 'live' ? model : 'deterministic-mock',
     effort: mode === 'live' ? effort : 'off', preflightChecksum: preflight?.preflightChecksum ?? 'sha256:mock' };
   const manifest = { schemaVersion: 'open-historia-strategic-gate0/1', runId, mode, status: 'running', freeze,
@@ -367,8 +388,27 @@ const main = async () => {
     const effort = args.effort ?? 'medium';
     const inspection = await inspectCodexSubscription({ desktopRuntime: true });
     if (!inspection.available || !hasChatGptLogin()) throw new Error(`Codex subscription unavailable: ${inspection.reason ?? 'ChatGPT login missing'}`);
-    const record = await runCodexSchemaPreflight({ model, effort, cliVersion: inspection.cliVersion,
-      directory: path.join(RUNS, 'codex-preflights') });
+    const schema = legacyStrategicDecisionV3JsonSchema();
+    const response = {
+      polityId: 'polity:preflight', revision: 'revision:preflight',
+      objective: { domain: 'campaign', summary: 'Verify the legacy audit transport.', horizon: 'short' },
+      selectedChoices: [], triggerCoverage: [], rejectedChoices: [],
+      durablePlan: { objective: 'Verify transport only.', futureSteps: [], commitments: [] },
+      contingency: 'Do not materialize this diagnostic response.',
+      hold: { reason: 'plan-sequencing', detail: 'Legacy audit transport only.', revisitAfterMonths: 1 },
+    };
+    const result = await invokeCodexStructured({
+      prompt: `This is an offline historical-audit preflight. Return exactly this JSON object.\n${JSON.stringify(response)}`,
+      schema, model, effort,
+    });
+    if (JSON.stringify(result.response) !== JSON.stringify(response)) throw new Error('legacy audit preflight response did not preserve the frozen sentinel payload');
+    const record = {
+      schemaVersion: 'open-historia-codex-preflight/1', provider: 'codex-subscription', contract: LEGACY_STRATEGIC_CONTRACT,
+      model, effort, cliVersion: String(inspection.cliVersion ?? 'unknown'),
+      schemaChecksum: sha256(schema), responseChecksum: sha256(response),
+    };
+    record.preflightChecksum = sha256(record);
+    atomicJson(path.join(RUNS, 'codex-preflights', `${record.preflightChecksum.slice(7)}.json`), record);
     process.stdout.write(`${JSON.stringify(record, null, 2)}\n`);
     return;
   }

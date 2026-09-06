@@ -27,22 +27,24 @@ import {
   expandStrategicAffordancesV3,
   materializeStrategicDecisionV3,
   materializeStrategicBatchV3,
-  buildStrategicBriefV4,
-  STRATEGIC_INPUT_TOKEN_LIMIT,
-  renderStrategicPromptV4,
-  materializeStrategicDecisionV4,
-  strategicDecisionV3Schema,
-  dispatchStrategicSessions,
-  stableStrategicCommitOrder,
-  strategicCallBudget,
-  isQuarterlyCheckpoint,
-  politicalIdentitySchema,
-  buildStrategicPoliticsFromState,
-  assertStrategicRunCompatible,
-  commitStrategicMemory,
-  pendingTriggerRetryMonth,
   type AgentState,
 } from '../src/index.js';
+import {
+  assertStrategicRunCompatible,
+  buildStrategicBriefV4,
+  buildStrategicPoliticsFromState,
+  commitStrategicMemory,
+  dispatchStrategicSessions,
+  isQuarterlyCheckpoint,
+  materializeStrategicDecisionV4,
+  pendingTriggerRetryMonth,
+  politicalIdentitySchema,
+  renderStrategicPromptV4,
+  stableStrategicCommitOrder,
+  STRATEGIC_INPUT_TOKEN_LIMIT,
+  strategicCallBudget,
+  strategicDecisionV3Schema,
+} from '../src/strategicV4.js';
 import { econCommandSchema, initState, parseScenario, runTurn, stateChecksum, type EconWorldState } from '@open-historia/engine';
 
 const fixture = fileURLToPath(new URL('../../../engine/fixtures/scenario-dev-map-4c/scenario.json', import.meta.url));

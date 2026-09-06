@@ -27,7 +27,6 @@ import type { IdentityCommand } from '@open-historia/engine';
 import type { CampaignCommand } from '@open-historia/engine';
 
 export * from './strategic.js';
-export * from './strategicV4.js';
 export * from './strategicV5.js';
 export * from './playerInputV2.js';
 

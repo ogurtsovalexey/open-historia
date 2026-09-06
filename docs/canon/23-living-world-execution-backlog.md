@@ -63,7 +63,9 @@ the same provider also interprets player intentions, while every live utility
 or Strategic V5 call supplies and validates its own frozen schema. A
 pre-existing V4/V3 preflight is rejected; the operator must run the local
 preflight once after this migration. The old V4 source remains confined to the
-documented offline-audit exception below.
+documented offline-audit exception below: it is no longer re-exported from the
+agent-runtime root used by live server code, and the Gate-0 audit fixture loads
+it by its direct offline module path.
 
 Strategic background actor work is now dispatched concurrently, still capped
 by the canonical four tasks, with a 45-second per-task deadline. This removes
