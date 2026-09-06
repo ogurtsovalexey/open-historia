@@ -417,8 +417,10 @@ documented migration/audit exception to the production-match search below.
 Complete WP12 fixtures in two relevant scenarios each. Only after those and
 R4 are green, remove live Strategic V4, model-authored impacts, binding-canon
 memory, AI-generated exact statistics, Europe-specific runtime branches,
-dual engine flags and writable legacy controls. Audit `packages/sim-core`
-imports before deciding whether it can be deleted.
+dual engine flags and writable legacy controls. The `packages/sim-core` import
+and replay audit is now complete: the package was retired in `bfd69af` after
+its useful invariants were verified against WorldStateV2; it must not be
+reintroduced as a second runtime accounting model.
 
 Required searches must return no live production matches (test/migration
 readers may be explicitly documented):
