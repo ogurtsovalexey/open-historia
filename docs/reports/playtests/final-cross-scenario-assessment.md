@@ -31,3 +31,11 @@ tribute-centred worlds. It does not claim that these peaceful, bounded runs
 forced every possible war, occupation, combat, peace, or territorial-transfer
 path; those remain covered by the dedicated deterministic and cross-era tests,
 not fabricated UI outcomes.
+
+The live shell was additionally opened at a 390 px viewport after the
+Napoleonic rerun: all six primary tabs, the three-month advance control, and
+the Orders text entry remained present in the accessibility tree, and the
+Orders tab opened normally. This is a manual responsive smoke check; the
+keyboard and no-horizontal-overflow assertions remain separately covered by
+the automated UI acceptance suite rather than being overstated as campaign
+evidence.
