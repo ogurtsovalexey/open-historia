@@ -1,5 +1,20 @@
 import { expect, test } from "@playwright/test";
 
+const hold = (task) => ({
+  taskKey: task.taskKey,
+  status: "succeeded",
+  modelOutput: {
+    polityId: task.actorPolityId,
+    revision: task.brief.revision,
+    selectedChoiceIds: [],
+    processDecisions: [],
+    initiativeProposals: [],
+    durablePlan: { objective: "Preserve current capacity.", goals: [], commitments: [], revisit: "Review a material change." },
+    evidenceIds: [task.brief.evidence[0].evidenceId],
+    hold: { reason: "no-legal-action", detail: "No other action is selected.", revisit: "next-quarter" },
+  },
+});
+
 test("the production shell records a typed external proposal without materializing a relationship before its recipient responds", async ({ page, request }) => {
   const gameId = "living-world-diplomacy-e2e";
   await request.delete(`/api/games/${gameId}`).catch(() => {});
@@ -65,5 +80,33 @@ test("the production shell records a typed external proposal without materializi
     && entry.summary.includes("Bavaria")
   ))).toBe(false);
   expect(confirmed.lastTransition.createdDiplomaticProposals).toHaveLength(1);
+
+  const bavariaTask = confirmed.strategicTasks.find((task) => task.actorPolityId === "polity:bavaria");
+  const acceptChoice = bavariaTask.brief.frozenChoices.find((choice) => choice.choiceId.startsWith("choice:proposal-accept-"));
+  expect(acceptChoice).toBeTruthy();
+  const advancedResponse = await request.post(`/api/games/${gameId}/living-world/advance`, { data: {
+    revision: confirmed.projection.revision,
+    sessionRevision: confirmed.sessionRevision,
+    optionId: "advance-three-months",
+    strategicAttempts: confirmed.strategicTasks.map((task) => task.taskKey === bavariaTask.taskKey ? {
+      ...hold(task),
+      modelOutput: {
+        ...hold(task).modelOutput,
+        selectedChoiceIds: [acceptChoice.choiceId],
+        evidenceIds: [acceptChoice.factsUsed[0]],
+        hold: null,
+      },
+    } : hold(task)),
+  } });
+  expect(advancedResponse.ok()).toBeTruthy();
+  const advanced = await advancedResponse.json();
+  expect(advanced.projection.diplomacy.conversations).toHaveLength(0);
+  expect(advanced.projection.diplomacy.commitments).toEqual(expect.arrayContaining([
+    expect.objectContaining({ title: "coalition negotiation", summary: expect.stringMatching(/Bavaria/) }),
+  ]));
+
+  await page.getByRole("tab", { name: "Дипломатия" }).click();
+  await expect(page.getByText("coalition negotiation")).toBeVisible();
+  await expect(page.getByText(/Bavaria/)).toBeVisible();
   await request.delete(`/api/games/${gameId}`);
 });
