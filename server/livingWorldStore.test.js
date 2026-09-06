@@ -15,6 +15,7 @@ let skippedStrategyGameId;
 let russianIntentGameId;
 let duplicateCandidateGameId;
 let mobilizationGameId;
+let territoryPreviewGameId;
 let resolveLivingWorldSubmonths;
 let readEngineSession;
 let buildPlayerIntentContext;
@@ -77,6 +78,11 @@ before(async () => {
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
     name: 'Living player mobilization test',
+  }).game.id;
+  territoryPreviewGameId = library.createGame({
+    scenarioId: 'scenario:napoleonic-europe-1805',
+    playerPolityId: 'polity:france',
+    name: 'Living territorial proposal preview test',
   }).game.id;
 });
 
@@ -358,6 +364,43 @@ describe('living-world command store', () => {
     assert.deepEqual(formation.personnelOrigins, [{ regionId: mobilization.originRegionId, personnel: mobilization.personnel }]);
     assert.equal(state.regions.find((entry) => entry.regionId === mobilization.originRegionId)?.control.actualControllerPolityId, 'polity:france');
     assert.equal(state.events.at(-1)?.kind, 'personnel-mobilization');
+  });
+
+  it('previews a grounded territorial offer as pending rather than blocked and leaves control unchanged until acceptance', () => {
+    const before = living.readLivingWorld(territoryPreviewGameId);
+    const actorEvidence = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    const region = before.interpretationContext.entities.find((entry) => (
+      entry.kind === 'region'
+      && entry.legalOwnerPolityId === 'polity:france'
+      && entry.actualControllerPolityId === 'polity:france'
+    ));
+    assert.ok(region);
+    const text = `Offer ${region.label} to Austria without immediate transfer.`;
+    const submitted = living.submitLivingWorldIntent(territoryPreviewGameId, {
+      revision: before.projection.revision, sessionRevision: before.sessionRevision, intentions: [text],
+      modelOutput: {
+        revision: before.projection.revision, questions: [], claims: [], proposedInitiatives: [],
+        requestedActions: [{
+          actionId: 'action:offer-controlled-region', domain: 'diplomacy', scope: 'external', intent: text, pace: 'slow',
+          effectFamilies: ['relation.modify'], targetEntityIds: [region.entityId, 'polity:austria'], claimRefs: [], evidenceIds: [actorEvidence],
+          operation: { kind: 'territory.offer', recipientPolityId: 'polity:austria', regionId: region.entityId },
+          sourceSpan: { start: 0, end: text.length, text },
+        }],
+      },
+    });
+    const preview = submitted.projection.interpretation.preview;
+    assert.match(preview.cost.label, /frozen proposal terms/u);
+    assert.match(preview.duration.label, /no territorial control changes before acceptance/u);
+    assert.deepEqual(preview.risks, ['The addressed polity can reject the frozen terms']);
+    assert.match(preview.opportunityCosts[0], /No territorial control changes until the addressed polity accepts/u);
+    const confirmed = living.confirmLivingWorldIntent(territoryPreviewGameId, {
+      revision: submitted.projection.revision, sessionRevision: submitted.sessionRevision,
+      interpretationId: submitted.projection.interpretation.interpretationId,
+    });
+    assert.equal(confirmed.lastTransition.createdDiplomaticProposals.length, 1);
+    const confirmedRegion = confirmed.interpretationContext.entities.find((entry) => entry.entityId === region.entityId);
+    assert.equal(confirmedRegion.legalOwnerPolityId, 'polity:france');
+    assert.equal(confirmedRegion.actualControllerPolityId, 'polity:france');
   });
 
   it('blocks a failed required strategy at the same world revision, then retries atomically', () => {

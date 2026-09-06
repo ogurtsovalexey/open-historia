@@ -225,6 +225,16 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
     .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind === 'military.mobilize')
     .map(() => worldV2.deriveMobilizationPreview(session.state, playerPolityId));
   const mobilizedPersonnel = mobilizationPreviews.reduce((sum, entry) => sum + entry.personnel, 0);
+  // Diplomatic proposals are material commitments in the canonical ledger, but
+  // deliberately have no immediate numeric effect.  Rendering them as
+  // "blocked" made a valid territorial offer appear unusable even though the
+  // confirm path correctly persisted a frozen proposal for the recipient.
+  const proposalPreviews = requestedActions.filter((entry) => (
+    entry.material
+    && entry.status === 'grounded'
+    && (entry.operation.kind === 'diplomacy.propose' || entry.operation.kind === 'territory.offer')
+  ));
+  const hasProposalPreview = proposalPreviews.length > 0;
   const activeEvidence = [...new Set([...requestedActions, ...proposedInitiatives].flatMap((entry) => entry.evidenceIds))];
   return {
     schemaVersion: 'open-historia-player-intent/1',
@@ -243,15 +253,21 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
         ? { kind: 'range', label: `${initialFunding} initial treasury commitment` }
         : mobilizationPreviews.length > 0
           ? { kind: 'range', label: `${mobilizedPersonnel} reserve personnel drawn from current controlled recruitment` }
-        : { kind: 'unknown', label: 'No currently feasible material commitment' },
+          : hasProposalPreview
+            ? { kind: 'unknown', label: 'No immediate treasury commitment; frozen proposal terms will be recorded' }
+            : { kind: 'unknown', label: 'No currently feasible material commitment' },
       duration: enginePreviews.length > 0
         ? { kind: 'range', label: 'Multi-stage; pace is rechecked at each monthly resolution' }
         : mobilizationPreviews.length > 0
           ? { kind: 'range', label: 'Reserve formation is recorded now; readiness remains subject to later world conditions' }
-        : { kind: 'unknown', label: 'Blocked until the interpretation or conditions change' },
+          : hasProposalPreview
+            ? { kind: 'range', label: 'Pending recipient response; no territorial control changes before acceptance' }
+            : { kind: 'unknown', label: 'Blocked until the interpretation or conditions change' },
       risks: enginePreviews.some((entry) => entry.allowedPacesAfterCommitment.length <= 3)
         ? ['High contextual resistance limits acceleration']
-        : ['Material blockers or opposition can slow the process at later checkpoints'],
+        : hasProposalPreview
+          ? ['The addressed polity can reject the frozen terms']
+          : ['Material blockers or opposition can slow the process at later checkpoints'],
       opportunityCosts: [
         ...enginePreviews.map((entry) => `${entry.fundingCommitment} treasury plus committed institutional capacity`),
         ...mobilizationPreviews.map((entry) => {
@@ -259,6 +275,7 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
           const origin = region?.displayName.en ?? 'the selected controlled region';
           return `${entry.personnel} fewer people in the civilian workforce; origin ${origin}`;
         }),
+        ...(hasProposalPreview ? ['No territorial control changes until the addressed polity accepts the frozen proposal'] : []),
       ],
       affected: [...new Set([...requestedActions, ...proposedInitiatives].flatMap((entry) => entry.targetLabels))],
       evidenceIds: activeEvidence,
