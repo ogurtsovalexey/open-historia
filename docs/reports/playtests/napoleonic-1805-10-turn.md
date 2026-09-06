@@ -85,3 +85,18 @@ same turn without changing world state through an unvalidated decision.
 npm run playtest:audit -- --game napoleonic-europe-january-1805-session \
   --data-dir .local-playtests/live-data --output /tmp/nap-persistent-ui-audit.json
 ```
+
+### Post-run territorial proposal boundary
+
+The same completed French campaign then tested the legal territory path through
+the visible Orders UI. A proposal about Hanover was rejected because France
+did not own and actually control it. A proposal to cede the actually controlled
+Paris-and-Seine region to Prussia was instead shown as a frozen, pending offer:
+the preview explicitly said that no territorial control changes before the
+addressed recipient accepts. After confirmation, audit transition
+`player-intent-confirmed` recorded
+`proposal:128d26ba1350af11c6a9d4bf12863c29` at world revision
+`sha256:a5129bd2fa3a4ae433846208a9d1a5baa45578dd222eb96f28b7af9b0e7d3d43`.
+The proposal is `pending`, addressed only to `polity:prussia`, while
+Paris-and-Seine remains both legally owned and actually controlled by
+`polity:france`. No player sentence or confirmation transferred the region.
