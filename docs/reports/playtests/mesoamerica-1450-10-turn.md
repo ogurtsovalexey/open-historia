@@ -87,3 +87,34 @@ world state, found no ledger record, and created no material commitment.
 npm run playtest:audit -- --game central-mesoamerica-1450-session \
   --data-dir .local-playtests/live-data --output /tmp/meso-persistent-ui-audit.json
 ```
+
+## Post-loop economy process evidence
+
+On 2026-09-06, after the completed ten-decision run, the same persistent
+campaign was reopened through the visible **Orders** UI. The player entered
+`Start a bounded chinampa and canoe-route maintenance process using current
+Mesoamerican capacity.` The interpreted preview committed exactly `32` initial
+treasury, described the action as multi-stage, and named its institutional
+opportunity cost before the player could confirm it. No player-entered numeric
+effect was accepted.
+
+After confirmation, the visible **Advance three months** control completed all
+three monthly boundaries. The persisted world records an active process
+`process:67c7c53bd99aed92edd1faf2` for Mexico-Tenochtitlan: `32` funding,
+`86` institutional capacity, `1,500 bp` progress, `5,100 bp` resistance, and
+only the conservative `capacity.modify` and `supply-capacity.modify` effect
+families. It is therefore evidence of a grounded, historically local economic
+intention becoming a bounded engine process—not an immediate player-authored
+economic result.
+
+| Field | Post-loop value |
+| --- | --- |
+| Date / engine turn / decisions | `1452-10-01` / `33` / `11` |
+| World revision | `sha256:764be9c34da063b5b0c29a65a09f6f77aa4db9041bbce3d1ba91ab833d135ecc` |
+| Replay checksum | `sha256:0bd0503752547f8bb61b2695b09b8980ef6ff7f53b6c096bb5529ec177a52816` |
+| Audit checksum | `sha256:8867fe7cb1108f23a6ff88c0307117cdb2aa1bfe331794459d275d84325d1480` |
+
+```text
+npm run playtest:audit -- --game central-mesoamerica-1450-session \
+  --data-dir .local-playtests/live-data --output /tmp/mesoamerica-process-audit.json
+```
