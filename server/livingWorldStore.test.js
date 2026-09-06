@@ -14,6 +14,7 @@ let mesoLongGameId;
 let mesoSituationGameId;
 let skippedStrategyGameId;
 let russianIntentGameId;
+let processSituationGameId;
 let duplicateCandidateGameId;
 let mobilizationGameId;
 let territoryPreviewGameId;
@@ -74,6 +75,11 @@ before(async () => {
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
     name: 'Living Russian intent test',
+  }).game.id;
+  processSituationGameId = library.createGame({
+    scenarioId: 'scenario:napoleonic-europe-1805',
+    playerPolityId: 'polity:france',
+    name: 'Living process resistance situation test',
   }).game.id;
   duplicateCandidateGameId = library.createGame({
     scenarioId: 'scenario:napoleonic-europe-1805',
@@ -319,6 +325,43 @@ describe('living-world command store', () => {
     assert.equal(confirmed.projection.processes[0].name, 'sosredotochit-deistvuyushchuyu-armiyu-na-reine');
     assert.equal(confirmed.projection.processes[0].nameRu, 'Сосредоточить действующую армию на Рейне.');
     assert.equal(living.readLivingWorld(russianIntentGameId, { locale: 'ru' }).projection.processes[0].name, 'Сосредоточить действующую армию на Рейне.');
+  });
+
+  it('surfaces a process only after canonical resistance exceeds its resolved progress', () => {
+    const before = living.readLivingWorld(processSituationGameId);
+    const actorEvidence = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    const text = 'Establish a bounded supply correspondence process.';
+    const submitted = living.submitLivingWorldIntent(processSituationGameId, {
+      revision: before.projection.revision,
+      sessionRevision: before.sessionRevision,
+      intentions: [text],
+      modelOutput: {
+        revision: before.projection.revision, questions: [], claims: [], proposedInitiatives: [],
+        requestedActions: [{
+          actionId: 'action:supply-correspondence', domain: 'military', scope: 'domestic', intent: text, pace: 'slow',
+          effectFamilies: ['capacity.modify'], targetEntityIds: ['polity:france'], claimRefs: [], evidenceIds: [actorEvidence],
+          operation: { kind: 'process.propose' }, sourceSpan: { start: 0, end: text.length, text },
+        }],
+      },
+    });
+    const confirmed = living.confirmLivingWorldIntent(processSituationGameId, {
+      revision: submitted.projection.revision,
+      sessionRevision: submitted.sessionRevision,
+      interpretationId: submitted.projection.interpretation.interpretationId,
+    });
+    assert.equal(confirmed.projection.situations.some((entry) => entry.situationId.startsWith('situation:process-resistance-')), false);
+    const advanced = living.advanceLivingWorld(processSituationGameId, {
+      revision: confirmed.projection.revision,
+      sessionRevision: confirmed.sessionRevision,
+      optionId: 'advance-three-months',
+      strategicAttempts: confirmed.strategicTasks.map(hold),
+    });
+    const parsed = parseIntentFirstProjection(advanced.projection);
+    const situation = parsed.situations.find((entry) => entry.situationId.startsWith('situation:process-resistance-'));
+    assert.ok(situation);
+    assert.match(situation.title, /supply correspondence process\.? faces recorded resistance/i);
+    assert.match(situation.summary, /engine-feasible options/i);
+    assert.equal(situation.urgency, 'medium');
   });
 
   it('materializes one process when a model duplicates one source span as action and initiative', () => {

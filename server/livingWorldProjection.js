@@ -169,6 +169,30 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     .filter((entry) => entry.status === 'active' && entry.sponsorEntityRefs.includes(polity.id))
     .map((entry) => processProjection(state, entry, visible, locale))
     .filter(Boolean);
+  // A process becomes a situation only after the engine has resolved at least
+  // one monthly checkpoint.  This keeps an initial proposal from masquerading
+  // as an immediate crisis while making recorded resistance visible when it
+  // materially outruns progress.  The card has no mutation authority: a new
+  // intention must still pass the normal feasibility and confirmation path.
+  const processResistanceSituations = state.processes
+    .filter((entry) => (
+      entry.status === 'active'
+      && entry.sponsorEntityRefs.includes(polity.id)
+      && entry.lastAdvancedMonth
+      && entry.resistanceBp > entry.progressBp
+    ))
+    .map((entry) => {
+      const projection = processProjection(state, entry, visible, locale);
+      if (!projection) return null;
+      return {
+        situationId: `situation:process-resistance-${entry.processId.replaceAll(':', '-')}`,
+        title: `${projection.name} faces recorded resistance`,
+        urgency: entry.resistanceBp >= 7500 ? 'high' : 'medium',
+        summary: `Current progress is lower than recorded resistance at this checkpoint. Any pace change remains limited to engine-feasible options.`,
+        evidenceIds: projection.evidenceIds,
+      };
+    })
+    .filter(Boolean);
   const relationships = state.relationships.filter((entry) => entry.participantPolityIds.includes(polity.id));
   const pendingProposals = state.diplomaticProposals.filter((entry) => (
     entry.status === 'pending'
@@ -256,6 +280,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
         evidenceIds: groundedEvidence(region.evidenceIds, visible, snapshotEvidence),
       })),
       ...tributeArrearSituations,
+      ...processResistanceSituations,
     ],
     diplomacy: {
       conversations: pendingProposals.map((proposal) => {
