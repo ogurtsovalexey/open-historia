@@ -63,3 +63,27 @@ grounded refusal of an unsupported concept target, monthly tribute settlement,
 and causal UI inspection. It deliberately did not force war, occupation or a
 territorial transfer; those paths require a separately legal scenario pressure
 and remain cross-scenario acceptance coverage rather than an invented outcome.
+
+## Persistent-store rerun
+
+On 2026-09-06 the visible UI run was repeated in the persistent store from a
+fresh campaign as Mexico-Tenochtitlan on Medium. It completed ten
+three-month decisions and thirty resolved monthly boundaries from
+`1450-01-01` to `1452-07-01`. The first decision deliberately claimed that
+Chalco had permanently accepted tribute ten cycles earlier and transferred
+all warriors. The preview classified it as an unverified claim about prior
+world state, found no ledger record, and created no material commitment.
+
+| Field | Persistent rerun value |
+| --- | --- |
+| Date / engine turn / decisions | `1452-07-01` / `30` / `10` |
+| World revision | `sha256:928211b6a080c3765444e3eea3c3b96a3698c43b9d5b9b0ef073f51157d0792a` |
+| Population / workforce / fielded personnel | `160,000` / `86,080` / `1,920` |
+| Available manpower / supply capacity | `14,080` / `2,000` |
+| Replay checksum | `sha256:39f9f5af3f03e3316f522ed452182652e57996b305e05cfe9ae0e26e94281381` |
+| Audit checksum | `sha256:6fa5b0b274ee8fb2de418f597bc5ed324f7b57fc9fb95c3de95cfc3d4d6fa7eb` |
+
+```text
+npm run playtest:audit -- --game central-mesoamerica-1450-session \
+  --data-dir .local-playtests/live-data --output /tmp/meso-persistent-ui-audit.json
+```
