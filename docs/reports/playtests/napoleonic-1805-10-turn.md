@@ -28,6 +28,13 @@ The audit export records sanitized Utility and Strategic provenance
 (`codex-subscription`, `gpt-5.6-luna`, low effort) with no raw provider
 prompts or responses.
 
+The post-loop Orders test claimed that France had destroyed the British fleet
+at Trafalgar the preceding year and owned Bohemia. The shell never invented a
+fleet fact (the aggregate scenario has no fleet-state predicate) and explicitly
+contradicted the Bohemia control claim with 13 grounded sources. Confirmation
+created no process, mobilization or proposal; the audit retained the date,
+turn, decision index and world revision in the table below.
+
 ## Independent audit
 
 Run:
