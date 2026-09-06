@@ -119,6 +119,15 @@ describe('living-world command store', () => {
     assert.ok(parsed.facts.some((entry) => entry.factId === 'fact:fielded-personnel' && entry.authority === 'derived'));
   });
 
+  it('surfaces real foreign control across canonical regional adjacency without implying a combat order', () => {
+    const view = living.readLivingWorld(gameId);
+    const situation = view.projection.situations.find((entry) => entry.situationId.startsWith('situation:border-pressure-'));
+    assert.ok(situation);
+    assert.match(situation.title, /controls the border at/i);
+    assert.match(situation.summary, /does not authorize combat, occupation, or territorial transfer/i);
+    assert.ok(situation.evidenceIds.length > 0);
+  });
+
   it('keeps a growing player semantic index bounded without dropping actor-owned regions', () => {
     const session = readEngineSession(library.getGameDirectory(gameId));
     const expanded = structuredClone(session);

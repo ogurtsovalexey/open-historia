@@ -151,6 +151,35 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     region.control.actualControllerPolityId === polity.id
     && region.control.legalOwnerPolityId !== polity.id
   ));
+  // A foreign controller across a canonical shared border is a material
+  // condition, not an implied war order. The card gives the player an honest
+  // reason to mobilize, negotiate, invest in supply, or deliberately avoid
+  // escalation, while territorial control remains exclusively reducer-owned.
+  const borderByCounterparty = new Map();
+  for (const ownRegion of state.regions.filter((region) => region.control.actualControllerPolityId === polity.id)) {
+    for (const adjacentRegionId of ownRegion.adjacentRegionIds) {
+      const foreignRegion = state.regions.find((region) => region.regionId === adjacentRegionId);
+      if (!foreignRegion || foreignRegion.control.actualControllerPolityId === polity.id) continue;
+      const counterpartyId = foreignRegion.control.actualControllerPolityId;
+      const key = `${counterpartyId}|${ownRegion.regionId}|${foreignRegion.regionId}`;
+      const current = borderByCounterparty.get(counterpartyId);
+      if (!current || key < current.key) borderByCounterparty.set(counterpartyId, { key, ownRegion, foreignRegion });
+    }
+  }
+  const borderPressureSituations = [...borderByCounterparty.values()]
+    .sort((left, right) => left.key.localeCompare(right.key))
+    .slice(0, 12)
+    .map(({ ownRegion, foreignRegion }) => {
+      const counterparty = localized(state.polities.find((entry) => entry.id === foreignRegion.control.actualControllerPolityId)?.displayName, locale)
+        || labelOf(foreignRegion.control.actualControllerPolityId);
+      return {
+        situationId: `situation:border-pressure-${ownRegion.regionId.replaceAll(':', '-')}-${foreignRegion.regionId.replaceAll(':', '-')}`,
+        title: `${counterparty} controls the border at ${localized(ownRegion.displayName, locale) || labelOf(ownRegion.regionId)}`,
+        urgency: foreignRegion.control.kind === 'occupation' ? 'high' : 'medium',
+        summary: `A canonical adjacent region is under another polity's actual control. This does not authorize combat, occupation, or territorial transfer by itself.`,
+        evidenceIds: groundedEvidence([...ownRegion.evidenceIds, ...foreignRegion.evidenceIds], visible, snapshotEvidence),
+      };
+    });
   const pendingIntent = interpretationProjection(session.playerIntent, snapshotEvidence);
   const last = session.lastTurn;
   const territoryEffects = (last?.strategicRecords ?? [])
@@ -281,6 +310,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       })),
       ...tributeArrearSituations,
       ...processResistanceSituations,
+      ...borderPressureSituations,
     ],
     diplomacy: {
       conversations: pendingProposals.map((proposal) => {
