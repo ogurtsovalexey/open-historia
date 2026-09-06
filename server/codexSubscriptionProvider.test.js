@@ -98,7 +98,7 @@ test("desktop inspection exposes CLI models but keeps schema transport pending",
   assert.equal(JSON.stringify(status).includes("token"), false);
 });
 
-test("schema preflight is isolated, validates the exact V5/V4 payload and stores only checksums", async () => {
+test("schema preflight is isolated, validates the canonical V4 sentinel and stores only checksums", async () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "open-historia-codex-preflight-test-"));
   try {
     let invocation;
@@ -110,7 +110,7 @@ test("schema preflight is isolated, validates the exact V5/V4 payload and stores
         return { response: sentinel, stdout: '{"type":"turn.completed"}\n' };
       },
     });
-    assert.equal(record.contract, "StrategicBriefV5+StrategicDecisionV4");
+    assert.equal(record.contract, "OpenHistoriaStructuredOutputV1");
     assert.equal(record.model, "gpt-5.6-luna");
     assert.equal(record.preflightChecksum.startsWith("sha256:"), true);
     assert.equal(invocation.schema.type, "object");
@@ -171,7 +171,7 @@ test("Codex transport failures surface JSONL API errors when stderr is empty", (
 
 test("runtime invocation requires desktop and an exact model, effort and contract preflight", async () => {
   const preflight = {
-    provider: "codex-subscription", contract: "StrategicBriefV5+StrategicDecisionV4",
+    provider: "codex-subscription", contract: "OpenHistoriaStructuredOutputV1",
     model: "gpt-5.6-terra", effort: "medium", preflightChecksum: "sha256:ok",
   };
   assert.equal(matchingCodexPreflight([preflight], { model: "gpt-5.6-terra", effort: "medium" }), preflight);

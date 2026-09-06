@@ -660,7 +660,7 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
                     const effort = settings.codexSubscriptionEffort ?? "medium";
                     const passed = (codexStatus.preflights ?? []).some((record) => record.model === model
                         && record.effort === effort && record.cliVersion === codexStatus.cliVersion
-                        && record.contract === "StrategicBriefV5+StrategicDecisionV4");
+                        && record.contract === "OpenHistoriaStructuredOutputV1");
                     return (
                         <div style={fieldGroupStyle}>
                         <button

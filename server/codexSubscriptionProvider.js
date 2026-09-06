@@ -15,10 +15,11 @@ export const CODEX_TESTED_MODELS = Object.freeze([
 
 const APP_SERVER_TIMEOUT_MS = 15_000;
 const STRUCTURED_TURN_TIMEOUT_MS = 10 * 60_000;
-// The living-world runtime submits Strategic V5 briefs and V4 decisions.  A
-// preflight must prove that exact output shape rather than letting a legacy
-// V3 diagnostic silently certify an incompatible live model/contract pair.
-export const CODEX_STRATEGIC_CONTRACT = "StrategicBriefV5+StrategicDecisionV4";
+// This transport is shared by player-intent interpretation and Strategic V5.
+// Its preflight proves structured-output transport with the canonical V4
+// decision sentinel; each live call still supplies and validates its own
+// frozen schema.  A legacy V4/V3 record never certifies this transport.
+export const CODEX_STRUCTURED_OUTPUT_CONTRACT = "OpenHistoriaStructuredOutputV1";
 
 const schemaVariant = (schema, value) => {
   const variants = schema?.anyOf ?? schema?.oneOf;
@@ -267,7 +268,7 @@ export function readCodexPreflights(directory) {
   }
 }
 
-export function matchingCodexPreflight(preflights, { model, effort, contract = CODEX_STRATEGIC_CONTRACT } = {}) {
+export function matchingCodexPreflight(preflights, { model, effort, contract = CODEX_STRUCTURED_OUTPUT_CONTRACT } = {}) {
   return (Array.isArray(preflights) ? preflights : []).find((entry) => entry?.provider === CODEX_SUBSCRIPTION_PROVIDER
     && entry.contract === contract && entry.model === model && entry.effort === effort && entry.preflightChecksum) ?? null;
 }
@@ -279,7 +280,7 @@ export async function invokePreflightedCodex({
   schema,
   model,
   effort = "medium",
-  contract = CODEX_STRATEGIC_CONTRACT,
+  contract = CODEX_STRUCTURED_OUTPUT_CONTRACT,
   invoke = invokeCodexStructured,
 } = {}) {
   if (!desktopRuntime) throw new Error("Codex subscription is available only in the desktop app.");
@@ -329,7 +330,7 @@ export async function runCodexSchemaPreflight({
   const record = {
     schemaVersion: "open-historia-codex-preflight/1",
     provider: CODEX_SUBSCRIPTION_PROVIDER,
-    contract: CODEX_STRATEGIC_CONTRACT,
+    contract: CODEX_STRUCTURED_OUTPUT_CONTRACT,
     model: selectedModel,
     effort: selectedEffort,
     cliVersion: String(cliVersion ?? "unknown"),
