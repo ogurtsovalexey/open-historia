@@ -221,6 +221,29 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
     }
   }
   const initialFunding = enginePreviews.reduce((sum, entry) => sum + entry.fundingCommitment, 0);
+  const processAdjustmentPreviews = requestedActions
+    .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind === 'process.adjust')
+    .map((entry) => {
+      const process = session.state.processes.find((candidate) => candidate.processId === entry.operation.processId);
+      if (!process || !process.sponsorEntityRefs.includes(playerPolityId)) {
+        entry.material = false;
+        entry.status = 'blocked';
+        entry.evidenceIds = [];
+        entry.summary = `${entry.summary} (blocked: the process is not sponsored by this polity)`;
+        return null;
+      }
+      const envelope = processes.buildFeasibilityEnvelope(session.state, process);
+      if (!envelope.allowedPaces.includes(entry.pace)) {
+        entry.material = false;
+        entry.status = 'blocked';
+        entry.evidenceIds = [];
+        entry.summary = `${entry.summary} (blocked: ${entry.pace} pace is infeasible; allowed: ${envelope.allowedPaces.join(', ')})`;
+        return null;
+      }
+      return { actionId: entry.actionId, processId: process.processId, pace: entry.pace, allowedPaces: envelope.allowedPaces };
+    })
+    .filter(Boolean);
+  const hasProcessAdjustmentPreview = processAdjustmentPreviews.length > 0;
   const mobilizationPreviews = requestedActions
     .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind === 'military.mobilize')
     .map(() => worldV2.deriveMobilizationPreview(session.state, playerPolityId));
@@ -253,6 +276,8 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
         ? { kind: 'range', label: `${initialFunding} initial treasury commitment` }
         : mobilizationPreviews.length > 0
           ? { kind: 'range', label: `${mobilizedPersonnel} reserve personnel drawn from current controlled recruitment` }
+          : hasProcessAdjustmentPreview
+            ? { kind: 'unknown', label: 'No additional immediate treasury commitment; the existing process commitment remains in force' }
           : hasProposalPreview
             ? { kind: 'unknown', label: 'No immediate treasury commitment; frozen proposal terms will be recorded' }
             : { kind: 'unknown', label: 'No currently feasible material commitment' },
@@ -260,16 +285,21 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
         ? { kind: 'range', label: 'Multi-stage; pace is rechecked at each monthly resolution' }
         : mobilizationPreviews.length > 0
           ? { kind: 'range', label: 'Reserve formation is recorded now; readiness remains subject to later world conditions' }
+          : hasProcessAdjustmentPreview
+            ? { kind: 'range', label: 'Applied at the next monthly resolution; pace remains subject to engine feasibility' }
           : hasProposalPreview
             ? { kind: 'range', label: 'Pending recipient response; no territorial control changes before acceptance' }
             : { kind: 'unknown', label: 'Blocked until the interpretation or conditions change' },
       risks: enginePreviews.some((entry) => entry.allowedPacesAfterCommitment.length <= 3)
         ? ['High contextual resistance limits acceleration']
+        : hasProcessAdjustmentPreview
+          ? ['A later checkpoint can still constrain the selected pace']
         : hasProposalPreview
           ? ['The addressed polity can reject the frozen terms']
           : ['Material blockers or opposition can slow the process at later checkpoints'],
       opportunityCosts: [
         ...enginePreviews.map((entry) => `${entry.fundingCommitment} treasury plus committed institutional capacity`),
+        ...(hasProcessAdjustmentPreview ? ['The existing process remains committed at its engine-derived capacity'] : []),
         ...mobilizationPreviews.map((entry) => {
           const region = session.state.regions.find((candidate) => candidate.regionId === entry.originRegionId);
           const origin = region?.displayName.en ?? 'the selected controlled region';
@@ -482,6 +512,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
   }
   const createdProposals = [];
   const createdMobilizations = [];
+  const adjustedProcesses = [];
   for (const action of playerIntent.requestedActions
     .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind !== 'process.propose')
     .sort((left, right) => left.actionId.localeCompare(right.actionId))) {
@@ -502,6 +533,28 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
         originRegionId: mobilized.originRegionId, revisionAfter: state.revision });
       continue;
     }
+    if (operation.kind === 'process.adjust') {
+      const process = state.processes.find((entry) => entry.processId === operation.processId);
+      if (!process || !process.sponsorEntityRefs.includes(playerIntent.playerPolityId)) {
+        throw new Error(`Cannot adjust an unsponsored or unknown process ${operation.processId}.`);
+      }
+      const envelope = processes.buildFeasibilityEnvelope(state, process);
+      if (!envelope.allowedPaces.includes(action.pace)) {
+        throw new Error(`The engine rejects ${action.pace} pace for ${process.processId}; allowed: ${envelope.allowedPaces.join(', ')}.`);
+      }
+      // A pace change retains exactly the already engine-approved selections.
+      // The utility model's effectFamilies remain descriptive metadata only.
+      const decided = processes.applyProcessDecision(state, {
+        processId: process.processId,
+        direction: process.direction,
+        pace: action.pace,
+        effectSelections: process.selectedEffects,
+        evidenceIds: action.evidenceIds,
+      });
+      state = decided.state;
+      adjustedProcesses.push({ actionId: action.actionId, processId: process.processId, pace: action.pace, revisionAfter: state.revision });
+      continue;
+    }
     const request = operation.kind === 'diplomacy.propose'
       ? {
         ...base, recipientPolityIds: operation.recipientPolityIds,
@@ -514,7 +567,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
     state = worldV2.proposeDiplomaticProposal(state, { ...request, evidenceIds: action.evidenceIds, expectedRevision: state.revision });
     createdProposals.push({ proposalId: request.proposalId, actionId: action.actionId, revisionAfter: state.revision });
   }
-  return { state, created, createdProposals, createdMobilizations };
+  return { state, created, createdProposals, createdMobilizations, adjustedProcesses };
 }
 
 export const readLivingWorld = (gameId, { locale = 'en' } = {}) => response(gameId, locale);
@@ -543,6 +596,7 @@ export function confirmLivingWorldIntent(gameId, { revision, sessionRevision, in
       createdProcesses: materialized.created,
       createdDiplomaticProposals: materialized.createdProposals,
       createdMobilizations: materialized.createdMobilizations,
+      adjustedProcesses: materialized.adjustedProcesses,
     },
     playerIntent: { ...session.playerIntent, status: 'confirmed' },
   });

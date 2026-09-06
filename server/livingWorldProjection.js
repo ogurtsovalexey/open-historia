@@ -373,6 +373,15 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
       kind: 'process',
       label: contextLabel(labelOf(process.kind), locale),
       status: process.status,
+      // Pace is a choice, but its legal options are derived fresh from the
+      // engine. This gives the interpreter a useful menu without exposing
+      // funding, effects, or an authority to rewrite the process itself.
+      currentPace: process.currentPace ?? null,
+      // Test and migration fixtures can contain deliberately skeletal legacy
+      // process rows. They are never actionable because they have no pace;
+      // avoid making a read-only bounded-context check attempt to interpret
+      // them as a canonical WorldProcessState.
+      allowedPaces: process.currentPace ? processes.buildFeasibilityEnvelope(state, process).allowedPaces : [],
       evidenceIds: process.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
     })), PLAYER_INTENT_CONTEXT_MAX.processes),
     ...boundedContextEntries(state.relationships.filter((entry) => entry.participantPolityIds.includes(actor.id)).map((relationship) => ({
@@ -426,7 +435,7 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
     evidence,
     allowedInitiativeKinds: ['technology', 'ideology', 'institution', 'doctrine', 'movement', 'project', 'investigation', 'other'],
     allowedEffectFamilies: [...processes.materializableEffectKinds],
-    allowedDiplomaticOperations: ['process.propose', 'military.mobilize', 'diplomacy.propose', 'territory.offer'],
+    allowedDiplomaticOperations: ['process.propose', 'process.adjust', 'military.mobilize', 'diplomacy.propose', 'territory.offer'],
     relationshipTypes: state.catalogs.relationshipTypes.map((entry) => entry.relationshipTypeId).sort(),
   };
   return context;

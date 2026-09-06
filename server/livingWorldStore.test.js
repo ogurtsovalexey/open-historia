@@ -18,6 +18,7 @@ let processSituationGameId;
 let duplicateCandidateGameId;
 let mobilizationGameId;
 let territoryPreviewGameId;
+let processPaceGameId;
 let resolveLivingWorldSubmonths;
 let readEngineSession;
 let buildPlayerIntentContext;
@@ -95,6 +96,11 @@ before(async () => {
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
     name: 'Living territorial proposal preview test',
+  }).game.id;
+  processPaceGameId = library.createGame({
+    scenarioId: 'scenario:napoleonic-europe-1805',
+    playerPolityId: 'polity:france',
+    name: 'Living process pace adjustment test',
   }).game.id;
 });
 
@@ -362,6 +368,59 @@ describe('living-world command store', () => {
     assert.match(situation.title, /supply correspondence process\.? faces recorded resistance/i);
     assert.match(situation.summary, /engine-feasible options/i);
     assert.equal(situation.urgency, 'medium');
+  });
+
+  it('changes only the engine-feasible pace of an existing sponsored process', () => {
+    const before = living.readLivingWorld(processPaceGameId);
+    const actorEvidence = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    const createText = 'Establish a bounded dispatch process.';
+    const submitted = living.submitLivingWorldIntent(processPaceGameId, {
+      revision: before.projection.revision, sessionRevision: before.sessionRevision, intentions: [createText],
+      modelOutput: {
+        revision: before.projection.revision, questions: [], claims: [], proposedInitiatives: [],
+        requestedActions: [{
+          actionId: 'action:dispatch-process', domain: 'administration', scope: 'domestic', intent: createText, pace: 'slow',
+          effectFamilies: ['capacity.modify'], targetEntityIds: ['polity:france'], claimRefs: [], evidenceIds: [actorEvidence],
+          operation: { kind: 'process.propose' }, sourceSpan: { start: 0, end: createText.length, text: createText },
+        }],
+      },
+    });
+    const created = living.confirmLivingWorldIntent(processPaceGameId, {
+      revision: submitted.projection.revision, sessionRevision: submitted.sessionRevision,
+      interpretationId: submitted.projection.interpretation.interpretationId,
+    });
+    const process = created.interpretationContext.entities.find((entry) => entry.kind === 'process');
+    assert.ok(process);
+    assert.equal(process.currentPace, 'slow');
+    const nextPace = process.allowedPaces.find((pace) => pace !== process.currentPace);
+    assert.ok(nextPace);
+    const adjustText = `Change the pace of ${process.label}.`;
+    const adjustedPending = living.submitLivingWorldIntent(processPaceGameId, {
+      revision: created.projection.revision, sessionRevision: created.sessionRevision, intentions: [adjustText],
+      modelOutput: {
+        revision: created.projection.revision, questions: [], claims: [], proposedInitiatives: [],
+        requestedActions: [{
+          actionId: 'action:adjust-dispatch-process', domain: 'administration', scope: 'domestic', intent: adjustText, pace: nextPace,
+          // This is intentionally different from the existing selected effect;
+          // adjustment must not allow the model to rewrite process effects.
+          effectFamilies: ['knowledge.reveal'], targetEntityIds: [process.entityId], claimRefs: [], evidenceIds: [actorEvidence],
+          operation: { kind: 'process.adjust', processId: process.entityId }, sourceSpan: { start: 0, end: adjustText.length, text: adjustText },
+        }],
+      },
+    });
+    assert.match(adjustedPending.projection.interpretation.preview.cost.label, /No additional immediate treasury commitment/u);
+    const beforeState = readEngineSession(library.getGameDirectory(processPaceGameId)).state;
+    const beforeProcess = beforeState.processes.find((entry) => entry.processId === process.entityId);
+    const adjusted = living.confirmLivingWorldIntent(processPaceGameId, {
+      revision: adjustedPending.projection.revision, sessionRevision: adjustedPending.sessionRevision,
+      interpretationId: adjustedPending.projection.interpretation.interpretationId,
+    });
+    const afterState = readEngineSession(library.getGameDirectory(processPaceGameId)).state;
+    const afterProcess = afterState.processes.find((entry) => entry.processId === process.entityId);
+    assert.equal(afterProcess.currentPace, nextPace);
+    assert.deepEqual(afterProcess.selectedEffects, beforeProcess.selectedEffects);
+    assert.equal(afterProcess.funding, beforeProcess.funding);
+    assert.deepEqual(adjusted.lastTransition.adjustedProcesses.map((entry) => entry.processId), [process.entityId]);
   });
 
   it('materializes one process when a model duplicates one source span as action and initiative', () => {

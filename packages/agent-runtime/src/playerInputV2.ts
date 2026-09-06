@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { worldV2 } from '@open-historia/engine';
+import { processes, worldV2 } from '@open-historia/engine';
 
 const boundedText = z.string().trim().min(1).max(1000);
 export const MAX_PLAYER_INPUT_V2_CHARS = 20000;
@@ -60,6 +60,7 @@ export const requestedActionV2ModelSchema = z.object({
   /** Semantic route only: exact effects, access, profiles and authorities stay engine-owned. */
   operation: z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('process.propose') }).strict(),
+    z.object({ kind: z.literal('process.adjust'), processId: entityIdSchema }).strict(),
     z.object({
       kind: z.literal('diplomacy.propose'),
       recipientPolityIds: z.array(entityIdSchema).min(1).max(16),
@@ -266,6 +267,17 @@ function domesticScopeIsProven(state: worldV2.WorldStateV2, actorPolityId: strin
 function operationReasons(state: worldV2.WorldStateV2, actorPolityId: string, action: ModelAction): string[] {
   const operation = action.operation ?? { kind: 'process.propose' as const };
   if (operation.kind === 'process.propose') return [];
+  if (operation.kind === 'process.adjust') {
+    const process = state.processes.find((entry) => entry.processId === operation.processId);
+    const reasons: string[] = [];
+    if (!process) reasons.push(`unknown-process:${operation.processId}`);
+    else {
+      if (!process.sponsorEntityRefs.includes(actorPolityId)) reasons.push(`not-sponsored-process:${operation.processId}`);
+      const envelope = processes.buildFeasibilityEnvelope(state, process);
+      if (!envelope.allowedPaces.includes(action.pace)) reasons.push(`infeasible-process-pace:${action.pace}`);
+    }
+    return reasons;
+  }
   if (operation.kind === 'diplomacy.propose') {
     const reasons: string[] = [];
     if (action.domain !== 'diplomacy') reasons.push('diplomacy-operation-requires-diplomacy-domain');
