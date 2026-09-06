@@ -31,6 +31,13 @@ read-only post-claim audit retained `1937-07-01`, turn `30`, decision index
 `10`, and the identical world revision below, proving that untrusted prose
 cannot rewrite territory or army figures.
 
+The UI then accepted “Begin a bounded investigation into electricity using
+current Polish capacity” only as a new proposed, multi-stage process. The
+preview gave an engine-derived 440 treasury commitment and contextual
+resistance to acceleration. Its post-confirmation audit records one process
+(`process:f9219d39c18e7153a1bddace`) at steady pace with funding 440, and no
+instant technology outcome or model-authored numeric effect.
+
 ## Independent audit
 
 ```text
