@@ -19,7 +19,7 @@ const request = async (pathname, { body, signal } = {}) => parseResponse(await f
 
 const STRATEGIC_TASK_TIMEOUT_MS = 45_000;
 
-const withTimeout = (promise, timeoutMs, label, onTimeout) => new Promise((resolve, reject) => {
+export const withTimeout = (promise, timeoutMs, label, onTimeout) => new Promise((resolve, reject) => {
   const timeoutId = setTimeout(() => {
     onTimeout?.();
     reject(new Error(`${label} exceeded the ${Math.round(timeoutMs / 1000)} second client deadline.`));
