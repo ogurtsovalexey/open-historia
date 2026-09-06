@@ -79,6 +79,15 @@ confirmation and production shell. This closes the implementation prerequisite
 for WP15 turn 9; it is not retroactive proof that every historical playtest
 script row has been run.
 
+Regional adjacency is now part of canonical WorldStateV2 rather than only a
+map projection. The compiler carries ScenarioV3's symmetric geography into
+the state; canonicalization and invariants reject missing, duplicate,
+self-referential or asymmetric links. The intent-first shell uses that fact to
+surface one bounded, read-only border-pressure situation per foreign actual
+controller. It deliberately authorizes no combat, occupation or transfer: it
+is evidence for an intention or conscious strategic avoidance, not a hidden
+war system. Engine/compiler and production-shell coverage prove this boundary.
+
 Strategic background actor work is now dispatched concurrently, still capped
 by the canonical four tasks, with a 45-second per-task deadline. This removes
 the former UI appearance of a stuck turn when four actors were selected
