@@ -2,13 +2,15 @@
 
 Date: 2026-09-06. Three fresh medium-difficulty browser campaigns completed
 without UI bypasses. Each ran ten player decisions and thirty monthly
-boundaries using the configured Codex-subscription provider.
+boundaries using the configured Codex-subscription provider. The latest reruns
+are retained in the ignored `.local-playtests/live-data` store rather than the
+test-cleared scratch location.
 
 | Scenario / player | End | Core live evidence | Replay checksum |
 | --- | --- | --- | --- |
-| Central Mesoamerica 1450 / Mexico-Tenochtitlan | `1452-07-01` | bounded tribute-route process; unsupported concepts fail closed; causal disclosure | `sha256:bb8fa11061fdb26f494e385c017352dc79db26b696972c7f1f5f86f9bc63be86` |
-| Napoleonic Europe 1805 / French Empire | `1807-07-01` | 337-person population/workforce-bound mobilization | `sha256:86a0775e4519d36f8dc610b14703d2055859b5072aac83d61e1e7601d077063a` |
-| Europe 1935 / Poland | `1937-07-01` | typed France consultation and canonical proposal acceptance | `sha256:1c3f7c1abebe63c72a94746effbc9323bad990cd8074f3b6d724eb8b0094d6b4` |
+| Central Mesoamerica 1450 / Mexico-Tenochtitlan | `1452-07-01` | prior-world tribute claim rejected; numeric canonical state retained | `sha256:39f9f5af3f03e3316f522ed452182652e57996b305e05cfe9ae0e26e94281381` |
+| Napoleonic Europe 1805 / French Empire | `1807-07-01` | 337-person population/workforce-bound mobilization; invalid strategic response safely retried | `sha256:7da72415b9d7677dd6da9070fab1026ff4fb66d7548ff09ea523e6f12662c089` |
+| Europe 1935 / Poland | `1937-07-01` | 440-cost electricity process; false territorial/army claim rejected; 461-person reserve | `sha256:9183f68bf30ff968e52df0bf625485afe907bc289319ab7ce63d639af426c955` |
 
 All three independent audit exports retained only sanitized provider metadata
 and canonical revisions. The reports are [Mesoamerica](./mesoamerica-1450-10-turn.md),

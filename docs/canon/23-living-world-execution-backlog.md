@@ -8,17 +8,20 @@ Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the pr
 
 This section is the authoritative resume point for the next implementation
 agent. Do not restart the merge ladder and do not reconstruct completed work
-from the old baseline. The current pushed implementation checkpoint is
-`115318f` on `feature/campaign-memory` (`docs(playtest): record Europe run and
-cross-scenario assessment`). R5 is complete. R6 has verified ten three-month UI
-decisions (30 monthly boundaries) in each of the three scenarios, with
-sanitized replay/audit evidence in `docs/reports/r6-ui-playtest-2026-09-05.md`.
-The three required redacted per-scenario reports and cross-scenario assessment
-now exist under `docs/reports/playtests/`; each new campaign used the configured
-provider, reached ten decisions/30 months, and has a read-only replay audit.
-This is still not full WP15 scripted-coverage completion: the deliberate
-false-history, counterfactual, political, and legal territorial-pressure
-intentions in section 20 were not all exercised in those bounded runs. A failed semantic request now visibly preserves
+from the old baseline. The implementation and evidence checkpoint before this
+documentation refresh is `033503c` on `feature/campaign-memory`. R5 is
+complete. R6 now has three fresh, persistent-store UI campaigns: each used the
+configured provider, reached ten player decisions / thirty monthly boundaries,
+and has a read-only replay/audit export under `docs/reports/playtests/`.
+Europe 1935 additionally exercised a bounded electricity process, a false
+territory/army claim, and player mobilization; Mesoamerica exercised an
+unverified prior tribute claim; Napoleonic Europe exercised a population- and
+workforce-bound reserve and safe retry after a rejected strategic response.
+`npm run ci` passed after those reruns, including lint, full tests, scenario
+build, UI acceptance, agent tests and cycle detection. This is still not full
+WP15 scripted-coverage completion: the deliberate political and legal
+territorial-pressure intentions in section 20 were not all exercised in those
+bounded runs. A failed semantic request now visibly preserves
 the player draft for an explicit retry rather than silently discarding it.
 The same live UI path now exposes the server's safe rejection text (including
 the required schema-preflight condition) instead of reducing it to an HTTP
