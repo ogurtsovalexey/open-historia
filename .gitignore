@@ -60,5 +60,6 @@ runs
 
 # Browser smoke artifacts and isolated mutable data store
 /test-results/
+/.local-playtests/
 /playwright-report/
 /build/scenarios/
