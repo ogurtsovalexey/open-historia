@@ -60,3 +60,28 @@ into a parameter console. It did not force combat, occupation, peace, or a
 territorial transfer. Those are separate legal-pressure and cross-scenario
 coverage tasks; absence of a valid trigger is recorded rather than filled with
 a scripted historical outcome.
+
+## Persistent-store rerun
+
+On 2026-09-06 the visible UI run was repeated from a fresh persistent-store
+campaign as the French Empire on Medium. It completed ten three-month
+decisions and thirty monthly boundaries from `1805-01-01` to `1807-07-01`.
+The first order created a bounded reserve of `337` people from Paris and Seine
+with the matching civilian-workforce cost. One later strategic response was
+rejected by its typed contract (`hold is required exactly when no material
+decision is proposed`); the UI exposed **Retry**, and retrying advanced the
+same turn without changing world state through an unvalidated decision.
+
+| Field | Persistent rerun value |
+| --- | --- |
+| Date / engine turn / decisions | `1807-07-01` / `30` / `10` |
+| World revision | `sha256:a66606a4f84599072ad864ffa691295d93b5a836add072dac55373a1ea33cef6` |
+| Population / workforce / fielded personnel | `30,100,000` / `14,455,456` / `293,337` |
+| Available manpower / supply capacity | `3,222,659` / `117,994` |
+| Replay checksum | `sha256:7da72415b9d7677dd6da9070fab1026ff4fb66d7548ff09ea523e6f12662c089` |
+| Audit checksum | `sha256:32c884d5599a2af5ff54215c46420361741bd7105fe6eae240c77bdad4c25e78` |
+
+```text
+npm run playtest:audit -- --game napoleonic-europe-january-1805-session \
+  --data-dir .local-playtests/live-data --output /tmp/nap-persistent-ui-audit.json
+```
