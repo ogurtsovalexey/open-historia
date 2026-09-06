@@ -17,28 +17,41 @@ const request = async (pathname, { body, signal } = {}) => parseResponse(await f
   signal,
 }));
 
+const STRATEGIC_TASK_TIMEOUT_MS = 45_000;
+
+const withTimeout = (promise, timeoutMs, label) => new Promise((resolve, reject) => {
+  const timeoutId = setTimeout(() => reject(new Error(`${label} exceeded the ${Math.round(timeoutMs / 1000)} second client deadline.`)), timeoutMs);
+  promise.then(
+    (value) => { clearTimeout(timeoutId); resolve(value); },
+    (error) => { clearTimeout(timeoutId); reject(error); },
+  );
+});
+
 async function runStrategicTasks(tasks = []) {
   if (tasks.length === 0) return [];
   const { callAI } = await import('../Game/AI/main.jsx');
-  const attempts = [];
-  for (const task of tasks) {
+  // All briefs are frozen against the same revision and server materialization
+  // remains stable-order/atomic. Running the bounded batch concurrently keeps
+  // one slow provider response from holding the primary advance control for
+  // several sequential timeouts; a timeout becomes an explicit failed attempt
+  // that the canonical checkpoint can show and retry.
+  return Promise.all(tasks.map(async (task) => {
     try {
-      const result = await callAI(task.systemPrompt, [{ role: 'user', parts: [{ text: task.userPrompt }] }], {
+      const result = await withTimeout(callAI(task.systemPrompt, [{ role: 'user', parts: [{ text: task.userPrompt }] }], {
         languageMode: 'none',
         providerRole: 'strategic',
         tool: task.tool,
-      });
+      }), STRATEGIC_TASK_TIMEOUT_MS, `Strategic task ${task.actorPolityId}`);
       if (!result?.toolInput) throw new Error('The strategic model returned no structured decision.');
-      attempts.push({ taskKey: task.taskKey, status: 'succeeded', modelOutput: result.toolInput });
+      return { taskKey: task.taskKey, status: 'succeeded', modelOutput: result.toolInput };
     } catch (error) {
-      attempts.push({
+      return {
         taskKey: task.taskKey,
         status: 'failed',
         message: error instanceof Error ? error.message : 'Strategic model call failed.',
-      });
+      };
     }
-  }
-  return attempts;
+  }));
 }
 
 // Persist only the non-secret provenance needed to audit a model-mediated
