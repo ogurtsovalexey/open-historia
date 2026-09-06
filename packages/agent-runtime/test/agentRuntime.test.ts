@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import * as liveRuntimeExports from '../src/index.js';
 import {
   buildFallbackBatch,
   buildDiplomacyBatch,
@@ -57,6 +58,12 @@ const inertDiplomacyInitial = () => {
   raw.polities.find((entry: { id: string }) => entry.id === 'polity:austria').decisionMode = 'inert';
   return initState(parseScenario(raw));
 };
+
+test('the live agent-runtime root does not re-export legacy Strategic V4 planning', () => {
+  assert.equal('buildStrategicBriefV4' in liveRuntimeExports, false);
+  assert.equal('materializeStrategicDecisionV4' in liveRuntimeExports, false);
+  assert.equal('strategicDecisionV3Schema' in liveRuntimeExports, false);
+});
 const benchmarkFixture = fileURLToPath(new URL('../../../data-packs/fixtures/europe-1935-benchmark/engine/scenario.json', import.meta.url));
 const benchmarkInitial = () => initState(parseScenario(JSON.parse(readFileSync(benchmarkFixture, 'utf8'))));
 const reallocationInitial = () => {
