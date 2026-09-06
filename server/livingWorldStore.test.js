@@ -11,6 +11,7 @@ let living;
 let gameId;
 let mesoGameId;
 let mesoLongGameId;
+let mesoSituationGameId;
 let skippedStrategyGameId;
 let russianIntentGameId;
 let duplicateCandidateGameId;
@@ -58,6 +59,11 @@ before(async () => {
     scenarioId: 'scenario:central-mesoamerica-1450',
     playerPolityId: 'polity:tenochtitlan',
     name: 'Living thirty-month test',
+  }).game.id;
+  mesoSituationGameId = library.createGame({
+    scenarioId: 'scenario:central-mesoamerica-1450',
+    playerPolityId: 'polity:tenochtitlan',
+    name: 'Living tribute situation test',
   }).game.id;
   skippedStrategyGameId = library.createGame({
     scenarioId: 'scenario:napoleonic-europe-1805',
@@ -151,6 +157,22 @@ describe('living-world command store', () => {
     assert.deepEqual(advanced.lastTransition.modelMetadata, {
       role: 'strategic', provider: 'codex-subscription', model: 'gpt-5.6-luna', effort: 'low',
     });
+  });
+
+  it('projects unsettled canonical tribute as a non-material situation', () => {
+    const before = living.readLivingWorld(mesoSituationGameId);
+    const advanced = living.advanceLivingWorld(mesoSituationGameId, {
+      revision: before.projection.revision, sessionRevision: before.sessionRevision,
+      optionId: 'advance-three-months', strategicAttempts: before.strategicTasks.map(hold),
+    });
+    const parsed = parseIntentFirstProjection(advanced.projection);
+    const situation = parsed.situations.find((entry) => entry.situationId === 'situation:tribute-arrears-obligation-xochimilco-triple-alliance');
+    assert.ok(situation);
+    assert.match(situation.title, /Xochimilco tribute remains in arrears/i);
+    assert.match(situation.summary, /unsettled maize deliveries/i);
+    assert.equal(situation.urgency, 'medium');
+    assert.ok(situation.evidenceIds.length > 0);
+    assert.equal(advanced.projection.processes.length, 0);
   });
 
   it('reaches thirty deterministic monthly boundaries after ten player decisions', () => {

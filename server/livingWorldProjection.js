@@ -191,6 +191,29 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
   });
   const outgoingLabor = outgoing.reduce((sum, entry) => sum + applyBp(entry.laborService?.people ?? 0, entry.complianceBp), 0);
   const outgoingMilitary = outgoing.reduce((sum, entry) => sum + applyBp(entry.militaryService?.personnel ?? 0, entry.complianceBp), 0);
+  // A situation is a read-only, engine-derived prompt for intervention.  It
+  // must never turn a player click into a new obligation or rewrite the
+  // historical record.  Occupation was the first such condition; unpaid
+  // canonical tribute is another material condition that can matter without
+  // inventing a generic "politics" resource or an era-specific event deck.
+  const tributeArrearSituations = incoming
+    .filter((entry) => entry.arrears.some((arrear) => arrear.quantity > 0))
+    .map((entry) => {
+      const payer = entry.payerPolityIds.map((id) => (
+        localized(state.polities.find((candidate) => candidate.id === id)?.displayName, locale) || labelOf(id)
+      )).join(' · ');
+      const commodities = entry.arrears
+        .filter((arrear) => arrear.quantity > 0)
+        .map((arrear) => labelOf(arrear.commodityId))
+        .join(' · ');
+      return {
+        situationId: `situation:tribute-arrears-${entry.obligationId.replaceAll(':', '-')}`,
+        title: `${payer} tribute remains in arrears`,
+        urgency: 'medium',
+        summary: `The shared obligation has unsettled ${commodities} deliveries; beneficiary shares remain constrained until a canonical settlement occurs.`,
+        evidenceIds: groundedEvidence(entry.evidenceIds, visible, snapshotEvidence),
+      };
+    });
   const tributeFacts = tributeObligations.length === 0 ? [] : [
     fact('fact:tribute-outgoing', 'Scheduled outgoing tribute', outgoingGoods.length > 0 ? outgoingGoods.join(' · ') : 'none', tributeEvidence, ['Every listed delivery is debited from payer stock before beneficiary credit']),
     fact('fact:tribute-incoming', 'Scheduled incoming tribute', incomingGoods.length > 0 ? incomingGoods.join(' · ') : 'none', tributeEvidence, ['Beneficiary shares are applied to conserved delivered goods']),
@@ -224,13 +247,16 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     ],
     interpretation: pendingIntent,
     processes: active,
-    situations: occupations.map((region) => ({
-      situationId: `situation:${region.regionId.replaceAll(':', '-')}`,
-      title: `${localized(region.displayName, locale)} is occupied`,
-      urgency: region.control.administrationAccessBp < 5000 ? 'high' : 'medium',
-      summary: `Actual control differs from legal ownership; access and recruitment follow the occupation profile.`,
-      evidenceIds: groundedEvidence(region.evidenceIds, visible, snapshotEvidence),
-    })),
+    situations: [
+      ...occupations.map((region) => ({
+        situationId: `situation:${region.regionId.replaceAll(':', '-')}`,
+        title: `${localized(region.displayName, locale)} is occupied`,
+        urgency: region.control.administrationAccessBp < 5000 ? 'high' : 'medium',
+        summary: `Actual control differs from legal ownership; access and recruitment follow the occupation profile.`,
+        evidenceIds: groundedEvidence(region.evidenceIds, visible, snapshotEvidence),
+      })),
+      ...tributeArrearSituations,
+    ],
     diplomacy: {
       conversations: pendingProposals.map((proposal) => {
         const counterparties = proposal.proposerPolityId === polity.id
