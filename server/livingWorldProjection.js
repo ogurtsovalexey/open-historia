@@ -466,7 +466,10 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
     allowedInitiativeKinds: ['technology', 'ideology', 'institution', 'doctrine', 'movement', 'project', 'investigation', 'other'],
     allowedEffectFamilies: [...processes.materializableEffectKinds],
     allowedDiplomaticOperations: ['process.propose', 'process.adjust', 'military.mobilize', 'diplomacy.propose', 'territory.offer'],
-    relationshipTypes: state.catalogs.relationshipTypes.map((entry) => entry.relationshipTypeId).sort(),
+    relationshipTypes: state.catalogs.relationshipTypes
+      .filter((entry) => entry.playerProposable)
+      .map((entry) => entry.relationshipTypeId)
+      .sort(),
   };
   return context;
 }

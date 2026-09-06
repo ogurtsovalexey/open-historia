@@ -194,7 +194,11 @@ describe('WP12 cross-era acceptance', () => {
         ...state.tributeObligations.map((item) => item.obligationId),
       ]);
       assert.ok(view.interpretationContext.entities.every((item) => knownIds.has(item.entityId)), `scenario-leakage: ${entry.slug} interpreter received an entity outside its seed`);
-      assert.deepEqual(view.interpretationContext.relationshipTypes, state.catalogs.relationshipTypes.map((item) => item.relationshipTypeId).sort(), `scenario-leakage: ${entry.slug} relationship types must come only from its runtime catalog`);
+      assert.deepEqual(
+        view.interpretationContext.relationshipTypes,
+        state.catalogs.relationshipTypes.filter((item) => item.playerProposable).map((item) => item.relationshipTypeId).sort(),
+        `scenario-leakage: ${entry.slug} player relationship types must be explicitly enabled by its runtime catalog`,
+      );
     });
 
     it(`open concepts: ${entry.slug} admits electricity and communism only as bounded, funded processes`, () => {

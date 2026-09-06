@@ -230,7 +230,12 @@ const scenario = {
     revenueChannels,
     financeInstruments,
     controlProfiles,
-    relationshipTypes: idRecord('relationship-type', ['war', 'coalition-negotiation', 'alliance', 'neutrality', 'personal-union', 'linked-executive', 'hre-membership', 'subsidy', 'maritime-interdiction']),
+    relationshipTypes: Object.fromEntries([
+      'war', 'coalition-negotiation', 'alliance', 'neutrality', 'personal-union', 'linked-executive', 'hre-membership', 'subsidy', 'maritime-interdiction',
+    ].map((name) => [`relationship-type:${name}`, {
+      id: `relationship-type:${name}`,
+      playerProposable: ['coalition-negotiation', 'alliance', 'neutrality', 'subsidy'].includes(name),
+    }])),
     routeClasses: idRecord('route-class', ['land-road', 'river', 'sea-lane', 'sea-blockade', 'external-market']),
     terminology: {
       'term:country-condition': { en: 'Condition of the realm', ru: 'Состояние державы' },

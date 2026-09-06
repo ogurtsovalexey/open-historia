@@ -213,10 +213,12 @@
     },
     "relationshipTypes": {
       "relationship-type:defensive-alliance": {
-        "id": "relationship-type:defensive-alliance"
+        "id": "relationship-type:defensive-alliance",
+        "playerProposable": true
       },
       "relationship-type:strategic-relation": {
-        "id": "relationship-type:strategic-relation"
+        "id": "relationship-type:strategic-relation",
+        "playerProposable": true
       }
     },
     "revenueChannels": {
@@ -1885,7 +1887,7 @@
         },
         "binding": {
           "path": "/catalogs",
-          "valueChecksum": "sha256:93e9d29daa4099b452fbaabbba6a8dbad581b1f33340abe1090ef5398c96ae91"
+          "valueChecksum": "sha256:e6480dc4165a6aa7628fd1c882c406a5874f3ad0546b84b4ee08b91c571773a8"
         },
         "id": "evidence:e1935-catalogs",
         "visibility": "public"

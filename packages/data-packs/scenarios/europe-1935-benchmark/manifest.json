@@ -18,5 +18,5 @@
     "../../fixtures/europe-1935-benchmark/geography/runtime-geography-manifest.json",
     "../../fixtures/europe-1935-benchmark/geography/runtime-regions.geojson"
   ],
-  "scenarioChecksum": "sha256:ccbad9ba50d5f103d6ca65e98cc9dd2dbaafe85188cdd575d183438c2439b560"
+  "scenarioChecksum": "sha256:518a0b5b543a9fe6009a820545d42456e20537ab28ad7b1b9cc661237cd33894"
 }

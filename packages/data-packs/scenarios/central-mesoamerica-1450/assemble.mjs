@@ -201,7 +201,10 @@ const scenario = {
       'control-profile:sovereign-altepetl': { id: 'control-profile:sovereign-altepetl', kind: 'sovereign', administrationAccessBp: 10000, extractionAccessBp: 10000, recruitmentAccessBp: 10000, integrationBp: 10000 },
       'control-profile:indirect-tributary': { id: 'control-profile:indirect-tributary', kind: 'indirect', administrationAccessBp: 0, extractionAccessBp: 0, recruitmentAccessBp: 0, integrationBp: 0 },
     },
-    relationshipTypes: Object.fromEntries(['tribute-alliance', 'tribute-obligation', 'shared-war-obligation', 'active-conflict', 'dynastic-relation', 'market-access'].map((name) => [`relationship-type:${name}`, { id: `relationship-type:${name}` }])),
+    relationshipTypes: Object.fromEntries(['tribute-alliance', 'tribute-obligation', 'shared-war-obligation', 'active-conflict', 'dynastic-relation', 'market-access'].map((name) => [`relationship-type:${name}`, {
+      id: `relationship-type:${name}`,
+      playerProposable: ['tribute-alliance', 'dynastic-relation', 'market-access'].includes(name),
+    }])),
     routeClasses: Object.fromEntries(['canoe', 'road-portage', 'runner-relay', 'long-distance-market'].map((name) => [`route-class:${name}`, { id: `route-class:${name}` }])),
     terminology: {
       'term:polity': { en: 'altepetl / ñuu / polity', ru: 'альтепетль / ньуу / полития' },

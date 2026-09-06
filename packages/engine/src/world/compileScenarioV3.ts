@@ -327,7 +327,10 @@ function buildInitialState(
       })),
       equipmentClasses: sortedValues(scenario.catalogs.equipmentClasses).map((entry) => ({ equipmentClassId: entry.id })),
       routeClasses: sortedValues(scenario.catalogs.routeClasses).map((entry) => ({ routeClassId: entry.id })),
-      relationshipTypes: sortedValues(scenario.catalogs.relationshipTypes).map((entry) => ({ relationshipTypeId: entry.id })),
+      relationshipTypes: sortedValues(scenario.catalogs.relationshipTypes).map((entry) => ({
+        relationshipTypeId: entry.id,
+        playerProposable: entry.playerProposable,
+      })),
     },
     polities,
     regions,

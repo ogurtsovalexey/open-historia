@@ -478,22 +478,28 @@
     },
     "relationshipTypes": {
       "relationship-type:tribute-alliance": {
-        "id": "relationship-type:tribute-alliance"
+        "id": "relationship-type:tribute-alliance",
+        "playerProposable": true
       },
       "relationship-type:tribute-obligation": {
-        "id": "relationship-type:tribute-obligation"
+        "id": "relationship-type:tribute-obligation",
+        "playerProposable": false
       },
       "relationship-type:shared-war-obligation": {
-        "id": "relationship-type:shared-war-obligation"
+        "id": "relationship-type:shared-war-obligation",
+        "playerProposable": false
       },
       "relationship-type:active-conflict": {
-        "id": "relationship-type:active-conflict"
+        "id": "relationship-type:active-conflict",
+        "playerProposable": false
       },
       "relationship-type:dynastic-relation": {
-        "id": "relationship-type:dynastic-relation"
+        "id": "relationship-type:dynastic-relation",
+        "playerProposable": true
       },
       "relationship-type:market-access": {
-        "id": "relationship-type:market-access"
+        "id": "relationship-type:market-access",
+        "playerProposable": true
       }
     },
     "routeClasses": {

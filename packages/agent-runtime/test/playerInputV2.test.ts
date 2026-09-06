@@ -29,6 +29,10 @@ function state(): worldV2.WorldStateV2 {
         { modelId: 'military-model:test', kind: 'military' },
       ],
       commodities: [],
+      relationshipTypes: [
+        { relationshipTypeId: 'relationship-type:consultation', playerProposable: true },
+        { relationshipTypeId: 'relationship-type:war', playerProposable: false },
+      ],
       formationArchetypes: [],
       equipmentClasses: [],
       routeClasses: [],
@@ -201,6 +205,28 @@ describe('PlayerInputInterpretationV2', () => {
     invalidRelationship.requestedActions[0]!.operation = { kind: 'diplomacy.propose', recipientPolityIds: ['polity:beta'], relationshipTypeId: 'relationship-type:invented' };
     const blocked = interpretPlayerInputV2(world, { actorPolityId: 'polity:alpha', playerText, modelOutput: invalidRelationship });
     assert.ok(blocked.value.requestedActions[0]!.reasons.includes('undeclared-relationship-type:relationship-type:invented'));
+  });
+
+  it('allows only scenario-authorized relationship types for player diplomacy', () => {
+    const world = state();
+    const playerText = 'Offer a consultation to Beta.';
+    const output = baseOutput(world.revision);
+    output.requestedActions.push({
+      actionId: 'action:consultation', domain: 'diplomacy', scope: 'external', intent: playerText,
+      pace: 'slow', effectFamilies: ['relation.modify'], targetEntityIds: ['polity:alpha', 'polity:beta'], claimRefs: [], evidenceIds: ['evidence:public'],
+      operation: { kind: 'diplomacy.propose', recipientPolityIds: ['polity:beta'], relationshipTypeId: 'relationship-type:consultation' },
+      sourceSpan: span(playerText, playerText),
+    });
+    assert.strictEqual(
+      interpretPlayerInputV2(world, { actorPolityId: 'polity:alpha', playerText, modelOutput: output }).value.requestedActions[0]!.status,
+      'grounded',
+    );
+    const blocked = structuredClone(output);
+    blocked.requestedActions[0]!.operation = { kind: 'diplomacy.propose', recipientPolityIds: ['polity:beta'], relationshipTypeId: 'relationship-type:war' };
+    assert.ok(
+      interpretPlayerInputV2(world, { actorPolityId: 'polity:alpha', playerText, modelOutput: blocked }).value.requestedActions[0]!.reasons
+        .includes('relationship-type-not-player-proposable:relationship-type:war'),
+    );
   });
 
   it('blocks typed mobilization before confirmation when the engine cannot derive an eligible controlled reserve', () => {

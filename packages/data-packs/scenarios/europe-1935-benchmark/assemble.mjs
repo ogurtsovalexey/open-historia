@@ -349,8 +349,8 @@ const scenario = {
     financeInstruments: { 'finance-instrument:public-debt': { id: 'finance-instrument:public-debt' } },
     controlProfiles: { 'control-profile:sovereign': { id: 'control-profile:sovereign', kind: 'sovereign', administrationAccessBp: 10000, extractionAccessBp: 10000, recruitmentAccessBp: 10000, integrationBp: 10000 } },
     relationshipTypes: {
-      'relationship-type:strategic-relation': { id: 'relationship-type:strategic-relation' },
-      'relationship-type:defensive-alliance': { id: 'relationship-type:defensive-alliance' },
+      'relationship-type:strategic-relation': { id: 'relationship-type:strategic-relation', playerProposable: true },
+      'relationship-type:defensive-alliance': { id: 'relationship-type:defensive-alliance', playerProposable: true },
     },
     routeClasses: { 'route-class:inter-polity-trade': { id: 'route-class:inter-polity-trade' } },
     terminology: {

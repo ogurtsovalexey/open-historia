@@ -286,8 +286,11 @@ function operationReasons(state: worldV2.WorldStateV2, actorPolityId: string, ac
       if (!state.polities.some((entry) => entry.id === recipientId)) reasons.push(`unknown-recipient:${recipientId}`);
       else if (recipientId === actorPolityId) reasons.push(`self-recipient:${recipientId}`);
     }
-    if (!state.catalogs.relationshipTypes.some((entry) => entry.relationshipTypeId === operation.relationshipTypeId)) {
+    const relationshipType = state.catalogs.relationshipTypes.find((entry) => entry.relationshipTypeId === operation.relationshipTypeId);
+    if (!relationshipType) {
       reasons.push(`undeclared-relationship-type:${operation.relationshipTypeId}`);
+    } else if (!relationshipType.playerProposable) {
+      reasons.push(`relationship-type-not-player-proposable:${operation.relationshipTypeId}`);
     }
     return reasons;
   }

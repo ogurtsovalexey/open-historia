@@ -359,6 +359,7 @@ export const catalogManifestSchema = z.object({
   }).strict()),
   relationshipTypes: z.array(z.object({
     relationshipTypeId: prefixedIdSchema('relationship-type'),
+    playerProposable: z.boolean().default(false),
   }).strict()).default([]),
 }).strict();
 

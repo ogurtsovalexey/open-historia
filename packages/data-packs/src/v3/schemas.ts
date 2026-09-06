@@ -37,6 +37,11 @@ const revenueChannelIdSchema = stableId('revenue-channel');
 const financeInstrumentIdSchema = stableId('finance-instrument');
 const controlProfileIdSchema = stableId('control-profile');
 const relationshipTypeIdSchema = stableId('relationship-type');
+const relationshipTypeSchema = z.object({
+  id: relationshipTypeIdSchema,
+  /** Explicitly opt in only non-escalatory relationship forms to player proposals. */
+  playerProposable: z.boolean().default(false),
+}).strict();
 const routeClassIdSchema = stableId('route-class');
 const evidenceIdSchema = stableId('evidence');
 const cohortIdSchema = stableId('cohort');
@@ -113,7 +118,7 @@ const catalogsSchema = z.object({
     recruitmentAccessBp: basisPoints,
     integrationBp: basisPoints,
   }).strict()),
-  relationshipTypes: z.record(relationshipTypeIdSchema, idOnly(relationshipTypeIdSchema)),
+  relationshipTypes: z.record(relationshipTypeIdSchema, relationshipTypeSchema),
   routeClasses: z.record(routeClassIdSchema, idOnly(routeClassIdSchema)),
   terminology: z.record(genericStableId, localizedTextSchema),
 }).strict();

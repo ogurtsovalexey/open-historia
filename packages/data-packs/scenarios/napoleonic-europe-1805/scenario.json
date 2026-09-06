@@ -507,31 +507,40 @@
     },
     "relationshipTypes": {
       "relationship-type:war": {
-        "id": "relationship-type:war"
+        "id": "relationship-type:war",
+        "playerProposable": false
       },
       "relationship-type:coalition-negotiation": {
-        "id": "relationship-type:coalition-negotiation"
+        "id": "relationship-type:coalition-negotiation",
+        "playerProposable": true
       },
       "relationship-type:alliance": {
-        "id": "relationship-type:alliance"
+        "id": "relationship-type:alliance",
+        "playerProposable": true
       },
       "relationship-type:neutrality": {
-        "id": "relationship-type:neutrality"
+        "id": "relationship-type:neutrality",
+        "playerProposable": true
       },
       "relationship-type:personal-union": {
-        "id": "relationship-type:personal-union"
+        "id": "relationship-type:personal-union",
+        "playerProposable": false
       },
       "relationship-type:linked-executive": {
-        "id": "relationship-type:linked-executive"
+        "id": "relationship-type:linked-executive",
+        "playerProposable": false
       },
       "relationship-type:hre-membership": {
-        "id": "relationship-type:hre-membership"
+        "id": "relationship-type:hre-membership",
+        "playerProposable": false
       },
       "relationship-type:subsidy": {
-        "id": "relationship-type:subsidy"
+        "id": "relationship-type:subsidy",
+        "playerProposable": true
       },
       "relationship-type:maritime-interdiction": {
-        "id": "relationship-type:maritime-interdiction"
+        "id": "relationship-type:maritime-interdiction",
+        "playerProposable": false
       }
     },
     "routeClasses": {
