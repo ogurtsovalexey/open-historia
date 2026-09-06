@@ -9,13 +9,16 @@ Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the pr
 This section is the authoritative resume point for the next implementation
 agent. Do not restart the merge ladder and do not reconstruct completed work
 from the old baseline. The current pushed implementation checkpoint is
-`680af8a` on `feature/campaign-memory` (`fix(ui): bound parallel strategic
-turn resolution`). R5 is complete. R6 has verified ten three-month UI
+`115318f` on `feature/campaign-memory` (`docs(playtest): record Europe run and
+cross-scenario assessment`). R5 is complete. R6 has verified ten three-month UI
 decisions (30 monthly boundaries) in each of the three scenarios, with
 sanitized replay/audit evidence in `docs/reports/r6-ui-playtest-2026-09-05.md`.
-Those runs are not WP15 completion: the individual scripted-report artifacts,
-full model-mediated coverage and a real UI-driven populated-region transfer
-remain to be demonstrated. A failed semantic request now visibly preserves
+The three required redacted per-scenario reports and cross-scenario assessment
+now exist under `docs/reports/playtests/`; each new campaign used the configured
+provider, reached ten decisions/30 months, and has a read-only replay audit.
+This is still not full WP15 scripted-coverage completion: the deliberate
+false-history, counterfactual, political, and legal territorial-pressure
+intentions in section 20 were not all exercised in those bounded runs. A failed semantic request now visibly preserves
 the player draft for an explicit retry rather than silently discarding it.
 The same live UI path now exposes the server's safe rejection text (including
 the required schema-preflight condition) instead of reducing it to an HTTP
@@ -37,8 +40,8 @@ then confirmation changed the visible fielded total to 293,337. The local
 audit at 1806-01-01 / turn 12 / player decision 4 includes the new
 `personnel-mobilize` evidence and replay checksum
 `sha256:fbd970fee7d2968f967dd68ee191695193289bb4d84d49e7d1e0fbf3243d0938`.
-This remains short of WP15: it is not a fresh ten-decision run and does not
-replace the separate redacted Napoleonic report.
+The later fresh ten-decision Napoleonic report supersedes this as the UI-loop
+proof; this smaller check remains the direct proof of the mobilization route.
 
 The Europe 1935 Scenario V3 compiler now also declares the generic military
 module whenever its authored aggregate formations exist. This repairs a live
@@ -54,9 +57,8 @@ the former UI appearance of a stuck turn when four actors were selected
 serially. A real configured-provider Mesoamerican game advanced through the
 next three-month decision from 1450-04-01 to 1450-07-01 after the repair;
 the saved-game audit command completed without reporting a replay violation.
-This is a recovery proof only, not a WP15 substitute: its party is an
-in-progress save and has not yet supplied all ten fresh UI decisions or the
-required redacted report.
+This is a recovery proof only; the later fresh Mesoamerican report supplies
+the full ten-decision UI-loop evidence.
 
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
