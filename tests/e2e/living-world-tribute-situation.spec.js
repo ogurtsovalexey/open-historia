@@ -47,7 +47,8 @@ test("the production shell surfaces canonical Mesoamerican tribute arrears as a 
   await page.getByRole("tab", { name: "Ситуации" }).click();
   await expect(page.getByText("Xochimilco tribute remains in arrears")).toBeVisible();
   await expect(page.getByText("unsettled maize deliveries")).toBeVisible();
-  await page.getByRole("button", { name: /Respond with an intention|Ответить намерением/ }).click();
+  await page.getByRole("article").filter({ hasText: "Xochimilco tribute remains in arrears" })
+    .getByRole("button", { name: /Respond with an intention|Ответить намерением/ }).click();
   await expect(page.getByRole("tab", { name: "Решения", selected: true })).toBeVisible();
 
   await request.delete(`/api/games/${gameId}`);
