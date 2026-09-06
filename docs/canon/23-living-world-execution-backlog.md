@@ -19,9 +19,11 @@ unverified prior tribute claim; Napoleonic Europe exercised a population- and
 workforce-bound reserve and safe retry after a rejected strategic response.
 `npm run ci` passed after those reruns, including lint, full tests, scenario
 build, UI acceptance, agent tests and cycle detection. This is still not full
-WP15 scripted-coverage completion: the deliberate political and legal
-territorial-pressure intentions in section 20 were not all exercised in those
-bounded runs. A failed semantic request now visibly preserves
+WP15 scripted-coverage completion: the deliberate political intentions in
+section 20 were not all exercised in those bounded runs. The legal territorial
+offer path now has both a live UI audit and a production-shell browser test:
+an unowned target is blocked, while an owned controlled region remains pending
+until only its addressed recipient accepts frozen terms. A failed semantic request now visibly preserves
 the player draft for an explicit retry rather than silently discarding it.
 The same live UI path now exposes the server's safe rejection text (including
 the required schema-preflight condition) instead of reducing it to an HTTP
@@ -144,10 +146,11 @@ result is unknown, not failed.
    process-effect families. Do not expose any other effect family until it has
    one exact engine reducer and invariant tests.
 2. The three fresh 30-month UI games, model-mediated interpretations, claim
-   boundaries, counterfactual process, and audits are complete. The complete
-   per-turn WP15 script table is not: mobile/keyboard checks, political
-   situations, legal territorial pressure and all individual prescribed
-   intentions still require direct evidence.
+   boundaries, counterfactual process, legal territorial-offer path and audits
+   are complete. The complete per-turn WP15 script table is not: political
+   situations and all individual prescribed intentions still require direct
+   evidence. Mobile/keyboard and legal-offer behaviour have separate browser
+   acceptance coverage.
 3. A legal territorial transition must still arise only from its typed peace,
    agreement or combat authority. Ordinary player prose must never synthesize
    `gm` authority.
