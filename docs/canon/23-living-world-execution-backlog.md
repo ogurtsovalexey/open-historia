@@ -30,9 +30,15 @@ formation/evidence/event and removes the personnel from workforce without
 changing population. The order preview shows the derived reserve size,
 origin label and workforce opportunity cost before confirmation. Focused
 engine, runtime-contract, server-route and strict UI-projection tests pass.
-This is not yet the WP15 formation/workforce check: rerun turns 5–8 through
-the live UI after the rebuilt server is running, then record its replay/audit
-evidence in the separate Napoleonic report.
+Live post-rebuild check passed: the Napoleonic UI interpreted “Mobilize a
+bounded French reserve from current recruitment” as `military.mobilize`,
+previewed 337 personnel from Paris and Seine and its equal workforce cost,
+then confirmation changed the visible fielded total to 293,337. The local
+audit at 1806-01-01 / turn 12 / player decision 4 includes the new
+`personnel-mobilize` evidence and replay checksum
+`sha256:fbd970fee7d2968f967dd68ee191695193289bb4d84d49e7d1e0fbf3243d0938`.
+This remains short of WP15: it is not a fresh ten-decision run and does not
+replace the separate redacted Napoleonic report.
 
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
