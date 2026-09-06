@@ -110,3 +110,65 @@ test("the production shell records a typed external proposal without materializi
   await expect(page.getByText(/Bavaria/)).toBeVisible();
   await request.delete(`/api/games/${gameId}`);
 });
+
+test("the production shell keeps a Mesoamerican market-access proposal to Chalco pending", async ({ page, request }) => {
+  const gameId = "living-world-meso-diplomacy-e2e";
+  await request.delete(`/api/games/${gameId}`).catch(() => {});
+  const created = await request.post("/api/games", {
+    data: {
+      id: gameId,
+      name: "Mesoamerican market-access proposal",
+      scenarioId: "scenario:central-mesoamerica-1450",
+      playerPolityId: "polity:tenochtitlan",
+    },
+  });
+  expect(created.ok()).toBeTruthy();
+
+  const initial = await (await request.get(`/api/games/${gameId}/living-world`)).json();
+  const actor = initial.interpretationContext.entities.find((entry) => entry.entityId === "polity:tenochtitlan");
+  expect(actor).toBeTruthy();
+  const text = "Offer Chalco limited market and route access without asserting sovereignty.";
+  const submittedResponse = await request.post(`/api/games/${gameId}/living-world/intent`, { data: {
+    revision: initial.projection.revision,
+    sessionRevision: initial.sessionRevision,
+    intentions: [text],
+    modelOutput: {
+      revision: initial.projection.revision,
+      questions: [],
+      claims: [],
+      proposedInitiatives: [],
+      requestedActions: [{
+        actionId: "action:chalco-market-access",
+        domain: "diplomacy",
+        scope: "external",
+        intent: text,
+        pace: "slow",
+        effectFamilies: ["relation.modify"],
+        targetEntityIds: ["polity:tenochtitlan", "polity:chalco"],
+        claimRefs: [],
+        evidenceIds: [actor.evidenceIds[0]],
+        operation: {
+          kind: "diplomacy.propose",
+          recipientPolityIds: ["polity:chalco"],
+          relationshipTypeId: "relationship-type:market-access",
+        },
+        sourceSpan: { start: 0, end: text.length, text },
+      }],
+    },
+  } });
+  expect(submittedResponse.ok()).toBeTruthy();
+
+  await page.goto("/");
+  await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
+  await page.getByRole("button", { name: "Current" }).first().click();
+  await page.getByRole("tab", { name: "Решения" }).click();
+  await expect(page.getByText("No immediate treasury commitment; frozen proposal terms will be recorded")).toBeVisible();
+  await page.getByRole("button", { name: "Подтвердить обоснованные действия" }).click();
+
+  const confirmed = await (await request.get(`/api/games/${gameId}/living-world`)).json();
+  expect(confirmed.projection.diplomacy.conversations).toEqual([
+    expect.objectContaining({ counterparty: expect.stringMatching(/Chalco/), status: "awaiting-response" }),
+  ]);
+  expect(confirmed.projection.diplomacy.commitments.some((entry) => entry.title === "market access")).toBe(false);
+  await request.delete(`/api/games/${gameId}`);
+});
