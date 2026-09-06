@@ -28,6 +28,14 @@ with 24 grounded sources. Read-only audit export confirms sanitized Utility and
 Strategic provenance (`codex-subscription`, `gpt-5.6-luna`, low effort) and
 contains no raw prompts or responses.
 
+After the ten-turn loop, the Orders UI also received the scripted false claim
+that Chalco had permanently accepted tribute ten cycles earlier and transferred
+all warriors. It was shown as an unverified prior-world-state claim with no
+ledger-grounded record and an explicit warning that free text cannot rewrite
+history. Confirmation created no process, mobilization or diplomatic proposal;
+the independent audit preserved `1452-07-01`, turn `30`, decision index `10`,
+and its original world revision below.
+
 ## Independent audit
 
 Run:
