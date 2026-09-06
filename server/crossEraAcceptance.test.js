@@ -7,8 +7,14 @@ import { processes, worldV2 } from '@open-historia/engine';
 import { loadCompiledScenarioPack } from './scenarioPackStore.js';
 
 const CASES = Object.freeze([
-  { scenarioId: 'scenario:napoleonic-europe-1805', playerPolityId: 'polity:france', slug: 'napoleonic' },
-  { scenarioId: 'scenario:central-mesoamerica-1450', playerPolityId: 'polity:tenochtitlan', slug: 'mesoamerica' },
+  {
+    scenarioId: 'scenario:napoleonic-europe-1805', playerPolityId: 'polity:france', slug: 'napoleonic',
+    diplomacy: { recipientPolityId: 'polity:bavaria', relationshipTypeId: 'relationship-type:coalition-negotiation' },
+  },
+  {
+    scenarioId: 'scenario:central-mesoamerica-1450', playerPolityId: 'polity:tenochtitlan', slug: 'mesoamerica',
+    diplomacy: { recipientPolityId: 'polity:chalco', relationshipTypeId: 'relationship-type:market-access' },
+  },
 ]);
 
 let temporary;
@@ -130,6 +136,42 @@ describe('WP12 cross-era acceptance', () => {
         formationId: formation.formationId, polityId: formation.polityId, manpower: formation.manpower,
         personnelOrigins: formation.personnelOrigins,
       })), formationsBefore, `territory-causality: ${entry.slug} must preserve formation allegiance and origins`);
+    });
+
+    it(`diplomacy: ${entry.slug} freezes a scenario-local offer until only its recipient accepts`, () => {
+      const state = loadCompiledScenarioPack(entry.scenarioId).initialState;
+      const actor = state.polities.find((item) => item.id === entry.playerPolityId);
+      const recipient = state.polities.find((item) => item.id === entry.diplomacy.recipientPolityId);
+      assert.ok(actor && recipient, `diplomacy: ${entry.slug} requires both proposal parties`);
+      assert.ok(
+        state.catalogs.relationshipTypes.some((item) => item.relationshipTypeId === entry.diplomacy.relationshipTypeId),
+        `diplomacy: ${entry.slug} must use only a scenario-local relationship type`,
+      );
+      const regionsBefore = structuredClone(state.regions);
+      const evidenceId = actor.evidenceIds[0];
+      assert.ok(evidenceId, `diplomacy: ${entry.slug} proposer requires canonical evidence`);
+      const proposalId = `proposal:wp12-${entry.slug}-relationship`;
+      const proposed = worldV2.proposeDiplomaticProposal(state, {
+        proposalId,
+        proposerPolityId: actor.id,
+        recipientPolityIds: [recipient.id],
+        terms: [{
+          kind: 'relationship', relationshipTypeId: entry.diplomacy.relationshipTypeId,
+          participantPolityIds: [actor.id, recipient.id],
+        }],
+        evidenceIds: [evidenceId],
+        expectedRevision: state.revision,
+      });
+      assert.equal(proposed.relationships.length, state.relationships.length, `diplomacy: ${entry.slug} pending offer must not materialize a relationship`);
+      assert.deepEqual(proposed.regions, regionsBefore, `diplomacy: ${entry.slug} pending offer must not change territory`);
+      assert.equal(proposed.diplomaticProposals.find((item) => item.proposalId === proposalId)?.status, 'pending', `diplomacy: ${entry.slug} offer must stay pending`);
+
+      const accepted = worldV2.resolveDiplomaticProposal(proposed, {
+        proposalId, actorPolityId: recipient.id, decision: 'accept', expectedRevision: proposed.revision,
+      });
+      assert.equal(accepted.diplomaticProposals.find((item) => item.proposalId === proposalId)?.status, 'accepted', `diplomacy: ${entry.slug} recipient must resolve its own offer`);
+      assert.equal(accepted.relationships.length, state.relationships.length + 1, `diplomacy: ${entry.slug} acceptance must create exactly one relationship`);
+      assert.deepEqual(accepted.regions, regionsBefore, `diplomacy: ${entry.slug} a relationship offer must not transfer territory`);
     });
 
     it(`replay: ${entry.slug} resolves three monthly boundaries without a model call`, () => {
