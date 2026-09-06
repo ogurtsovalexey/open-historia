@@ -100,3 +100,15 @@ addressed recipient accepts. After confirmation, audit transition
 The proposal is `pending`, addressed only to `polity:prussia`, while
 Paris-and-Seine remains both legally owned and actually controlled by
 `polity:france`. No player sentence or confirmation transferred the region.
+
+The completed campaign also exposed the grounded **Hanover is occupied**
+situation. The player answered through its UI action with a bounded civic
+administration and supply review, explicitly without annexation. The engine
+created active proposed process `process:e2ba6003ee6daa7093e16130` with
+funding `1,757`, progress `975 bp`, resistance `4,200 bp`, and only
+`capacity.modify` / `supply-capacity.modify` selected for Hanover. Its
+`1807-10-01` audit (`sha256:5f34ad91645daf429c2e1e793534208704b455ad47aa4738dc27ba8b3d78fd8a`)
+still shows Hanover legally owned by `polity:hanover` and actually controlled
+by `polity:france`; it also records the Paris offer as `rejected`, with Paris
+still under French legal and actual control. This is a live political/occupation
+response without a prose-created sovereignty or territorial transfer.
