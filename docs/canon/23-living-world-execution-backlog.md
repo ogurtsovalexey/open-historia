@@ -9,8 +9,8 @@ Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the pr
 This section is the authoritative resume point for the next implementation
 agent. Do not restart the merge ladder and do not reconstruct completed work
 from the old baseline. The current pushed implementation checkpoint is
-`e64fc30` on `feature/campaign-memory` (`docs(living-world): record player
-mobilization route gap`). R5 is complete. R6 has verified ten three-month UI
+`680af8a` on `feature/campaign-memory` (`fix(ui): bound parallel strategic
+turn resolution`). R5 is complete. R6 has verified ten three-month UI
 decisions (30 monthly boundaries) in each of the three scenarios, with
 sanitized replay/audit evidence in `docs/reports/r6-ui-playtest-2026-09-05.md`.
 Those runs are not WP15 completion: the individual scripted-report artifacts,
@@ -39,6 +39,24 @@ audit at 1806-01-01 / turn 12 / player decision 4 includes the new
 `sha256:fbd970fee7d2968f967dd68ee191695193289bb4d84d49e7d1e0fbf3243d0938`.
 This remains short of WP15: it is not a fresh ten-decision run and does not
 replace the separate redacted Napoleonic report.
+
+The Europe 1935 Scenario V3 compiler now also declares the generic military
+module whenever its authored aggregate formations exist. This repairs a live
+shell inconsistency: Poland could display real personnel and recruitment while
+the readiness/mobilization control was incorrectly disabled by a stale legacy
+module flag. A fresh post-fix UI game previewed a 461-person Polish reserve
+from Województwo warszawskie and showed the same workforce cost before
+confirmation.
+
+Strategic background actor work is now dispatched concurrently, still capped
+by the canonical four tasks, with a 45-second per-task deadline. This removes
+the former UI appearance of a stuck turn when four actors were selected
+serially. A real configured-provider Mesoamerican game advanced through the
+next three-month decision from 1450-04-01 to 1450-07-01 after the repair;
+the saved-game audit command completed without reporting a replay violation.
+This is a recovery proof only, not a WP15 substitute: its party is an
+in-progress save and has not yet supplied all ten fresh UI decisions or the
+required redacted report.
 
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
