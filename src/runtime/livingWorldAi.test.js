@@ -7,7 +7,11 @@ const context = {
   month: "1500-01-01",
   actor: { entityId: "polity:test", label: "Test" },
   worldRules: { plausibilityContext: ["pre-industrial"] },
-  entities: [{ entityId: "polity:test", kind: "polity", label: "Test", evidenceIds: ["evidence:test"] }],
+  entities: [
+    { entityId: "polity:test", kind: "polity", label: "Test", evidenceIds: ["evidence:test"] },
+    { entityId: "process:active", kind: "process", label: "Active", status: "active", evidenceIds: ["evidence:test"] },
+    { entityId: "process:completed", kind: "process", label: "Completed", status: "completed", evidenceIds: ["evidence:test"] },
+  ],
   evidence: [{ evidenceId: "evidence:test", kind: "authored" }],
   allowedInitiativeKinds: ["technology"],
   allowedEffectFamilies: ["capacity.modify"],
@@ -36,7 +40,7 @@ describe("living-world semantic AI boundary", () => {
     const schema = playerInputModelJsonSchema(context);
     assert.deepEqual(schema.properties.revision.enum, [context.revision]);
     const initiative = schema.properties.proposedInitiatives.items.properties;
-    assert.deepEqual(initiative.targetEntityIds.items.enum, ["polity:test"]);
+    assert.deepEqual(initiative.targetEntityIds.items.enum, ["polity:test", "process:active", "process:completed"]);
     assert.deepEqual(initiative.evidenceIds.items.enum, ["evidence:test"]);
     assert.deepEqual(initiative.effectFamilies.items.enum, ["capacity.modify"]);
     assert.ok(initiative.pace.enum.includes("slow"));
@@ -45,6 +49,7 @@ describe("living-world semantic AI boundary", () => {
     assert.ok(operationByKind.has("military.mobilize"));
     assert.ok(operationByKind.has("process.adjust"));
     assert.ok(operationByKind.has("territory.offer"));
+    assert.deepEqual(operationByKind.get("process.adjust").properties.processId.enum, ["process:active"]);
     assert.equal(JSON.stringify(operation).includes("administrationAccessBp"), false);
     assert.equal(JSON.stringify(operation).includes("authority"), false);
     assert.equal(JSON.stringify(schema).includes("numericEffects"), false);

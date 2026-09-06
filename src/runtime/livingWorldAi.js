@@ -10,6 +10,9 @@ const spanSchema = object({
 
 export function playerInputModelJsonSchema(context) {
   const entityIds = context.entities.map((entry) => entry.entityId);
+  const adjustableProcessIds = context.entities
+    .filter((entry) => entry.kind === "process" && entry.status === "active")
+    .map((entry) => entry.entityId);
   const claimableRegionIds = context.claimableRegionRefs?.map((entry) => entry.entityId) ?? entityIds;
   const evidenceIds = context.evidence.map((entry) => entry.evidenceId);
   const entityId = { type: "string", enum: entityIds };
@@ -18,7 +21,7 @@ export function playerInputModelJsonSchema(context) {
     anyOf: [
       object({ kind: { type: "string", const: "military.mobilize" } }),
       object({ kind: { type: "string", const: "process.propose" } }),
-      object({ kind: { type: "string", const: "process.adjust" }, processId: entityId }),
+      object({ kind: { type: "string", const: "process.adjust" }, processId: { type: "string", enum: adjustableProcessIds } }),
       object({
         kind: { type: "string", const: "diplomacy.propose" },
         recipientPolityIds: array(entityId, 16, 1),
