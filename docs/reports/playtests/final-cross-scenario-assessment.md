@@ -15,6 +15,15 @@ and canonical revisions. The reports are [Mesoamerica](./mesoamerica-1450-10-tur
 [Napoleonic Europe](./napoleonic-1805-10-turn.md), and
 [Europe 1935](./europe-1935-10-turn.md).
 
+Post-loop UI checks added three safe historical-claim boundaries: Poland's
+East Prussia/two-million-soldier claim was separately contradicted; Tenochtitlan's
+claim of permanent Chalco tribute and all warriors was rejected as unverified;
+and France's Bohemia claim was contradicted while the unsupported Trafalgar
+fleet assertion remained non-material. None created a process, proposal,
+mobilization, control transfer, or change to the audited world revision. Poland
+also created an Electricity investigation only as a proposed, funded,
+multi-stage process with engine-derived commitment and resistance.
+
 This demonstrates the normal player loop across industrial, Napoleonic and
 tribute-centred worlds. It does not claim that these peaceful, bounded runs
 forced every possible war, occupation, combat, peace, or territorial-transfer
