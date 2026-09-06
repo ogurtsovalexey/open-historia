@@ -47,11 +47,15 @@ export function assertContractVersion(actual, expected, contract) {
 const loadRuntime = async () => {
   const engineFile = requireGateFile(path.join(ROOT, "packages/engine/dist/index.js"));
   const agentFile = requireGateFile(path.join(ROOT, "packages/agent-runtime/dist/index.js"));
-  const [engine, agent] = await Promise.all([
+  // The baseline gate is an explicit historical audit. V4 is intentionally
+  // loaded from its retired direct module, never from the live runtime root.
+  const legacyAgentFile = requireGateFile(path.join(ROOT, "packages/agent-runtime/dist/strategicV4.js"));
+  const [engine, agent, legacyAgent] = await Promise.all([
     import(pathToFileURL(engineFile).href),
     import(pathToFileURL(agentFile).href),
+    import(pathToFileURL(legacyAgentFile).href),
   ]);
-  return { engine, agent };
+  return { engine, agent, legacyAgent };
 };
 
 /** Compare complete deterministic snapshots, rather than trusting a turn count. */
@@ -74,7 +78,7 @@ export function compareReplaySnapshots(expected, actual, canonicalOf, sha256OfSt
   return { ok: mismatches.length === 0, mismatches };
 }
 
-function assertBaselineContracts(engine, agent, scenario, initialState) {
+function assertBaselineContracts(engine, agent, legacyAgent, scenario, initialState) {
   assertContractVersion(scenario.schemaVersion, LIVING_WORLD_CONTRACTS.baseline.scenario, "baseline scenario");
   assertContractVersion(initialState.schemaVersion, LIVING_WORLD_CONTRACTS.baseline.world, "baseline world");
   agent.interpretedActionSchema.parse({
@@ -83,7 +87,7 @@ function assertBaselineContracts(engine, agent, scenario, initialState) {
     command: null,
     disposition: "unsupported",
   });
-  agent.strategicDecisionV3Schema.parse({
+  legacyAgent.strategicDecisionV3Schema.parse({
     polityId: "polity:baseline",
     revision: initialState.revision,
     objective: { domain: "campaign", summary: "Hold baseline", horizon: "short" },
@@ -123,13 +127,13 @@ export function checkTargetContracts(rootDirectory = ROOT) {
 }
 
 export async function runBaselineGate() {
-  const { engine, agent } = await loadRuntime();
+  const { engine, agent, legacyAgent } = await loadRuntime();
   const scenarioFile = requireGateFile(path.join(EUROPE_FIXTURE, "scenario.json"));
   const firstMonthFile = requireGateFile(path.join(EUROPE_FIXTURE, "first-month-baseline.json"));
   const scenarioRaw = readJson(scenarioFile);
   const scenario = engine.parseScenario(scenarioRaw);
   const initialState = engine.initState(scenario);
-  assertBaselineContracts(engine, agent, scenario, initialState);
+  assertBaselineContracts(engine, agent, legacyAgent, scenario, initialState);
 
   const scenarioChecksum = engine.sha256OfString(engine.canonicalOf(scenarioRaw));
   const startStateChecksum = engine.stateChecksum(initialState);
