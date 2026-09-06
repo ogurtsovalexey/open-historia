@@ -19,8 +19,11 @@ const request = async (pathname, { body, signal } = {}) => parseResponse(await f
 
 const STRATEGIC_TASK_TIMEOUT_MS = 45_000;
 
-const withTimeout = (promise, timeoutMs, label) => new Promise((resolve, reject) => {
-  const timeoutId = setTimeout(() => reject(new Error(`${label} exceeded the ${Math.round(timeoutMs / 1000)} second client deadline.`)), timeoutMs);
+const withTimeout = (promise, timeoutMs, label, onTimeout) => new Promise((resolve, reject) => {
+  const timeoutId = setTimeout(() => {
+    onTimeout?.();
+    reject(new Error(`${label} exceeded the ${Math.round(timeoutMs / 1000)} second client deadline.`));
+  }, timeoutMs);
   promise.then(
     (value) => { clearTimeout(timeoutId); resolve(value); },
     (error) => { clearTimeout(timeoutId); reject(error); },
@@ -36,12 +39,14 @@ async function runStrategicTasks(tasks = []) {
   // several sequential timeouts; a timeout becomes an explicit failed attempt
   // that the canonical checkpoint can show and retry.
   return Promise.all(tasks.map(async (task) => {
+    const controller = new AbortController();
     try {
       const result = await withTimeout(callAI(task.systemPrompt, [{ role: 'user', parts: [{ text: task.userPrompt }] }], {
         languageMode: 'none',
         providerRole: 'strategic',
+        signal: controller.signal,
         tool: task.tool,
-      }), STRATEGIC_TASK_TIMEOUT_MS, `Strategic task ${task.actorPolityId}`);
+      }), STRATEGIC_TASK_TIMEOUT_MS, `Strategic task ${task.actorPolityId}`, () => controller.abort());
       if (!result?.toolInput) throw new Error('The strategic model returned no structured decision.');
       return { taskKey: task.taskKey, status: 'succeeded', modelOutput: result.toolInput };
     } catch (error) {
