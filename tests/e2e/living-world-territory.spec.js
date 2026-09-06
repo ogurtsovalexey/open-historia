@@ -12,7 +12,7 @@ const hold = (task) => ({
   },
 });
 
-test("a living-world territorial offer remains pending until the addressed polity accepts its frozen choice", async ({ request }) => {
+test("a living-world territorial offer remains pending until the addressed polity accepts its frozen choice", async ({ page, request }) => {
   const gameId = "living-world-territory-e2e";
   await request.delete(`/api/games/${gameId}`).catch(() => {});
   const created = await request.post("/api/games", {
@@ -37,12 +37,22 @@ test("a living-world territorial offer remains pending until the addressed polit
   } });
   expect(submittedResponse.ok()).toBeTruthy();
   const submitted = await submittedResponse.json();
-  const confirmedResponse = await request.post(`/api/games/${gameId}/living-world/intent/confirm`, { data: {
-    revision: submitted.projection.revision, sessionRevision: submitted.sessionRevision,
-    interpretationId: submitted.projection.interpretation.interpretationId,
-  } });
-  expect(confirmedResponse.ok()).toBeTruthy();
-  const confirmed = await confirmedResponse.json();
+  // The semantic envelope is seeded through the deterministic test adapter,
+  // but the pending-offer preview and confirmation use the production browser
+  // shell. This prevents a legal frozen proposal from regressing into a UI
+  // that calls it blocked.
+  await page.goto("/");
+  // Production boot also warms PMTiles; wait for the actual command center
+  // rather than asserting against the transient world-texture loading shell.
+  await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
+  await page.getByRole("button", { name: "Current" }).first().click();
+  await page.getByRole("tab", { name: "Решения" }).click();
+  await expect(page.getByText("frozen proposal terms will be recorded")).toBeVisible();
+  await expect(page.getByText("no territorial control changes before acceptance")).toBeVisible();
+  await expect(page.getByText("The addressed polity can reject the frozen terms")).toBeVisible();
+  await page.getByRole("button", { name: "Подтвердить обоснованные действия" }).click();
+  await expect(page.getByRole("button", { name: "Продолжить на три месяца" })).toBeEnabled();
+  const confirmed = await (await request.get(`/api/games/${gameId}/living-world`)).json();
   expect(confirmed.interpretationContext.entities.find((entry) => entry.entityId === region.entityId).legalOwnerPolityId).toBe("polity:france");
   const austriaTask = confirmed.strategicTasks.find((task) => task.actorPolityId === "polity:austria");
   const acceptChoice = austriaTask.brief.frozenChoices.find((choice) => choice.choiceId.startsWith("choice:proposal-accept-"));
