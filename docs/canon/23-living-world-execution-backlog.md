@@ -21,6 +21,16 @@ The same live UI path now exposes the server's safe rejection text (including
 the required schema-preflight condition) instead of reducing it to an HTTP
 status, so an operator can complete the preflight before retrying.
 
+Live R6 discovery (Napoleonic France, 1806-01-01): a request to form a legal
+formation from the visible French origin regions is grounded to those regions,
+but it is still materialized as a generic process. Do not count that as the
+WP15 formation/workforce check. `PlayerInputV2` currently admits only
+`process.propose`, `diplomacy.propose` and `territory.offer`; the existing
+engine `military.mobilize` reducer has no normal player-order route. Add a
+bounded, engine-derived mobilization operation (origin, manpower, equipment,
+commander and ID must be selected/derived by the reducer, never supplied by
+the model) before rerunning turns 5–8 of the Napoleonic script.
+
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
 explicitly reverses that instruction. Prefer focused tests while developing;
