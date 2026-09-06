@@ -56,6 +56,13 @@ module flag. A fresh post-fix UI game previewed a 461-person Polish reserve
 from Województwo warszawskie and showed the same workforce cost before
 confirmation.
 
+The desktop Codex structured-output preflight is now stamped against the live
+`StrategicBriefV5+StrategicDecisionV4` contract and generates its schema from
+the canonical V4 decision schema. A pre-existing V4/V3 preflight is therefore
+deliberately rejected rather than certifying a different output shape; the
+operator must run the local preflight once after this migration. The old V4
+source remains confined to the documented offline-audit exception below.
+
 Strategic background actor work is now dispatched concurrently, still capped
 by the canonical four tasks, with a 45-second per-task deadline. This removes
 the former UI appearance of a stuck turn when four actors were selected

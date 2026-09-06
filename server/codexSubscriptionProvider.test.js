@@ -6,7 +6,7 @@ import path from "node:path";
 import { PassThrough } from "node:stream";
 import test from "node:test";
 import { z } from "zod";
-import { strategicDecisionV3Schema } from "@open-historia/agent-runtime";
+import { strategicDecisionV4Schema } from "@open-historia/agent-runtime";
 import {
   codexFailureMessage,
   codexAppServerArgs,
@@ -22,7 +22,7 @@ import {
   readCodexPreflights,
   runCodexSchemaPreflight,
   sanitizeCodexProviderEnvironment,
-  strategicDecisionV3JsonSchema,
+  strategicDecisionV4JsonSchema,
 } from "./codexSubscriptionProvider.js";
 
 const rawModels = [{
@@ -98,7 +98,7 @@ test("desktop inspection exposes CLI models but keeps schema transport pending",
   assert.equal(JSON.stringify(status).includes("token"), false);
 });
 
-test("schema preflight is isolated, validates the exact V3 payload and stores only checksums", async () => {
+test("schema preflight is isolated, validates the exact V5/V4 payload and stores only checksums", async () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "open-historia-codex-preflight-test-"));
   try {
     let invocation;
@@ -110,7 +110,7 @@ test("schema preflight is isolated, validates the exact V3 payload and stores on
         return { response: sentinel, stdout: '{"type":"turn.completed"}\n' };
       },
     });
-    assert.equal(record.contract, "StrategicBriefV4+StrategicDecisionV3");
+    assert.equal(record.contract, "StrategicBriefV5+StrategicDecisionV4");
     assert.equal(record.model, "gpt-5.6-luna");
     assert.equal(record.preflightChecksum.startsWith("sha256:"), true);
     assert.equal(invocation.schema.type, "object");
@@ -124,10 +124,10 @@ test("schema preflight is isolated, validates the exact V3 payload and stores on
   }
 });
 
-test("server preflight schema stays structurally identical to canonical StrategicDecisionV3", () => {
-  const canonical = z.toJSONSchema(strategicDecisionV3Schema);
+test("server preflight schema stays structurally identical to canonical StrategicDecisionV4", () => {
+  const canonical = z.toJSONSchema(strategicDecisionV4Schema);
   delete canonical.$schema;
-  assert.deepEqual(strategicDecisionV3JsonSchema(), canonical);
+  assert.deepEqual(strategicDecisionV4JsonSchema(), canonical);
 });
 
 test("Codex schema transport requires every property and restores source optional fields", () => {
@@ -171,10 +171,14 @@ test("Codex transport failures surface JSONL API errors when stderr is empty", (
 
 test("runtime invocation requires desktop and an exact model, effort and contract preflight", async () => {
   const preflight = {
-    provider: "codex-subscription", contract: "StrategicBriefV4+StrategicDecisionV3",
+    provider: "codex-subscription", contract: "StrategicBriefV5+StrategicDecisionV4",
     model: "gpt-5.6-terra", effort: "medium", preflightChecksum: "sha256:ok",
   };
   assert.equal(matchingCodexPreflight([preflight], { model: "gpt-5.6-terra", effort: "medium" }), preflight);
+  assert.equal(matchingCodexPreflight([{
+    ...preflight,
+    contract: "StrategicBriefV4+StrategicDecisionV3",
+  }], { model: "gpt-5.6-terra", effort: "medium" }), null, "a legacy V4/V3 preflight cannot certify a V5/V4 turn");
   assert.equal(matchingCodexPreflight([preflight], { model: "gpt-5.6-terra", effort: "low" }), null);
   await assert.rejects(invokePreflightedCodex({ desktopRuntime: false }), /desktop app/);
   await assert.rejects(invokePreflightedCodex({

@@ -3,6 +3,8 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { z } from "zod";
+import { strategicDecisionV4Schema } from "@open-historia/agent-runtime";
 
 export const CODEX_SUBSCRIPTION_PROVIDER = "codex-subscription";
 export const CODEX_TESTED_MODELS = Object.freeze([
@@ -13,7 +15,10 @@ export const CODEX_TESTED_MODELS = Object.freeze([
 
 const APP_SERVER_TIMEOUT_MS = 15_000;
 const STRUCTURED_TURN_TIMEOUT_MS = 10 * 60_000;
-export const CODEX_STRATEGIC_CONTRACT = "StrategicBriefV4+StrategicDecisionV3";
+// The living-world runtime submits Strategic V5 briefs and V4 decisions.  A
+// preflight must prove that exact output shape rather than letting a legacy
+// V3 diagnostic silently certify an incompatible live model/contract pair.
+export const CODEX_STRATEGIC_CONTRACT = "StrategicBriefV5+StrategicDecisionV4";
 
 const schemaVariant = (schema, value) => {
   const variants = schema?.anyOf ?? schema?.oneOf;
@@ -144,56 +149,9 @@ export function normalizeCodexModelCatalog(raw) {
   }).sort((left, right) => Number(right.isDefault) - Number(left.isDefault) || left.id.localeCompare(right.id));
 }
 
-export function strategicDecisionV3JsonSchema() {
-  const string = (maxLength) => ({ type: "string", minLength: 1, ...(maxLength ? { maxLength } : {}) });
-  const array = (items, maxItems, minItems) => ({
-    ...(minItems ? { minItems } : {}), ...(maxItems ? { maxItems } : {}), type: "array", items,
-  });
-  const object = (properties) => ({ type: "object", properties, required: Object.keys(properties), additionalProperties: false });
-  const hold = object({
-    reason: { type: "string", enum: ["no-legal-action", "waiting-response", "insufficient-resources", "plan-sequencing", "risk-too-high", "mandatory-overflow", "stale"] },
-    detail: string(320),
-    revisitAfterMonths: { type: "integer", minimum: 1, maximum: 12 },
-  });
-  return object({
-    polityId: string(),
-    revision: string(),
-    objective: object({
-      domain: { type: "string", enum: ["economy", "diplomacy", "politics", "military", "statecraft", "campaign"] },
-      summary: string(320),
-      horizon: { type: "string", enum: ["short", "medium", "long"] },
-    }),
-    selectedChoices: array(object({
-      choiceId: string(), purpose: string(240), evidenceIds: array(string(), 12, 1), expectedConsequence: string(320),
-    }), 10),
-    triggerCoverage: array(object({ triggerId: string(), choiceIds: array(string(), 1, 1) }), 32),
-    rejectedChoices: array(object({ choiceId: string(), reason: string(240) }), 3),
-    durablePlan: object({ objective: string(320), futureSteps: array(string(240), 8), commitments: array(string(240), 8) }),
-    contingency: string(500),
-    hold: { anyOf: [hold, { type: "null" }] },
-  });
-}
-
-export function strategicDecisionSchemaForBrief(brief) {
-  const schema = strategicDecisionV3JsonSchema();
-  const choiceIds = brief.choices.map((entry) => entry.choiceId);
-  const evidenceIds = [...new Set([
-    ...brief.choices.map((entry) => entry.evidenceId),
-    ...brief.triggers.flatMap((entry) => [entry.triggerId, ...entry.evidenceIds]),
-    ...brief.ownIntelligence.map((entry) => entry.evidenceId),
-  ])];
-  schema.properties.polityId = { type: "string", enum: [brief.actor.id] };
-  schema.properties.revision = { type: "string", enum: [brief.revision] };
-  schema.properties.selectedChoices.items.properties.choiceId = { type: "string", enum: choiceIds };
-  schema.properties.selectedChoices.items.properties.evidenceIds.items = { type: "string", enum: evidenceIds };
-  schema.properties.rejectedChoices.items.properties.choiceId = { type: "string", enum: choiceIds };
-  schema.properties.rejectedChoices.minItems = brief.choices.length > 1 ? 1 : 0;
-  if (brief.triggers.length) {
-    schema.properties.triggerCoverage.items.properties.triggerId = {
-      type: "string", enum: brief.triggers.map((entry) => entry.triggerId),
-    };
-  }
-  schema.properties.triggerCoverage.items.properties.choiceIds.items = { type: "string", enum: choiceIds };
+export function strategicDecisionV4JsonSchema() {
+  const schema = z.toJSONSchema(strategicDecisionV4Schema);
+  delete schema.$schema;
   return schema;
 }
 
@@ -288,14 +246,13 @@ export function invokeCodexStructured({
 
 const preflightResponse = Object.freeze({
   polityId: "polity:preflight",
-  revision: "revision:preflight",
-  objective: { domain: "campaign", summary: "Verify the structured decision transport.", horizon: "short" },
-  selectedChoices: [],
-  triggerCoverage: [],
-  rejectedChoices: [],
-  durablePlan: { objective: "Verify transport only.", futureSteps: [], commitments: [] },
-  contingency: "Do not materialize this diagnostic response.",
-  hold: { reason: "plan-sequencing", detail: "Transport preflight only.", revisitAfterMonths: 1 },
+  revision: "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  selectedChoiceIds: [],
+  processDecisions: [],
+  initiativeProposals: [],
+  durablePlan: { objective: "Verify transport only.", goals: [], commitments: [], revisit: "next-checkpoint" },
+  evidenceIds: ["evidence:preflight"],
+  hold: { reason: "no-legal-action", detail: "Transport preflight only.", revisit: "next-checkpoint" },
 });
 
 const checksum = (value) => crypto.createHash("sha256").update(typeof value === "string" ? value : JSON.stringify(value)).digest("hex");
@@ -360,7 +317,7 @@ export async function runCodexSchemaPreflight({
   const selectedModel = safeModel(model);
   const selectedEffort = safeEffort(effort);
   if (!directory) throw new Error("Codex preflight directory is required");
-  const schema = strategicDecisionV3JsonSchema();
+  const schema = strategicDecisionV4JsonSchema();
   const prompt = [
     "This is a transport-only structured-output preflight. Return exactly the JSON object below.",
     "Do not add prose, markdown, tools, or numeric effects.",
