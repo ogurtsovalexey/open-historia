@@ -118,12 +118,12 @@ calls.
   canon 06.
 - Everything in spec §11 (prices, trade, migration, combat, NPC AI…).
 
-## Relationship to packages/sim-core
+## Historical prototype note
 
-`packages/sim-core` implements the same accepted contract at its earlier #32
-stage and additionally has region transfer. It is kept, not deleted; the
-comparison and the convergence order are in canon 02. Region transfer (task T9
-below) ports from there.
+The earlier `packages/sim-core` prototype was retired on 2026-09-06 after its
+transfer, determinism and accounting-safety invariants were audited against
+WorldStateV2. This slice remains historical specification context; it is not a
+second runtime contract.
 
 ## Open questions
 

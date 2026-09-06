@@ -1110,7 +1110,7 @@ Delete only after all replacements are green:
 - global era-specific catalogs and fixed IDs moved to data packs;
 - duplicated polity aggregates and obsolete manpower conservation;
 - scenario-specific generic-runtime branches;
-- `packages/sim-core` only if an import/replay audit proves WorldStateV2 fully replaces it.
+- `packages/sim-core` only if an import/replay audit proves WorldStateV2 fully replaces it. **Completed 2026-09-06:** no live imports remained; the checked coverage is recorded in canon 02, and the package/root CI references were removed.
 
 Then run:
 

@@ -285,7 +285,7 @@ describe('monthly tick — goods edge cases (rre §7)', () => {
   });
 });
 
-describe('potentialOutput overflow safety (found by cross-checking sim-core)', () => {
+describe('potentialOutput overflow safety', () => {
   it('caps at capacity without demanding the labour product be a safe integer', () => {
     // Idle labour can dwarf capacity: 1e9 workers x 1e9 output each overflows
     // 2^53, yet the answer is simply the capacity, which needs no big number.

@@ -14,9 +14,6 @@
       "path": "./packages/data-packs/tsconfig.json"
     },
     {
-      "path": "./packages/sim-core/tsconfig.json"
-    },
-    {
       "path": "./packages/engine/tsconfig.json"
     },
     {
