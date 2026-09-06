@@ -42,7 +42,7 @@ Run:
 
 ```text
 npm run playtest:audit -- --game central-mesoamerica-1450-session-2 \
-  --data-dir test-results/live-playtest-data --output /tmp/meso-wp15-audit.json
+  --data-dir .local-playtests/live-data --output /tmp/meso-wp15-audit.json
 ```
 
 Final canonical state:

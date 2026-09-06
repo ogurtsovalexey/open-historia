@@ -42,7 +42,7 @@ instant technology outcome or model-authored numeric effect.
 
 ```text
 npm run playtest:audit -- --game europe-1935-1940-benchmark-session-3 \
-  --data-dir test-results/live-playtest-data --output /tmp/europe-wp15-audit.json
+  --data-dir .local-playtests/live-data --output /tmp/europe-wp15-audit.json
 ```
 
 | Field | Value |

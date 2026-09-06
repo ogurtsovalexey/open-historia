@@ -41,7 +41,7 @@ Run:
 
 ```text
 npm run playtest:audit -- --game napoleonic-europe-january-1805-session-2 \
-  --data-dir test-results/live-playtest-data --output /tmp/napoleonic-wp15-audit.json
+  --data-dir .local-playtests/live-data --output /tmp/napoleonic-wp15-audit.json
 ```
 
 | Field | Value |
