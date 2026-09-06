@@ -152,6 +152,10 @@
         "id": "module:intelligence",
         "kind": "intelligence"
       },
+      "module:military": {
+        "id": "module:military",
+        "kind": "military"
+      },
       "module:politics": {
         "id": "module:politics",
         "kind": "politics"
@@ -1855,6 +1859,7 @@
       "module:diplomacy",
       "module:finance",
       "module:intelligence",
+      "module:military",
       "module:politics",
       "module:projects",
       "module:shortages",
@@ -1880,7 +1885,7 @@
         },
         "binding": {
           "path": "/catalogs",
-          "valueChecksum": "sha256:4e742aa970d887364d18745d9831155c2adddb2b286d81af767896e6e10e2a72"
+          "valueChecksum": "sha256:93e9d29daa4099b452fbaabbba6a8dbad581b1f33340abe1090ef5398c96ae91"
         },
         "id": "evidence:e1935-catalogs",
         "visibility": "public"

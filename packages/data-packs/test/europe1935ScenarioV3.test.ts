@@ -63,6 +63,7 @@ describe('Europe 1935 shipped ScenarioV3', () => {
     const scenario = validation.scenario!;
     const formations = Object.values(scenario.startingState.formations);
     assert.strictEqual(formations.length, 7);
+    assert.ok(scenario.modules.enabled.includes('module:military'), 'formations require the generic military module for bounded readiness orders');
     for (const formation of formations) {
       const origins = Object.entries(formation.personnelOrigins).filter(([, personnel]) => personnel > 0);
       assert.ok(origins.length >= 2, `${formation.id} must not invent a single-region origin`);

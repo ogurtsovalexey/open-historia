@@ -290,6 +290,11 @@ const modules = Object.fromEntries(Object.entries(legacyScenario.modules).filter
   const moduleId = `module:${kebab(id)}`;
   return [moduleId, { id: moduleId, kind: kebab(id) }];
 }).sort(([left], [right]) => compareIds(left, right)));
+// The V3 package contains aggregate armed formations with conserved regional
+// origins. It must therefore expose the matching generic module even when the
+// retired presentation-era flag was false; otherwise a player can see real
+// recruitment and formations but cannot issue the bounded V2 readiness order.
+modules['module:military'] ??= { id: 'module:military', kind: 'military' };
 const commodities = Object.fromEntries([...legacyScenario.activeResources].sort(compareIds).map((id) => [`commodity:${id}`, { id: `commodity:${id}`, unitId: 'unit:quantity', usage: 'both' }]));
 const activities = Object.fromEntries([
   ...legacyScenario.activeResources.filter((id) => id !== 'goods').map((id) => [`activity:extract-${id}`, { id: `activity:extract-${id}`, inputCommodityIds: [], outputCommodityIds: [`commodity:${id}`] }]),
