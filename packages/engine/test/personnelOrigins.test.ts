@@ -4,6 +4,8 @@ import { regionIdSchema } from '@open-historia/domain';
 import {
   allocatePersonnelByLargestRemainder,
   applyDemobilization,
+  deriveMobilizationPreview,
+  applyMobilization,
 } from '../src/world/personnel.js';
 import { stampWorldStateRevision } from '../src/world/revision.js';
 import type { WorldStateV2Input } from '../src/world/schema.js';
@@ -84,5 +86,24 @@ describe('personnel origins', () => {
     assert.strictEqual(derivePolitySnapshot(result.state, 'polity:alpha').value.workforce, workforceBefore + 250);
     assert.strictEqual(deriveWorldPopulationIdentity(result.state).value.population, populationBefore);
     assert.ok(!('populationCausality' in result.state.events.at(-1)!));
+  });
+
+  it('mobilizes a bounded reserve from the best controlled recruitment region without changing population', () => {
+    const before = stampWorldStateRevision(input());
+    const populationBefore = deriveWorldPopulationIdentity(before).value.population;
+    const workforceBefore = derivePolitySnapshot(before, 'polity:alpha').value.workforce;
+    const result = applyMobilization(before, {
+      transitionId: 'personnel-transition:mobilize-test', polityId: 'polity:alpha', expectedRevision: before.revision,
+      authority: { orderId: 'order:mobilize-test' },
+    });
+    assert.deepStrictEqual(deriveMobilizationPreview(before, 'polity:alpha'), {
+      polityId: 'polity:alpha', originRegionId: 'region:test:B', personnel: 100, archetypeId: 'formation-archetype:army',
+    });
+    assert.equal(result.originRegionId, 'region:test:B', 'the least-mobilized controlled region has more available recruits');
+    assert.equal(result.personnel, 100, 'the reducer applies its bounded minimum rather than accepting a model number');
+    assert.equal(result.state.formations.at(-1)?.personnelOrigins[0]?.personnel, 100);
+    assert.equal(derivePolitySnapshot(result.state, 'polity:alpha').value.workforce, workforceBefore - 100);
+    assert.equal(deriveWorldPopulationIdentity(result.state).value.population, populationBefore);
+    assert.equal(result.state.events.at(-1)?.kind, 'personnel-mobilization');
   });
 });

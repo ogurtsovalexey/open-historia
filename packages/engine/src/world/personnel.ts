@@ -11,6 +11,7 @@ import {
   type WorldStateV2Input,
 } from './schema.js';
 import { assertExpectedWorldRevision, nextRevisionLineage, stampWorldStateRevision } from './revision.js';
+import { deriveRegionalRecruitmentAvailability } from './selectors.js';
 
 const safePositiveIntegerSchema = z.number().int().min(1).max(Number.MAX_SAFE_INTEGER);
 const personnelTransitionIdSchema = z.string().max(160).regex(/^personnel-transition:[a-z0-9][a-z0-9._-]{0,138}$/);
@@ -32,6 +33,14 @@ export interface DemobilizationTransition {
   authority: { orderId: string };
 }
 
+/** A player may request mobilization, but the canonical reducer selects every quantity and origin. */
+export interface MobilizationTransition {
+  transitionId: string;
+  polityId: string;
+  expectedRevision: WorldStateV2['revision'];
+  authority: { orderId: string };
+}
+
 export interface PersonnelTransitionLedgerRecord {
   transitionId: string;
   kind: 'combat-loss' | 'demobilization';
@@ -49,6 +58,24 @@ export interface PersonnelTransitionLedgerRecord {
 export interface PersonnelTransitionResult {
   state: WorldStateV2;
   ledgerRecord: PersonnelTransitionLedgerRecord;
+}
+
+export interface MobilizationTransitionResult {
+  state: WorldStateV2;
+  formationId: WorldStateV2['formations'][number]['formationId'];
+  personnel: number;
+  originRegionId: string;
+  revisionBefore: WorldStateV2['revision'];
+  revisionAfter: WorldStateV2['revision'];
+  evidenceIds: EvidenceId[];
+}
+
+/** Engine-derived mobilization facts safe to show before a player confirms an order. */
+export interface MobilizationPreview {
+  polityId: string;
+  originRegionId: string;
+  personnel: number;
+  archetypeId: string;
 }
 
 const compareIds = (left: string, right: string): number => left < right ? -1 : left > right ? 1 : 0;
@@ -257,4 +284,62 @@ export function applyDemobilization(
     state, transition.transitionId, 'demobilization', formationIndex, formations, state.populationCohorts,
     originChanges, transition.personnel, { kind: 'order', orderId: transition.authority.orderId },
   );
+}
+
+function deriveMobilizationPlan(state: WorldStateV2, polityId: string): MobilizationPreview {
+  const polity = state.polities.find((entry) => entry.id === polityId);
+  if (!polity) throw new Error(`mobilization: unknown polity ${polityId}`);
+  const candidates = state.regions
+    .filter((region) => region.control.actualControllerPolityId === polity.id)
+    .map((region) => ({ region, availability: deriveRegionalRecruitmentAvailability(state, region.regionId, polity.id).value.availableManpower }))
+    .filter((entry) => entry.availability >= 100)
+    .sort((left, right) => right.availability - left.availability || compareIds(left.region.regionId, right.region.regionId));
+  const selected = candidates[0];
+  if (!selected) throw new Error(`mobilization: ${polityId} has no controlled recruitment capacity`);
+  const personnel = Math.min(5_000, Math.max(100, Math.floor(selected.availability / 1_000)));
+  if (personnel > selected.availability) throw new Error(`mobilization: derived personnel exceeds recruitment capacity`);
+  const archetypeId = state.formations.filter((entry) => entry.polityId === polity.id)
+    .map((entry) => entry.archetypeId).sort(compareIds)[0]
+    ?? state.catalogs.formationArchetypes.map((entry) => entry.formationArchetypeId).sort(compareIds)[0];
+  if (!archetypeId) throw new Error(`mobilization: ${polityId} has no formation archetype available`);
+  return { polityId: polity.id, originRegionId: selected.region.regionId, personnel, archetypeId };
+}
+
+export function deriveMobilizationPreview(state: WorldStateV2, polityId: string): MobilizationPreview {
+  return deriveMobilizationPlan(state, polityId);
+}
+
+/**
+ * Create one bounded reserve from the best currently controlled recruitment
+ * region. The request contains no amounts, region, archetype, equipment or
+ * identifier, so prose and model output cannot mint arbitrary forces.
+ */
+export function applyMobilization(state: WorldStateV2, transition: MobilizationTransition): MobilizationTransitionResult {
+  assertExpectedWorldRevision(state, transition.expectedRevision);
+  if (!authorityId('order').safeParse(transition.authority.orderId).success) fail(transition.transitionId, 'mobilization authority has invalid orderId');
+  if (!personnelTransitionIdSchema.safeParse(transition.transitionId).success) fail(transition.transitionId, 'invalid transitionId');
+  let plan: MobilizationPreview;
+  try {
+    plan = deriveMobilizationPlan(state, transition.polityId);
+  } catch (error) {
+    fail(transition.transitionId, error instanceof Error ? error.message : 'could not derive a mobilization plan');
+  }
+  const suffix = transition.transitionId.slice('personnel-transition:'.length);
+  const formationId = formationIdSchema.parse(`formation:reserve-${suffix}`);
+  if (state.formations.some((entry) => entry.formationId === formationId)) fail(transition.transitionId, `formation ${formationId} already exists`);
+  const eventId = worldEventIdSchema.parse(`event:personnel-mobilize-${suffix}`);
+  const evidenceId = evidenceIdSchema.parse(`evidence:personnel-mobilize-${suffix}`);
+  if (state.events.some((event) => event.eventId === eventId) || state.evidence.some((entry) => entry.evidenceId === evidenceId)) fail(transition.transitionId, 'duplicate mobilization event');
+  const formation = { formationId, polityId: plan.polityId, archetypeId: plan.archetypeId, manpower: plan.personnel,
+    personnelOrigins: [{ regionId: plan.originRegionId, personnel: plan.personnel }], equipment: [], evidenceIds: [evidenceId] };
+  const formations = [...state.formations, formation].sort((left, right) => compareIds(left.formationId, right.formationId));
+  const formationIndex = formations.findIndex((entry) => entry.formationId === formationId);
+  const { revision: _revision, ...content } = state;
+  void _revision;
+  const nextState = stampWorldStateRevision({ ...content, revisionLineage: nextRevisionLineage(state), formations,
+    events: [...state.events, { eventId, revision: state.revision, kind: 'personnel-mobilization', entityRefs: [formationId, plan.polityId, plan.originRegionId], evidenceIds: [evidenceId] }],
+    evidence: [...state.evidence, { evidenceId, revision: state.revision, kind: 'personnel-mobilization', entityRefs: [formationId, plan.polityId, plan.originRegionId], eventRefs: [eventId], canonicalPointers: [`/formations/${formationIndex}`], visibility: 'public' }],
+  });
+  return { state: nextState, formationId, personnel: plan.personnel, originRegionId: plan.originRegionId,
+    revisionBefore: state.revision, revisionAfter: nextState.revision, evidenceIds: [evidenceId] };
 }

@@ -203,6 +203,21 @@ describe('PlayerInputInterpretationV2', () => {
     assert.ok(blocked.value.requestedActions[0]!.reasons.includes('undeclared-relationship-type:relationship-type:invented'));
   });
 
+  it('blocks typed mobilization before confirmation when the engine cannot derive an eligible controlled reserve', () => {
+    const world = state();
+    const playerText = 'Mobilize a reserve.';
+    const output = baseOutput(world.revision);
+    output.requestedActions.push({
+      actionId: 'action:mobilize', domain: 'military', scope: 'domestic', intent: playerText,
+      pace: 'slow', effectFamilies: ['recruitment-access.modify'], targetEntityIds: ['polity:alpha'], claimRefs: [], evidenceIds: ['evidence:public'],
+      operation: { kind: 'military.mobilize' }, sourceSpan: span(playerText, playerText),
+    });
+    const result = interpretPlayerInputV2(world, { actorPolityId: 'polity:alpha', playerText, modelOutput: output });
+    assert.strictEqual(result.value.requestedActions[0]!.status, 'blocked');
+    assert.ok(result.value.requestedActions[0]!.reasons.includes('military-module-disabled'));
+    assert.ok(result.value.requestedActions[0]!.reasons.includes('no-eligible-controlled-recruitment-capacity'));
+  });
+
   it('repairs only an unambiguous verbatim source span with model-miscalculated offsets', () => {
     const world = state();
     const playerText = 'Investigate electrical phenomena.';

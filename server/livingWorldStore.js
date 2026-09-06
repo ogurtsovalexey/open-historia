@@ -221,6 +221,10 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
     }
   }
   const initialFunding = enginePreviews.reduce((sum, entry) => sum + entry.fundingCommitment, 0);
+  const mobilizationPreviews = requestedActions
+    .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind === 'military.mobilize')
+    .map(() => worldV2.deriveMobilizationPreview(session.state, playerPolityId));
+  const mobilizedPersonnel = mobilizationPreviews.reduce((sum, entry) => sum + entry.personnel, 0);
   const activeEvidence = [...new Set([...requestedActions, ...proposedInitiatives].flatMap((entry) => entry.evidenceIds))];
   return {
     schemaVersion: 'open-historia-player-intent/1',
@@ -237,14 +241,25 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
     preview: {
       cost: enginePreviews.length > 0
         ? { kind: 'range', label: `${initialFunding} initial treasury commitment` }
+        : mobilizationPreviews.length > 0
+          ? { kind: 'range', label: `${mobilizedPersonnel} reserve personnel drawn from current controlled recruitment` }
         : { kind: 'unknown', label: 'No currently feasible material commitment' },
       duration: enginePreviews.length > 0
         ? { kind: 'range', label: 'Multi-stage; pace is rechecked at each monthly resolution' }
+        : mobilizationPreviews.length > 0
+          ? { kind: 'range', label: 'Reserve formation is recorded now; readiness remains subject to later world conditions' }
         : { kind: 'unknown', label: 'Blocked until the interpretation or conditions change' },
       risks: enginePreviews.some((entry) => entry.allowedPacesAfterCommitment.length <= 3)
         ? ['High contextual resistance limits acceleration']
         : ['Material blockers or opposition can slow the process at later checkpoints'],
-      opportunityCosts: enginePreviews.map((entry) => `${entry.fundingCommitment} treasury plus committed institutional capacity`),
+      opportunityCosts: [
+        ...enginePreviews.map((entry) => `${entry.fundingCommitment} treasury plus committed institutional capacity`),
+        ...mobilizationPreviews.map((entry) => {
+          const region = session.state.regions.find((candidate) => candidate.regionId === entry.originRegionId);
+          const origin = region?.displayName.en ?? 'the selected controlled region';
+          return `${entry.personnel} fewer people in the civilian workforce; origin ${origin}`;
+        }),
+      ],
       affected: [...new Set([...requestedActions, ...proposedInitiatives].flatMap((entry) => entry.targetLabels))],
       evidenceIds: activeEvidence,
     },
@@ -449,6 +464,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
     });
   }
   const createdProposals = [];
+  const createdMobilizations = [];
   for (const action of playerIntent.requestedActions
     .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind !== 'process.propose')
     .sort((left, right) => left.actionId.localeCompare(right.actionId))) {
@@ -457,6 +473,18 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
       proposalId: hashId('proposal', [playerIntent.interpretationId, action.actionId]),
       proposerPolityId: playerIntent.playerPolityId,
     };
+    if (operation.kind === 'military.mobilize') {
+      const mobilized = worldV2.applyMobilization(state, {
+        transitionId: hashId('personnel-transition', [playerIntent.interpretationId, action.actionId]),
+        polityId: playerIntent.playerPolityId,
+        expectedRevision: state.revision,
+        authority: { orderId: hashId('order', [playerIntent.interpretationId, action.actionId]) },
+      });
+      state = mobilized.state;
+      createdMobilizations.push({ actionId: action.actionId, formationId: mobilized.formationId, personnel: mobilized.personnel,
+        originRegionId: mobilized.originRegionId, revisionAfter: state.revision });
+      continue;
+    }
     const request = operation.kind === 'diplomacy.propose'
       ? {
         ...base, recipientPolityIds: operation.recipientPolityIds,
@@ -469,7 +497,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
     state = worldV2.proposeDiplomaticProposal(state, { ...request, evidenceIds: action.evidenceIds, expectedRevision: state.revision });
     createdProposals.push({ proposalId: request.proposalId, actionId: action.actionId, revisionAfter: state.revision });
   }
-  return { state, created, createdProposals };
+  return { state, created, createdProposals, createdMobilizations };
 }
 
 export const readLivingWorld = (gameId, { locale = 'en' } = {}) => response(gameId, locale);
@@ -497,6 +525,7 @@ export function confirmLivingWorldIntent(gameId, { revision, sessionRevision, in
       modelMetadata: session.playerIntent.modelMetadata ?? null,
       createdProcesses: materialized.created,
       createdDiplomaticProposals: materialized.createdProposals,
+      createdMobilizations: materialized.createdMobilizations,
     },
     playerIntent: { ...session.playerIntent, status: 'confirmed' },
   });

@@ -70,6 +70,7 @@ export const requestedActionV2ModelSchema = z.object({
       recipientPolityId: entityIdSchema,
       regionId: entityIdSchema,
     }).strict(),
+    z.object({ kind: z.literal('military.mobilize') }).strict(),
   ]).optional(),
   targetEntityIds: z.array(entityIdSchema).max(64),
   claimRefs: z.array(interpretationIdSchema('claim')).max(64),
@@ -274,6 +275,16 @@ function operationReasons(state: worldV2.WorldStateV2, actorPolityId: string, ac
     }
     if (!state.catalogs.relationshipTypes.some((entry) => entry.relationshipTypeId === operation.relationshipTypeId)) {
       reasons.push(`undeclared-relationship-type:${operation.relationshipTypeId}`);
+    }
+    return reasons;
+  }
+  if (operation.kind === 'military.mobilize') {
+    const reasons: string[] = action.domain !== 'military' ? ['mobilization-operation-requires-military-domain'] : [];
+    if (!state.modules.enabled.includes('module:military')) reasons.push('military-module-disabled');
+    try {
+      worldV2.deriveMobilizationPreview(state, actorPolityId);
+    } catch {
+      reasons.push('no-eligible-controlled-recruitment-capacity');
     }
     return reasons;
   }

@@ -14,6 +14,7 @@ let mesoLongGameId;
 let skippedStrategyGameId;
 let russianIntentGameId;
 let duplicateCandidateGameId;
+let mobilizationGameId;
 let resolveLivingWorldSubmonths;
 let readEngineSession;
 let buildPlayerIntentContext;
@@ -71,6 +72,11 @@ before(async () => {
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
     name: 'Living duplicate candidate test',
+  }).game.id;
+  mobilizationGameId = library.createGame({
+    scenarioId: 'scenario:napoleonic-europe-1805',
+    playerPolityId: 'polity:france',
+    name: 'Living player mobilization test',
   }).game.id;
 });
 
@@ -318,6 +324,40 @@ describe('living-world command store', () => {
     assert.equal(confirmed.lastTransition.createdProcesses.length, 1);
     assert.equal(confirmed.projection.processes.length, 1);
     assert.equal(confirmed.projection.processes[0].name, 'Optical relay service');
+  });
+
+  it('materializes a player-requested reserve from canonical manpower rather than a model-supplied army size', () => {
+    const before = living.readLivingWorld(mobilizationGameId);
+    const actorEvidence = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    const text = 'Mobilize a bounded French reserve from current recruitment.';
+    const submitted = living.submitLivingWorldIntent(mobilizationGameId, {
+      revision: before.projection.revision, sessionRevision: before.sessionRevision, intentions: [text],
+      modelOutput: {
+        revision: before.projection.revision, questions: [], claims: [], proposedInitiatives: [],
+        requestedActions: [{
+          actionId: 'action:mobilize-reserve', domain: 'military', scope: 'domestic', intent: text, pace: 'slow',
+          effectFamilies: ['recruitment-access.modify'], targetEntityIds: ['polity:france'], claimRefs: [], evidenceIds: [actorEvidence],
+          operation: { kind: 'military.mobilize' }, sourceSpan: { start: 0, end: text.length, text },
+        }],
+      },
+    });
+    parseIntentFirstProjection(submitted.projection);
+    assert.match(submitted.projection.interpretation.preview.cost.label, /^\d+ reserve personnel drawn from current controlled recruitment$/u);
+    assert.match(submitted.projection.interpretation.preview.opportunityCosts[0], /^\d+ fewer people in the civilian workforce; origin /u);
+    const confirmed = living.confirmLivingWorldIntent(mobilizationGameId, {
+      revision: submitted.projection.revision, sessionRevision: submitted.sessionRevision,
+      interpretationId: submitted.projection.interpretation.interpretationId,
+    });
+    const mobilization = confirmed.lastTransition.createdMobilizations[0];
+    assert.ok(mobilization);
+    assert.ok(mobilization.personnel >= 100 && mobilization.personnel <= 5_000);
+    const state = readEngineSession(library.getGameDirectory(mobilizationGameId)).state;
+    const formation = state.formations.find((entry) => entry.formationId === mobilization.formationId);
+    assert.ok(formation);
+    assert.equal(formation.manpower, mobilization.personnel);
+    assert.deepEqual(formation.personnelOrigins, [{ regionId: mobilization.originRegionId, personnel: mobilization.personnel }]);
+    assert.equal(state.regions.find((entry) => entry.regionId === mobilization.originRegionId)?.control.actualControllerPolityId, 'polity:france');
+    assert.equal(state.events.at(-1)?.kind, 'personnel-mobilization');
   });
 
   it('blocks a failed required strategy at the same world revision, then retries atomically', () => {

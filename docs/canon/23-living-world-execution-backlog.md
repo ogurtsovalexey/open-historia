@@ -9,8 +9,8 @@ Original baseline audited: `feature/campaign-memory` at `5eb4fb73`, after the pr
 This section is the authoritative resume point for the next implementation
 agent. Do not restart the merge ladder and do not reconstruct completed work
 from the old baseline. The current pushed implementation checkpoint is
-`211ff39` on `feature/campaign-memory` (`fix(ai): show Codex relay error
-details`). R5 is complete. R6 has verified ten three-month UI
+`e64fc30` on `feature/campaign-memory` (`docs(living-world): record player
+mobilization route gap`). R5 is complete. R6 has verified ten three-month UI
 decisions (30 monthly boundaries) in each of the three scenarios, with
 sanitized replay/audit evidence in `docs/reports/r6-ui-playtest-2026-09-05.md`.
 Those runs are not WP15 completion: the individual scripted-report artifacts,
@@ -21,15 +21,18 @@ The same live UI path now exposes the server's safe rejection text (including
 the required schema-preflight condition) instead of reducing it to an HTTP
 status, so an operator can complete the preflight before retrying.
 
-Live R6 discovery (Napoleonic France, 1806-01-01): a request to form a legal
-formation from the visible French origin regions is grounded to those regions,
-but it is still materialized as a generic process. Do not count that as the
-WP15 formation/workforce check. `PlayerInputV2` currently admits only
-`process.propose`, `diplomacy.propose` and `territory.offer`; the existing
-engine `military.mobilize` reducer has no normal player-order route. Add a
-bounded, engine-derived mobilization operation (origin, manpower, equipment,
-commander and ID must be selected/derived by the reducer, never supplied by
-the model) before rerunning turns 5–8 of the Napoleonic script.
+The successor checkpoint to `e64fc30` closes the live R6 discovery: a normal
+`military.mobilize` player operation now reaches a bounded engine reducer.
+The model selects no numeric quantity, origin, archetype, equipment or ID.
+The engine deterministically selects one actually controlled region with
+recruitment capacity, derives a 100–5,000-person reserve, records its
+formation/evidence/event and removes the personnel from workforce without
+changing population. The order preview shows the derived reserve size,
+origin label and workforce opportunity cost before confirmation. Focused
+engine, runtime-contract, server-route and strict UI-projection tests pass.
+This is not yet the WP15 formation/workforce check: rerun turns 5–8 through
+the live UI after the rebuilt server is running, then record its replay/audit
+evidence in the separate Napoleonic report.
 
 The next owner is expected to work serially in one session. Do not start the
 repository's agent orchestrator and do not spawn subagents unless the owner
@@ -54,6 +57,7 @@ canonical reducer.
 | Strategic V5 contracts | Private revision-frozen briefs, evidence checks, open initiatives, durable retrieval memory and deterministic materialization exist. | `strategicV5.ts`; `strategicV5.test.ts` |
 | Production opponent loop | Required V5 batches are atomic and visibly fail closed. Background calls are evidence-aware and capped; accepted initiatives enter the same engine process path. | `server/livingWorldStrategy.js`; R1 checkpoint |
 | Typed diplomacy and territory | A proposal stays immaterial until its frozen recipient response; accepted cessions use the sole territorial-control reducer. | `world/diplomacy.ts`; R2 checkpoint |
+| Player mobilization | A direct player order has a typed, non-numeric path to one bounded reserve selected from real controlled recruitment capacity; preview exposes the workforce trade-off. | `world/personnel.ts`; `livingWorldStore.test.js` |
 | Three-month player loop | One normal decision resolves three local monthly boundaries, including monthly tribute and stable process settlement, then records every submonth. | `server/livingWorldStore.js`; R3 checkpoint |
 | Cross-era acceptance | Napoleonic and Mesoamerican worlds prove false-history rejection, bounded open concepts, territorial causality, deterministic replay, catalog isolation and epistemic privacy. | `server/crossEraAcceptance.test.js`; WP12 checkpoint |
 
