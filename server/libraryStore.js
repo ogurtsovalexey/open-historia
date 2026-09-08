@@ -100,6 +100,24 @@ const COMPILED_POLITY_DISPLAY_NAMES_RU = {
   "polity:united-kingdom": "Соединённое королевство Великобритании и Ирландии",
 };
 
+// Catalog prose is presentation metadata, not simulation truth.  Keep it at
+// this seam so a Russian UI never has to translate opaque ids or infer a
+// campaign title from the date/profile.
+const COMPILED_SCENARIO_DISPLAY_RU = {
+  "scenario:europe-1935-benchmark": {
+    title: "Европа, 1935–1940",
+    description: "Исторический мир с каноническими населением, экономикой, территориями и силами.",
+  },
+  "scenario:napoleonic-europe-1805": {
+    title: "Наполеоновская Европа — январь 1805",
+    description: "Исторический мир с каноническими населением, экономикой, территориями и силами.",
+  },
+  "scenario:central-mesoamerica-1450": {
+    title: "Центральная Мезоамерика, 1450",
+    description: "Исторический мир с каноническими населением, экономикой, территориями и силами.",
+  },
+};
+
 const compiledPolityDisplayNameRu = (polity) =>
   polity.displayName.ru ?? COMPILED_POLITY_DISPLAY_NAMES_RU[polity.polityId] ?? polity.displayName.en;
 
@@ -315,7 +333,11 @@ const emptyAssetStatus = () => Object.fromEntries(
 
 const compiledScenarioSummaries = (usageCounts = new Map()) => {
   try {
-    return listCompiledScenarioPacks({ rootDirectory: COMPILED_SCENARIOS_DIR }).map((pack) => ({
+    return listCompiledScenarioPacks({ rootDirectory: COMPILED_SCENARIOS_DIR }).map((pack) => {
+      const russian = COMPILED_SCENARIO_DISPLAY_RU[pack.scenarioId];
+      const heroSubtitle = `${pack.startDate} · ${pack.playerEligiblePolityIds.length} playable polities`;
+      const subtitle = `${pack.startDate} · grounded ScenarioV3`;
+      return {
       accentColor: "#b28a52",
       assetStatus: emptyAssetStatus(),
       cacheToken: pack.seedChecksum,
@@ -325,15 +347,20 @@ const compiledScenarioSummaries = (usageCounts = new Map()) => {
       countryNameOverrides: {},
       createdAt: pack.startDate,
       description: `Grounded ${pack.profile} world with canonical population, economy, territory and forces.`,
+      descriptionRu: russian?.description ?? `Исторический мир профиля ${pack.profile} с каноническими населением, экономикой, территориями и силами.`,
       eyebrow: "Living World",
+      eyebrowRu: "Живой мир",
       gameCount: usageCounts.get(pack.scenarioId) ?? 0,
-      heroSubtitle: `${pack.startDate} · ${pack.playerEligiblePolityIds.length} playable polities`,
+      heroSubtitle,
+      heroSubtitleRu: `${pack.startDate} · ${pack.playerEligiblePolityIds.length} игровых стран`,
       heroTitle: pack.title.en,
+      heroTitleRu: russian?.title ?? pack.title.ru ?? pack.title.en,
       hubOrigin: null,
       id: pack.scenarioId,
       immutable: true,
       livingWorld: true,
       name: pack.title.en,
+      nameRu: russian?.title ?? pack.title.ru ?? pack.title.en,
       playCount: 0,
       playerEligiblePolityIds: pack.playerEligiblePolityIds,
       defaultPlayerPolityId: pack.defaultPlayerPolityId,
@@ -341,9 +368,11 @@ const compiledScenarioSummaries = (usageCounts = new Map()) => {
       seedChecksum: pack.seedChecksum,
       startDate: pack.startDate,
       startView: compiledScenarioMapPresentation(pack.scenarioId)?.startView ?? null,
-      subtitle: `${pack.startDate} · grounded ScenarioV3`,
+      subtitle,
+      subtitleRu: `${pack.startDate} · сценарий ScenarioV3`,
       updatedAt: pack.startDate,
-    }));
+      };
+    });
   } catch (error) {
     console.warn(`Compiled scenarios are unavailable: ${error instanceof Error ? error.message : String(error)}`);
     return [];

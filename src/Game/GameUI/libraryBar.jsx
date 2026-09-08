@@ -73,6 +73,12 @@ const pickerMapMessage = (kind, detail = "") => {
     : `Could not load the scenario map: ${detail}`;
 };
 
+const scenarioDisplayName = (scenario) => (
+  String(getStoredLanguage()).toLowerCase().startsWith("ru")
+    ? (scenario?.nameRu || scenario?.name || "")
+    : (scenario?.name || "")
+);
+
 // "#rrggbb" -> [r,g,b], the shape colors.json stores. Faults to a neutral grey
 // rather than throwing, so a bad colour never blocks creating the faction.
 const hexToRgbArray = (hex) => {
@@ -362,6 +368,7 @@ const PromptSectionEditor = ({
 };
 
 const ScenarioCard = ({ onClone, onEdit, onPlay, onSelect, onUpdate, scenario, selected, updateAvailable }) => {
+  const russianUi = String(getStoredLanguage()).toLowerCase().startsWith("ru");
   const isBuiltIn = scenario.id === "default";
   const assetBadges = Object.entries(scenarioBadgeLabels)
     .filter(([key]) => scenario.assetStatus?.[key])
@@ -432,7 +439,7 @@ const ScenarioCard = ({ onClone, onEdit, onPlay, onSelect, onUpdate, scenario, s
                   textTransform: "uppercase",
                 }}
               >
-                {scenario.eyebrow || "Scenario"}
+                {(russianUi ? scenario.eyebrowRu : scenario.eyebrow) || (russianUi ? "Сценарий" : "Scenario")}
               </span>
               {isBuiltIn && (
                 <span
@@ -454,7 +461,7 @@ const ScenarioCard = ({ onClone, onEdit, onPlay, onSelect, onUpdate, scenario, s
               )}
             </div>
             <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.74rem" }}>
-              {scenario.gameCount} game{scenario.gameCount === 1 ? "" : "s"}
+              {russianUi ? `${scenario.gameCount} игр` : `${scenario.gameCount} game${scenario.gameCount === 1 ? "" : "s"}`}
             </span>
           </div>
           <div style={{ marginTop: "4rem" }}>
@@ -467,7 +474,7 @@ const ScenarioCard = ({ onClone, onEdit, onPlay, onSelect, onUpdate, scenario, s
                 lineHeight: 1,
               }}
             >
-              {scenario.heroTitle || scenario.name}
+              {(russianUi ? scenario.heroTitleRu : scenario.heroTitle) || (russianUi ? scenario.nameRu : scenario.name)}
             </div>
             <div
               style={{
@@ -478,14 +485,16 @@ const ScenarioCard = ({ onClone, onEdit, onPlay, onSelect, onUpdate, scenario, s
                 maxWidth: "16rem",
               }}
             >
-              {scenario.heroSubtitle || scenario.description || scenario.subtitle}
+              {(russianUi ? scenario.heroSubtitleRu : scenario.heroSubtitle)
+                || (russianUi ? scenario.descriptionRu : scenario.description)
+                || (russianUi ? scenario.subtitleRu : scenario.subtitle)}
             </div>
           </div>
         </div>
 
         <div>
           <div style={{ color: "rgba(255,255,255,0.68)", fontSize: "0.8rem", marginBottom: "0.7rem" }}>
-            {scenario.subtitle}
+            {russianUi ? (scenario.subtitleRu || scenario.subtitle) : scenario.subtitle}
           </div>
           <AssetBadgeRow badges={assetBadges} />
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem" }}>
@@ -505,15 +514,15 @@ const ScenarioCard = ({ onClone, onEdit, onPlay, onSelect, onUpdate, scenario, s
                 : undefined}
               type="button"
             >
-              {updateAvailable ? "⬆ Update" : "New Game"}
+              {updateAvailable ? (russianUi ? "⬆ Обновить" : "⬆ Update") : (russianUi ? "Новая игра" : "New Game")}
             </button>
             {!scenario.immutable && (
               <>
                 <button onClick={() => onEdit(scenario.id)} style={{ ...actionButtonStyle, flex: 1 }} type="button">
-                  Edit
+                  {russianUi ? "Изменить" : "Edit"}
                 </button>
                 <button onClick={() => onClone(scenario)} style={{ ...actionButtonStyle, flexBasis: "100%" }} type="button">
-                  Clone Scenario
+                  {russianUi ? "Клонировать сценарий" : "Clone Scenario"}
                 </button>
               </>
             )}
@@ -1164,7 +1173,7 @@ const LibraryTopBar = () => {
     setMenuOpen(false);
     try {
       const details = await createGame({
-        name: `${scenario.name} Session`,
+        name: `${scenarioDisplayName(scenario)} ${String(getStoredLanguage()).toLowerCase().startsWith("ru") ? "— кампания" : "Session"}`,
         ...(scenario.livingWorld && countryCode ? { playerPolityId: countryCode } : null),
         scenarioId: scenario.id,
         setActive: true,
@@ -2233,7 +2242,7 @@ const LibraryTopBar = () => {
                     : (russianUi ? "Выберите свою страну" : "Choose your country")}
                 </div>
                 <div style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.75rem", margin: "0.15rem 0 0.6rem" }}>
-                  {russianUi ? "Начало: " : "Starting “"}{countryPicker.name}{russianUi ? "" : "”"}
+                  {russianUi ? "Начало: " : "Starting “"}{scenarioDisplayName(countryPicker)}{russianUi ? "" : "”"}
                 </div>
                 {/* Refining an existing game (Apply-&-Play) only swaps the country;
                     inventing a faction is a fresh-game concern, so the tabs show
@@ -2491,8 +2500,8 @@ const LibraryTopBar = () => {
             ) : (
               <>
                 <MenuRow
-                  title="Living World Campaigns"
-                  emptyText="The authored Living World campaigns are loading."
+                  title={russianUi ? "Кампании «Живой мир»" : "Living World Campaigns"}
+                  emptyText={russianUi ? "Загружаются авторские кампании «Живой мир»." : "The authored Living World campaigns are loading."}
                 >
                   {livingWorldScenarios.map((scenario) => (
                     <ScenarioCard
