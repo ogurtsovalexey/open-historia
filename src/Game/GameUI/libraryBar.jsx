@@ -2310,7 +2310,7 @@ const LibraryTopBar = () => {
                       )}
                     </Suspense>
                     {pickerMapStatus && (
-                      <div style={{ color: pickerMapStatus.startsWith("Could not") || pickerMapStatus.startsWith("Не удалось") ? "#fca5a5" : "rgba(255,255,255,0.55)", fontSize: "0.72rem", marginTop: "0.35rem" }}>
+                      <div data-testid="scenario-map-status" style={{ color: pickerMapStatus.startsWith("Could not") || pickerMapStatus.startsWith("Не удалось") ? "#fca5a5" : "rgba(255,255,255,0.55)", fontSize: "0.72rem", marginTop: "0.35rem" }}>
                         {pickerMapStatus}
                       </div>
                     )}

@@ -342,6 +342,7 @@ const CountryPickerMap = ({
       )}
       <div
         ref={containerRef}
+        data-testid="country-picker-map"
         style={{
           width: "100%",
           height: "320px",
