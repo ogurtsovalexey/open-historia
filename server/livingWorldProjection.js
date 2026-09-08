@@ -125,7 +125,24 @@ function territoryEffectProjection(state, transition, visible, locale) {
   };
 }
 
-function interpretationProjection(intent, fallbackEvidence) {
+const localizeIntentPreviewText = (value, locale) => {
+  const raw = String(value ?? '');
+  if (!isRussian(locale)) return raw;
+  const reserve = /^(\d+) reserve personnel drawn from current controlled recruitment$/u.exec(raw);
+  if (reserve) return `${reserve[1]} резервных военнослужащих из доступного набора под текущим контролем`;
+  const workforce = /^(\d+) fewer people in the civilian workforce; origin (.+)$/u.exec(raw);
+  if (workforce) return `${workforce[1]} человек меньше в гражданской рабочей силе; источник: ${RUSSIAN_HISTORICAL_NAMES[workforce[2]] ?? workforce[2]}`;
+  const known = {
+    'Reserve formation is recorded now; readiness remains subject to later world conditions': 'Резерв создаётся сейчас; готовность зависит от дальнейших условий мира.',
+    'Material blockers or opposition can slow the process at later checkpoints': 'Материальные ограничения или сопротивление могут замедлить процесс на следующих проверках.',
+    'No immediate treasury commitment; frozen proposal terms will be recorded': 'Немедленных затрат казны нет; условия предложения будут зафиксированы.',
+    'Pending recipient response; no territorial control changes before acceptance': 'Ожидается ответ адресата; до принятия контроля над территориями не меняется.',
+    'No territorial control changes until the addressed polity accepts the frozen proposal': 'Контроль над территориями не меняется, пока адресат не примет зафиксированное предложение.',
+  };
+  return known[raw] ?? raw;
+};
+
+function interpretationProjection(intent, fallbackEvidence, locale) {
   if (!intent || intent.status !== 'pending') return null;
   return {
     interpretationId: intent.interpretationId,
@@ -141,9 +158,20 @@ function interpretationProjection(intent, fallbackEvidence) {
         ? { ...claim, evidenceIds: fallbackEvidence }
         : claim
     )),
-    requestedActions: intent.requestedActions ?? [],
+    requestedActions: (intent.requestedActions ?? []).map((action) => ({
+      ...action,
+      // The exact player span is already preserved in the canonical input and
+      // is the safest Russian rendering of an action authored in Russian.
+      summary: isRussian(locale) ? action.sourceSpan?.text || localizeIntentPreviewText(action.summary, locale) : action.summary,
+    })),
     proposedInitiatives: intent.proposedInitiatives ?? [],
-    preview: intent.preview ?? {
+    preview: intent.preview ? {
+      ...intent.preview,
+      cost: { ...intent.preview.cost, label: localizeIntentPreviewText(intent.preview.cost?.label, locale) },
+      duration: { ...intent.preview.duration, label: localizeIntentPreviewText(intent.preview.duration?.label, locale) },
+      risks: (intent.preview.risks ?? []).map((value) => localizeIntentPreviewText(value, locale)),
+      opportunityCosts: (intent.preview.opportunityCosts ?? []).map((value) => localizeIntentPreviewText(value, locale)),
+    } : {
       cost: { kind: 'unknown', label: 'Requires semantic and material resolution' },
       duration: { kind: 'unknown', label: 'Depends on feasibility and chosen pace' },
       risks: ['The requested outcome may exceed current institutions or material capacity'],
@@ -203,7 +231,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
         evidenceIds: groundedEvidence([...ownRegion.evidenceIds, ...foreignRegion.evidenceIds], visible, snapshotEvidence),
       };
     });
-  const pendingIntent = interpretationProjection(session.playerIntent, snapshotEvidence);
+  const pendingIntent = interpretationProjection(session.playerIntent, snapshotEvidence, locale);
   const last = session.lastTurn;
   const territoryEffects = (last?.strategicRecords ?? [])
     .flatMap((record) => record.territorialTransitions ?? [])

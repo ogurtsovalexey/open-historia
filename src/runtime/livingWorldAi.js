@@ -135,7 +135,9 @@ export async function interpretLivingWorldIntent(context, intentions) {
   try {
     const result = await Promise.race([
       callAI(PLAYER_INPUT_SYSTEM_PROMPT, [{ role: "user", parts: [{ text: renderPlayerInputPrompt(context, playerText) }] }], {
-        languageMode: "none",
+        // Identifiers and numeric fields remain schema-bound, but every prose
+        // field in this interpretation is player-facing in the preview.
+        languageMode: "ui",
         providerRole: "utility",
         signal: controller.signal,
         tool: {

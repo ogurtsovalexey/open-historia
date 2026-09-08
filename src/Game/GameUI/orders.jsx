@@ -49,7 +49,7 @@ export const Orders = ({ interpretation, busy, error, onSubmit, onConfirm, onDis
       {interpretation && (
         <div className="oh-intent-card-grid" data-testid="intent-interpretation">
           <div className="oh-intent-card">
-            <span className="oh-intent-eyebrow">Interpreted from</span>
+            <span className="oh-intent-eyebrow">{intentText(locale, "Interpreted from")}</span>
             <p data-no-translate="true">“{interpretation.sourceText}”</p>
           </div>
           {interpretation.claims.map((claim) => (
@@ -61,23 +61,23 @@ export const Orders = ({ interpretation, busy, error, onSubmit, onConfirm, onDis
           ))}
           {interpretation.requestedActions.map((action) => (
             <article className="oh-intent-card" key={action.actionId}>
-              <span className="oh-intent-eyebrow">Typed action</span><strong>{action.summary}</strong>
-              {action.targetLabels.length > 0 && <p className="oh-intent-muted">Affects: {action.targetLabels.join(", ")}</p>}
+              <span className="oh-intent-eyebrow">{intentText(locale, "Typed action")}</span><strong>{action.summary}</strong>
+              {action.targetLabels.length > 0 && <p className="oh-intent-muted">{intentText(locale, "Affects")}: {action.targetLabels.join(", ")}</p>}
             </article>
           ))}
           {interpretation.proposedInitiatives.map((initiative) => (
             <article className="oh-intent-card" key={initiative.initiativeId}>
-              <span className="oh-intent-eyebrow">New proposed process</span><strong>{initiative.summary}</strong>
+              <span className="oh-intent-eyebrow">{intentText(locale, "New proposed process")}</span><strong>{initiative.summary}</strong>
             </article>
           ))}
           <article className="oh-intent-card oh-intent-card-grid" data-testid="intent-preview">
             <div className="oh-intent-split">
-              <div><span className="oh-intent-eyebrow">Cost</span><div>{interpretation.preview.cost.label}</div></div>
-              <div><span className="oh-intent-eyebrow">Duration</span><div>{interpretation.preview.duration.label}</div></div>
+              <div><span className="oh-intent-eyebrow">{intentText(locale, "Cost")}</span><div>{interpretation.preview.cost.label}</div></div>
+              <div><span className="oh-intent-eyebrow">{intentText(locale, "Duration")}</span><div>{interpretation.preview.duration.label}</div></div>
             </div>
-            <PreviewList title="Risks" values={interpretation.preview.risks} />
-            <PreviewList title="Opportunity cost" values={interpretation.preview.opportunityCosts} />
-            <PreviewList title="Affected" values={interpretation.preview.affected} />
+            <PreviewList title={intentText(locale, "Risks")} values={interpretation.preview.risks} />
+            <PreviewList title={intentText(locale, "Opportunity cost")} values={interpretation.preview.opportunityCosts} />
+            <PreviewList title={intentText(locale, "Affected")} values={interpretation.preview.affected} />
           </article>
           {interpretation.questions.map((question) => <div className="oh-intent-card" key={question.questionId}>{question.prompt}</div>)}
           {interpretation.confirmationRequired && (
