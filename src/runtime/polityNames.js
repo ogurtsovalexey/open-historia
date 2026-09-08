@@ -5,6 +5,7 @@
 // code itself as a last resort, and caches the lookup for cheap sync access.
 import { useEffect, useState } from "react";
 import { JSON_URLS, loadCountryNames, readJson } from "./assets.js";
+import { getStoredLanguage } from "./i18n.js";
 
 let nameByCode = new Map();
 let refreshedAt = 0;
@@ -21,8 +22,15 @@ const refresh = async () => {
   }
   // Era polities win over modern names for the same code — but only when
   // they actually carry a name; a nameless override must not degrade one.
-  for (const polity of Object.values(world?.polityOverrides ?? {})) {
-    if (polity?.code && polity?.name) next.set(String(polity.code), polity.name);
+  const russian = String(getStoredLanguage()).toLowerCase().startsWith("ru");
+  for (const [id, polity] of Object.entries(world?.polityOverrides ?? {})) {
+    const name = russian ? (polity?.nameRu || polity?.name) : polity?.name;
+    if (!name) continue;
+    // Living World uses polity:* as its stable canonical id.  It is valid
+    // simulation data but must resolve through exactly the same display seam
+    // as older code-keyed polities.
+    if (id) next.set(String(id), name);
+    if (polity?.code) next.set(String(polity.code), name);
   }
   nameByCode = next;
   refreshedAt = Date.now();
@@ -57,6 +65,15 @@ export const useCountryDisplayName = (code) => {
     return () => {
       cancelled = true;
     };
+  }, [code]);
+
+  useEffect(() => {
+    const refreshForLanguage = () => {
+      refreshedAt = 0;
+      ensurePolityNames().then(() => setName(polityDisplayName(code))).catch(() => {});
+    };
+    window.addEventListener("i18n:updated", refreshForLanguage);
+    return () => window.removeEventListener("i18n:updated", refreshForLanguage);
   }, [code]);
 
   return name;

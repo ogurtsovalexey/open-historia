@@ -24,6 +24,7 @@ import { resolveRegionName } from "../../runtime/regionNameFixes.js";
 import { toCountryName } from "../../runtime/ownerNames.js";
 import { loadCountryLabelCollections } from "../../runtime/countryLabels.js";
 import { translateLabel } from "../../runtime/translator.js";
+import { getStoredLanguage } from "../../runtime/i18n.js";
 import { MAP_SETTING_KEYS, useMapSetting } from "../../runtime/mapSettings.js";
 import { useWorldState } from "./useWorldState.js";
 
@@ -551,7 +552,12 @@ const WorldMap = ({ isGlobe = false, regionClickHandlerRef }) => {
       customRegionData,
       regionOwnershipOverrides,
       polityOverrides,
-      (raw, owner) => translateLabel(resolveCountryDisplayName(raw, owner)),
+      (raw, owner) => {
+        const polity = polityOverrides?.[owner];
+        const russian = String(getStoredLanguage()).toLowerCase().startsWith("ru");
+        const authored = russian ? (polity?.nameRu || polity?.name || raw) : (polity?.name || raw);
+        return translateLabel(resolveCountryDisplayName(authored, owner));
+      },
       regionAdjacency,
     );
     // labelEpoch: rebuild once new translations land.

@@ -84,6 +84,25 @@ const COMPILED_POLITY_DISPLAY_NAMES = {
   "polity:united-kingdom": "United Kingdom of Great Britain and Ireland",
 };
 
+const COMPILED_POLITY_DISPLAY_NAMES_RU = {
+  "polity:austria": "Австрийская империя",
+  "polity:batavian-republic": "Батавская республика",
+  "polity:denmark-norway": "Дания — Норвегия",
+  "polity:france": "Французская империя",
+  "polity:italy": "Итальянская республика",
+  "polity:ottoman-empire": "Османская империя",
+  "polity:portugal": "Королевство Португалии и Алгарве",
+  "polity:prussia": "Королевство Пруссия",
+  "polity:russia": "Российская империя",
+  "polity:spain": "Королевство Испания",
+  "polity:sweden": "Королевство Швеция",
+  "polity:swiss-confederation": "Швейцарская конфедерация",
+  "polity:united-kingdom": "Соединённое королевство Великобритании и Ирландии",
+};
+
+const compiledPolityDisplayNameRu = (polity) =>
+  polity.displayName.ru ?? COMPILED_POLITY_DISPLAY_NAMES_RU[polity.polityId] ?? polity.displayName.en;
+
 const compiledScenarioMapPresentation = (scenarioId) =>
   COMPILED_SCENARIO_MAP_PRESENTATIONS[String(scenarioId ?? "").trim()] ?? null;
 
@@ -338,6 +357,10 @@ const compiledScenarioDetails = (scenarioId) => {
   if (!summary) throw new Error(`Compiled scenario not found: ${scenarioId}`);
   const polityById = Object.fromEntries(pack.runtimeProjection.polities.map((polity) => [polity.polityId, {
     name: polity.displayName.en,
+    // The legacy map renderer reads an intentionally small display registry.
+    // Carry the compiled scenario's authored locale here as well: the internal
+    // polity id is never a suitable player-facing fallback.
+    nameRu: compiledPolityDisplayNameRu(polity),
     aliases: [],
     color: polity.color,
     note: polity.playerEligible ? "Player eligible" : "AI polity",
@@ -2405,8 +2428,35 @@ const normalizeRuntimeWorld = (assetKey, data) => {
 const withCompiledMapPresentation = (scenarioId, world) => {
   const presentation = compiledScenarioMapPresentation(scenarioId);
   if (!presentation || !world || typeof world !== "object" || Array.isArray(world)) return world;
+  // Existing sessions created before localized display names were added keep a
+  // small, persisted world registry.  Hydrate missing authored names from the
+  // immutable compiled pack on read so a player never has to recreate a game
+  // merely to stop seeing `polity:russia` or English map labels.
+  let compiledPolityOverrides = {};
+  try {
+    const pack = loadCompiledScenarioPack(scenarioId, { rootDirectory: COMPILED_SCENARIOS_DIR });
+    compiledPolityOverrides = Object.fromEntries(pack.runtimeProjection.polities.map((polity) => [polity.polityId, {
+      name: polity.displayName.en,
+      nameRu: compiledPolityDisplayNameRu(polity),
+      aliases: [],
+      color: polity.color,
+      note: polity.playerEligible ? "Player eligible" : "AI polity",
+    }]));
+  } catch {
+    // A presentation must still work if a developer is midway through a pack
+    // rebuild; the persisted scenario registry remains a safe fallback.
+  }
+  const persistedPolities = world.polityOverrides && typeof world.polityOverrides === "object"
+    ? world.polityOverrides
+    : {};
   return {
     ...world,
+    polityOverrides: Object.fromEntries([...new Set([
+      ...Object.keys(compiledPolityOverrides), ...Object.keys(persistedPolities),
+    ])].map((id) => [id, {
+      ...(compiledPolityOverrides[id] ?? {}),
+      ...(persistedPolities[id] ?? {}),
+    }])),
     // Server-injected so existing saved campaigns become legible immediately;
     // compiledScenarioDetails persists the same display data for new games.
     countryOwnershipOverrides: {

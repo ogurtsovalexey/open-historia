@@ -1,3 +1,5 @@
+import { getStoredLanguage } from "../../runtime/i18n.js";
+
 const TECHNICAL_OWNER_CODES = new Set([
   "NA", "XCA", "Z01", "Z02", "Z03", "Z04", "Z05", "Z06", "Z07", "Z08", "Z09",
 ]);
@@ -17,12 +19,16 @@ export const buildScenarioCountryOptions = (world, allCountries, nameOverrides =
   const explicitPlayable = Array.isArray(world?.playableOwnerCodes) ? world.playableOwnerCodes : null;
   const nameByCode = new Map(list.map((entry) => [entry.code, entry.name]));
   const polity = world?.polityOverrides ?? {};
+  const countryOwners = world?.countryOwnershipOverrides ?? {};
+  const russian = String(getStoredLanguage()).toLowerCase().startsWith("ru");
   const resolveOption = (code, fallbackName = code) => {
     const scenarioName = nameOverrides[code] || nameOverrides[fallbackName];
-    const polityName = polity[code]?.name;
+    const polityName = russian ? (polity[code]?.nameRu || polity[code]?.name) : polity[code]?.name;
+    const flagCode = Object.entries(countryOwners).find(([, owner]) => owner === code)?.[0] || code;
     return {
       code,
       name: (polityName && polityName !== code ? polityName : null) || scenarioName || fallbackName,
+      ...(flagCode !== code ? { flagCode } : null),
     };
   };
   const codes = new Set(explicitPlayable ?? (ownerCodes && ownerCodes.length ? ownerCodes : list.map((entry) => entry.code)));

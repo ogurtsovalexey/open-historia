@@ -13,6 +13,7 @@ import { fromLonLat } from "ol/proj";
 import { defaults as defaultControls } from "ol/control/defaults";
 import { loadSeedFeatures } from "../../Editor/regionImport.js";
 import { flagEmojiFromGid } from "../../runtime/countryFlags.js";
+import { getStoredLanguage } from "../../runtime/i18n.js";
 
 const codeToColor = (code) => {
   let h = 0;
@@ -78,6 +79,11 @@ const CountryPickerMap = ({
   ownerOverrides = null,
   countryOwnerOverrides = null,
   startView = null,
+  // Authored Living World campaigns fetch their compact display geometry
+  // asynchronously.  Do not parse the 50 MB global seed in the meantime: it
+  // consumes gigabytes in Chrome and can prevent the actual scenario geometry
+  // from ever rendering.
+  deferFallbackSeed = false,
   // "country" (default): click a whole country to pick it — the new-game selector.
   // "regions": click regions to toggle them in/out of a selection — the faction
   // creator picking its starting territory. selectedRegionIds + onToggleRegion +
@@ -88,7 +94,9 @@ const CountryPickerMap = ({
   onToggleRegion = null,
   selectionColor = "#7c3aed",
 }) => {
+  const russianUi = String(getStoredLanguage()).toLowerCase().startsWith("ru");
   const containerRef = useRef(null);
+  const mapRef = useRef(null);
   const layerRef = useRef(null);
   const sourceRef = useRef(null);
   const hoveredCodeRef = useRef(null);
@@ -150,6 +158,7 @@ const CountryPickerMap = ({
         maxZoom: 8,
       }),
     });
+    mapRef.current = olMap;
 
     const regionIdOf = (feature) =>
       (feature.getId?.() ?? feature.get("id") ?? feature.get("GID_1") ?? null);
@@ -246,9 +255,24 @@ const CountryPickerMap = ({
 
     return () => {
       sourceRef.current?.clear();
+      mapRef.current = null;
       olMap.setTarget(null);
     };
   }, []);
+
+  // Scenario metadata arrives after the picker itself has mounted.  Applying
+  // the authored view here prevents an 1805 Europe picker from being stranded
+  // at the generic world overview it used during the first render.
+  useEffect(() => {
+    if (!startView || !mapRef.current) return;
+    const longitude = Number(startView.longitude);
+    const latitude = Number(startView.latitude);
+    const zoom = Number(startView.zoom);
+    if (!Number.isFinite(longitude) || !Number.isFinite(latitude) || !Number.isFinite(zoom)) return;
+    const view = mapRef.current.getView();
+    view.setCenter(fromLonLat([longitude, latitude]));
+    view.setZoom(zoom);
+  }, [startView?.longitude, startView?.latitude, startView?.zoom]);
 
   // Load or reload region features when GeoJSON source changes
   useEffect(() => {
@@ -270,7 +294,7 @@ const CountryPickerMap = ({
   useEffect(() => {
     const source = sourceRef.current;
     if (!source) return;
-    if (regionsGeojson) return; // custom data already loaded above
+    if (regionsGeojson || deferFallbackSeed) return; // authored data is pending/already loaded
     let cancelled = false;
     loadSeedFeatures()
       .then((features) => {
@@ -280,7 +304,7 @@ const CountryPickerMap = ({
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [!!regionsGeojson, ownerOverrides, countryOwnerOverrides]);
+  }, [!!regionsGeojson, deferFallbackSeed, ownerOverrides, countryOwnerOverrides]);
 
   // Re-style when the playable set OR the selection mode changes (the style fn
   // reads modeRef, so the layer must be told to repaint when the mode flips).
@@ -303,7 +327,7 @@ const CountryPickerMap = ({
           autoFocus
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search countries…"
+          placeholder={russianUi ? "Поиск стран…" : "Search countries…"}
           style={{
             padding: "0.55rem 0.7rem",
             borderRadius: 8,
@@ -359,14 +383,16 @@ const CountryPickerMap = ({
             }}
           >
             <span aria-hidden="true" style={{ fontSize: "1.2rem", width: "1.5rem" }}>
-              {flagEmojiFromGid(c.code) || "🏳️"}
+              {flagEmojiFromGid(c.flagCode || c.code) || "🏳️"}
             </span>
             <span>{c.name}</span>
           </button>
         ))}
         {filteredOptions.length > (query.trim() ? 30 : 12) && (
           <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.72rem", padding: "0.3rem", textAlign: "center" }}>
-            {filteredOptions.length - (query.trim() ? 30 : 12)} more… type to search
+            {russianUi
+              ? `Ещё ${filteredOptions.length - (query.trim() ? 30 : 12)}… начните вводить название`
+              : `${filteredOptions.length - (query.trim() ? 30 : 12)} more… type to search`}
           </div>
         )}
       </div>

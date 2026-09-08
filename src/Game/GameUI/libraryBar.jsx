@@ -42,6 +42,7 @@ import {
 } from "../../runtime/communityBasemaps.js";
 import { zipBundle, unzipBundle, looksLikeZip } from "../../runtime/bundleZip.js";
 import { buildScenarioCountryOptions } from "./scenarioCountries.js";
+import { getStoredLanguage } from "../../runtime/i18n.js";
 
 const UNIT_TYPE_LABELS = {
   infantry: "Infantry",
@@ -60,6 +61,17 @@ const CommunityPanel = lazy(() => import("./communityHub.jsx"));
 const CountryPickerMap = lazy(() => import("./CountryPickerMap.jsx"));
 
 const BAR_HEIGHT = 64;
+
+const pickerMapMessage = (kind, detail = "") => {
+  const russian = String(getStoredLanguage()).toLowerCase().startsWith("ru");
+  if (kind === "loading") return russian ? "Загружается карта сценария…" : "Loading scenario map…";
+  if (kind === "ready") return russian
+    ? `Карта сценария готова: ${detail} регионов.`
+    : `Scenario map ready: ${detail} regions.`;
+  return russian
+    ? `Не удалось загрузить карту сценария: ${detail}`
+    : `Could not load the scenario map: ${detail}`;
+};
 
 // "#rrggbb" -> [r,g,b], the shape colors.json stores. Faults to a neutral grey
 // rather than throwing, so a bad colour never blocks creating the faction.
@@ -1048,6 +1060,7 @@ const EditorDrawer = ({
 };
 
 const LibraryTopBar = () => {
+  const russianUi = String(getStoredLanguage()).toLowerCase().startsWith("ru");
   const {
     activeGame,
     activeGameId,
@@ -1252,6 +1265,7 @@ const LibraryTopBar = () => {
     setCountryQuery("");
     setCountryOptions([]);
     setCustomRegionData(null); setPickerOwnerOverrides(null); setPickerCountryOwnerOverrides(null); setPickerStartView(null);
+    setPickerMapStatus(pickerMapMessage("loading"));
     setPlayGameId(null);
     setPickerTab("country");
     setCountryPicker(scenario);
@@ -1272,10 +1286,17 @@ const LibraryTopBar = () => {
         // compact display slice for compiled historical campaigns. In both cases
         // it is safer than asking the browser to parse the global seed.
         downloadScenarioJsonAsset(scenario.id, "regionsGeojson")
-          .then((geojson) => { if (geojson) setCustomRegionData(geojson); })
-          .catch(() => {});
+          .then((geojson) => {
+            if (!geojson?.features) throw new Error("Scenario map geometry is unavailable.");
+            setCustomRegionData(geojson);
+            setPickerMapStatus(pickerMapMessage("ready", geojson.features.length.toLocaleString()));
+          })
+          .catch((error) => setPickerMapStatus(pickerMapMessage("error", error?.message ?? (String(getStoredLanguage()).startsWith("ru") ? "неизвестная ошибка" : "unknown error"))));
       })
-      .catch(() => setCountryOptions([]));
+      .catch((error) => {
+        setCountryOptions([]);
+        setPickerMapStatus(pickerMapMessage("error", error?.message ?? (String(getStoredLanguage()).startsWith("ru") ? "неизвестная ошибка" : "unknown error")));
+      });
   };
 
   // Hub update detection: scenarios imported straight from the community tab
@@ -1723,6 +1744,7 @@ const LibraryTopBar = () => {
   const [pickerOwnerOverrides, setPickerOwnerOverrides] = useState(null);
   const [pickerCountryOwnerOverrides, setPickerCountryOwnerOverrides] = useState(null);
   const [pickerStartView, setPickerStartView] = useState(null);
+  const [pickerMapStatus, setPickerMapStatus] = useState("");
   const [countryQuery, setCountryQuery] = useState("");
   // Which tab of the new-game dialog: pick an existing country, or invent one.
   const [pickerTab, setPickerTab] = useState("country"); // "country" | "faction"
@@ -2206,10 +2228,12 @@ const LibraryTopBar = () => {
             ) : (
               <>
                 <div style={{ fontWeight: 800, fontSize: "1rem" }}>
-                  {pickerTab === "faction" ? "Create your faction" : "Choose your country"}
+                  {pickerTab === "faction"
+                    ? (russianUi ? "Создайте свою страну" : "Create your faction")
+                    : (russianUi ? "Выберите свою страну" : "Choose your country")}
                 </div>
                 <div style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.75rem", margin: "0.15rem 0 0.6rem" }}>
-                  Starting “{countryPicker.name}”
+                  {russianUi ? "Начало: " : "Starting “"}{countryPicker.name}{russianUi ? "" : "”"}
                 </div>
                 {/* Refining an existing game (Apply-&-Play) only swaps the country;
                     inventing a faction is a fresh-game concern, so the tabs show
@@ -2227,7 +2251,7 @@ const LibraryTopBar = () => {
                         borderColor: pickerTab === "country" ? "rgba(124,58,237,0.7)" : undefined,
                       }}
                     >
-                      Pick a country
+                      {russianUi ? "Выбрать страну" : "Pick a country"}
                     </button>
                     <button
                       type="button"
@@ -2240,7 +2264,7 @@ const LibraryTopBar = () => {
                         borderColor: pickerTab === "faction" ? "rgba(124,58,237,0.7)" : undefined,
                       }}
                     >
-                      Create a faction
+                      {russianUi ? "Создать страну" : "Create a faction"}
                     </button>
                   </div>
                 )}
@@ -2258,7 +2282,9 @@ const LibraryTopBar = () => {
                       onClick={() => pickCountry("")}
                       style={{ ...actionButtonStyle, justifyContent: "flex-start", background: "rgba(124,58,237,0.18)", marginBottom: "0.4rem" }}
                     >
-                      {playGameId ? "Keep scenario default" : "Scenario default"}
+                      {playGameId
+                        ? (russianUi ? "Оставить страну сценария" : "Keep scenario default")
+                        : (russianUi ? "Страна по умолчанию" : "Scenario default")}
                     </button>
                     <Suspense
                       fallback={
@@ -2267,17 +2293,29 @@ const LibraryTopBar = () => {
                         </div>
                       }
                     >
-                      <CountryPickerMap
-                        countryOptions={countryOptions}
-                        regionsGeojson={customRegionData}
-                        ownerOverrides={pickerOwnerOverrides}
-                        countryOwnerOverrides={pickerCountryOwnerOverrides}
-                        startView={pickerStartView}
-                        onPickCountry={(code) => pickCountry(code)}
-                      />
+                      {countryPicker?.livingWorld && !customRegionData ? (
+                        <div style={{ height: 320, alignContent: "center", color: "rgba(255,255,255,0.55)", fontSize: "0.85rem", textAlign: "center" }}>
+                          {russianUi ? "Загружается историческая карта…" : "Loading historical map…"}
+                        </div>
+                      ) : (
+                        <CountryPickerMap
+                          countryOptions={countryOptions}
+                          regionsGeojson={customRegionData}
+                          ownerOverrides={pickerOwnerOverrides}
+                          countryOwnerOverrides={pickerCountryOwnerOverrides}
+                          startView={pickerStartView}
+                          deferFallbackSeed={Boolean(countryPicker?.livingWorld)}
+                          onPickCountry={(code) => pickCountry(code)}
+                        />
+                      )}
                     </Suspense>
+                    {pickerMapStatus && (
+                      <div style={{ color: pickerMapStatus.startsWith("Could not") || pickerMapStatus.startsWith("Не удалось") ? "#fca5a5" : "rgba(255,255,255,0.55)", fontSize: "0.72rem", marginTop: "0.35rem" }}>
+                        {pickerMapStatus}
+                      </div>
+                    )}
                     <button type="button" onClick={() => { setCountryPicker(null); setPlayGameId(null); setCustomRegionData(null); setPickerOwnerOverrides(null); }} style={{ ...actionButtonStyle, marginTop: "0.6rem" }}>
-                      {playGameId ? "Done" : "Cancel"}
+                      {playGameId ? (russianUi ? "Готово" : "Done") : (russianUi ? "Отмена" : "Cancel")}
                     </button>
                   </>
                 )}
