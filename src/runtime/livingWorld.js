@@ -91,14 +91,24 @@ export function useLivingWorldRuntime() {
       return undefined;
     }
     const controller = new AbortController();
+    // AbortSignal alone is not a sufficient ordering guarantee: a prior
+    // response can finish parsing while React is switching from one newly
+    // created campaign to another. Never let that stale projection paint the
+    // new game's date, population or decisions.
+    let disposed = false;
     setPayload(null);
     const locale = getStoredLanguage();
     request(`${livingWorldEndpoint(activeGameId)}?locale=${encodeURIComponent(locale)}`, { signal: controller.signal })
-      .then(setPayload)
+      .then((nextPayload) => {
+        if (!disposed) setPayload(nextPayload);
+      })
       .catch((error) => {
-        if (error?.name !== "AbortError") console.error("Failed to load living-world projection:", error);
+        if (!disposed && error?.name !== "AbortError") console.error("Failed to load living-world projection:", error);
       });
-    return () => controller.abort();
+    return () => {
+      disposed = true;
+      controller.abort();
+    };
   }, [activeGameId, enabled]);
 
   const commands = useMemo(() => {

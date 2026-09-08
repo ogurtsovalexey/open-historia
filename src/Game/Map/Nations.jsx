@@ -271,6 +271,10 @@ const ringCentroidLngLat = (ring) => {
 // Mediterranean and only the empire got named.
 const CLUSTER_JOIN_DEGREES = 10; // centroids closer than this merge into one label cluster
 const MIN_CLUSTER_AREA = 1.5; // in lng/lat degrees^2 — skips tiny extra islands
+// Owner clusters cover many source regions (Russia can contain hundreds), so
+// their geographic area is much larger than a stock country-label feature.
+// Keep era labels legible without letting an empire name dominate the map.
+const CUSTOM_OWNER_LABEL_SCALE = 0.42;
 
 // Which regions physically touch, from shared border vertices. The seed
 // simplifies each region on its own, so mid-border vertices don't always match
@@ -442,7 +446,7 @@ const buildOwnerLabelCollection = (regionsFC, overrides, polityOverrides, nameRe
         geometry: { type: "Point", coordinates: [cluster.cx, cluster.cy] },
         properties: {
           name,
-          areaScale: Math.sqrt(cluster.area) * 17500,
+          areaScale: Math.sqrt(cluster.area) * 17500 * CUSTOM_OWNER_LABEL_SCALE,
           rotation: 0,
           // See GLOBE_LAT_CORRECTION — same globe text-size fix (issue #6).
           lat: cluster.cy,
