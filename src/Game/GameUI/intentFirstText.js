@@ -18,6 +18,9 @@ const RU = Object.freeze({
   "Long-running processes": "Долгие процессы", "No active processes.": "Нет активных процессов.", "Domain detail": "Предметные сведения",
   Pace: "Темп", Feasibility: "Осуществимость", "Main inputs": "Главные входы", Spending: "Затраты", Progress: "Прогресс", Blockers: "Препятствия",
   Accelerators: "Ускорители", Support: "Поддержка", Opposition: "Противодействие", "Last semantic decision": "Последнее смысловое решение", "Next checkpoint": "Следующая проверка", "Why?": "Почему?",
+  Canonical: "Каноническое", "Engine derived": "Выведено движком", "Estimate range": "Диапазон оценки", Interpretation: "Толкование", Unknown: "Неизвестно",
+  "No visible canonical evidence.": "Нет доступных канонических свидетельств.", "No causal explanation is available.": "Причинное объяснение отсутствует.", "Sources:": "Источники:",
+  "No canonical source": "Нет канонического источника", "No grounded country facts are available.": "Нет доступных сведений о стране по данным движка.",
 });
 
 export const intentText = (locale, text) => locale === "ru" ? (RU[text] ?? text) : text;

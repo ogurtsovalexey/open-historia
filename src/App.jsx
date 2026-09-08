@@ -120,7 +120,12 @@ function GameApp() {
         if (!isActive) return;
 
         runStartupPreload({
-          includeMapAssets: Boolean(activeGameId),
+          // The intent UI is useful before MapLibre has fetched and parsed a
+          // scenario's geometry.  Waiting for the world map here made an
+          // already-created campaign look like a frozen blank screen, and even
+          // left visible tabs covered by the startup overlay.  The map owns its
+          // own asynchronous loading path; startup only needs game state.
+          includeMapAssets: false,
           onProgress: (nextState) => {
             if (!isActive) return;
             setStartupState((current) => ({ ...current, ...nextState }));
@@ -129,14 +134,7 @@ function GameApp() {
           preloadFinishedRef.current = true;
           if (!isActive) return;
 
-          if (worldIdleRef.current) {
-            setIsReady(true);
-          } else {
-            setStartupState((current) => ({
-              ...current,
-              done: true,
-            }));
-          }
+          setIsReady(true);
         });
       });
 

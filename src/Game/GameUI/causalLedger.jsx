@@ -15,14 +15,14 @@ export const GroundedValue = ({ fact, locale }) => (
       <div>
         <strong>{fact.label}</strong>
         <div className="oh-intent-tag" data-tone={fact.authority === "unknown" ? "unknown" : undefined}>
-          {authorityLabel[fact.authority]}
+          {intentText(locale, authorityLabel[fact.authority])}
         </div>
       </div>
       <span className="oh-intent-value" data-no-translate="true">
         {fact.authority === "unknown" ? "—" : fact.value}
       </span>
     </div>
-    {fact.authority === "unknown" && <p className="oh-intent-muted">{fact.unknownReason}</p>}
+    {fact.authority === "unknown" && <p className="oh-intent-muted">{intentText(locale, fact.unknownReason)}</p>}
     <WhyDisclosure reasons={fact.why} evidenceCount={fact.evidenceIds.length} sourceLabels={fact.sourceLabels} locale={locale} />
   </article>
 );
@@ -38,10 +38,10 @@ export const WhyDisclosure = ({ reasons = [], evidenceCount = 0, causes = [], so
         </div>
       ))}
       {reasons.map((reason, index) => <div key={`${reason}-${index}`}>{reason}</div>)}
-      {causes.length === 0 && reasons.length === 0 && <div>No causal explanation is available.</div>}
+      {causes.length === 0 && reasons.length === 0 && <div>{intentText(locale, "No causal explanation is available.")}</div>}
       <div className="oh-intent-source">{sourceLabels.length > 0
-        ? `Sources: ${sourceLabels.join(", ")}`
-        : (evidenceCount > 0 ? `${evidenceCount} grounded source${evidenceCount === 1 ? "" : "s"}` : "No canonical source")}</div>
+        ? `${intentText(locale, "Sources:")} ${sourceLabels.join(", ")}`
+        : (evidenceCount > 0 ? `${evidenceCount} ${intentText(locale, evidenceCount === 1 ? "grounded source" : "grounded sources")}` : intentText(locale, "No canonical source"))}</div>
     </div>
   </details>
 );

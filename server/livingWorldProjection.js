@@ -266,9 +266,12 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       if (!projection) return null;
       return {
         situationId: `situation:process-resistance-${entry.processId.replaceAll(':', '-')}`,
-        title: `${projection.name} faces recorded resistance`,
+        title: phrase(locale, `${projection.name} faces recorded resistance`, `${projection.name}: зафиксировано сопротивление`),
         urgency: entry.resistanceBp >= 7500 ? 'high' : 'medium',
-        summary: `Current progress is lower than recorded resistance at this checkpoint. Any pace change remains limited to engine-feasible options.`,
+        summary: phrase(locale,
+          'Current progress is lower than recorded resistance at this checkpoint. Any pace change remains limited to engine-feasible options.',
+          'На этой проверке прогресс ниже зафиксированного сопротивления. Любое изменение темпа ограничено осуществимыми для движка вариантами.',
+        ),
         evidenceIds: projection.evidenceIds,
       };
     })
@@ -312,16 +315,19 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
         .join(' · ');
       return {
         situationId: `situation:tribute-arrears-${entry.obligationId.replaceAll(':', '-')}`,
-        title: `${payer} tribute remains in arrears`,
+        title: phrase(locale, `${payer} tribute remains in arrears`, `${payer}: дань остаётся в просрочке`),
         urgency: 'medium',
-        summary: `The shared obligation has unsettled ${commodities} deliveries; beneficiary shares remain constrained until a canonical settlement occurs.`,
+        summary: phrase(locale,
+          `The shared obligation has unsettled ${commodities} deliveries; beneficiary shares remain constrained until a canonical settlement occurs.`,
+          `По общему обязательству не урегулированы поставки ${commodities}; доли получателей ограничены до канонического урегулирования.`,
+        ),
         evidenceIds: groundedEvidence(entry.evidenceIds, visible, snapshotEvidence),
       };
     });
   const tributeFacts = tributeObligations.length === 0 ? [] : [
-    fact('fact:tribute-outgoing', 'Scheduled outgoing tribute', outgoingGoods.length > 0 ? outgoingGoods.join(' · ') : 'none', tributeEvidence, ['Every listed delivery is debited from payer stock before beneficiary credit']),
-    fact('fact:tribute-incoming', 'Scheduled incoming tribute', incomingGoods.length > 0 ? incomingGoods.join(' · ') : 'none', tributeEvidence, ['Beneficiary shares are applied to conserved delivered goods']),
-    fact('fact:tribute-service', 'Reserved tribute service', `${formatNumber(outgoingLabor)} labor · ${formatNumber(outgoingMilitary)} military`, tributeEvidence, ['Reserved service is already removed from available workforce and recruitment']),
+    fact('fact:tribute-outgoing', phrase(locale, 'Scheduled outgoing tribute', 'Назначенная исходящая дань'), outgoingGoods.length > 0 ? outgoingGoods.join(' · ') : phrase(locale, 'none', 'нет'), tributeEvidence, [phrase(locale, 'Every listed delivery is debited from payer stock before beneficiary credit', 'Каждая указанная поставка списывается из запаса плательщика до зачисления получателю')]),
+    fact('fact:tribute-incoming', phrase(locale, 'Scheduled incoming tribute', 'Назначенная входящая дань'), incomingGoods.length > 0 ? incomingGoods.join(' · ') : phrase(locale, 'none', 'нет'), tributeEvidence, [phrase(locale, 'Beneficiary shares are applied to conserved delivered goods', 'К сохранённому объёму поставленных благ применяются доли получателей')]),
+    fact('fact:tribute-service', phrase(locale, 'Reserved tribute service', 'Зарезервированная служба по дани'), `${formatNumber(outgoingLabor)} ${phrase(locale, 'labor', 'труда')} · ${formatNumber(outgoingMilitary)} ${phrase(locale, 'military', 'военных')}`, tributeEvidence, [phrase(locale, 'Reserved service is already removed from available workforce and recruitment', 'Зарезервированная служба уже вычтена из доступной рабочей силы и набора')]),
   ];
 
   return {
@@ -341,14 +347,14 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       territoryEffects,
     },
     facts: [
-      fact('fact:controlled-population', 'Population under actual control', formatNumber(snapshot.controlledPopulation), snapshotEvidence, ['Summed from regional population cohorts and current actual control']),
-      fact('fact:administered-population', 'Effectively administered population', formatNumber(snapshot.administeredPopulation), snapshotEvidence, ['Control access limits how much population administration reaches']),
-      fact('fact:workforce', 'Available workforce', formatNumber(snapshot.workforce), snapshotEvidence, ['Mobilized personnel are removed from potential civilian workforce']),
-      fact('fact:treasury', 'Treasury', formatNumber(snapshot.treasury), groundedEvidence(polity.evidenceIds, visible, snapshotEvidence)),
-      fact('fact:regional-output', 'Accessible productive capacity', formatNumber(snapshot.regionalOutput), snapshotEvidence, ['Extraction access is applied region by region']),
-      fact('fact:fielded-personnel', 'Fielded personnel', formatNumber(snapshot.fieldedPersonnel), snapshotEvidence, ['Summed from canonical formations']),
-      fact('fact:available-manpower', 'Unmobilized recruitable population', formatNumber(snapshot.availableManpower), snapshotEvidence, ['Population eligibility and regional recruitment access set the ceiling']),
-      fact('fact:supply-capacity', 'Accessible supply capacity', formatNumber(snapshot.supplyCapacity), snapshotEvidence),
+      fact('fact:controlled-population', phrase(locale, 'Population under actual control', 'Население под фактическим контролем'), formatNumber(snapshot.controlledPopulation), snapshotEvidence, [phrase(locale, 'Summed from regional population cohorts and current actual control', 'Сумма региональных групп населения с учётом текущего фактического контроля')]),
+      fact('fact:administered-population', phrase(locale, 'Effectively administered population', 'Эффективно управляемое население'), formatNumber(snapshot.administeredPopulation), snapshotEvidence, [phrase(locale, 'Control access limits how much population administration reaches', 'Доступ управления ограничивает охват населения администрацией')]),
+      fact('fact:workforce', phrase(locale, 'Available workforce', 'Доступная рабочая сила'), formatNumber(snapshot.workforce), snapshotEvidence, [phrase(locale, 'Mobilized personnel are removed from potential civilian workforce', 'Мобилизованные люди вычтены из потенциальной гражданской рабочей силы')]),
+      fact('fact:treasury', phrase(locale, 'Treasury', 'Казна'), formatNumber(snapshot.treasury), groundedEvidence(polity.evidenceIds, visible, snapshotEvidence)),
+      fact('fact:regional-output', phrase(locale, 'Accessible productive capacity', 'Доступная производственная мощность'), formatNumber(snapshot.regionalOutput), snapshotEvidence, [phrase(locale, 'Extraction access is applied region by region', 'Доступ к извлечению применяется отдельно к каждому региону')]),
+      fact('fact:fielded-personnel', phrase(locale, 'Fielded personnel', 'Личный состав в строю'), formatNumber(snapshot.fieldedPersonnel), snapshotEvidence, [phrase(locale, 'Summed from canonical formations', 'Сумма по каноническим формированиям')]),
+      fact('fact:available-manpower', phrase(locale, 'Unmobilized recruitable population', 'Немобилизованное население для набора'), formatNumber(snapshot.availableManpower), snapshotEvidence, [phrase(locale, 'Population eligibility and regional recruitment access set the ceiling', 'Пригодность населения и региональный доступ к набору задают предел')]),
+      fact('fact:supply-capacity', phrase(locale, 'Accessible supply capacity', 'Доступная снабженческая мощность'), formatNumber(snapshot.supplyCapacity), snapshotEvidence),
       ...tributeFacts,
     ],
     interpretation: pendingIntent,
@@ -356,9 +362,9 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     situations: [
       ...occupations.map((region) => ({
         situationId: `situation:${region.regionId.replaceAll(':', '-')}`,
-        title: `${localized(region.displayName, locale)} is occupied`,
+        title: phrase(locale, `${localized(region.displayName, locale)} is occupied`, `Регион «${localized(region.displayName, locale)}» оккупирован`),
         urgency: region.control.administrationAccessBp < 5000 ? 'high' : 'medium',
-        summary: `Actual control differs from legal ownership; access and recruitment follow the occupation profile.`,
+        summary: phrase(locale, 'Actual control differs from legal ownership; access and recruitment follow the occupation profile.', 'Фактический контроль отличается от юридической принадлежности; доступ и набор следуют профилю оккупации.'),
         evidenceIds: groundedEvidence(region.evidenceIds, visible, snapshotEvidence),
       })),
       ...tributeArrearSituations,
