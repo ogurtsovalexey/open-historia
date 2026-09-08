@@ -12,6 +12,7 @@ const RU = Object.freeze({
   Cost: "Цена", Duration: "Срок", Risks: "Риски", "Opportunity cost": "Упущенные возможности", Affected: "Затронуты",
   "grounded source": "обоснованный источник", "grounded sources": "обоснованных источника", "No record found": "Записей не найдено",
   Conversations: "Переговоры", "No active commitments.": "Нет действующих обязательств.", "No current conversations.": "Нет текущих переговоров.",
+  "Conversation is not commitment": "Переговоры — не обязательство",
   "Response required": "Нужен ответ", "Awaiting response": "Ожидается ответ", "Compact grounded condition": "Краткое состояние по данным движка",
   "Needs attention": "Требует внимания", "Nothing currently requires intervention.": "Сейчас вмешательство не требуется.",
   "Respond with an intention": "Ответить намерением", "Secondary audit and domain views": "Вторичные журналы и данные",

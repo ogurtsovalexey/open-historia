@@ -137,13 +137,20 @@ const localizeIntentPreviewText = (value, locale) => {
     'Material blockers or opposition can slow the process at later checkpoints': 'Материальные ограничения или сопротивление могут замедлить процесс на следующих проверках.',
     'No immediate treasury commitment; frozen proposal terms will be recorded': 'Немедленных затрат казны нет; условия предложения будут зафиксированы.',
     'Pending recipient response; no territorial control changes before acceptance': 'Ожидается ответ адресата; до принятия контроля над территориями не меняется.',
+    'The addressed polity can reject the frozen terms': 'Адресат может отклонить зафиксированные условия.',
     'No territorial control changes until the addressed polity accepts the frozen proposal': 'Контроль над территориями не меняется, пока адресат не примет зафиксированное предложение.',
   };
   return known[raw] ?? raw;
 };
 
-function interpretationProjection(intent, fallbackEvidence, locale) {
+function interpretationProjection(intent, fallbackEvidence, locale, state) {
   if (!intent || intent.status !== 'pending') return null;
+  const localizeAffected = (reference) => {
+    if (!isRussian(locale)) return reference;
+    const polity = state?.polities?.find((entry) => entry.id === reference);
+    const region = state?.regions?.find((entry) => entry.regionId === reference);
+    return localized(polity?.displayName ?? region?.displayName, locale) || reference;
+  };
   return {
     interpretationId: intent.interpretationId,
     sourceText: intent.sourceText,
@@ -163,6 +170,7 @@ function interpretationProjection(intent, fallbackEvidence, locale) {
       // The exact player span is already preserved in the canonical input and
       // is the safest Russian rendering of an action authored in Russian.
       summary: isRussian(locale) ? action.sourceSpan?.text || localizeIntentPreviewText(action.summary, locale) : action.summary,
+      targetLabels: (action.targetLabels ?? []).map(localizeAffected),
     })),
     proposedInitiatives: intent.proposedInitiatives ?? [],
     preview: intent.preview ? {
@@ -171,6 +179,7 @@ function interpretationProjection(intent, fallbackEvidence, locale) {
       duration: { ...intent.preview.duration, label: localizeIntentPreviewText(intent.preview.duration?.label, locale) },
       risks: (intent.preview.risks ?? []).map((value) => localizeIntentPreviewText(value, locale)),
       opportunityCosts: (intent.preview.opportunityCosts ?? []).map((value) => localizeIntentPreviewText(value, locale)),
+      affected: (intent.preview.affected ?? []).map(localizeAffected),
     } : {
       cost: { kind: 'unknown', label: 'Requires semantic and material resolution' },
       duration: { kind: 'unknown', label: 'Depends on feasibility and chosen pace' },
@@ -231,7 +240,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
         evidenceIds: groundedEvidence([...ownRegion.evidenceIds, ...foreignRegion.evidenceIds], visible, snapshotEvidence),
       };
     });
-  const pendingIntent = interpretationProjection(session.playerIntent, snapshotEvidence, locale);
+  const pendingIntent = interpretationProjection(session.playerIntent, snapshotEvidence, locale, state);
   const last = session.lastTurn;
   const territoryEffects = (last?.strategicRecords ?? [])
     .flatMap((record) => record.territorialTransitions ?? [])
@@ -298,6 +307,12 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
   });
   const outgoingLabor = outgoing.reduce((sum, entry) => sum + applyBp(entry.laborService?.people ?? 0, entry.complianceBp), 0);
   const outgoingMilitary = outgoing.reduce((sum, entry) => sum + applyBp(entry.militaryService?.personnel ?? 0, entry.complianceBp), 0);
+  const relationshipLabel = (kind) => phrase(locale, labelOf(kind), ({
+    'coalition-negotiation': 'переговоры о коалиции',
+    'coalition negotiation': 'переговоры о коалиции',
+    neutrality: 'нейтралитет',
+  })[labelOf(kind)] ?? labelOf(kind));
+  const polityLabel = (id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id);
   // A situation is a read-only, engine-derived prompt for intervention.  It
   // must never turn a player click into a new obligation or rewrite the
   // historical record.  Occupation was the first such condition; unpaid
@@ -378,7 +393,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
           : [proposal.proposerPolityId];
         const terms = proposal.terms.map((term) => term.kind === 'territorial-cession'
           ? `${labelOf(term.regionId)} → ${labelOf(term.toPolityId)}`
-          : `${labelOf(term.relationshipTypeId)}: ${term.participantPolityIds.map(labelOf).join(', ')}`);
+          : `${relationshipLabel(term.relationshipTypeId)}: ${term.participantPolityIds.map(polityLabel).join(', ')}`);
         return {
           conversationId: `conversation:${proposal.proposalId.slice('proposal:'.length)}`,
           counterparty: counterparties.map((id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id)).join(' · '),
@@ -389,7 +404,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       commitments: [
         ...relationships.map((relationship) => ({
         commitmentId: `commitment:${relationship.relationshipId.replaceAll(':', '-')}`,
-        title: labelOf(relationship.kind),
+        title: relationshipLabel(relationship.kind),
         summary: relationship.participantPolityIds
           .map((id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id))
           .join(' · '),
@@ -397,8 +412,8 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
         })),
         ...tributeObligations.map((obligation) => ({
           commitmentId: `commitment:${obligation.obligationId.replaceAll(':', '-')}`,
-          title: 'tribute obligation',
-          summary: `${obligation.payerPolityIds.map(labelOf).join(', ')} → ${obligation.beneficiaries.map((entry) => `${labelOf(entry.polityId)} ${entry.shareBp / 100}%`).join(', ')} · ${obligation.cadence}`,
+          title: phrase(locale, 'tribute obligation', 'обязательство по дани'),
+          summary: `${obligation.payerPolityIds.map(polityLabel).join(', ')} → ${obligation.beneficiaries.map((entry) => `${polityLabel(entry.polityId)} ${entry.shareBp / 100}%`).join(', ')} · ${obligation.cadence}`,
           evidenceIds: groundedEvidence(obligation.evidenceIds, visible),
         })),
       ],
