@@ -129,6 +129,13 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    // The desktop server serves the currently running build directly from
+    // `dist`.  Erasing that directory during a rebuild deletes code-split
+    // chunks that an already-open game can still import (for example when the
+    // player presses "Interpret intention").  Keep previous hashed chunks for
+    // desktop rebuilds; the next full package build may clean them deliberately.
+    // The web deployment remains a clean artifact.
+    emptyOutDir: mode === 'web',
     rollupOptions: {
       output: {
         manualChunks: {

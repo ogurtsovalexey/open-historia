@@ -39,6 +39,54 @@ const PMTILES_ASSETS_DIR = process.env.OH_ASSETS_DIR
 const DEFAULT_SCENARIO_ID = "default";
 const DEFAULT_GAME_ID = "default";
 
+// Temporary cartographic presentation for authored Living World scenarios whose
+// economic/political data is complete but whose reviewed historical *regional*
+// geometry has not yet been licensed and prepared. These mappings are display
+// data only: canonical ownership, combat, population and economy continue to
+// use the scenario's explicit region ids. They prevent a playable campaign from
+// opening on an empty modern map while never pretending that modern borders are
+// exact 1805 boundaries.
+const COMPILED_SCENARIO_MAP_PRESENTATIONS = {
+  "scenario:napoleonic-europe-1805": {
+    countryOwnershipOverrides: {
+      ALB: "polity:ottoman-empire", AUT: "polity:austria", BEL: "polity:france", BGR: "polity:ottoman-empire",
+      BIH: "polity:ottoman-empire", BLR: "polity:russia", CHE: "polity:swiss-confederation", CZE: "polity:austria",
+      DEU: "polity:prussia", DNK: "polity:denmark-norway", ESP: "polity:spain", EST: "polity:russia",
+      FIN: "polity:sweden", FRA: "polity:france", GBR: "polity:united-kingdom", GRC: "polity:ottoman-empire",
+      HRV: "polity:austria", HUN: "polity:austria", IRL: "polity:united-kingdom", ITA: "polity:italy",
+      LTU: "polity:russia", LVA: "polity:russia", MDA: "polity:russia", MKD: "polity:ottoman-empire",
+      MNE: "polity:ottoman-empire", NLD: "polity:batavian-republic", NOR: "polity:denmark-norway", POL: "polity:prussia",
+      PRT: "polity:portugal", ROU: "polity:ottoman-empire", RUS: "polity:russia", SRB: "polity:ottoman-empire",
+      SVK: "polity:austria", SVN: "polity:austria", SWE: "polity:sweden", TUR: "polity:ottoman-empire",
+      UKR: "polity:russia",
+    },
+    startView: { longitude: 18, latitude: 51, zoom: 3.9 },
+  },
+};
+
+// MapLibre's palette and labels operate in the visible polity-name namespace;
+// the simulation's `polity:*` identifiers are intentionally opaque internals.
+// Keep the translation at this display-only seam instead of leaking ids into
+// player-facing labels such as "POLITY:PRUSSIA".
+const COMPILED_POLITY_DISPLAY_NAMES = {
+  "polity:austria": "Austrian Empire",
+  "polity:batavian-republic": "Batavian Republic",
+  "polity:denmark-norway": "Denmark–Norway",
+  "polity:france": "French Empire",
+  "polity:italy": "Italian Republic",
+  "polity:ottoman-empire": "Ottoman Empire",
+  "polity:portugal": "Kingdom of Portugal and the Algarves",
+  "polity:prussia": "Kingdom of Prussia",
+  "polity:russia": "Russian Empire",
+  "polity:spain": "Kingdom of Spain",
+  "polity:sweden": "Kingdom of Sweden",
+  "polity:swiss-confederation": "Swiss Confederation",
+  "polity:united-kingdom": "United Kingdom of Great Britain and Ireland",
+};
+
+const compiledScenarioMapPresentation = (scenarioId) =>
+  COMPILED_SCENARIO_MAP_PRESENTATIONS[String(scenarioId ?? "").trim()] ?? null;
+
 // ---------------------------------------------------------------------------
 // One naming scheme, and it is the COUNTRY'S NAME. Everywhere a country is
 // referenced — ownership overrides, ownerCodes, polity keys, colors, the played
@@ -273,7 +321,7 @@ const compiledScenarioSummaries = (usageCounts = new Map()) => {
       profile: pack.profile,
       seedChecksum: pack.seedChecksum,
       startDate: pack.startDate,
-      startView: null,
+      startView: compiledScenarioMapPresentation(pack.scenarioId)?.startView ?? null,
       subtitle: `${pack.startDate} · grounded ScenarioV3`,
       updatedAt: pack.startDate,
     }));
@@ -286,6 +334,7 @@ const compiledScenarioSummaries = (usageCounts = new Map()) => {
 const compiledScenarioDetails = (scenarioId) => {
   const pack = loadCompiledScenarioPack(scenarioId, { rootDirectory: COMPILED_SCENARIOS_DIR });
   const summary = compiledScenarioSummaries().find((entry) => entry.id === scenarioId);
+  const mapPresentation = compiledScenarioMapPresentation(scenarioId);
   if (!summary) throw new Error(`Compiled scenario not found: ${scenarioId}`);
   const polityById = Object.fromEntries(pack.runtimeProjection.polities.map((polity) => [polity.polityId, {
     name: polity.displayName.en,
@@ -312,6 +361,7 @@ const compiledScenarioDetails = (scenarioId) => {
           region.regionId,
           region.control.actualControllerPolityId,
         ])),
+        ...(mapPresentation ? { countryOwnershipOverrides: mapPresentation.countryOwnershipOverrides } : {}),
       },
     },
     scenario: summary,
@@ -572,6 +622,53 @@ path.join(
 );
 const getScenarioUploadPath = (scenarioId, assetKey) =>
 path.join(getScenarioDirectory(scenarioId), UPLOADABLE_SCENARIO_ASSET_FILES[assetKey]);
+
+// The normal stock region seed is deliberately a detailed, global authoring
+// file. Sending that 50+ MB document to a country-picker just to colour a
+// European campaign made Chrome allocate well over a gigabyte and, in practice,
+// left the picker blank. A compiled scenario may instead expose a small,
+// read-only *presentation* slice. It is not stored as scenario geometry: the
+// campaign's canonical regions remain the data in world.json.
+const compiledScenarioDisplayGeometryCache = new Map();
+const getCompiledScenarioDisplayGeometry = (scenarioId) => {
+  const normalizedId = String(scenarioId ?? "").trim();
+  const presentation = compiledScenarioMapPresentation(normalizedId);
+  if (!presentation?.countryOwnershipOverrides) return null;
+
+  if (compiledScenarioDisplayGeometryCache.has(normalizedId)) {
+    return compiledScenarioDisplayGeometryCache.get(normalizedId);
+  }
+
+  const countryOwners = presentation.countryOwnershipOverrides;
+  const source = readJsonFile(
+    // Runtime data directories intentionally do not duplicate the large default
+    // seed. The installed public asset is the authoritative fallback here.
+    path.join(PUBLIC_DIR, "assets", "regions-seed.geojson"),
+    EMPTY_FEATURE_COLLECTION,
+  );
+  const features = Array.isArray(source?.features) ? source.features : [];
+  const display = {
+    type: "FeatureCollection",
+    features: features.flatMap((feature) => {
+      const properties = feature?.properties ?? {};
+      const countryCode = String(properties.gid0 ?? properties.GID_0 ?? "").trim();
+      const owner = COMPILED_POLITY_DISPLAY_NAMES[countryOwners[countryCode]] ?? countryOwners[countryCode];
+      if (!owner || !feature?.geometry) return [];
+      return [{
+        ...feature,
+        properties: {
+          ...properties,
+          // CountryPickerMap accepts either the feature id or this property.
+          id: String(properties.id ?? properties.GID_1 ?? countryCode),
+          gid0: countryCode,
+          owner,
+        },
+      }];
+    }),
+  };
+  compiledScenarioDisplayGeometryCache.set(normalizedId, display);
+  return display;
+};
 
 const getGameDirectory = (gameId) => resolveWithinDirectory(GAMES_DIR, gameId, "game id");
 const getGameMetaPath = (gameId) => path.join(getGameDirectory(gameId), "game-instance.json");
@@ -2305,6 +2402,20 @@ const normalizeRuntimeWorld = (assetKey, data) => {
   return data.customRegions ? data : { ...data, customRegions: true };
 };
 
+const withCompiledMapPresentation = (scenarioId, world) => {
+  const presentation = compiledScenarioMapPresentation(scenarioId);
+  if (!presentation || !world || typeof world !== "object" || Array.isArray(world)) return world;
+  return {
+    ...world,
+    // Server-injected so existing saved campaigns become legible immediately;
+    // compiledScenarioDetails persists the same display data for new games.
+    countryOwnershipOverrides: {
+      ...presentation.countryOwnershipOverrides,
+      ...(world.countryOwnershipOverrides ?? {}),
+    },
+  };
+};
+
 // ---------------------------------------------------------------------------
 // Owner schema migration: rewrite a record whose owners are GADM codes into one
 // whose owners are country names. Once per record, eagerly, on disk.
@@ -2455,6 +2566,20 @@ const readRuntimeJsonAsset = (assetKey) => {
   if (assetKey in SCENARIO_GEOJSON_ASSET_FILES) {
     const scenario = getActiveRuntimeScenarioSummary();
     ensureScenarioOwnerSchema(scenario.id);
+    // The runtime uses the same compact presentation geometry as the campaign
+    // picker. Without this, normalizeRuntimeWorld enables the custom-map path
+    // and the renderer falls back to the modern world seed, whose persisted
+    // owner values make all of Europe inherit one misleading colour.
+    if (assetKey === "regionsGeojson") {
+      const displayGeometry = getCompiledScenarioDisplayGeometry(scenario.id);
+      if (displayGeometry) {
+        return {
+          contentType: "application/json; charset=utf-8",
+          data: displayGeometry,
+          sourcePath: null,
+        };
+      }
+    }
     let sourcePath = getScenarioUploadPath(scenario.id, assetKey);
     if (!fs.existsSync(sourcePath)) {
       sourcePath = null;
@@ -2503,6 +2628,9 @@ const readRuntimeJsonAsset = (assetKey) => {
           },
         };
       }
+    }
+    if (assetKey === "world" && activeGame?.livingWorld) {
+      data = withCompiledMapPresentation(activeGame.scenarioId, data);
     }
     return {
       contentType: "application/json; charset=utf-8",
@@ -3006,6 +3134,7 @@ export {
   removeScenarioAsset,
   resolveGameUploadAsset,
   resolveScenarioUploadAsset,
+  getCompiledScenarioDisplayGeometry,
   resolveRuntimeBinaryAsset,
   setActiveGame,
   setSelectedScenario,

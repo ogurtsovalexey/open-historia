@@ -621,7 +621,7 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
                 <div style={fieldGroupStyle}>
                 <label style={labelStyle}>Model</label>
                 <select
-                value={settings.codexSubscriptionModel ?? "gpt-5.6-luna"}
+                value={settings.codexSubscriptionModel ?? "gpt-5.6-terra"}
                 onChange={(event) => {
                     const model = (codexStatus.models ?? []).find((entry) => entry.id === event.target.value);
                     onSettingChange("codexSubscriptionModel", event.target.value);
@@ -656,7 +656,7 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
                 </select>
                 </div>
                 {(() => {
-                    const model = settings.codexSubscriptionModel ?? "gpt-5.6-luna";
+                    const model = settings.codexSubscriptionModel ?? "gpt-5.6-terra";
                     const effort = settings.codexSubscriptionEffort ?? "medium";
                     const passed = (codexStatus.preflights ?? []).some((record) => record.model === model
                         && record.effort === effort && record.cliVersion === codexStatus.cliVersion

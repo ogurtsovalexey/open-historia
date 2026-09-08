@@ -2,6 +2,13 @@ const text = (maxLength = 1000) => ({ type: "string", minLength: 1, maxLength })
 const array = (items, maxItems, minItems = 0) => ({ type: "array", items, maxItems, minItems });
 const object = (properties) => ({ type: "object", properties, required: Object.keys(properties), additionalProperties: false });
 
+// Intent interpretation is the first interaction of a Living World turn.  It
+// must never leave the player with a permanently disabled composer when a
+// provider, dynamic import, or browser request stalls.  Strategic resolution
+// has its own timeout in livingWorld.js; keep this shorter interaction bounded
+// independently and abort the underlying fetch as well.
+const INTENT_INTERPRETATION_TIMEOUT_MS = 45_000;
+
 const spanSchema = object({
   start: { type: "integer", minimum: 0 },
   end: { type: "integer", minimum: 0 },
@@ -123,15 +130,30 @@ export const PLAYER_INPUT_SYSTEM_PROMPT = [
 export async function interpretLivingWorldIntent(context, intentions) {
   const playerText = intentions.map((entry) => String(entry ?? "").trim()).filter(Boolean).join("\n").slice(0, 6000);
   const { callAI } = await import("../Game/AI/main.jsx");
-  const result = await callAI(PLAYER_INPUT_SYSTEM_PROMPT, [{ role: "user", parts: [{ text: renderPlayerInputPrompt(context, playerText) }] }], {
-    languageMode: "none",
-    providerRole: "utility",
-    tool: {
-      name: "interpret_player_input_v2",
-      description: "Separate claims, actions and open initiatives under the exact current revision.",
-      schema: playerInputModelJsonSchema(context),
-    },
-  });
-  if (!result?.toolInput) throw new Error("The semantic interpreter did not return a structured result.");
-  return result.toolInput;
+  const controller = new AbortController();
+  let timeoutId = null;
+  try {
+    const result = await Promise.race([
+      callAI(PLAYER_INPUT_SYSTEM_PROMPT, [{ role: "user", parts: [{ text: renderPlayerInputPrompt(context, playerText) }] }], {
+        languageMode: "none",
+        providerRole: "utility",
+        signal: controller.signal,
+        tool: {
+          name: "interpret_player_input_v2",
+          description: "Separate claims, actions and open initiatives under the exact current revision.",
+          schema: playerInputModelJsonSchema(context),
+        },
+      }),
+      new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          controller.abort();
+          reject(new Error("Intent interpretation exceeded the 45 second client deadline. Please retry."));
+        }, INTENT_INTERPRETATION_TIMEOUT_MS);
+      }),
+    ]);
+    if (!result?.toolInput) throw new Error("The semantic interpreter did not return a structured result.");
+    return result.toolInput;
+  } finally {
+    if (timeoutId !== null) clearTimeout(timeoutId);
+  }
 }

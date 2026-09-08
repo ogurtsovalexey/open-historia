@@ -89,7 +89,11 @@ const PROVIDER_SETTINGS = {
         customParams: { storageKey: "openai_compatible_custom_params", defaultValue: "" },
     },
     "codex-subscription": {
-        model: { storageKey: "codex_subscription_model", defaultValue: "gpt-5.6-luna" },
+        // A local desktop campaign should be playable out of the box with the
+        // ChatGPT/Codex subscription already present on this machine. Terra is
+        // the deliberate strategic default; players can still choose a cheaper
+        // model separately for either role in Settings.
+        model: { storageKey: "codex_subscription_model", defaultValue: "gpt-5.6-terra" },
         effort: { storageKey: "codex_subscription_effort", defaultValue: "medium" },
     },
 };
@@ -144,11 +148,24 @@ export function normalizeProvider(provider) {
 }
 
 export function getStoredProvider(role = "strategic") {
-    if (role === "utility") {
-        const configured = localStorage.getItem("utility_api_provider");
-        return configured === null ? normalizeProvider(localStorage.getItem("api_provider")) : normalizeProvider(configured);
+    const configured = role === "utility"
+        ? localStorage.getItem("utility_api_provider") ?? localStorage.getItem("api_provider")
+        : localStorage.getItem("api_provider");
+    const provider = normalizeProvider(configured);
+
+    // Older desktop installs persisted Gemini as the blanket default even when
+    // no key had ever been supplied. That produces a dead-on-arrival campaign
+    // and an instruction to acquire an unrelated Google key despite the user
+    // already having a Codex subscription. Preserve a real Gemini setup and
+    // every explicit non-Gemini selection; only heal this credential-less local
+    // legacy default. The hosted build must remain key/provider neutral.
+    const isLocalDesktop = typeof window !== "undefined" &&
+        !import.meta.env.VITE_OH_WEB &&
+        ["127.0.0.1", "localhost"].includes(window.location.hostname);
+    if (isLocalDesktop && provider === "gemini" && !getProviderField("gemini", "apiKey", role).trim()) {
+        return "codex-subscription";
     }
-    return normalizeProvider(localStorage.getItem("api_provider"));
+    return provider;
 }
 
 export function getProviderMeta(provider) {

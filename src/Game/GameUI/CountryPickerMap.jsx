@@ -39,14 +39,15 @@ const withAlpha = (hex, alpha) => {
 // world.regionOwnershipOverrides is the same region-id -> owner lookup the game
 // map resolves through (see Nations.jsx ownerLookupRef); applying it here makes
 // the picker agree with the world you are about to play.
-const applyOwnerOverrides = (features, overrides) => {
-  if (!overrides) return features;
+const applyOwnerOverrides = (features, overrides, countryOverrides = null) => {
+  if (!overrides && !countryOverrides) return features;
   for (const feature of features) {
     const id = feature.getId();
-    if (id == null) continue;
-    const owner = overrides[String(id)];
+    const countryCode = feature.get("gid0") || feature.get("GID_0") || "";
+    const owner = id == null ? undefined : overrides?.[String(id)];
     // "" is a real value — an explicitly unclaimed region — so only skip undefined.
     if (owner !== undefined) feature.set("owner", owner);
+    else if (countryCode && countryOverrides?.[countryCode] !== undefined) feature.set("owner", countryOverrides[countryCode]);
   }
   return features;
 };
@@ -75,6 +76,8 @@ const CountryPickerMap = ({
   // drawing their own — without it this renders present-day Earth. See
   // applyOwnerOverrides.
   ownerOverrides = null,
+  countryOwnerOverrides = null,
+  startView = null,
   // "country" (default): click a whole country to pick it — the new-game selector.
   // "regions": click regions to toggle them in/out of a selection — the faction
   // creator picking its starting territory. selectedRegionIds + onToggleRegion +
@@ -141,8 +144,8 @@ const CountryPickerMap = ({
         layer,
       ],
       view: new View({
-        center: fromLonLat([0, 20]),
-        zoom: 2,
+        center: fromLonLat([startView?.longitude ?? 0, startView?.latitude ?? 20]),
+        zoom: startView?.zoom ?? 2,
         minZoom: 1,
         maxZoom: 8,
       }),
@@ -256,12 +259,12 @@ const CountryPickerMap = ({
     if (regionsGeojson) {
       try {
         const features = parseGeoJSONFeatures(regionsGeojson);
-        source.addFeatures(applyOwnerOverrides(features, ownerOverrides));
+        source.addFeatures(applyOwnerOverrides(features, ownerOverrides, countryOwnerOverrides));
       } catch {
         // parsed GeoJSON is invalid — fall through to seed
       }
     }
-  }, [regionsGeojson, ownerOverrides]);
+  }, [regionsGeojson, ownerOverrides, countryOwnerOverrides]);
 
   // Load seed features on mount (after regionsGeojson is checked above)
   useEffect(() => {
@@ -273,11 +276,11 @@ const CountryPickerMap = ({
       .then((features) => {
         // The seed is the shared stock world, so overriding owners on it is what
         // turns "present-day Earth" into this scenario's map.
-        if (!cancelled) source.addFeatures(applyOwnerOverrides(features, ownerOverrides));
+        if (!cancelled) source.addFeatures(applyOwnerOverrides(features, ownerOverrides, countryOwnerOverrides));
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [!!regionsGeojson, ownerOverrides]);
+  }, [!!regionsGeojson, ownerOverrides, countryOwnerOverrides]);
 
   // Re-style when the playable set OR the selection mode changes (the style fn
   // reads modeRef, so the layer must be told to repaint when the mode flips).

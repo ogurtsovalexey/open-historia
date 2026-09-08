@@ -87,6 +87,7 @@ export function useWorldState() {
     customCities: Boolean(state?.customCities),
     basemap: state?.basemap || null,
     background: state?.background ?? null,
+    countryOwnershipOverrides: state?.countryOwnershipOverrides ?? {},
     regionOwnershipOverrides: state?.regionOwnershipOverrides ?? {},
     regionClaimants: state?.regionClaimants ?? {},
     polityOverrides: state?.polityOverrides ?? {},
@@ -105,6 +106,7 @@ export function useWorldState() {
     prev.customCities === derived.customCities &&
     prev.basemap === derived.basemap &&
     prev.background === derived.background &&
+    areEqualShallow(prev.countryOwnershipOverrides, derived.countryOwnershipOverrides) &&
     prev.labelFont === derived.labelFont &&
     prev.labelHaloColor === derived.labelHaloColor &&
     prev.labelTextColor === derived.labelTextColor &&

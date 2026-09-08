@@ -461,6 +461,7 @@ const WorldMap = ({ isGlobe = false, regionClickHandlerRef }) => {
     worldState,
     worldKnown,
     customRegions: customFlag,
+    countryOwnershipOverrides,
     regionOwnershipOverrides,
     regionClaimants,
     polityOverrides,
@@ -844,6 +845,10 @@ const WorldMap = ({ isGlobe = false, regionClickHandlerRef }) => {
       regionId,
       ownerColorCss(ownerCode),
     ]);
+    const countryOverrideStops = Object.entries(countryOwnershipOverrides).flatMap(([countryCode, ownerCode]) => [
+      countryCode,
+      ownerColorCss(ownerCode),
+    ]);
 
     return {
       "fill-color": regionOverrideStops.length > 0
@@ -851,14 +856,18 @@ const WorldMap = ({ isGlobe = false, regionClickHandlerRef }) => {
           "match",
           ["get", "GID_1"],
           ...regionOverrideStops,
-          stops.length > 0 ? ["match", ["get", "GID_0"], ...stops, fallback] : fallback,
+          countryOverrideStops.length > 0
+            ? ["match", ["get", "GID_0"], ...countryOverrideStops, stops.length > 0 ? ["match", ["get", "GID_0"], ...stops, fallback] : fallback]
+            : stops.length > 0 ? ["match", ["get", "GID_0"], ...stops, fallback] : fallback,
         ]
+        : countryOverrideStops.length > 0
+        ? ["match", ["get", "GID_0"], ...countryOverrideStops, stops.length > 0 ? ["match", ["get", "GID_0"], ...stops, fallback] : fallback]
         : stops.length > 0
         ? ["match", ["get", "GID_0"], ...stops, fallback]
         : fallback,
       "fill-opacity": 0.66,
     };
-  }, [colorMap, regionOwnershipOverrides, ownerColorCss]);
+  }, [colorMap, countryOwnershipOverrides, regionOwnershipOverrides, ownerColorCss]);
 
   // Fill for custom (editor) regions: we pre-compute a _fillColor property onto
   // every feature so the MapLibre paint expression is just ["get", "_fillColor"]
@@ -973,6 +982,20 @@ const WorldMap = ({ isGlobe = false, regionClickHandlerRef }) => {
   }, [customActive, customRegionData]);
 
   const stockRegionsFillPaint = useMemo(() => {
+    const countryStops = Object.entries(countryOwnershipOverrides).flatMap(([countryCode, owner]) => [
+      countryCode,
+      ownerColorCss(owner),
+    ]);
+    // Grounded scenarios without reviewed historical region geometry still
+    // need a legible political map.  Their canonical region ids cannot match
+    // modern GADM GID_1 tiles, so render the explicitly declared country-level
+    // presentation layer instead of leaving the world blank.
+    if (!customActive && countryStops.length > 0) {
+      return {
+        "fill-color": ["match", ["get", "GID_0"], ...countryStops, NEUTRAL_LAND_COLOR],
+        "fill-opacity": worldKnown ? 0.66 : 0,
+      };
+    }
     if (!customActive) return { "fill-opacity": 0 };
     const stops = [];
     for (const [regionId, owner] of ownerByRegionId) {
@@ -990,7 +1013,7 @@ const WorldMap = ({ isGlobe = false, regionClickHandlerRef }) => {
         ? ["case", ["in", ["get", "GID_1"], ["literal", editedStockIds]], 0, TILE_FILL_FADE]
         : TILE_FILL_FADE,
     };
-  }, [customActive, ownerByRegionId, colorMap, ownerColorCss, editedStockIds]);
+  }, [customActive, countryOwnershipOverrides, ownerByRegionId, colorMap, ownerColorCss, editedStockIds, worldKnown]);
 
   // Stock country fills/borders render ONLY once the world is known to be a
   // stock world. Gating on the customRegions FLAG (not customActive, which

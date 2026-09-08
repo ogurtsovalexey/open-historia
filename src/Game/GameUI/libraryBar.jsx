@@ -1143,7 +1143,7 @@ const LibraryTopBar = () => {
   // the player chose in the two-step picker, then open its editor.
   const startGameForCountry = async (scenario, countryCode, difficulty) => {
     setCountryPicker(null);
-    setCustomRegionData(null); setPickerOwnerOverrides(null);
+    setCustomRegionData(null); setPickerOwnerOverrides(null); setPickerCountryOwnerOverrides(null); setPickerStartView(null);
     setEditorError(null);
     setIsBusy(true);
     // Before the await: createGame({setActive}) remounts the UI mid-flight and
@@ -1251,7 +1251,7 @@ const LibraryTopBar = () => {
   const handleScenarioPlay = (scenario) => {
     setCountryQuery("");
     setCountryOptions([]);
-    setCustomRegionData(null); setPickerOwnerOverrides(null);
+    setCustomRegionData(null); setPickerOwnerOverrides(null); setPickerCountryOwnerOverrides(null); setPickerStartView(null);
     setPlayGameId(null);
     setPickerTab("country");
     setCountryPicker(scenario);
@@ -1266,13 +1266,14 @@ const LibraryTopBar = () => {
         // stock seed is repainted in this scenario's owners, without it the picker
         // shows modern countries the scenario does not contain.
         setPickerOwnerOverrides(details?.data?.world?.regionOwnershipOverrides ?? null);
-        // Load custom region geometry so the map renders the scenario's actual
-        // boundaries instead of the stock world seed.
-        if (details?.data?.world?.customRegions) {
-          downloadScenarioJsonAsset(scenario.id, "regionsGeojson")
-            .then((geojson) => { if (geojson) setCustomRegionData(geojson); })
-            .catch(() => {});
-        }
+        setPickerCountryOwnerOverrides(details?.data?.world?.countryOwnershipOverrides ?? null);
+        setPickerStartView(details?.scenario?.startView ?? scenario.startView ?? null);
+        // The endpoint returns authored geometry for map-editor scenarios and a
+        // compact display slice for compiled historical campaigns. In both cases
+        // it is safer than asking the browser to parse the global seed.
+        downloadScenarioJsonAsset(scenario.id, "regionsGeojson")
+          .then((geojson) => { if (geojson) setCustomRegionData(geojson); })
+          .catch(() => {});
       })
       .catch(() => setCountryOptions([]));
   };
@@ -1720,6 +1721,8 @@ const LibraryTopBar = () => {
   // world seed with its GADM owners — present-day Europe inside a scenario that
   // has none of it. See applyOwnerOverrides in CountryPickerMap.
   const [pickerOwnerOverrides, setPickerOwnerOverrides] = useState(null);
+  const [pickerCountryOwnerOverrides, setPickerCountryOwnerOverrides] = useState(null);
+  const [pickerStartView, setPickerStartView] = useState(null);
   const [countryQuery, setCountryQuery] = useState("");
   // Which tab of the new-game dialog: pick an existing country, or invent one.
   const [pickerTab, setPickerTab] = useState("country"); // "country" | "faction"
@@ -2268,6 +2271,8 @@ const LibraryTopBar = () => {
                         countryOptions={countryOptions}
                         regionsGeojson={customRegionData}
                         ownerOverrides={pickerOwnerOverrides}
+                        countryOwnerOverrides={pickerCountryOwnerOverrides}
+                        startView={pickerStartView}
                         onPickCountry={(code) => pickCountry(code)}
                       />
                     </Suspense>

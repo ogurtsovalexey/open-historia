@@ -6,7 +6,23 @@ const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const formatNumber = (value) => number.format(value);
 const applyBp = (value, bp) => Number(BigInt(value) * BigInt(bp) / 10000n);
 const labelOf = (value) => String(value ?? '').split(':').at(-1).replaceAll('-', ' ');
-const localized = (value, locale) => value?.[locale] ?? value?.en ?? '';
+const RUSSIAN_HISTORICAL_NAMES = Object.freeze({
+  'Austrian Empire': 'Австрийская империя', 'Batavian Republic': 'Батавская республика',
+  'Danish–Norwegian Realm': 'Датско-норвежское королевство', 'Denmark–Norway': 'Дания — Норвегия',
+  'Electorate of Bavaria': 'Курфюршество Бавария', 'Electorate of Saxony': 'Курфюршество Саксония',
+  'French Empire': 'Французская империя', 'Italian Republic': 'Итальянская республика',
+  'Kingdom of Prussia': 'Королевство Пруссия', 'Kingdom of Spain': 'Королевство Испания',
+  'Kingdom of Sweden': 'Королевство Швеция', 'Kingdoms of Naples and Sicily': 'Королевства Неаполь и Сицилия',
+  'Ottoman Empire': 'Османская империя', 'Russian Empire': 'Российская империя',
+  'United Kingdom of Great Britain and Ireland': 'Соединённое королевство Великобритании и Ирландии',
+  'Baltic Provinces': 'Прибалтийские губернии', 'New Russia': 'Новороссия',
+});
+const isRussian = (locale) => String(locale ?? '').toLowerCase().startsWith('ru');
+const localized = (value, locale) => {
+  const fallback = value?.en ?? '';
+  return value?.[locale] ?? (isRussian(locale) ? RUSSIAN_HISTORICAL_NAMES[fallback] ?? fallback : fallback);
+};
+const phrase = (locale, english, russian) => isRussian(locale) ? russian : english;
 
 // This is an index for a semantic interpreter, not a serialized world copy.
 // Stable caps prevent a long campaign from making an already-grounded player
@@ -174,9 +190,16 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
         || labelOf(foreignRegion.control.actualControllerPolityId);
       return {
         situationId: `situation:border-pressure-${ownRegion.regionId.replaceAll(':', '-')}-${foreignRegion.regionId.replaceAll(':', '-')}`,
-        title: `${counterparty} controls the border at ${localized(ownRegion.displayName, locale) || labelOf(ownRegion.regionId)}`,
+        title: phrase(
+          locale,
+          `${counterparty} controls the border at ${localized(ownRegion.displayName, locale) || labelOf(ownRegion.regionId)}`,
+          `${counterparty} контролирует границу у региона «${localized(ownRegion.displayName, locale) || labelOf(ownRegion.regionId)}»`,
+        ),
         urgency: foreignRegion.control.kind === 'occupation' ? 'high' : 'medium',
-        summary: `A canonical adjacent region is under another polity's actual control. This does not authorize combat, occupation, or territorial transfer by itself.`,
+        summary: phrase(locale,
+          `A canonical adjacent region is under another polity's actual control. This does not authorize combat, occupation, or territorial transfer by itself.`,
+          `Соседний канонический регион находится под фактическим контролем другой державы. Само по себе это не разрешает бой, оккупацию или передачу территории.`,
+        ),
         evidenceIds: groundedEvidence([...ownRegion.evidenceIds, ...foreignRegion.evidenceIds], visible, snapshotEvidence),
       };
     });
@@ -280,10 +303,12 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     locale,
     playerPolity: { polityId: polity.id, displayName: localized(polity.displayName, locale) },
     briefing: {
-      headline: pendingIntent ? 'Confirm how your orders were understood' : `${localized(polity.displayName, locale)} at the opening of turn ${state.turn + 1}`,
+      headline: pendingIntent
+        ? phrase(locale, 'Confirm how your orders were understood', 'Подтвердите, как были поняты ваши распоряжения')
+        : phrase(locale, `${localized(polity.displayName, locale)} at the opening of turn ${state.turn + 1}`, `${localized(polity.displayName, locale)} в начале хода ${state.turn + 1}`),
       summary: pendingIntent
-        ? 'Claims about the past are separated from requested future actions. No material state changes before confirmation.'
-        : `${formatNumber(snapshot.controlledPopulation)} people under actual control across ${controlledRegions.length} regions.`,
+        ? phrase(locale, 'Claims about the past are separated from requested future actions. No material state changes before confirmation.', 'Утверждения о прошлом отделены от будущих действий. До подтверждения материальное состояние мира не меняется.')
+        : phrase(locale, `${formatNumber(snapshot.controlledPopulation)} people under actual control across ${controlledRegions.length} regions.`, `${formatNumber(snapshot.controlledPopulation)} человек находятся под фактическим контролем в ${controlledRegions.length} регионах.`),
       changes,
       territoryEffects,
     },
@@ -345,14 +370,14 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       ],
     },
     details: [
-      { detailId: 'detail:territory', label: 'Territory', summary: `${controlledRegions.length} actually controlled regions; ${occupations.length} held under non-sovereign control.` },
-      { detailId: 'detail:economy', label: 'Economy', summary: `Tax base ${formatNumber(snapshot.taxBase)}; regional output ${formatNumber(snapshot.regionalOutput)}; treasury ${formatNumber(snapshot.treasury)}.` },
-      { detailId: 'detail:forces', label: 'Forces', summary: `${formatNumber(snapshot.fieldedPersonnel)} fielded personnel; ${formatNumber(snapshot.availableManpower)} additional recruitable people under current access.` },
-      { detailId: 'detail:provenance', label: 'Evidence', summary: `${visible.size} public or polity-visible evidence records ground this view at one exact revision.` },
+      { detailId: 'detail:territory', label: phrase(locale, 'Territory', 'Территория'), summary: phrase(locale, `${controlledRegions.length} actually controlled regions; ${occupations.length} held under non-sovereign control.`, `${controlledRegions.length} регионов под фактическим контролем; ${occupations.length} — под несуверенным контролем.`) },
+      { detailId: 'detail:economy', label: phrase(locale, 'Economy', 'Экономика'), summary: phrase(locale, `Tax base ${formatNumber(snapshot.taxBase)}; regional output ${formatNumber(snapshot.regionalOutput)}; treasury ${formatNumber(snapshot.treasury)}.`, `Налоговая база: ${formatNumber(snapshot.taxBase)}; выпуск регионов: ${formatNumber(snapshot.regionalOutput)}; казна: ${formatNumber(snapshot.treasury)}.`) },
+      { detailId: 'detail:forces', label: phrase(locale, 'Forces', 'Войска'), summary: phrase(locale, `${formatNumber(snapshot.fieldedPersonnel)} fielded personnel; ${formatNumber(snapshot.availableManpower)} additional recruitable people under current access.`, `${formatNumber(snapshot.fieldedPersonnel)} военнослужащих в строю; ещё ${formatNumber(snapshot.availableManpower)} человек доступны для набора при текущем доступе.`) },
+      { detailId: 'detail:provenance', label: phrase(locale, 'Evidence', 'Основания'), summary: phrase(locale, `${visible.size} public or polity-visible evidence records ground this view at one exact revision.`, `${visible.size} открытых или доступных державе источников обосновывают этот срез мира на одной точной ревизии.`) },
     ],
     time: {
       label: state.month,
-      options: [{ optionId: 'advance-three-months', label: 'Advance three months' }],
+      options: [{ optionId: 'advance-three-months', label: phrase(locale, 'Advance three months', 'Продолжить на три месяца') }],
       completedSubmonths: last?.kind === 'world-month-advanced' ? last.submonths?.length ?? 1 : 0,
       totalSubmonths: last?.kind === 'world-month-advanced' ? last.submonths?.length ?? 1 : 3,
     },
