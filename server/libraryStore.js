@@ -1333,13 +1333,27 @@ const buildGameCatalog = () => {
     const meta = readGameMeta(gameId);
     const assetStatus = getGameAssetStatus(gameId);
     let gameData = readJsonFile(getGameJsonPath(gameId, "game"), {});
+    let integrity = null;
     if (meta.livingWorld) {
-      const session = readEngineSession(getGameDirectory(gameId));
-      if (session) {
-        gameData = {
-          ...gameData,
-          gameDate: session.manifest.gameDate,
-          round: session.manifest.turn === undefined ? session.manifest.round : session.manifest.turn + 1,
+      // A corrupt or superseded immutable engine snapshot must never make the
+      // scenario launcher unavailable.  Keep the save visible with its last
+      // persisted display data and let the live-game endpoint fail closed if a
+      // player explicitly tries to resume it.  New games from the compiled
+      // scenario fleet remain fully available.
+      try {
+        const session = readEngineSession(getGameDirectory(gameId));
+        if (session) {
+          gameData = {
+            ...gameData,
+            gameDate: session.manifest.gameDate,
+            round: session.manifest.turn === undefined ? session.manifest.round : session.manifest.turn + 1,
+          };
+        }
+      } catch (error) {
+        integrity = {
+          code: String(error?.code ?? "UNREADABLE_SESSION"),
+          message: String(error?.message ?? "This saved game needs repair.").slice(0, 320),
+          status: "unreadable",
         };
       }
     }
@@ -1363,6 +1377,7 @@ const buildGameCatalog = () => {
        coverImageUrl: ownCoverImageUrl ?? scenario?.coverImageUrl ?? null,
        currentDate: String(gameData?.gameDate ?? "").trim(),
        eventCount: Array.isArray(events) ? events.length : 0,
+       integrity,
        ownCoverImageUrl,
        pendingActions,
        round:

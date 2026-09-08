@@ -582,6 +582,11 @@ const GameCard = ({ active, game, onActivate, onClone, onEdit }) => {
             <div style={{ color: "rgba(240,244,255,0.58)", fontSize: "0.84rem", marginTop: "0.5rem", lineHeight: 1.45 }}>
               {game.description || "Playable campaign session."}
             </div>
+            {game.integrity?.status === "unreadable" && (
+              <div style={{ color: "#fecaca", fontSize: "0.78rem", lineHeight: 1.4, marginTop: "0.55rem" }}>
+                Saved state needs migration or repair. Start a new campaign from the scenario catalog instead.
+              </div>
+            )}
           </div>
         </div>
 
@@ -591,17 +596,20 @@ const GameCard = ({ active, game, onActivate, onClone, onEdit }) => {
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem" }}>
             <button
+              disabled={game.integrity?.status === "unreadable"}
               onClick={() => onActivate(game.id)}
               style={{
                 ...actionButtonStyle,
                 background: active ? "rgba(255,255,255,0.16)" : `${game.accentColor}cc`,
                 borderColor: active ? "rgba(255,255,255,0.22)" : `${game.accentColor}dd`,
                 color: "#fff",
+                cursor: game.integrity?.status === "unreadable" ? "not-allowed" : "pointer",
                 flex: 1,
+                opacity: game.integrity?.status === "unreadable" ? 0.55 : 1,
               }}
               type="button"
             >
-              {active ? "Current" : "Play"}
+              {game.integrity?.status === "unreadable" ? "Needs repair" : active ? "Current" : "Play"}
             </button>
             {!game.livingWorld && (
               <>
@@ -1051,7 +1059,11 @@ const LibraryTopBar = () => {
     scenarios,
     selectedScenarioId,
   } = useLibraryState();
-  const [activeTab, setActiveTab] = useState("games");
+  // A player who has not explicitly opened their saves is choosing a world,
+  // not resuming a technical record.  Starting on Scenarios makes the first
+  // visible decision the campaign and then the country — exactly the launch
+  // path used by Living World.
+  const [activeTab, setActiveTab] = useState("scenarios");
   const [menuOpen, setMenuOpenState] = useState(menuOpenDefault);
   // The module-level default is the ONLY value that survives the keyed UI
   // remount a game activation triggers, so every open/close writes it first.
@@ -1933,22 +1945,36 @@ const LibraryTopBar = () => {
     () => [...games].sort((a, b) => (b.playCount ?? 0) - (a.playCount ?? 0) || (b.round ?? 0) - (a.round ?? 0)),
     [games],
   );
-  const mostPlayedScenarios = useMemo(
-    () => [...scenarios].sort((a, b) => (b.playCount ?? 0) - (a.playCount ?? 0) || (b.gameCount ?? 0) - (a.gameCount ?? 0)),
+  // Scenario cards used to be repeated in three shelves ordered by game
+  // counters.  That makes a pristine authored campaign look like a "zero
+  // games" test artifact and buries the actual choice behind duplicate cards.
+  // Each scenario belongs to exactly one shelf now.  The authored Living World
+  // campaigns always lead and have a stable, intentional presentation order.
+  const livingWorldScenarios = useMemo(() => {
+    const campaignRank = (scenario) => {
+      // External scenario catalogs have historically exposed both `id` and
+      // `scenarioId`, with and without the `scenario:` namespace. Use the
+      // authored, human-stable title as the final key too, so the launch order
+      // does not silently regress when a catalog representation changes.
+      const key = [scenario?.id, scenario?.scenarioId, scenario?.name]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      if (key.includes("napoleonic-europe-1805") || key.includes("napoleonic europe")) return 0;
+      if (key.includes("europe-1935-benchmark") || key.includes("europe, 1935")) return 1;
+      if (key.includes("central-mesoamerica-1450") || key.includes("central mesoamerica")) return 2;
+      return 99;
+    };
+    return scenarios
+      .filter((scenario) => scenario.livingWorld)
+      .sort((left, right) => campaignRank(left) - campaignRank(right) || left.name.localeCompare(right.name));
+  }, [scenarios]);
+  const communityScenarios = useMemo(
+    () => scenarios.filter((scenario) => !scenario.livingWorld && scenario.hubOrigin),
     [scenarios],
   );
-  const lastUpdatedScenarios = useMemo(
-    () => [...scenarios].sort((a, b) => String(b.updatedAt ?? "").localeCompare(String(a.updatedAt ?? ""))),
-    [scenarios],
-  );
-  // "Your Scenarios": ones the player made or edited themselves. hubOrigin is
-  // null for locally created scenarios AND for hub imports edited locally (any
-  // local meta write clears it — see writeScenarioMeta). The stock built-in
-  // only counts once it has actually been touched.
-  const yourScenarios = useMemo(
-    () => scenarios.filter(
-      (scenario) => !scenario.hubOrigin && (scenario.id !== "default" || scenario.updatedAt !== scenario.createdAt),
-    ),
+  const otherScenarios = useMemo(
+    () => scenarios.filter((scenario) => !scenario.livingWorld && !scenario.hubOrigin),
     [scenarios],
   );
 
@@ -2421,8 +2447,11 @@ const LibraryTopBar = () => {
               )
             ) : (
               <>
-                <MenuRow title="🔥 Most Played" emptyText="No scenarios yet.">
-                  {mostPlayedScenarios.map((scenario) => (
+                <MenuRow
+                  title="Living World Campaigns"
+                  emptyText="The authored Living World campaigns are loading."
+                >
+                  {livingWorldScenarios.map((scenario) => (
                     <ScenarioCard
                       key={scenario.id}
                       onClone={handleScenarioClone}
@@ -2436,24 +2465,26 @@ const LibraryTopBar = () => {
                     />
                   ))}
                 </MenuRow>
-                <MenuRow title="🕐 Last Updated" emptyText="No scenarios yet.">
-                  {lastUpdatedScenarios.map((scenario) => (
-                    <ScenarioCard
-                      key={scenario.id}
-                      onClone={handleScenarioClone}
-                      onEdit={openScenarioEditor}
-                      onPlay={handleScenarioPlay}
-                      onSelect={selectScenario}
-                      onUpdate={handleScenarioUpdate}
-                      scenario={scenario}
-                      selected={scenario.id === selectedScenarioId}
-                      updateAvailable={scenarioUpdateAvailable(scenario)}
-                    />
-                  ))}
-                </MenuRow>
-                <MenuRow title="✦ Your Scenarios">
+                {communityScenarios.length > 0 && (
+                  <MenuRow title="Community Scenarios">
+                    {communityScenarios.map((scenario) => (
+                      <ScenarioCard
+                        key={scenario.id}
+                        onClone={handleScenarioClone}
+                        onEdit={openScenarioEditor}
+                        onPlay={handleScenarioPlay}
+                        onSelect={selectScenario}
+                        onUpdate={handleScenarioUpdate}
+                        scenario={scenario}
+                        selected={scenario.id === selectedScenarioId}
+                        updateAvailable={scenarioUpdateAvailable(scenario)}
+                      />
+                    ))}
+                  </MenuRow>
+                )}
+                <MenuRow title="Other Scenarios">
                   <CreateScenarioTile busy={isBusy} onCreate={handleCreateScenario} />
-                  {yourScenarios.map((scenario) => (
+                  {otherScenarios.map((scenario) => (
                     <ScenarioCard
                       key={scenario.id}
                       onClone={handleScenarioClone}
