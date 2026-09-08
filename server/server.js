@@ -464,12 +464,18 @@ app.put("/api/scenarios/:scenarioId/import", largeJsonParser, (req, res) => {
 
 app.get("/api/scenarios/:scenarioId/assets/:assetKey", (req, res) => {
   try {
-    // Compiled campaigns can provide a compact, display-only map slice for the
-    // country picker. It never replaces authored scenario geometry or runtime
-    // simulation data.
+      // Compiled campaigns can provide a compact, display-only map slice for the
+      // country picker. It never replaces authored scenario geometry or runtime
+      // simulation data.
     if (req.params.assetKey === "regionsGeojson") {
       const displayGeometry = getCompiledScenarioDisplayGeometry(req.params.scenarioId);
-      if (displayGeometry) return res.json(displayGeometry);
+      if (displayGeometry) {
+        // Immutable compiled packs are checksum-versioned in the catalog. A
+        // picker remount must not re-download and parse the same 13 MB display
+        // slice a second time during one short launch flow.
+        res.set("Cache-Control", "private, max-age=300");
+        return res.json(displayGeometry);
+      }
     }
     const asset = resolveScenarioUploadAsset(req.params.scenarioId, req.params.assetKey);
     streamBinaryFile(req, res, asset.sourcePath, asset.contentType);
