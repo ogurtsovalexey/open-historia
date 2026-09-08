@@ -456,7 +456,7 @@ const ScenarioCard = ({ onClone, onEdit, onPlay, onSelect, onUpdate, scenario, s
                     textTransform: "uppercase",
                   }}
                 >
-                  Built-In
+                  {russianUi ? "Встроенный" : "Built-In"}
                 </span>
               )}
             </div>
@@ -691,7 +691,9 @@ const CreateScenarioTile = ({ busy, onCreate }) => (
     }}
   >
     <span aria-hidden="true" style={{ fontSize: "4.6rem", fontWeight: 300, lineHeight: 1 }}>+</span>
-    <span style={{ fontSize: "0.95rem", fontWeight: 700 }}>Create Scenario</span>
+    <span style={{ fontSize: "0.95rem", fontWeight: 700 }}>
+      {String(getStoredLanguage()).toLowerCase().startsWith("ru") ? "Создать сценарий" : "Create Scenario"}
+    </span>
   </button>
 );
 
@@ -2518,7 +2520,7 @@ const LibraryTopBar = () => {
                   ))}
                 </MenuRow>
                 {communityScenarios.length > 0 && (
-                  <MenuRow title="Community Scenarios">
+                  <MenuRow title={russianUi ? "Сценарии сообщества" : "Community Scenarios"}>
                     {communityScenarios.map((scenario) => (
                       <ScenarioCard
                         key={scenario.id}
@@ -2534,7 +2536,7 @@ const LibraryTopBar = () => {
                     ))}
                   </MenuRow>
                 )}
-                <MenuRow title="Other Scenarios">
+                <MenuRow title={russianUi ? "Другие сценарии" : "Other Scenarios"}>
                   <CreateScenarioTile busy={isBusy} onCreate={handleCreateScenario} />
                   {otherScenarios.map((scenario) => (
                     <ScenarioCard
