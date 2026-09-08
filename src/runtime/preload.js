@@ -160,8 +160,6 @@ const STARTUP_TASKS = [
   },
 ];
 
-const TOTAL_WEIGHT = STARTUP_TASKS.reduce((sum, task) => sum + task.weight, 0);
-
 const normalizeTaskResult = (result) => {
   if (!result) return 0;
 
@@ -172,8 +170,8 @@ const normalizeTaskResult = (result) => {
   return Number(result.size) || 0;
 };
 
-const buildStepState = (activeId, completedIds) =>
-  STARTUP_TASKS.map((task) => ({
+const buildStepState = (activeId, completedIds, tasks = STARTUP_TASKS) =>
+  tasks.map((task) => ({
     id: task.id,
     label: task.label,
     status: completedIds.has(task.id)
@@ -201,7 +199,15 @@ export const createInitialStartupState = () => ({
 export const runStartupPreload = async ({
   onProgress,
   timeBudgetMs = STARTUP_TIME_BUDGET_MS,
+  // The scenario library has its own compact authored map path. Warming the
+  // global PMTiles archives before a world is selected wastes memory and can
+  // starve the country picker in Chrome.
+  includeMapAssets = true,
 } = {}) => {
+  const tasks = includeMapAssets
+    ? STARTUP_TASKS
+    : STARTUP_TASKS.filter((task) => task.id === "state");
+  const totalWeight = tasks.reduce((sum, task) => sum + task.weight, 0) || 1;
   const completedIds = new Set();
   const errors = [];
   const startedAt = performance.now();
@@ -217,18 +223,18 @@ export const runStartupPreload = async ({
       elapsedMs: Math.min(timeBudgetMs, performance.now() - startedAt),
       errors: [...errors],
       loadedBytes,
-      progress: Math.round((completedWeight / TOTAL_WEIGHT) * 100),
+      progress: Math.round((completedWeight / totalWeight) * 100),
       stage,
-      steps: buildStepState(activeId, completedIds),
+      steps: buildStepState(activeId, completedIds, tasks),
       timeBudgetMs,
       timedOut,
-      total: STARTUP_TASKS.length,
+      total: tasks.length,
     });
   };
 
   publish("Preparing the world");
 
-  for (const task of STARTUP_TASKS) {
+  for (const task of tasks) {
     const elapsedMs = performance.now() - startedAt;
     const remainingMs = timeBudgetMs - elapsedMs;
 

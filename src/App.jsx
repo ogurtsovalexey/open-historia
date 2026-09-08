@@ -95,7 +95,9 @@ function GameApp() {
         return;
       }
 
-      if (preloadFinishedRef.current && worldIdleRef.current) {
+      // The library is a valid first screen. It needs no global map idle event:
+      // its country picker loads compact authored geometry after selection.
+      if (preloadFinishedRef.current && (!activeGameId || worldIdleRef.current)) {
         setIsReady(true);
         return;
       }
@@ -118,6 +120,7 @@ function GameApp() {
         if (!isActive) return;
 
         runStartupPreload({
+          includeMapAssets: Boolean(activeGameId),
           onProgress: (nextState) => {
             if (!isActive) return;
             setStartupState((current) => ({ ...current, ...nextState }));
@@ -168,13 +171,13 @@ function GameApp() {
   return (
     <>
     <div style={WorldShell}>
-    <Map
+    {activeGameId && <Map
     key={`map-${activeGameId || "default"}`}
     mapRef={mapRef}
     projection={isGlobeEnabled ? "globe" : "mercator"}
     terrainEnabled={isTerrainEnabled}
     onInitialIdle={handleFirstWorldIdle}
-    />
+    />}
     <div style={Vignette} />
     </div>
     {isReady && (
