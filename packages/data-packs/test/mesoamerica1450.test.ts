@@ -37,6 +37,9 @@ describe('Central Mesoamerica 1450 shipped ScenarioV3', () => {
       Object.values(scenario.startingState.polities).filter((polity) => polity.decisionMode === 'supported').length,
       16,
     );
+    assert.ok(Object.values(scenario.startingState.polities).every((polity) => (
+      typeof polity.displayName.ru === 'string' && /[А-Яа-яЁё]/.test(polity.displayName.ru)
+    )), 'every Mesoamerican polity has a Russian display name');
   });
 
   it('owns Mesoamerican catalogs and contains no industrial or modern-state defaults', async () => {

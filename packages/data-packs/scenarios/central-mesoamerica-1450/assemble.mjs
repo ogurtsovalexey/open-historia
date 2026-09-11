@@ -62,6 +62,16 @@ const supportedPolities = [
   ['polity:yanhuitlan', 'Yanhuitlan'], ['polity:huajuapan', 'Huajuapan'],
   ['polity:tochtepec', 'Tochtepec corridor'], ['polity:soconusco', 'Soconusco corridor'],
 ].map(([id, name], index) => [id, name, `#${(0x354c55 + index * 0x050909).toString(16).slice(-6)}`]);
+const polityNamesRu = Object.freeze({
+  'polity:tenochtitlan': 'Мехико-Теночтитлан', 'polity:texcoco': 'Тескоко', 'polity:tlacopan': 'Тлакопан',
+  'polity:tlatelolco': 'Мехико-Тлателолько', 'polity:tlaxcallan': 'Тлашкалан', 'polity:purepecha': 'государство пурепеча',
+  'polity:cholollan': 'Чололлан', 'polity:chalco': 'Чалько', 'polity:huexotzinco': 'Уэшоцинко', 'polity:tututepec': 'Юку Дзаа (Тутутепек)',
+  'polity:xochimilco': 'Сочимилько', 'polity:azcapotzalco': 'Аскапоцалько', 'polity:cuauhtitlan': 'Куаутитлан', 'polity:tepeaca': 'Тепеака',
+  'polity:cuauhtinchan': 'Куаутинчан', 'polity:cuauhnahuac': 'Куаунауак', 'polity:yautepec': 'Яутепек', 'polity:coixtlahuaca': 'Койштлауака',
+  'polity:tilantongo': 'Тилантонго', 'polity:tlaxiaco': 'Тлашиако', 'polity:teozacoalco': 'Теосакоалько', 'polity:nochistlan': 'Ночистлан',
+  'polity:yanhuitlan': 'Яньюитлан', 'polity:huajuapan': 'Уахуапан', 'polity:tochtepec': 'коридор Точтепек', 'polity:soconusco': 'коридор Соконуско',
+});
+const polityDisplayName = (id, displayName) => ({ en: displayName, ru: polityNamesRu[id] ?? displayName });
 
 const regionRows = [
   // Mexican Basin (12)
@@ -245,7 +255,7 @@ const addEvidence = (id, path, basis, visibility = 'public', visibleToPolityIds)
 const activePolityIdsForDecisions = new Set(activePolities.map(([id]) => id));
 for (const [id, displayName, color] of [...activePolities, ...supportedPolities]) {
   const evidenceId = `evidence:meso1450-polity-${slug(id.slice(7))}`;
-  scenario.startingState.polities[id] = { id, displayName: { en: displayName }, color, decisionMode: activePolityIdsForDecisions.has(id) ? 'active' : 'supported', treasury: 0, stockpiles: {}, evidenceIds: [evidenceId] };
+  scenario.startingState.polities[id] = { id, displayName: polityDisplayName(id, displayName), color, decisionMode: activePolityIdsForDecisions.has(id) ? 'active' : 'supported', treasury: 0, stockpiles: {}, evidenceIds: [evidenceId] };
   const specialized = id === 'polity:tlatelolco' ? ['source:meso1450:inah-tlatelolco']
     : id === 'polity:tlaxcallan' ? ['source:meso1450:inah-tlaxcallan']
       : id === 'polity:purepecha' ? ['source:meso1450:inah-tzintzuntzan', 'source:meso1450:inah-ihuatzio']
