@@ -42,7 +42,10 @@ const baseStyle = {
 const SETTINGS_RU = Object.freeze({
     "Strategic AI provider": "Стратегический AI-провайдер",
     "Utility AI provider": "Вспомогательный AI-провайдер",
-    Settings: "настройки",
+    "Codex subscription": "Подписка Codex",
+    "Native APIs": "Прямые API",
+    "Gateways and self-hosted": "Шлюзы и локальные модели",
+    Settings: "Настройки",
     Change: "Изменить", Hide: "Скрыть",
     "Searchable catalog instead of a wall of provider buttons.": "Каталог с поиском вместо длинного списка кнопок провайдеров.",
     "Search provider, protocol or gateway...": "Поиск провайдера, протокола или шлюза…",
@@ -55,9 +58,18 @@ const SETTINGS_RU = Object.freeze({
     "Schema preflight passed": "Проверка схемы пройдена",
     "Running schema preflight…": "Выполняется проверка схемы…",
     "Run schema preflight": "Проверить схему",
+    Active: "Активен",
+    "Nothing matched the search.": "Ничего не найдено.",
     "UI language": "Язык интерфейса", "AI chat language": "Язык ответов AI",
     "Search languages...": "Поиск языка…", "matches — pick one": "совпадений — выберите один", "No matching language": "Подходящий язык не найден",
     "What the advisor and diplomatic chats reply in. Defaults to your interface language.": "На этом языке отвечают советник и дипломатические чаты. По умолчанию используется язык интерфейса.",
+    "Game Settings": "Настройки игры",
+    Fullscreen: "Во весь экран", "3D Globe": "3D-глобус", "3D Terrain": "3D-рельеф",
+    "Very Experimental": "Очень экспериментально", Map: "Карта",
+    "Hide country labels": "Скрыть названия стран", "Reduce motion": "Уменьшить анимацию",
+    "Disable idle globe rotation": "Отключить вращение глобуса", "Disable camera movement during events": "Отключить движение камеры во время событий",
+    "Limit AI generation": "Ограничить генерацию AI", AI: "AI",
+    "On: time skips give the model 5 minutes, then fall back to canned events. Off (default): generation waits as long as the model needs. Cancel works either way.": "При включении на расчёт пропуска времени даётся 5 минут, затем используются заготовленные события. При выключении AI ждёт столько, сколько нужно; отмена работает в обоих режимах.",
 });
 const settingsText = (value) => getStoredLanguage() === "ru" ? (SETTINGS_RU[value] ?? value) : value;
 
@@ -225,7 +237,7 @@ const Toggle = ({ label, enabled, onToggle }) => (
         marginBottom: "1rem",
     }}
     >
-    <span style={{ fontSize: "0.9rem" }}>{label}</span>
+    <span style={{ fontSize: "0.9rem" }}>{settingsText(label)}</span>
     <button
     onClick={onToggle}
     style={{
@@ -298,7 +310,7 @@ const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider"
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem" }}>
         <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: "0.9rem", fontWeight: 700 }}>
-        {selectedProvider.label}
+        {settingsText(selectedProvider.label)}
         </div>
         <div style={{ marginTop: "0.2rem", fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.45 }}>
         {settingsText(selectedProvider.group)} · {settingsText(selectedProvider.description)}
@@ -341,7 +353,7 @@ const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider"
             {groupedProviders.length > 0 ? groupedProviders.map((group) => (
                 <div key={group.name}>
                 <div style={{ marginBottom: "0.35rem", fontSize: "0.68rem", fontWeight: 700, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                {group.name}
+                {settingsText(group.name)}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 {group.items.map((option) => {
@@ -368,16 +380,16 @@ const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider"
                         >
                         <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", alignItems: "center" }}>
                         <span style={{ fontSize: "0.84rem", fontWeight: selected ? 700 : 600 }}>
-                        {option.label}
+                        {settingsText(option.label)}
                         </span>
                         {selected && (
                             <span style={{ fontSize: "0.68rem", color: "#93c5fd", fontWeight: 700 }}>
-                            Active
+                            {settingsText("Active")}
                             </span>
                         )}
                         </div>
                         <div style={{ marginTop: "0.18rem", fontSize: "0.72rem", lineHeight: 1.4, color: "rgba(255,255,255,0.6)" }}>
-                        {option.description}
+                        {settingsText(option.description)}
                         </div>
                         {unavailable && (
                             <div style={{ marginTop: "0.2rem", fontSize: "0.68rem", color: "#fbbf24" }}>
@@ -391,7 +403,7 @@ const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider"
                 </div>
             )) : (
                 <div style={{ ...helperStyle, marginTop: 0 }}>
-                Nothing matched the search.
+                {settingsText("Nothing matched the search.")}
                 </div>
             )}
             </div>
@@ -412,14 +424,14 @@ const SettingsInput = ({
 }) => (
     <div style={fieldGroupStyle}>
     <label style={labelStyle}>
-    {label}
+    {settingsText(label)}
     </label>
     {multiline ? (
         <textarea
         rows={4}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
+        placeholder={settingsText(placeholder)}
         autoComplete="off"
         spellCheck={false}
         style={{ ...inputStyle, fontFamily: "monospace", resize: "vertical" }}
@@ -429,7 +441,7 @@ const SettingsInput = ({
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
+        placeholder={settingsText(placeholder)}
         autoComplete="off"
         spellCheck={false}
         style={inputStyle}
@@ -437,7 +449,7 @@ const SettingsInput = ({
     )}
     {helperText && (
         <div style={helperStyle}>
-        {helperText}
+        {settingsText(helperText)}
         </div>
     )}
     </div>
@@ -467,7 +479,7 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
         }}
         >
         <div style={{ fontSize: "0.84rem", fontWeight: 700, marginBottom: "0.25rem" }}>
-        {meta.label} {settingsText("Settings")}
+        {settingsText(meta.label)} {settingsText("Settings")}
         </div>
         <div style={{ ...helperStyle, marginTop: 0, marginBottom: "0.85rem" }}>
         {settingsText(meta.description)}
@@ -857,6 +869,7 @@ const SocialLinks = ({ discordUrl, redditUrl, githubUrl }) => (
 
 const SettingsButton = ({ onToggle, topOffset = "0.5rem" }) => (
     <button
+    aria-label={settingsText("Settings")}
     onClick={onToggle}
     style={{
         ...baseStyle,
@@ -971,7 +984,7 @@ const SettingsMenu = ({
             borderBottom: "1px solid rgba(255,255,255,0.1)",
         }}
         >
-        Game Settings
+        {settingsText("Game Settings")}
         </h3>
 
         <ApiProviderSelector
@@ -1023,12 +1036,12 @@ const SettingsMenu = ({
             padding: "0.16rem 0.55rem",
         }}
         >
-        Very Experimental
+        {settingsText("Very Experimental")}
         </span>
         </div>
         <Toggle label="3D Terrain" enabled={isTerrainEnabled} onToggle={onToggleTerrain} />
         <div style={{ margin: "0.5rem 0 1rem", paddingTop: "0.75rem", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-        <div style={{ fontSize: "0.84rem", fontWeight: 700, marginBottom: "0.6rem" }}>Map</div>
+        <div style={{ fontSize: "0.84rem", fontWeight: 700, marginBottom: "0.6rem" }}>{settingsText("Map")}</div>
         <Toggle
         label="Hide country labels"
         enabled={mapSettings.hideCountryLabels}
@@ -1059,14 +1072,14 @@ const SettingsMenu = ({
         </div>
 
         <div style={{ margin: "0.5rem 0 1rem", paddingTop: "0.75rem", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-        <div style={{ fontSize: "0.84rem", fontWeight: 700, marginBottom: "0.6rem" }}>AI</div>
+        <div style={{ fontSize: "0.84rem", fontWeight: 700, marginBottom: "0.6rem" }}>{settingsText("AI")}</div>
         <Toggle
         label="Limit AI generation"
         enabled={mapSettings.limitAiGeneration}
         onToggle={() => updateMapSetting("limitAiGeneration", MAP_SETTING_KEYS.limitAiGeneration, !mapSettings.limitAiGeneration)}
         />
         <div style={{ marginTop: "-0.7rem", marginBottom: "0.4rem", fontSize: "0.72rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.35 }}>
-        On: time skips give the model 5 minutes, then fall back to canned events. Off (default): generation waits as long as the model needs. Cancel works either way.
+        {settingsText("On: time skips give the model 5 minutes, then fall back to canned events. Off (default): generation waits as long as the model needs. Cancel works either way.")}
         </div>
         </div>
 

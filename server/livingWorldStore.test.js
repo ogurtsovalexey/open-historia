@@ -158,6 +158,8 @@ describe('living-world command store', () => {
     assert.ok(parsed.diplomacy.commitments.some((entry) => /obligation-xochimilco-triple-alliance/.test(entry.commitmentId)));
     assert.ok(view.interpretationContext.entities.some((entry) => entry.entityId === 'obligation:xochimilco-triple-alliance' && entry.kind === 'tribute-obligation'));
     assert.doesNotMatch(JSON.stringify(parsed).toLowerCase(), /(?:^|[^a-z])(gdp|bonds?|unemployment)(?:[^a-z]|$)/);
+    const russian = living.readLivingWorld(mesoGameId, { locale: 'ru' });
+    assert.ok(russian.projection.facts.some((entry) => entry.factId === 'fact:tribute-incoming' && /кукуруза/u.test(entry.value)));
   });
 
   it('advances one player decision through three atomic monthly tribute settlements', () => {
@@ -194,6 +196,9 @@ describe('living-world command store', () => {
     assert.equal(situation.urgency, 'medium');
     assert.ok(situation.evidenceIds.length > 0);
     assert.equal(advanced.projection.processes.length, 0);
+    const russian = living.readLivingWorld(mesoSituationGameId, { locale: 'ru' });
+    const russianSituation = russian.projection.situations.find((entry) => entry.situationId === situation.situationId);
+    assert.match(russianSituation.summary, /не урегулированы поставки кукурузы/u);
   });
 
   it('reaches thirty deterministic monthly boundaries after ten player decisions', () => {
@@ -421,6 +426,9 @@ describe('living-world command store', () => {
     const adjustedRussian = living.readLivingWorld(processPaceGameId, { locale: 'ru' });
     assert.equal(adjustedRussian.projection.interpretation.preview.cost.label, 'Новых немедленных затрат казны нет; обязательство по уже идущему процессу сохраняется.');
     assert.equal(adjustedRussian.projection.interpretation.preview.duration.label, 'Будет применено при следующем месячном расчёте; темп остаётся ограничен осуществимостью для движка.');
+    assert.equal(adjustedRussian.projection.processes[0].pace, 'медленный');
+    assert.equal(adjustedRussian.projection.processes[0].stage, 'предложен');
+    assert.match(adjustedRussian.projection.processes[0].progressLabel, /стадии «предложен»/u);
     const beforeState = readEngineSession(library.getGameDirectory(processPaceGameId)).state;
     const beforeProcess = beforeState.processes.find((entry) => entry.processId === process.entityId);
     const adjusted = living.confirmLivingWorldIntent(processPaceGameId, {

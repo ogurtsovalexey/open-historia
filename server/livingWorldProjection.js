@@ -6,6 +6,26 @@ const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const formatNumber = (value) => number.format(value);
 const applyBp = (value, bp) => Number(BigInt(value) * BigInt(bp) / 10000n);
 const labelOf = (value) => String(value ?? '').split(':').at(-1).replaceAll('-', ' ');
+const RUSSIAN_RESOURCE_NAMES = Object.freeze({
+  grain: 'зерно', timber: 'древесина', iron: 'железо', horses: 'лошади',
+  fibers: 'волокно', powder: 'пороховой состав', provisions: 'провиант',
+  cloth: 'ткань', arms: 'вооружение', gunpowder: 'порох', luxury: 'предметы роскоши',
+  maize: 'кукуруза', cacao: 'какао', obsidian: 'обсидиан', salt: 'соль',
+});
+const RUSSIAN_RESOURCE_DELIVERY_NAMES = Object.freeze({
+  grain: 'зерна', timber: 'древесины', iron: 'железа', horses: 'лошадей',
+  fibers: 'волокна', powder: 'порохового состава', provisions: 'провианта',
+  cloth: 'ткани', arms: 'вооружения', gunpowder: 'пороха', luxury: 'предметов роскоши',
+  maize: 'кукурузы', cacao: 'какао', obsidian: 'обсидиана', salt: 'соли',
+});
+const resourceLabel = (value, locale) => {
+  const label = labelOf(value);
+  return isRussian(locale) ? RUSSIAN_RESOURCE_NAMES[label] ?? label : label;
+};
+const resourceDeliveryLabel = (value, locale) => {
+  const label = labelOf(value);
+  return isRussian(locale) ? RUSSIAN_RESOURCE_DELIVERY_NAMES[label] ?? resourceLabel(value, locale) : label;
+};
 const RUSSIAN_HISTORICAL_NAMES = Object.freeze({
   'Austrian Empire': 'Австрийская империя', 'Batavian Republic': 'Батавская республика',
   'Electorate of Baden': 'Курфюршество Баден', 'Electorate of Hanover': 'Курфюршество Ганновер',
@@ -94,7 +114,7 @@ function processProjection(state, process, visible, locale) {
     nextCheckpoint: process.stage === 'institutionalized'
       ? phrase(locale, 'Institutionalized', 'Институционализирован')
       : phrase(locale, 'Next stage boundary', 'Следующая граница стадии'),
-    mainInputs: envelope.opportunityCosts.map((entry) => `${labelOf(entry.resourceId)}: ${formatNumber(entry.amount)}`),
+    mainInputs: envelope.opportunityCosts.map((entry) => `${resourceLabel(entry.resourceId, locale)}: ${formatNumber(entry.amount)}`),
     blockers: envelope.blockers.map(labelOf),
     accelerators: envelope.accelerators.map(labelOf),
     support: process.sponsorEntityRefs.map((id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id)),
@@ -326,12 +346,12 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
   const outgoing = tributeObligations.filter((entry) => entry.payerPolityIds.includes(polity.id));
   const incoming = tributeObligations.filter((entry) => entry.beneficiaries.some((beneficiary) => beneficiary.polityId === polity.id));
   const outgoingGoods = outgoing.flatMap((entry) => entry.deliveries.map((delivery) => (
-    `${labelOf(delivery.commodityId)} ${formatNumber(applyBp(delivery.quantity, entry.complianceBp))}`
+    `${resourceLabel(delivery.commodityId, locale)} ${formatNumber(applyBp(delivery.quantity, entry.complianceBp))}`
   )));
   const incomingGoods = incoming.flatMap((entry) => {
     const beneficiary = entry.beneficiaries.find((candidate) => candidate.polityId === polity.id);
     return entry.deliveries.map((delivery) => (
-      `${labelOf(delivery.commodityId)} ${formatNumber(applyBp(applyBp(delivery.quantity, entry.complianceBp), beneficiary?.shareBp ?? 0))}`
+      `${resourceLabel(delivery.commodityId, locale)} ${formatNumber(applyBp(applyBp(delivery.quantity, entry.complianceBp), beneficiary?.shareBp ?? 0))}`
     ));
   });
   const outgoingLabor = outgoing.reduce((sum, entry) => sum + applyBp(entry.laborService?.people ?? 0, entry.complianceBp), 0);
@@ -355,7 +375,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       )).join(' · ');
       const commodities = entry.arrears
         .filter((arrear) => arrear.quantity > 0)
-        .map((arrear) => labelOf(arrear.commodityId))
+        .map((arrear) => resourceDeliveryLabel(arrear.commodityId, locale))
         .join(' · ');
       return {
         situationId: `situation:tribute-arrears-${entry.obligationId.replaceAll(':', '-')}`,
