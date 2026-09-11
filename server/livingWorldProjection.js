@@ -72,25 +72,38 @@ function processProjection(state, process, visible, locale) {
   if (evidenceIds.length === 0) return null;
   const concept = process.conceptId ? state.concepts.find((entry) => entry.conceptId === process.conceptId) : null;
   const progressPercent = Math.trunc(process.progressBp / 100);
+  const stageLabel = phrase(locale, process.stage, ({
+    proposed: 'предложен', emerging: 'зарождается', organized: 'организован',
+    demonstrated: 'продемонстрирован', adopted: 'принят', institutionalized: 'институционализирован',
+  })[process.stage] ?? process.stage);
+  const paceLabel = phrase(locale, process.currentPace, ({
+    stalled: 'приостановлен', slow: 'медленный', steady: 'ровный', fast: 'быстрый', breakthrough: 'прорывной',
+  })[process.currentPace] ?? process.currentPace);
   return {
     processId: process.processId,
     name: localized(concept?.displayName, locale) || labelOf(process.kind),
     nameRu: concept?.displayName?.ru ?? null,
     direction: labelOf(process.direction),
-    stage: process.stage,
-    pace: process.currentPace,
-    feasibility: envelope.reasons.length === 0 ? 'Feasible under current known conditions' : envelope.reasons.join('; '),
-    progressLabel: `${progressPercent}% through ${process.stage}`,
+    stage: stageLabel,
+    pace: paceLabel,
+    feasibility: envelope.reasons.length === 0
+      ? phrase(locale, 'Feasible under current known conditions', 'Осуществимо при известных текущих условиях')
+      : envelope.reasons.join('; '),
+    progressLabel: phrase(locale, `${progressPercent}% through ${process.stage}`, `${progressPercent}% стадии «${stageLabel}»`),
     progressPercent,
-    nextCheckpoint: process.stage === 'institutionalized' ? 'Institutionalized' : 'Next stage boundary',
+    nextCheckpoint: process.stage === 'institutionalized'
+      ? phrase(locale, 'Institutionalized', 'Институционализирован')
+      : phrase(locale, 'Next stage boundary', 'Следующая граница стадии'),
     mainInputs: envelope.opportunityCosts.map((entry) => `${labelOf(entry.resourceId)}: ${formatNumber(entry.amount)}`),
     blockers: envelope.blockers.map(labelOf),
     accelerators: envelope.accelerators.map(labelOf),
     support: process.sponsorEntityRefs.map((id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id)),
-    opposition: process.prerequisites.oppositionEvidenceIds.map(() => 'Recorded opposition'),
+    opposition: process.prerequisites.oppositionEvidenceIds.map(() => phrase(locale, 'Recorded opposition', 'Зафиксированное противодействие')),
     spending: formatNumber(process.funding),
-    latestChanges: process.lastAdvancedMonth ? [`Last resolved ${process.lastAdvancedMonth}`] : ['Not yet resolved'],
-    lastSemanticDecision: `${process.currentPace} pace toward ${labelOf(process.direction)}`,
+    latestChanges: process.lastAdvancedMonth
+      ? [phrase(locale, `Last resolved ${process.lastAdvancedMonth}`, `Последний расчёт: ${process.lastAdvancedMonth}`)]
+      : [phrase(locale, 'Not yet resolved', 'Ещё не рассчитывался')],
+    lastSemanticDecision: phrase(locale, `${process.currentPace} pace toward ${labelOf(process.direction)}`, `${paceLabel} темп в направлении «${labelOf(process.direction)}»`),
     evidenceIds,
   };
 }
