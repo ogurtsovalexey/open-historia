@@ -86,18 +86,31 @@ const COMPILED_POLITY_DISPLAY_NAMES = {
 
 const COMPILED_POLITY_DISPLAY_NAMES_RU = {
   "polity:austria": "Австрийская империя",
+  "polity:baden": "Курфюршество Баден",
   "polity:batavian-republic": "Батавская республика",
+  "polity:bavaria": "Курфюршество Бавария",
+  "polity:brunswick": "Княжество Брауншвейг-Вольфенбюттель",
   "polity:denmark-norway": "Дания — Норвегия",
+  "polity:etruria": "Королевство Этрурия",
   "polity:france": "Французская империя",
+  "polity:hanover": "Курфюршество Ганновер",
+  "polity:hesse-darmstadt": "Ландграфство Гессен-Дармштадт",
+  "polity:hesse-kassel": "Ландграфство Гессен-Кассель",
   "polity:italy": "Итальянская республика",
+  "polity:ligurian-republic": "Лигурийская республика",
+  "polity:naples-sicily": "Королевства Неаполь и Сицилия",
   "polity:ottoman-empire": "Османская империя",
+  "polity:papal-states": "Папская область",
   "polity:portugal": "Королевство Португалии и Алгарве",
   "polity:prussia": "Королевство Пруссия",
   "polity:russia": "Российская империя",
+  "polity:sardinia": "Королевство Сардиния",
+  "polity:saxony": "Курфюршество Саксония",
   "polity:spain": "Королевство Испания",
   "polity:sweden": "Королевство Швеция",
   "polity:swiss-confederation": "Швейцарская конфедерация",
   "polity:united-kingdom": "Соединённое королевство Великобритании и Ирландии",
+  "polity:wurttemberg": "Курфюршество Вюртемберг",
 };
 
 // Catalog prose is presentation metadata, not simulation truth.  Keep it at

@@ -32,6 +32,9 @@ describe('living-world library integration', () => {
     assert.equal(details.data.game.startDate, '1805-01-01');
     assert.equal(details.data.world.playableOwnerCodes.includes('polity:france'), true);
     assert.equal(details.data.world.ownerCodes.includes('polity:hanover'), true);
+    assert.ok(Object.values(details.data.world.polityOverrides).every((polity) => (
+      typeof polity.nameRu === 'string' && polity.nameRu.length > 0
+    )));
   });
 
   it('creates an atomic V3 session and preserves stable polity identity', () => {

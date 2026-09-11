@@ -8,11 +8,17 @@ const applyBp = (value, bp) => Number(BigInt(value) * BigInt(bp) / 10000n);
 const labelOf = (value) => String(value ?? '').split(':').at(-1).replaceAll('-', ' ');
 const RUSSIAN_HISTORICAL_NAMES = Object.freeze({
   'Austrian Empire': 'Австрийская империя', 'Batavian Republic': 'Батавская республика',
+  'Electorate of Baden': 'Курфюршество Баден', 'Electorate of Hanover': 'Курфюршество Ганновер',
   'Danish–Norwegian Realm': 'Датско-норвежское королевство', 'Denmark–Norway': 'Дания — Норвегия',
   'Electorate of Bavaria': 'Курфюршество Бавария', 'Electorate of Saxony': 'Курфюршество Саксония',
+  'Electorate of Württemberg': 'Курфюршество Вюртемберг', 'Kingdom of Etruria': 'Королевство Этрурия',
   'French Empire': 'Французская империя', 'Italian Republic': 'Итальянская республика',
+  'Kingdom of Portugal and the Algarves': 'Королевство Португалии и Алгарве', 'Kingdom of Sardinia': 'Королевство Сардиния',
   'Kingdom of Prussia': 'Королевство Пруссия', 'Kingdom of Spain': 'Королевство Испания',
   'Kingdom of Sweden': 'Королевство Швеция', 'Kingdoms of Naples and Sicily': 'Королевства Неаполь и Сицилия',
+  'Landgraviate of Hesse-Darmstadt': 'Ландграфство Гессен-Дармштадт', 'Landgraviate of Hesse-Kassel': 'Ландграфство Гессен-Кассель',
+  'Ligurian Republic': 'Лигурийская республика', 'Papal States': 'Папская область',
+  'Principality of Brunswick-Wolfenbüttel': 'Княжество Брауншвейг-Вольфенбюттель',
   'Ottoman Empire': 'Османская империя', 'Russian Empire': 'Российская империя',
   'United Kingdom of Great Britain and Ireland': 'Соединённое королевство Великобритании и Ирландии',
   'Baltic Provinces': 'Прибалтийские губернии', 'New Russia': 'Новороссия',
