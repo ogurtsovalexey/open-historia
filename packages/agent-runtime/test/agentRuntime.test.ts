@@ -763,7 +763,6 @@ test('100 active polities all tick for twelve months and rotate within five usin
     agentState = {
       schemaVersion: 'open-historia-agent-state/1',
       consumedActionIds: [],
-      strategicV4: agentState.strategicV4,
       polities: [
         ...agentState.polities.filter((entry) => !selectedSet.has(entry.polityId)),
         ...selected.map((id) => ({
@@ -811,7 +810,6 @@ test('ten-month fallback decision chain matches the dedicated P3a golden', () =>
     agentState = {
       schemaVersion: 'open-historia-agent-state/1',
       consumedActionIds: [],
-      strategicV4: agentState.strategicV4,
       polities: [
         ...agentState.polities.filter((entry) => !chosen.has(entry.polityId)),
         ...decisions.map((decision) => ({
