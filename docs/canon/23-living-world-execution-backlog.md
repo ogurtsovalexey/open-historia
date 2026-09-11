@@ -465,7 +465,7 @@ diplomacy, counterfactual concept and territorial-pressure paths.
 
 Automation supplement: `tests/e2e/living-world-ten-turn-ui.spec.js` now
 plays ten visible player decisions through the production browser shell in
-both Napoleonic France and Central Mesoamerica. It intentionally routes the
+Napoleonic France, Central Mesoamerica, and Europe 1935. It intentionally routes the
 strategic provider to an unreachable local endpoint, asserts the visible
 fail-closed checkpoint, and clicks the explicit **continue without this
 decision** control on each turn. This is not evidence of model quality and
