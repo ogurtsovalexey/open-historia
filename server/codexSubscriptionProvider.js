@@ -452,7 +452,11 @@ export async function inspectCodexSubscription({
       provider: CODEX_SUBSCRIPTION_PROVIDER,
       available: true,
       reason: null,
-      message: "Codex CLI and ChatGPT login detected. A schema transport preflight is still required before the first game turn.",
+      // Inspection cannot know which independently configured Strategic or
+      // Utility model/effort pair the player will select.  Do not imply that
+      // every turn is blocked merely because another pair has no preflight.
+      // The invoke boundary still requires an exact pair-specific record.
+      message: "Codex CLI and ChatGPT login detected. Choose a model and effort; its exact pair needs a current schema preflight before use.",
       cliVersion,
       auth: "chatgpt",
       preflightRequired: true,

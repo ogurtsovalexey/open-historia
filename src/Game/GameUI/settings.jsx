@@ -51,7 +51,7 @@ const SETTINGS_RU = Object.freeze({
     "Search provider, protocol or gateway...": "Поиск провайдера, протокола или шлюза…",
     "Desktop subscription": "Подписка для настольного приложения",
     "Installed Codex CLI using your ChatGPT login; desktop only": "Установленный Codex CLI использует вход ChatGPT; только для настольного приложения.",
-    "Codex CLI and ChatGPT login detected. A schema transport preflight is still required before the first game turn.": "Codex CLI и вход ChatGPT обнаружены. Перед первым ходом нужна проверка схемы обмена.",
+    "Codex CLI and ChatGPT login detected. Choose a model and effort; its exact pair needs a current schema preflight before use.": "Codex CLI и вход ChatGPT обнаружены. Выберите модель и уровень рассуждений: для этой точной пары перед использованием нужна актуальная проверка схемы.",
     "Checking the desktop Codex CLI…": "Проверяем настольный Codex CLI…",
     Model: "Модель", "Reasoning effort": "Уровень рассуждений",
     "Models come from the installed CLI. Tested badges are global; every model/contract pair still needs a local schema preflight.": "Модели берутся из установленного CLI. Метки проверки общие; для каждой пары модели и контракта всё равно нужна локальная проверка схемы.",
