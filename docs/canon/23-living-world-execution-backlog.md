@@ -463,6 +463,16 @@ spans remain blocked. This is still not WP15 completion: repeat the three full
 runs with the configured production provider to cover model-mediated
 diplomacy, counterfactual concept and territorial-pressure paths.
 
+Automation supplement: `tests/e2e/living-world-ten-turn-ui.spec.js` now
+plays ten visible player decisions through the production browser shell in
+both Napoleonic France and Central Mesoamerica. It intentionally routes the
+strategic provider to an unreachable local endpoint, asserts the visible
+fail-closed checkpoint, and clicks the explicit **continue without this
+decision** control on each turn. This is not evidence of model quality and
+does not replace the redacted configured-provider runs above; it prevents a
+future UI refactor from turning an unavailable model into a hidden strategic
+decision or from breaking the ten-turn player loop.
+
 ### 0.6 Definition of a safe handoff between remaining packages
 
 At the end of R1-R6, leave:
