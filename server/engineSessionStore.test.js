@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -12,9 +13,17 @@ import {
   setEngineSessionTestHooks,
 } from "./engineSessionStore.js";
 import { worldV2 } from "@open-historia/engine";
+import { canonicalStringify } from "@open-historia/data-packs";
 import { minimalScenarioV3 } from "../packages/data-packs/dist-test/test/scenarioV3Fixtures.js";
 
 const roots = [];
+const canonical = (value) => {
+  if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
+  if (value && typeof value === "object") return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`).join(",")}}`;
+  return JSON.stringify(value);
+};
+const sha256 = (value) => `sha256:${crypto.createHash("sha256").update(value).digest("hex")}`;
+const descriptor = (bytes) => ({ sha256: sha256(bytes), bytes: Buffer.byteLength(bytes) });
 const gameDir = () => {
   const value = fs.mkdtempSync(path.join(os.tmpdir(), "oh-engine-session-"));
   roots.push(value);
@@ -94,6 +103,59 @@ describe("atomic WorldStateV2 sessions", { concurrency: false }, () => {
     state.turn += 1;
     fs.writeFileSync(statePath, JSON.stringify(state));
     assert.throws(() => readEngineSession(root), (error) => error instanceof EngineSessionError && error.code === "CORRUPT_SESSION");
+  });
+
+  it("reads and rebases only a hash-verified pre-explicit-catalog V2 save", () => {
+    const root = gameDir();
+    const compiled = compiledWorld();
+    const first = commitLivingWorldSession(root, {
+      expectedRevision: null, gameId: "living-game", scenarioId: compiled.seed.id,
+      seedChecksum: compiled.seedChecksum, state: compiled.initialState,
+    });
+    const firstDirectory = path.join(root, "engine-session", "revisions", first.manifest.revision.replace(":", "-"));
+    const legacyState = JSON.parse(fs.readFileSync(path.join(firstDirectory, "world-state.json"), "utf8"));
+    for (const region of legacyState.regions) delete region.adjacentRegionIds;
+    for (const relationshipType of legacyState.catalogs.relationshipTypes) delete relationshipType.playerProposable;
+    const { revision: _revision, ...legacyContent } = legacyState;
+    void _revision;
+    legacyState.revision = sha256(canonicalStringify(legacyContent));
+
+    const payloads = {
+      state: `${JSON.stringify(legacyState)}\n`,
+      lastTransition: fs.readFileSync(path.join(firstDirectory, "last-transition.json"), "utf8"),
+      strategicState: fs.readFileSync(path.join(firstDirectory, "strategic-state.json"), "utf8"),
+      agentTurn: fs.readFileSync(path.join(firstDirectory, "agent-turn.json"), "utf8"),
+      playerIntent: fs.readFileSync(path.join(firstDirectory, "player-intent.json"), "utf8"),
+    };
+    const content = {
+      schema: ENGINE_SESSION_SCHEMA_V3, gameId: "living-game", scenarioId: compiled.seed.id,
+      seedChecksum: compiled.seedChecksum, parentRevision: first.manifest.revision,
+      worldRevision: legacyState.revision, gameDate: legacyState.month, turn: legacyState.turn,
+      playerDecisionIndex: 0,
+      files: Object.fromEntries(Object.entries(payloads).map(([key, bytes]) => [key, descriptor(bytes)])),
+    };
+    const legacyManifest = { ...content, revision: sha256(canonical(content)) };
+    const legacyDirectory = path.join(root, "engine-session", "revisions", legacyManifest.revision.replace(":", "-"));
+    fs.mkdirSync(legacyDirectory, { recursive: true });
+    const filenames = { state: "world-state.json", lastTransition: "last-transition.json", strategicState: "strategic-state.json", agentTurn: "agent-turn.json", playerIntent: "player-intent.json" };
+    for (const [key, filename] of Object.entries(filenames)) fs.writeFileSync(path.join(legacyDirectory, filename), payloads[key]);
+    fs.writeFileSync(path.join(legacyDirectory, "manifest.json"), `${canonical(legacyManifest)}\n`);
+    fs.writeFileSync(path.join(root, "engine-session", "current.json"), `${canonical({ revision: legacyManifest.revision })}\n`);
+
+    const migrated = readEngineSession(root);
+    assert.equal(migrated.manifest.migratedWorldStateV2, true);
+    assert.notEqual(migrated.state.revision, legacyState.revision);
+    assert.equal(migrated.manifest.worldRevision, migrated.state.revision);
+    assert.equal(migrated.state.regions.every((region) => Array.isArray(region.adjacentRegionIds)), true);
+    assert.equal(migrated.state.catalogs.relationshipTypes.every((entry) => typeof entry.playerProposable === "boolean"), true);
+
+    const rebased = commitLivingWorldSession(root, {
+      expectedRevision: migrated.manifest.revision, gameId: "living-game", scenarioId: compiled.seed.id,
+      seedChecksum: compiled.seedChecksum, state: migrated.state,
+    });
+    assert.equal(rebased.manifest.parentRevision, legacyManifest.revision);
+    assert.equal(rebased.manifest.migratedWorldStateV2, undefined);
+    assert.equal(rebased.state.revision, migrated.state.revision);
   });
 
   it("fails closed when a pointer targets a retired session schema", () => {

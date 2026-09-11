@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { worldV2 } from "@open-historia/engine";
+import { canonicalStringify } from "@open-historia/data-packs";
 
 export const ENGINE_SESSION_SCHEMA_V3 = "open-historia-engine-session/3";
 const POINTER_FILE = "current.json";
@@ -65,6 +66,40 @@ const hook = (name, context) => {
 const descriptor = (bytes) => ({ sha256: sha256(bytes), bytes: Buffer.byteLength(bytes) });
 const parseJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
 
+// V2 sessions published before the adjacency and proposer-catalog fields were
+// made explicit are still valid historical records: their revision was hashed
+// over the then-canonical content, which omitted those fields.  Do not make a
+// broad "try parsing anyway" escape hatch.  We accept exactly that omitted
+// shape only when its original content hash matches, then re-stamp the
+// canonical state in memory. The next normal atomic commit writes the modern
+// revision; malformed or otherwise altered saves still fail closed.
+const legacyWorldRevision = (rawState) => {
+  const { revision: _revision, ...content } = rawState ?? {};
+  void _revision;
+  return sha256(canonicalStringify(content));
+};
+
+const isPreExplicitCatalogWorld = (rawState) => (
+  rawState?.schemaVersion === "open-historia-world/2"
+  && Array.isArray(rawState?.regions)
+  && rawState.regions.every((region) => !Object.hasOwn(region, "adjacentRegionIds"))
+  && Array.isArray(rawState?.catalogs?.relationshipTypes)
+  && rawState.catalogs.relationshipTypes.every((type) => !Object.hasOwn(type, "playerProposable"))
+  && typeof rawState?.revision === "string"
+  && legacyWorldRevision(rawState) === rawState.revision
+);
+
+const parsePersistedWorldState = (rawState) => {
+  try {
+    return { state: worldV2.parseWorldStateV2(rawState), migrated: false };
+  } catch (error) {
+    if (!isPreExplicitCatalogWorld(rawState)) throw error;
+    const { revision: _legacyRevision, ...legacyContent } = rawState;
+    void _legacyRevision;
+    return { state: worldV2.stampWorldStateRevision(legacyContent), migrated: true };
+  }
+};
+
 const verifyDirectoryFiles = (dir, manifest) => {
   for (const [key, filename] of Object.entries(filesForSchema())) {
     const bytes = fs.readFileSync(path.join(dir, filename), "utf8");
@@ -112,8 +147,9 @@ export const readEngineSession = (gameDir) => {
     const dir = revisionFor(gameDir, pointer.revision);
     const manifest = verifyManifest(gameDir, parseJson(path.join(dir, MANIFEST_FILE)));
     if (manifest.revision !== pointer.revision) throw new Error("pointer mismatch");
-    const state = worldV2.parseWorldStateV2(parseJson(path.join(dir, FILES_V3.state)));
-    if (state.revision !== manifest.worldRevision
+    const parsedState = parsePersistedWorldState(parseJson(path.join(dir, FILES_V3.state)));
+    const state = parsedState.state;
+    if ((!parsedState.migrated && state.revision !== manifest.worldRevision)
       || state.scenarioId !== manifest.scenarioId
       || state.revisionLineage.seedRevision !== manifest.seedChecksum
       || state.month !== manifest.gameDate
@@ -121,7 +157,11 @@ export const readEngineSession = (gameDir) => {
       throw new EngineSessionError("CORRUPT_SESSION", "living-world manifest does not match its canonical WorldStateV2");
     }
     return {
-      manifest,
+      // The on-disk manifest remains immutable and hash-verified. Its in-memory
+      // view follows the re-stamped world revision so all subsequent commands
+      // can commit one normal child revision and permanently leave the legacy
+      // representation behind.
+      manifest: parsedState.migrated ? { ...manifest, worldRevision: state.revision, migratedWorldStateV2: true } : manifest,
       state,
       playerDecisionIndex: Number.isSafeInteger(manifest.playerDecisionIndex) && manifest.playerDecisionIndex >= 0
         ? manifest.playerDecisionIndex : 0,
