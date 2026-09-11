@@ -9,6 +9,7 @@ import { expect, test } from "@playwright/test";
 const scenarios = [
   { slug: "napoleon", scenarioId: "scenario:napoleonic-europe-1805", playerPolityId: "polity:france", finalDate: "1807-07-01" },
   { slug: "mesoamerica", scenarioId: "scenario:central-mesoamerica-1450", playerPolityId: "polity:tenochtitlan", finalDate: "1452-07-01" },
+  { slug: "europe-1935", scenarioId: "scenario:europe-1935-benchmark", playerPolityId: "polity:poland", finalDate: "1937-07-01" },
 ];
 
 for (const scenario of scenarios) {
