@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { worldV2 } from '@open-historia/engine';
-import { readEngineSession } from '../server/engineSessionStore.js';
+import { parsePersistedWorldState, readEngineSession } from '../server/engineSessionStore.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const REVISION_PATTERN = /^sha256:[a-f0-9]{64}$/;
@@ -66,7 +66,10 @@ function readRevisionChain(gameDirectory, latestRevision, polityId) {
     const directory = revisionDirectory(gameDirectory, revision);
     const manifest = readJson(path.join(directory, 'manifest.json'));
     if (manifest.revision !== revision) throw new Error('engine-session manifest revision does not match its directory');
-    const state = worldV2.parseWorldStateV2(readJson(path.join(directory, 'world-state.json')));
+    // Do not parse immutable revision files independently of the session
+    // store. Some historical V2 revisions predate explicit catalog defaults;
+    // the store accepts only their exact old shape and re-stamps it in memory.
+    const { state } = parsePersistedWorldState(readJson(path.join(directory, 'world-state.json')));
     const transition = readJson(path.join(directory, 'last-transition.json'));
     const playerIntent = readJson(path.join(directory, 'player-intent.json'));
     reverse.push({

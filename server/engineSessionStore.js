@@ -89,7 +89,11 @@ const isPreExplicitCatalogWorld = (rawState) => (
   && legacyWorldRevision(rawState) === rawState.revision
 );
 
-const parsePersistedWorldState = (rawState) => {
+// Kept public for read-only tooling (for example, the playtest audit).  Every
+// consumer of immutable session revisions must apply the same deliberately
+// narrow compatibility rule as the live server; otherwise an old but valid
+// campaign can open in the UI yet become impossible to audit.
+export const parsePersistedWorldState = (rawState) => {
   try {
     return { state: worldV2.parseWorldStateV2(rawState), migrated: false };
   } catch (error) {
