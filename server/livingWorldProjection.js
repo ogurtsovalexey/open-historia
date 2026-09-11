@@ -10,13 +10,21 @@ const RUSSIAN_RESOURCE_NAMES = Object.freeze({
   grain: 'зерно', timber: 'древесина', iron: 'железо', horses: 'лошади',
   fibers: 'волокно', powder: 'пороховой состав', provisions: 'провиант',
   cloth: 'ткань', arms: 'вооружение', gunpowder: 'порох', luxury: 'предметы роскоши',
-  maize: 'кукуруза', cacao: 'какао', obsidian: 'обсидиан', salt: 'соль',
+  maize: 'кукуруза', 'food-basket': 'продовольствие', obsidian: 'обсидиан', cotton: 'хлопок', cacao: 'какао',
+  stone: 'камень', clay: 'глина', salt: 'соль', 'maguey-fiber': 'волокно магея', mantles: 'накидки',
+  pottery: 'керамика', paper: 'бумага', feathers: 'перья', copal: 'копал', shell: 'раковины',
+  greenstone: 'зелёный камень', gold: 'золото', copper: 'медь', weapons: 'оружие', shields: 'щиты',
+  'cotton-armour': 'хлопковый доспех',
 });
 const RUSSIAN_RESOURCE_DELIVERY_NAMES = Object.freeze({
   grain: 'зерна', timber: 'древесины', iron: 'железа', horses: 'лошадей',
   fibers: 'волокна', powder: 'порохового состава', provisions: 'провианта',
   cloth: 'ткани', arms: 'вооружения', gunpowder: 'пороха', luxury: 'предметов роскоши',
-  maize: 'кукурузы', cacao: 'какао', obsidian: 'обсидиана', salt: 'соли',
+  maize: 'кукурузы', 'food-basket': 'продовольствия', obsidian: 'обсидиана', cotton: 'хлопка', cacao: 'какао',
+  stone: 'камня', clay: 'глины', salt: 'соли', 'maguey-fiber': 'волокна магея', mantles: 'накидок',
+  pottery: 'керамики', paper: 'бумаги', feathers: 'перьев', copal: 'копала', shell: 'раковин',
+  greenstone: 'зелёного камня', gold: 'золота', copper: 'меди', weapons: 'оружия', shields: 'щитов',
+  'cotton-armour': 'хлопкового доспеха',
 });
 const resourceLabel = (value, locale) => {
   const label = labelOf(value);
