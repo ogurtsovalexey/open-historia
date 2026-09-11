@@ -94,6 +94,23 @@ const regionRows = [
   ['tochtepec-corridor', 'Tochtepec exchange corridor', 'polity:tochtepec'], ['soconusco-corridor', 'Soconusco exchange corridor', 'polity:soconusco'],
 ];
 
+// Preserve the local historical names while giving the Russian interface an
+// authored reading. These names travel with ScenarioV3 into facts, situations
+// and diplomatic previews; they are not a lossy UI-side transliteration pass.
+const regionNamesRu = Object.freeze({
+  tenochtitlan: 'Мехико-Теночтитлан', tlatelolco: 'Мехико-Тлателолько', texcoco: 'Тескоко', tlacopan: 'Тлакопан',
+  xochimilco: 'Сочимилько', culhuacan: 'Кулуакан', coyoacan: 'Койоакан', azcapotzalco: 'Аскапоцалько',
+  cuauhtitlan: 'Куаутитлан', otompan: 'Отомпан', teotihuacan: 'Теотиуакан', acolman: 'Акольман',
+  tepeticpac: 'Тепетикпак', ocotelulco: 'Окотелолько', quiahuiztlan: 'Киауистлан', tizatlan: 'Тисатлан',
+  cholollan: 'Чололлан', huexotzinco: 'Уэшоцинко', tepeaca: 'Тепеака', cuauhtinchan: 'Куаутинчан',
+  chalco: 'Чалько', amecameca: 'Амекамека', cuauhnahuac: 'Куаунауак', yautepec: 'Яутепек', huaxtepec: 'Уаштепек', tlayacapan: 'Тлайякапан',
+  tzintzuntzan: 'Цинцунцан', patzcuaro: 'Пацкуаро', ihuatzio: 'Иуацио', uruapan: 'Уруапан', zacapu: 'Сакапу', cuitzeo: 'Куицео',
+  'ucareo-zinapecuaro': 'Укарео — Синапекуаро', 'balsas-frontier': 'Пограничье Бальсас',
+  tututepec: 'Юку Дзаа (Тутутепек)', coixtlahuaca: 'Койштлауака', tilantongo: 'Тилантонго', tlaxiaco: 'Тлашиако', teozacoalco: 'Теосакоалько', nochistlan: 'Ночистлан', yanhuitlan: 'Яньюитлан', huajuapan: 'Уахуапан',
+  'tochtepec-corridor': 'Торговый коридор Точтепек', 'soconusco-corridor': 'Торговый коридор Соконуско',
+});
+const regionDisplayName = (slugName, displayName) => ({ en: displayName, ru: regionNamesRu[slugName] ?? displayName });
+
 // These central estimates are playable simulation controls. They are deliberately
 // lower-confidence than the structural records and must never be presented as an exact census.
 const polityPopulationControls = {
@@ -279,7 +296,7 @@ for (const [slugName, displayName, owner] of regionRows) {
   if (/tututepec|tochtepec|soconusco/i.test(slugName)) resources['commodity:cacao'] = Math.max(1, Math.floor(population / 800));
   if (owner === 'polity:purepecha') resources['commodity:copper'] = Math.max(1, Math.floor(population / 1000));
   scenario.startingState.regions[id] = {
-    id, displayName: { en: displayName }, legalOwnerPolityId: owner, actualControllerPolityId: owner,
+    id, displayName: regionDisplayName(slugName, displayName), legalOwnerPolityId: owner, actualControllerPolityId: owner,
     controlProfileId: 'control-profile:sovereign-altepetl', fiscalBase: Math.max(1, Math.floor(population / 200)),
     productiveCapacity: Math.max(1, Math.floor(population / 100)),
     supplyCapacity: Math.max(1, Math.floor(population / 80)), resources, evidenceIds: [evidenceId],

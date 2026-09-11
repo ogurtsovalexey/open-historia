@@ -1513,7 +1513,8 @@
       "region:meso1450:acolman": {
         "id": "region:meso1450:acolman",
         "displayName": {
-          "en": "Acolman"
+          "en": "Acolman",
+          "ru": "Акольман"
         },
         "legalOwnerPolityId": "polity:texcoco",
         "actualControllerPolityId": "polity:texcoco",
@@ -1535,7 +1536,8 @@
       "region:meso1450:amecameca": {
         "id": "region:meso1450:amecameca",
         "displayName": {
-          "en": "Amecameca"
+          "en": "Amecameca",
+          "ru": "Амекамека"
         },
         "legalOwnerPolityId": "polity:chalco",
         "actualControllerPolityId": "polity:chalco",
@@ -1557,7 +1559,8 @@
       "region:meso1450:azcapotzalco": {
         "id": "region:meso1450:azcapotzalco",
         "displayName": {
-          "en": "Azcapotzalco"
+          "en": "Azcapotzalco",
+          "ru": "Аскапоцалько"
         },
         "legalOwnerPolityId": "polity:azcapotzalco",
         "actualControllerPolityId": "polity:azcapotzalco",
@@ -1579,7 +1582,8 @@
       "region:meso1450:balsas-frontier": {
         "id": "region:meso1450:balsas-frontier",
         "displayName": {
-          "en": "Balsas frontier"
+          "en": "Balsas frontier",
+          "ru": "Пограничье Бальсас"
         },
         "legalOwnerPolityId": "polity:purepecha",
         "actualControllerPolityId": "polity:purepecha",
@@ -1602,7 +1606,8 @@
       "region:meso1450:chalco": {
         "id": "region:meso1450:chalco",
         "displayName": {
-          "en": "Chalco"
+          "en": "Chalco",
+          "ru": "Чалько"
         },
         "legalOwnerPolityId": "polity:chalco",
         "actualControllerPolityId": "polity:chalco",
@@ -1624,7 +1629,8 @@
       "region:meso1450:cholollan": {
         "id": "region:meso1450:cholollan",
         "displayName": {
-          "en": "Cholollan"
+          "en": "Cholollan",
+          "ru": "Чололлан"
         },
         "legalOwnerPolityId": "polity:cholollan",
         "actualControllerPolityId": "polity:cholollan",
@@ -1646,7 +1652,8 @@
       "region:meso1450:coixtlahuaca": {
         "id": "region:meso1450:coixtlahuaca",
         "displayName": {
-          "en": "Coixtlahuaca"
+          "en": "Coixtlahuaca",
+          "ru": "Койштлауака"
         },
         "legalOwnerPolityId": "polity:coixtlahuaca",
         "actualControllerPolityId": "polity:coixtlahuaca",
@@ -1668,7 +1675,8 @@
       "region:meso1450:coyoacan": {
         "id": "region:meso1450:coyoacan",
         "displayName": {
-          "en": "Coyoacan"
+          "en": "Coyoacan",
+          "ru": "Койоакан"
         },
         "legalOwnerPolityId": "polity:tlacopan",
         "actualControllerPolityId": "polity:tlacopan",
@@ -1690,7 +1698,8 @@
       "region:meso1450:cuauhnahuac": {
         "id": "region:meso1450:cuauhnahuac",
         "displayName": {
-          "en": "Cuauhnahuac"
+          "en": "Cuauhnahuac",
+          "ru": "Куаунауак"
         },
         "legalOwnerPolityId": "polity:cuauhnahuac",
         "actualControllerPolityId": "polity:cuauhnahuac",
@@ -1713,7 +1722,8 @@
       "region:meso1450:cuauhtinchan": {
         "id": "region:meso1450:cuauhtinchan",
         "displayName": {
-          "en": "Cuauhtinchan"
+          "en": "Cuauhtinchan",
+          "ru": "Куаутинчан"
         },
         "legalOwnerPolityId": "polity:cuauhtinchan",
         "actualControllerPolityId": "polity:cuauhtinchan",
@@ -1735,7 +1745,8 @@
       "region:meso1450:cuauhtitlan": {
         "id": "region:meso1450:cuauhtitlan",
         "displayName": {
-          "en": "Cuauhtitlan"
+          "en": "Cuauhtitlan",
+          "ru": "Куаутитлан"
         },
         "legalOwnerPolityId": "polity:cuauhtitlan",
         "actualControllerPolityId": "polity:cuauhtitlan",
@@ -1757,7 +1768,8 @@
       "region:meso1450:cuitzeo": {
         "id": "region:meso1450:cuitzeo",
         "displayName": {
-          "en": "Cuitzeo"
+          "en": "Cuitzeo",
+          "ru": "Куицео"
         },
         "legalOwnerPolityId": "polity:purepecha",
         "actualControllerPolityId": "polity:purepecha",
@@ -1780,7 +1792,8 @@
       "region:meso1450:culhuacan": {
         "id": "region:meso1450:culhuacan",
         "displayName": {
-          "en": "Culhuacan"
+          "en": "Culhuacan",
+          "ru": "Кулуакан"
         },
         "legalOwnerPolityId": "polity:tenochtitlan",
         "actualControllerPolityId": "polity:tenochtitlan",
@@ -1802,7 +1815,8 @@
       "region:meso1450:huajuapan": {
         "id": "region:meso1450:huajuapan",
         "displayName": {
-          "en": "Huajuapan"
+          "en": "Huajuapan",
+          "ru": "Уахуапан"
         },
         "legalOwnerPolityId": "polity:huajuapan",
         "actualControllerPolityId": "polity:huajuapan",
@@ -1824,7 +1838,8 @@
       "region:meso1450:huaxtepec": {
         "id": "region:meso1450:huaxtepec",
         "displayName": {
-          "en": "Huaxtepec"
+          "en": "Huaxtepec",
+          "ru": "Уаштепек"
         },
         "legalOwnerPolityId": "polity:yautepec",
         "actualControllerPolityId": "polity:yautepec",
@@ -1847,7 +1862,8 @@
       "region:meso1450:huexotzinco": {
         "id": "region:meso1450:huexotzinco",
         "displayName": {
-          "en": "Huexotzinco"
+          "en": "Huexotzinco",
+          "ru": "Уэшоцинко"
         },
         "legalOwnerPolityId": "polity:huexotzinco",
         "actualControllerPolityId": "polity:huexotzinco",
@@ -1869,7 +1885,8 @@
       "region:meso1450:ihuatzio": {
         "id": "region:meso1450:ihuatzio",
         "displayName": {
-          "en": "Ihuatzio"
+          "en": "Ihuatzio",
+          "ru": "Иуацио"
         },
         "legalOwnerPolityId": "polity:purepecha",
         "actualControllerPolityId": "polity:purepecha",
@@ -1892,7 +1909,8 @@
       "region:meso1450:nochistlan": {
         "id": "region:meso1450:nochistlan",
         "displayName": {
-          "en": "Nochistlan"
+          "en": "Nochistlan",
+          "ru": "Ночистлан"
         },
         "legalOwnerPolityId": "polity:nochistlan",
         "actualControllerPolityId": "polity:nochistlan",
@@ -1914,7 +1932,8 @@
       "region:meso1450:ocotelulco": {
         "id": "region:meso1450:ocotelulco",
         "displayName": {
-          "en": "Ocotelulco"
+          "en": "Ocotelulco",
+          "ru": "Окотелолько"
         },
         "legalOwnerPolityId": "polity:tlaxcallan",
         "actualControllerPolityId": "polity:tlaxcallan",
@@ -1936,7 +1955,8 @@
       "region:meso1450:otompan": {
         "id": "region:meso1450:otompan",
         "displayName": {
-          "en": "Otompan"
+          "en": "Otompan",
+          "ru": "Отомпан"
         },
         "legalOwnerPolityId": "polity:texcoco",
         "actualControllerPolityId": "polity:texcoco",
@@ -1959,7 +1979,8 @@
       "region:meso1450:patzcuaro": {
         "id": "region:meso1450:patzcuaro",
         "displayName": {
-          "en": "Pátzcuaro"
+          "en": "Pátzcuaro",
+          "ru": "Пацкуаро"
         },
         "legalOwnerPolityId": "polity:purepecha",
         "actualControllerPolityId": "polity:purepecha",
@@ -1982,7 +2003,8 @@
       "region:meso1450:quiahuiztlan": {
         "id": "region:meso1450:quiahuiztlan",
         "displayName": {
-          "en": "Quiahuiztlan"
+          "en": "Quiahuiztlan",
+          "ru": "Киауистлан"
         },
         "legalOwnerPolityId": "polity:tlaxcallan",
         "actualControllerPolityId": "polity:tlaxcallan",
@@ -2004,7 +2026,8 @@
       "region:meso1450:soconusco-corridor": {
         "id": "region:meso1450:soconusco-corridor",
         "displayName": {
-          "en": "Soconusco exchange corridor"
+          "en": "Soconusco exchange corridor",
+          "ru": "Торговый коридор Соконуско"
         },
         "legalOwnerPolityId": "polity:soconusco",
         "actualControllerPolityId": "polity:soconusco",
@@ -2028,7 +2051,8 @@
       "region:meso1450:tenochtitlan": {
         "id": "region:meso1450:tenochtitlan",
         "displayName": {
-          "en": "Mexico-Tenochtitlan"
+          "en": "Mexico-Tenochtitlan",
+          "ru": "Мехико-Теночтитлан"
         },
         "legalOwnerPolityId": "polity:tenochtitlan",
         "actualControllerPolityId": "polity:tenochtitlan",
@@ -2050,7 +2074,8 @@
       "region:meso1450:teotihuacan": {
         "id": "region:meso1450:teotihuacan",
         "displayName": {
-          "en": "Teotihuacan"
+          "en": "Teotihuacan",
+          "ru": "Теотиуакан"
         },
         "legalOwnerPolityId": "polity:texcoco",
         "actualControllerPolityId": "polity:texcoco",
@@ -2073,7 +2098,8 @@
       "region:meso1450:teozacoalco": {
         "id": "region:meso1450:teozacoalco",
         "displayName": {
-          "en": "Teozacoalco"
+          "en": "Teozacoalco",
+          "ru": "Теосакоалько"
         },
         "legalOwnerPolityId": "polity:teozacoalco",
         "actualControllerPolityId": "polity:teozacoalco",
@@ -2095,7 +2121,8 @@
       "region:meso1450:tepeaca": {
         "id": "region:meso1450:tepeaca",
         "displayName": {
-          "en": "Tepeaca"
+          "en": "Tepeaca",
+          "ru": "Тепеака"
         },
         "legalOwnerPolityId": "polity:tepeaca",
         "actualControllerPolityId": "polity:tepeaca",
@@ -2117,7 +2144,8 @@
       "region:meso1450:tepeticpac": {
         "id": "region:meso1450:tepeticpac",
         "displayName": {
-          "en": "Tepeticpac"
+          "en": "Tepeticpac",
+          "ru": "Тепетикпак"
         },
         "legalOwnerPolityId": "polity:tlaxcallan",
         "actualControllerPolityId": "polity:tlaxcallan",
@@ -2139,7 +2167,8 @@
       "region:meso1450:texcoco": {
         "id": "region:meso1450:texcoco",
         "displayName": {
-          "en": "Tetzcoco"
+          "en": "Tetzcoco",
+          "ru": "Тескоко"
         },
         "legalOwnerPolityId": "polity:texcoco",
         "actualControllerPolityId": "polity:texcoco",
@@ -2161,7 +2190,8 @@
       "region:meso1450:tilantongo": {
         "id": "region:meso1450:tilantongo",
         "displayName": {
-          "en": "Tilantongo"
+          "en": "Tilantongo",
+          "ru": "Тилантонго"
         },
         "legalOwnerPolityId": "polity:tilantongo",
         "actualControllerPolityId": "polity:tilantongo",
@@ -2183,7 +2213,8 @@
       "region:meso1450:tizatlan": {
         "id": "region:meso1450:tizatlan",
         "displayName": {
-          "en": "Tizatlan"
+          "en": "Tizatlan",
+          "ru": "Тисатлан"
         },
         "legalOwnerPolityId": "polity:tlaxcallan",
         "actualControllerPolityId": "polity:tlaxcallan",
@@ -2205,7 +2236,8 @@
       "region:meso1450:tlacopan": {
         "id": "region:meso1450:tlacopan",
         "displayName": {
-          "en": "Tlacopan"
+          "en": "Tlacopan",
+          "ru": "Тлакопан"
         },
         "legalOwnerPolityId": "polity:tlacopan",
         "actualControllerPolityId": "polity:tlacopan",
@@ -2227,7 +2259,8 @@
       "region:meso1450:tlatelolco": {
         "id": "region:meso1450:tlatelolco",
         "displayName": {
-          "en": "Mexico-Tlatelolco"
+          "en": "Mexico-Tlatelolco",
+          "ru": "Мехико-Тлателолько"
         },
         "legalOwnerPolityId": "polity:tlatelolco",
         "actualControllerPolityId": "polity:tlatelolco",
@@ -2249,7 +2282,8 @@
       "region:meso1450:tlaxiaco": {
         "id": "region:meso1450:tlaxiaco",
         "displayName": {
-          "en": "Tlaxiaco"
+          "en": "Tlaxiaco",
+          "ru": "Тлашиако"
         },
         "legalOwnerPolityId": "polity:tlaxiaco",
         "actualControllerPolityId": "polity:tlaxiaco",
@@ -2271,7 +2305,8 @@
       "region:meso1450:tlayacapan": {
         "id": "region:meso1450:tlayacapan",
         "displayName": {
-          "en": "Tlayacapan"
+          "en": "Tlayacapan",
+          "ru": "Тлайякапан"
         },
         "legalOwnerPolityId": "polity:chalco",
         "actualControllerPolityId": "polity:chalco",
@@ -2293,7 +2328,8 @@
       "region:meso1450:tochtepec-corridor": {
         "id": "region:meso1450:tochtepec-corridor",
         "displayName": {
-          "en": "Tochtepec exchange corridor"
+          "en": "Tochtepec exchange corridor",
+          "ru": "Торговый коридор Точтепек"
         },
         "legalOwnerPolityId": "polity:tochtepec",
         "actualControllerPolityId": "polity:tochtepec",
@@ -2316,7 +2352,8 @@
       "region:meso1450:tututepec": {
         "id": "region:meso1450:tututepec",
         "displayName": {
-          "en": "Yucu Dzaa (Tututepec)"
+          "en": "Yucu Dzaa (Tututepec)",
+          "ru": "Юку Дзаа (Тутутепек)"
         },
         "legalOwnerPolityId": "polity:tututepec",
         "actualControllerPolityId": "polity:tututepec",
@@ -2340,7 +2377,8 @@
       "region:meso1450:tzintzuntzan": {
         "id": "region:meso1450:tzintzuntzan",
         "displayName": {
-          "en": "Tzintzuntzan"
+          "en": "Tzintzuntzan",
+          "ru": "Цинцунцан"
         },
         "legalOwnerPolityId": "polity:purepecha",
         "actualControllerPolityId": "polity:purepecha",
@@ -2363,7 +2401,8 @@
       "region:meso1450:ucareo-zinapecuaro": {
         "id": "region:meso1450:ucareo-zinapecuaro",
         "displayName": {
-          "en": "Ucareo–Zinapécuaro"
+          "en": "Ucareo–Zinapécuaro",
+          "ru": "Укарео — Синапекуаро"
         },
         "legalOwnerPolityId": "polity:purepecha",
         "actualControllerPolityId": "polity:purepecha",
@@ -2387,7 +2426,8 @@
       "region:meso1450:uruapan": {
         "id": "region:meso1450:uruapan",
         "displayName": {
-          "en": "Uruapan"
+          "en": "Uruapan",
+          "ru": "Уруапан"
         },
         "legalOwnerPolityId": "polity:purepecha",
         "actualControllerPolityId": "polity:purepecha",
@@ -2410,7 +2450,8 @@
       "region:meso1450:xochimilco": {
         "id": "region:meso1450:xochimilco",
         "displayName": {
-          "en": "Xochimilco"
+          "en": "Xochimilco",
+          "ru": "Сочимилько"
         },
         "legalOwnerPolityId": "polity:xochimilco",
         "actualControllerPolityId": "polity:xochimilco",
@@ -2432,7 +2473,8 @@
       "region:meso1450:yanhuitlan": {
         "id": "region:meso1450:yanhuitlan",
         "displayName": {
-          "en": "Yanhuitlan"
+          "en": "Yanhuitlan",
+          "ru": "Яньюитлан"
         },
         "legalOwnerPolityId": "polity:yanhuitlan",
         "actualControllerPolityId": "polity:yanhuitlan",
@@ -2454,7 +2496,8 @@
       "region:meso1450:yautepec": {
         "id": "region:meso1450:yautepec",
         "displayName": {
-          "en": "Yauhtepec"
+          "en": "Yauhtepec",
+          "ru": "Яутепек"
         },
         "legalOwnerPolityId": "polity:yautepec",
         "actualControllerPolityId": "polity:yautepec",
@@ -2477,7 +2520,8 @@
       "region:meso1450:zacapu": {
         "id": "region:meso1450:zacapu",
         "displayName": {
-          "en": "Zacapu"
+          "en": "Zacapu",
+          "ru": "Сакапу"
         },
         "legalOwnerPolityId": "polity:purepecha",
         "actualControllerPolityId": "polity:purepecha",
@@ -7573,7 +7617,7 @@
         "id": "evidence:meso1450-region-acolman",
         "binding": {
           "path": "/startingState/regions/region:meso1450:acolman",
-          "valueChecksum": "sha256:1a80fe1d8b633229c86a06c01378401445c86cfa5363ad7bfdc97319be936084"
+          "valueChecksum": "sha256:461bbd23bfb57f607f4def23ccca5edb7e74edbd1334a544a765bd53c72eec86"
         },
         "basis": {
           "kind": "historical",
@@ -7591,7 +7635,7 @@
         "id": "evidence:meso1450-region-amecameca",
         "binding": {
           "path": "/startingState/regions/region:meso1450:amecameca",
-          "valueChecksum": "sha256:efae072bb3ccf00141b39ad99e26e473dbd6e2472b169fc883c06edbbe471320"
+          "valueChecksum": "sha256:1d190721f392d6c6b3de2bd192ef9dd2a292b477dec526f61179bac5a8661a32"
         },
         "basis": {
           "kind": "historical",
@@ -7609,7 +7653,7 @@
         "id": "evidence:meso1450-region-azcapotzalco",
         "binding": {
           "path": "/startingState/regions/region:meso1450:azcapotzalco",
-          "valueChecksum": "sha256:ceb5271f5cd7239e8d44d1c0251983d7481b56f36b5f2b96fcfe76b082985c04"
+          "valueChecksum": "sha256:7539152dfec738c193d3ac2d34a4c24899f260f2704cc916b6f15388cf2b0ae0"
         },
         "basis": {
           "kind": "historical",
@@ -7627,7 +7671,7 @@
         "id": "evidence:meso1450-region-balsas-frontier",
         "binding": {
           "path": "/startingState/regions/region:meso1450:balsas-frontier",
-          "valueChecksum": "sha256:09f1e13e69a535513cc7bfea38e9d80b67d331eaf4f579f9efe401b7afadccf4"
+          "valueChecksum": "sha256:8ef8657f41e72d804834cdc94d6d313740bbe856987d59bfbe6c074c6bed9883"
         },
         "basis": {
           "kind": "historical",
@@ -7646,7 +7690,7 @@
         "id": "evidence:meso1450-region-chalco",
         "binding": {
           "path": "/startingState/regions/region:meso1450:chalco",
-          "valueChecksum": "sha256:4a437c281f5cd54c208b863869c05c5cdd36a1309be5e8fd19be562007c65e78"
+          "valueChecksum": "sha256:0fa799a4fa667a7601849ccc3f49fc5a1da9e99cd2261faa2cb116167af2a6bd"
         },
         "basis": {
           "kind": "historical",
@@ -7664,7 +7708,7 @@
         "id": "evidence:meso1450-region-cholollan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:cholollan",
-          "valueChecksum": "sha256:3dc5619b48bd9a007b818731f37c88276926803501e6dc6f540d8a0742a28271"
+          "valueChecksum": "sha256:72f665fe14df13d2c08c827c22b824da0ce514434d6a71043c5acf096ac69492"
         },
         "basis": {
           "kind": "historical",
@@ -7682,7 +7726,7 @@
         "id": "evidence:meso1450-region-coixtlahuaca",
         "binding": {
           "path": "/startingState/regions/region:meso1450:coixtlahuaca",
-          "valueChecksum": "sha256:e5500d12dda6672a2984abdcc11599e31a7a272b3e42e22ec33d8bbb65baeaf5"
+          "valueChecksum": "sha256:06b76823d5da18d1aa1f2f6e9f7e27786fb7d562e0e170b6413f06a66710e05b"
         },
         "basis": {
           "kind": "historical",
@@ -7700,7 +7744,7 @@
         "id": "evidence:meso1450-region-coyoacan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:coyoacan",
-          "valueChecksum": "sha256:6107f1752fa357e0a74852e47101ad88a055b11a8fbb2c7cd7b5f08f5074da4a"
+          "valueChecksum": "sha256:97c57318eb107040c82f5ba8adb4ca8fcb50c07bee04cde5e011ce99ab3f7e06"
         },
         "basis": {
           "kind": "historical",
@@ -7718,7 +7762,7 @@
         "id": "evidence:meso1450-region-cuauhnahuac",
         "binding": {
           "path": "/startingState/regions/region:meso1450:cuauhnahuac",
-          "valueChecksum": "sha256:e3bde79b9b0a9ff23c1df975ee69de0e39be55462286496cbd2bf0cecbeca228"
+          "valueChecksum": "sha256:6e1c4b76c8f58da4fbc8a2ca84a6d73c76af252320ca74897737d81b0f3f54de"
         },
         "basis": {
           "kind": "historical",
@@ -7736,7 +7780,7 @@
         "id": "evidence:meso1450-region-cuauhtinchan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:cuauhtinchan",
-          "valueChecksum": "sha256:354c7d64cb07e420c2f3078ed89107c41df697c175b696aa47ec238548eee10e"
+          "valueChecksum": "sha256:d3021aacd13f81de1f5c36a66cdfed05942312b7f7866fe2df11cec740af577e"
         },
         "basis": {
           "kind": "historical",
@@ -7754,7 +7798,7 @@
         "id": "evidence:meso1450-region-cuauhtitlan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:cuauhtitlan",
-          "valueChecksum": "sha256:3f09167580773020a43741a00acbeb16975a48aa1ad7f928ddf6c2badc4a7589"
+          "valueChecksum": "sha256:3bb050e4705bab89cc4c5fad58b49c03b47b2feed1ca7962dd1ebe7037db6c28"
         },
         "basis": {
           "kind": "historical",
@@ -7772,7 +7816,7 @@
         "id": "evidence:meso1450-region-cuitzeo",
         "binding": {
           "path": "/startingState/regions/region:meso1450:cuitzeo",
-          "valueChecksum": "sha256:e30a0631a5b98c3f4abd8ab47d87840fc9bf429f21aeec0a97485e3d830ad4d0"
+          "valueChecksum": "sha256:a0e1d55cfb768edd4126c67a3546b3f96563c8d1d05bd05d2fd66084cfafca85"
         },
         "basis": {
           "kind": "historical",
@@ -7791,7 +7835,7 @@
         "id": "evidence:meso1450-region-culhuacan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:culhuacan",
-          "valueChecksum": "sha256:904b153c74723ce739b931e1fadff107ea1b731de8dc8f4dc238a05e59afb9bd"
+          "valueChecksum": "sha256:9958f48f23d1c6ad59dff21a01a3202890c6a28db69d70c12e7fcdb1f6925b96"
         },
         "basis": {
           "kind": "historical",
@@ -7809,7 +7853,7 @@
         "id": "evidence:meso1450-region-huajuapan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:huajuapan",
-          "valueChecksum": "sha256:447492927d64d0e894b8e473106ef16c398cd4b756838da87568ca51e5015ac7"
+          "valueChecksum": "sha256:9a8acfddaf03b23263642db2a7b0e6f12b735be07f9d6420c11ca71e3e1cb831"
         },
         "basis": {
           "kind": "historical",
@@ -7827,7 +7871,7 @@
         "id": "evidence:meso1450-region-huaxtepec",
         "binding": {
           "path": "/startingState/regions/region:meso1450:huaxtepec",
-          "valueChecksum": "sha256:6283e5a9a9d0861e755e9b7c4ae3098d4c87dcf1ab4ec4e30544bc21c27b4a49"
+          "valueChecksum": "sha256:520f94ae781a1f06910864fec266b65f195df806c19e7fc469c8aead7eccbbde"
         },
         "basis": {
           "kind": "historical",
@@ -7845,7 +7889,7 @@
         "id": "evidence:meso1450-region-huexotzinco",
         "binding": {
           "path": "/startingState/regions/region:meso1450:huexotzinco",
-          "valueChecksum": "sha256:e44c71f5024faeb409c66fef81ed3efd85c43cab6f7bd09166d5cc5863aed520"
+          "valueChecksum": "sha256:e04a186c48c9bb1a9b59f08e7f41fae9264c084c8d4b6d059310b6df1dc18d64"
         },
         "basis": {
           "kind": "historical",
@@ -7863,7 +7907,7 @@
         "id": "evidence:meso1450-region-ihuatzio",
         "binding": {
           "path": "/startingState/regions/region:meso1450:ihuatzio",
-          "valueChecksum": "sha256:5240ed0997dac0956c09938a0790b5acf7ad25459c15639cea46e9e528a509ad"
+          "valueChecksum": "sha256:cbf31dd86f0e1c3577203df264a381b61b6ef49fb5899b33a61122ad9692f3f9"
         },
         "basis": {
           "kind": "historical",
@@ -7882,7 +7926,7 @@
         "id": "evidence:meso1450-region-nochistlan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:nochistlan",
-          "valueChecksum": "sha256:1508cc34ed6aac4b009a79e11cea281eaab98c03fc1dc3c8fe38447a250e5bcf"
+          "valueChecksum": "sha256:2d4e7fe1b75ad7b76e1ba2a7136708ed3f41981d965dcf2f18f6e0f1584c3d07"
         },
         "basis": {
           "kind": "historical",
@@ -7900,7 +7944,7 @@
         "id": "evidence:meso1450-region-ocotelulco",
         "binding": {
           "path": "/startingState/regions/region:meso1450:ocotelulco",
-          "valueChecksum": "sha256:d7b2a035e2168824944d9798ef31fc51ea8b8b35633da86af365cf431bbf212f"
+          "valueChecksum": "sha256:faf9e4021ca1fb1f07b61096fbd4404e0f3d272a85c41c6f24e79be7d8248e4c"
         },
         "basis": {
           "kind": "historical",
@@ -7918,7 +7962,7 @@
         "id": "evidence:meso1450-region-otompan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:otompan",
-          "valueChecksum": "sha256:dfa9dc8ea1d7374deb0eb30c6de21de455067e45698e23b1f1c3ed4010a6f69f"
+          "valueChecksum": "sha256:70fbd9bcb36cf56207486afcaee91cd5c4a7f73a4eca3ea92987230e20c605bc"
         },
         "basis": {
           "kind": "historical",
@@ -7936,7 +7980,7 @@
         "id": "evidence:meso1450-region-patzcuaro",
         "binding": {
           "path": "/startingState/regions/region:meso1450:patzcuaro",
-          "valueChecksum": "sha256:46537ea365812d26806be476835b2091aff1c6e14c8b79170af85e5a1e759520"
+          "valueChecksum": "sha256:ba57eec342a1d8545f55573f66ee78089acd29108e69ee20dcf56089b933e21a"
         },
         "basis": {
           "kind": "historical",
@@ -7955,7 +7999,7 @@
         "id": "evidence:meso1450-region-quiahuiztlan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:quiahuiztlan",
-          "valueChecksum": "sha256:19ec6efc26a5dd315c1fbdfe4fcbf3aaa3043e178c03a9a45d0685fd2249f8e5"
+          "valueChecksum": "sha256:9f6c303c6e106b894aa8586ae8f1586e07912d1d4f1fd499f5b95e7825302d91"
         },
         "basis": {
           "kind": "historical",
@@ -7973,7 +8017,7 @@
         "id": "evidence:meso1450-region-soconusco-corridor",
         "binding": {
           "path": "/startingState/regions/region:meso1450:soconusco-corridor",
-          "valueChecksum": "sha256:73f7132d49dcb53073f0c46298fc2270aeb6e80e2aa4c92cf43917f9d8771403"
+          "valueChecksum": "sha256:d436e4bc84f22e6324229d4f90536785bfa6f2b92bc31c21791a8fb09dce594c"
         },
         "basis": {
           "kind": "historical",
@@ -7991,7 +8035,7 @@
         "id": "evidence:meso1450-region-tenochtitlan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tenochtitlan",
-          "valueChecksum": "sha256:5f2f2773c1da2d62eff9645f2b913ef11f78b66d31f95e59586774dc0bbe86d0"
+          "valueChecksum": "sha256:b8fceada8e3f459c54e9af4126416dd6f4068f6ffefd0368e9185e9bd153f8db"
         },
         "basis": {
           "kind": "historical",
@@ -8009,7 +8053,7 @@
         "id": "evidence:meso1450-region-teotihuacan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:teotihuacan",
-          "valueChecksum": "sha256:500e4003e7ad3fc92683b8f1b118ab1a17570821220237f6afde482f13fd4fc4"
+          "valueChecksum": "sha256:2b1bb570a45246250b52842d4912acba7a601f09f53ffdf35bb4a2697f729a60"
         },
         "basis": {
           "kind": "historical",
@@ -8027,7 +8071,7 @@
         "id": "evidence:meso1450-region-teozacoalco",
         "binding": {
           "path": "/startingState/regions/region:meso1450:teozacoalco",
-          "valueChecksum": "sha256:0d909bf6d7747532fdebf505fdd0e36c3f9fb4ed4ac7522f361d7cdb6f9b2182"
+          "valueChecksum": "sha256:a47931c36a48801e36860905e6ad37e91120bab12cf6587eadf31d8f7dba5c2e"
         },
         "basis": {
           "kind": "historical",
@@ -8045,7 +8089,7 @@
         "id": "evidence:meso1450-region-tepeaca",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tepeaca",
-          "valueChecksum": "sha256:b73ea42576d80affc7c65651b2d2815c2ef050f94b609aebc2a20fdbd0f1bdd8"
+          "valueChecksum": "sha256:c2dc3f664cce86628c032db64014f2ccd18e237cc88281166c06ddefad2872a2"
         },
         "basis": {
           "kind": "historical",
@@ -8063,7 +8107,7 @@
         "id": "evidence:meso1450-region-tepeticpac",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tepeticpac",
-          "valueChecksum": "sha256:2706f7a74011409b4a360adcfc13ab73d75df01d141eda2e85b5a6a13c4d094a"
+          "valueChecksum": "sha256:713ea30be707e85417781e608895324dd4752cb922c637161d86854046f7d581"
         },
         "basis": {
           "kind": "historical",
@@ -8081,7 +8125,7 @@
         "id": "evidence:meso1450-region-texcoco",
         "binding": {
           "path": "/startingState/regions/region:meso1450:texcoco",
-          "valueChecksum": "sha256:9e5b03714316ce4baae7c3cfa7dbb250b7bd6028daefceae554101a28e8cd6cf"
+          "valueChecksum": "sha256:97facc5a2c0bebe712b6caa1735e353f6389cae661f27340092bb6b3673ff6a2"
         },
         "basis": {
           "kind": "historical",
@@ -8099,7 +8143,7 @@
         "id": "evidence:meso1450-region-tilantongo",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tilantongo",
-          "valueChecksum": "sha256:e4fade2090431ea83d4171aca2708bf4a97d3bfc338fc0d1f023dafa1ac48722"
+          "valueChecksum": "sha256:5ee53ff94988b687703c5e7242f81064eeb538d617003654edc766a72b23392b"
         },
         "basis": {
           "kind": "historical",
@@ -8117,7 +8161,7 @@
         "id": "evidence:meso1450-region-tizatlan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tizatlan",
-          "valueChecksum": "sha256:fc9bb46a34c7870712ce5835316dc11f6fc9c034b7aca81b53cce24893a78c6d"
+          "valueChecksum": "sha256:005ecdfb3a4b6e7cc6398a27087393d165de2a48fe1fa81f700f418eb49c3158"
         },
         "basis": {
           "kind": "historical",
@@ -8135,7 +8179,7 @@
         "id": "evidence:meso1450-region-tlacopan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tlacopan",
-          "valueChecksum": "sha256:6e5bc15176ee8ae5059a986f62af0fcce9bd23df26732a67246293140221f94e"
+          "valueChecksum": "sha256:c32b048b7bf44178cbffa4fbf91282747f487d6a3a25f3160bf3a27b42ef691f"
         },
         "basis": {
           "kind": "historical",
@@ -8153,7 +8197,7 @@
         "id": "evidence:meso1450-region-tlatelolco",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tlatelolco",
-          "valueChecksum": "sha256:c0585886d726ad3ec2cf165e5ec364d084ce4db06207882ebd7805a93cc61fa4"
+          "valueChecksum": "sha256:56d8e257775279797f3279c308eb3cb252e53d77c75f63233d5c909e8992f6d1"
         },
         "basis": {
           "kind": "historical",
@@ -8171,7 +8215,7 @@
         "id": "evidence:meso1450-region-tlaxiaco",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tlaxiaco",
-          "valueChecksum": "sha256:5febfaf7f0fbb69b016c653cc73d51b802a478c35471632dd510d747f09fef26"
+          "valueChecksum": "sha256:cf8477050541c098c442bc65bd9be6e1492fb7e3f1940db52de8290381b22383"
         },
         "basis": {
           "kind": "historical",
@@ -8189,7 +8233,7 @@
         "id": "evidence:meso1450-region-tlayacapan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tlayacapan",
-          "valueChecksum": "sha256:a8852b1604bd5897a790b418c3c5f8297fe89edc0cac228e54ddaee5b8e479a8"
+          "valueChecksum": "sha256:2f40da9b57a4fe43841326e6e49124a3184954aca8c92c2541fda516d0f5885d"
         },
         "basis": {
           "kind": "historical",
@@ -8207,7 +8251,7 @@
         "id": "evidence:meso1450-region-tochtepec-corridor",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tochtepec-corridor",
-          "valueChecksum": "sha256:9617fe4ac22cb086f35a571dc6c64c1d6cb5988115280a83fe2d74e83380f5bb"
+          "valueChecksum": "sha256:d9983a3ddfb0a7327fd3701b6c7950edbac6cc09fb1303de79b21edc8abacf8c"
         },
         "basis": {
           "kind": "historical",
@@ -8225,7 +8269,7 @@
         "id": "evidence:meso1450-region-tututepec",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tututepec",
-          "valueChecksum": "sha256:3dc8a1a085497ed9556710b23d88460b7301c90abf93b899e79e31d1fac31850"
+          "valueChecksum": "sha256:27cc200b37493a63e72de9da5e6354766a54847371ac4c5534f1fbb046118503"
         },
         "basis": {
           "kind": "historical",
@@ -8243,7 +8287,7 @@
         "id": "evidence:meso1450-region-tzintzuntzan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:tzintzuntzan",
-          "valueChecksum": "sha256:4533bea17fddf19a27096680e44c88048e3a838dedcda9076a01b9c2140cfa79"
+          "valueChecksum": "sha256:79d77bcc4a5e8cf74265dc3fc5ab01948e867b419772e03ae5f93c631d993d7b"
         },
         "basis": {
           "kind": "historical",
@@ -8262,7 +8306,7 @@
         "id": "evidence:meso1450-region-ucareo-zinapecuaro",
         "binding": {
           "path": "/startingState/regions/region:meso1450:ucareo-zinapecuaro",
-          "valueChecksum": "sha256:8bbb2973f73e04b21f2363e87622b2107ffd41e10458ca657f84973768059487"
+          "valueChecksum": "sha256:99f955dce7dac87526a46d1d4592529615333df4db01549c1e9e68d179501f79"
         },
         "basis": {
           "kind": "historical",
@@ -8281,7 +8325,7 @@
         "id": "evidence:meso1450-region-uruapan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:uruapan",
-          "valueChecksum": "sha256:42578bf98b83d104a605b10d290bd66f2d2356d31dcb56357290297c4a4e033c"
+          "valueChecksum": "sha256:e0fc9c0f6a151df8afd7596fd1ce68b92f5afa7a56eb21072af88f3716d51c74"
         },
         "basis": {
           "kind": "historical",
@@ -8300,7 +8344,7 @@
         "id": "evidence:meso1450-region-xochimilco",
         "binding": {
           "path": "/startingState/regions/region:meso1450:xochimilco",
-          "valueChecksum": "sha256:491f022c11244fd55ca5250e8f2d392a72332b42fae736cb8ac1769b47006e0a"
+          "valueChecksum": "sha256:0c81125059ca37a28b56c936429f74ea0668082ace3a450ea39dfa70360e9a89"
         },
         "basis": {
           "kind": "historical",
@@ -8318,7 +8362,7 @@
         "id": "evidence:meso1450-region-yanhuitlan",
         "binding": {
           "path": "/startingState/regions/region:meso1450:yanhuitlan",
-          "valueChecksum": "sha256:501a91535a23e43a537c9d42fb7c70f7c2caeb00ff812ba556f38e7dc61252bc"
+          "valueChecksum": "sha256:e6af48beaf3631d5c42f7aac6daab4f48c3410ff56d817e0499fc7aea68b9c02"
         },
         "basis": {
           "kind": "historical",
@@ -8336,7 +8380,7 @@
         "id": "evidence:meso1450-region-yautepec",
         "binding": {
           "path": "/startingState/regions/region:meso1450:yautepec",
-          "valueChecksum": "sha256:81133d34276b179cfb17b280281ad2e54e6fbd50e53eb46fdc3a22efc31f2c53"
+          "valueChecksum": "sha256:030fe69650b0b21902fc59033103b559ded8d1c0f389f92315720e5a2718e332"
         },
         "basis": {
           "kind": "historical",
@@ -8354,7 +8398,7 @@
         "id": "evidence:meso1450-region-zacapu",
         "binding": {
           "path": "/startingState/regions/region:meso1450:zacapu",
-          "valueChecksum": "sha256:6f6d9533d60a9c96f8ad954e79a1ed32be96ee77c756beed88f6ece909435da4"
+          "valueChecksum": "sha256:46da0fe333a7f262df1cced4e88754665c621ee7b20e7f71f6240d2425e188cf"
         },
         "basis": {
           "kind": "historical",

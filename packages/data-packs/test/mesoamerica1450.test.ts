@@ -18,6 +18,13 @@ describe('Central Mesoamerica 1450 shipped ScenarioV3', () => {
     assert.strictEqual(scenario.profile, 'historical');
     assert.strictEqual(scenario.game.startDate, '1450-01-01');
     assert.strictEqual(Object.keys(scenario.startingState.regions).length, 44);
+    assert.ok(Object.values(scenario.startingState.regions).every((region) => (
+      typeof region.displayName.ru === 'string' && /[А-Яа-яЁё]/.test(region.displayName.ru)
+    )), 'every authored Mesoamerican region has a Russian display name');
+    assert.strictEqual(
+      Object.values(scenario.startingState.regions).find((region) => region.id === 'region:meso1450:soconusco-corridor')!.displayName.ru,
+      'Торговый коридор Соконуско',
+    );
     assert.deepStrictEqual(scenario.game.playerEligiblePolityIds, [
       'polity:tenochtitlan', 'polity:texcoco', 'polity:tlacopan', 'polity:tlatelolco',
       'polity:tlaxcallan', 'polity:purepecha', 'polity:cholollan', 'polity:chalco',
