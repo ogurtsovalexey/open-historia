@@ -41,7 +41,8 @@ const RUSSIAN_HISTORICAL_NAMES = Object.freeze({
   'Principality of Brunswick-Wolfenbüttel': 'Княжество Брауншвейг-Вольфенбюттель',
   'Ottoman Empire': 'Османская империя', 'Russian Empire': 'Российская империя',
   'United Kingdom of Great Britain and Ireland': 'Соединённое королевство Великобритании и Ирландии',
-  'Baltic Provinces': 'Прибалтийские губернии', 'New Russia': 'Новороссия',
+  'Baltic Provinces': 'Прибалтийские губернии', Lithuania: 'Литва', Belarus: 'Белоруссия', Volhynia: 'Волынь',
+  Podolia: 'Подолия', 'Ukraine West': 'Правобережная Украина', 'New Russia': 'Новороссия',
 });
 const isRussian = (locale) => String(locale ?? '').toLowerCase().startsWith('ru');
 const localized = (value, locale) => {

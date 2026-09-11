@@ -75,6 +75,30 @@ const areaRegions = {
   'hesse-darmstadt': ['Hesse-Darmstadt'],
   brunswick: ['Brunswick'],
 };
+// Region labels are authored data, not an interface-side best effort.  The
+// Russian campaign must not switch languages when a region enters a situation,
+// diplomatic offer or an engine-derived fact.
+const regionNamesRu = Object.freeze({
+  'Paris and Seine': 'Париж и Сена', Normandy: 'Нормандия', Brittany: 'Бретань', Loire: 'Луара', Aquitaine: 'Аквитания', Pyrenees: 'Пиренеи', Languedoc: 'Лангедок', Provence: 'Прованс', Alps: 'Альпы', Burgundy: 'Бургундия', Alsace: 'Эльзас', Lorraine: 'Лотарингия', Champagne: 'Шампань', Picardy: 'Пикардия', Flanders: 'Фландрия', Corsica: 'Корсика',
+  'London and Home Counties': 'Лондон и домашние графства', 'Southwest England': 'Юго-Западная Англия', Midlands: 'Мидлендс', 'Northern England': 'Северная Англия', Wales: 'Уэльс', 'Scottish Lowlands': 'Шотландская низменность', 'Scottish Highlands': 'Шотландское нагорье', Ireland: 'Ирландия', Gibraltar: 'Гибралтар',
+  'Vienna and Lower Austria': 'Вена и Нижняя Австрия', 'Upper Austria': 'Верхняя Австрия', Salzburg: 'Зальцбург', Bohemia: 'Богемия', Moravia: 'Моравия', 'Austrian Silesia': 'Австрийская Силезия', Tyrol: 'Тироль', 'Carinthia and Carniola': 'Каринтия и Крайна', 'Hungary West': 'Западная Венгрия', 'Hungary East': 'Восточная Венгрия', Venetia: 'Венеция',
+  'Baltic Provinces': 'Прибалтийские губернии', Lithuania: 'Литва', Belarus: 'Белоруссия', Volhynia: 'Волынь', Podolia: 'Подолия', 'Ukraine West': 'Правобережная Украина', 'New Russia': 'Новороссия',
+  Brandenburg: 'Бранденбург', Pomerania: 'Померания', 'East Prussia': 'Восточная Пруссия', 'West Prussia': 'Западная Пруссия', Silesia: 'Силезия', Magdeburg: 'Магдебург', 'Westphalian Prussia': 'Вестфальская Пруссия', Neuchatel: 'Невшатель',
+  'Madrid and Castile': 'Мадрид и Кастилия', Galicia: 'Галисия', 'Basque Provinces and Navarre': 'Баскские провинции и Наварра', Aragon: 'Арагон', Catalonia: 'Каталония', 'Valencia and Murcia': 'Валенсия и Мурсия', Andalusia: 'Андалусия', 'Balearic Islands': 'Балеарские острова',
+  'Thrace and Constantinople': 'Фракия и Константинополь', 'Rumelia East': 'Восточная Румелия', 'Rumelia West': 'Западная Румелия', Bosnia: 'Босния', 'Danubian Principalities': 'Дунайские княжества', 'Morea and Aegean': 'Морея и Эгейские острова', 'Western Anatolia': 'Западная Анатолия',
+  Svealand: 'Свеаланд', Gotaland: 'Гёталанд', Norrland: 'Норрланд', 'Swedish Pomerania': 'Шведская Померания', Finland: 'Финляндия',
+  Zealand: 'Зеландия', Jutland: 'Ютландия', 'Schleswig-Holstein': 'Шлезвиг-Гольштейн', 'Southern Norway': 'Южная Норвегия', 'Northern Norway': 'Северная Норвегия',
+  Campania: 'Кампания', 'Apulia and Calabria': 'Апулия и Калабрия', 'Sicily East': 'Восточная Сицилия', 'Sicily West': 'Западная Сицилия',
+  'Milan and Lombardy': 'Милан и Ломбардия', Emilia: 'Эмилия', Romagna: 'Романья', Modena: 'Модена', Mantua: 'Мантуя',
+  'Upper Bavaria': 'Верхняя Бавария', 'Lower Bavaria': 'Нижняя Бавария', 'Franconian Bavaria': 'Франконская Бавария',
+  Holland: 'Голландия', Friesland: 'Фрисландия', 'Batavian Interior': 'Внутренняя Батавия',
+  'Northern Portugal': 'Северная Португалия', 'Central Portugal': 'Центральная Португалия', 'Southern Portugal': 'Южная Португалия',
+  'Western Switzerland': 'Западная Швейцария', 'Central Switzerland': 'Центральная Швейцария', 'Eastern Switzerland': 'Восточная Швейцария',
+  'Dresden and Meissen': 'Дрезден и Мейсен', 'Leipzig and Thuringian Saxony': 'Лейпциг и Тюрингская Саксония',
+  'Stuttgart and Neckar': 'Штутгарт и Неккар', 'Swabian Württemberg': 'Швабский Вюртемберг', 'Upper Baden': 'Верхний Баден', 'Lower Baden': 'Нижний Баден', Hanover: 'Ганновер', 'Bremen-Verden': 'Бремен-Ферден',
+  'Rome and Lazio': 'Рим и Лацио', 'Umbria and Marche': 'Умбрия и Марке', Tuscany: 'Тоскана', Liguria: 'Лигурия', Sardinia: 'Сардиния', 'Hesse-Kassel': 'Гессен-Кассель', 'Hesse-Darmstadt': 'Гессен-Дармштадт', Brunswick: 'Брауншвейг',
+});
+const regionDisplayName = (name) => ({ en: name, ru: regionNamesRu[name] ?? name });
 
 // Central estimates are simulation controls, not claims of exact census precision.
 // They make population, recruitment, supply and fiscal capacity causally usable from turn one.
@@ -298,7 +322,7 @@ for (let index = 0; index < regions.length; index += 1) {
   if (/Hungary|Normandy|Castile|Ukraine|Prussia|Jutland|Ireland|Anatolia/i.test(region.name)) resources['commodity:horses'] = Math.max(1, Math.floor(population / 900));
   scenario.geography.regions[region.id] = { id: region.id, link: { kind: 'off-map', reason: 'Historical-region geometry remains unknown pending a reviewed, redistributable 1805 boundary asset.' }, adjacentRegionIds: [previous, next].sort() };
   scenario.startingState.regions[region.id] = {
-    id: region.id, displayName: { en: region.name }, legalOwnerPolityId: region.ownerId, actualControllerPolityId: isHanover ? 'polity:france' : region.ownerId,
+    id: region.id, displayName: regionDisplayName(region.name), legalOwnerPolityId: region.ownerId, actualControllerPolityId: isHanover ? 'polity:france' : region.ownerId,
     controlProfileId: isHanover ? 'control-profile:occupation' : 'control-profile:sovereign',
     fiscalBase: Math.max(1, Math.floor(population / 1000)),
     productiveCapacity: Math.max(1, Math.floor(population / 500)),

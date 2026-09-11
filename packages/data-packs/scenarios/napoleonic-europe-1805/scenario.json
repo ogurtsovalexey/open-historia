@@ -2268,7 +2268,8 @@
       "region:nap1805:paris-and-seine": {
         "id": "region:nap1805:paris-and-seine",
         "displayName": {
-          "en": "Paris and Seine"
+          "en": "Paris and Seine",
+          "ru": "Париж и Сена"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2287,7 +2288,8 @@
       "region:nap1805:normandy": {
         "id": "region:nap1805:normandy",
         "displayName": {
-          "en": "Normandy"
+          "en": "Normandy",
+          "ru": "Нормандия"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2307,7 +2309,8 @@
       "region:nap1805:brittany": {
         "id": "region:nap1805:brittany",
         "displayName": {
-          "en": "Brittany"
+          "en": "Brittany",
+          "ru": "Бретань"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2326,7 +2329,8 @@
       "region:nap1805:loire": {
         "id": "region:nap1805:loire",
         "displayName": {
-          "en": "Loire"
+          "en": "Loire",
+          "ru": "Луара"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2345,7 +2349,8 @@
       "region:nap1805:aquitaine": {
         "id": "region:nap1805:aquitaine",
         "displayName": {
-          "en": "Aquitaine"
+          "en": "Aquitaine",
+          "ru": "Аквитания"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2364,7 +2369,8 @@
       "region:nap1805:pyrenees": {
         "id": "region:nap1805:pyrenees",
         "displayName": {
-          "en": "Pyrenees"
+          "en": "Pyrenees",
+          "ru": "Пиренеи"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2383,7 +2389,8 @@
       "region:nap1805:languedoc": {
         "id": "region:nap1805:languedoc",
         "displayName": {
-          "en": "Languedoc"
+          "en": "Languedoc",
+          "ru": "Лангедок"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2402,7 +2409,8 @@
       "region:nap1805:provence": {
         "id": "region:nap1805:provence",
         "displayName": {
-          "en": "Provence"
+          "en": "Provence",
+          "ru": "Прованс"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2421,7 +2429,8 @@
       "region:nap1805:alps": {
         "id": "region:nap1805:alps",
         "displayName": {
-          "en": "Alps"
+          "en": "Alps",
+          "ru": "Альпы"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2440,7 +2449,8 @@
       "region:nap1805:burgundy": {
         "id": "region:nap1805:burgundy",
         "displayName": {
-          "en": "Burgundy"
+          "en": "Burgundy",
+          "ru": "Бургундия"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2459,7 +2469,8 @@
       "region:nap1805:alsace": {
         "id": "region:nap1805:alsace",
         "displayName": {
-          "en": "Alsace"
+          "en": "Alsace",
+          "ru": "Эльзас"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2478,7 +2489,8 @@
       "region:nap1805:lorraine": {
         "id": "region:nap1805:lorraine",
         "displayName": {
-          "en": "Lorraine"
+          "en": "Lorraine",
+          "ru": "Лотарингия"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2497,7 +2509,8 @@
       "region:nap1805:champagne": {
         "id": "region:nap1805:champagne",
         "displayName": {
-          "en": "Champagne"
+          "en": "Champagne",
+          "ru": "Шампань"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2516,7 +2529,8 @@
       "region:nap1805:picardy": {
         "id": "region:nap1805:picardy",
         "displayName": {
-          "en": "Picardy"
+          "en": "Picardy",
+          "ru": "Пикардия"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2535,7 +2549,8 @@
       "region:nap1805:flanders": {
         "id": "region:nap1805:flanders",
         "displayName": {
-          "en": "Flanders"
+          "en": "Flanders",
+          "ru": "Фландрия"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2554,7 +2569,8 @@
       "region:nap1805:corsica": {
         "id": "region:nap1805:corsica",
         "displayName": {
-          "en": "Corsica"
+          "en": "Corsica",
+          "ru": "Корсика"
         },
         "legalOwnerPolityId": "polity:france",
         "actualControllerPolityId": "polity:france",
@@ -2573,7 +2589,8 @@
       "region:nap1805:london-and-home-counties": {
         "id": "region:nap1805:london-and-home-counties",
         "displayName": {
-          "en": "London and Home Counties"
+          "en": "London and Home Counties",
+          "ru": "Лондон и домашние графства"
         },
         "legalOwnerPolityId": "polity:united-kingdom",
         "actualControllerPolityId": "polity:united-kingdom",
@@ -2592,7 +2609,8 @@
       "region:nap1805:southwest-england": {
         "id": "region:nap1805:southwest-england",
         "displayName": {
-          "en": "Southwest England"
+          "en": "Southwest England",
+          "ru": "Юго-Западная Англия"
         },
         "legalOwnerPolityId": "polity:united-kingdom",
         "actualControllerPolityId": "polity:united-kingdom",
@@ -2611,7 +2629,8 @@
       "region:nap1805:midlands": {
         "id": "region:nap1805:midlands",
         "displayName": {
-          "en": "Midlands"
+          "en": "Midlands",
+          "ru": "Мидлендс"
         },
         "legalOwnerPolityId": "polity:united-kingdom",
         "actualControllerPolityId": "polity:united-kingdom",
@@ -2631,7 +2650,8 @@
       "region:nap1805:northern-england": {
         "id": "region:nap1805:northern-england",
         "displayName": {
-          "en": "Northern England"
+          "en": "Northern England",
+          "ru": "Северная Англия"
         },
         "legalOwnerPolityId": "polity:united-kingdom",
         "actualControllerPolityId": "polity:united-kingdom",
@@ -2650,7 +2670,8 @@
       "region:nap1805:wales": {
         "id": "region:nap1805:wales",
         "displayName": {
-          "en": "Wales"
+          "en": "Wales",
+          "ru": "Уэльс"
         },
         "legalOwnerPolityId": "polity:united-kingdom",
         "actualControllerPolityId": "polity:united-kingdom",
@@ -2670,7 +2691,8 @@
       "region:nap1805:scottish-lowlands": {
         "id": "region:nap1805:scottish-lowlands",
         "displayName": {
-          "en": "Scottish Lowlands"
+          "en": "Scottish Lowlands",
+          "ru": "Шотландская низменность"
         },
         "legalOwnerPolityId": "polity:united-kingdom",
         "actualControllerPolityId": "polity:united-kingdom",
@@ -2689,7 +2711,8 @@
       "region:nap1805:scottish-highlands": {
         "id": "region:nap1805:scottish-highlands",
         "displayName": {
-          "en": "Scottish Highlands"
+          "en": "Scottish Highlands",
+          "ru": "Шотландское нагорье"
         },
         "legalOwnerPolityId": "polity:united-kingdom",
         "actualControllerPolityId": "polity:united-kingdom",
@@ -2708,7 +2731,8 @@
       "region:nap1805:ireland": {
         "id": "region:nap1805:ireland",
         "displayName": {
-          "en": "Ireland"
+          "en": "Ireland",
+          "ru": "Ирландия"
         },
         "legalOwnerPolityId": "polity:united-kingdom",
         "actualControllerPolityId": "polity:united-kingdom",
@@ -2728,7 +2752,8 @@
       "region:nap1805:gibraltar": {
         "id": "region:nap1805:gibraltar",
         "displayName": {
-          "en": "Gibraltar"
+          "en": "Gibraltar",
+          "ru": "Гибралтар"
         },
         "legalOwnerPolityId": "polity:united-kingdom",
         "actualControllerPolityId": "polity:united-kingdom",
@@ -2747,7 +2772,8 @@
       "region:nap1805:vienna-and-lower-austria": {
         "id": "region:nap1805:vienna-and-lower-austria",
         "displayName": {
-          "en": "Vienna and Lower Austria"
+          "en": "Vienna and Lower Austria",
+          "ru": "Вена и Нижняя Австрия"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2766,7 +2792,8 @@
       "region:nap1805:upper-austria": {
         "id": "region:nap1805:upper-austria",
         "displayName": {
-          "en": "Upper Austria"
+          "en": "Upper Austria",
+          "ru": "Верхняя Австрия"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2785,7 +2812,8 @@
       "region:nap1805:salzburg": {
         "id": "region:nap1805:salzburg",
         "displayName": {
-          "en": "Salzburg"
+          "en": "Salzburg",
+          "ru": "Зальцбург"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2804,7 +2832,8 @@
       "region:nap1805:bohemia": {
         "id": "region:nap1805:bohemia",
         "displayName": {
-          "en": "Bohemia"
+          "en": "Bohemia",
+          "ru": "Богемия"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2824,7 +2853,8 @@
       "region:nap1805:moravia": {
         "id": "region:nap1805:moravia",
         "displayName": {
-          "en": "Moravia"
+          "en": "Moravia",
+          "ru": "Моравия"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2843,7 +2873,8 @@
       "region:nap1805:austrian-silesia": {
         "id": "region:nap1805:austrian-silesia",
         "displayName": {
-          "en": "Austrian Silesia"
+          "en": "Austrian Silesia",
+          "ru": "Австрийская Силезия"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2863,7 +2894,8 @@
       "region:nap1805:tyrol": {
         "id": "region:nap1805:tyrol",
         "displayName": {
-          "en": "Tyrol"
+          "en": "Tyrol",
+          "ru": "Тироль"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2882,7 +2914,8 @@
       "region:nap1805:carinthia-and-carniola": {
         "id": "region:nap1805:carinthia-and-carniola",
         "displayName": {
-          "en": "Carinthia and Carniola"
+          "en": "Carinthia and Carniola",
+          "ru": "Каринтия и Крайна"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2901,7 +2934,8 @@
       "region:nap1805:hungary-west": {
         "id": "region:nap1805:hungary-west",
         "displayName": {
-          "en": "Hungary West"
+          "en": "Hungary West",
+          "ru": "Западная Венгрия"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2921,7 +2955,8 @@
       "region:nap1805:hungary-east": {
         "id": "region:nap1805:hungary-east",
         "displayName": {
-          "en": "Hungary East"
+          "en": "Hungary East",
+          "ru": "Восточная Венгрия"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2941,7 +2976,8 @@
       "region:nap1805:venetia": {
         "id": "region:nap1805:venetia",
         "displayName": {
-          "en": "Venetia"
+          "en": "Venetia",
+          "ru": "Венеция"
         },
         "legalOwnerPolityId": "polity:austria",
         "actualControllerPolityId": "polity:austria",
@@ -2960,7 +2996,8 @@
       "region:nap1805:baltic-provinces": {
         "id": "region:nap1805:baltic-provinces",
         "displayName": {
-          "en": "Baltic Provinces"
+          "en": "Baltic Provinces",
+          "ru": "Прибалтийские губернии"
         },
         "legalOwnerPolityId": "polity:russia",
         "actualControllerPolityId": "polity:russia",
@@ -2979,7 +3016,8 @@
       "region:nap1805:lithuania": {
         "id": "region:nap1805:lithuania",
         "displayName": {
-          "en": "Lithuania"
+          "en": "Lithuania",
+          "ru": "Литва"
         },
         "legalOwnerPolityId": "polity:russia",
         "actualControllerPolityId": "polity:russia",
@@ -2998,7 +3036,8 @@
       "region:nap1805:belarus": {
         "id": "region:nap1805:belarus",
         "displayName": {
-          "en": "Belarus"
+          "en": "Belarus",
+          "ru": "Белоруссия"
         },
         "legalOwnerPolityId": "polity:russia",
         "actualControllerPolityId": "polity:russia",
@@ -3017,7 +3056,8 @@
       "region:nap1805:volhynia": {
         "id": "region:nap1805:volhynia",
         "displayName": {
-          "en": "Volhynia"
+          "en": "Volhynia",
+          "ru": "Волынь"
         },
         "legalOwnerPolityId": "polity:russia",
         "actualControllerPolityId": "polity:russia",
@@ -3036,7 +3076,8 @@
       "region:nap1805:podolia": {
         "id": "region:nap1805:podolia",
         "displayName": {
-          "en": "Podolia"
+          "en": "Podolia",
+          "ru": "Подолия"
         },
         "legalOwnerPolityId": "polity:russia",
         "actualControllerPolityId": "polity:russia",
@@ -3055,7 +3096,8 @@
       "region:nap1805:ukraine-west": {
         "id": "region:nap1805:ukraine-west",
         "displayName": {
-          "en": "Ukraine West"
+          "en": "Ukraine West",
+          "ru": "Правобережная Украина"
         },
         "legalOwnerPolityId": "polity:russia",
         "actualControllerPolityId": "polity:russia",
@@ -3075,7 +3117,8 @@
       "region:nap1805:new-russia": {
         "id": "region:nap1805:new-russia",
         "displayName": {
-          "en": "New Russia"
+          "en": "New Russia",
+          "ru": "Новороссия"
         },
         "legalOwnerPolityId": "polity:russia",
         "actualControllerPolityId": "polity:russia",
@@ -3094,7 +3137,8 @@
       "region:nap1805:brandenburg": {
         "id": "region:nap1805:brandenburg",
         "displayName": {
-          "en": "Brandenburg"
+          "en": "Brandenburg",
+          "ru": "Бранденбург"
         },
         "legalOwnerPolityId": "polity:prussia",
         "actualControllerPolityId": "polity:prussia",
@@ -3114,7 +3158,8 @@
       "region:nap1805:pomerania": {
         "id": "region:nap1805:pomerania",
         "displayName": {
-          "en": "Pomerania"
+          "en": "Pomerania",
+          "ru": "Померания"
         },
         "legalOwnerPolityId": "polity:prussia",
         "actualControllerPolityId": "polity:prussia",
@@ -3133,7 +3178,8 @@
       "region:nap1805:east-prussia": {
         "id": "region:nap1805:east-prussia",
         "displayName": {
-          "en": "East Prussia"
+          "en": "East Prussia",
+          "ru": "Восточная Пруссия"
         },
         "legalOwnerPolityId": "polity:prussia",
         "actualControllerPolityId": "polity:prussia",
@@ -3153,7 +3199,8 @@
       "region:nap1805:west-prussia": {
         "id": "region:nap1805:west-prussia",
         "displayName": {
-          "en": "West Prussia"
+          "en": "West Prussia",
+          "ru": "Западная Пруссия"
         },
         "legalOwnerPolityId": "polity:prussia",
         "actualControllerPolityId": "polity:prussia",
@@ -3173,7 +3220,8 @@
       "region:nap1805:silesia": {
         "id": "region:nap1805:silesia",
         "displayName": {
-          "en": "Silesia"
+          "en": "Silesia",
+          "ru": "Силезия"
         },
         "legalOwnerPolityId": "polity:prussia",
         "actualControllerPolityId": "polity:prussia",
@@ -3193,7 +3241,8 @@
       "region:nap1805:magdeburg": {
         "id": "region:nap1805:magdeburg",
         "displayName": {
-          "en": "Magdeburg"
+          "en": "Magdeburg",
+          "ru": "Магдебург"
         },
         "legalOwnerPolityId": "polity:prussia",
         "actualControllerPolityId": "polity:prussia",
@@ -3212,7 +3261,8 @@
       "region:nap1805:westphalian-prussia": {
         "id": "region:nap1805:westphalian-prussia",
         "displayName": {
-          "en": "Westphalian Prussia"
+          "en": "Westphalian Prussia",
+          "ru": "Вестфальская Пруссия"
         },
         "legalOwnerPolityId": "polity:prussia",
         "actualControllerPolityId": "polity:prussia",
@@ -3233,7 +3283,8 @@
       "region:nap1805:neuchatel": {
         "id": "region:nap1805:neuchatel",
         "displayName": {
-          "en": "Neuchatel"
+          "en": "Neuchatel",
+          "ru": "Невшатель"
         },
         "legalOwnerPolityId": "polity:prussia",
         "actualControllerPolityId": "polity:prussia",
@@ -3252,7 +3303,8 @@
       "region:nap1805:madrid-and-castile": {
         "id": "region:nap1805:madrid-and-castile",
         "displayName": {
-          "en": "Madrid and Castile"
+          "en": "Madrid and Castile",
+          "ru": "Мадрид и Кастилия"
         },
         "legalOwnerPolityId": "polity:spain",
         "actualControllerPolityId": "polity:spain",
@@ -3272,7 +3324,8 @@
       "region:nap1805:galicia": {
         "id": "region:nap1805:galicia",
         "displayName": {
-          "en": "Galicia"
+          "en": "Galicia",
+          "ru": "Галисия"
         },
         "legalOwnerPolityId": "polity:spain",
         "actualControllerPolityId": "polity:spain",
@@ -3291,7 +3344,8 @@
       "region:nap1805:basque-provinces-and-navarre": {
         "id": "region:nap1805:basque-provinces-and-navarre",
         "displayName": {
-          "en": "Basque Provinces and Navarre"
+          "en": "Basque Provinces and Navarre",
+          "ru": "Баскские провинции и Наварра"
         },
         "legalOwnerPolityId": "polity:spain",
         "actualControllerPolityId": "polity:spain",
@@ -3310,7 +3364,8 @@
       "region:nap1805:aragon": {
         "id": "region:nap1805:aragon",
         "displayName": {
-          "en": "Aragon"
+          "en": "Aragon",
+          "ru": "Арагон"
         },
         "legalOwnerPolityId": "polity:spain",
         "actualControllerPolityId": "polity:spain",
@@ -3329,7 +3384,8 @@
       "region:nap1805:catalonia": {
         "id": "region:nap1805:catalonia",
         "displayName": {
-          "en": "Catalonia"
+          "en": "Catalonia",
+          "ru": "Каталония"
         },
         "legalOwnerPolityId": "polity:spain",
         "actualControllerPolityId": "polity:spain",
@@ -3348,7 +3404,8 @@
       "region:nap1805:valencia-and-murcia": {
         "id": "region:nap1805:valencia-and-murcia",
         "displayName": {
-          "en": "Valencia and Murcia"
+          "en": "Valencia and Murcia",
+          "ru": "Валенсия и Мурсия"
         },
         "legalOwnerPolityId": "polity:spain",
         "actualControllerPolityId": "polity:spain",
@@ -3367,7 +3424,8 @@
       "region:nap1805:andalusia": {
         "id": "region:nap1805:andalusia",
         "displayName": {
-          "en": "Andalusia"
+          "en": "Andalusia",
+          "ru": "Андалусия"
         },
         "legalOwnerPolityId": "polity:spain",
         "actualControllerPolityId": "polity:spain",
@@ -3386,7 +3444,8 @@
       "region:nap1805:balearic-islands": {
         "id": "region:nap1805:balearic-islands",
         "displayName": {
-          "en": "Balearic Islands"
+          "en": "Balearic Islands",
+          "ru": "Балеарские острова"
         },
         "legalOwnerPolityId": "polity:spain",
         "actualControllerPolityId": "polity:spain",
@@ -3405,7 +3464,8 @@
       "region:nap1805:thrace-and-constantinople": {
         "id": "region:nap1805:thrace-and-constantinople",
         "displayName": {
-          "en": "Thrace and Constantinople"
+          "en": "Thrace and Constantinople",
+          "ru": "Фракия и Константинополь"
         },
         "legalOwnerPolityId": "polity:ottoman-empire",
         "actualControllerPolityId": "polity:ottoman-empire",
@@ -3424,7 +3484,8 @@
       "region:nap1805:rumelia-east": {
         "id": "region:nap1805:rumelia-east",
         "displayName": {
-          "en": "Rumelia East"
+          "en": "Rumelia East",
+          "ru": "Восточная Румелия"
         },
         "legalOwnerPolityId": "polity:ottoman-empire",
         "actualControllerPolityId": "polity:ottoman-empire",
@@ -3443,7 +3504,8 @@
       "region:nap1805:rumelia-west": {
         "id": "region:nap1805:rumelia-west",
         "displayName": {
-          "en": "Rumelia West"
+          "en": "Rumelia West",
+          "ru": "Западная Румелия"
         },
         "legalOwnerPolityId": "polity:ottoman-empire",
         "actualControllerPolityId": "polity:ottoman-empire",
@@ -3462,7 +3524,8 @@
       "region:nap1805:bosnia": {
         "id": "region:nap1805:bosnia",
         "displayName": {
-          "en": "Bosnia"
+          "en": "Bosnia",
+          "ru": "Босния"
         },
         "legalOwnerPolityId": "polity:ottoman-empire",
         "actualControllerPolityId": "polity:ottoman-empire",
@@ -3481,7 +3544,8 @@
       "region:nap1805:danubian-principalities": {
         "id": "region:nap1805:danubian-principalities",
         "displayName": {
-          "en": "Danubian Principalities"
+          "en": "Danubian Principalities",
+          "ru": "Дунайские княжества"
         },
         "legalOwnerPolityId": "polity:ottoman-empire",
         "actualControllerPolityId": "polity:ottoman-empire",
@@ -3500,7 +3564,8 @@
       "region:nap1805:morea-and-aegean": {
         "id": "region:nap1805:morea-and-aegean",
         "displayName": {
-          "en": "Morea and Aegean"
+          "en": "Morea and Aegean",
+          "ru": "Морея и Эгейские острова"
         },
         "legalOwnerPolityId": "polity:ottoman-empire",
         "actualControllerPolityId": "polity:ottoman-empire",
@@ -3519,7 +3584,8 @@
       "region:nap1805:western-anatolia": {
         "id": "region:nap1805:western-anatolia",
         "displayName": {
-          "en": "Western Anatolia"
+          "en": "Western Anatolia",
+          "ru": "Западная Анатолия"
         },
         "legalOwnerPolityId": "polity:ottoman-empire",
         "actualControllerPolityId": "polity:ottoman-empire",
@@ -3539,7 +3605,8 @@
       "region:nap1805:svealand": {
         "id": "region:nap1805:svealand",
         "displayName": {
-          "en": "Svealand"
+          "en": "Svealand",
+          "ru": "Свеаланд"
         },
         "legalOwnerPolityId": "polity:sweden",
         "actualControllerPolityId": "polity:sweden",
@@ -3558,7 +3625,8 @@
       "region:nap1805:gotaland": {
         "id": "region:nap1805:gotaland",
         "displayName": {
-          "en": "Gotaland"
+          "en": "Gotaland",
+          "ru": "Гёталанд"
         },
         "legalOwnerPolityId": "polity:sweden",
         "actualControllerPolityId": "polity:sweden",
@@ -3577,7 +3645,8 @@
       "region:nap1805:norrland": {
         "id": "region:nap1805:norrland",
         "displayName": {
-          "en": "Norrland"
+          "en": "Norrland",
+          "ru": "Норрланд"
         },
         "legalOwnerPolityId": "polity:sweden",
         "actualControllerPolityId": "polity:sweden",
@@ -3596,7 +3665,8 @@
       "region:nap1805:swedish-pomerania": {
         "id": "region:nap1805:swedish-pomerania",
         "displayName": {
-          "en": "Swedish Pomerania"
+          "en": "Swedish Pomerania",
+          "ru": "Шведская Померания"
         },
         "legalOwnerPolityId": "polity:sweden",
         "actualControllerPolityId": "polity:sweden",
@@ -3615,7 +3685,8 @@
       "region:nap1805:finland": {
         "id": "region:nap1805:finland",
         "displayName": {
-          "en": "Finland"
+          "en": "Finland",
+          "ru": "Финляндия"
         },
         "legalOwnerPolityId": "polity:sweden",
         "actualControllerPolityId": "polity:sweden",
@@ -3634,7 +3705,8 @@
       "region:nap1805:zealand": {
         "id": "region:nap1805:zealand",
         "displayName": {
-          "en": "Zealand"
+          "en": "Zealand",
+          "ru": "Зеландия"
         },
         "legalOwnerPolityId": "polity:denmark-norway",
         "actualControllerPolityId": "polity:denmark-norway",
@@ -3653,7 +3725,8 @@
       "region:nap1805:jutland": {
         "id": "region:nap1805:jutland",
         "displayName": {
-          "en": "Jutland"
+          "en": "Jutland",
+          "ru": "Ютландия"
         },
         "legalOwnerPolityId": "polity:denmark-norway",
         "actualControllerPolityId": "polity:denmark-norway",
@@ -3673,7 +3746,8 @@
       "region:nap1805:schleswig-holstein": {
         "id": "region:nap1805:schleswig-holstein",
         "displayName": {
-          "en": "Schleswig-Holstein"
+          "en": "Schleswig-Holstein",
+          "ru": "Шлезвиг-Гольштейн"
         },
         "legalOwnerPolityId": "polity:denmark-norway",
         "actualControllerPolityId": "polity:denmark-norway",
@@ -3692,7 +3766,8 @@
       "region:nap1805:southern-norway": {
         "id": "region:nap1805:southern-norway",
         "displayName": {
-          "en": "Southern Norway"
+          "en": "Southern Norway",
+          "ru": "Южная Норвегия"
         },
         "legalOwnerPolityId": "polity:denmark-norway",
         "actualControllerPolityId": "polity:denmark-norway",
@@ -3711,7 +3786,8 @@
       "region:nap1805:northern-norway": {
         "id": "region:nap1805:northern-norway",
         "displayName": {
-          "en": "Northern Norway"
+          "en": "Northern Norway",
+          "ru": "Северная Норвегия"
         },
         "legalOwnerPolityId": "polity:denmark-norway",
         "actualControllerPolityId": "polity:denmark-norway",
@@ -3730,7 +3806,8 @@
       "region:nap1805:campania": {
         "id": "region:nap1805:campania",
         "displayName": {
-          "en": "Campania"
+          "en": "Campania",
+          "ru": "Кампания"
         },
         "legalOwnerPolityId": "polity:naples-sicily",
         "actualControllerPolityId": "polity:naples-sicily",
@@ -3749,7 +3826,8 @@
       "region:nap1805:apulia-and-calabria": {
         "id": "region:nap1805:apulia-and-calabria",
         "displayName": {
-          "en": "Apulia and Calabria"
+          "en": "Apulia and Calabria",
+          "ru": "Апулия и Калабрия"
         },
         "legalOwnerPolityId": "polity:naples-sicily",
         "actualControllerPolityId": "polity:naples-sicily",
@@ -3768,7 +3846,8 @@
       "region:nap1805:sicily-east": {
         "id": "region:nap1805:sicily-east",
         "displayName": {
-          "en": "Sicily East"
+          "en": "Sicily East",
+          "ru": "Восточная Сицилия"
         },
         "legalOwnerPolityId": "polity:naples-sicily",
         "actualControllerPolityId": "polity:naples-sicily",
@@ -3787,7 +3866,8 @@
       "region:nap1805:sicily-west": {
         "id": "region:nap1805:sicily-west",
         "displayName": {
-          "en": "Sicily West"
+          "en": "Sicily West",
+          "ru": "Западная Сицилия"
         },
         "legalOwnerPolityId": "polity:naples-sicily",
         "actualControllerPolityId": "polity:naples-sicily",
@@ -3806,7 +3886,8 @@
       "region:nap1805:milan-and-lombardy": {
         "id": "region:nap1805:milan-and-lombardy",
         "displayName": {
-          "en": "Milan and Lombardy"
+          "en": "Milan and Lombardy",
+          "ru": "Милан и Ломбардия"
         },
         "legalOwnerPolityId": "polity:italy",
         "actualControllerPolityId": "polity:italy",
@@ -3825,7 +3906,8 @@
       "region:nap1805:emilia": {
         "id": "region:nap1805:emilia",
         "displayName": {
-          "en": "Emilia"
+          "en": "Emilia",
+          "ru": "Эмилия"
         },
         "legalOwnerPolityId": "polity:italy",
         "actualControllerPolityId": "polity:italy",
@@ -3844,7 +3926,8 @@
       "region:nap1805:romagna": {
         "id": "region:nap1805:romagna",
         "displayName": {
-          "en": "Romagna"
+          "en": "Romagna",
+          "ru": "Романья"
         },
         "legalOwnerPolityId": "polity:italy",
         "actualControllerPolityId": "polity:italy",
@@ -3863,7 +3946,8 @@
       "region:nap1805:modena": {
         "id": "region:nap1805:modena",
         "displayName": {
-          "en": "Modena"
+          "en": "Modena",
+          "ru": "Модена"
         },
         "legalOwnerPolityId": "polity:italy",
         "actualControllerPolityId": "polity:italy",
@@ -3882,7 +3966,8 @@
       "region:nap1805:mantua": {
         "id": "region:nap1805:mantua",
         "displayName": {
-          "en": "Mantua"
+          "en": "Mantua",
+          "ru": "Мантуя"
         },
         "legalOwnerPolityId": "polity:italy",
         "actualControllerPolityId": "polity:italy",
@@ -3901,7 +3986,8 @@
       "region:nap1805:upper-bavaria": {
         "id": "region:nap1805:upper-bavaria",
         "displayName": {
-          "en": "Upper Bavaria"
+          "en": "Upper Bavaria",
+          "ru": "Верхняя Бавария"
         },
         "legalOwnerPolityId": "polity:bavaria",
         "actualControllerPolityId": "polity:bavaria",
@@ -3921,7 +4007,8 @@
       "region:nap1805:lower-bavaria": {
         "id": "region:nap1805:lower-bavaria",
         "displayName": {
-          "en": "Lower Bavaria"
+          "en": "Lower Bavaria",
+          "ru": "Нижняя Бавария"
         },
         "legalOwnerPolityId": "polity:bavaria",
         "actualControllerPolityId": "polity:bavaria",
@@ -3941,7 +4028,8 @@
       "region:nap1805:franconian-bavaria": {
         "id": "region:nap1805:franconian-bavaria",
         "displayName": {
-          "en": "Franconian Bavaria"
+          "en": "Franconian Bavaria",
+          "ru": "Франконская Бавария"
         },
         "legalOwnerPolityId": "polity:bavaria",
         "actualControllerPolityId": "polity:bavaria",
@@ -3961,7 +4049,8 @@
       "region:nap1805:holland": {
         "id": "region:nap1805:holland",
         "displayName": {
-          "en": "Holland"
+          "en": "Holland",
+          "ru": "Голландия"
         },
         "legalOwnerPolityId": "polity:batavian-republic",
         "actualControllerPolityId": "polity:batavian-republic",
@@ -3980,7 +4069,8 @@
       "region:nap1805:friesland": {
         "id": "region:nap1805:friesland",
         "displayName": {
-          "en": "Friesland"
+          "en": "Friesland",
+          "ru": "Фрисландия"
         },
         "legalOwnerPolityId": "polity:batavian-republic",
         "actualControllerPolityId": "polity:batavian-republic",
@@ -3999,7 +4089,8 @@
       "region:nap1805:batavian-interior": {
         "id": "region:nap1805:batavian-interior",
         "displayName": {
-          "en": "Batavian Interior"
+          "en": "Batavian Interior",
+          "ru": "Внутренняя Батавия"
         },
         "legalOwnerPolityId": "polity:batavian-republic",
         "actualControllerPolityId": "polity:batavian-republic",
@@ -4018,7 +4109,8 @@
       "region:nap1805:northern-portugal": {
         "id": "region:nap1805:northern-portugal",
         "displayName": {
-          "en": "Northern Portugal"
+          "en": "Northern Portugal",
+          "ru": "Северная Португалия"
         },
         "legalOwnerPolityId": "polity:portugal",
         "actualControllerPolityId": "polity:portugal",
@@ -4037,7 +4129,8 @@
       "region:nap1805:central-portugal": {
         "id": "region:nap1805:central-portugal",
         "displayName": {
-          "en": "Central Portugal"
+          "en": "Central Portugal",
+          "ru": "Центральная Португалия"
         },
         "legalOwnerPolityId": "polity:portugal",
         "actualControllerPolityId": "polity:portugal",
@@ -4056,7 +4149,8 @@
       "region:nap1805:southern-portugal": {
         "id": "region:nap1805:southern-portugal",
         "displayName": {
-          "en": "Southern Portugal"
+          "en": "Southern Portugal",
+          "ru": "Южная Португалия"
         },
         "legalOwnerPolityId": "polity:portugal",
         "actualControllerPolityId": "polity:portugal",
@@ -4075,7 +4169,8 @@
       "region:nap1805:western-switzerland": {
         "id": "region:nap1805:western-switzerland",
         "displayName": {
-          "en": "Western Switzerland"
+          "en": "Western Switzerland",
+          "ru": "Западная Швейцария"
         },
         "legalOwnerPolityId": "polity:swiss-confederation",
         "actualControllerPolityId": "polity:swiss-confederation",
@@ -4094,7 +4189,8 @@
       "region:nap1805:central-switzerland": {
         "id": "region:nap1805:central-switzerland",
         "displayName": {
-          "en": "Central Switzerland"
+          "en": "Central Switzerland",
+          "ru": "Центральная Швейцария"
         },
         "legalOwnerPolityId": "polity:swiss-confederation",
         "actualControllerPolityId": "polity:swiss-confederation",
@@ -4113,7 +4209,8 @@
       "region:nap1805:eastern-switzerland": {
         "id": "region:nap1805:eastern-switzerland",
         "displayName": {
-          "en": "Eastern Switzerland"
+          "en": "Eastern Switzerland",
+          "ru": "Восточная Швейцария"
         },
         "legalOwnerPolityId": "polity:swiss-confederation",
         "actualControllerPolityId": "polity:swiss-confederation",
@@ -4132,7 +4229,8 @@
       "region:nap1805:dresden-and-meissen": {
         "id": "region:nap1805:dresden-and-meissen",
         "displayName": {
-          "en": "Dresden and Meissen"
+          "en": "Dresden and Meissen",
+          "ru": "Дрезден и Мейсен"
         },
         "legalOwnerPolityId": "polity:saxony",
         "actualControllerPolityId": "polity:saxony",
@@ -4151,7 +4249,8 @@
       "region:nap1805:leipzig-and-thuringian-saxony": {
         "id": "region:nap1805:leipzig-and-thuringian-saxony",
         "displayName": {
-          "en": "Leipzig and Thuringian Saxony"
+          "en": "Leipzig and Thuringian Saxony",
+          "ru": "Лейпциг и Тюрингская Саксония"
         },
         "legalOwnerPolityId": "polity:saxony",
         "actualControllerPolityId": "polity:saxony",
@@ -4170,7 +4269,8 @@
       "region:nap1805:stuttgart-and-neckar": {
         "id": "region:nap1805:stuttgart-and-neckar",
         "displayName": {
-          "en": "Stuttgart and Neckar"
+          "en": "Stuttgart and Neckar",
+          "ru": "Штутгарт и Неккар"
         },
         "legalOwnerPolityId": "polity:wurttemberg",
         "actualControllerPolityId": "polity:wurttemberg",
@@ -4189,7 +4289,8 @@
       "region:nap1805:swabian-wurttemberg": {
         "id": "region:nap1805:swabian-wurttemberg",
         "displayName": {
-          "en": "Swabian Württemberg"
+          "en": "Swabian Württemberg",
+          "ru": "Швабский Вюртемберг"
         },
         "legalOwnerPolityId": "polity:wurttemberg",
         "actualControllerPolityId": "polity:wurttemberg",
@@ -4208,7 +4309,8 @@
       "region:nap1805:upper-baden": {
         "id": "region:nap1805:upper-baden",
         "displayName": {
-          "en": "Upper Baden"
+          "en": "Upper Baden",
+          "ru": "Верхний Баден"
         },
         "legalOwnerPolityId": "polity:baden",
         "actualControllerPolityId": "polity:baden",
@@ -4227,7 +4329,8 @@
       "region:nap1805:lower-baden": {
         "id": "region:nap1805:lower-baden",
         "displayName": {
-          "en": "Lower Baden"
+          "en": "Lower Baden",
+          "ru": "Нижний Баден"
         },
         "legalOwnerPolityId": "polity:baden",
         "actualControllerPolityId": "polity:baden",
@@ -4246,7 +4349,8 @@
       "region:nap1805:hanover": {
         "id": "region:nap1805:hanover",
         "displayName": {
-          "en": "Hanover"
+          "en": "Hanover",
+          "ru": "Ганновер"
         },
         "legalOwnerPolityId": "polity:hanover",
         "actualControllerPolityId": "polity:france",
@@ -4265,7 +4369,8 @@
       "region:nap1805:bremen-verden": {
         "id": "region:nap1805:bremen-verden",
         "displayName": {
-          "en": "Bremen-Verden"
+          "en": "Bremen-Verden",
+          "ru": "Бремен-Ферден"
         },
         "legalOwnerPolityId": "polity:hanover",
         "actualControllerPolityId": "polity:france",
@@ -4284,7 +4389,8 @@
       "region:nap1805:rome-and-lazio": {
         "id": "region:nap1805:rome-and-lazio",
         "displayName": {
-          "en": "Rome and Lazio"
+          "en": "Rome and Lazio",
+          "ru": "Рим и Лацио"
         },
         "legalOwnerPolityId": "polity:papal-states",
         "actualControllerPolityId": "polity:papal-states",
@@ -4303,7 +4409,8 @@
       "region:nap1805:umbria-and-marche": {
         "id": "region:nap1805:umbria-and-marche",
         "displayName": {
-          "en": "Umbria and Marche"
+          "en": "Umbria and Marche",
+          "ru": "Умбрия и Марке"
         },
         "legalOwnerPolityId": "polity:papal-states",
         "actualControllerPolityId": "polity:papal-states",
@@ -4322,7 +4429,8 @@
       "region:nap1805:tuscany": {
         "id": "region:nap1805:tuscany",
         "displayName": {
-          "en": "Tuscany"
+          "en": "Tuscany",
+          "ru": "Тоскана"
         },
         "legalOwnerPolityId": "polity:etruria",
         "actualControllerPolityId": "polity:etruria",
@@ -4341,7 +4449,8 @@
       "region:nap1805:liguria": {
         "id": "region:nap1805:liguria",
         "displayName": {
-          "en": "Liguria"
+          "en": "Liguria",
+          "ru": "Лигурия"
         },
         "legalOwnerPolityId": "polity:ligurian-republic",
         "actualControllerPolityId": "polity:ligurian-republic",
@@ -4360,7 +4469,8 @@
       "region:nap1805:sardinia": {
         "id": "region:nap1805:sardinia",
         "displayName": {
-          "en": "Sardinia"
+          "en": "Sardinia",
+          "ru": "Сардиния"
         },
         "legalOwnerPolityId": "polity:sardinia",
         "actualControllerPolityId": "polity:sardinia",
@@ -4379,7 +4489,8 @@
       "region:nap1805:hesse-kassel": {
         "id": "region:nap1805:hesse-kassel",
         "displayName": {
-          "en": "Hesse-Kassel"
+          "en": "Hesse-Kassel",
+          "ru": "Гессен-Кассель"
         },
         "legalOwnerPolityId": "polity:hesse-kassel",
         "actualControllerPolityId": "polity:hesse-kassel",
@@ -4398,7 +4509,8 @@
       "region:nap1805:hesse-darmstadt": {
         "id": "region:nap1805:hesse-darmstadt",
         "displayName": {
-          "en": "Hesse-Darmstadt"
+          "en": "Hesse-Darmstadt",
+          "ru": "Гессен-Дармштадт"
         },
         "legalOwnerPolityId": "polity:hesse-darmstadt",
         "actualControllerPolityId": "polity:hesse-darmstadt",
@@ -4417,7 +4529,8 @@
       "region:nap1805:brunswick": {
         "id": "region:nap1805:brunswick",
         "displayName": {
-          "en": "Brunswick"
+          "en": "Brunswick",
+          "ru": "Брауншвейг"
         },
         "legalOwnerPolityId": "polity:brunswick",
         "actualControllerPolityId": "polity:brunswick",
@@ -7720,7 +7833,7 @@
         "id": "evidence:nap1805-region-paris-and-seine",
         "binding": {
           "path": "/startingState/regions/region:nap1805:paris-and-seine",
-          "valueChecksum": "sha256:aa6b5faa89cb56c0b0334f0a9e35231ae11abdfb5a5ec8c55c33f614873bd78d"
+          "valueChecksum": "sha256:ea76b3c36023cd9f592ac3bd0df1050bdcf423a2373589b058e41e6b9206fa97"
         },
         "basis": {
           "kind": "historical",
@@ -7758,7 +7871,7 @@
         "id": "evidence:nap1805-region-normandy",
         "binding": {
           "path": "/startingState/regions/region:nap1805:normandy",
-          "valueChecksum": "sha256:bfed0ba7281ec13283b7a778241f62566bd7d0309cf3238748dd0448bf961b40"
+          "valueChecksum": "sha256:62ba8432df612231f82312a2518466f2ab1856b70401fd7b1ef382a3bf6c3527"
         },
         "basis": {
           "kind": "historical",
@@ -7796,7 +7909,7 @@
         "id": "evidence:nap1805-region-brittany",
         "binding": {
           "path": "/startingState/regions/region:nap1805:brittany",
-          "valueChecksum": "sha256:b150efb9e13137400f340519e1f4f86d8dde015469ce055fffbc856d774ff0a4"
+          "valueChecksum": "sha256:e8f40b830dd1dbcf2ea018ddde1be423866ed6f89f65ac1d3a707bb747882d6b"
         },
         "basis": {
           "kind": "historical",
@@ -7834,7 +7947,7 @@
         "id": "evidence:nap1805-region-loire",
         "binding": {
           "path": "/startingState/regions/region:nap1805:loire",
-          "valueChecksum": "sha256:c6bc76eb4c47f38866492f342f4119de7950f160f29fa2a755df674dbd6364e6"
+          "valueChecksum": "sha256:4b5fa858bd735518b7e32a1ad10d0cbd6b48518cd7e730095f2fd7340288f361"
         },
         "basis": {
           "kind": "historical",
@@ -7872,7 +7985,7 @@
         "id": "evidence:nap1805-region-aquitaine",
         "binding": {
           "path": "/startingState/regions/region:nap1805:aquitaine",
-          "valueChecksum": "sha256:26e206bf864721ec35f3e4cf5194d5b66a7fcb0e67dbce00301088d05ce57734"
+          "valueChecksum": "sha256:f8f58496a20daef3b82010f0138d4f0cedf0ee6d9e6927d86d3cc6ec261535dc"
         },
         "basis": {
           "kind": "historical",
@@ -7910,7 +8023,7 @@
         "id": "evidence:nap1805-region-pyrenees",
         "binding": {
           "path": "/startingState/regions/region:nap1805:pyrenees",
-          "valueChecksum": "sha256:29343dff6114ad36eb9981dac4a0767956e6f210f3216fbf0aad7baa5aff5563"
+          "valueChecksum": "sha256:fdfe6cdc446f29dba8faf97e8e43aad15ac9499759967b340bb9db7d3460b287"
         },
         "basis": {
           "kind": "historical",
@@ -7948,7 +8061,7 @@
         "id": "evidence:nap1805-region-languedoc",
         "binding": {
           "path": "/startingState/regions/region:nap1805:languedoc",
-          "valueChecksum": "sha256:7a7025a7b5efed7f9b0a231cc47527113b1c3023c54227573d0e91e067ed1157"
+          "valueChecksum": "sha256:b853f77a7acc6d477402181dfeb3f14808974182a2453d6dbd6ce4bfea264817"
         },
         "basis": {
           "kind": "historical",
@@ -7986,7 +8099,7 @@
         "id": "evidence:nap1805-region-provence",
         "binding": {
           "path": "/startingState/regions/region:nap1805:provence",
-          "valueChecksum": "sha256:60b8e1fd3ee6e2191cf4af3dd3d6a8ebef1936bd91d42929d7ca419777fe2340"
+          "valueChecksum": "sha256:90dffeb90f34b37c4c23d79797ac5d913b33a2a8579403fd1b5436c3e0159af5"
         },
         "basis": {
           "kind": "historical",
@@ -8024,7 +8137,7 @@
         "id": "evidence:nap1805-region-alps",
         "binding": {
           "path": "/startingState/regions/region:nap1805:alps",
-          "valueChecksum": "sha256:ac957184e8af1b631654510e600e40f90d973f81556683bb0fb1e7190d847f56"
+          "valueChecksum": "sha256:b74e00b47046b98620b34822048206a20f62c9e7c20f4741c23b7a8b4da9df5d"
         },
         "basis": {
           "kind": "historical",
@@ -8062,7 +8175,7 @@
         "id": "evidence:nap1805-region-burgundy",
         "binding": {
           "path": "/startingState/regions/region:nap1805:burgundy",
-          "valueChecksum": "sha256:18a291b72515cdb4aef0b8bf514a0dd3a354c2fb31db46b7b2b16a8c6b594fe5"
+          "valueChecksum": "sha256:8a996eea72030beb9462b03d14086a5d399453a4a95033ee03ccbbdee8466b88"
         },
         "basis": {
           "kind": "historical",
@@ -8100,7 +8213,7 @@
         "id": "evidence:nap1805-region-alsace",
         "binding": {
           "path": "/startingState/regions/region:nap1805:alsace",
-          "valueChecksum": "sha256:67930ab7c33fe356e99b9436c5d73a366579ed511d79a6ad3b3b6e16be2b162f"
+          "valueChecksum": "sha256:11be128038db0dd5ccc738baf8a5cd79e24d60f836be275e3d1438c8c70fb2a6"
         },
         "basis": {
           "kind": "historical",
@@ -8138,7 +8251,7 @@
         "id": "evidence:nap1805-region-lorraine",
         "binding": {
           "path": "/startingState/regions/region:nap1805:lorraine",
-          "valueChecksum": "sha256:10fc06739e4aec4a3fcf9b4959d33b36eb32fcf00f3bb6029940d3d4c51f5498"
+          "valueChecksum": "sha256:90ac6cb43979ea139d0dd912933a4288ea3a75ec56d1929cd839f6f29e0c13a6"
         },
         "basis": {
           "kind": "historical",
@@ -8176,7 +8289,7 @@
         "id": "evidence:nap1805-region-champagne",
         "binding": {
           "path": "/startingState/regions/region:nap1805:champagne",
-          "valueChecksum": "sha256:0084446667053d381cf71f08e54e00272ddf5e4baa86fa579819747fac4324bd"
+          "valueChecksum": "sha256:a23fec402e18c1d81862cbdf2c4773f3b593a2937cbcf710d918b869d00a2a8c"
         },
         "basis": {
           "kind": "historical",
@@ -8214,7 +8327,7 @@
         "id": "evidence:nap1805-region-picardy",
         "binding": {
           "path": "/startingState/regions/region:nap1805:picardy",
-          "valueChecksum": "sha256:bad85a0b2716e39772e54a764ab8b35a6e1ead982d7530812ebf90acb301a654"
+          "valueChecksum": "sha256:dc384e8569425957c57c83ee216bd46ecb8855aa01b1d4284b19f78b3304c8b5"
         },
         "basis": {
           "kind": "historical",
@@ -8252,7 +8365,7 @@
         "id": "evidence:nap1805-region-flanders",
         "binding": {
           "path": "/startingState/regions/region:nap1805:flanders",
-          "valueChecksum": "sha256:4f1a4121ae61014c37c5889f0e37bba71100c26c08553fac16f5e24bc56af81a"
+          "valueChecksum": "sha256:ccfe35accf40146228166d0fb4a498d3d5a1db251e9603456f25ca44874f4f46"
         },
         "basis": {
           "kind": "historical",
@@ -8290,7 +8403,7 @@
         "id": "evidence:nap1805-region-corsica",
         "binding": {
           "path": "/startingState/regions/region:nap1805:corsica",
-          "valueChecksum": "sha256:8b5de2051bbc0cc611fe5c2e9b127215a274371d5509a7e7079bfce8dad42f82"
+          "valueChecksum": "sha256:5e219cb302a0d0b3d99f02e8794f14d47a34821ae2a6143c30ebdeebdbe4500a"
         },
         "basis": {
           "kind": "historical",
@@ -8328,7 +8441,7 @@
         "id": "evidence:nap1805-region-london-and-home-counties",
         "binding": {
           "path": "/startingState/regions/region:nap1805:london-and-home-counties",
-          "valueChecksum": "sha256:15e768af7912ae15b91bbe637bf6dda5c760c82d5cab9c6e4290c102a90ab767"
+          "valueChecksum": "sha256:0b09606f6f2ed5a207d3c222480d2b98abb3a82f04381bd9242caa34fa0f5f47"
         },
         "basis": {
           "kind": "historical",
@@ -8366,7 +8479,7 @@
         "id": "evidence:nap1805-region-southwest-england",
         "binding": {
           "path": "/startingState/regions/region:nap1805:southwest-england",
-          "valueChecksum": "sha256:f801caef105459af9e2906dbce60abb98dcd98ea2001ed2536cc0eba7a137f6d"
+          "valueChecksum": "sha256:4e86a58944028577f740a7034792e4634e5bbed843cda3f2d92da4378d33ceb0"
         },
         "basis": {
           "kind": "historical",
@@ -8404,7 +8517,7 @@
         "id": "evidence:nap1805-region-midlands",
         "binding": {
           "path": "/startingState/regions/region:nap1805:midlands",
-          "valueChecksum": "sha256:668d587e6db297ab40d809a20baee56a887a23622f20e8268c71fa09bf513e97"
+          "valueChecksum": "sha256:137444f6db04a62b7dbcb62bf7fab56e855b4c38b7ff633be02e54d3a41eac57"
         },
         "basis": {
           "kind": "historical",
@@ -8442,7 +8555,7 @@
         "id": "evidence:nap1805-region-northern-england",
         "binding": {
           "path": "/startingState/regions/region:nap1805:northern-england",
-          "valueChecksum": "sha256:2e830b547c76bec9f9dce95a62933961f2efcf1d8a92f1d0720051ed37896437"
+          "valueChecksum": "sha256:446a2d29d071390ffaf07d5b028a325a9092f1d2ca05e2e07f0a118074e6392a"
         },
         "basis": {
           "kind": "historical",
@@ -8480,7 +8593,7 @@
         "id": "evidence:nap1805-region-wales",
         "binding": {
           "path": "/startingState/regions/region:nap1805:wales",
-          "valueChecksum": "sha256:84f19118214af1916e54dd1d40f80303389ca82a92dfbdff544a232f3f01a0e2"
+          "valueChecksum": "sha256:62afb0d74639f8e7e4873e54cbd377d02f53c12321be3f42fc55abe4015db43b"
         },
         "basis": {
           "kind": "historical",
@@ -8518,7 +8631,7 @@
         "id": "evidence:nap1805-region-scottish-lowlands",
         "binding": {
           "path": "/startingState/regions/region:nap1805:scottish-lowlands",
-          "valueChecksum": "sha256:972cd67f86002e9af894c3358b4f1ef1e3a4e5925c5bec5af6f8493db3726a89"
+          "valueChecksum": "sha256:56f58676b10522f8c6e5432f72f95061baaf4d88acce521a81cc3c28b99b79c2"
         },
         "basis": {
           "kind": "historical",
@@ -8556,7 +8669,7 @@
         "id": "evidence:nap1805-region-scottish-highlands",
         "binding": {
           "path": "/startingState/regions/region:nap1805:scottish-highlands",
-          "valueChecksum": "sha256:c7e6645133ca30dfc9cd94e96a6f0bdaa5859e74201158ace3134807a0663674"
+          "valueChecksum": "sha256:40fea7b0d2bc7ce26080aae4bceb2b2a156502717d966d2bf3f488f3982b3e94"
         },
         "basis": {
           "kind": "historical",
@@ -8594,7 +8707,7 @@
         "id": "evidence:nap1805-region-ireland",
         "binding": {
           "path": "/startingState/regions/region:nap1805:ireland",
-          "valueChecksum": "sha256:a6b6955a9511c8679054e5406493341c1469a78d3583ab8ca1a091d5cc3c75f4"
+          "valueChecksum": "sha256:ff64cc48eedf57e604ed07908c61b82bfe50469f89b42d4131af9d62902da4bc"
         },
         "basis": {
           "kind": "historical",
@@ -8632,7 +8745,7 @@
         "id": "evidence:nap1805-region-gibraltar",
         "binding": {
           "path": "/startingState/regions/region:nap1805:gibraltar",
-          "valueChecksum": "sha256:8c71ec60276c36fb32bde8b80984f3bd45147a9c431b5439a64131073956bd92"
+          "valueChecksum": "sha256:601909d5b75b4ce078a58cb0d2961c5f27963f2b35870b4e9de7ff0541066a9f"
         },
         "basis": {
           "kind": "historical",
@@ -8670,7 +8783,7 @@
         "id": "evidence:nap1805-region-vienna-and-lower-austria",
         "binding": {
           "path": "/startingState/regions/region:nap1805:vienna-and-lower-austria",
-          "valueChecksum": "sha256:adda91d1ee51c2ad8c6df8868bdf33fc33240a023732651894f9c9a1d6009ddd"
+          "valueChecksum": "sha256:c491076cc529974b487e54562fe973d1c6fd8ccb1a155ccf2761c3ebbb9a3421"
         },
         "basis": {
           "kind": "historical",
@@ -8707,7 +8820,7 @@
         "id": "evidence:nap1805-region-upper-austria",
         "binding": {
           "path": "/startingState/regions/region:nap1805:upper-austria",
-          "valueChecksum": "sha256:606292ed46277cc440c18526c952b40504458f6a5dd18e91029aaee4fff05a04"
+          "valueChecksum": "sha256:f7b154f40df9a9824a37baefb311ea21952241be6375dcc171da26f287aa48c7"
         },
         "basis": {
           "kind": "historical",
@@ -8744,7 +8857,7 @@
         "id": "evidence:nap1805-region-salzburg",
         "binding": {
           "path": "/startingState/regions/region:nap1805:salzburg",
-          "valueChecksum": "sha256:bb1205ed5ee48ca8d495aa2eea3d3a01f06410574fa49c72b4991ca51e8d5c07"
+          "valueChecksum": "sha256:30951685530611c45740875ba92cdc3946ce04a4d17df2e9b18fea5f33b1505c"
         },
         "basis": {
           "kind": "historical",
@@ -8781,7 +8894,7 @@
         "id": "evidence:nap1805-region-bohemia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:bohemia",
-          "valueChecksum": "sha256:7ff83ae7696d72e39797c833ede9303a92380b5adbcc46cddffb8d485394fa17"
+          "valueChecksum": "sha256:da72681d947c62124e73e4e2e471437553645d81bc0d1d8b655b5c50ded70e02"
         },
         "basis": {
           "kind": "historical",
@@ -8818,7 +8931,7 @@
         "id": "evidence:nap1805-region-moravia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:moravia",
-          "valueChecksum": "sha256:a34277026a4eb8287773cf01a60641e758d47884f6575dffed5186a0f0ec15b7"
+          "valueChecksum": "sha256:049afa4659d7f599df320e18017ea0496a42d952b0dfdafd9730a0dc376a4880"
         },
         "basis": {
           "kind": "historical",
@@ -8855,7 +8968,7 @@
         "id": "evidence:nap1805-region-austrian-silesia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:austrian-silesia",
-          "valueChecksum": "sha256:7121fddf0412606a5e2d9782ad64685727201e748d99cbfc292168a4603c426b"
+          "valueChecksum": "sha256:fdad7f5edd4874b0e03dcf3458189cdda5afb281920586946c366e4af2f87962"
         },
         "basis": {
           "kind": "historical",
@@ -8892,7 +9005,7 @@
         "id": "evidence:nap1805-region-tyrol",
         "binding": {
           "path": "/startingState/regions/region:nap1805:tyrol",
-          "valueChecksum": "sha256:c153c5ccf7ffce27c6c23cb52edf9c75608597e46cb9effb682bf51325db8f69"
+          "valueChecksum": "sha256:1d62aee8a9ce2f694a5c5d2d43431531a4ee19b29ac31c74c37bdc1fa7a768f3"
         },
         "basis": {
           "kind": "historical",
@@ -8929,7 +9042,7 @@
         "id": "evidence:nap1805-region-carinthia-and-carniola",
         "binding": {
           "path": "/startingState/regions/region:nap1805:carinthia-and-carniola",
-          "valueChecksum": "sha256:457ba698fdf9fe2650b5ccfd9c1e532b1ca17d5dd3c145dd695f4504bdc2975a"
+          "valueChecksum": "sha256:32dd89d4e460f100d445e62f53a6b4a604c1061426e687ed57672eef195417be"
         },
         "basis": {
           "kind": "historical",
@@ -8966,7 +9079,7 @@
         "id": "evidence:nap1805-region-hungary-west",
         "binding": {
           "path": "/startingState/regions/region:nap1805:hungary-west",
-          "valueChecksum": "sha256:d72f2950f9d3f467f1697ee2576760c9fe1cec24997b51ff766c2232cf0f492a"
+          "valueChecksum": "sha256:35313e9a032f2f14a28aae1a13a45372b0154ef2704d0074b8bdcbb29bcd5754"
         },
         "basis": {
           "kind": "historical",
@@ -9003,7 +9116,7 @@
         "id": "evidence:nap1805-region-hungary-east",
         "binding": {
           "path": "/startingState/regions/region:nap1805:hungary-east",
-          "valueChecksum": "sha256:30b12c000aafe0fee94aed1d42561b4dd2b903755c3e474f09ec7feadbc84d77"
+          "valueChecksum": "sha256:552947f97cc429615f850e70421b83011d9c0cfa7eb57daf4321ebc3e70d939e"
         },
         "basis": {
           "kind": "historical",
@@ -9040,7 +9153,7 @@
         "id": "evidence:nap1805-region-venetia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:venetia",
-          "valueChecksum": "sha256:ec8e603735e620955710b9d0e8b9d18aa7cdfc3205244251f895e144ef0d52b3"
+          "valueChecksum": "sha256:4a11569d6cf928b9a6cc21481821aa70cd69861df52bb2962fb551a538d88b9f"
         },
         "basis": {
           "kind": "historical",
@@ -9077,7 +9190,7 @@
         "id": "evidence:nap1805-region-baltic-provinces",
         "binding": {
           "path": "/startingState/regions/region:nap1805:baltic-provinces",
-          "valueChecksum": "sha256:b1a96ca9cdaf5ffa60136261ddc2b21f5908883109642ca3a841c04a261db77e"
+          "valueChecksum": "sha256:7e95413b1a3ddd180fe8e9fcd6255fd8840da37d5b853e295897c5021178d63c"
         },
         "basis": {
           "kind": "historical",
@@ -9114,7 +9227,7 @@
         "id": "evidence:nap1805-region-lithuania",
         "binding": {
           "path": "/startingState/regions/region:nap1805:lithuania",
-          "valueChecksum": "sha256:d9a41574cad06cc473b26f6e31fb255c1b0b7078bba38d814b9674fe38fc95c8"
+          "valueChecksum": "sha256:8463bd12705f6e92c09051affd5d87d05b02032e61aac25981d67d6cfc28202d"
         },
         "basis": {
           "kind": "historical",
@@ -9151,7 +9264,7 @@
         "id": "evidence:nap1805-region-belarus",
         "binding": {
           "path": "/startingState/regions/region:nap1805:belarus",
-          "valueChecksum": "sha256:4688c84332714bc900f3b10e365b9b38453c598e69a0a1989dc461750c939d58"
+          "valueChecksum": "sha256:c291cc3131eae27f68744f7a19f9272cf16216df18c9f883caf08132b6bfeb53"
         },
         "basis": {
           "kind": "historical",
@@ -9188,7 +9301,7 @@
         "id": "evidence:nap1805-region-volhynia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:volhynia",
-          "valueChecksum": "sha256:099a54d136de1ba02cf49cbddbd5ee839ae87bfe5457d3f1b448de7041ba1cdd"
+          "valueChecksum": "sha256:7eee6e60e0d07633bcb1ca9f230d818c3a33a643cf2b8f9bbf3fafc352cb2255"
         },
         "basis": {
           "kind": "historical",
@@ -9225,7 +9338,7 @@
         "id": "evidence:nap1805-region-podolia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:podolia",
-          "valueChecksum": "sha256:124ca90c2ac664ebe17622f9b6f0583daeb544678edb98aae0c397dfef4497e5"
+          "valueChecksum": "sha256:16554948254e5740b8a026f34599b235240a1e058e09350ae764bea95033c7ea"
         },
         "basis": {
           "kind": "historical",
@@ -9262,7 +9375,7 @@
         "id": "evidence:nap1805-region-ukraine-west",
         "binding": {
           "path": "/startingState/regions/region:nap1805:ukraine-west",
-          "valueChecksum": "sha256:1b264f22d38132132b0d9c9dbc4100d71c1d52e6de584d15c04fe370f69ee23b"
+          "valueChecksum": "sha256:d066c5f407a6eb5bbb1832ca85a1ca42dc3b640788e37759ca65a5c7565b392c"
         },
         "basis": {
           "kind": "historical",
@@ -9299,7 +9412,7 @@
         "id": "evidence:nap1805-region-new-russia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:new-russia",
-          "valueChecksum": "sha256:5931e41a63e6869a91862f975e930c50de9d5c062a362bc3dac4cc129405868d"
+          "valueChecksum": "sha256:f1f4a251fe661404846717c56567be25f5fad5f24e64f3870067683b547666eb"
         },
         "basis": {
           "kind": "historical",
@@ -9336,7 +9449,7 @@
         "id": "evidence:nap1805-region-brandenburg",
         "binding": {
           "path": "/startingState/regions/region:nap1805:brandenburg",
-          "valueChecksum": "sha256:8c9c9103935e8c8ae0f88bb1a51e3f86e6e6dd03d010bbde2d0e476ef5cf4e6b"
+          "valueChecksum": "sha256:bc029c527f1ed9aa81cb9fbcc5f7aed4e13cc7a4ef42c2ed09442b7168042611"
         },
         "basis": {
           "kind": "historical",
@@ -9373,7 +9486,7 @@
         "id": "evidence:nap1805-region-pomerania",
         "binding": {
           "path": "/startingState/regions/region:nap1805:pomerania",
-          "valueChecksum": "sha256:0e12a5e8cba85acf75d4eb7c3f336658d2776138e54410d4aac9139427e15000"
+          "valueChecksum": "sha256:4ec217c8b917065fa17dabe542ca461d2f0a99b195014583afe07ef2c7f93a6d"
         },
         "basis": {
           "kind": "historical",
@@ -9410,7 +9523,7 @@
         "id": "evidence:nap1805-region-east-prussia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:east-prussia",
-          "valueChecksum": "sha256:bff87df78b397032cd4012a7cb00f9ccfac76a96bd7b9e03ee5693f8c869076d"
+          "valueChecksum": "sha256:8452659bc00198efbb022244c02fb211b252359f30d67a0f2f9146622adc9964"
         },
         "basis": {
           "kind": "historical",
@@ -9447,7 +9560,7 @@
         "id": "evidence:nap1805-region-west-prussia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:west-prussia",
-          "valueChecksum": "sha256:ff9c590566d1af809e5a6f95189e760da36194a96d7cb34b968ba5c25545115a"
+          "valueChecksum": "sha256:1a1255cabf72e398b4a1c2551d3adfb061cb52a65ad39425847560af15885a42"
         },
         "basis": {
           "kind": "historical",
@@ -9484,7 +9597,7 @@
         "id": "evidence:nap1805-region-silesia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:silesia",
-          "valueChecksum": "sha256:224eb985af19b4302bf6b80d094918dce2e77076172462920d87e06c5cbb754e"
+          "valueChecksum": "sha256:36ca2c18ac5f299e470bc852ac1090bbae1465c4b7e836bba07d51f4b5957858"
         },
         "basis": {
           "kind": "historical",
@@ -9521,7 +9634,7 @@
         "id": "evidence:nap1805-region-magdeburg",
         "binding": {
           "path": "/startingState/regions/region:nap1805:magdeburg",
-          "valueChecksum": "sha256:86d48efb5f304f7acb168ef7903dece7ae01afdc1328229be480ddb150509b5a"
+          "valueChecksum": "sha256:e3f5a6741d1858a05cc692929161a5b2ccaae2c4c1c5f05e2c8284f590eaf09e"
         },
         "basis": {
           "kind": "historical",
@@ -9558,7 +9671,7 @@
         "id": "evidence:nap1805-region-westphalian-prussia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:westphalian-prussia",
-          "valueChecksum": "sha256:831b0bf8100c0645e8729cb165ad97a282b679d780edc6cbe0410cdc084e6ddc"
+          "valueChecksum": "sha256:8056707fdf8443a9bf700578e4e2b29448060b3f5738e15d2dad32fae2b25f28"
         },
         "basis": {
           "kind": "historical",
@@ -9595,7 +9708,7 @@
         "id": "evidence:nap1805-region-neuchatel",
         "binding": {
           "path": "/startingState/regions/region:nap1805:neuchatel",
-          "valueChecksum": "sha256:8f11097bdec32b59ec9af1f7e27de2d5114fc1e4e6b283333bd7c04a6b807fe0"
+          "valueChecksum": "sha256:25c9adcc4b53a26b4d7144721b88fd7b8dac8ebd09e5f864ac591d30ed5ce5d9"
         },
         "basis": {
           "kind": "historical",
@@ -9632,7 +9745,7 @@
         "id": "evidence:nap1805-region-madrid-and-castile",
         "binding": {
           "path": "/startingState/regions/region:nap1805:madrid-and-castile",
-          "valueChecksum": "sha256:edf178840532a662ae759a7736c41756da928321769213f521f7e27a64b0316b"
+          "valueChecksum": "sha256:629b69af5d94df3bc9e696f4948a94103774d5b21a061a736a316e9451d3771b"
         },
         "basis": {
           "kind": "historical",
@@ -9669,7 +9782,7 @@
         "id": "evidence:nap1805-region-galicia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:galicia",
-          "valueChecksum": "sha256:c59a7232e835f140b1ba8c4f7f3d9d3fe0c00cf92e0c014e5a566515c2e3c290"
+          "valueChecksum": "sha256:e1491313e193258ccbebdd1f41abbdbcc17e6aa0190961fefcb1dfec8a54aea8"
         },
         "basis": {
           "kind": "historical",
@@ -9706,7 +9819,7 @@
         "id": "evidence:nap1805-region-basque-provinces-and-navarre",
         "binding": {
           "path": "/startingState/regions/region:nap1805:basque-provinces-and-navarre",
-          "valueChecksum": "sha256:ee0ae83f5ba42db48701d218733e64e0dcd4d0702b07cc0dbe9f9c05a4687240"
+          "valueChecksum": "sha256:734249b4688ecb54899f34d6dd263aad0f34b02bba63524e978ef114f081b1d5"
         },
         "basis": {
           "kind": "historical",
@@ -9743,7 +9856,7 @@
         "id": "evidence:nap1805-region-aragon",
         "binding": {
           "path": "/startingState/regions/region:nap1805:aragon",
-          "valueChecksum": "sha256:fb6f011317e3b0e486c93b23c6e011daa3d58d713464cc986a2584e1367c7f22"
+          "valueChecksum": "sha256:3406ecd481f301dfc56e193f92329fc23f86168a377c937f6933757398f579d7"
         },
         "basis": {
           "kind": "historical",
@@ -9780,7 +9893,7 @@
         "id": "evidence:nap1805-region-catalonia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:catalonia",
-          "valueChecksum": "sha256:4946fe53abe8df24e5062ba7eaa93813581b79279fd19bb4c956e6ce11ccd411"
+          "valueChecksum": "sha256:8c8da2005abe39233335424d92fab594cda3e16cb17a73437d8b0c9783bbb3e2"
         },
         "basis": {
           "kind": "historical",
@@ -9817,7 +9930,7 @@
         "id": "evidence:nap1805-region-valencia-and-murcia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:valencia-and-murcia",
-          "valueChecksum": "sha256:2a9afdff2a956625d4f4569b031c81a25e384e4bb2634522c24344c9433daf23"
+          "valueChecksum": "sha256:f140a085b4aedef66ca85e38363b8a6537af561584ea91941f6213bbf31d1ee3"
         },
         "basis": {
           "kind": "historical",
@@ -9854,7 +9967,7 @@
         "id": "evidence:nap1805-region-andalusia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:andalusia",
-          "valueChecksum": "sha256:ddc5da1e798f035779b7b7eae05a5752da7b791f1b3ac726f4683731569c86a2"
+          "valueChecksum": "sha256:7387de950653186370a42e79f62076995a2bfe3fcfe3c2df915ee5525c0140a8"
         },
         "basis": {
           "kind": "historical",
@@ -9891,7 +10004,7 @@
         "id": "evidence:nap1805-region-balearic-islands",
         "binding": {
           "path": "/startingState/regions/region:nap1805:balearic-islands",
-          "valueChecksum": "sha256:6e54bc76803b75121ae137448b55d77786c4b9d719df7a78bd902c3254943acf"
+          "valueChecksum": "sha256:57d0ebf509bdcbd3f5ff8af1aef2bbb9038c434372a381e4463ace8ec16c5a6c"
         },
         "basis": {
           "kind": "historical",
@@ -9928,7 +10041,7 @@
         "id": "evidence:nap1805-region-thrace-and-constantinople",
         "binding": {
           "path": "/startingState/regions/region:nap1805:thrace-and-constantinople",
-          "valueChecksum": "sha256:4ade0633071f196e8d1d0848f4e08577df004b38aea6084be8d497df8b0f18aa"
+          "valueChecksum": "sha256:959ca379fb4a6c42d6b71d70bc28a5a0e91375ac2d545cf4f98dacd6af64aa01"
         },
         "basis": {
           "kind": "historical",
@@ -9965,7 +10078,7 @@
         "id": "evidence:nap1805-region-rumelia-east",
         "binding": {
           "path": "/startingState/regions/region:nap1805:rumelia-east",
-          "valueChecksum": "sha256:5d3f47691c4b8d737348ecfdd7628425f6ffc6f309de09ef7587a3c3cb23bc72"
+          "valueChecksum": "sha256:5cd8902d79fdddc89829487707d33d5dc30bbf0cc027179432ee376faa7f1125"
         },
         "basis": {
           "kind": "historical",
@@ -10002,7 +10115,7 @@
         "id": "evidence:nap1805-region-rumelia-west",
         "binding": {
           "path": "/startingState/regions/region:nap1805:rumelia-west",
-          "valueChecksum": "sha256:0ba598740b50f18c0f0703009e2d43f05b7f84912a2d9d2a217e11a9ceccd7ad"
+          "valueChecksum": "sha256:ba4fd170c1956626dd665363a313c19706539b02d191c09a8010e69c3910fcb4"
         },
         "basis": {
           "kind": "historical",
@@ -10039,7 +10152,7 @@
         "id": "evidence:nap1805-region-bosnia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:bosnia",
-          "valueChecksum": "sha256:ab466638eda367f0dd03dcf2e93b8a203cdec6c4c98bd7569bfed0146c070775"
+          "valueChecksum": "sha256:d6d4fffdae90640263d42f7df02764619e4c465829acc888a7a86d420aef2d44"
         },
         "basis": {
           "kind": "historical",
@@ -10076,7 +10189,7 @@
         "id": "evidence:nap1805-region-danubian-principalities",
         "binding": {
           "path": "/startingState/regions/region:nap1805:danubian-principalities",
-          "valueChecksum": "sha256:200db9c90228853ac1f9dc11ce1288cc85c4a933049819bd031107db096974c1"
+          "valueChecksum": "sha256:f39e85409d04e426ab207ec687f49bc91a2bb66264cf54edc1658e914460868c"
         },
         "basis": {
           "kind": "historical",
@@ -10113,7 +10226,7 @@
         "id": "evidence:nap1805-region-morea-and-aegean",
         "binding": {
           "path": "/startingState/regions/region:nap1805:morea-and-aegean",
-          "valueChecksum": "sha256:f16c7039bc8e92b4f2ce1a3b63931aae2942f43cc4259132905a12f31f2c17bd"
+          "valueChecksum": "sha256:d720399ada37e0611605fca419997a7f804dc6fe7ecbcf0381a052b6b99dd461"
         },
         "basis": {
           "kind": "historical",
@@ -10150,7 +10263,7 @@
         "id": "evidence:nap1805-region-western-anatolia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:western-anatolia",
-          "valueChecksum": "sha256:d8bd52852462f21333da0febd275da7a8291c26f704720ce3e4756c90ae879d4"
+          "valueChecksum": "sha256:fd4fd8583102fa4b71b366668b97cd5d92f513b477ea60d779256f6a6d378464"
         },
         "basis": {
           "kind": "historical",
@@ -10187,7 +10300,7 @@
         "id": "evidence:nap1805-region-svealand",
         "binding": {
           "path": "/startingState/regions/region:nap1805:svealand",
-          "valueChecksum": "sha256:0f0dc417d44b4a9878ff845966cef9e9f8b82f2a37fdc6612caf99cc7d2e41c2"
+          "valueChecksum": "sha256:e4b9b5e68119d73107f61eae1dc52eb44f3d6689143251b1f1e0fff85e9b8d78"
         },
         "basis": {
           "kind": "historical",
@@ -10224,7 +10337,7 @@
         "id": "evidence:nap1805-region-gotaland",
         "binding": {
           "path": "/startingState/regions/region:nap1805:gotaland",
-          "valueChecksum": "sha256:f5754b73b3912611ae11a03cbd1f472af8f83502635f28975a7f49c0a6a6d07f"
+          "valueChecksum": "sha256:b246128760ca3f88494aa90c196c1df13955b2088d1048e2632918dc7129bba5"
         },
         "basis": {
           "kind": "historical",
@@ -10261,7 +10374,7 @@
         "id": "evidence:nap1805-region-norrland",
         "binding": {
           "path": "/startingState/regions/region:nap1805:norrland",
-          "valueChecksum": "sha256:ba7afbda52654cdaa6f62da45d772412f28b4d9179ccacdc42c1176544baa050"
+          "valueChecksum": "sha256:0dfd7454483f581c36d73d8b4bb197329a608747548032eaeb7377dbb1813c1e"
         },
         "basis": {
           "kind": "historical",
@@ -10298,7 +10411,7 @@
         "id": "evidence:nap1805-region-swedish-pomerania",
         "binding": {
           "path": "/startingState/regions/region:nap1805:swedish-pomerania",
-          "valueChecksum": "sha256:c13d63dacdd6f2b43cb5029e88dee1fc40192ded615f21a96a3f85215bef8cd1"
+          "valueChecksum": "sha256:12d25552ac08f496c6f820bfd576d48c5a3ba1a3be4278cd19ca63e3a0bf6a9a"
         },
         "basis": {
           "kind": "historical",
@@ -10335,7 +10448,7 @@
         "id": "evidence:nap1805-region-finland",
         "binding": {
           "path": "/startingState/regions/region:nap1805:finland",
-          "valueChecksum": "sha256:69bf2649bb689ab2d68ad7f13b612552f683000c6354f7cad6c8ca43fcfb25a7"
+          "valueChecksum": "sha256:4ddb5f6bee2ef8d3fff6cf73e0ddf5f348bfef69d2016c0428b8227502016df7"
         },
         "basis": {
           "kind": "historical",
@@ -10372,7 +10485,7 @@
         "id": "evidence:nap1805-region-zealand",
         "binding": {
           "path": "/startingState/regions/region:nap1805:zealand",
-          "valueChecksum": "sha256:dbb5b4621834eeebc2e838c03eff0e9ec6ea84fbd3a6fdc687aadd17ee24c063"
+          "valueChecksum": "sha256:89bfa8f484badba5734af3108666332b787edb8efe8ca698d21e5545f23a095f"
         },
         "basis": {
           "kind": "historical",
@@ -10409,7 +10522,7 @@
         "id": "evidence:nap1805-region-jutland",
         "binding": {
           "path": "/startingState/regions/region:nap1805:jutland",
-          "valueChecksum": "sha256:1a452d6f6a6731a12a65fc20091f26e622e8b270eea992ae7abd4678af5e2262"
+          "valueChecksum": "sha256:37caf85bb3fbe6ba7ef8c8a26918b67cd01109b7fdee717a523c9c3b6fda759b"
         },
         "basis": {
           "kind": "historical",
@@ -10446,7 +10559,7 @@
         "id": "evidence:nap1805-region-schleswig-holstein",
         "binding": {
           "path": "/startingState/regions/region:nap1805:schleswig-holstein",
-          "valueChecksum": "sha256:2f85b5924f517fef6a410f07f2515c1903e0d92ffaa2bcb1ea45afaaec92cd53"
+          "valueChecksum": "sha256:832b6edabbef0af534e58bcd06e543dcc47cac03e7b5e4633340d32227bf84eb"
         },
         "basis": {
           "kind": "historical",
@@ -10483,7 +10596,7 @@
         "id": "evidence:nap1805-region-southern-norway",
         "binding": {
           "path": "/startingState/regions/region:nap1805:southern-norway",
-          "valueChecksum": "sha256:71b1a10e224c3a4fd1c63dfd2f68edf12f339ef1e97d31afe37fdddb42eab76c"
+          "valueChecksum": "sha256:73e1965257d45a2c08e58bf576ac84314f06a805f44c97cccb8e770e1277be82"
         },
         "basis": {
           "kind": "historical",
@@ -10520,7 +10633,7 @@
         "id": "evidence:nap1805-region-northern-norway",
         "binding": {
           "path": "/startingState/regions/region:nap1805:northern-norway",
-          "valueChecksum": "sha256:8f84e3024de49302d6ff010360b66a8ff91e287033966685a8ad626916fa59d2"
+          "valueChecksum": "sha256:01a67d1c2adfc44e7a81869ed9fc9e47ccf24b49fad9dcb61e156008734fef23"
         },
         "basis": {
           "kind": "historical",
@@ -10557,7 +10670,7 @@
         "id": "evidence:nap1805-region-campania",
         "binding": {
           "path": "/startingState/regions/region:nap1805:campania",
-          "valueChecksum": "sha256:cf5cd31fae5ab58bc2aa7061893ca27a194198dac9e2c8b3ccfbe2030071a92b"
+          "valueChecksum": "sha256:e0feda8cf64a0e757cd93f4234ec51226eb0c4e92ac8903943cab7c3fde16a8d"
         },
         "basis": {
           "kind": "historical",
@@ -10594,7 +10707,7 @@
         "id": "evidence:nap1805-region-apulia-and-calabria",
         "binding": {
           "path": "/startingState/regions/region:nap1805:apulia-and-calabria",
-          "valueChecksum": "sha256:1c7ef658e49d35249d515623b23e815003f692c5687d89dc9f35fab0edb983ed"
+          "valueChecksum": "sha256:9430afe43b9351fa2be8c9f50162a7deaa0d54bab3f207d79d6d4533c0219123"
         },
         "basis": {
           "kind": "historical",
@@ -10631,7 +10744,7 @@
         "id": "evidence:nap1805-region-sicily-east",
         "binding": {
           "path": "/startingState/regions/region:nap1805:sicily-east",
-          "valueChecksum": "sha256:9d3b73e1d6927a2381f3a64728fb54a8d281024e584bb657665f42aae3e5bd64"
+          "valueChecksum": "sha256:2dd86cb5ae8599a02516f684108037ed24aef1b282e9625f5e0a99dc20eb5cf7"
         },
         "basis": {
           "kind": "historical",
@@ -10668,7 +10781,7 @@
         "id": "evidence:nap1805-region-sicily-west",
         "binding": {
           "path": "/startingState/regions/region:nap1805:sicily-west",
-          "valueChecksum": "sha256:8374bf92df246a259723667d6003fce57f789f48290f4d528ce2254814ca14ba"
+          "valueChecksum": "sha256:895e66cb338b4ba7d9ec695db79c405e1a53af8287c08ace33862f7f60bfd7cc"
         },
         "basis": {
           "kind": "historical",
@@ -10705,7 +10818,7 @@
         "id": "evidence:nap1805-region-milan-and-lombardy",
         "binding": {
           "path": "/startingState/regions/region:nap1805:milan-and-lombardy",
-          "valueChecksum": "sha256:9b64c3ac72fde03ce4bf1c002fad70ef4a7358a6218d8f3c143d194364ba6bb7"
+          "valueChecksum": "sha256:252f1e0266f211e6948f013f7883607fe9c0a3399412db80e8ec39694822e817"
         },
         "basis": {
           "kind": "historical",
@@ -10742,7 +10855,7 @@
         "id": "evidence:nap1805-region-emilia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:emilia",
-          "valueChecksum": "sha256:13d25db054fd3f192b47c558fd05654a2f29912a4185e915a55cad47cb74c881"
+          "valueChecksum": "sha256:adbfcb1d28b0566ac98f44a914c69711085f52b124826b5614425852b25a5871"
         },
         "basis": {
           "kind": "historical",
@@ -10779,7 +10892,7 @@
         "id": "evidence:nap1805-region-romagna",
         "binding": {
           "path": "/startingState/regions/region:nap1805:romagna",
-          "valueChecksum": "sha256:efe76fa0d64a43438f993024119b6aeb4bd5909ab9e06ce7c804774cf6c9e6d4"
+          "valueChecksum": "sha256:e37ca4472bd5814e2ced30035119d4058835041371a4857a1fff448b19b5b0ab"
         },
         "basis": {
           "kind": "historical",
@@ -10816,7 +10929,7 @@
         "id": "evidence:nap1805-region-modena",
         "binding": {
           "path": "/startingState/regions/region:nap1805:modena",
-          "valueChecksum": "sha256:94306c69df0353efd2a90de23a5a59dd8bea7f5f6952a3d852bb80dc98247d3c"
+          "valueChecksum": "sha256:04a001dca56e4e886fe2ae0574288ed3746b105c41c761507a73226735784648"
         },
         "basis": {
           "kind": "historical",
@@ -10853,7 +10966,7 @@
         "id": "evidence:nap1805-region-mantua",
         "binding": {
           "path": "/startingState/regions/region:nap1805:mantua",
-          "valueChecksum": "sha256:71436dcdfdcdc440e2bfc081438d23f2696830b6df3f76b3243309a33a08038b"
+          "valueChecksum": "sha256:87a5eae1cb86ea6d60b385946e0a07b2fb557ab16f89faaea73db4bfa223c048"
         },
         "basis": {
           "kind": "historical",
@@ -10890,7 +11003,7 @@
         "id": "evidence:nap1805-region-upper-bavaria",
         "binding": {
           "path": "/startingState/regions/region:nap1805:upper-bavaria",
-          "valueChecksum": "sha256:998f71a0b3e9230644aa37ff52489e803858af830b1ad5b3bd2f504bf7c59c1b"
+          "valueChecksum": "sha256:52a0cf84f39222904b83f36ad15a7a912823286f17952290e9861d8577fa1de3"
         },
         "basis": {
           "kind": "historical",
@@ -10927,7 +11040,7 @@
         "id": "evidence:nap1805-region-lower-bavaria",
         "binding": {
           "path": "/startingState/regions/region:nap1805:lower-bavaria",
-          "valueChecksum": "sha256:25acc365e95fba235c5b6f77acd26199f3aa7f09ff034123a48ed4e8b98588af"
+          "valueChecksum": "sha256:1968562655a97e5065649d601f01b256761b55d7685689001fbb926df4897d0c"
         },
         "basis": {
           "kind": "historical",
@@ -10964,7 +11077,7 @@
         "id": "evidence:nap1805-region-franconian-bavaria",
         "binding": {
           "path": "/startingState/regions/region:nap1805:franconian-bavaria",
-          "valueChecksum": "sha256:e68b62e91070b66ff6f933291fe39640c3d0396ca1c121312dd11d0059ee98fb"
+          "valueChecksum": "sha256:fc375689eb8fbdd8d782d3623bea78c6ed5cda2e43bb36064557bfccc4139416"
         },
         "basis": {
           "kind": "historical",
@@ -11001,7 +11114,7 @@
         "id": "evidence:nap1805-region-holland",
         "binding": {
           "path": "/startingState/regions/region:nap1805:holland",
-          "valueChecksum": "sha256:1349196fa0e26dc9db8ac010e009c261fd0b840337e27e90c70d55eaae9d1476"
+          "valueChecksum": "sha256:d5235ec74718d14403f48f0d796d3bef52b9c8244b9b660affa964522a48f735"
         },
         "basis": {
           "kind": "historical",
@@ -11038,7 +11151,7 @@
         "id": "evidence:nap1805-region-friesland",
         "binding": {
           "path": "/startingState/regions/region:nap1805:friesland",
-          "valueChecksum": "sha256:7f4bbc8d740662532172c1f7291d0207d335159d9aad14f8bd4b89076c506f66"
+          "valueChecksum": "sha256:11d359a1586e642360631121f022f4390e3e61cfd6fb2e136685ae1b2dc57871"
         },
         "basis": {
           "kind": "historical",
@@ -11075,7 +11188,7 @@
         "id": "evidence:nap1805-region-batavian-interior",
         "binding": {
           "path": "/startingState/regions/region:nap1805:batavian-interior",
-          "valueChecksum": "sha256:bc03a6eda3828cb3ff54d04d1cb7fdf6ac6d316c449ac610cfebf0ba4ab60b59"
+          "valueChecksum": "sha256:5230d0ff0f2d6079e75a259500e66467264ed943db88a2b744fa3c9b559c64e0"
         },
         "basis": {
           "kind": "historical",
@@ -11112,7 +11225,7 @@
         "id": "evidence:nap1805-region-northern-portugal",
         "binding": {
           "path": "/startingState/regions/region:nap1805:northern-portugal",
-          "valueChecksum": "sha256:e73435a81d85a231002be9b1e711f047ef2d72a30e1a330ba50ba51642bf0444"
+          "valueChecksum": "sha256:58021b726de4efbecd47c8e67fa671a15df0a00b6bd9c344f02bcffecbe090d8"
         },
         "basis": {
           "kind": "historical",
@@ -11149,7 +11262,7 @@
         "id": "evidence:nap1805-region-central-portugal",
         "binding": {
           "path": "/startingState/regions/region:nap1805:central-portugal",
-          "valueChecksum": "sha256:cd3cf8d565149ae72c41b27537cf0326f29a275e9bb518ce3eb84da7907c0e21"
+          "valueChecksum": "sha256:1ec3814fb0d7987c8126f42b09aa51bca8c0081eca2b70b92ada1a0fc662b461"
         },
         "basis": {
           "kind": "historical",
@@ -11186,7 +11299,7 @@
         "id": "evidence:nap1805-region-southern-portugal",
         "binding": {
           "path": "/startingState/regions/region:nap1805:southern-portugal",
-          "valueChecksum": "sha256:4713302bcc53cac8f288894fa49c58009c2301544e949569fb8e616891bdb707"
+          "valueChecksum": "sha256:bd17b1c283f4e9c755687a0aea6055af847a297b70c4e9736a38e7f918c04330"
         },
         "basis": {
           "kind": "historical",
@@ -11223,7 +11336,7 @@
         "id": "evidence:nap1805-region-western-switzerland",
         "binding": {
           "path": "/startingState/regions/region:nap1805:western-switzerland",
-          "valueChecksum": "sha256:1ba75917a869b31835eb152be8976c6693f14fa326742177c4a01cabe9a2a80a"
+          "valueChecksum": "sha256:dd9a642df6d34947a3310601215076a762cf79216dd001f011bfd706ae84774b"
         },
         "basis": {
           "kind": "historical",
@@ -11260,7 +11373,7 @@
         "id": "evidence:nap1805-region-central-switzerland",
         "binding": {
           "path": "/startingState/regions/region:nap1805:central-switzerland",
-          "valueChecksum": "sha256:5876e94b76f8b5797321758aa9c2d3d97eb2121f496fdba2d9383b07247225a4"
+          "valueChecksum": "sha256:bf2461f8ec9fcb5f7df5630339136021e34691fccc84cac1ec1663f2efb36b26"
         },
         "basis": {
           "kind": "historical",
@@ -11297,7 +11410,7 @@
         "id": "evidence:nap1805-region-eastern-switzerland",
         "binding": {
           "path": "/startingState/regions/region:nap1805:eastern-switzerland",
-          "valueChecksum": "sha256:5c61d7f1a47cfdd47a80d54c15539a4a3c209151ec3c22bcc592aaa050281bf1"
+          "valueChecksum": "sha256:b5b2deb89f2cb299c21a2f162466441190402a5414ace9b492ef157283af49f6"
         },
         "basis": {
           "kind": "historical",
@@ -11334,7 +11447,7 @@
         "id": "evidence:nap1805-region-dresden-and-meissen",
         "binding": {
           "path": "/startingState/regions/region:nap1805:dresden-and-meissen",
-          "valueChecksum": "sha256:019bebb20a1f559d203a3b61f9055c069188f39e1bf98c5342fe8645af648775"
+          "valueChecksum": "sha256:a268d9d23eee6286d7de8810f9ddcdc91c92ed27acb81be7ffaf1feb41647e0c"
         },
         "basis": {
           "kind": "historical",
@@ -11371,7 +11484,7 @@
         "id": "evidence:nap1805-region-leipzig-and-thuringian-saxony",
         "binding": {
           "path": "/startingState/regions/region:nap1805:leipzig-and-thuringian-saxony",
-          "valueChecksum": "sha256:25e85a05f9f41f19d545306c14e1ee35a93e849b2a50ba965b4e62749afae41b"
+          "valueChecksum": "sha256:1bc63677446d141cede2b07ac5fac1e84a8f0fee0323509e521330a1724e298a"
         },
         "basis": {
           "kind": "historical",
@@ -11408,7 +11521,7 @@
         "id": "evidence:nap1805-region-stuttgart-and-neckar",
         "binding": {
           "path": "/startingState/regions/region:nap1805:stuttgart-and-neckar",
-          "valueChecksum": "sha256:ab5b8bd31fef4aaf361caa3db282369907b2d40a2b62b7de617f287ab6b12dbc"
+          "valueChecksum": "sha256:15bde499384a1184ba8c2f837e2dda2ca875d6dc6db3b9d8ad3433578a863897"
         },
         "basis": {
           "kind": "historical",
@@ -11445,7 +11558,7 @@
         "id": "evidence:nap1805-region-swabian-wurttemberg",
         "binding": {
           "path": "/startingState/regions/region:nap1805:swabian-wurttemberg",
-          "valueChecksum": "sha256:9a7a80887e813be22f57cd52c6ae3ddff9be2d913501b784e27bcba1427fea73"
+          "valueChecksum": "sha256:63f35fbb70f2decd097074a94554011472480d9c6a5f5f48d3c7235645e9edb4"
         },
         "basis": {
           "kind": "historical",
@@ -11482,7 +11595,7 @@
         "id": "evidence:nap1805-region-upper-baden",
         "binding": {
           "path": "/startingState/regions/region:nap1805:upper-baden",
-          "valueChecksum": "sha256:48e6e6566c52d648b5c5d92c9a70358bad64093c0e1934c8edd8d42db164d37d"
+          "valueChecksum": "sha256:4f790973d6ae4638419ab1544e961d82014c61c16d742983b0e14bd2a4f2a382"
         },
         "basis": {
           "kind": "historical",
@@ -11519,7 +11632,7 @@
         "id": "evidence:nap1805-region-lower-baden",
         "binding": {
           "path": "/startingState/regions/region:nap1805:lower-baden",
-          "valueChecksum": "sha256:2c1e3989e3bc0f45d95ff1ea6fb04f4b1be1c48a76464405e60bb7fd3a5d16d1"
+          "valueChecksum": "sha256:05c687033020783a57ce2f3b8ce42289ef39168e69a885d72adea84348d205fa"
         },
         "basis": {
           "kind": "historical",
@@ -11556,7 +11669,7 @@
         "id": "evidence:nap1805-region-hanover",
         "binding": {
           "path": "/startingState/regions/region:nap1805:hanover",
-          "valueChecksum": "sha256:d17f07bdf0df979763ce8f88c927f8a918d0e26d786b11b346b89c71cf3f0c01"
+          "valueChecksum": "sha256:9560f76e40e2a865589e376c19e0a905636f7b32407104528299d2d644114e76"
         },
         "basis": {
           "kind": "historical",
@@ -11593,7 +11706,7 @@
         "id": "evidence:nap1805-region-bremen-verden",
         "binding": {
           "path": "/startingState/regions/region:nap1805:bremen-verden",
-          "valueChecksum": "sha256:66e46ce3a4b561335c52aa29cb11644bf08bea8c2d07d2cf7e535796c5dd0a1f"
+          "valueChecksum": "sha256:baef7d6e0fc809ff45a9c183da7451d0b5a182e6bd3696a50bd80136bd4d3049"
         },
         "basis": {
           "kind": "historical",
@@ -11630,7 +11743,7 @@
         "id": "evidence:nap1805-region-rome-and-lazio",
         "binding": {
           "path": "/startingState/regions/region:nap1805:rome-and-lazio",
-          "valueChecksum": "sha256:31b1b173dea1198f95816a61be08c3320382b03b71ab4cd207bf5c187388fb55"
+          "valueChecksum": "sha256:43784eae281fddd392757f7ed35b4a09570302c3f07ce99a7adaf8b1b6682f0c"
         },
         "basis": {
           "kind": "historical",
@@ -11667,7 +11780,7 @@
         "id": "evidence:nap1805-region-umbria-and-marche",
         "binding": {
           "path": "/startingState/regions/region:nap1805:umbria-and-marche",
-          "valueChecksum": "sha256:1782b1989ae5cbb9db6d5999c8ab13594b9082bb54695328d655a3a19808112c"
+          "valueChecksum": "sha256:bc7ffdc8c1b5cee9cdcbb7fc97909f1bd250ecc91a65454a1638a128c978d1d3"
         },
         "basis": {
           "kind": "historical",
@@ -11704,7 +11817,7 @@
         "id": "evidence:nap1805-region-tuscany",
         "binding": {
           "path": "/startingState/regions/region:nap1805:tuscany",
-          "valueChecksum": "sha256:2e037d9c0108653f47ee2957e31a40fdd92df7ffb522685ec75c27476c8b6a3b"
+          "valueChecksum": "sha256:d5ed8124d58af271ff209780dd97773c6b96e15f4a6ffc891919c3383bb0fd0e"
         },
         "basis": {
           "kind": "historical",
@@ -11741,7 +11854,7 @@
         "id": "evidence:nap1805-region-liguria",
         "binding": {
           "path": "/startingState/regions/region:nap1805:liguria",
-          "valueChecksum": "sha256:93d394ecf41cf13720a787095186d6cb7fd1ee86df7682e238212c0b7655cf70"
+          "valueChecksum": "sha256:c27013d01ede362e2121335dcd1005272c362f253984a8d2d3f56c7002c851c6"
         },
         "basis": {
           "kind": "historical",
@@ -11778,7 +11891,7 @@
         "id": "evidence:nap1805-region-sardinia",
         "binding": {
           "path": "/startingState/regions/region:nap1805:sardinia",
-          "valueChecksum": "sha256:2a4d8830a21a909067798c3a90f28abe42ea6d0cfbf47e62c496ddb461ec8bc8"
+          "valueChecksum": "sha256:24ae7599c537d7c52efc200ac786e3d6cb1603b6a854a10c5bd402c8f4b43c3a"
         },
         "basis": {
           "kind": "historical",
@@ -11815,7 +11928,7 @@
         "id": "evidence:nap1805-region-hesse-kassel",
         "binding": {
           "path": "/startingState/regions/region:nap1805:hesse-kassel",
-          "valueChecksum": "sha256:5058061adf9fa675942c73693656cf808c5442733c1b598c969cfa6f8488511d"
+          "valueChecksum": "sha256:fb5dd59652d7b57c605a421b43db308ed0f9f3fdecd7d053d529aab55a8340af"
         },
         "basis": {
           "kind": "historical",
@@ -11852,7 +11965,7 @@
         "id": "evidence:nap1805-region-hesse-darmstadt",
         "binding": {
           "path": "/startingState/regions/region:nap1805:hesse-darmstadt",
-          "valueChecksum": "sha256:bde834ae56817f052162b91561ce029d137000bc564b9b14e81468e5ddc3528a"
+          "valueChecksum": "sha256:d2c1aff952ff9ef32feafd9aa1166fdc102743dcda5ae907c3919dc18130feb6"
         },
         "basis": {
           "kind": "historical",
@@ -11889,7 +12002,7 @@
         "id": "evidence:nap1805-region-brunswick",
         "binding": {
           "path": "/startingState/regions/region:nap1805:brunswick",
-          "valueChecksum": "sha256:61ec43ddfcdae54db7eb5f84274567edc7ad1f484b15473ebc772fcaa4fd8bdc"
+          "valueChecksum": "sha256:0bffc05f1ba5ca6e17bb1ef5e5795a88a1b2c9545dbc19b1cd307ca3657e8344"
         },
         "basis": {
           "kind": "historical",

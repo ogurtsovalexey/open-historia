@@ -2,7 +2,8 @@
   "region:nap1805:paris-and-seine": {
     "id": "region:nap1805:paris-and-seine",
     "displayName": {
-      "en": "Paris and Seine"
+      "en": "Paris and Seine",
+      "ru": "Париж и Сена"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -21,7 +22,8 @@
   "region:nap1805:normandy": {
     "id": "region:nap1805:normandy",
     "displayName": {
-      "en": "Normandy"
+      "en": "Normandy",
+      "ru": "Нормандия"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -41,7 +43,8 @@
   "region:nap1805:brittany": {
     "id": "region:nap1805:brittany",
     "displayName": {
-      "en": "Brittany"
+      "en": "Brittany",
+      "ru": "Бретань"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -60,7 +63,8 @@
   "region:nap1805:loire": {
     "id": "region:nap1805:loire",
     "displayName": {
-      "en": "Loire"
+      "en": "Loire",
+      "ru": "Луара"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -79,7 +83,8 @@
   "region:nap1805:aquitaine": {
     "id": "region:nap1805:aquitaine",
     "displayName": {
-      "en": "Aquitaine"
+      "en": "Aquitaine",
+      "ru": "Аквитания"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -98,7 +103,8 @@
   "region:nap1805:pyrenees": {
     "id": "region:nap1805:pyrenees",
     "displayName": {
-      "en": "Pyrenees"
+      "en": "Pyrenees",
+      "ru": "Пиренеи"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -117,7 +123,8 @@
   "region:nap1805:languedoc": {
     "id": "region:nap1805:languedoc",
     "displayName": {
-      "en": "Languedoc"
+      "en": "Languedoc",
+      "ru": "Лангедок"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -136,7 +143,8 @@
   "region:nap1805:provence": {
     "id": "region:nap1805:provence",
     "displayName": {
-      "en": "Provence"
+      "en": "Provence",
+      "ru": "Прованс"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -155,7 +163,8 @@
   "region:nap1805:alps": {
     "id": "region:nap1805:alps",
     "displayName": {
-      "en": "Alps"
+      "en": "Alps",
+      "ru": "Альпы"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -174,7 +183,8 @@
   "region:nap1805:burgundy": {
     "id": "region:nap1805:burgundy",
     "displayName": {
-      "en": "Burgundy"
+      "en": "Burgundy",
+      "ru": "Бургундия"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -193,7 +203,8 @@
   "region:nap1805:alsace": {
     "id": "region:nap1805:alsace",
     "displayName": {
-      "en": "Alsace"
+      "en": "Alsace",
+      "ru": "Эльзас"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -212,7 +223,8 @@
   "region:nap1805:lorraine": {
     "id": "region:nap1805:lorraine",
     "displayName": {
-      "en": "Lorraine"
+      "en": "Lorraine",
+      "ru": "Лотарингия"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -231,7 +243,8 @@
   "region:nap1805:champagne": {
     "id": "region:nap1805:champagne",
     "displayName": {
-      "en": "Champagne"
+      "en": "Champagne",
+      "ru": "Шампань"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -250,7 +263,8 @@
   "region:nap1805:picardy": {
     "id": "region:nap1805:picardy",
     "displayName": {
-      "en": "Picardy"
+      "en": "Picardy",
+      "ru": "Пикардия"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -269,7 +283,8 @@
   "region:nap1805:flanders": {
     "id": "region:nap1805:flanders",
     "displayName": {
-      "en": "Flanders"
+      "en": "Flanders",
+      "ru": "Фландрия"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -288,7 +303,8 @@
   "region:nap1805:corsica": {
     "id": "region:nap1805:corsica",
     "displayName": {
-      "en": "Corsica"
+      "en": "Corsica",
+      "ru": "Корсика"
     },
     "legalOwnerPolityId": "polity:france",
     "actualControllerPolityId": "polity:france",
@@ -307,7 +323,8 @@
   "region:nap1805:london-and-home-counties": {
     "id": "region:nap1805:london-and-home-counties",
     "displayName": {
-      "en": "London and Home Counties"
+      "en": "London and Home Counties",
+      "ru": "Лондон и домашние графства"
     },
     "legalOwnerPolityId": "polity:united-kingdom",
     "actualControllerPolityId": "polity:united-kingdom",
@@ -326,7 +343,8 @@
   "region:nap1805:southwest-england": {
     "id": "region:nap1805:southwest-england",
     "displayName": {
-      "en": "Southwest England"
+      "en": "Southwest England",
+      "ru": "Юго-Западная Англия"
     },
     "legalOwnerPolityId": "polity:united-kingdom",
     "actualControllerPolityId": "polity:united-kingdom",
@@ -345,7 +363,8 @@
   "region:nap1805:midlands": {
     "id": "region:nap1805:midlands",
     "displayName": {
-      "en": "Midlands"
+      "en": "Midlands",
+      "ru": "Мидлендс"
     },
     "legalOwnerPolityId": "polity:united-kingdom",
     "actualControllerPolityId": "polity:united-kingdom",
@@ -365,7 +384,8 @@
   "region:nap1805:northern-england": {
     "id": "region:nap1805:northern-england",
     "displayName": {
-      "en": "Northern England"
+      "en": "Northern England",
+      "ru": "Северная Англия"
     },
     "legalOwnerPolityId": "polity:united-kingdom",
     "actualControllerPolityId": "polity:united-kingdom",
@@ -384,7 +404,8 @@
   "region:nap1805:wales": {
     "id": "region:nap1805:wales",
     "displayName": {
-      "en": "Wales"
+      "en": "Wales",
+      "ru": "Уэльс"
     },
     "legalOwnerPolityId": "polity:united-kingdom",
     "actualControllerPolityId": "polity:united-kingdom",
@@ -404,7 +425,8 @@
   "region:nap1805:scottish-lowlands": {
     "id": "region:nap1805:scottish-lowlands",
     "displayName": {
-      "en": "Scottish Lowlands"
+      "en": "Scottish Lowlands",
+      "ru": "Шотландская низменность"
     },
     "legalOwnerPolityId": "polity:united-kingdom",
     "actualControllerPolityId": "polity:united-kingdom",
@@ -423,7 +445,8 @@
   "region:nap1805:scottish-highlands": {
     "id": "region:nap1805:scottish-highlands",
     "displayName": {
-      "en": "Scottish Highlands"
+      "en": "Scottish Highlands",
+      "ru": "Шотландское нагорье"
     },
     "legalOwnerPolityId": "polity:united-kingdom",
     "actualControllerPolityId": "polity:united-kingdom",
@@ -442,7 +465,8 @@
   "region:nap1805:ireland": {
     "id": "region:nap1805:ireland",
     "displayName": {
-      "en": "Ireland"
+      "en": "Ireland",
+      "ru": "Ирландия"
     },
     "legalOwnerPolityId": "polity:united-kingdom",
     "actualControllerPolityId": "polity:united-kingdom",
@@ -462,7 +486,8 @@
   "region:nap1805:gibraltar": {
     "id": "region:nap1805:gibraltar",
     "displayName": {
-      "en": "Gibraltar"
+      "en": "Gibraltar",
+      "ru": "Гибралтар"
     },
     "legalOwnerPolityId": "polity:united-kingdom",
     "actualControllerPolityId": "polity:united-kingdom",
@@ -481,7 +506,8 @@
   "region:nap1805:vienna-and-lower-austria": {
     "id": "region:nap1805:vienna-and-lower-austria",
     "displayName": {
-      "en": "Vienna and Lower Austria"
+      "en": "Vienna and Lower Austria",
+      "ru": "Вена и Нижняя Австрия"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -500,7 +526,8 @@
   "region:nap1805:upper-austria": {
     "id": "region:nap1805:upper-austria",
     "displayName": {
-      "en": "Upper Austria"
+      "en": "Upper Austria",
+      "ru": "Верхняя Австрия"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -519,7 +546,8 @@
   "region:nap1805:salzburg": {
     "id": "region:nap1805:salzburg",
     "displayName": {
-      "en": "Salzburg"
+      "en": "Salzburg",
+      "ru": "Зальцбург"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -538,7 +566,8 @@
   "region:nap1805:bohemia": {
     "id": "region:nap1805:bohemia",
     "displayName": {
-      "en": "Bohemia"
+      "en": "Bohemia",
+      "ru": "Богемия"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -558,7 +587,8 @@
   "region:nap1805:moravia": {
     "id": "region:nap1805:moravia",
     "displayName": {
-      "en": "Moravia"
+      "en": "Moravia",
+      "ru": "Моравия"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -577,7 +607,8 @@
   "region:nap1805:austrian-silesia": {
     "id": "region:nap1805:austrian-silesia",
     "displayName": {
-      "en": "Austrian Silesia"
+      "en": "Austrian Silesia",
+      "ru": "Австрийская Силезия"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -597,7 +628,8 @@
   "region:nap1805:tyrol": {
     "id": "region:nap1805:tyrol",
     "displayName": {
-      "en": "Tyrol"
+      "en": "Tyrol",
+      "ru": "Тироль"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -616,7 +648,8 @@
   "region:nap1805:carinthia-and-carniola": {
     "id": "region:nap1805:carinthia-and-carniola",
     "displayName": {
-      "en": "Carinthia and Carniola"
+      "en": "Carinthia and Carniola",
+      "ru": "Каринтия и Крайна"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -635,7 +668,8 @@
   "region:nap1805:hungary-west": {
     "id": "region:nap1805:hungary-west",
     "displayName": {
-      "en": "Hungary West"
+      "en": "Hungary West",
+      "ru": "Западная Венгрия"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -655,7 +689,8 @@
   "region:nap1805:hungary-east": {
     "id": "region:nap1805:hungary-east",
     "displayName": {
-      "en": "Hungary East"
+      "en": "Hungary East",
+      "ru": "Восточная Венгрия"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -675,7 +710,8 @@
   "region:nap1805:venetia": {
     "id": "region:nap1805:venetia",
     "displayName": {
-      "en": "Venetia"
+      "en": "Venetia",
+      "ru": "Венеция"
     },
     "legalOwnerPolityId": "polity:austria",
     "actualControllerPolityId": "polity:austria",
@@ -694,7 +730,8 @@
   "region:nap1805:baltic-provinces": {
     "id": "region:nap1805:baltic-provinces",
     "displayName": {
-      "en": "Baltic Provinces"
+      "en": "Baltic Provinces",
+      "ru": "Прибалтийские губернии"
     },
     "legalOwnerPolityId": "polity:russia",
     "actualControllerPolityId": "polity:russia",
@@ -713,7 +750,8 @@
   "region:nap1805:lithuania": {
     "id": "region:nap1805:lithuania",
     "displayName": {
-      "en": "Lithuania"
+      "en": "Lithuania",
+      "ru": "Литва"
     },
     "legalOwnerPolityId": "polity:russia",
     "actualControllerPolityId": "polity:russia",
@@ -732,7 +770,8 @@
   "region:nap1805:belarus": {
     "id": "region:nap1805:belarus",
     "displayName": {
-      "en": "Belarus"
+      "en": "Belarus",
+      "ru": "Белоруссия"
     },
     "legalOwnerPolityId": "polity:russia",
     "actualControllerPolityId": "polity:russia",
@@ -751,7 +790,8 @@
   "region:nap1805:volhynia": {
     "id": "region:nap1805:volhynia",
     "displayName": {
-      "en": "Volhynia"
+      "en": "Volhynia",
+      "ru": "Волынь"
     },
     "legalOwnerPolityId": "polity:russia",
     "actualControllerPolityId": "polity:russia",
@@ -770,7 +810,8 @@
   "region:nap1805:podolia": {
     "id": "region:nap1805:podolia",
     "displayName": {
-      "en": "Podolia"
+      "en": "Podolia",
+      "ru": "Подолия"
     },
     "legalOwnerPolityId": "polity:russia",
     "actualControllerPolityId": "polity:russia",
@@ -789,7 +830,8 @@
   "region:nap1805:ukraine-west": {
     "id": "region:nap1805:ukraine-west",
     "displayName": {
-      "en": "Ukraine West"
+      "en": "Ukraine West",
+      "ru": "Правобережная Украина"
     },
     "legalOwnerPolityId": "polity:russia",
     "actualControllerPolityId": "polity:russia",
@@ -809,7 +851,8 @@
   "region:nap1805:new-russia": {
     "id": "region:nap1805:new-russia",
     "displayName": {
-      "en": "New Russia"
+      "en": "New Russia",
+      "ru": "Новороссия"
     },
     "legalOwnerPolityId": "polity:russia",
     "actualControllerPolityId": "polity:russia",
@@ -828,7 +871,8 @@
   "region:nap1805:brandenburg": {
     "id": "region:nap1805:brandenburg",
     "displayName": {
-      "en": "Brandenburg"
+      "en": "Brandenburg",
+      "ru": "Бранденбург"
     },
     "legalOwnerPolityId": "polity:prussia",
     "actualControllerPolityId": "polity:prussia",
@@ -848,7 +892,8 @@
   "region:nap1805:pomerania": {
     "id": "region:nap1805:pomerania",
     "displayName": {
-      "en": "Pomerania"
+      "en": "Pomerania",
+      "ru": "Померания"
     },
     "legalOwnerPolityId": "polity:prussia",
     "actualControllerPolityId": "polity:prussia",
@@ -867,7 +912,8 @@
   "region:nap1805:east-prussia": {
     "id": "region:nap1805:east-prussia",
     "displayName": {
-      "en": "East Prussia"
+      "en": "East Prussia",
+      "ru": "Восточная Пруссия"
     },
     "legalOwnerPolityId": "polity:prussia",
     "actualControllerPolityId": "polity:prussia",
@@ -887,7 +933,8 @@
   "region:nap1805:west-prussia": {
     "id": "region:nap1805:west-prussia",
     "displayName": {
-      "en": "West Prussia"
+      "en": "West Prussia",
+      "ru": "Западная Пруссия"
     },
     "legalOwnerPolityId": "polity:prussia",
     "actualControllerPolityId": "polity:prussia",
@@ -907,7 +954,8 @@
   "region:nap1805:silesia": {
     "id": "region:nap1805:silesia",
     "displayName": {
-      "en": "Silesia"
+      "en": "Silesia",
+      "ru": "Силезия"
     },
     "legalOwnerPolityId": "polity:prussia",
     "actualControllerPolityId": "polity:prussia",
@@ -927,7 +975,8 @@
   "region:nap1805:magdeburg": {
     "id": "region:nap1805:magdeburg",
     "displayName": {
-      "en": "Magdeburg"
+      "en": "Magdeburg",
+      "ru": "Магдебург"
     },
     "legalOwnerPolityId": "polity:prussia",
     "actualControllerPolityId": "polity:prussia",
@@ -946,7 +995,8 @@
   "region:nap1805:westphalian-prussia": {
     "id": "region:nap1805:westphalian-prussia",
     "displayName": {
-      "en": "Westphalian Prussia"
+      "en": "Westphalian Prussia",
+      "ru": "Вестфальская Пруссия"
     },
     "legalOwnerPolityId": "polity:prussia",
     "actualControllerPolityId": "polity:prussia",
@@ -967,7 +1017,8 @@
   "region:nap1805:neuchatel": {
     "id": "region:nap1805:neuchatel",
     "displayName": {
-      "en": "Neuchatel"
+      "en": "Neuchatel",
+      "ru": "Невшатель"
     },
     "legalOwnerPolityId": "polity:prussia",
     "actualControllerPolityId": "polity:prussia",
@@ -986,7 +1037,8 @@
   "region:nap1805:madrid-and-castile": {
     "id": "region:nap1805:madrid-and-castile",
     "displayName": {
-      "en": "Madrid and Castile"
+      "en": "Madrid and Castile",
+      "ru": "Мадрид и Кастилия"
     },
     "legalOwnerPolityId": "polity:spain",
     "actualControllerPolityId": "polity:spain",
@@ -1006,7 +1058,8 @@
   "region:nap1805:galicia": {
     "id": "region:nap1805:galicia",
     "displayName": {
-      "en": "Galicia"
+      "en": "Galicia",
+      "ru": "Галисия"
     },
     "legalOwnerPolityId": "polity:spain",
     "actualControllerPolityId": "polity:spain",
@@ -1025,7 +1078,8 @@
   "region:nap1805:basque-provinces-and-navarre": {
     "id": "region:nap1805:basque-provinces-and-navarre",
     "displayName": {
-      "en": "Basque Provinces and Navarre"
+      "en": "Basque Provinces and Navarre",
+      "ru": "Баскские провинции и Наварра"
     },
     "legalOwnerPolityId": "polity:spain",
     "actualControllerPolityId": "polity:spain",
@@ -1044,7 +1098,8 @@
   "region:nap1805:aragon": {
     "id": "region:nap1805:aragon",
     "displayName": {
-      "en": "Aragon"
+      "en": "Aragon",
+      "ru": "Арагон"
     },
     "legalOwnerPolityId": "polity:spain",
     "actualControllerPolityId": "polity:spain",
@@ -1063,7 +1118,8 @@
   "region:nap1805:catalonia": {
     "id": "region:nap1805:catalonia",
     "displayName": {
-      "en": "Catalonia"
+      "en": "Catalonia",
+      "ru": "Каталония"
     },
     "legalOwnerPolityId": "polity:spain",
     "actualControllerPolityId": "polity:spain",
@@ -1082,7 +1138,8 @@
   "region:nap1805:valencia-and-murcia": {
     "id": "region:nap1805:valencia-and-murcia",
     "displayName": {
-      "en": "Valencia and Murcia"
+      "en": "Valencia and Murcia",
+      "ru": "Валенсия и Мурсия"
     },
     "legalOwnerPolityId": "polity:spain",
     "actualControllerPolityId": "polity:spain",
@@ -1101,7 +1158,8 @@
   "region:nap1805:andalusia": {
     "id": "region:nap1805:andalusia",
     "displayName": {
-      "en": "Andalusia"
+      "en": "Andalusia",
+      "ru": "Андалусия"
     },
     "legalOwnerPolityId": "polity:spain",
     "actualControllerPolityId": "polity:spain",
@@ -1120,7 +1178,8 @@
   "region:nap1805:balearic-islands": {
     "id": "region:nap1805:balearic-islands",
     "displayName": {
-      "en": "Balearic Islands"
+      "en": "Balearic Islands",
+      "ru": "Балеарские острова"
     },
     "legalOwnerPolityId": "polity:spain",
     "actualControllerPolityId": "polity:spain",
@@ -1139,7 +1198,8 @@
   "region:nap1805:thrace-and-constantinople": {
     "id": "region:nap1805:thrace-and-constantinople",
     "displayName": {
-      "en": "Thrace and Constantinople"
+      "en": "Thrace and Constantinople",
+      "ru": "Фракия и Константинополь"
     },
     "legalOwnerPolityId": "polity:ottoman-empire",
     "actualControllerPolityId": "polity:ottoman-empire",
@@ -1158,7 +1218,8 @@
   "region:nap1805:rumelia-east": {
     "id": "region:nap1805:rumelia-east",
     "displayName": {
-      "en": "Rumelia East"
+      "en": "Rumelia East",
+      "ru": "Восточная Румелия"
     },
     "legalOwnerPolityId": "polity:ottoman-empire",
     "actualControllerPolityId": "polity:ottoman-empire",
@@ -1177,7 +1238,8 @@
   "region:nap1805:rumelia-west": {
     "id": "region:nap1805:rumelia-west",
     "displayName": {
-      "en": "Rumelia West"
+      "en": "Rumelia West",
+      "ru": "Западная Румелия"
     },
     "legalOwnerPolityId": "polity:ottoman-empire",
     "actualControllerPolityId": "polity:ottoman-empire",
@@ -1196,7 +1258,8 @@
   "region:nap1805:bosnia": {
     "id": "region:nap1805:bosnia",
     "displayName": {
-      "en": "Bosnia"
+      "en": "Bosnia",
+      "ru": "Босния"
     },
     "legalOwnerPolityId": "polity:ottoman-empire",
     "actualControllerPolityId": "polity:ottoman-empire",
@@ -1215,7 +1278,8 @@
   "region:nap1805:danubian-principalities": {
     "id": "region:nap1805:danubian-principalities",
     "displayName": {
-      "en": "Danubian Principalities"
+      "en": "Danubian Principalities",
+      "ru": "Дунайские княжества"
     },
     "legalOwnerPolityId": "polity:ottoman-empire",
     "actualControllerPolityId": "polity:ottoman-empire",
@@ -1234,7 +1298,8 @@
   "region:nap1805:morea-and-aegean": {
     "id": "region:nap1805:morea-and-aegean",
     "displayName": {
-      "en": "Morea and Aegean"
+      "en": "Morea and Aegean",
+      "ru": "Морея и Эгейские острова"
     },
     "legalOwnerPolityId": "polity:ottoman-empire",
     "actualControllerPolityId": "polity:ottoman-empire",
@@ -1253,7 +1318,8 @@
   "region:nap1805:western-anatolia": {
     "id": "region:nap1805:western-anatolia",
     "displayName": {
-      "en": "Western Anatolia"
+      "en": "Western Anatolia",
+      "ru": "Западная Анатолия"
     },
     "legalOwnerPolityId": "polity:ottoman-empire",
     "actualControllerPolityId": "polity:ottoman-empire",
@@ -1273,7 +1339,8 @@
   "region:nap1805:svealand": {
     "id": "region:nap1805:svealand",
     "displayName": {
-      "en": "Svealand"
+      "en": "Svealand",
+      "ru": "Свеаланд"
     },
     "legalOwnerPolityId": "polity:sweden",
     "actualControllerPolityId": "polity:sweden",
@@ -1292,7 +1359,8 @@
   "region:nap1805:gotaland": {
     "id": "region:nap1805:gotaland",
     "displayName": {
-      "en": "Gotaland"
+      "en": "Gotaland",
+      "ru": "Гёталанд"
     },
     "legalOwnerPolityId": "polity:sweden",
     "actualControllerPolityId": "polity:sweden",
@@ -1311,7 +1379,8 @@
   "region:nap1805:norrland": {
     "id": "region:nap1805:norrland",
     "displayName": {
-      "en": "Norrland"
+      "en": "Norrland",
+      "ru": "Норрланд"
     },
     "legalOwnerPolityId": "polity:sweden",
     "actualControllerPolityId": "polity:sweden",
@@ -1330,7 +1399,8 @@
   "region:nap1805:swedish-pomerania": {
     "id": "region:nap1805:swedish-pomerania",
     "displayName": {
-      "en": "Swedish Pomerania"
+      "en": "Swedish Pomerania",
+      "ru": "Шведская Померания"
     },
     "legalOwnerPolityId": "polity:sweden",
     "actualControllerPolityId": "polity:sweden",
@@ -1349,7 +1419,8 @@
   "region:nap1805:finland": {
     "id": "region:nap1805:finland",
     "displayName": {
-      "en": "Finland"
+      "en": "Finland",
+      "ru": "Финляндия"
     },
     "legalOwnerPolityId": "polity:sweden",
     "actualControllerPolityId": "polity:sweden",
@@ -1368,7 +1439,8 @@
   "region:nap1805:zealand": {
     "id": "region:nap1805:zealand",
     "displayName": {
-      "en": "Zealand"
+      "en": "Zealand",
+      "ru": "Зеландия"
     },
     "legalOwnerPolityId": "polity:denmark-norway",
     "actualControllerPolityId": "polity:denmark-norway",
@@ -1387,7 +1459,8 @@
   "region:nap1805:jutland": {
     "id": "region:nap1805:jutland",
     "displayName": {
-      "en": "Jutland"
+      "en": "Jutland",
+      "ru": "Ютландия"
     },
     "legalOwnerPolityId": "polity:denmark-norway",
     "actualControllerPolityId": "polity:denmark-norway",
@@ -1407,7 +1480,8 @@
   "region:nap1805:schleswig-holstein": {
     "id": "region:nap1805:schleswig-holstein",
     "displayName": {
-      "en": "Schleswig-Holstein"
+      "en": "Schleswig-Holstein",
+      "ru": "Шлезвиг-Гольштейн"
     },
     "legalOwnerPolityId": "polity:denmark-norway",
     "actualControllerPolityId": "polity:denmark-norway",
@@ -1426,7 +1500,8 @@
   "region:nap1805:southern-norway": {
     "id": "region:nap1805:southern-norway",
     "displayName": {
-      "en": "Southern Norway"
+      "en": "Southern Norway",
+      "ru": "Южная Норвегия"
     },
     "legalOwnerPolityId": "polity:denmark-norway",
     "actualControllerPolityId": "polity:denmark-norway",
@@ -1445,7 +1520,8 @@
   "region:nap1805:northern-norway": {
     "id": "region:nap1805:northern-norway",
     "displayName": {
-      "en": "Northern Norway"
+      "en": "Northern Norway",
+      "ru": "Северная Норвегия"
     },
     "legalOwnerPolityId": "polity:denmark-norway",
     "actualControllerPolityId": "polity:denmark-norway",
@@ -1464,7 +1540,8 @@
   "region:nap1805:campania": {
     "id": "region:nap1805:campania",
     "displayName": {
-      "en": "Campania"
+      "en": "Campania",
+      "ru": "Кампания"
     },
     "legalOwnerPolityId": "polity:naples-sicily",
     "actualControllerPolityId": "polity:naples-sicily",
@@ -1483,7 +1560,8 @@
   "region:nap1805:apulia-and-calabria": {
     "id": "region:nap1805:apulia-and-calabria",
     "displayName": {
-      "en": "Apulia and Calabria"
+      "en": "Apulia and Calabria",
+      "ru": "Апулия и Калабрия"
     },
     "legalOwnerPolityId": "polity:naples-sicily",
     "actualControllerPolityId": "polity:naples-sicily",
@@ -1502,7 +1580,8 @@
   "region:nap1805:sicily-east": {
     "id": "region:nap1805:sicily-east",
     "displayName": {
-      "en": "Sicily East"
+      "en": "Sicily East",
+      "ru": "Восточная Сицилия"
     },
     "legalOwnerPolityId": "polity:naples-sicily",
     "actualControllerPolityId": "polity:naples-sicily",
@@ -1521,7 +1600,8 @@
   "region:nap1805:sicily-west": {
     "id": "region:nap1805:sicily-west",
     "displayName": {
-      "en": "Sicily West"
+      "en": "Sicily West",
+      "ru": "Западная Сицилия"
     },
     "legalOwnerPolityId": "polity:naples-sicily",
     "actualControllerPolityId": "polity:naples-sicily",
@@ -1540,7 +1620,8 @@
   "region:nap1805:milan-and-lombardy": {
     "id": "region:nap1805:milan-and-lombardy",
     "displayName": {
-      "en": "Milan and Lombardy"
+      "en": "Milan and Lombardy",
+      "ru": "Милан и Ломбардия"
     },
     "legalOwnerPolityId": "polity:italy",
     "actualControllerPolityId": "polity:italy",
@@ -1559,7 +1640,8 @@
   "region:nap1805:emilia": {
     "id": "region:nap1805:emilia",
     "displayName": {
-      "en": "Emilia"
+      "en": "Emilia",
+      "ru": "Эмилия"
     },
     "legalOwnerPolityId": "polity:italy",
     "actualControllerPolityId": "polity:italy",
@@ -1578,7 +1660,8 @@
   "region:nap1805:romagna": {
     "id": "region:nap1805:romagna",
     "displayName": {
-      "en": "Romagna"
+      "en": "Romagna",
+      "ru": "Романья"
     },
     "legalOwnerPolityId": "polity:italy",
     "actualControllerPolityId": "polity:italy",
@@ -1597,7 +1680,8 @@
   "region:nap1805:modena": {
     "id": "region:nap1805:modena",
     "displayName": {
-      "en": "Modena"
+      "en": "Modena",
+      "ru": "Модена"
     },
     "legalOwnerPolityId": "polity:italy",
     "actualControllerPolityId": "polity:italy",
@@ -1616,7 +1700,8 @@
   "region:nap1805:mantua": {
     "id": "region:nap1805:mantua",
     "displayName": {
-      "en": "Mantua"
+      "en": "Mantua",
+      "ru": "Мантуя"
     },
     "legalOwnerPolityId": "polity:italy",
     "actualControllerPolityId": "polity:italy",
@@ -1635,7 +1720,8 @@
   "region:nap1805:upper-bavaria": {
     "id": "region:nap1805:upper-bavaria",
     "displayName": {
-      "en": "Upper Bavaria"
+      "en": "Upper Bavaria",
+      "ru": "Верхняя Бавария"
     },
     "legalOwnerPolityId": "polity:bavaria",
     "actualControllerPolityId": "polity:bavaria",
@@ -1655,7 +1741,8 @@
   "region:nap1805:lower-bavaria": {
     "id": "region:nap1805:lower-bavaria",
     "displayName": {
-      "en": "Lower Bavaria"
+      "en": "Lower Bavaria",
+      "ru": "Нижняя Бавария"
     },
     "legalOwnerPolityId": "polity:bavaria",
     "actualControllerPolityId": "polity:bavaria",
@@ -1675,7 +1762,8 @@
   "region:nap1805:franconian-bavaria": {
     "id": "region:nap1805:franconian-bavaria",
     "displayName": {
-      "en": "Franconian Bavaria"
+      "en": "Franconian Bavaria",
+      "ru": "Франконская Бавария"
     },
     "legalOwnerPolityId": "polity:bavaria",
     "actualControllerPolityId": "polity:bavaria",
@@ -1695,7 +1783,8 @@
   "region:nap1805:holland": {
     "id": "region:nap1805:holland",
     "displayName": {
-      "en": "Holland"
+      "en": "Holland",
+      "ru": "Голландия"
     },
     "legalOwnerPolityId": "polity:batavian-republic",
     "actualControllerPolityId": "polity:batavian-republic",
@@ -1714,7 +1803,8 @@
   "region:nap1805:friesland": {
     "id": "region:nap1805:friesland",
     "displayName": {
-      "en": "Friesland"
+      "en": "Friesland",
+      "ru": "Фрисландия"
     },
     "legalOwnerPolityId": "polity:batavian-republic",
     "actualControllerPolityId": "polity:batavian-republic",
@@ -1733,7 +1823,8 @@
   "region:nap1805:batavian-interior": {
     "id": "region:nap1805:batavian-interior",
     "displayName": {
-      "en": "Batavian Interior"
+      "en": "Batavian Interior",
+      "ru": "Внутренняя Батавия"
     },
     "legalOwnerPolityId": "polity:batavian-republic",
     "actualControllerPolityId": "polity:batavian-republic",
@@ -1752,7 +1843,8 @@
   "region:nap1805:northern-portugal": {
     "id": "region:nap1805:northern-portugal",
     "displayName": {
-      "en": "Northern Portugal"
+      "en": "Northern Portugal",
+      "ru": "Северная Португалия"
     },
     "legalOwnerPolityId": "polity:portugal",
     "actualControllerPolityId": "polity:portugal",
@@ -1771,7 +1863,8 @@
   "region:nap1805:central-portugal": {
     "id": "region:nap1805:central-portugal",
     "displayName": {
-      "en": "Central Portugal"
+      "en": "Central Portugal",
+      "ru": "Центральная Португалия"
     },
     "legalOwnerPolityId": "polity:portugal",
     "actualControllerPolityId": "polity:portugal",
@@ -1790,7 +1883,8 @@
   "region:nap1805:southern-portugal": {
     "id": "region:nap1805:southern-portugal",
     "displayName": {
-      "en": "Southern Portugal"
+      "en": "Southern Portugal",
+      "ru": "Южная Португалия"
     },
     "legalOwnerPolityId": "polity:portugal",
     "actualControllerPolityId": "polity:portugal",
@@ -1809,7 +1903,8 @@
   "region:nap1805:western-switzerland": {
     "id": "region:nap1805:western-switzerland",
     "displayName": {
-      "en": "Western Switzerland"
+      "en": "Western Switzerland",
+      "ru": "Западная Швейцария"
     },
     "legalOwnerPolityId": "polity:swiss-confederation",
     "actualControllerPolityId": "polity:swiss-confederation",
@@ -1828,7 +1923,8 @@
   "region:nap1805:central-switzerland": {
     "id": "region:nap1805:central-switzerland",
     "displayName": {
-      "en": "Central Switzerland"
+      "en": "Central Switzerland",
+      "ru": "Центральная Швейцария"
     },
     "legalOwnerPolityId": "polity:swiss-confederation",
     "actualControllerPolityId": "polity:swiss-confederation",
@@ -1847,7 +1943,8 @@
   "region:nap1805:eastern-switzerland": {
     "id": "region:nap1805:eastern-switzerland",
     "displayName": {
-      "en": "Eastern Switzerland"
+      "en": "Eastern Switzerland",
+      "ru": "Восточная Швейцария"
     },
     "legalOwnerPolityId": "polity:swiss-confederation",
     "actualControllerPolityId": "polity:swiss-confederation",
@@ -1866,7 +1963,8 @@
   "region:nap1805:dresden-and-meissen": {
     "id": "region:nap1805:dresden-and-meissen",
     "displayName": {
-      "en": "Dresden and Meissen"
+      "en": "Dresden and Meissen",
+      "ru": "Дрезден и Мейсен"
     },
     "legalOwnerPolityId": "polity:saxony",
     "actualControllerPolityId": "polity:saxony",
@@ -1885,7 +1983,8 @@
   "region:nap1805:leipzig-and-thuringian-saxony": {
     "id": "region:nap1805:leipzig-and-thuringian-saxony",
     "displayName": {
-      "en": "Leipzig and Thuringian Saxony"
+      "en": "Leipzig and Thuringian Saxony",
+      "ru": "Лейпциг и Тюрингская Саксония"
     },
     "legalOwnerPolityId": "polity:saxony",
     "actualControllerPolityId": "polity:saxony",
@@ -1904,7 +2003,8 @@
   "region:nap1805:stuttgart-and-neckar": {
     "id": "region:nap1805:stuttgart-and-neckar",
     "displayName": {
-      "en": "Stuttgart and Neckar"
+      "en": "Stuttgart and Neckar",
+      "ru": "Штутгарт и Неккар"
     },
     "legalOwnerPolityId": "polity:wurttemberg",
     "actualControllerPolityId": "polity:wurttemberg",
@@ -1923,7 +2023,8 @@
   "region:nap1805:swabian-wurttemberg": {
     "id": "region:nap1805:swabian-wurttemberg",
     "displayName": {
-      "en": "Swabian Württemberg"
+      "en": "Swabian Württemberg",
+      "ru": "Швабский Вюртемберг"
     },
     "legalOwnerPolityId": "polity:wurttemberg",
     "actualControllerPolityId": "polity:wurttemberg",
@@ -1942,7 +2043,8 @@
   "region:nap1805:upper-baden": {
     "id": "region:nap1805:upper-baden",
     "displayName": {
-      "en": "Upper Baden"
+      "en": "Upper Baden",
+      "ru": "Верхний Баден"
     },
     "legalOwnerPolityId": "polity:baden",
     "actualControllerPolityId": "polity:baden",
@@ -1961,7 +2063,8 @@
   "region:nap1805:lower-baden": {
     "id": "region:nap1805:lower-baden",
     "displayName": {
-      "en": "Lower Baden"
+      "en": "Lower Baden",
+      "ru": "Нижний Баден"
     },
     "legalOwnerPolityId": "polity:baden",
     "actualControllerPolityId": "polity:baden",
@@ -1980,7 +2083,8 @@
   "region:nap1805:hanover": {
     "id": "region:nap1805:hanover",
     "displayName": {
-      "en": "Hanover"
+      "en": "Hanover",
+      "ru": "Ганновер"
     },
     "legalOwnerPolityId": "polity:hanover",
     "actualControllerPolityId": "polity:france",
@@ -1999,7 +2103,8 @@
   "region:nap1805:bremen-verden": {
     "id": "region:nap1805:bremen-verden",
     "displayName": {
-      "en": "Bremen-Verden"
+      "en": "Bremen-Verden",
+      "ru": "Бремен-Ферден"
     },
     "legalOwnerPolityId": "polity:hanover",
     "actualControllerPolityId": "polity:france",
@@ -2018,7 +2123,8 @@
   "region:nap1805:rome-and-lazio": {
     "id": "region:nap1805:rome-and-lazio",
     "displayName": {
-      "en": "Rome and Lazio"
+      "en": "Rome and Lazio",
+      "ru": "Рим и Лацио"
     },
     "legalOwnerPolityId": "polity:papal-states",
     "actualControllerPolityId": "polity:papal-states",
@@ -2037,7 +2143,8 @@
   "region:nap1805:umbria-and-marche": {
     "id": "region:nap1805:umbria-and-marche",
     "displayName": {
-      "en": "Umbria and Marche"
+      "en": "Umbria and Marche",
+      "ru": "Умбрия и Марке"
     },
     "legalOwnerPolityId": "polity:papal-states",
     "actualControllerPolityId": "polity:papal-states",
@@ -2056,7 +2163,8 @@
   "region:nap1805:tuscany": {
     "id": "region:nap1805:tuscany",
     "displayName": {
-      "en": "Tuscany"
+      "en": "Tuscany",
+      "ru": "Тоскана"
     },
     "legalOwnerPolityId": "polity:etruria",
     "actualControllerPolityId": "polity:etruria",
@@ -2075,7 +2183,8 @@
   "region:nap1805:liguria": {
     "id": "region:nap1805:liguria",
     "displayName": {
-      "en": "Liguria"
+      "en": "Liguria",
+      "ru": "Лигурия"
     },
     "legalOwnerPolityId": "polity:ligurian-republic",
     "actualControllerPolityId": "polity:ligurian-republic",
@@ -2094,7 +2203,8 @@
   "region:nap1805:sardinia": {
     "id": "region:nap1805:sardinia",
     "displayName": {
-      "en": "Sardinia"
+      "en": "Sardinia",
+      "ru": "Сардиния"
     },
     "legalOwnerPolityId": "polity:sardinia",
     "actualControllerPolityId": "polity:sardinia",
@@ -2113,7 +2223,8 @@
   "region:nap1805:hesse-kassel": {
     "id": "region:nap1805:hesse-kassel",
     "displayName": {
-      "en": "Hesse-Kassel"
+      "en": "Hesse-Kassel",
+      "ru": "Гессен-Кассель"
     },
     "legalOwnerPolityId": "polity:hesse-kassel",
     "actualControllerPolityId": "polity:hesse-kassel",
@@ -2132,7 +2243,8 @@
   "region:nap1805:hesse-darmstadt": {
     "id": "region:nap1805:hesse-darmstadt",
     "displayName": {
-      "en": "Hesse-Darmstadt"
+      "en": "Hesse-Darmstadt",
+      "ru": "Гессен-Дармштадт"
     },
     "legalOwnerPolityId": "polity:hesse-darmstadt",
     "actualControllerPolityId": "polity:hesse-darmstadt",
@@ -2151,7 +2263,8 @@
   "region:nap1805:brunswick": {
     "id": "region:nap1805:brunswick",
     "displayName": {
-      "en": "Brunswick"
+      "en": "Brunswick",
+      "ru": "Брауншвейг"
     },
     "legalOwnerPolityId": "polity:brunswick",
     "actualControllerPolityId": "polity:brunswick",

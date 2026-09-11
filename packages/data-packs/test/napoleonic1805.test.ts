@@ -19,6 +19,13 @@ describe('Napoleonic Europe 1805 shipped ScenarioV3', () => {
     assert.strictEqual(scenario.game.startDate, '1805-01-01');
     assert.strictEqual(Object.keys(scenario.startingState.polities).length, 26);
     assert.strictEqual(Object.keys(scenario.startingState.regions).length, 113);
+    assert.ok(Object.values(scenario.startingState.regions).every((region) => (
+      typeof region.displayName.ru === 'string' && /[А-Яа-яЁё]/.test(region.displayName.ru)
+    )), 'every authored Napoleonic region has a Russian display name');
+    assert.strictEqual(
+      Object.values(scenario.startingState.regions).find((region) => region.id === 'region:nap1805:bremen-verden')!.displayName.ru,
+      'Бремен-Ферден',
+    );
     assert.deepStrictEqual(
       scenario.game.playerEligiblePolityIds.map((id) => scenario.startingState.polities[id]!.displayName.en),
       [
