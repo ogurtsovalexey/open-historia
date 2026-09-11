@@ -36,6 +36,31 @@ const baseStyle = {
     boxShadow: "0 4px 6px -1px rgba(0,0,0,0.2)",
 };
 
+// Settings are part of the playable UI, not developer diagnostics.  Keep the
+// small static vocabulary here instead of sending provider/account data to a
+// translation service. Provider and model identifiers intentionally stay exact.
+const SETTINGS_RU = Object.freeze({
+    "Strategic AI provider": "Стратегический AI-провайдер",
+    "Utility AI provider": "Вспомогательный AI-провайдер",
+    Settings: "настройки",
+    Change: "Изменить", Hide: "Скрыть",
+    "Searchable catalog instead of a wall of provider buttons.": "Каталог с поиском вместо длинного списка кнопок провайдеров.",
+    "Search provider, protocol or gateway...": "Поиск провайдера, протокола или шлюза…",
+    "Desktop subscription": "Подписка для настольного приложения",
+    "Installed Codex CLI using your ChatGPT login; desktop only": "Установленный Codex CLI использует вход ChatGPT; только для настольного приложения.",
+    "Codex CLI and ChatGPT login detected. A schema transport preflight is still required before the first game turn.": "Codex CLI и вход ChatGPT обнаружены. Перед первым ходом нужна проверка схемы обмена.",
+    "Checking the desktop Codex CLI…": "Проверяем настольный Codex CLI…",
+    Model: "Модель", "Reasoning effort": "Уровень рассуждений",
+    "Models come from the installed CLI. Tested badges are global; every model/contract pair still needs a local schema preflight.": "Модели берутся из установленного CLI. Метки проверки общие; для каждой пары модели и контракта всё равно нужна локальная проверка схемы.",
+    "Schema preflight passed": "Проверка схемы пройдена",
+    "Running schema preflight…": "Выполняется проверка схемы…",
+    "Run schema preflight": "Проверить схему",
+    "UI language": "Язык интерфейса", "AI chat language": "Язык ответов AI",
+    "Search languages...": "Поиск языка…", "matches — pick one": "совпадений — выберите один", "No matching language": "Подходящий язык не найден",
+    "What the advisor and diplomatic chats reply in. Defaults to your interface language.": "На этом языке отвечают советник и дипломатические чаты. По умолчанию используется язык интерфейса.",
+});
+const settingsText = (value) => getStoredLanguage() === "ru" ? (SETTINGS_RU[value] ?? value) : value;
+
 const labelStyle = {
     display: "block",
     fontSize: "0.82rem",
@@ -112,12 +137,12 @@ const LanguagePicker = ({ label, current, onSelect, saving = false, helperText }
 
     return (
         <div style={fieldGroupStyle}>
-        <label style={labelStyle}>{label}</label>
+        <label style={labelStyle}>{settingsText(label)}</label>
         <input
         style={{ ...inputStyle, marginBottom: "0.4rem" }}
         type="text"
         value={query}
-        placeholder="Search languages..."
+        placeholder={settingsText("Search languages...")}
         onChange={(event) => setQuery(event.target.value)}
         />
         <select
@@ -128,7 +153,7 @@ const LanguagePicker = ({ label, current, onSelect, saving = false, helperText }
         >
         {!listed && (
             <option value="" disabled>
-            {filtered.length ? `${filtered.length} matches — pick one` : "No matching language"}
+            {filtered.length ? `${filtered.length} ${settingsText("matches — pick one")}` : settingsText("No matching language")}
             </option>
         )}
         {filtered.map((option) => (
@@ -139,7 +164,7 @@ const LanguagePicker = ({ label, current, onSelect, saving = false, helperText }
         </select>
         {helperText && (
             <div style={helperStyle}>
-            {helperText}
+            {settingsText(helperText)}
             </div>
         )}
         </div>
@@ -254,7 +279,7 @@ const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider"
     return (
         <div style={{ marginBottom: "1rem" }}>
         <label style={{ display: "block", fontSize: "0.9rem", marginBottom: "0.6rem", color: "white" }}>
-        {label}
+        {settingsText(label)}
         </label>
 
         <button
@@ -276,17 +301,17 @@ const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider"
         {selectedProvider.label}
         </div>
         <div style={{ marginTop: "0.2rem", fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.45 }}>
-        {selectedProvider.group} · {selectedProvider.description}
+        {settingsText(selectedProvider.group)} · {settingsText(selectedProvider.description)}
         </div>
         </div>
         <div style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.7)" }}>
-        {isCatalogOpen ? "Hide" : "Change"}
+        {isCatalogOpen ? settingsText("Hide") : settingsText("Change")}
         </div>
         </div>
         </button>
 
         <div style={{ ...helperStyle, marginBottom: isCatalogOpen ? "0.65rem" : 0 }}>
-        Searchable catalog instead of a wall of provider buttons.
+        {settingsText("Searchable catalog instead of a wall of provider buttons.")}
         </div>
 
         {isCatalogOpen && (
@@ -303,7 +328,7 @@ const ApiProviderSelector = ({ provider, onProviderChange, label = "AI Provider"
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search provider, protocol or gateway..."
+            placeholder={settingsText("Search provider, protocol or gateway...")}
             autoComplete="off"
             spellCheck={false}
             style={{
@@ -442,10 +467,10 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
         }}
         >
         <div style={{ fontSize: "0.84rem", fontWeight: 700, marginBottom: "0.25rem" }}>
-        {meta.label} Settings
+        {meta.label} {settingsText("Settings")}
         </div>
         <div style={{ ...helperStyle, marginTop: 0, marginBottom: "0.85rem" }}>
-        {meta.description}
+        {settingsText(meta.description)}
         </div>
 
         {provider === "gemini" && (
@@ -614,12 +639,12 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
         {provider === "codex-subscription" && (
             <>
             <div style={{ ...helperStyle, marginTop: 0, marginBottom: "0.85rem", color: codexStatus?.available ? "#86efac" : "#fbbf24" }}>
-            {codexStatus?.message ?? "Checking the desktop Codex CLI…"}
+            {settingsText(codexStatus?.message ?? "Checking the desktop Codex CLI…")}
             </div>
             {codexStatus?.available && (
                 <>
                 <div style={fieldGroupStyle}>
-                <label style={labelStyle}>Model</label>
+                <label style={labelStyle}>{settingsText("Model")}</label>
                 <select
                 value={settings.codexSubscriptionModel ?? "gpt-5.6-terra"}
                 onChange={(event) => {
@@ -638,11 +663,11 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
                 ))}
                 </select>
                 <div style={helperStyle}>
-                Models come from the installed CLI. Tested badges are global; every model/contract pair still needs a local schema preflight.
+                {settingsText("Models come from the installed CLI. Tested badges are global; every model/contract pair still needs a local schema preflight.")}
                 </div>
                 </div>
                 <div style={fieldGroupStyle}>
-                <label style={labelStyle}>Reasoning effort</label>
+                <label style={labelStyle}>{settingsText("Reasoning effort")}</label>
                 <select
                 value={settings.codexSubscriptionEffort ?? "medium"}
                 onChange={(event) => onSettingChange("codexSubscriptionEffort", event.target.value)}
@@ -676,7 +701,7 @@ const ProviderSettingsPanel = ({ provider, settings, onSettingChange, showReason
                         style={{ ...inputStyle, cursor: preflightRunning || passed ? "default" : "pointer",
                             backgroundColor: passed ? "rgba(34,197,94,0.18)" : "rgba(59,130,246,0.18)" }}
                         >
-                        {passed ? "Schema preflight passed" : preflightRunning ? "Running schema preflight…" : "Run schema preflight"}
+                        {passed ? settingsText("Schema preflight passed") : preflightRunning ? settingsText("Running schema preflight…") : settingsText("Run schema preflight")}
                         </button>
                         {preflightError && <div style={{ ...helperStyle, color: "#fca5a5" }}>{preflightError}</div>}
                         </div>
