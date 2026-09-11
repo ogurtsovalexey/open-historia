@@ -402,8 +402,8 @@ never engine settlement.
 Delivered: WP12 cross-era acceptance is implemented in
 `server/crossEraAcceptance.test.js` and included in `npm run test:living-world`.
 It runs false-history, open-concept, territorial-causality, replay,
-scenario-leakage and epistemics assertions against both Napoleonic and Central
-Mesoamerican compiled worlds. The hard cut removes retired economy/agent-turn
+scenario-leakage and epistemics assertions against the Napoleonic, Central
+Mesoamerican, and Europe 1935 compiled worlds. The hard cut removes retired economy/agent-turn
 HTTP endpoints, their UI controls, Europe-specific runtime materialization and
 the dual live-engine flags. WorldStateV2 session V3 now rejects a pre-V2
 pointer explicitly, while old on-disk economy directories are backed up before

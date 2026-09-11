@@ -15,6 +15,10 @@ const CASES = Object.freeze([
     scenarioId: 'scenario:central-mesoamerica-1450', playerPolityId: 'polity:tenochtitlan', slug: 'mesoamerica',
     diplomacy: { recipientPolityId: 'polity:chalco', relationshipTypeId: 'relationship-type:market-access' },
   },
+  {
+    scenarioId: 'scenario:europe-1935-benchmark', playerPolityId: 'polity:poland', slug: 'europe-1935',
+    diplomacy: { recipientPolityId: 'polity:france', relationshipTypeId: 'relationship-type:defensive-alliance' },
+  },
 ]);
 
 let temporary;
