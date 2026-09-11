@@ -44,9 +44,9 @@ test("the production shell surfaces canonical Mesoamerican tribute arrears as a 
   await page.goto(`/?gameId=${gameId}`);
   await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
   await page.getByTestId("intent-nav-situations").click();
-  await expect(page.getByText("Xochimilco: дань остаётся в просрочке")).toBeVisible();
+  await expect(page.getByText("Сочимилько: дань остаётся в просрочке")).toBeVisible();
   await expect(page.getByText("По общему обязательству не урегулированы поставки кукурузы; доли получателей ограничены до канонического урегулирования.")).toBeVisible();
-  await page.getByRole("article").filter({ hasText: "Xochimilco: дань остаётся в просрочке" })
+  await page.getByRole("article").filter({ hasText: "Сочимилько: дань остаётся в просрочке" })
     .getByRole("button", { name: /Respond with an intention|Ответить намерением/ }).click();
   await expect(page.getByRole("tab", { name: "Решения", selected: true })).toBeVisible();
 
