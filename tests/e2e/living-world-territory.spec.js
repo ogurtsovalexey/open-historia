@@ -16,7 +16,7 @@ test("a living-world territorial offer remains pending until the addressed polit
   const gameId = "living-world-territory-e2e";
   await request.delete(`/api/games/${gameId}`).catch(() => {});
   const created = await request.post("/api/games", {
-    data: { id: gameId, name: "Territory offer", scenarioId: "scenario:napoleonic-europe-1805", playerPolityId: "polity:france" },
+    data: { id: gameId, name: "Territory offer", scenarioId: "scenario:napoleonic-europe-1805", playerPolityId: "polity:france", setActive: true },
   });
   expect(created.ok()).toBeTruthy();
   const initial = await (await request.get(`/api/games/${gameId}/living-world`)).json();
@@ -41,15 +41,14 @@ test("a living-world territorial offer remains pending until the addressed polit
   // but the pending-offer preview and confirmation use the production browser
   // shell. This prevents a legal frozen proposal from regressing into a UI
   // that calls it blocked.
-  await page.goto("/");
+  await page.goto(`/?gameId=${gameId}`);
   // Production boot also warms PMTiles; wait for the actual command center
   // rather than asserting against the transient world-texture loading shell.
   await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
-  await page.getByRole("button", { name: "Current" }).first().click();
-  await page.getByRole("tab", { name: "Решения" }).click();
-  await expect(page.getByText("frozen proposal terms will be recorded")).toBeVisible();
-  await expect(page.getByText("no territorial control changes before acceptance")).toBeVisible();
-  await expect(page.getByText("The addressed polity can reject the frozen terms")).toBeVisible();
+  await page.getByTestId("intent-nav-orders").click();
+  await expect(page.getByText("Немедленных затрат казны нет; условия предложения будут зафиксированы.")).toBeVisible();
+  await expect(page.getByText("Ожидается ответ адресата; до принятия контроля над территориями не меняется.")).toBeVisible();
+  await expect(page.getByText("Адресат может отклонить зафиксированные условия.")).toBeVisible();
   await page.getByRole("button", { name: "Подтвердить обоснованные действия" }).click();
   await expect(page.getByRole("button", { name: "Продолжить на три месяца" })).toBeEnabled();
   const confirmed = await (await request.get(`/api/games/${gameId}/living-world`)).json();

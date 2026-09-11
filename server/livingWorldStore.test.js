@@ -418,6 +418,9 @@ describe('living-world command store', () => {
       },
     });
     assert.match(adjustedPending.projection.interpretation.preview.cost.label, /No additional immediate treasury commitment/u);
+    const adjustedRussian = living.readLivingWorld(processPaceGameId, { locale: 'ru' });
+    assert.equal(adjustedRussian.projection.interpretation.preview.cost.label, 'Новых немедленных затрат казны нет; обязательство по уже идущему процессу сохраняется.');
+    assert.equal(adjustedRussian.projection.interpretation.preview.duration.label, 'Будет применено при следующем месячном расчёте; темп остаётся ограничен осуществимостью для движка.');
     const beforeState = readEngineSession(library.getGameDirectory(processPaceGameId)).state;
     const beforeProcess = beforeState.processes.find((entry) => entry.processId === process.entityId);
     const adjusted = living.confirmLivingWorldIntent(processPaceGameId, {
@@ -526,6 +529,10 @@ describe('living-world command store', () => {
     assert.match(preview.duration.label, /no territorial control changes before acceptance/u);
     assert.deepEqual(preview.risks, ['The addressed polity can reject the frozen terms']);
     assert.match(preview.opportunityCosts[0], /No territorial control changes until the addressed polity accepts/u);
+    const russianPreview = living.readLivingWorld(territoryPreviewGameId, { locale: 'ru' }).projection.interpretation.preview;
+    assert.equal(russianPreview.cost.label, 'Немедленных затрат казны нет; условия предложения будут зафиксированы.');
+    assert.equal(russianPreview.duration.label, 'Ожидается ответ адресата; до принятия контроля над территориями не меняется.');
+    assert.deepEqual(russianPreview.risks, ['Адресат может отклонить зафиксированные условия.']);
     const confirmed = living.confirmLivingWorldIntent(territoryPreviewGameId, {
       revision: submitted.projection.revision, sessionRevision: submitted.sessionRevision,
       interpretationId: submitted.projection.interpretation.interpretationId,

@@ -136,9 +136,19 @@ const localizeIntentPreviewText = (value, locale) => {
     'Reserve formation is recorded now; readiness remains subject to later world conditions': 'Резерв создаётся сейчас; готовность зависит от дальнейших условий мира.',
     'Material blockers or opposition can slow the process at later checkpoints': 'Материальные ограничения или сопротивление могут замедлить процесс на следующих проверках.',
     'No immediate treasury commitment; frozen proposal terms will be recorded': 'Немедленных затрат казны нет; условия предложения будут зафиксированы.',
+    'No additional immediate treasury commitment; the existing process commitment remains in force': 'Новых немедленных затрат казны нет; обязательство по уже идущему процессу сохраняется.',
+    'No currently feasible material commitment': 'Сейчас нет осуществимого материального обязательства.',
+    'Applied at the next monthly resolution; pace remains subject to engine feasibility': 'Будет применено при следующем месячном расчёте; темп остаётся ограничен осуществимостью для движка.',
+    'Blocked until the interpretation or conditions change': 'Заблокировано до изменения толкования или условий.',
+    'High contextual resistance limits acceleration': 'Высокое контекстное сопротивление ограничивает ускорение.',
+    'A later checkpoint can still constrain the selected pace': 'Следующая проверка всё ещё может ограничить выбранный темп.',
     'Pending recipient response; no territorial control changes before acceptance': 'Ожидается ответ адресата; до принятия контроля над территориями не меняется.',
     'The addressed polity can reject the frozen terms': 'Адресат может отклонить зафиксированные условия.',
     'No territorial control changes until the addressed polity accepts the frozen proposal': 'Контроль над территориями не меняется, пока адресат не примет зафиксированное предложение.',
+    'Requires semantic and material resolution': 'Требует смыслового и материального разрешения.',
+    'Depends on feasibility and chosen pace': 'Зависит от осуществимости и выбранного темпа.',
+    'The requested outcome may exceed current institutions or material capacity': 'Запрошенный результат может превышать возможности нынешних институтов или материальной базы.',
+    'Committed capacity cannot serve every objective at once': 'Выделенная мощность не может одновременно служить всем целям.',
   };
   return known[raw] ?? raw;
 };

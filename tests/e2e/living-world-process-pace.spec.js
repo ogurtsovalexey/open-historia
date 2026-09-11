@@ -4,7 +4,7 @@ test("the production shell previews and confirms an engine-bounded process pace 
   const gameId = "living-world-process-pace-e2e";
   await request.delete(`/api/games/${gameId}`).catch(() => {});
   const created = await request.post("/api/games", {
-    data: { id: gameId, name: "Process pace adjustment", scenarioId: "scenario:napoleonic-europe-1805", playerPolityId: "polity:france" },
+    data: { id: gameId, name: "Process pace adjustment", scenarioId: "scenario:napoleonic-europe-1805", playerPolityId: "polity:france", setActive: true },
   });
   expect(created.ok()).toBeTruthy();
   const initial = await (await request.get(`/api/games/${gameId}/living-world`)).json();
@@ -40,12 +40,11 @@ test("the production shell previews and confirms an engine-bounded process pace 
   } });
   expect(adjustmentResponse.ok()).toBeTruthy();
 
-  await page.goto("/");
+  await page.goto(`/?gameId=${gameId}`);
   await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
-  await page.getByRole("button", { name: "Current" }).first().click();
-  await page.getByRole("tab", { name: "Решения" }).click();
-  await expect(page.getByText("No additional immediate treasury commitment; the existing process commitment remains in force")).toBeVisible();
-  await expect(page.getByText("Applied at the next monthly resolution; pace remains subject to engine feasibility")).toBeVisible();
+  await page.getByTestId("intent-nav-orders").click();
+  await expect(page.getByText("Новых немедленных затрат казны нет; обязательство по уже идущему процессу сохраняется.")).toBeVisible();
+  await expect(page.getByText("Будет применено при следующем месячном расчёте; темп остаётся ограничен осуществимостью для движка.")).toBeVisible();
   await page.getByRole("button", { name: "Подтвердить обоснованные действия" }).click();
   const adjusted = await (await request.get(`/api/games/${gameId}/living-world`)).json();
   expect(adjusted.lastTransition.adjustedProcesses).toEqual([expect.objectContaining({ processId: process.entityId, pace: nextPace })]);

@@ -20,7 +20,7 @@ test("the production shell surfaces canonical Mesoamerican tribute arrears as a 
       id: gameId,
       name: "Tribute arrears situation",
       scenarioId: "scenario:central-mesoamerica-1450",
-      playerPolityId: "polity:tenochtitlan",
+      playerPolityId: "polity:tenochtitlan", setActive: true,
     },
   });
   expect(created.ok()).toBeTruthy();
@@ -41,13 +41,12 @@ test("the production shell surfaces canonical Mesoamerican tribute arrears as a 
     }),
   ]));
 
-  await page.goto("/");
+  await page.goto(`/?gameId=${gameId}`);
   await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
-  await page.getByRole("button", { name: "Current" }).first().click();
-  await page.getByRole("tab", { name: "Ситуации" }).click();
-  await expect(page.getByText("Xochimilco tribute remains in arrears")).toBeVisible();
-  await expect(page.getByText("unsettled maize deliveries")).toBeVisible();
-  await page.getByRole("article").filter({ hasText: "Xochimilco tribute remains in arrears" })
+  await page.getByTestId("intent-nav-situations").click();
+  await expect(page.getByText("Xochimilco: дань остаётся в просрочке")).toBeVisible();
+  await expect(page.getByText("По общему обязательству не урегулированы поставки maize; доли получателей ограничены до канонического урегулирования.")).toBeVisible();
+  await page.getByRole("article").filter({ hasText: "Xochimilco: дань остаётся в просрочке" })
     .getByRole("button", { name: /Respond with an intention|Ответить намерением/ }).click();
   await expect(page.getByRole("tab", { name: "Решения", selected: true })).toBeVisible();
 

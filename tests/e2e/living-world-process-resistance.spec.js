@@ -16,7 +16,7 @@ test("the production shell surfaces process resistance only after a resolved che
   const gameId = "living-world-process-resistance-e2e";
   await request.delete(`/api/games/${gameId}`).catch(() => {});
   const created = await request.post("/api/games", {
-    data: { id: gameId, name: "Process resistance situation", scenarioId: "scenario:napoleonic-europe-1805", playerPolityId: "polity:france" },
+    data: { id: gameId, name: "Process resistance situation", scenarioId: "scenario:napoleonic-europe-1805", playerPolityId: "polity:france", setActive: true },
   });
   expect(created.ok()).toBeTruthy();
   const initial = await (await request.get(`/api/games/${gameId}/living-world`)).json();
@@ -53,12 +53,11 @@ test("the production shell surfaces process resistance only after a resolved che
   } });
   expect(advancedResponse.ok()).toBeTruthy();
 
-  await page.goto("/");
+  await page.goto(`/?gameId=${gameId}`);
   await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
-  await page.getByRole("button", { name: "Current" }).first().click();
-  await page.getByRole("tab", { name: "Ситуации" }).click();
-  await expect(page.getByText(/supply correspondence process\.? faces recorded resistance/i)).toBeVisible();
-  await expect(page.getByText("Any pace change remains limited to engine-feasible options.")).toBeVisible();
+  await page.getByTestId("intent-nav-situations").click();
+  await expect(page.getByText(/зафиксировано сопротивление/i)).toBeVisible();
+  await expect(page.getByText("На этой проверке прогресс ниже зафиксированного сопротивления. Любое изменение темпа ограничено осуществимыми для движка вариантами.")).toBeVisible();
 
   await request.delete(`/api/games/${gameId}`);
 });

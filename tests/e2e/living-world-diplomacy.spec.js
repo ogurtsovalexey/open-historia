@@ -23,7 +23,7 @@ test("the production shell records a typed external proposal without materializi
       id: gameId,
       name: "Typed coalition proposal",
       scenarioId: "scenario:napoleonic-europe-1805",
-      playerPolityId: "polity:france",
+      playerPolityId: "polity:france", setActive: true,
     },
   });
   expect(created.ok()).toBeTruthy();
@@ -62,12 +62,11 @@ test("the production shell records a typed external proposal without materializi
   } });
   expect(submittedResponse.ok()).toBeTruthy();
 
-  await page.goto("/");
+  await page.goto(`/?gameId=${gameId}`);
   await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
-  await page.getByRole("button", { name: "Current" }).first().click();
-  await page.getByRole("tab", { name: "Решения" }).click();
-  await expect(page.getByText("No immediate treasury commitment; frozen proposal terms will be recorded")).toBeVisible();
-  await expect(page.getByText("Pending recipient response; no territorial control changes before acceptance")).toBeVisible();
+  await page.getByTestId("intent-nav-orders").click();
+  await expect(page.getByText("Немедленных затрат казны нет; условия предложения будут зафиксированы.")).toBeVisible();
+  await expect(page.getByText("Ожидается ответ адресата; до принятия контроля над территориями не меняется.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Подтвердить обоснованные действия" })).toBeVisible();
   await page.getByRole("button", { name: "Подтвердить обоснованные действия" }).click();
 
@@ -105,9 +104,9 @@ test("the production shell records a typed external proposal without materializi
     expect.objectContaining({ title: "coalition negotiation", summary: expect.stringMatching(/Bavaria/) }),
   ]));
 
-  await page.getByRole("tab", { name: "Дипломатия" }).click();
-  await expect(page.getByText("coalition negotiation")).toBeVisible();
-  await expect(page.getByText(/Bavaria/)).toBeVisible();
+  await page.getByTestId("intent-nav-diplomacy").click();
+  await expect(page.getByText("переговоры о коалиции")).toBeVisible();
+  await expect(page.getByTestId("intent-surface-diplomacy").getByText(/Бавар/).first()).toBeVisible();
   await request.delete(`/api/games/${gameId}`);
 });
 
@@ -119,7 +118,7 @@ test("the production shell keeps a Mesoamerican market-access proposal to Chalco
       id: gameId,
       name: "Mesoamerican market-access proposal",
       scenarioId: "scenario:central-mesoamerica-1450",
-      playerPolityId: "polity:tenochtitlan",
+      playerPolityId: "polity:tenochtitlan", setActive: true,
     },
   });
   expect(created.ok()).toBeTruthy();
@@ -158,11 +157,10 @@ test("the production shell keeps a Mesoamerican market-access proposal to Chalco
   } });
   expect(submittedResponse.ok()).toBeTruthy();
 
-  await page.goto("/");
+  await page.goto(`/?gameId=${gameId}`);
   await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
-  await page.getByRole("button", { name: "Current" }).first().click();
-  await page.getByRole("tab", { name: "Решения" }).click();
-  await expect(page.getByText("No immediate treasury commitment; frozen proposal terms will be recorded")).toBeVisible();
+  await page.getByTestId("intent-nav-orders").click();
+  await expect(page.getByText("Немедленных затрат казны нет; условия предложения будут зафиксированы.")).toBeVisible();
   await page.getByRole("button", { name: "Подтвердить обоснованные действия" }).click();
 
   const confirmed = await (await request.get(`/api/games/${gameId}/living-world`)).json();

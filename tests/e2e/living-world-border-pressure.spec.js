@@ -4,15 +4,14 @@ test("the production shell shows a derived border-pressure situation without cre
   const gameId = "living-world-border-pressure-e2e";
   await request.delete(`/api/games/${gameId}`).catch(() => {});
   const created = await request.post("/api/games", {
-    data: { id: gameId, name: "Border pressure", scenarioId: "scenario:napoleonic-europe-1805", playerPolityId: "polity:france" },
+    data: { id: gameId, name: "Border pressure", scenarioId: "scenario:napoleonic-europe-1805", playerPolityId: "polity:france", setActive: true },
   });
   expect(created.ok()).toBeTruthy();
 
-  await page.goto("/");
+  await page.goto(`/?gameId=${gameId}`);
   await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
-  await page.getByRole("button", { name: "Current" }).first().click();
-  await page.getByRole("tab", { name: "Ситуации" }).click();
-  await expect(page.getByText(/controls the border at/i).first()).toBeVisible();
-  await expect(page.getByText("A canonical adjacent region is under another polity's actual control. This does not authorize combat, occupation, or territorial transfer by itself.").first()).toBeVisible();
+  await page.getByTestId("intent-nav-situations").click();
+  await expect(page.getByText(/контролирует границу у региона/i).first()).toBeVisible();
+  await expect(page.getByText("Соседний канонический регион находится под фактическим контролем другой державы. Само по себе это не разрешает бой, оккупацию или передачу территории.").first()).toBeVisible();
   await request.delete(`/api/games/${gameId}`);
 });
