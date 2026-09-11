@@ -459,9 +459,13 @@ also verified a bounded counterfactual electricity-research intention becoming
 a proposed, funded long-running process rather than instant technology. The
 first Utility-AI attempt failed closed on invalid source spans; `2eb7b52`
 repairs only uniquely matching verbatim spans, while ambiguous/paraphrased
-spans remain blocked. This is still not WP15 completion: repeat the three full
-runs with the configured production provider to cover model-mediated
-diplomacy, counterfactual concept and territorial-pressure paths.
+spans remain blocked. The three saved campaigns remain read-only auditable
+after the pre-explicit-catalog WorldStateV2 compatibility migration: the audit
+reader applies the same hash-bound, narrow migration as the live server and
+never silently accepts malformed revision content. This is still not full
+WP15 scripted coverage: the remaining work is direct evidence for individual
+political intentions in the table below, rather than another generic ten-turn
+loop.
 
 Automation supplement: `tests/e2e/living-world-ten-turn-ui.spec.js` now
 plays ten visible player decisions through the production browser shell in
