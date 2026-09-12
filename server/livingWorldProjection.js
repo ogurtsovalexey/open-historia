@@ -212,6 +212,7 @@ const localizeIntentPreviewText = (value, locale) => {
     'Depends on feasibility and chosen pace': 'Зависит от осуществимости и выбранного темпа.',
     'The requested outcome may exceed current institutions or material capacity': 'Запрошенный результат может превышать возможности нынешних институтов или материальной базы.',
     'Committed capacity cannot serve every objective at once': 'Выделенная мощность не может одновременно служить всем целям.',
+    'The existing process remains committed at its engine-derived capacity': 'Уже идущий процесс сохраняет задействованную мощность, рассчитанную движком.',
   };
   return known[raw] ?? raw;
 };
@@ -254,10 +255,10 @@ function interpretationProjection(intent, fallbackEvidence, locale, state) {
       opportunityCosts: (intent.preview.opportunityCosts ?? []).map((value) => localizeIntentPreviewText(value, locale)),
       affected: (intent.preview.affected ?? []).map(localizeAffected),
     } : {
-      cost: { kind: 'unknown', label: 'Requires semantic and material resolution' },
-      duration: { kind: 'unknown', label: 'Depends on feasibility and chosen pace' },
-      risks: ['The requested outcome may exceed current institutions or material capacity'],
-      opportunityCosts: ['Committed capacity cannot serve every objective at once'],
+      cost: { kind: 'unknown', label: localizeIntentPreviewText('Requires semantic and material resolution', locale) },
+      duration: { kind: 'unknown', label: localizeIntentPreviewText('Depends on feasibility and chosen pace', locale) },
+      risks: [localizeIntentPreviewText('The requested outcome may exceed current institutions or material capacity', locale)],
+      opportunityCosts: [localizeIntentPreviewText('Committed capacity cannot serve every objective at once', locale)],
       affected: [],
       evidenceIds: fallbackEvidence,
     },

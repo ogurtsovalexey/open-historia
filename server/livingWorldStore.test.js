@@ -459,6 +459,7 @@ describe('living-world command store', () => {
     const adjustedRussian = living.readLivingWorld(processPaceGameId, { locale: 'ru' });
     assert.equal(adjustedRussian.projection.interpretation.preview.cost.label, 'Новых немедленных затрат казны нет; обязательство по уже идущему процессу сохраняется.');
     assert.equal(adjustedRussian.projection.interpretation.preview.duration.label, 'Будет применено при следующем месячном расчёте; темп остаётся ограничен осуществимостью для движка.');
+    assert.match(adjustedRussian.projection.interpretation.preview.opportunityCosts.join(' '), /задействованную мощность, рассчитанную движком/u);
     assert.equal(adjustedRussian.projection.processes[0].pace, 'медленный');
     assert.equal(adjustedRussian.projection.processes[0].stage, 'предложен');
     assert.match(adjustedRussian.projection.processes[0].progressLabel, /стадии «предложен»/u);
