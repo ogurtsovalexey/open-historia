@@ -104,6 +104,14 @@ test("the production shell records a typed external proposal without materializi
     expect.objectContaining({ title: "coalition negotiation", summary: expect.stringMatching(/Bavaria/) }),
   ]));
 
+  const russianAdvanced = await (await request.get(`/api/games/${gameId}/living-world?locale=ru`)).json();
+  const acceptedOutcome = russianAdvanced.projection.briefing.changes.find((change) => change.magnitude === "Принято");
+  expect(acceptedOutcome.label).toMatch(/^Курфюршество Бавария приняла предложение: переговоры о коалиции:/);
+  await page.reload();
+  await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
+  await page.getByTestId("intent-nav-briefing").click();
+  await expect(page.getByText(acceptedOutcome.label)).toBeVisible();
+
   await page.getByTestId("intent-nav-diplomacy").click();
   await expect(page.getByText("переговоры о коалиции")).toBeVisible();
   await expect(page.getByTestId("intent-surface-diplomacy").getByText(/Бавар/).first()).toBeVisible();

@@ -58,6 +58,16 @@ const localized = (value, locale) => {
   return value?.[locale] ?? (isRussian(locale) ? RUSSIAN_HISTORICAL_NAMES[fallback] ?? fallback : fallback);
 };
 const phrase = (locale, english, russian) => isRussian(locale) ? russian : english;
+const relationshipTypeLabel = (value, locale) => {
+  const label = labelOf(value);
+  return phrase(locale, label, ({
+    'coalition negotiation': 'переговоры о коалиции', alliance: 'союз', neutrality: 'нейтралитет',
+    war: 'война', 'personal union': 'личная уния', 'linked executive': 'связанная исполнительная власть',
+    'hre membership': 'членство в Священной Римской империи', 'tribute alliance': 'даннический союз',
+    'tribute obligation': 'данническое обязательство', 'shared war obligation': 'общее военное обязательство',
+    'active conflict': 'активный конфликт', 'dynastic relation': 'династическая связь', 'market access': 'доступ к рынку',
+  })[label] ?? label);
+};
 
 // This is an index for a semantic interpreter, not a serialized world copy.
 // Stable caps prevent a long campaign from making an already-grounded player
@@ -309,7 +319,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
   const regionLabel = (id) => localized(state.regions.find((entry) => entry.regionId === id)?.displayName, locale) || labelOf(id);
   const proposalLabel = (proposal) => proposal.terms.map((term) => term.kind === 'territorial-cession'
     ? `${regionLabel(term.regionId)} → ${polityLabel(term.toPolityId)}`
-    : `${labelOf(term.relationshipTypeId)}: ${term.participantPolityIds.map(polityLabel).join(', ')}`).join('; ');
+    : `${relationshipTypeLabel(term.relationshipTypeId, locale)}: ${term.participantPolityIds.map(polityLabel).join(', ')}`).join('; ');
   const territoryEffects = (last?.strategicRecords ?? [])
     .flatMap((record) => record.territorialTransitions ?? [])
     .map((transition) => territoryEffectProjection(state, transition, visible, locale))
@@ -397,11 +407,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
   });
   const outgoingLabor = outgoing.reduce((sum, entry) => sum + applyBp(entry.laborService?.people ?? 0, entry.complianceBp), 0);
   const outgoingMilitary = outgoing.reduce((sum, entry) => sum + applyBp(entry.militaryService?.personnel ?? 0, entry.complianceBp), 0);
-  const relationshipLabel = (kind) => phrase(locale, labelOf(kind), ({
-    'coalition-negotiation': 'переговоры о коалиции',
-    'coalition negotiation': 'переговоры о коалиции',
-    neutrality: 'нейтралитет',
-  })[labelOf(kind)] ?? labelOf(kind));
+  const relationshipLabel = (kind) => relationshipTypeLabel(kind, locale);
   // A situation is a read-only, engine-derived prompt for intervention.  It
   // must never turn a player click into a new obligation or rewrite the
   // historical record.  Occupation was the first such condition; unpaid
