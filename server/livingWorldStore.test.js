@@ -567,6 +567,9 @@ describe('living-world command store', () => {
       },
     });
     assert.equal(submitted.projection.interpretation.requestedActions[0].status, 'grounded');
+    assert.equal(submitted.projection.interpretation.preview.cost.label, 'Немедленных затрат казны нет; объявление конфликта будет зафиксировано.');
+    assert.match(submitted.projection.interpretation.preview.duration.label, /Конфликт фиксируется сейчас/u);
+    assert.match(submitted.projection.interpretation.preview.opportunityCosts.join(' '), /не создаёт бой, потери/u);
     const confirmed = living.confirmLivingWorldIntent(conflictDeclarationGameId, {
       revision: submitted.projection.revision, sessionRevision: submitted.sessionRevision,
       interpretationId: submitted.projection.interpretation.interpretationId, locale: 'ru',

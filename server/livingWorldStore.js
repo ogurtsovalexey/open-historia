@@ -258,6 +258,10 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
     && (entry.operation.kind === 'diplomacy.propose' || entry.operation.kind === 'territory.offer')
   ));
   const hasProposalPreview = proposalPreviews.length > 0;
+  const conflictPreviews = requestedActions.filter((entry) => (
+    entry.material && entry.status === 'grounded' && entry.operation.kind === 'conflict.declare'
+  ));
+  const hasConflictPreview = conflictPreviews.length > 0;
   const activeEvidence = [...new Set([...requestedActions, ...proposedInitiatives].flatMap((entry) => entry.evidenceIds))];
   return {
     schemaVersion: 'open-historia-player-intent/1',
@@ -280,6 +284,8 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
             ? { kind: 'unknown', label: 'No additional immediate treasury commitment; the existing process commitment remains in force' }
           : hasProposalPreview
             ? { kind: 'unknown', label: 'No immediate treasury commitment; frozen proposal terms will be recorded' }
+            : hasConflictPreview
+              ? { kind: 'unknown', label: 'No immediate treasury commitment; the conflict declaration will be recorded' }
             : { kind: 'unknown', label: 'No currently feasible material commitment' },
       duration: enginePreviews.length > 0
         ? { kind: 'range', label: 'Multi-stage; pace is rechecked at each monthly resolution' }
@@ -289,14 +295,18 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
             ? { kind: 'range', label: 'Applied at the next monthly resolution; pace remains subject to engine feasibility' }
           : hasProposalPreview
             ? { kind: 'range', label: 'Pending recipient response; no territorial control changes before acceptance' }
+            : hasConflictPreview
+              ? { kind: 'range', label: 'The conflict is recorded now; combat and territorial consequences require later legal operations' }
             : { kind: 'unknown', label: 'Blocked until the interpretation or conditions change' },
       risks: enginePreviews.some((entry) => entry.allowedPacesAfterCommitment.length <= 3)
         ? ['High contextual resistance limits acceleration']
         : hasProcessAdjustmentPreview
           ? ['A later checkpoint can still constrain the selected pace']
-        : hasProposalPreview
-          ? ['The addressed polity can reject the frozen terms']
-          : ['Material blockers or opposition can slow the process at later checkpoints'],
+          : hasProposalPreview
+            ? ['The addressed polity can reject the frozen terms']
+            : hasConflictPreview
+              ? ['The opposing polity can react, but the declaration creates no automatic battlefield outcome']
+            : ['Material blockers or opposition can slow the process at later checkpoints'],
       opportunityCosts: [
         ...enginePreviews.map((entry) => `${entry.fundingCommitment} treasury plus committed institutional capacity`),
         ...(hasProcessAdjustmentPreview ? ['The existing process remains committed at its engine-derived capacity'] : []),
@@ -306,6 +316,7 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
           return `${entry.personnel} fewer people in the civilian workforce; origin ${origin}`;
         }),
         ...(hasProposalPreview ? ['No territorial control changes until the addressed polity accepts the frozen proposal'] : []),
+        ...(hasConflictPreview ? ['No battle, casualties, occupation, or territorial transfer is created by the declaration alone'] : []),
       ],
       affected: [...new Set([...requestedActions, ...proposedInitiatives].flatMap((entry) => entry.targetLabels))],
       evidenceIds: activeEvidence,
