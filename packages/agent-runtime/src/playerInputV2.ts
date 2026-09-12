@@ -73,6 +73,7 @@ export const requestedActionV2ModelSchema = z.object({
     }).strict(),
     z.object({ kind: z.literal('military.mobilize') }).strict(),
     z.object({ kind: z.literal('conflict.declare'), defenderPolityId: entityIdSchema }).strict(),
+    z.object({ kind: z.literal('conflict.propose-peace'), conflictId: entityIdSchema }).strict(),
   ]).optional(),
   targetEntityIds: z.array(entityIdSchema).max(64),
   claimRefs: z.array(interpretationIdSchema('claim')).max(64),
@@ -197,6 +198,7 @@ function entityIds(state: worldV2.WorldStateV2): Set<string> {
     ...state.concepts.map((entry) => entry.conceptId),
     ...state.processes.map((entry) => entry.processId),
     ...state.relationships.map((entry) => entry.relationshipId),
+    ...state.conflicts.map((entry) => entry.conflictId),
   ]);
 }
 
@@ -318,6 +320,13 @@ function operationReasons(state: worldV2.WorldStateV2, actorPolityId: string, ac
       (entry.attackerPolityId === actorPolityId && entry.defenderPolityId === operation.defenderPolityId)
       || (entry.attackerPolityId === operation.defenderPolityId && entry.defenderPolityId === actorPolityId)
     ))) reasons.push(`active-conflict:${operation.defenderPolityId}`);
+    return reasons;
+  }
+  if (operation.kind === 'conflict.propose-peace') {
+    const conflict = state.conflicts.find((entry) => entry.conflictId === operation.conflictId);
+    const reasons: string[] = action.domain !== 'diplomacy' ? ['conflict-peace-requires-diplomacy-domain'] : [];
+    if (!conflict || conflict.status !== 'active') reasons.push(`no-active-conflict:${operation.conflictId}`);
+    else if (conflict.attackerPolityId !== actorPolityId && conflict.defenderPolityId !== actorPolityId) reasons.push(`foreign-conflict:${operation.conflictId}`);
     return reasons;
   }
   const region = state.regions.find((entry) => entry.regionId === operation.regionId);

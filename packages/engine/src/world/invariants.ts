@@ -389,12 +389,26 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
             violations.push(`diplomatic proposal ${proposal.proposalId} relationship term omits recipient ${recipientId}`);
           }
         }
-      } else {
+      } else if (term.kind === 'territorial-cession') {
         assertRegion(term.regionId, `diplomatic proposal ${proposal.proposalId} territorial term`);
         assertPolity(term.fromPolityId, `diplomatic proposal ${proposal.proposalId} territorial term from`);
         assertPolity(term.toPolityId, `diplomatic proposal ${proposal.proposalId} territorial term to`);
         if (term.fromPolityId !== proposal.proposerPolityId) violations.push(`diplomatic proposal ${proposal.proposalId} territorial term must be offered by its legal owner`);
         if (!proposal.recipientPolityIds.includes(term.toPolityId)) violations.push(`diplomatic proposal ${proposal.proposalId} territorial term recipient is not a proposal recipient`);
+      } else {
+        const conflict = state.conflicts.find((entry) => entry.conflictId === term.conflictId);
+        if (!conflict) {
+          violations.push(`diplomatic proposal ${proposal.proposalId} references unknown conflict ${term.conflictId}`);
+          continue;
+        }
+        const sides = [conflict.attackerPolityId, conflict.defenderPolityId];
+        if (!sides.includes(proposal.proposerPolityId) || proposal.recipientPolityIds.length !== 1
+          || !sides.includes(proposal.recipientPolityIds[0]) || proposal.recipientPolityIds[0] === proposal.proposerPolityId) {
+          violations.push(`diplomatic proposal ${proposal.proposalId} settlement must be between the two conflict parties`);
+        }
+        if (proposal.status === 'accepted' && conflict.status !== 'ended') {
+          violations.push(`accepted diplomatic proposal ${proposal.proposalId} did not end conflict ${term.conflictId}`);
+        }
       }
     }
   }

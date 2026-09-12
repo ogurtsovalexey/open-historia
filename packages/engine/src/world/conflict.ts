@@ -27,6 +27,12 @@ export interface DeclareConflictResult {
   evidenceId: string;
 }
 
+export interface EndConflictRequest {
+  conflictId: string;
+  evidenceIds: EvidenceId[];
+  expectedRevision: WorldStateV2['revision'];
+}
+
 function fail(message: string): never { throw new Error(`conflict declaration: ${message}`); }
 function contentOf(state: WorldStateV2): Omit<WorldStateV2, 'revision'> {
   const { revision: _revision, ...content } = state;
@@ -77,6 +83,47 @@ export function declareConflict(state: WorldStateV2, request: DeclareConflictReq
       evidenceId, revision: state.revision, kind: 'conflict-declared',
       entityRefs: [request.conflictId, request.attackerPolityId, request.defenderPolityId].sort(compare) as never,
       eventRefs: [eventId], canonicalPointers: [`/conflicts/${state.conflicts.length}`], visibility: 'public' as const,
+    }],
+  } as WorldStateV2Input);
+  return { state: next, conflictId: request.conflictId, eventId, evidenceId };
+}
+
+/**
+ * Ends one active political conflict.  This reducer is deliberately unable
+ * to alter control, formations, population, or any economic selector: a
+ * peace agreement is not evidence of a battle result.
+ */
+export function endConflict(state: WorldStateV2, request: EndConflictRequest): DeclareConflictResult {
+  assertExpectedWorldRevision(state, request.expectedRevision);
+  if (!conflictIdSchema.safeParse(request.conflictId).success) fail('conflictId has invalid stable ID format');
+  const index = state.conflicts.findIndex((entry) => entry.conflictId === request.conflictId);
+  if (index < 0) fail(`unknown conflict ${request.conflictId}`);
+  const existing = state.conflicts[index]!;
+  if (existing.status !== 'active') fail(`conflict ${request.conflictId} is not active`);
+  if (new Set(request.evidenceIds).size !== request.evidenceIds.length) fail('evidenceIds contains duplicates');
+  const knownEvidence = new Set(state.evidence.map((entry) => entry.evidenceId));
+  for (const evidenceId of request.evidenceIds) if (!knownEvidence.has(evidenceId)) fail(`references unknown evidence ${evidenceId}`);
+
+  const suffix = hash(request.conflictId, state.revision, 'ended');
+  const eventId = worldEventIdSchema.parse(`event:conflict-ended-${suffix}`);
+  const evidenceId = evidenceIdSchema.parse(`evidence:conflict-ended-${suffix}`);
+  const conflict = {
+    ...existing,
+    status: 'ended' as const,
+    evidenceIds: [...existing.evidenceIds, ...request.evidenceIds, evidenceId].sort(compare) as never,
+  };
+  const next = stampWorldStateRevision({
+    ...contentOf(state), revisionLineage: nextRevisionLineage(state),
+    conflicts: state.conflicts.map((entry, entryIndex) => entryIndex === index ? conflict : entry),
+    events: [...state.events, {
+      eventId, revision: state.revision, kind: 'conflict-ended',
+      entityRefs: [request.conflictId, existing.attackerPolityId, existing.defenderPolityId].sort(compare) as never,
+      evidenceIds: [evidenceId],
+    }],
+    evidence: [...state.evidence, {
+      evidenceId, revision: state.revision, kind: 'conflict-ended',
+      entityRefs: [request.conflictId, existing.attackerPolityId, existing.defenderPolityId].sort(compare) as never,
+      eventRefs: [eventId], canonicalPointers: [`/conflicts/${index}`], visibility: 'public' as const,
     }],
   } as WorldStateV2Input);
   return { state: next, conflictId: request.conflictId, eventId, evidenceId };

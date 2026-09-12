@@ -255,9 +255,11 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
   const proposalPreviews = requestedActions.filter((entry) => (
     entry.material
     && entry.status === 'grounded'
-    && (entry.operation.kind === 'diplomacy.propose' || entry.operation.kind === 'territory.offer')
+    && (entry.operation.kind === 'diplomacy.propose' || entry.operation.kind === 'territory.offer' || entry.operation.kind === 'conflict.propose-peace')
   ));
   const hasProposalPreview = proposalPreviews.length > 0;
+  const peacePreviews = proposalPreviews.filter((entry) => entry.operation.kind === 'conflict.propose-peace');
+  const hasPeacePreview = peacePreviews.length > 0;
   const conflictPreviews = requestedActions.filter((entry) => (
     entry.material && entry.status === 'grounded' && entry.operation.kind === 'conflict.declare'
   ));
@@ -283,7 +285,7 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
           : hasProcessAdjustmentPreview
             ? { kind: 'unknown', label: 'No additional immediate treasury commitment; the existing process commitment remains in force' }
           : hasProposalPreview
-            ? { kind: 'unknown', label: 'No immediate treasury commitment; frozen proposal terms will be recorded' }
+            ? { kind: 'unknown', label: hasPeacePreview ? 'No immediate treasury commitment; a frozen peace proposal will be recorded' : 'No immediate treasury commitment; frozen proposal terms will be recorded' }
             : hasConflictPreview
               ? { kind: 'unknown', label: 'No immediate treasury commitment; the conflict declaration will be recorded' }
             : { kind: 'unknown', label: 'No currently feasible material commitment' },
@@ -294,7 +296,7 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
           : hasProcessAdjustmentPreview
             ? { kind: 'range', label: 'Applied at the next monthly resolution; pace remains subject to engine feasibility' }
           : hasProposalPreview
-            ? { kind: 'range', label: 'Pending recipient response; no territorial control changes before acceptance' }
+            ? { kind: 'range', label: hasPeacePreview ? 'Pending opposing party response; the conflict ends only after acceptance' : 'Pending recipient response; no territorial control changes before acceptance' }
             : hasConflictPreview
               ? { kind: 'range', label: 'The conflict is recorded now; combat and territorial consequences require later legal operations' }
             : { kind: 'unknown', label: 'Blocked until the interpretation or conditions change' },
@@ -303,7 +305,7 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
         : hasProcessAdjustmentPreview
           ? ['A later checkpoint can still constrain the selected pace']
           : hasProposalPreview
-            ? ['The addressed polity can reject the frozen terms']
+            ? [hasPeacePreview ? 'The opposing polity can reject the frozen peace terms' : 'The addressed polity can reject the frozen terms']
             : hasConflictPreview
               ? ['The opposing polity can react, but the declaration creates no automatic battlefield outcome']
             : ['Material blockers or opposition can slow the process at later checkpoints'],
@@ -315,7 +317,9 @@ function buildPendingIntent(session, playerPolityId, intentions, modelOutput, mo
           const origin = region?.displayName.en ?? 'the selected controlled region';
           return `${entry.personnel} fewer people in the civilian workforce; origin ${origin}`;
         }),
-        ...(hasProposalPreview ? ['No territorial control changes until the addressed polity accepts the frozen proposal'] : []),
+        ...(hasProposalPreview ? [hasPeacePreview
+          ? 'No battle, casualties, occupation, or territorial transfer is created by this peace proposal'
+          : 'No territorial control changes until the addressed polity accepts the frozen proposal'] : []),
         ...(hasConflictPreview ? ['No battle, casualties, occupation, or territorial transfer is created by the declaration alone'] : []),
       ],
       affected: [...new Set([...requestedActions, ...proposedInitiatives].flatMap((entry) => entry.targetLabels))],
@@ -524,6 +528,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
   const createdProposals = [];
   const createdMobilizations = [];
   const declaredConflicts = [];
+  const createdPeaceProposals = [];
   const adjustedProcesses = [];
   for (const action of playerIntent.requestedActions
     .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind !== 'process.propose')
@@ -556,6 +561,20 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
       state = declared.state;
       declaredConflicts.push({ actionId: action.actionId, conflictId: declared.conflictId, defenderPolityId: operation.defenderPolityId,
         eventId: declared.eventId, evidenceId: declared.evidenceId, revisionAfter: state.revision });
+      continue;
+    }
+    if (operation.kind === 'conflict.propose-peace') {
+      const conflict = state.conflicts.find((entry) => entry.conflictId === operation.conflictId);
+      if (!conflict || conflict.status !== 'active') throw new Error(`Cannot settle a non-active conflict ${operation.conflictId}.`);
+      const recipientPolityId = conflict.attackerPolityId === playerIntent.playerPolityId
+        ? conflict.defenderPolityId : conflict.attackerPolityId;
+      const request = {
+        ...base, recipientPolityIds: [recipientPolityId],
+        terms: [{ kind: 'conflict-settlement', conflictId: operation.conflictId }],
+      };
+      state = worldV2.proposeDiplomaticProposal(state, { ...request, evidenceIds: action.evidenceIds, expectedRevision: state.revision });
+      createdProposals.push({ proposalId: request.proposalId, actionId: action.actionId, revisionAfter: state.revision });
+      createdPeaceProposals.push({ actionId: action.actionId, proposalId: request.proposalId, conflictId: operation.conflictId, recipientPolityId, revisionAfter: state.revision });
       continue;
     }
     if (operation.kind === 'process.adjust') {
@@ -592,7 +611,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
     state = worldV2.proposeDiplomaticProposal(state, { ...request, evidenceIds: action.evidenceIds, expectedRevision: state.revision });
     createdProposals.push({ proposalId: request.proposalId, actionId: action.actionId, revisionAfter: state.revision });
   }
-  return { state, created, createdProposals, createdMobilizations, declaredConflicts, adjustedProcesses };
+  return { state, created, createdProposals, createdMobilizations, declaredConflicts, createdPeaceProposals, adjustedProcesses };
 }
 
 export const readLivingWorld = (gameId, { locale = 'en' } = {}) => response(gameId, locale);
@@ -622,6 +641,7 @@ export function confirmLivingWorldIntent(gameId, { revision, sessionRevision, in
       createdDiplomaticProposals: materialized.createdProposals,
       createdMobilizations: materialized.createdMobilizations,
       declaredConflicts: materialized.declaredConflicts,
+      createdPeaceProposals: materialized.createdPeaceProposals,
       adjustedProcesses: materialized.adjustedProcesses,
     },
     playerIntent: { ...session.playerIntent, status: 'confirmed' },

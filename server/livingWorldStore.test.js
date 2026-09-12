@@ -590,6 +590,55 @@ describe('living-world command store', () => {
     assert.ok(austriaTask.brief.materialSituation.some((entry) => entry.domain === 'military' && entry.severity === 'critical'));
   });
 
+  it('settles an active conflict only after the opposing polity accepts a frozen peace proposal', () => {
+    const before = living.readLivingWorld(conflictDeclarationGameId, { locale: 'ru' });
+    const conflict = before.interpretationContext.entities.find((entry) => entry.kind === 'conflict' && entry.status === 'active');
+    const evidenceId = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    assert.ok(conflict && evidenceId);
+    const controlBefore = readEngineSession(library.getGameDirectory(conflictDeclarationGameId)).state.regions
+      .map((entry) => ({ regionId: entry.regionId, control: entry.control }));
+    const text = 'Предложить Австрийской империи мирное урегулирование активного конфликта без территориальных условий.';
+    const submitted = living.submitLivingWorldIntent(conflictDeclarationGameId, {
+      revision: before.projection.revision, sessionRevision: before.sessionRevision, intentions: [text], locale: 'ru',
+      modelOutput: {
+        revision: before.projection.revision, questions: [], claims: [], proposedInitiatives: [], requestedActions: [{
+          actionId: 'action:propose-peace', domain: 'diplomacy', scope: 'external', intent: text, pace: 'slow',
+          effectFamilies: ['relation.modify'], targetEntityIds: [conflict.entityId, 'polity:austria'], claimRefs: [], evidenceIds: [evidenceId],
+          operation: { kind: 'conflict.propose-peace', conflictId: conflict.entityId }, sourceSpan: { start: 0, end: text.length, text },
+        }],
+      },
+    });
+    assert.equal(submitted.projection.interpretation.requestedActions[0].status, 'grounded');
+    assert.equal(submitted.projection.interpretation.preview.cost.label, 'Немедленных затрат казны нет; зафиксированное мирное предложение будет создано.');
+    assert.match(submitted.projection.interpretation.preview.duration.label, /конфликт завершится только после принятия/u);
+    assert.match(submitted.projection.interpretation.preview.opportunityCosts.join(' '), /не создаёт бой, потери/u);
+    const confirmed = living.confirmLivingWorldIntent(conflictDeclarationGameId, {
+      revision: submitted.projection.revision, sessionRevision: submitted.sessionRevision,
+      interpretationId: submitted.projection.interpretation.interpretationId, locale: 'ru',
+    });
+    assert.equal(confirmed.lastTransition.createdPeaceProposals.length, 1);
+    const austriaTask = confirmed.strategicTasks.find((task) => task.actorPolityId === 'polity:austria');
+    const acceptChoice = austriaTask?.brief.frozenChoices.find((choice) => choice.choiceId.startsWith('choice:proposal-accept-'));
+    assert.ok(austriaTask && acceptChoice);
+    const advanced = living.advanceLivingWorld(conflictDeclarationGameId, {
+      revision: confirmed.projection.revision, sessionRevision: confirmed.sessionRevision, optionId: 'advance-one-month', locale: 'ru',
+      strategicAttempts: confirmed.strategicTasks.map((task) => task.taskKey === austriaTask.taskKey ? {
+        taskKey: task.taskKey, status: 'succeeded', modelOutput: {
+          polityId: task.actorPolityId, revision: task.brief.revision, selectedChoiceIds: [acceptChoice.choiceId], processDecisions: [], initiativeProposals: [],
+          durablePlan: { objective: 'Respond to the peace proposal.', goals: [], commitments: [], revisit: 'Review changed conditions.' },
+          evidenceIds: [acceptChoice.factsUsed[0]], hold: null,
+        },
+      } : hold(task)),
+    });
+    const state = readEngineSession(library.getGameDirectory(conflictDeclarationGameId)).state;
+    assert.equal(state.conflicts.find((entry) => entry.conflictId === conflict.entityId)?.status, 'ended');
+    assert.equal(state.diplomaticProposals.at(-1)?.status, 'accepted');
+    assert.ok(state.events.some((entry) => entry.kind === 'conflict-ended'));
+    assert.ok(state.events.some((entry) => entry.kind === 'diplomatic-proposal-accept'));
+    assert.deepEqual(state.regions.map((entry) => ({ regionId: entry.regionId, control: entry.control })), controlBefore);
+    assert.equal(advanced.projection.situations.some((entry) => /Активный конфликт/u.test(entry.title)), false);
+  });
+
   it('previews a grounded territorial offer as pending rather than blocked and leaves control unchanged until acceptance', () => {
     const before = living.readLivingWorld(territoryPreviewGameId);
     const actorEvidence = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];

@@ -219,6 +219,15 @@ export const diplomaticTermSchema = z.discriminatedUnion('kind', [
     /** Frozen when offered; acceptance must fail rather than reinterpret changed control. */
     expectedControl: regionalControlSchema,
   }).strict(),
+  /**
+   * A settlement can end one recorded conflict, but does not smuggle a
+   * territorial result into diplomacy.  Any cession remains a separate,
+   * explicitly offered term with its own frozen-control check.
+   */
+  z.object({
+    kind: z.literal('conflict-settlement'),
+    conflictId: conflictIdSchema,
+  }).strict(),
 ]);
 export type DiplomaticTerm = z.infer<typeof diplomaticTermSchema>;
 

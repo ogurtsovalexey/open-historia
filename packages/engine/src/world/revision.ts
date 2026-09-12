@@ -116,10 +116,12 @@ export function canonicalWorldState(state: WorldStateV2): WorldStateV2 {
       recipientPolityIds: sortedStrings(entry.recipientPolityIds),
       terms: entry.terms.map((term) => term.kind === 'relationship'
         ? { ...term, participantPolityIds: sortedStrings(term.participantPolityIds) }
-        : { ...term, expectedControl: { ...term.expectedControl } })
+        : term.kind === 'territorial-cession'
+          ? { ...term, expectedControl: { ...term.expectedControl } }
+          : { ...term })
         .sort((a, b) => compareId(
-          a.kind === 'relationship' ? `relationship|${a.relationshipTypeId}` : `territory|${a.regionId}`,
-          b.kind === 'relationship' ? `relationship|${b.relationshipTypeId}` : `territory|${b.regionId}`,
+          a.kind === 'relationship' ? `relationship|${a.relationshipTypeId}` : a.kind === 'territorial-cession' ? `territory|${a.regionId}` : `settlement|${a.conflictId}`,
+          b.kind === 'relationship' ? `relationship|${b.relationshipTypeId}` : b.kind === 'territorial-cession' ? `territory|${b.regionId}` : `settlement|${b.conflictId}`,
         )),
     })).sort((a, b) => compareId(a.proposalId, b.proposalId)),
     tributeObligations: state.tributeObligations.map((entry) => ({

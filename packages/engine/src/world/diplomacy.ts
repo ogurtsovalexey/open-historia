@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { applyTerritorialTransition } from './control.js';
+import { endConflict } from './conflict.js';
 import {
   diplomaticProposalIdSchema,
   evidenceIdSchema,
@@ -17,7 +18,8 @@ const hash = (...values: string[]) => createHash('sha256').update(values.join('\
 
 export type ProposedDiplomaticTerm =
   | { kind: 'relationship'; relationshipTypeId: string; participantPolityIds: string[] }
-  | { kind: 'territorial-cession'; regionId: string; fromPolityId: string; toPolityId: string };
+  | { kind: 'territorial-cession'; regionId: string; fromPolityId: string; toPolityId: string }
+  | { kind: 'conflict-settlement'; conflictId: string };
 
 export interface ProposeDiplomaticProposalRequest {
   proposalId: string;
@@ -65,6 +67,15 @@ function proposalTerms(state: WorldStateV2, request: ProposeDiplomaticProposalRe
       }
       term.participantPolityIds.forEach((id) => requirePolity(state, id, 'relationship term'));
       return { kind: term.kind, relationshipTypeId: term.relationshipTypeId as never, participantPolityIds: [...term.participantPolityIds].sort(compare) as never };
+    }
+    if (term.kind === 'conflict-settlement') {
+      const conflict = state.conflicts.find((entry) => entry.conflictId === term.conflictId);
+      if (!conflict || conflict.status !== 'active') fail(`references no active conflict ${term.conflictId}`);
+      const sides = [conflict.attackerPolityId, conflict.defenderPolityId];
+      if (!sides.includes(request.proposerPolityId as never)) fail('conflict settlement proposer is not a conflict party');
+      if (request.recipientPolityIds.length !== 1 || !sides.includes(request.recipientPolityIds[0] as never)
+        || request.recipientPolityIds[0] === request.proposerPolityId) fail('conflict settlement requires exactly the opposing conflict party as recipient');
+      return { kind: term.kind, conflictId: term.conflictId as never };
     }
     const region = state.regions.find((entry) => entry.regionId === term.regionId);
     if (!region) fail(`references unknown region ${term.regionId}`);
@@ -151,22 +162,33 @@ export function resolveDiplomaticProposal(state: WorldStateV2, request: ResolveD
   for (const relationship of acceptedRelationships) {
     if (state.relationships.some((entry) => entry.relationshipId === relationship.relationshipId)) fail(`relationship ${relationship.relationshipId} already exists`);
   }
+  const settlementTerms = proposal.terms.filter((term) => term.kind === 'conflict-settlement');
+  // End the conflict first, while the proposal is still pending.  Both steps
+  // are executed inside one resolver call, but each canonical mutation still
+  // gets its own evidence/revision.  This preserves the invariant that no
+  // persisted accepted settlement can coexist with an active conflict.
+  let next = state;
+  if (request.decision === 'accept') {
+    for (const term of settlementTerms) {
+      next = endConflict(next, { conflictId: term.conflictId, evidenceIds: [], expectedRevision: next.revision }).state;
+    }
+  }
   const updatedProposal = {
     ...proposal, status: request.decision === 'accept' ? 'accepted' as const : 'rejected' as const,
-    ...(request.decision === 'accept' && proposal.terms.some((term) => term.kind === 'territorial-cession') ? { acceptedAgreementId: agreementId } : {}),
+    ...(request.decision === 'accept' && proposal.terms.some((term) => term.kind === 'territorial-cession' || term.kind === 'conflict-settlement') ? { acceptedAgreementId: agreementId } : {}),
     evidenceIds: [...proposal.evidenceIds, evidenceId].sort(compare),
   };
-  let next = stampWorldStateRevision({
-    ...contentOf(state), revisionLineage: nextRevisionLineage(state),
-    diplomaticProposals: state.diplomaticProposals.map((entry, entryIndex) => entryIndex === index ? updatedProposal : entry),
-    relationships: [...state.relationships, ...acceptedRelationships],
-    events: [...state.events, {
-      eventId, revision: state.revision, kind: `diplomatic-proposal-${request.decision}`,
+  next = stampWorldStateRevision({
+    ...contentOf(next), revisionLineage: nextRevisionLineage(next),
+    diplomaticProposals: next.diplomaticProposals.map((entry, entryIndex) => entryIndex === index ? updatedProposal : entry),
+    relationships: [...next.relationships, ...acceptedRelationships],
+    events: [...next.events, {
+      eventId, revision: next.revision, kind: `diplomatic-proposal-${request.decision}`,
       entityRefs: [proposal.proposalId, proposal.proposerPolityId, request.actorPolityId, ...acceptedRelationships.map((entry) => entry.relationshipId)].sort(compare) as never,
       evidenceIds: [evidenceId],
     }],
-    evidence: [...state.evidence, {
-      evidenceId, revision: state.revision, kind: `diplomatic-proposal-${request.decision}`,
+    evidence: [...next.evidence, {
+      evidenceId, revision: next.revision, kind: `diplomatic-proposal-${request.decision}`,
       entityRefs: [proposal.proposalId, proposal.proposerPolityId, request.actorPolityId, ...acceptedRelationships.map((entry) => entry.relationshipId)].sort(compare) as never,
       eventRefs: [eventId], canonicalPointers: [`/diplomaticProposals/${index}`], visibility: 'public' as const,
     }],

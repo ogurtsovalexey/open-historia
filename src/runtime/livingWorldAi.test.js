@@ -60,4 +60,18 @@ describe("living-world semantic AI boundary", () => {
     const prompt = renderPlayerInputPrompt(context, "Declare a conflict.");
     assert.match(prompt, /never creates a battle, casualties, occupation, or territorial transfer/i);
   });
+
+  it("offers a peace operation only for a supplied active conflict", () => {
+    const schema = playerInputModelJsonSchema({
+      ...context,
+      entities: [...context.entities, {
+        entityId: "conflict:test", kind: "conflict", status: "active", label: "Test conflict", evidenceIds: ["evidence:test"],
+      }],
+      allowedDiplomaticOperations: [...context.allowedDiplomaticOperations, "conflict.propose-peace"],
+    });
+    const operation = schema.properties.requestedActions.items.properties.operation.anyOf;
+    const peace = operation.find((entry) => entry.properties.kind.const === "conflict.propose-peace");
+    assert.deepEqual(peace.properties.conflictId.enum, ["conflict:test"]);
+    assert.match(renderPlayerInputPrompt(context, "Offer peace."), /peace proposal/i);
+  });
 });

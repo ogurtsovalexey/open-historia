@@ -198,6 +198,7 @@ const localizeIntentPreviewText = (value, locale) => {
     'Reserve formation is recorded now; readiness remains subject to later world conditions': 'Резерв создаётся сейчас; готовность зависит от дальнейших условий мира.',
     'Material blockers or opposition can slow the process at later checkpoints': 'Материальные ограничения или сопротивление могут замедлить процесс на следующих проверках.',
     'No immediate treasury commitment; frozen proposal terms will be recorded': 'Немедленных затрат казны нет; условия предложения будут зафиксированы.',
+    'No immediate treasury commitment; a frozen peace proposal will be recorded': 'Немедленных затрат казны нет; зафиксированное мирное предложение будет создано.',
     'No immediate treasury commitment; the conflict declaration will be recorded': 'Немедленных затрат казны нет; объявление конфликта будет зафиксировано.',
     'Multi-stage; pace is rechecked at each monthly resolution': 'Многоэтапный процесс; темп перепроверяется при каждом месячном расчёте.',
     'No additional immediate treasury commitment; the existing process commitment remains in force': 'Новых немедленных затрат казны нет; обязательство по уже идущему процессу сохраняется.',
@@ -207,11 +208,14 @@ const localizeIntentPreviewText = (value, locale) => {
     'High contextual resistance limits acceleration': 'Высокое контекстное сопротивление ограничивает ускорение.',
     'A later checkpoint can still constrain the selected pace': 'Следующая проверка всё ещё может ограничить выбранный темп.',
     'Pending recipient response; no territorial control changes before acceptance': 'Ожидается ответ адресата; до принятия контроля над территориями не меняется.',
+    'Pending opposing party response; the conflict ends only after acceptance': 'Ожидается ответ противной стороны; конфликт завершится только после принятия.',
     'The conflict is recorded now; combat and territorial consequences require later legal operations': 'Конфликт фиксируется сейчас; бой и территориальные последствия требуют последующих законных операций.',
     'The addressed polity can reject the frozen terms': 'Адресат может отклонить зафиксированные условия.',
+    'The opposing polity can reject the frozen peace terms': 'Противная сторона может отклонить зафиксированные мирные условия.',
     'The opposing polity can react, but the declaration creates no automatic battlefield outcome': 'Противник может отреагировать, но объявление не создаёт автоматического исхода на поле боя.',
     'No territorial control changes until the addressed polity accepts the frozen proposal': 'Контроль над территориями не меняется, пока адресат не примет зафиксированное предложение.',
     'No battle, casualties, occupation, or territorial transfer is created by the declaration alone': 'Само объявление не создаёт бой, потери, оккупацию или передачу территории.',
+    'No battle, casualties, occupation, or territorial transfer is created by this peace proposal': 'Это мирное предложение само по себе не создаёт бой, потери, оккупацию или передачу территории.',
     'Requires semantic and material resolution': 'Требует смыслового и материального разрешения.',
     'Depends on feasibility and chosen pace': 'Зависит от осуществимости и выбранного темпа.',
     'The requested outcome may exceed current institutions or material capacity': 'Запрошенный результат может превышать возможности нынешних институтов или материальной базы.',
@@ -340,7 +344,9 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
   const regionLabel = (id) => localized(state.regions.find((entry) => entry.regionId === id)?.displayName, locale) || labelOf(id);
   const proposalLabel = (proposal) => proposal.terms.map((term) => term.kind === 'territorial-cession'
     ? `${regionLabel(term.regionId)} → ${polityLabel(term.toPolityId)}`
-    : `${relationshipTypeLabel(term.relationshipTypeId, locale)}: ${term.participantPolityIds.map(polityLabel).join(', ')}`).join('; ');
+    : term.kind === 'conflict-settlement'
+      ? phrase(locale, `settlement of ${labelOf(term.conflictId)}`, `мирное урегулирование ${labelOf(term.conflictId)}`)
+      : `${relationshipTypeLabel(term.relationshipTypeId, locale)}: ${term.participantPolityIds.map(polityLabel).join(', ')}`).join('; ');
   const territoryEffects = (last?.strategicRecords ?? [])
     .flatMap((record) => record.territorialTransitions ?? [])
     .map((transition) => territoryEffectProjection(state, transition, visible, locale))
@@ -510,7 +516,9 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
           : [proposal.proposerPolityId];
         const terms = proposal.terms.map((term) => term.kind === 'territorial-cession'
           ? `${regionLabel(term.regionId)} → ${polityLabel(term.toPolityId)}`
-          : `${relationshipLabel(term.relationshipTypeId)}: ${term.participantPolityIds.map(polityLabel).join(', ')}`);
+          : term.kind === 'conflict-settlement'
+            ? phrase(locale, 'Peace settlement of an active conflict', 'Мирное урегулирование активного конфликта')
+            : `${relationshipLabel(term.relationshipTypeId)}: ${term.participantPolityIds.map(polityLabel).join(', ')}`);
         return {
           conversationId: `conversation:${proposal.proposalId.slice('proposal:'.length)}`,
           counterparty: counterparties.map((id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id)).join(' · '),
@@ -612,6 +620,17 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
       participantPolityIds: relationship.participantPolityIds,
       evidenceIds: relationship.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
     })), PLAYER_INTENT_CONTEXT_MAX.relationships),
+    ...boundedContextEntries(state.conflicts.filter((entry) => entry.status === 'active' && (
+      entry.attackerPolityId === actor.id || entry.defenderPolityId === actor.id
+    )).map((conflict) => ({
+      entityId: conflict.conflictId,
+      kind: 'conflict',
+      label: contextLabel(labelOf(conflict.conflictId), locale),
+      attackerPolityId: conflict.attackerPolityId,
+      defenderPolityId: conflict.defenderPolityId,
+      status: conflict.status,
+      evidenceIds: conflict.evidenceIds.filter((id) => visibleIds.has(id)).slice(0, 2),
+    })), 12),
     ...boundedContextEntries(state.tributeObligations.filter((entry) => (
       entry.payerPolityIds.includes(actor.id) || entry.beneficiaries.some((beneficiary) => beneficiary.polityId === actor.id)
     )).map((obligation) => ({
@@ -656,7 +675,7 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
     evidence,
     allowedInitiativeKinds: ['technology', 'ideology', 'institution', 'doctrine', 'movement', 'project', 'investigation', 'other'],
     allowedEffectFamilies: [...processes.materializableEffectKinds],
-    allowedDiplomaticOperations: ['process.propose', 'process.adjust', 'military.mobilize', 'conflict.declare', 'diplomacy.propose', 'territory.offer'],
+    allowedDiplomaticOperations: ['process.propose', 'process.adjust', 'military.mobilize', 'conflict.declare', 'conflict.propose-peace', 'diplomacy.propose', 'territory.offer'],
     relationshipTypes: state.catalogs.relationshipTypes
       .filter((entry) => entry.playerProposable)
       .map((entry) => entry.relationshipTypeId)

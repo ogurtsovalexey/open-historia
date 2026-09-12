@@ -217,3 +217,66 @@ test("the production shell confirms a canonical conflict declaration without fab
   ]));
   await request.delete(`/api/games/${gameId}`);
 });
+
+test("the production shell sends and accepts a conflict settlement without fabricating territorial consequences", async ({ page, request }) => {
+  const gameId = "living-world-peace-e2e";
+  await request.delete(`/api/games/${gameId}`).catch(() => {});
+  const created = await request.post("/api/games", { data: {
+    id: gameId, name: "Typed conflict settlement", scenarioId: "scenario:napoleonic-europe-1805",
+    playerPolityId: "polity:france", setActive: true,
+  } });
+  expect(created.ok()).toBeTruthy();
+  const initial = await (await request.get(`/api/games/${gameId}/living-world?locale=ru`)).json();
+  const actor = initial.interpretationContext.entities.find((entry) => entry.entityId === "polity:france");
+  const declarationText = "Объявить ограниченный конфликт Австрийской империи без заявления о занятии территории.";
+  const declaration = await request.post(`/api/games/${gameId}/living-world/intent?locale=ru`, { data: {
+    revision: initial.projection.revision, sessionRevision: initial.sessionRevision, intentions: [declarationText],
+    modelOutput: { revision: initial.projection.revision, questions: [], claims: [], proposedInitiatives: [], requestedActions: [{
+      actionId: "action:declare-conflict", domain: "diplomacy", scope: "external", intent: declarationText, pace: "steady",
+      effectFamilies: ["capacity.modify"], targetEntityIds: ["polity:austria"], claimRefs: [], evidenceIds: [actor.evidenceIds[0]],
+      operation: { kind: "conflict.declare", defenderPolityId: "polity:austria" }, sourceSpan: { start: 0, end: declarationText.length, text: declarationText },
+    }] },
+  } });
+  expect(declaration.ok()).toBeTruthy();
+  await page.goto(`/?gameId=${gameId}`);
+  await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
+  await page.getByTestId("intent-nav-orders").click();
+  await page.getByRole("button", { name: "Подтвердить обоснованные действия" }).click();
+
+  const declared = await (await request.get(`/api/games/${gameId}/living-world?locale=ru`)).json();
+  const conflict = declared.interpretationContext.entities.find((entry) => entry.kind === "conflict" && entry.status === "active");
+  expect(conflict).toBeTruthy();
+  const controlsBefore = declared.projection.briefing.territoryEffects;
+  const peaceText = "Предложить Австрийской империи мирное урегулирование активного конфликта без территориальных условий.";
+  const peace = await request.post(`/api/games/${gameId}/living-world/intent?locale=ru`, { data: {
+    revision: declared.projection.revision, sessionRevision: declared.sessionRevision, intentions: [peaceText],
+    modelOutput: { revision: declared.projection.revision, questions: [], claims: [], proposedInitiatives: [], requestedActions: [{
+      actionId: "action:propose-peace", domain: "diplomacy", scope: "external", intent: peaceText, pace: "slow",
+      effectFamilies: ["relation.modify"], targetEntityIds: [conflict.entityId, "polity:austria"], claimRefs: [], evidenceIds: [actor.evidenceIds[0]],
+      operation: { kind: "conflict.propose-peace", conflictId: conflict.entityId }, sourceSpan: { start: 0, end: peaceText.length, text: peaceText },
+    }] },
+  } });
+  expect(peace.ok()).toBeTruthy();
+  await page.reload();
+  await page.getByTestId("intent-nav-orders").click();
+  await expect(page.getByText("Немедленных затрат казны нет; зафиксированное мирное предложение будет создано.")).toBeVisible();
+  await expect(page.getByText("Ожидается ответ противной стороны; конфликт завершится только после принятия.")).toBeVisible();
+  await page.getByRole("button", { name: "Подтвердить обоснованные действия" }).click();
+
+  const pending = await (await request.get(`/api/games/${gameId}/living-world?locale=ru`)).json();
+  await page.getByTestId("intent-nav-diplomacy").click();
+  await expect(page.getByText("Мирное урегулирование активного конфликта")).toBeVisible();
+  const austriaTask = pending.strategicTasks.find((task) => task.actorPolityId === "polity:austria");
+  const acceptChoice = austriaTask.brief.frozenChoices.find((choice) => choice.choiceId.startsWith("choice:proposal-accept-"));
+  const advancedResponse = await request.post(`/api/games/${gameId}/living-world/advance?locale=ru`, { data: {
+    revision: pending.projection.revision, sessionRevision: pending.sessionRevision, optionId: "advance-three-months",
+    strategicAttempts: pending.strategicTasks.map((task) => task.taskKey === austriaTask.taskKey ? {
+      ...hold(task), modelOutput: { ...hold(task).modelOutput, selectedChoiceIds: [acceptChoice.choiceId], evidenceIds: [acceptChoice.factsUsed[0]], hold: null },
+    } : hold(task)),
+  } });
+  expect(advancedResponse.ok()).toBeTruthy();
+  const advanced = await advancedResponse.json();
+  expect(advanced.projection.situations.some((entry) => /Активный конфликт/.test(entry.title))).toBe(false);
+  expect(advanced.projection.briefing.territoryEffects).toEqual(controlsBefore);
+  await request.delete(`/api/games/${gameId}`);
+});

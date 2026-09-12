@@ -121,7 +121,7 @@ canonical reducer.
 | Production opponent loop | Required V5 batches are atomic and visibly fail closed. Background calls are evidence-aware and capped; accepted initiatives enter the same engine process path. | `server/livingWorldStrategy.js`; R1 checkpoint |
 | Typed diplomacy and territory | A proposal stays immaterial until its frozen recipient response; accepted cessions use the sole territorial-control reducer. | `world/diplomacy.ts`; R2 checkpoint |
 | Player mobilization | A direct player order has a typed, non-numeric path to one bounded reserve selected from real controlled recruitment capacity; preview exposes the workforce trade-off. | `world/personnel.ts`; `livingWorldStore.test.js` |
-| Typed conflict declaration | A player can declare a conflict against one real polity through a revision-bound, evidence-backed operation; the opponent receives a private Strategic V5 war checkpoint. Declaration alone never changes formations, population, occupation, control or territory. | `world/conflict.ts`; `livingWorldStrategy.js`; production-shell acceptance |
+| Typed conflict declaration and settlement | A player can declare a conflict against one real polity through a revision-bound, evidence-backed operation; the opponent receives a private Strategic V5 war checkpoint. Either side can then send a frozen bilateral peace proposal; only the addressed opponent's acceptance ends the political conflict. Neither declaration nor settlement alone changes formations, population, occupation, control or territory. | `world/conflict.ts`; `world/diplomacy.ts`; `livingWorldStrategy.js`; production-shell acceptance |
 | Three-month player loop | One normal decision resolves three local monthly boundaries, including monthly tribute and stable process settlement, then records every submonth. | `server/livingWorldStore.js`; R3 checkpoint |
 | Cross-era acceptance | Napoleonic and Mesoamerican worlds prove false-history rejection, bounded open concepts, territorial causality, deterministic replay, catalog isolation and epistemic privacy. | `server/crossEraAcceptance.test.js`; WP12 checkpoint |
 
@@ -190,11 +190,11 @@ result is unknown, not failed.
 4. Retired Strategic V4 source and Europe-specific authoring utilities remain
    documented offline audit tooling only. A future deletion commit needs the
    required `rg` audit and persisted-save migration proof before removing them.
-5. Conflict declaration is a political fact and opponent-review trigger, not a
-   surrogate combat system. Before exposing an advance, battle, occupation or
-   territorial peace term, implement a dedicated formation-location/front
-   reducer that calls the sole territorial transition owner and personnel-loss
-   reducer exactly once.
+5. Conflict declaration and a bilateral no-territory settlement are political
+   facts, not a surrogate combat system. Before exposing an advance, battle,
+   occupation or territorial peace term, implement a dedicated
+   formation-location/front reducer that calls the sole territorial transition
+   owner and personnel-loss reducer exactly once.
 
 ### 0.4 Scope guard for a simpler implementation agent
 
