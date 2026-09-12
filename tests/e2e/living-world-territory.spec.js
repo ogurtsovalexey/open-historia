@@ -51,6 +51,12 @@ test("a living-world territorial offer remains pending until the addressed polit
   await expect(page.getByText("Адресат может отклонить зафиксированные условия.")).toBeVisible();
   await page.getByRole("button", { name: "Подтвердить обоснованные действия" }).click();
   await expect(page.getByRole("button", { name: "Продолжить на три месяца" })).toBeEnabled();
+  const russianConfirmed = await (await request.get(`/api/games/${gameId}/living-world?locale=ru`)).json();
+  const localizedOffer = russianConfirmed.projection.diplomacy.conversations.find((entry) => entry.status === 'awaiting-response');
+  expect(localizedOffer.latestMessage).toMatch(/ → Австрийская империя$/);
+  expect(localizedOffer.latestMessage).not.toMatch(/region:|polity:/);
+  await page.getByTestId("intent-nav-diplomacy").click();
+  await expect(page.getByText(localizedOffer.latestMessage)).toBeVisible();
   const confirmed = await (await request.get(`/api/games/${gameId}/living-world`)).json();
   expect(confirmed.interpretationContext.entities.find((entry) => entry.entityId === region.entityId).legalOwnerPolityId).toBe("polity:france");
   const austriaTask = confirmed.strategicTasks.find((task) => task.actorPolityId === "polity:austria");

@@ -371,6 +371,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     neutrality: 'нейтралитет',
   })[labelOf(kind)] ?? labelOf(kind));
   const polityLabel = (id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id);
+  const regionLabel = (id) => localized(state.regions.find((entry) => entry.regionId === id)?.displayName, locale) || labelOf(id);
   // A situation is a read-only, engine-derived prompt for intervention.  It
   // must never turn a player click into a new obligation or rewrite the
   // historical record.  Occupation was the first such condition; unpaid
@@ -450,7 +451,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
           ? proposal.recipientPolityIds
           : [proposal.proposerPolityId];
         const terms = proposal.terms.map((term) => term.kind === 'territorial-cession'
-          ? `${labelOf(term.regionId)} → ${labelOf(term.toPolityId)}`
+          ? `${regionLabel(term.regionId)} → ${polityLabel(term.toPolityId)}`
           : `${relationshipLabel(term.relationshipTypeId)}: ${term.participantPolityIds.map(polityLabel).join(', ')}`);
         return {
           conversationId: `conversation:${proposal.proposalId.slice('proposal:'.length)}`,
