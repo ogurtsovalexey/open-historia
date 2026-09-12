@@ -305,7 +305,7 @@ export function resolveLivingWorldStrategicTasks(stateInput, tasks, submittedAtt
   for (const { task, resolution } of resolutions) {
     const record = {
       taskKey: task.taskKey, actorPolityId: task.actorPolityId, status: resolution.status,
-      materializedProcessIds: [], territorialTransitions: [], errors: [],
+      materializedProcessIds: [], territorialTransitions: [], proposalResponses: [], errors: [],
     };
     if (resolution.status === 'accepted') {
       const selectedResponses = resolution.semanticPackage.selectedChoiceIds
@@ -322,6 +322,7 @@ export function resolveLivingWorldStrategicTasks(stateInput, tasks, submittedAtt
             proposalId: response.proposalId, actorPolityId: task.actorPolityId,
             decision: response.decision, expectedRevision: state.revision,
           });
+          record.proposalResponses.push({ proposalId: response.proposalId, decision: response.decision });
           for (const region of state.regions) {
             const controlBefore = controlsBefore.get(region.regionId);
             if (controlBefore && JSON.stringify(controlBefore) !== JSON.stringify(region.control)) {

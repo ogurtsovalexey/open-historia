@@ -300,6 +300,11 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     });
   const pendingIntent = interpretationProjection(session.playerIntent, snapshotEvidence, locale, state);
   const last = session.lastTurn;
+  const polityLabel = (id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id);
+  const regionLabel = (id) => localized(state.regions.find((entry) => entry.regionId === id)?.displayName, locale) || labelOf(id);
+  const proposalLabel = (proposal) => proposal.terms.map((term) => term.kind === 'territorial-cession'
+    ? `${regionLabel(term.regionId)} → ${polityLabel(term.toPolityId)}`
+    : `${labelOf(term.relationshipTypeId)}: ${term.participantPolityIds.map(polityLabel).join(', ')}`).join('; ');
   const territoryEffects = (last?.strategicRecords ?? [])
     .flatMap((record) => record.territorialTransitions ?? [])
     .map((transition) => territoryEffectProjection(state, transition, visible, locale))
@@ -311,7 +316,22 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     authority: 'canonical',
     evidenceIds: groundedEvidence([last.clock?.evidenceId], visible, snapshotEvidence),
     causes: [{ category: 'other', label: 'Confirmed time advance', contribution: 'One calendar month' }],
-  }] : [];
+  }, ...(last.strategicRecords ?? []).flatMap((record) => (record.proposalResponses ?? []).map((response) => {
+    const proposal = state.diplomaticProposals.find((entry) => entry.proposalId === response.proposalId);
+    if (!proposal) return null;
+    const accepted = response.decision === 'accept';
+    return {
+      changeId: `change:${response.proposalId}:${response.decision}`,
+      magnitude: accepted ? phrase(locale, 'Accepted', 'Принято') : phrase(locale, 'Rejected', 'Отклонено'),
+      label: phrase(locale,
+        `${polityLabel(record.actorPolityId)} ${accepted ? 'accepted' : 'rejected'} ${proposalLabel(proposal)}.`,
+        `${polityLabel(record.actorPolityId)} ${accepted ? 'приняла' : 'отклонила'} предложение: ${proposalLabel(proposal)}.`,
+      ),
+      authority: 'canonical',
+      evidenceIds: groundedEvidence(proposal.evidenceIds, visible, snapshotEvidence),
+      causes: [{ category: 'other', label: phrase(locale, 'Frozen recipient decision', 'Зафиксированное решение адресата'), contribution: proposal.proposalId }],
+    };
+  }).filter(Boolean))] : [];
   const active = state.processes
     .filter((entry) => entry.status === 'active' && entry.sponsorEntityRefs.includes(polity.id))
     .map((entry) => processProjection(state, entry, visible, locale))
@@ -370,8 +390,6 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     'coalition negotiation': 'переговоры о коалиции',
     neutrality: 'нейтралитет',
   })[labelOf(kind)] ?? labelOf(kind));
-  const polityLabel = (id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id);
-  const regionLabel = (id) => localized(state.regions.find((entry) => entry.regionId === id)?.displayName, locale) || labelOf(id);
   // A situation is a read-only, engine-derived prompt for intervention.  It
   // must never turn a player click into a new obligation or rewrite the
   // historical record.  Occupation was the first such condition; unpaid

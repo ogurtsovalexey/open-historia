@@ -637,6 +637,7 @@ describe('living-world command store', () => {
     assert.equal(advanced.interpretationContext.entities.find((entry) => entry.entityId === region.entityId).legalOwnerPolityId, 'polity:austria');
     const parsed = parseIntentFirstProjection(advanced.projection);
     assert.equal(parsed.briefing.territoryEffects.length, 1);
+    assert.equal(parsed.briefing.changes.some((change) => /accepted/i.test(change.label)), true);
     const effect = parsed.briefing.territoryEffects[0];
     assert.equal(effect.fromPolityId, 'polity:france');
     assert.equal(effect.toPolityId, 'polity:austria');
