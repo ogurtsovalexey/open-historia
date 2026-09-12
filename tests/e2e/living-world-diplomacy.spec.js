@@ -178,3 +178,37 @@ test("the production shell keeps a Mesoamerican market-access proposal to Chalco
   expect(confirmed.projection.diplomacy.commitments.some((entry) => entry.title === "market access")).toBe(false);
   await request.delete(`/api/games/${gameId}`);
 });
+
+test("the production shell confirms a canonical conflict declaration without fabricating combat", async ({ page, request }) => {
+  const gameId = "living-world-conflict-e2e";
+  await request.delete(`/api/games/${gameId}`).catch(() => {});
+  const created = await request.post("/api/games", { data: {
+    id: gameId, name: "Typed conflict declaration", scenarioId: "scenario:napoleonic-europe-1805",
+    playerPolityId: "polity:france", setActive: true,
+  } });
+  expect(created.ok()).toBeTruthy();
+  const initial = await (await request.get(`/api/games/${gameId}/living-world?locale=ru`)).json();
+  const actor = initial.interpretationContext.entities.find((entry) => entry.entityId === "polity:france");
+  const text = "Объявить ограниченный конфликт Австрийской империи без заявления о занятии территории.";
+  const submitted = await request.post(`/api/games/${gameId}/living-world/intent?locale=ru`, { data: {
+    revision: initial.projection.revision, sessionRevision: initial.sessionRevision, intentions: [text],
+    modelOutput: { revision: initial.projection.revision, questions: [], claims: [], proposedInitiatives: [], requestedActions: [{
+      actionId: "action:declare-conflict", domain: "military", scope: "external", intent: text, pace: "steady",
+      effectFamilies: ["capacity.modify"], targetEntityIds: ["polity:austria"], claimRefs: [], evidenceIds: [actor.evidenceIds[0]],
+      operation: { kind: "conflict.declare", defenderPolityId: "polity:austria" }, sourceSpan: { start: 0, end: text.length, text },
+    }] },
+  } });
+  expect(submitted.ok()).toBeTruthy();
+  await page.goto(`/?gameId=${gameId}`);
+  await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
+  await page.getByTestId("intent-nav-orders").click();
+  await expect(page.getByRole("button", { name: "Подтвердить обоснованные действия" })).toBeVisible();
+  await page.getByRole("button", { name: "Подтвердить обоснованные действия" }).click();
+  await page.getByTestId("intent-nav-situations").click();
+  await expect(page.getByText(/Активный конфликт с державой «Австрийская империя»/)).toBeVisible();
+  await expect(page.getByText(/не создаёт бой, потери, оккупацию или передачу территории/)).toBeVisible();
+  const confirmed = await (await request.get(`/api/games/${gameId}/living-world?locale=ru`)).json();
+  expect(confirmed.lastTransition.declaredConflicts).toHaveLength(1);
+  expect(confirmed.lastTransition.createdMobilizations).toEqual([]);
+  await request.delete(`/api/games/${gameId}`);
+});

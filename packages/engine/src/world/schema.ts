@@ -40,6 +40,7 @@ export const conceptIdSchema = prefixedIdSchema('concept').brand<'ConceptId'>();
 export const processIdSchema = prefixedIdSchema('process').brand<'ProcessId'>();
 export const relationshipIdSchema = prefixedIdSchema('relationship').brand<'RelationshipId'>();
 export const diplomaticProposalIdSchema = prefixedIdSchema('proposal').brand<'DiplomaticProposalId'>();
+export const conflictIdSchema = prefixedIdSchema('conflict').brand<'ConflictId'>();
 export const tributeObligationIdSchema = prefixedIdSchema('obligation').brand<'TributeObligationId'>();
 export const evidenceIdSchema = prefixedIdSchema('evidence').brand<'EvidenceId'>();
 export const worldEventIdSchema = prefixedIdSchema('event').brand<'WorldEventId'>();
@@ -57,6 +58,7 @@ export type RouteClassId = z.infer<typeof routeClassIdSchema>;
 export type RouteId = z.infer<typeof routeIdSchema>;
 export type EvidenceId = z.infer<typeof evidenceIdSchema>;
 export type WorldEventId = z.infer<typeof worldEventIdSchema>;
+export type ConflictId = z.infer<typeof conflictIdSchema>;
 
 export const localizedTextSchema = z.object({
   en: nonEmptyTextSchema,
@@ -232,6 +234,20 @@ export const diplomaticProposalStateSchema = z.object({
 }).strict();
 export type DiplomaticProposalState = z.infer<typeof diplomaticProposalStateSchema>;
 
+/**
+ * A declaration is a canonical political fact, not an implicit combat result.
+ * Fronts, casualties, occupation and peace require separate typed reducers.
+ */
+export const conflictStateSchema = z.object({
+  conflictId: conflictIdSchema,
+  attackerPolityId: polityIdSchema,
+  defenderPolityId: polityIdSchema,
+  status: z.enum(['active', 'ended']),
+  declaredAtRevision: nonzeroWorldRevisionHashSchema,
+  evidenceIds: evidenceIdsSchema,
+}).strict();
+export type ConflictState = z.infer<typeof conflictStateSchema>;
+
 export const tributeObligationStateSchema = z.object({
   obligationId: tributeObligationIdSchema,
   payerPolityIds: z.array(polityIdSchema).min(1),
@@ -279,6 +295,7 @@ const entityRefSchema = z.union([
   processIdSchema,
   relationshipIdSchema,
   diplomaticProposalIdSchema,
+  conflictIdSchema,
   tributeObligationIdSchema,
 ]);
 
@@ -388,6 +405,7 @@ export const worldStateV2ContentSchema = z.object({
   processes: z.array(worldProcessStateSchema),
   relationships: z.array(relationshipStateSchema),
   diplomaticProposals: z.array(diplomaticProposalStateSchema).default([]),
+  conflicts: z.array(conflictStateSchema).default([]),
   tributeObligations: z.array(tributeObligationStateSchema).default([]),
   knowledge: knowledgeStateSchema,
   events: z.array(worldEventSchema),

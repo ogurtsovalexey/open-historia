@@ -512,6 +512,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
   }
   const createdProposals = [];
   const createdMobilizations = [];
+  const declaredConflicts = [];
   const adjustedProcesses = [];
   for (const action of playerIntent.requestedActions
     .filter((entry) => entry.material && entry.status === 'grounded' && entry.operation.kind !== 'process.propose')
@@ -531,6 +532,19 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
       state = mobilized.state;
       createdMobilizations.push({ actionId: action.actionId, formationId: mobilized.formationId, personnel: mobilized.personnel,
         originRegionId: mobilized.originRegionId, revisionAfter: state.revision });
+      continue;
+    }
+    if (operation.kind === 'conflict.declare') {
+      const declared = worldV2.declareConflict(state, {
+        conflictId: hashId('conflict', [playerIntent.interpretationId, action.actionId]),
+        attackerPolityId: playerIntent.playerPolityId,
+        defenderPolityId: operation.defenderPolityId,
+        evidenceIds: action.evidenceIds,
+        expectedRevision: state.revision,
+      });
+      state = declared.state;
+      declaredConflicts.push({ actionId: action.actionId, conflictId: declared.conflictId, defenderPolityId: operation.defenderPolityId,
+        eventId: declared.eventId, evidenceId: declared.evidenceId, revisionAfter: state.revision });
       continue;
     }
     if (operation.kind === 'process.adjust') {
@@ -567,7 +581,7 @@ function materializeConfirmedInitiatives(stateInput, playerIntent) {
     state = worldV2.proposeDiplomaticProposal(state, { ...request, evidenceIds: action.evidenceIds, expectedRevision: state.revision });
     createdProposals.push({ proposalId: request.proposalId, actionId: action.actionId, revisionAfter: state.revision });
   }
-  return { state, created, createdProposals, createdMobilizations, adjustedProcesses };
+  return { state, created, createdProposals, createdMobilizations, declaredConflicts, adjustedProcesses };
 }
 
 export const readLivingWorld = (gameId, { locale = 'en' } = {}) => response(gameId, locale);
@@ -596,6 +610,7 @@ export function confirmLivingWorldIntent(gameId, { revision, sessionRevision, in
       createdProcesses: materialized.created,
       createdDiplomaticProposals: materialized.createdProposals,
       createdMobilizations: materialized.createdMobilizations,
+      declaredConflicts: materialized.declaredConflicts,
       adjustedProcesses: materialized.adjustedProcesses,
     },
     playerIntent: { ...session.playerIntent, status: 'confirmed' },

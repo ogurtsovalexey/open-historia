@@ -314,6 +314,22 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
         evidenceIds: groundedEvidence([...ownRegion.evidenceIds, ...foreignRegion.evidenceIds], visible, snapshotEvidence),
       };
     });
+  const activeConflictSituations = state.conflicts
+    .filter((conflict) => conflict.status === 'active' && (conflict.attackerPolityId === polity.id || conflict.defenderPolityId === polity.id))
+    .sort((left, right) => left.conflictId.localeCompare(right.conflictId))
+    .map((conflict) => {
+      const opponentId = conflict.attackerPolityId === polity.id ? conflict.defenderPolityId : conflict.attackerPolityId;
+      const opponent = localized(state.polities.find((entry) => entry.id === opponentId)?.displayName, locale) || labelOf(opponentId);
+      return {
+        situationId: `situation:active-conflict-${conflict.conflictId.replaceAll(':', '-')}`,
+        title: phrase(locale, `Active conflict with ${opponent}`, `Активный конфликт с державой «${opponent}»`),
+        urgency: 'high',
+        summary: phrase(locale,
+          'The declaration is canonical. It does not itself create combat, casualties, occupation, or a territorial transfer.',
+          'Объявление конфликта канонично. Само по себе оно не создаёт бой, потери, оккупацию или передачу территории.'),
+        evidenceIds: groundedEvidence(conflict.evidenceIds, visible, snapshotEvidence),
+      };
+    });
   const pendingIntent = interpretationProjection(session.playerIntent, snapshotEvidence, locale, state);
   const last = session.lastTurn;
   const polityLabel = (id) => localized(state.polities.find((entry) => entry.id === id)?.displayName, locale) || labelOf(id);
@@ -481,6 +497,7 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
       ...tributeArrearSituations,
       ...processResistanceSituations,
       ...borderPressureSituations,
+      ...activeConflictSituations,
     ],
     diplomacy: {
       conversations: pendingProposals.map((proposal) => {
@@ -635,7 +652,7 @@ export function buildPlayerIntentContext({ session, playerPolityId, locale = 'en
     evidence,
     allowedInitiativeKinds: ['technology', 'ideology', 'institution', 'doctrine', 'movement', 'project', 'investigation', 'other'],
     allowedEffectFamilies: [...processes.materializableEffectKinds],
-    allowedDiplomaticOperations: ['process.propose', 'process.adjust', 'military.mobilize', 'diplomacy.propose', 'territory.offer'],
+    allowedDiplomaticOperations: ['process.propose', 'process.adjust', 'military.mobilize', 'conflict.declare', 'diplomacy.propose', 'territory.offer'],
     relationshipTypes: state.catalogs.relationshipTypes
       .filter((entry) => entry.playerProposable)
       .map((entry) => entry.relationshipTypeId)

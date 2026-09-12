@@ -72,6 +72,7 @@ export const requestedActionV2ModelSchema = z.object({
       regionId: entityIdSchema,
     }).strict(),
     z.object({ kind: z.literal('military.mobilize') }).strict(),
+    z.object({ kind: z.literal('conflict.declare'), defenderPolityId: entityIdSchema }).strict(),
   ]).optional(),
   targetEntityIds: z.array(entityIdSchema).max(64),
   claimRefs: z.array(interpretationIdSchema('claim')).max(64),
@@ -302,6 +303,17 @@ function operationReasons(state: worldV2.WorldStateV2, actorPolityId: string, ac
     } catch {
       reasons.push('no-eligible-controlled-recruitment-capacity');
     }
+    return reasons;
+  }
+  if (operation.kind === 'conflict.declare') {
+    const reasons: string[] = action.domain !== 'military' ? ['conflict-declaration-requires-military-domain'] : [];
+    if (!state.modules.enabled.includes('module:military')) reasons.push('military-module-disabled');
+    if (!state.polities.some((entry) => entry.id === operation.defenderPolityId)) reasons.push(`unknown-defender:${operation.defenderPolityId}`);
+    if (operation.defenderPolityId === actorPolityId) reasons.push(`self-defender:${operation.defenderPolityId}`);
+    if (state.conflicts.some((entry) => entry.status === 'active' && (
+      (entry.attackerPolityId === actorPolityId && entry.defenderPolityId === operation.defenderPolityId)
+      || (entry.attackerPolityId === operation.defenderPolityId && entry.defenderPolityId === actorPolityId)
+    ))) reasons.push(`active-conflict:${operation.defenderPolityId}`);
     return reasons;
   }
   const region = state.regions.find((entry) => entry.regionId === operation.regionId);

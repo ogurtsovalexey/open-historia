@@ -84,6 +84,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     ...state.processes.map((entry) => entry.processId as string),
     ...state.relationships.map((entry) => entry.relationshipId as string),
     ...state.diplomaticProposals.map((entry) => entry.proposalId as string),
+    ...state.conflicts.map((entry) => entry.conflictId as string),
     ...state.tributeObligations.map((entry) => entry.obligationId as string),
   ]);
 
@@ -99,6 +100,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
   checkUnique(violations, 'process', state.processes.map((entry) => entry.processId));
   checkUnique(violations, 'relationship', state.relationships.map((entry) => entry.relationshipId));
   checkUnique(violations, 'diplomatic proposal', state.diplomaticProposals.map((entry) => entry.proposalId));
+  checkUnique(violations, 'conflict', state.conflicts.map((entry) => entry.conflictId));
   checkUnique(violations, 'tribute obligation', state.tributeObligations.map((entry) => entry.obligationId));
   checkUnique(violations, 'event', state.events.map((entry) => entry.eventId));
   checkUnique(violations, 'evidence', state.evidence.map((entry) => entry.evidenceId));
@@ -430,6 +432,14 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
       }
     }
   }
+  for (const conflict of state.conflicts) {
+    assertPolity(conflict.attackerPolityId, `conflict ${conflict.conflictId} attacker`);
+    assertPolity(conflict.defenderPolityId, `conflict ${conflict.conflictId} defender`);
+    if (conflict.attackerPolityId === conflict.defenderPolityId) violations.push(`conflict ${conflict.conflictId} cannot name one polity as both sides`);
+    if (!lineageRevisions.has(conflict.declaredAtRevision)) {
+      violations.push(`conflict ${conflict.conflictId} declaration revision is not in world lineage: ${conflict.declaredAtRevision}`);
+    }
+  }
   for (const record of state.knowledge.records) {
     assertPolity(record.polityId, 'knowledge record');
     if (!conceptIds.has(record.conceptId)) violations.push(`knowledge record references unknown concept ${record.conceptId}`);
@@ -452,6 +462,7 @@ export function worldStateV2InvariantViolations(state: WorldStateV2): string[] {
     ...state.relationships.map((entry) => ({ label: `relationship ${entry.relationshipId}`, evidenceIds: entry.evidenceIds })),
     ...state.tributeObligations.map((entry) => ({ label: `tribute obligation ${entry.obligationId}`, evidenceIds: entry.evidenceIds })),
     ...state.diplomaticProposals.map((entry) => ({ label: `diplomatic proposal ${entry.proposalId}`, evidenceIds: entry.evidenceIds })),
+    ...state.conflicts.map((entry) => ({ label: `conflict ${entry.conflictId}`, evidenceIds: entry.evidenceIds })),
     ...state.knowledge.records.map((entry) => ({ label: `knowledge ${entry.polityId}/${entry.conceptId}`, evidenceIds: entry.evidenceIds })),
     ...state.events.map((entry) => ({ label: `event ${entry.eventId}`, evidenceIds: entry.evidenceIds })),
   ];

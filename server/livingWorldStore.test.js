@@ -20,6 +20,7 @@ let mobilizationGameId;
 let territoryPreviewGameId;
 let processPaceGameId;
 let previewLocalizationGameId;
+let conflictDeclarationGameId;
 let resolveLivingWorldSubmonths;
 let readEngineSession;
 let buildPlayerIntentContext;
@@ -107,6 +108,11 @@ before(async () => {
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
     name: 'Living preview localization test',
+  }).game.id;
+  conflictDeclarationGameId = library.createGame({
+    scenarioId: 'scenario:napoleonic-europe-1805',
+    playerPolityId: 'polity:france',
+    name: 'Living conflict declaration test',
   }).game.id;
 });
 
@@ -542,6 +548,39 @@ describe('living-world command store', () => {
     assert.deepEqual(formation.personnelOrigins, [{ regionId: mobilization.originRegionId, personnel: mobilization.personnel }]);
     assert.equal(state.regions.find((entry) => entry.regionId === mobilization.originRegionId)?.control.actualControllerPolityId, 'polity:france');
     assert.equal(state.events.at(-1)?.kind, 'personnel-mobilization');
+  });
+
+  it('records a grounded player conflict declaration without inventing a battle or territory change', () => {
+    const before = living.readLivingWorld(conflictDeclarationGameId, { locale: 'ru' });
+    const occupiedBefore = readEngineSession(library.getGameDirectory(conflictDeclarationGameId)).state.regions
+      .filter((entry) => entry.control.actualControllerPolityId !== entry.control.legalOwnerPolityId).length;
+    const actorEvidence = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    const text = 'Объявить ограниченный конфликт Австрийской империи без заявления о занятии территории.';
+    const submitted = living.submitLivingWorldIntent(conflictDeclarationGameId, {
+      revision: before.projection.revision, sessionRevision: before.sessionRevision, intentions: [text], locale: 'ru',
+      modelOutput: {
+        revision: before.projection.revision, questions: [], claims: [], proposedInitiatives: [], requestedActions: [{
+          actionId: 'action:declare-conflict', domain: 'military', scope: 'external', intent: text, pace: 'steady',
+          effectFamilies: ['capacity.modify'], targetEntityIds: ['polity:austria'], claimRefs: [], evidenceIds: [actorEvidence],
+          operation: { kind: 'conflict.declare', defenderPolityId: 'polity:austria' }, sourceSpan: { start: 0, end: text.length, text },
+        }],
+      },
+    });
+    assert.equal(submitted.projection.interpretation.requestedActions[0].status, 'grounded');
+    const confirmed = living.confirmLivingWorldIntent(conflictDeclarationGameId, {
+      revision: submitted.projection.revision, sessionRevision: submitted.sessionRevision,
+      interpretationId: submitted.projection.interpretation.interpretationId, locale: 'ru',
+    });
+    const declaration = confirmed.lastTransition.declaredConflicts[0];
+    assert.ok(declaration);
+    const state = readEngineSession(library.getGameDirectory(conflictDeclarationGameId)).state;
+    assert.deepEqual(state.conflicts.map((entry) => ({ attacker: entry.attackerPolityId, defender: entry.defenderPolityId, status: entry.status })), [
+      { attacker: 'polity:france', defender: 'polity:austria', status: 'active' },
+    ]);
+    assert.equal(state.events.at(-1)?.kind, 'conflict-declared');
+    assert.equal(state.regions.filter((entry) => entry.control.actualControllerPolityId !== entry.control.legalOwnerPolityId).length, occupiedBefore);
+    assert.ok(confirmed.projection.situations.some((entry) => /Активный конфликт/u.test(entry.title)));
+    assert.match(confirmed.projection.situations.find((entry) => /Активный конфликт/u.test(entry.title)).summary, /не создаёт бой/u);
   });
 
   it('previews a grounded territorial offer as pending rather than blocked and leaves control unchanged until acceptance', () => {
