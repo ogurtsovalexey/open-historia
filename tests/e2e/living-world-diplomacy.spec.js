@@ -210,5 +210,10 @@ test("the production shell confirms a canonical conflict declaration without fab
   const confirmed = await (await request.get(`/api/games/${gameId}/living-world?locale=ru`)).json();
   expect(confirmed.lastTransition.declaredConflicts).toHaveLength(1);
   expect(confirmed.lastTransition.createdMobilizations).toEqual([]);
+  const austriaTask = confirmed.strategicTasks.find((task) => task.actorPolityId === "polity:austria");
+  expect(austriaTask.brief.checkpoint.reason).toBe("war");
+  expect(austriaTask.brief.materialSituation).toEqual(expect.arrayContaining([
+    expect.objectContaining({ domain: "military", severity: "critical" }),
+  ]));
   await request.delete(`/api/games/${gameId}`);
 });

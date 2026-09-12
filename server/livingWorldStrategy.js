@@ -75,7 +75,7 @@ function visibleEvidence(state, polityId) {
     }));
 }
 
-function buildBrief(state, polity, strategicState, pendingProposals = []) {
+function buildBrief(state, polity, strategicState, pendingProposals = [], activeConflicts = []) {
   const evidence = visibleEvidence(state, polity.id);
   if (evidence.length === 0) return null;
   const factId = evidence[0].evidenceId;
@@ -124,6 +124,17 @@ function buildBrief(state, polity, strategicState, pendingProposals = []) {
       },
     }));
   });
+  const conflictSituations = activeConflicts.map((conflict) => {
+    const opponentId = conflict.attackerPolityId === polity.id ? conflict.defenderPolityId : conflict.attackerPolityId;
+    const opponent = state.polities.find((entry) => entry.id === opponentId);
+    const factsUsed = conflict.evidenceIds.filter((id) => evidence.some((entry) => entry.evidenceId === id)).slice(0, 12);
+    return {
+      situationId: `situation:conflict-${conflict.conflictId.slice('conflict:'.length)}`,
+      domain: 'military', severity: 'critical',
+      summary: `An active conflict with ${localized(opponent?.displayName) ?? labelOf(opponentId)} is canonical. No battle or territorial result is implied.`,
+      factsUsed: factsUsed.length > 0 ? factsUsed : [factId],
+    };
+  });
   const brief = {
     schemaVersion: 'open-historia-strategic-brief/5',
     decisionSchemaVersion: 'open-historia-strategic-decision/4',
@@ -132,8 +143,9 @@ function buildBrief(state, polity, strategicState, pendingProposals = []) {
     month: state.month,
     revision: state.revision,
     checkpoint: {
-      checkpointId, reason: 'scheduled-quarter', required: true,
-      summary: 'Staggered quarterly strategic review.', triggerIds: [],
+      checkpointId, reason: activeConflicts.length > 0 ? 'war' : 'scheduled-quarter', required: true,
+      summary: activeConflicts.length > 0 ? 'A directly involved conflict requires a bounded strategic review.' : 'Staggered quarterly strategic review.',
+      triggerIds: activeConflicts.map((entry) => entry.conflictId),
     },
     goals: [{ goalId: `goal:preserve-${polity.id.slice(7)}`, summary: 'Preserve sovereignty and useful capacity.', factsUsed: [factId] }],
     redLines: ['Do not rely on invented history, resources, territory, forces, or completed outcomes.'],
@@ -141,7 +153,7 @@ function buildBrief(state, polity, strategicState, pendingProposals = []) {
       situationId: `situation:condition-${polity.id.slice(7)}`, domain: 'general', severity: 'watch',
       summary: `${snapshot.controlledPopulation} people under actual control; treasury ${snapshot.treasury}; fielded personnel ${snapshot.fieldedPersonnel}.`,
       factsUsed: [factId],
-    }],
+    }, ...conflictSituations],
     claims: [], evidence, frozenChoices, processOptions,
     initiativeEnvelope: {
       allowedConceptTypes: ['technology', 'ideology', 'religious-movement', 'institution', 'doctrine', 'economic-practice', 'scientific-theory'],
@@ -179,7 +191,17 @@ export function buildLivingWorldStrategicTasks(state, playerPolityId, strategicS
       pendingByRecipient.set(recipientId, proposals);
     }
   }
-  const directedPolityIds = new Set([...(options.directedPolityIds ?? []), ...pendingByRecipient.keys()]);
+  const conflictsByOpponent = new Map();
+  for (const conflict of state.conflicts.filter((entry) => entry.status === 'active')) {
+    const opponentId = conflict.attackerPolityId === playerPolityId
+      ? conflict.defenderPolityId
+      : conflict.defenderPolityId === playerPolityId ? conflict.attackerPolityId : null;
+    if (!opponentId) continue;
+    const rows = conflictsByOpponent.get(opponentId) ?? [];
+    rows.push(conflict);
+    conflictsByOpponent.set(opponentId, rows);
+  }
+  const directedPolityIds = new Set([...(options.directedPolityIds ?? []), ...pendingByRecipient.keys(), ...conflictsByOpponent.keys()]);
   const backgroundTaskLimit = options.backgroundTaskLimit ?? BACKGROUND_TASK_LIMIT;
   const actors = state.polities
     .filter((polity) => polity.id !== playerPolityId && polity.decisionMode !== 'inert')
@@ -193,7 +215,8 @@ export function buildLivingWorldStrategicTasks(state, playerPolityId, strategicS
   )).slice(0, backgroundTaskLimit);
   return [...directed, ...background].map((polity) => {
     const proposals = (pendingByRecipient.get(polity.id) ?? []).sort((left, right) => left.proposalId.localeCompare(right.proposalId));
-    const brief = buildBrief(state, polity, strategicState, proposals);
+    const conflicts = (conflictsByOpponent.get(polity.id) ?? []).sort((left, right) => left.conflictId.localeCompare(right.conflictId));
+    const brief = buildBrief(state, polity, strategicState, proposals, conflicts);
     if (!brief) return null;
     const taskKey = `strategic-v5:${state.turn}:${polity.id}`;
     return {

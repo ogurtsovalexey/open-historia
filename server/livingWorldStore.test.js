@@ -584,6 +584,10 @@ describe('living-world command store', () => {
     assert.equal(state.regions.filter((entry) => entry.control.actualControllerPolityId !== entry.control.legalOwnerPolityId).length, occupiedBefore);
     assert.ok(confirmed.projection.situations.some((entry) => /Активный конфликт/u.test(entry.title)));
     assert.match(confirmed.projection.situations.find((entry) => /Активный конфликт/u.test(entry.title)).summary, /не создаёт бой/u);
+    const austriaTask = confirmed.strategicTasks.find((task) => task.actorPolityId === 'polity:austria');
+    assert.ok(austriaTask);
+    assert.equal(austriaTask.brief.checkpoint.reason, 'war');
+    assert.ok(austriaTask.brief.materialSituation.some((entry) => entry.domain === 'military' && entry.severity === 'critical'));
   });
 
   it('previews a grounded territorial offer as pending rather than blocked and leaves control unchanged until acceptance', () => {
