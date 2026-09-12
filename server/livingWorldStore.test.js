@@ -560,7 +560,7 @@ describe('living-world command store', () => {
       revision: before.projection.revision, sessionRevision: before.sessionRevision, intentions: [text], locale: 'ru',
       modelOutput: {
         revision: before.projection.revision, questions: [], claims: [], proposedInitiatives: [], requestedActions: [{
-          actionId: 'action:declare-conflict', domain: 'military', scope: 'external', intent: text, pace: 'steady',
+          actionId: 'action:declare-conflict', domain: 'diplomacy', scope: 'external', intent: text, pace: 'steady',
           effectFamilies: ['capacity.modify'], targetEntityIds: ['polity:austria'], claimRefs: [], evidenceIds: [actorEvidence],
           operation: { kind: 'conflict.declare', defenderPolityId: 'polity:austria' }, sourceSpan: { start: 0, end: text.length, text },
         }],

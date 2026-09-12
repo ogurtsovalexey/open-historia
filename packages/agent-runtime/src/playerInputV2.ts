@@ -306,7 +306,11 @@ function operationReasons(state: worldV2.WorldStateV2, actorPolityId: string, ac
     return reasons;
   }
   if (operation.kind === 'conflict.declare') {
-    const reasons: string[] = action.domain !== 'military' ? ['conflict-declaration-requires-military-domain'] : [];
+    // A declaration is a political act that authorizes a military conflict;
+    // the semantic classifier may reasonably identify either side of that
+    // boundary.  Its legal target and every material consequence remain
+    // engine-owned, so accepting both domains does not broaden authority.
+    const reasons: string[] = !['military', 'diplomacy'].includes(action.domain) ? ['conflict-declaration-requires-military-or-diplomacy-domain'] : [];
     if (!state.modules.enabled.includes('module:military')) reasons.push('military-module-disabled');
     if (!state.polities.some((entry) => entry.id === operation.defenderPolityId)) reasons.push(`unknown-defender:${operation.defenderPolityId}`);
     if (operation.defenderPolityId === actorPolityId) reasons.push(`self-defender:${operation.defenderPolityId}`);

@@ -193,7 +193,7 @@ test("the production shell confirms a canonical conflict declaration without fab
   const submitted = await request.post(`/api/games/${gameId}/living-world/intent?locale=ru`, { data: {
     revision: initial.projection.revision, sessionRevision: initial.sessionRevision, intentions: [text],
     modelOutput: { revision: initial.projection.revision, questions: [], claims: [], proposedInitiatives: [], requestedActions: [{
-      actionId: "action:declare-conflict", domain: "military", scope: "external", intent: text, pace: "steady",
+      actionId: "action:declare-conflict", domain: "diplomacy", scope: "external", intent: text, pace: "steady",
       effectFamilies: ["capacity.modify"], targetEntityIds: ["polity:austria"], claimRefs: [], evidenceIds: [actor.evidenceIds[0]],
       operation: { kind: "conflict.declare", defenderPolityId: "polity:austria" }, sourceSpan: { start: 0, end: text.length, text },
     }] },
