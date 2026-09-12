@@ -1,8 +1,8 @@
 /*! Open Historia — portions (mobile search layout) © 2026 Nicholas Krol, MIT (see src/Editor/LICENSE). */
 import React, { memo, useEffect, useRef, useState } from "react";
 import { useIsMobile } from "../../runtime/useIsMobile.js";
+import { getStoredLanguage } from "../../runtime/i18n.js";
 
-const SEARCH_HEADERS = { "Accept-Language": "en, *;q=0.5" };
 const SEARCH_RESULT_CACHE = new Map();
 
 const formatSuggestion = (suggestion) => {
@@ -40,27 +40,27 @@ const dedup = (results) => {
   });
 };
 
-const buildSearchParams = (query, limit) =>
+const buildSearchParams = (query, limit, locale) =>
   new URLSearchParams({
     q: query,
     format: "json",
     limit: String(limit),
     addressdetails: "1",
     namedetails: "1",
-    "accept-language": "en",
-    accept_language: "en",
+    "accept-language": locale,
+    accept_language: locale,
   });
 
-const fetchPlaces = async (query, limit, { signal } = {}) => {
+const fetchPlaces = async (query, limit, { locale = "en", signal } = {}) => {
   const trimmedQuery = query.trim();
-  const cacheKey = `${trimmedQuery.toLowerCase()}::${limit}`;
+  const cacheKey = `${locale}::${trimmedQuery.toLowerCase()}::${limit}`;
   if (SEARCH_RESULT_CACHE.has(cacheKey)) {
     return SEARCH_RESULT_CACHE.get(cacheKey);
   }
 
   const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?${buildSearchParams(trimmedQuery, limit)}`,
-    { headers: SEARCH_HEADERS, signal },
+    `https://nominatim.openstreetmap.org/search?${buildSearchParams(trimmedQuery, limit, locale)}`,
+    { headers: { "Accept-Language": `${locale}, *;q=0.5` }, signal },
   );
   if (!response.ok) {
     throw new Error(`Search failed: HTTP ${response.status}`);
@@ -143,6 +143,7 @@ const getIcon = (suggestion) => {
 
 const Search = memo(({ mapRef }) => {
   const isMobile = useIsMobile();
+  const locale = String(getStoredLanguage()).toLowerCase().startsWith("ru") ? "ru" : "en";
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState(null);
@@ -175,7 +176,7 @@ const Search = memo(({ mapRef }) => {
       searchAbortRef.current = controller;
 
       try {
-        const results = await fetchPlaces(query, 5, { signal: controller.signal });
+        const results = await fetchPlaces(query, 5, { locale, signal: controller.signal });
         if (searchAbortRef.current !== controller) return;
         setSuggestions(results);
         setSelectedIndex(-1);
@@ -189,7 +190,7 @@ const Search = memo(({ mapRef }) => {
       clearTimeout(debounceRef.current);
       searchAbortRef.current?.abort();
     };
-  }, [query]);
+  }, [locale, query]);
 
   const close = () => {
     clearTimeout(debounceRef.current);
@@ -220,7 +221,7 @@ const Search = memo(({ mapRef }) => {
     setSuggestions([]);
 
     try {
-      const [result] = await fetchPlaces(place, 1);
+      const [result] = await fetchPlaces(place, 1, { locale });
       if (!result) {
         setStatus("error");
         return;
@@ -322,7 +323,7 @@ const Search = memo(({ mapRef }) => {
             color: status === "error" ? "#f87171" : "rgba(255,255,255,0.8)",
             transition: "color 0.2s",
           }}
-          title={expanded ? "Close" : "Search place"}
+          title={expanded ? (locale === "ru" ? "Закрыть" : "Close") : (locale === "ru" ? "Найти место" : "Search place")}
         >
           {status === "loading" ? (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -359,7 +360,9 @@ const Search = memo(({ mapRef }) => {
             setStatus(null);
           }}
           onKeyDown={handleKeyDown}
-          placeholder={status === "error" ? "Place not found..." : "Search place..."}
+          placeholder={status === "error"
+            ? (locale === "ru" ? "Место не найдено..." : "Place not found...")
+            : (locale === "ru" ? "Найти место..." : "Search place...")}
           style={{
             background: "none",
             border: "none",
