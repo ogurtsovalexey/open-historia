@@ -178,12 +178,17 @@ const localizeIntentPreviewText = (value, locale) => {
   if (!isRussian(locale)) return raw;
   const reserve = /^(\d+) reserve personnel drawn from current controlled recruitment$/u.exec(raw);
   if (reserve) return `${reserve[1]} резервных военнослужащих из доступного набора под текущим контролем`;
+  const initialTreasury = /^(\d+) initial treasury commitment$/u.exec(raw);
+  if (initialTreasury) return `${initialTreasury[1]} первоначальное обязательство казны`;
+  const institutionalCommitment = /^(\d+) treasury plus committed institutional capacity$/u.exec(raw);
+  if (institutionalCommitment) return `${institutionalCommitment[1]} из казны и задействованная институциональная мощность`;
   const workforce = /^(\d+) fewer people in the civilian workforce; origin (.+)$/u.exec(raw);
   if (workforce) return `${workforce[1]} человек меньше в гражданской рабочей силе; источник: ${RUSSIAN_HISTORICAL_NAMES[workforce[2]] ?? workforce[2]}`;
   const known = {
     'Reserve formation is recorded now; readiness remains subject to later world conditions': 'Резерв создаётся сейчас; готовность зависит от дальнейших условий мира.',
     'Material blockers or opposition can slow the process at later checkpoints': 'Материальные ограничения или сопротивление могут замедлить процесс на следующих проверках.',
     'No immediate treasury commitment; frozen proposal terms will be recorded': 'Немедленных затрат казны нет; условия предложения будут зафиксированы.',
+    'Multi-stage; pace is rechecked at each monthly resolution': 'Многоэтапный процесс; темп перепроверяется при каждом месячном расчёте.',
     'No additional immediate treasury commitment; the existing process commitment remains in force': 'Новых немедленных затрат казны нет; обязательство по уже идущему процессу сохраняется.',
     'No currently feasible material commitment': 'Сейчас нет осуществимого материального обязательства.',
     'Applied at the next monthly resolution; pace remains subject to engine feasibility': 'Будет применено при следующем месячном расчёте; темп остаётся ограничен осуществимостью для движка.',

@@ -19,6 +19,7 @@ let duplicateCandidateGameId;
 let mobilizationGameId;
 let territoryPreviewGameId;
 let processPaceGameId;
+let previewLocalizationGameId;
 let resolveLivingWorldSubmonths;
 let readEngineSession;
 let buildPlayerIntentContext;
@@ -101,6 +102,11 @@ before(async () => {
     scenarioId: 'scenario:napoleonic-europe-1805',
     playerPolityId: 'polity:france',
     name: 'Living process pace adjustment test',
+  }).game.id;
+  previewLocalizationGameId = library.createGame({
+    scenarioId: 'scenario:napoleonic-europe-1805',
+    playerPolityId: 'polity:france',
+    name: 'Living preview localization test',
   }).game.id;
 });
 
@@ -186,6 +192,27 @@ describe('living-world command store', () => {
     assert.deepEqual(timeAdvance.causes, [{
       category: 'other', label: 'Подтверждённое продвижение времени', contribution: 'Один календарный месяц',
     }]);
+  });
+
+  it('localizes dynamic engine-derived process preview amounts without trusting model prose', () => {
+    const before = living.readLivingWorld(previewLocalizationGameId);
+    const actorEvidence = before.interpretationContext.entities.find((entry) => entry.entityId === 'polity:france').evidenceIds[0];
+    const text = 'Build a bounded supply depot process.';
+    const submitted = living.submitLivingWorldIntent(previewLocalizationGameId, {
+      revision: before.projection.revision, sessionRevision: before.sessionRevision, intentions: [text],
+      modelOutput: {
+        revision: before.projection.revision, questions: [], claims: [], proposedInitiatives: [], requestedActions: [{
+          actionId: 'action:localized-preview', domain: 'administration', scope: 'domestic', intent: text, pace: 'steady',
+          effectFamilies: ['capacity.modify'], targetEntityIds: ['polity:france'], claimRefs: [], evidenceIds: [actorEvidence],
+          operation: { kind: 'process.propose' }, sourceSpan: { start: 0, end: text.length, text },
+        }],
+      },
+    });
+    const russian = living.readLivingWorld(previewLocalizationGameId, { locale: 'ru' });
+    assert.equal(russian.projection.interpretation.interpretationId, submitted.projection.interpretation.interpretationId);
+    assert.match(russian.projection.interpretation.preview.cost.label, /первоначальное обязательство казны/u);
+    assert.match(russian.projection.interpretation.preview.duration.label, /Многоэтапный процесс/u);
+    assert.match(russian.projection.interpretation.preview.opportunityCosts.join(' '), /задействованная институциональная мощность/u);
   });
 
   it('projects unsettled canonical tribute as a non-material situation', () => {
