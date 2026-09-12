@@ -180,6 +180,12 @@ describe('living-world command store', () => {
     assert.deepEqual(advanced.lastTransition.modelMetadata, {
       role: 'strategic', provider: 'codex-subscription', model: 'gpt-5.6-luna', effort: 'low',
     });
+    const russian = living.readLivingWorld(mesoGameId, { locale: 'ru' });
+    const timeAdvance = russian.projection.briefing.changes.find((entry) => entry.changeId.startsWith('change:clock-'));
+    assert.match(timeAdvance.label, /Время продвинулось/u);
+    assert.deepEqual(timeAdvance.causes, [{
+      category: 'other', label: 'Подтверждённое продвижение времени', contribution: 'Один календарный месяц',
+    }]);
   });
 
   it('projects unsettled canonical tribute as a non-material situation', () => {

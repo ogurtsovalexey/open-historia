@@ -318,7 +318,11 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     ),
     authority: 'canonical',
     evidenceIds: groundedEvidence([last.clock?.evidenceId], visible, snapshotEvidence),
-    causes: [{ category: 'other', label: 'Confirmed time advance', contribution: 'One calendar month' }],
+    causes: [{
+      category: 'other',
+      label: phrase(locale, 'Confirmed time advance', 'Подтверждённое продвижение времени'),
+      contribution: phrase(locale, 'One calendar month', 'Один календарный месяц'),
+    }],
   }, ...(last.strategicRecords ?? []).flatMap((record) => (record.proposalResponses ?? []).map((response) => {
     const proposal = state.diplomaticProposals.find((entry) => entry.proposalId === response.proposalId);
     if (!proposal) return null;
