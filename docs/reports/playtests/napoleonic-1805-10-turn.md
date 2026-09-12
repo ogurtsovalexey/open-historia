@@ -112,3 +112,39 @@ still shows Hanover legally owned by `polity:hanover` and actually controlled
 by `polity:france`; it also records the Paris offer as `rejected`, with Paris
 still under French legal and actual control. This is a live political/occupation
 response without a prose-created sovereignty or territorial transfer.
+
+## UI rerun with Terra medium (2026-09-12)
+
+A separate campaign, `1805-3`, was created and played through the production
+browser UI as the French Empire.  It reached ten player decisions and thirty
+monthly engine boundaries (`1805-01-01` to `1807-07-01`).  The configured
+Utility and Strategic calls both report `codex-subscription`,
+`gpt-5.6-terra`, and `medium` effort in the audit; no game-state mutation was
+sent to a gameplay endpoint outside the interface.
+
+The run deliberately exercised different ordinary player-facing paths: a
+grounded supply process, a bounded Bavarian coalition proposal that was
+accepted, a constrained optical-service process, a population-bound French
+reserve, steady process adjustments, an attempted unsupported military intent
+that the UI returned for clarification, and a false historical claim.  The
+false claim was contradicted by canonical evidence rather than becoming a
+world fact.  The accepted coalition was rendered in Russian as a coalition
+negotiation; the later briefing and intent-preview paths were also inspected
+in Russian.
+
+| Field | Terra UI rerun value |
+| --- | --- |
+| Campaign / country | `1805-3` / French Empire |
+| Date / engine turn / decisions | `1807-07-01` / `30` / `10` |
+| Population / workforce / fielded personnel | `30,100,000` / `14,455,456` / `293,337` |
+| Available manpower / supply capacity | `3,222,659` / `117,994` |
+| Confirmed semantic intents / contradicted claims | `7` / `1` |
+| Replay checksum | `sha256:931627e372e3f280f1b045c33ba406308aa0c6ea52f7a15708eb487acd3c79e4` |
+| Audit checksum | `sha256:6f341ea98cf32484d598520b999277b44b67aaca4b0ea838254563c841e309c9` |
+
+The audit contains only semantic intent evidence (fingerprints, action kinds,
+grounding status and canonical revisions), never raw player text or model
+prompts/responses.  This rerun strengthens end-to-end UI and provenance
+coverage, but does **not** substitute for the still-open direct tests of every
+individual WP15 political outcome, especially combat, occupation, peace and
+territorial transfer.
