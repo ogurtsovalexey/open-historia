@@ -78,5 +78,12 @@ test("a living-world territorial offer remains pending until the addressed polit
   expect(advanced.projection.briefing.territoryEffects[0]).toMatchObject({
     fromPolityId: "polity:france", toPolityId: "polity:austria",
   });
+  const russianAdvanced = await (await request.get(`/api/games/${gameId}/living-world?locale=ru`)).json();
+  const acceptedOutcome = russianAdvanced.projection.briefing.changes.find((change) => change.magnitude === 'Принято');
+  expect(acceptedOutcome.label).toMatch(/^Австрийская империя приняла предложение:/);
+  await page.reload();
+  await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
+  await page.getByTestId("intent-nav-briefing").click();
+  await expect(page.getByText(acceptedOutcome.label)).toBeVisible();
   await request.delete(`/api/games/${gameId}`);
 });
