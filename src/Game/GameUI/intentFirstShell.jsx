@@ -111,7 +111,7 @@ export const IntentFirstShell = ({ projection: rawProjection, commands: rawComma
       </main>
       <footer className="oh-intent-footer">
         <div className="oh-intent-footer-meta"><strong>{projection.time.label}</strong> · {projection.playerPolity.displayName}
-          {projection.time.completedSubmonths > 0 && <span data-testid="turn-resolution-progress"> · {projection.time.completedSubmonths}/{projection.time.totalSubmonths} monthly boundaries resolved</span>}
+          {projection.time.completedSubmonths > 0 && <span data-testid="turn-resolution-progress"> · {projection.time.completedSubmonths}/{projection.time.totalSubmonths} {intentText(locale, "monthly boundaries resolved")}</span>}
         </div>
         {projection.strategicCheckpoint && (
           <div className="oh-intent-card" data-testid="strategic-checkpoint" role="status">

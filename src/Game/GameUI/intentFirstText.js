@@ -1,6 +1,7 @@
 const RU = Object.freeze({
   Briefing: "Сводка", Orders: "Решения", Diplomacy: "Дипломатия", Country: "Страна", Situations: "Ситуации", Details: "Подробности",
   "Advance three months": "Продолжить на три месяца", "Time unavailable": "Время недоступно", "Strategic decision required": "Нужно стратегическое решение",
+  "monthly boundaries resolved": "месячных границ рассчитано",
   Retry: "Повторить", "Continue without this decision": "Продолжить без этого решения", "What changed": "Что изменилось",
   "No material changes since the previous decision.": "С прошлого решения существенных изменений нет.",
   "Territorial transition": "Территориальный переход", Population: "Население", "Tax base": "Налоговая база", "Productive capacity": "Производственная мощность",

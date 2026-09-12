@@ -2054,11 +2054,11 @@ const LibraryTopBar = () => {
           </div>
           <button
             onClick={() => setMenuOpen(true)}
-            title="Leave this game and return to the main menu"
+            title={russianUi ? "Выйти из игры и вернуться в главное меню" : "Leave this game and return to the main menu"}
             type="button"
             style={{ ...actionButtonStyle, ...surfaceStyle, borderRadius: "999px", fontSize: "0.74rem", minHeight: "0", padding: "0.5rem 0.85rem" }}
           >
-            ⌂ Exit Game
+            ⌂ {russianUi ? "Выйти из игры" : "Exit Game"}
           </button>
           {/* Shut the server down (phones/Termux have no terminal handy). Hidden
               on the hosted website (web build) — there's no local server to stop
@@ -2066,7 +2066,7 @@ const LibraryTopBar = () => {
           {!import.meta.env.VITE_OH_WEB && (
             <button
               onClick={handleShutdownServer}
-              title="Exit: shut down the Open Historia server"
+              title={russianUi ? "Выход: остановить сервер Open Historia" : "Exit: shut down the Open Historia server"}
               type="button"
               style={{
                 ...actionButtonStyle,
