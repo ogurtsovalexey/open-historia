@@ -89,6 +89,17 @@ const isPreExplicitCatalogWorld = (rawState) => (
   && legacyWorldRevision(rawState) === rawState.revision
 );
 
+// `conflicts` was added as an explicitly empty, canonical V2 collection.
+// Its absence is only compatible when the immutable historic payload hashes
+// exactly as it was stored; any populated or tampered conflict-looking value
+// still fails closed.  Re-stamping retains every old fact and adds only `[]`.
+const isPreConflictCollectionWorld = (rawState) => (
+  rawState?.schemaVersion === "open-historia-world/2"
+  && !Object.hasOwn(rawState, "conflicts")
+  && typeof rawState?.revision === "string"
+  && legacyWorldRevision(rawState) === rawState.revision
+);
+
 // Kept public for read-only tooling (for example, the playtest audit).  Every
 // consumer of immutable session revisions must apply the same deliberately
 // narrow compatibility rule as the live server; otherwise an old but valid
@@ -97,7 +108,7 @@ export const parsePersistedWorldState = (rawState) => {
   try {
     return { state: worldV2.parseWorldStateV2(rawState), migrated: false };
   } catch (error) {
-    if (!isPreExplicitCatalogWorld(rawState)) throw error;
+    if (!isPreExplicitCatalogWorld(rawState) && !isPreConflictCollectionWorld(rawState)) throw error;
     const { revision: _legacyRevision, ...legacyContent } = rawState;
     void _legacyRevision;
     return { state: worldV2.stampWorldStateRevision(legacyContent), migrated: true };

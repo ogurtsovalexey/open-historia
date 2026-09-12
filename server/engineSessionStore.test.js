@@ -105,7 +105,7 @@ describe("atomic WorldStateV2 sessions", { concurrency: false }, () => {
     assert.throws(() => readEngineSession(root), (error) => error instanceof EngineSessionError && error.code === "CORRUPT_SESSION");
   });
 
-  it("reads and rebases only a hash-verified pre-explicit-catalog V2 save", () => {
+  it("reads and rebases only a hash-verified V2 save missing explicit catalog and conflict collections", () => {
     const root = gameDir();
     const compiled = compiledWorld();
     const first = commitLivingWorldSession(root, {
@@ -116,6 +116,7 @@ describe("atomic WorldStateV2 sessions", { concurrency: false }, () => {
     const legacyState = JSON.parse(fs.readFileSync(path.join(firstDirectory, "world-state.json"), "utf8"));
     for (const region of legacyState.regions) delete region.adjacentRegionIds;
     for (const relationshipType of legacyState.catalogs.relationshipTypes) delete relationshipType.playerProposable;
+    delete legacyState.conflicts;
     const { revision: _revision, ...legacyContent } = legacyState;
     void _revision;
     legacyState.revision = sha256(canonicalStringify(legacyContent));
@@ -148,6 +149,7 @@ describe("atomic WorldStateV2 sessions", { concurrency: false }, () => {
     assert.equal(migrated.manifest.worldRevision, migrated.state.revision);
     assert.equal(migrated.state.regions.every((region) => Array.isArray(region.adjacentRegionIds)), true);
     assert.equal(migrated.state.catalogs.relationshipTypes.every((entry) => typeof entry.playerProposable === "boolean"), true);
+    assert.deepEqual(migrated.state.conflicts, []);
 
     const rebased = commitLivingWorldSession(root, {
       expectedRevision: migrated.manifest.revision, gameId: "living-game", scenarioId: compiled.seed.id,
