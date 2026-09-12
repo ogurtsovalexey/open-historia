@@ -20,6 +20,7 @@ export function playerInputModelJsonSchema(context) {
   const adjustableProcessIds = context.entities
     .filter((entry) => entry.kind === "process" && entry.status === "active")
     .map((entry) => entry.entityId);
+  const polityIds = context.entities.filter((entry) => entry.kind === "polity").map((entry) => entry.entityId);
   const claimableRegionIds = context.claimableRegionRefs?.map((entry) => entry.entityId) ?? entityIds;
   const evidenceIds = context.evidence.map((entry) => entry.evidenceId);
   const entityId = { type: "string", enum: entityIds };
@@ -39,6 +40,10 @@ export function playerInputModelJsonSchema(context) {
         recipientPolityId: entityId,
         regionId: entityId,
       }),
+      ...(context.allowedDiplomaticOperations?.includes("conflict.declare") ? [object({
+        kind: { type: "string", const: "conflict.declare" },
+        defenderPolityId: { type: "string", enum: polityIds },
+      })] : []),
     ],
   };
   return object({
@@ -106,7 +111,7 @@ export function renderPlayerInputPrompt(context, playerText) {
     "[DERIVED_CHANGES]",
     JSON.stringify({ note: "No prose in this section is canonical unless linked to supplied evidence." }),
     "[LEGAL_CHOICES]",
-    JSON.stringify({ operations: context.allowedDiplomaticOperations, relationshipTypes: context.relationshipTypes, note: "Extract future requests; never convert a past claim into a completed action. Territory offers and relationship proposals are pending negotiations, never completed agreements." }),
+    JSON.stringify({ operations: context.allowedDiplomaticOperations, relationshipTypes: context.relationshipTypes, note: "Extract future requests; never convert a past claim into a completed action. Territory offers and relationship proposals are pending negotiations, never completed agreements. A conflict declaration records only a political conflict; it never creates a battle, casualties, occupation, or territorial transfer." }),
     "[OPEN_INITIATIVE_CONTRACT]",
     JSON.stringify({ kinds: context.allowedInitiativeKinds, rule: "A novel idea becomes only a proposed initiative, never an accomplished capability." }),
     "[UNTRUSTED_PLAYER_TEXT]",

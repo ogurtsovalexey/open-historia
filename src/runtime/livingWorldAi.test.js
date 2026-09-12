@@ -15,7 +15,7 @@ const context = {
   evidence: [{ evidenceId: "evidence:test", kind: "authored" }],
   allowedInitiativeKinds: ["technology"],
   allowedEffectFamilies: ["capacity.modify"],
-  allowedDiplomaticOperations: ["process.propose", "territory.offer"],
+  allowedDiplomaticOperations: ["process.propose", "territory.offer", "conflict.declare"],
   relationshipTypes: ["relationship-type:alliance"],
 };
 
@@ -49,9 +49,15 @@ describe("living-world semantic AI boundary", () => {
     assert.ok(operationByKind.has("military.mobilize"));
     assert.ok(operationByKind.has("process.adjust"));
     assert.ok(operationByKind.has("territory.offer"));
+    assert.ok(operationByKind.has("conflict.declare"));
     assert.deepEqual(operationByKind.get("process.adjust").properties.processId.enum, ["process:active"]);
     assert.equal(JSON.stringify(operation).includes("administrationAccessBp"), false);
     assert.equal(JSON.stringify(operation).includes("authority"), false);
     assert.equal(JSON.stringify(schema).includes("numericEffects"), false);
+  });
+
+  it("makes the non-combat boundary of a conflict declaration explicit to the model", () => {
+    const prompt = renderPlayerInputPrompt(context, "Declare a conflict.");
+    assert.match(prompt, /never creates a battle, casualties, occupation, or territorial transfer/i);
   });
 });
