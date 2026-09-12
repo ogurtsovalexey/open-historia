@@ -54,7 +54,8 @@
 .oh-intent-card { padding: 0.85rem; background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 13px; }
 .oh-intent-card-grid { display: grid; gap: 0.65rem; }
 .oh-intent-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
-.oh-intent-value { color: #fff8e8; font-weight: 650; text-align: right; }
+.oh-intent-card-header > :first-child { min-width: 0; overflow-wrap: anywhere; }
+.oh-intent-value { min-width: 0; max-width: 46%; color: #fff8e8; font-weight: 650; overflow-wrap: anywhere; text-align: right; }
 .oh-intent-tag { display: inline-flex; width: max-content; padding: 0.2rem 0.45rem; border-radius: 999px; color: #dbe6f5; background: rgba(148, 163, 184, 0.16); font-size: 0.7rem; }
 .oh-intent-tag[data-tone="positive"] { color: #a7f3d0; background: rgba(16, 185, 129, 0.14); }
 .oh-intent-tag[data-tone="warning"] { color: #fde68a; background: rgba(245, 158, 11, 0.15); }

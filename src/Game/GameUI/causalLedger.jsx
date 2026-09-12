@@ -9,6 +9,10 @@ const authorityLabel = {
   unknown: "Unknown",
 };
 
+const causeCategoryLabel = {
+  other: "Other",
+};
+
 export const GroundedValue = ({ fact, locale }) => (
   <article className="oh-intent-card" data-testid={`grounded-fact-${fact.factId}`}>
     <div className="oh-intent-card-header">
@@ -33,7 +37,7 @@ export const WhyDisclosure = ({ reasons = [], evidenceCount = 0, causes = [], so
     <div className="oh-intent-why-body">
       {causes.map((cause, index) => (
         <div key={`${cause.label}-${index}`}>
-          <span className="oh-intent-cause-category">{cause.category.replaceAll("-", " ")}</span>{" "}
+          <span className="oh-intent-cause-category">{intentText(locale, causeCategoryLabel[cause.category] ?? cause.category.replaceAll("-", " "))}</span>{" "}
           {cause.label}: <span data-no-translate="true">{cause.contribution}</span>
         </div>
       ))}

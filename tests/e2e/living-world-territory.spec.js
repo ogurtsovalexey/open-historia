@@ -85,5 +85,10 @@ test("a living-world territorial offer remains pending until the addressed polit
   await expect(page.getByRole("complementary", { name: "History command center" })).toBeVisible({ timeout: 30_000 });
   await page.getByTestId("intent-nav-briefing").click();
   await expect(page.getByText(acceptedOutcome.label)).toBeVisible();
+  const timeChange = page.getByTestId(/causal-change-change:clock-/);
+  await timeChange.getByText("Почему?").click();
+  await expect(timeChange).toContainText("Прочее Подтверждённое продвижение времени");
+  await expect(timeChange).toContainText("Один календарный месяц");
+  expect(await timeChange.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBeTruthy();
   await request.delete(`/api/games/${gameId}`);
 });
