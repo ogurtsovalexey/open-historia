@@ -73,13 +73,19 @@ test('exports a validated, read-only revision and provider-provenance audit', ()
   assert.equal(audit.current.date, '1805-01-01');
   assert.equal(audit.replay.length, 3);
   assert.equal(audit.ledger.length, audit.replay.length);
+  assert.equal(audit.playerIntentEvidence.length, 1);
+  assert.deepEqual(audit.playerIntentEvidence[0].statuses, ['pending', 'confirmed']);
+  assert.match(audit.playerIntentEvidence[0].inputFingerprint, /^sha256:[a-f0-9]{64}$/);
+  assert.equal(audit.playerIntentEvidence[0].inputLength, 'Keep the frontier supplied.'.length);
   assert.match(audit.replayChecksum, /^sha256:[a-f0-9]{64}$/);
   assert.match(audit.auditChecksum, /^sha256:[a-f0-9]{64}$/);
   assert.deepEqual(audit.modelMetadata, [{
     role: 'utility', provider: 'codex-subscription', model: 'gpt-5.6-luna', effort: 'low',
   }]);
   assert.equal(JSON.stringify(audit).includes('must-not-be-persisted'), false);
+  assert.equal(JSON.stringify(audit).includes('Keep the frontier supplied.'), false);
   assert.equal(audit.privacy.rawPromptsOrResponsesIncluded, false);
+  assert.equal(audit.privacy.rawPlayerInputsIncluded, false);
 });
 
 test('rejects an unsafe game identifier before reading a save', () => {

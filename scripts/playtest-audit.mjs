@@ -103,6 +103,62 @@ function modelProvenance(revisions) {
   return metadata;
 }
 
+// Playtest reports need to prove which *kind* of player decision reached a
+// canonical revision, but raw player wording belongs in the ignored save
+// bundle just like provider traffic.  This compact trace is deliberately
+// semantic and one-way: it can be matched to an input held by the reviewer,
+// while it cannot reveal that input to a checked-in report.
+function playerIntentEvidence(revisions) {
+  const entries = new Map();
+  for (const revision of revisions) {
+    const intent = revision.playerIntent;
+    const sourceText = typeof intent?.sourceText === 'string' ? intent.sourceText : '';
+    if (!sourceText) continue;
+    const inputFingerprint = checksum({ sourceText });
+    const interpretationId = String(intent.interpretationId ?? 'unidentified');
+    const key = `${interpretationId}:${inputFingerprint}`;
+    const actionKinds = (intent.requestedActions ?? []).map((action) => ({
+      domain: action.domain ?? null,
+      scope: action.scope ?? null,
+      operationKind: action.operation?.kind ?? null,
+      pace: action.pace ?? null,
+      material: action.material === true,
+      status: action.status ?? null,
+      effectFamilies: [...(action.effectFamilies ?? [])].sort(),
+      targetEntityIds: [...(action.targetEntityIds ?? [])].sort(),
+      evidenceCount: (action.evidenceIds ?? []).length,
+    }));
+    const claimStatuses = (intent.claims ?? []).map((claim) => ({
+      status: claim.status ?? null,
+      evidenceCount: (claim.evidenceIds ?? []).length,
+    }));
+    const existing = entries.get(key);
+    const status = intent.status ?? 'none';
+    if (existing) {
+      if (!existing.statuses.includes(status)) existing.statuses.push(status);
+      existing.revisions.push(revision.sessionRevision);
+      continue;
+    }
+    entries.set(key, {
+      interpretationId,
+      inputFingerprint,
+      inputLength: sourceText.length,
+      firstSeen: {
+        sessionRevision: revision.sessionRevision,
+        date: revision.date,
+        playerDecisionIndex: revision.playerDecisionIndex,
+      },
+      statuses: [status],
+      actionKinds,
+      claimStatuses,
+      revisions: [revision.sessionRevision],
+    });
+  }
+  return [...entries.values()].sort((left, right) => (
+    left.firstSeen.sessionRevision.localeCompare(right.firstSeen.sessionRevision)
+  ));
+}
+
 export function buildPlaytestAudit({ gameId, dataDir = process.env.OH_DATA_DIR ?? path.join(ROOT, 'server', 'data') }) {
   const dataDirectory = path.resolve(dataDir);
   const gameDirectory = safeGameDirectory(dataDirectory, gameId);
@@ -149,10 +205,12 @@ export function buildPlaytestAudit({ gameId, dataDir = process.env.OH_DATA_DIR ?
     replayChecksum: checksum(replay),
     groundedSnapshots: revisions.map(({ sessionRevision, snapshot }) => ({ sessionRevision, ...snapshot })),
     ledger,
+    playerIntentEvidence: playerIntentEvidence(revisions),
     modelMetadata: modelProvenance(revisions),
     privacy: {
       rawPromptsOrResponsesIncluded: false,
-      note: 'Only sanitized provider/model/effort provenance and canonical session transitions are exported.',
+      rawPlayerInputsIncluded: false,
+      note: 'Only sanitized semantic intent evidence, provider/model/effort provenance and canonical session transitions are exported.',
     },
   };
   return { ...audit, auditChecksum: checksum(audit) };
