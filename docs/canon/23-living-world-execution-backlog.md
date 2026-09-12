@@ -1237,6 +1237,14 @@ the immutable session chain and exports revisions, grounded snapshots, ledgers,
 replay checksum and sanitized provider/model/effort metadata; it accepts no
 game-state mutation command.
 
+The audit additionally exports `playerIntentEvidence`: one privacy-safe entry
+per persisted interpretation, with a one-way fingerprint and length of the
+player input, observed pending/confirmed statuses, semantic operation kinds,
+selected entity IDs and evidence counts. It never exports raw player input,
+provider prompts or provider responses. Use it with the ignored raw revision
+bundle to prove the individual WP15 table rows; a ten-turn calendar replay
+without matching intent evidence is not proof of scripted-intention coverage.
+
 Any state corruption, accepted fake fact, unexplained material number, cross-era leak, required-AI silent fallback or non-replayable outcome fails the release gate.  Cosmetic defects may be recorded for follow-up only if the full loop remains understandable and operable.
 
 ## 21. Scenario audit details
