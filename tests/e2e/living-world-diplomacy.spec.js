@@ -278,5 +278,7 @@ test("the production shell sends and accepts a conflict settlement without fabri
   const advanced = await advancedResponse.json();
   expect(advanced.projection.situations.some((entry) => /Активный конфликт/.test(entry.title))).toBe(false);
   expect(advanced.projection.briefing.territoryEffects).toEqual(controlsBefore);
+  const acceptedPeace = advanced.projection.briefing.changes.find((entry) => entry.magnitude === "Принято");
+  expect(acceptedPeace.label).toMatch(/^Австрийская империя приняла предложение: мирное урегулирование между «Французская империя» и «Австрийская империя»/);
   await request.delete(`/api/games/${gameId}`);
 });

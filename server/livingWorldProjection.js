@@ -345,7 +345,12 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
   const proposalLabel = (proposal) => proposal.terms.map((term) => term.kind === 'territorial-cession'
     ? `${regionLabel(term.regionId)} → ${polityLabel(term.toPolityId)}`
     : term.kind === 'conflict-settlement'
-      ? phrase(locale, `settlement of ${labelOf(term.conflictId)}`, `мирное урегулирование ${labelOf(term.conflictId)}`)
+      ? (() => {
+        const conflict = state.conflicts.find((entry) => entry.conflictId === term.conflictId);
+        const attacker = conflict ? polityLabel(conflict.attackerPolityId) : labelOf(term.conflictId);
+        const defender = conflict ? polityLabel(conflict.defenderPolityId) : labelOf(term.conflictId);
+        return phrase(locale, `peace settlement between ${attacker} and ${defender}`, `мирное урегулирование между «${attacker}» и «${defender}»`);
+      })()
       : `${relationshipTypeLabel(term.relationshipTypeId, locale)}: ${term.participantPolityIds.map(polityLabel).join(', ')}`).join('; ');
   const territoryEffects = (last?.strategicRecords ?? [])
     .flatMap((record) => record.territorialTransitions ?? [])
