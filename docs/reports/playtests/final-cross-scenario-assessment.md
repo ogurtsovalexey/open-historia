@@ -32,6 +32,21 @@ forced every possible war, occupation, combat, peace, or territorial-transfer
 path; those remain covered by the dedicated deterministic and cross-era tests,
 not fabricated UI outcomes.
 
+## Supplemental live territorial-response path (2026-09-12)
+
+A separate fresh French campaign (`1805-2`) was played through the visible
+Russian UI with Codex subscription `gpt-5.6-terra` at `medium` effort for both
+the Utility and Strategic roles. France offered Paris and Seine, then Corsica,
+to Austria through model-interpreted typed territorial offers. Austria's
+Strategic AI rejected both frozen offers; no control changed, as required. The
+second response was visibly rendered as: “Австрийская империя отклонила
+предложение: Корсика → Австрийская империя.” This found and fixed the missing
+post-response UI result and dynamic-term localization. The read-only audit at
+`1805-07-01`, turn `6`, player decision `2` has checksum
+`sha256:9ba3d9006c3b70a40b806060300d566801fa9a47fef96a9eee191b0ffa66425d`.
+It is evidence of the legal model-mediated offer/response path, not a claim
+that the recipient accepted or that territorial transfer occurred.
+
 The live shell was additionally opened at a 390 px viewport after the
 Napoleonic rerun: all six primary tabs, the three-month advance control, and
 the Orders text entry remained present in the accessibility tree, and the
