@@ -90,5 +90,9 @@ test("a living-world territorial offer remains pending until the addressed polit
   await expect(timeChange).toContainText("Прочее Подтверждённое продвижение времени");
   await expect(timeChange).toContainText("Один календарный месяц");
   expect(await timeChange.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBeTruthy();
+  const [shellBox, timeChangeBox] = await Promise.all([
+    page.getByTestId("intent-first-shell").boundingBox(), timeChange.boundingBox(),
+  ]);
+  expect(timeChangeBox.x + timeChangeBox.width).toBeLessThanOrEqual(shellBox.x + shellBox.width);
   await request.delete(`/api/games/${gameId}`);
 });

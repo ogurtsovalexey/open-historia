@@ -17,6 +17,7 @@
   backdrop-filter: blur(14px);
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
 }
+.oh-intent-shell > * { box-sizing: border-box; min-width: 0; }
 
 .oh-intent-nav {
   display: grid;
@@ -46,14 +47,14 @@
 }
 
 .oh-intent-nav-icon { display: block; font-size: 1rem; margin-bottom: 0.15rem; }
-.oh-intent-body { min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 1rem; }
-.oh-intent-section { display: grid; gap: 0.9rem; }
+.oh-intent-body { min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 1rem; }
+.oh-intent-section { display: grid; min-width: 0; gap: 0.9rem; }
 .oh-intent-section h2, .oh-intent-section h3, .oh-intent-section p { margin: 0; }
 .oh-intent-eyebrow { color: var(--intent-accent); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; }
 .oh-intent-muted { color: #aeb9c9; line-height: 1.45; }
-.oh-intent-card { padding: 0.85rem; background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 13px; }
-.oh-intent-card-grid { display: grid; gap: 0.65rem; }
-.oh-intent-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
+.oh-intent-card { min-width: 0; padding: 0.85rem; background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 13px; }
+.oh-intent-card-grid { display: grid; min-width: 0; gap: 0.65rem; }
+.oh-intent-card-header { display: flex; min-width: 0; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
 .oh-intent-card-header > :first-child { min-width: 0; overflow-wrap: anywhere; }
 .oh-intent-value { min-width: 0; max-width: 46%; color: #fff8e8; font-weight: 650; overflow-wrap: anywhere; text-align: right; }
 .oh-intent-tag { display: inline-flex; width: max-content; padding: 0.2rem 0.45rem; border-radius: 999px; color: #dbe6f5; background: rgba(148, 163, 184, 0.16); font-size: 0.7rem; }
