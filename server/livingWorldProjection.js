@@ -311,8 +311,11 @@ export function buildIntentFirstProjection({ session, playerPolityId, locale = '
     .filter(Boolean);
   const changes = last?.kind === 'world-month-advanced' ? [{
     changeId: `change:clock-${state.turn}`,
-    magnitude: `Now ${state.month}`,
-    label: `Time advanced through ${last.submonths?.length ?? 1} deterministic monthly ${((last.submonths?.length ?? 1) === 1) ? 'boundary' : 'boundaries'}`,
+    magnitude: phrase(locale, `Now ${state.month}`, `Теперь ${state.month}`),
+    label: phrase(locale,
+      `Time advanced through ${last.submonths?.length ?? 1} deterministic monthly ${((last.submonths?.length ?? 1) === 1) ? 'boundary' : 'boundaries'}`,
+      `Время продвинулось через ${last.submonths?.length ?? 1} детерминированн${(last.submonths?.length ?? 1) === 1 ? 'ую месячную границу' : 'ые месячные границы'}`,
+    ),
     authority: 'canonical',
     evidenceIds: groundedEvidence([last.clock?.evidenceId], visible, snapshotEvidence),
     causes: [{ category: 'other', label: 'Confirmed time advance', contribution: 'One calendar month' }],
